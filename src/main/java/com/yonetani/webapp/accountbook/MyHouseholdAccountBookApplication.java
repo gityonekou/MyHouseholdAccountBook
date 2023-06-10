@@ -5,7 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * マイ家計簿用SpringBootプロジェクトのmainです
- * @author user
+ * 
+ * @author Kouki Yonetani
  *
  */
 @SpringBootApplication
