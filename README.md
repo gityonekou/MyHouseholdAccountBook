@@ -5,7 +5,7 @@ SpringBootを使って作成しています。<br>
 <br>
 ・SpringBoot:3.0.7<br>
 ・Spring Security:6.0.7<br>
-・Mybatis:???<br>
+・Mybatis:2.2.2<br>
 
 コーディング前の動作確認用サンプルプログラムは以下にて作成してからこちらに実装しています。
 「SpringWebSample」

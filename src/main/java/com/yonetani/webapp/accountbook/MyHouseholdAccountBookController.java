@@ -1,5 +1,5 @@
 /**
- * マイ家計簿アクセス時のindexとログイン画面表示、ログイン後のトップページを表示するコントローラーです。
+ * マイ家計簿アクセス時のindexとログイン画面を表示するコントローラーです。
  *
  *------------------------------------------------
  * 更新履歴
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 /**
  *<pre>
- * マイ家計簿アクセス時のindexとログイン画面表示、ログイン後のトップページを表示するコントローラーです。
+ * マイ家計簿アクセス時のindexとログイン画面を表示するコントローラーです。
  *
  *</pre>
  *
@@ -47,17 +47,5 @@ public class MyHouseholdAccountBookController {
 	@GetMapping("/login/")
 	public String getLogin() {
 		return "login";
-	}
-	
-	/**
-	 *<pre>
-	 * トップページメニュー表示のGet要求時のマッピングです。
-	 *</pre>
-	 * @return
-	 *
-	 */
-	@GetMapping("/myhacbook/topmenu/")
-	public String getTopMenu() {
-		return "top/topmenu";
 	}
 }

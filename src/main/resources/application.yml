@@ -35,9 +35,9 @@ spring:
       # (DB初期化用SQL↑実行を)常に行う.EMBEDDED=h2dbのとき、の意味. ALWAYSは無条件
       mode: embedded
 
-  # MyBatisを使用する場合は以下は不要？？ただ、ひかりのコネクションプールが使えないのはどうするか。。
+  # MyBatisを使用する場合は以下は不要？？
   #jpa
-  jpa:
-    #data.sqlをschema.sqlの後に読み込むように設定
-    defer-datasource-initialization: true
+  #jpa:
+  #  #data.sqlをschema.sqlの後に読み込むように設定
+  #  defer-datasource-initialization: true
     

@@ -33,6 +33,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		<!-- ヘッダー部のレイアウト分割に使用します -->
+		<dependency>
+			<groupId>nz.net.ultraq.thymeleaf</groupId>
+			<artifactId>thymeleaf-layout-dialect</artifactId>
+		</dependency>
 		<!-- org.thymeleaf.extras はhtmlでxmlns:secを有効にするために設定します -->
 		<!-- 対象ソースはトップメニューでの管理者ボタンの表示制御部分 -->
 		<dependency>

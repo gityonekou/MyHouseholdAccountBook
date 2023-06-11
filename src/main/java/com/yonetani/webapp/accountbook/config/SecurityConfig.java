@@ -30,7 +30,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-public class MyHouseholdAccountBookSecurityConfig {
+public class SecurityConfig {
 	
 	/**
 	 *<pre>

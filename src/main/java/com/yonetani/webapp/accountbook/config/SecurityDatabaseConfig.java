@@ -32,7 +32,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Configuration
 @RequiredArgsConstructor
-public class MyHouseholdAccountBookSecurityDatabaseConfig {
+public class SecurityDatabaseConfig {
 	
 	// DBアクセス用データソース
 	private final DataSource datasource;
