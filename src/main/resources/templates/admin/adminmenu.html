@@ -11,6 +11,7 @@
 <body>
 	<!--/* ヘッダー */-->
 	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+	
 	<!--/* ボディ部 */-->
 	<h2>管理者メニュー</h2>
 	<div class="mb-3">
@@ -18,5 +19,9 @@
 		<label for="text1" class="form-label"><a th:href="@{/myhacbook/admin/useradd}">ユーザ登録</a><br>
 		</label>
 	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	
 </body>
 </html>

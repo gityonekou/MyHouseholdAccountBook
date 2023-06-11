@@ -39,7 +39,7 @@
 			<artifactId>thymeleaf-layout-dialect</artifactId>
 		</dependency>
 		<!-- org.thymeleaf.extras はhtmlでxmlns:secを有効にするために設定します -->
-		<!-- 対象ソースはトップメニューでの管理者ボタンの表示制御部分 -->
+		<!-- 対象ソースはヘッダー部での管理者ボタンの表示制御部分など -->
 		<dependency>
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-springsecurity6</artifactId>

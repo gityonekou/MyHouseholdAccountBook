@@ -12,15 +12,24 @@
 	<header th:fragment="header">
 		<nav class="navbar navbar-expand-sm navbar-light bg-light" th:fragment="header">
 			<div class="container-fluid">
+				<span class="navbar-brand mb-0 h1">テストユーザさん家計簿</span>
 				<div class="collapse navbar-collapse" id="navbarSupportedContent">
 					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
-						<!--/* 管理者ロールの場合 */-->
-						<li class="nav-item" sec:authorize="hasRole('ADMIN')">
-							<a class="nav-link active" aria-current="page" th:href="@{/myhacbook/admin/}">管理者ページ</a>
-						</li>
 						<!--/* ユーザロールの場合 */-->
 						<li class="nav-item" sec:authorize="hasRole('USER')">
-							<a class="nav-link active" aria-current="page" th:href="@{/myhacbook/topmenu/}">トップページ</a>
+							<a class="nav-link active" aria-current="page" th:href="@{/myhacbook/topmenu/}">トップページへ</a>
+						</li>
+						<!--/* 管理者ロールの場合 */-->
+						<li class="nav-item dropdown" sec:authorize="hasRole('ADMIN')">
+							<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">管理者メニュー</a>
+							<ul class="dropdown-menu">
+								<li><a class="dropdown-item" th:href="@{/myhacbook/admin/useradd}">ユーザ登録</a></li>
+								<li><a class="dropdown-item" href="#">メニュー2</a></li>
+								<li><a class="dropdown-item" href="#">メニュー3</a></li>
+								<li><a class="dropdown-item" href="#">DBデータ＊＊など。。。</a></li>
+								<li><hr class="dropdown-divider"></li>
+								<li><a class="dropdown-item" th:href="@{/myhacbook/admin/}">管理者メニューはいらなくなるか？？</a></li>
+							</ul>
 						</li>
 					</ul>
 					<form class="d-flex" method="post" th:action="@{/logout/}">

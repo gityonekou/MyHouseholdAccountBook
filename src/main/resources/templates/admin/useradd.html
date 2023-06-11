@@ -11,10 +11,14 @@
 <body>
 	<!--/* ヘッダー */-->
 	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+	
 	<!--/* ボディ部 */-->
 	<h2>マイ家計簿ユーザ登録画面</h2>
 	<div class="mb-3">
 		<label for="text1" class="form-label">工事中：</label>
 	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
 </body>
 </html>
