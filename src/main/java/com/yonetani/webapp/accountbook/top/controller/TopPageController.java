@@ -13,6 +13,7 @@ package com.yonetani.webapp.accountbook.top.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  *<pre>
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  *
  */
 @Controller
+@RequestMapping("/myhacbook/topmenu/")
 public class TopPageController {
 	
 	/**
@@ -36,7 +38,7 @@ public class TopPageController {
 	 * @return
 	 *
 	 */
-	@GetMapping("/myhacbook/topmenu/")
+	@GetMapping
 	public String getTopMenu() {
 		return "top/topmenu";
 	}
