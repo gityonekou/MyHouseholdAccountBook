@@ -55,7 +55,7 @@ public class SecurityConfig {
 			.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
 			// /indexはアクセス制限をかけない
 			.requestMatchers("/").permitAll()
-			// h2コンソールへのアクセス権限
+			// h2コンソールへのアクセス権限(ただ、permitAll()に変更してもDBコネクト後に403になっちゃいます。。なぜ。。)
 			.requestMatchers("/h2-console/**").hasRole("ADMIN")
 			// 管理者ページへのアクセス権限
 			.requestMatchers("/myhacbook/admin/**").hasRole("ADMIN")

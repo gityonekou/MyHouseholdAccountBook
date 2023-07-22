@@ -12,12 +12,59 @@
 	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
 	
 	<!--/* ボディ部 */-->
-	<h2>テストユーザさん家計簿メニュー</h2>
-	<div class="mb-3">
-		<label for="text1" class="form-label">家計簿参照</label>
-		<label for="text1" class="form-label">家計簿登録</label>
-		<label for="text1" class="form-label"><a th:href="@{/sample1/}">家計簿登録</a><br>
-		</label>
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">最近～今月の支出</h5>
+				<p class="card-text">コメントがある場合はこの部分に表示される。ない場合は何も表示されない</p>
+				<ul class="list-group">
+					<li class="list-group-item">今月トータル支出額:　999,999円</li>
+					<li class="list-group-item">今週の食費合計:　999,999円</li>
+					<li class="list-group-item">前月の今時点の生活費支出額は999,999円でした。</li>
+					<li class="list-group-item">今月の食費余り額合計:　999,999円</li>
+					<li class="list-group-item">今年の合計:　999,999円</li>
+					<li class="list-group-item">■表示する金額の種類を精査すること■</li>
+				</ul>
+			</div>
+			<div class="card-body">
+				<aside class="mb-3 px-2">
+				<h5 class="card-title border-bottom">メニュー</h5>
+				<nav class="small" id="toc">
+					<ul class="list-unstyled">
+						<li class="my-2">
+							<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+								aria-expanded="false" data-bs-target="#kakeibo-collapse" aria-controls="kakeibo-collapse">▼家計簿</button>
+							<ul class="list-unstyled ps-3 collapse" id="kakeibo-collapse">
+								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#typography">・買い物</a></li>
+								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#images">・家計簿参照・更新</a></li>
+								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#figures">・締め処理</a></li>
+							</ul>
+						</li>
+						<li class="my-2">
+							<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+								aria-expanded="false" data-bs-target="#kakeibo-info-collapse" aria-controls="kakeibo-info-collapse">▼家計簿情報管理</button>
+							<ul class="list-unstyled ps-3 collapse" id="kakeibo-info-collapse">
+								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#overview">・商品</a></li>
+								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#overview">・お店</a></li>
+								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#overview">・テンプレート</a></li>
+								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#overview">・イベント</a></li>
+							</ul>
+						</li>
+						<li class="my-2">
+							<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+								aria-expanded="false" data-bs-target="#syouhi-collapse" aria-controls="syouhi-collapse">▼在庫管理</button>
+							<ul class="list-unstyled ps-3 collapse" id="syouhi-collapse">
+								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#disabled-forms">・在庫管理</a></li>
+								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#overview">・消費登録</a></li>
+								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#disabled-forms">・消費参照</a></li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+				</aside>
+			</div>
+			
+		</div>
 	</div>
 	
 	<!--/* フッター共通jsのインクルード) */-->

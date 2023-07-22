@@ -10,10 +10,13 @@
 </head>
 <body>
 	<header th:fragment="header">
-		<nav class="navbar navbar-expand-sm navbar-light bg-light" th:fragment="header">
+		<nav class="navbar navbar-expand-lg navbar-light bg-light">
 			<div class="container-fluid">
 				<span class="navbar-brand mb-0 h1">テストユーザさん家計簿</span>
-				<div class="collapse navbar-collapse" id="navbarSupportedContent">
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeaderContent" aria-controls="navbarHeaderContent" aria-expanded="false" aria-label="ヘッダーメニュー">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarHeaderContent">
 					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
 						<!--/* ユーザロールの場合 */-->
 						<li class="nav-item" sec:authorize="hasRole('USER')">

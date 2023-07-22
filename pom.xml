@@ -33,6 +33,17 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 		<!-- ヘッダー部のレイアウト分割に使用します -->
 		<dependency>
 			<groupId>nz.net.ultraq.thymeleaf</groupId>
@@ -44,34 +55,19 @@
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
 		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
-		</dependency>
+		<!-- lombokを使用 -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
 		<!-- MyBatisを使用 -->
 		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>
 			<artifactId>mybatis-spring-boot-starter</artifactId>
-			<version>2.2.2</version>
+			<version>3.0.2</version>
 		</dependency>
+		<!-- MyBatisでthymeleafなsqlを使用可にする -->
 		<dependency>
 			<groupId>org.mybatis.scripting</groupId>
 			<artifactId>mybatis-thymeleaf</artifactId>
@@ -87,11 +83,18 @@
 				 テスト以外で使用する場合はコメントアウトで -->
 			<scope>runtime</scope>
 		</dependency>
-<!--		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
-		</dependency>
--->
+		<!-- Spring Securityのテストパッケージ(Test実装時にコメントアウト外してセキュリティ関連のテストをする -->
+<!--		<dependency> -->
+<!--			<groupId>org.springframework.security</groupId> -->
+<!--			<artifactId>spring-security-test</artifactId> -->
+<!--			<scope>test</scope> -->
+<!--		</dependency> -->
+<!--	jpaは本アプリでは使用しない予定 -->
+<!--		<dependency> -->
+<!--			<groupId>org.springframework.boot</groupId> -->
+<!--			<artifactId>spring-boot-starter-data-jpa</artifactId> -->
+<!--		</dependency> -->
+
 	</dependencies>
 
 	<build>
