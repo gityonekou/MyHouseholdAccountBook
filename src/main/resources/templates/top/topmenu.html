@@ -27,7 +27,6 @@
 				</ul>
 			</div>
 			<div class="card-body">
-				<aside class="mb-3 px-2">
 				<h5 class="card-title border-bottom">メニュー</h5>
 				<nav class="small" id="toc">
 					<ul class="list-unstyled">
@@ -35,17 +34,18 @@
 							<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
 								aria-expanded="false" data-bs-target="#kakeibo-collapse" aria-controls="kakeibo-collapse">▼家計簿</button>
 							<ul class="list-unstyled ps-3 collapse" id="kakeibo-collapse">
-								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#typography">・買い物</a></li>
-								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#images">・家計簿参照・更新</a></li>
+								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" th:href="@{/myhacbook/accountregist/shoppingregist/}">・買い物登録</a></li>
+								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" th:href="@{/myhacbook/accountinquiry/accountmonth/}">・家計簿参照・更新</a></li>
 								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#figures">・締め処理</a></li>
 							</ul>
 						</li>
 						<li class="my-2">
 							<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
-								aria-expanded="false" data-bs-target="#kakeibo-info-collapse" aria-controls="kakeibo-info-collapse">▼家計簿情報管理</button>
+								aria-expanded="false" data-bs-target="#kakeibo-info-collapse" aria-controls="kakeibo-info-collapse">▼情報管理</button>
 							<ul class="list-unstyled ps-3 collapse" id="kakeibo-info-collapse">
-								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#overview">・商品</a></li>
-								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#overview">・お店</a></li>
+								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" th:href="@{/myhacbook/managebaseinfo/shoppingiteminfo/initload/}">・商品</a></li>
+								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" th:href="@{/myhacbook/managebaseinfo/shopinfo/initload/}">・お店</a></li>
+								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" th:href="@{/myhacbook/managebaseinfo/expenditeminfo/initload/}">・支出項目</a></li>
 								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#overview">・テンプレート</a></li>
 								<li><a class="d-inline-flex align-items-center rounded text-decoration-none" href="#overview">・イベント</a></li>
 							</ul>
@@ -61,7 +61,6 @@
 						</li>
 					</ul>
 				</nav>
-				</aside>
 			</div>
 			
 		</div>

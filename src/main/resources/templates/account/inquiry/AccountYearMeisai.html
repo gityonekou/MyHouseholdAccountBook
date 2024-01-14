@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<title>マイ家計簿参照・更新</title>
+</head>
+<body>
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">マイ家計簿(年間収支(明細))</h5>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
+			</div>
+			<div class="card-body">
+				<nav>
+					<div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+						<form class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountmonth/}">
+							<button class="nav-link" type="submit">各月の収支</button>
+							<input type="hidden" name="targetYearMonth" th:value="${targetYearMonth}" />
+						</form>
+						<button class="nav-link active" id="nav-nenkan-syuusi-tab" data-bs-toggle="tab" data-bs-target="#nav-nenkan-syuusi" type="button" role="tab" aria-controls="nav-nenkan-syuusi" aria-selected="true" disabled>年間収支</button>
+						<form class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/paymentconfirmation/}">
+							<button class="nav-link" type="submit">支払い確認</button>
+							<input type="hidden" name="targetYearMonth" th:value="${targetYearMonth}" />
+						</form>
+					
+					</div>
+				</nav>
+				<div class="tab-content" id="nav-tabContent">
+					<!-- 各月収支タブエリア -->
+					<div class="tab-pane fade" id="nav-kakutuki-syuusi" role="tabpanel" aria-labelledby="nav-kakutuki-syuusi-tab">
+						<p class="px-3">これは、<strong>各月の収支</strong>に関連付けられたコンテンツのプレースホルダーコンテンツ。[このタブは常に表示されない]</p>
+					</div>
+					
+					<!-- 年間収支タブエリア -->
+					<div class="tab-pane fade show active" id="nav-nenkan-syuusi" role="tabpanel" aria-labelledby="nav--nenkan-syuusi-tab">
+						
+						<div class="mb-3">
+							<button class="btn btn-outline-primary" id="account-year-mage-btn" type="button">年間収支(マージ)</button>
+							<button class="btn btn-primary" id="account-year-meisai-btn" type="button" disabled>年間収支(明細)</button>
+							<form name="AccountYearMage" class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountyear/mage/}">
+								<input type="hidden" name="targetYear" th:value="${targetYear}" />
+							</form>
+						</div>
+					
+						<!-- 表示対象の年切り替えボタンエリア -->
+						<p class="card-text"><button class="btn btn-outline-primary" id="account-year-meisai-before-btn" type="button">＜</button>&emsp;■ <span th:text="${targetYear}"></span>年度 ■&emsp;<button class="btn btn-outline-primary" id="account-year-meisai-next-btn" type="button">＞</button></p>
+						<form name="AccountYearMeisaiBefore" class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountyear/meisai/}">
+							<input type="hidden" name="targetYear" th:value="${beforeYear}" />
+						</form>
+						<form name="AccountYearMeisaiNext" class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountyear/meisai/}">
+							<input type="hidden" name="targetYear" th:value="${nextYear}" />
+						</form>
+					
+						<!-- 収支(マージ)表示エリア -->
+						<th:block th:if="${#lists.size(meisaiInquiryList)}>0">
+						<table class="table table-sm table-borderless">
+							<thead><tr class="table-secondary">
+								<th scope="col">年月</th>
+								<th scope="col">事業経費</th>
+								<th scope="col">固定(非課税)</th>
+								<th scope="col">固定(課税)</th>
+								<th scope="col">衣類住居設備</th>
+								<th scope="col">飲食日用品</th>
+								<th scope="col">趣味娯楽</th>
+								<th scope="col">支出B合計</th>
+								<th scope="col">支出合計</th>
+								<th scope="col">収支</th>
+							</tr></thead>
+							<tbody>
+								<tr th:each="item : ${meisaiInquiryList}">
+									<td><span th:text="${item.month}"></span>月</td>
+									<td><span th:text="${item.jigyouKeihiKingaku}"></span>円</td>
+									<td><span th:text="${item.koteiHikazeiKingaku}"></span>円</td>
+									<td><span th:text="${item.koteiKazeiKingaku}"></span>円</td>
+									<td><span th:text="${item.iruiJyuukyoSetubiKingaku}"></span>円</td>
+									<td><span th:text="${item.insyokuNitiyouhinKingaku}"></span>円</td>
+									<td><span th:text="${item.syumiGotakuKingaku}"></span>円</td>
+									<td><span th:text="${item.sisyutuKingakuB}"></span>円</td>
+									<td><span th:text="${item.sisyutuKingaku}"></span>円</td>
+									<td><span th:text="${item.syuusiKingaku}"></span>円</td>
+								</tr>
+								<tr class="table-success">
+									<td>合計</td>
+									<td><span th:text="${jigyouKeihiKingakuGoukei}"></span>円</td>
+									<td><span th:text="${koteiHikazeiKingakuGoukei}"></span>円</td>
+									<td><span th:text="${koteiKazeiKingakuGoukei}"></span>円</td>
+									<td><span th:text="${iruiJyuukyoSetubiKingakuGoukei}"></span>円</td>
+									<td><span th:text="${insyokuNitiyouhinKingakuGoukei}"></span>円</td>
+									<td><span th:text="${syumiGotakuKingakuGoukei}"></span>円</td>
+									<td><span th:text="${sisyutuKingakuBGoukei}"></span>円</td>
+									<td><span th:text="${sisyutuKingakuGoukei}"></span>円</td>
+									<td><span th:text="${syuusiKingakuGoukei}"></span>円</td>
+								</tr>
+							</tbody>
+						</table>
+						</th:block>
+					</div>
+					
+					<!-- 支払い確認タブエリア -->
+					<div class="tab-pane fade" id="nav-siharai" role="tabpanel" aria-labelledby="nav-siharai-tab">
+						<p class="px-3">これは、<strong>支払い確認</strong>に関連付けられたコンテンツのプレースホルダーコンテンツ。[このタブは常に表示されない]</p>
+					</div>
+					
+				</div>
+			</div>
+			<div class="card-body">
+				<button class="btn btn-outline-primary" id="shopping-add-btn" type="button">買い物登録</button>
+				<button class="btn btn-outline-primary" id="account-year-detai-btn" type="button">詳細表示</button>
+				<button class="btn btn-outline-primary" type="button">更新</button>
+				<form  name="ShoppinAdd" class="d-flex" method="post" th:action="@{/myhacbook/accountregist/shoppingregist/}">
+					<input type="hidden" name="target-month" value="202308" />
+				</form>
+				<form name="AccountYearDetail" class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountdetail/year/}">
+					<input type="hidden" name="target-year" value="2023" />
+				</form>
+				<form name="accountupdate" class="d-flex" method="post" th:action="@{/myhacbook/account/accountupdate/}">
+					<input type="hidden" name="target" value="202308" />
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	
+	<!--/* 家計簿共通JavaScript */-->
+	<script type="text/javascript" src="/js/AccountCommonScript.js"></script>
+	
+</body>
+</html>

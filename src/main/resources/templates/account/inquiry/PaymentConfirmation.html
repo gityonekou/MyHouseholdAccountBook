@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<title>マイ家計簿参照・更新</title>
+</head>
+<body>
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">マイ家計簿(支払い確認)</h5>
+				<p class="card-text">何かのメッセージがある場合はここに表示</p>
+			</div>
+			<div class="card-body">
+				<nav>
+					<div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+						<form class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountmonth/}">
+							<button class="nav-link" type="submit">各月の収支</button>
+							<input type="hidden" name="targetYearMonth" value="202308" />
+						</form>
+						<form class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountyear/meisai/}">
+							<button class="nav-link" type="submit">年間収支</button>
+							<input type="hidden" name="target-year" value="2023" />
+						</form>
+						<button class="nav-link active" id="nav-siharai-tab" data-bs-toggle="tab" data-bs-target="#nav-siharai" type="button" role="tab" aria-controls="nav-siharai" aria-selected="true" disabled>支払い確認</button>
+					</div>
+				</nav>
+				<div class="tab-content" id="nav-tabContent">
+					<!-- 各月収支タブエリア -->
+					<div class="tab-pane fade" id="nav-kakutuki-syuusi" role="tabpanel" aria-labelledby="nav-kakutuki-syuusi-tab">
+						<p class="px-3">これは、<strong>各月の収支</strong>に関連付けられたコンテンツのプレースホルダーコンテンツ。[このタブは常に表示されない]</p>
+					</div>
+					<!-- 年間収支タブエリア -->
+					<div class="tab-pane fade" id="nav-nenkan-syuusi" role="tabpanel" aria-labelledby="nav--nenkan-syuusi-tab">
+						<p class="px-3">これは、<strong>年間収支</strong>に関連付けられたコンテンツのプレースホルダーコンテンツ。[このタブは常に表示されない]</p>
+					</div>
+					<!-- 支払い確認タブエリア -->
+					<div class="tab-pane fade show active" id="nav-siharai" role="tabpanel" aria-labelledby="nav-siharai-tab">
+						<p class="px-3">これは、<strong>支払い確認</strong>に関連付けられたコンテンツのプレースホルダーコンテンツ。<br>
+						当月、翌月のクレカ支払額、現金出金額、各銀行口座での引き落とし額が確認できるようにする。<br>
+						給料入金口座からどの銀行口座にいくら振込、または食費用・コンビニ支払い用にいくら現金を引き出す必要があるかを確認する</p>
+					</div>
+					
+				</div>
+			</div>
+			<div class="card-body">
+				<button class="btn btn-outline-primary" type="button">買い物登録</button>
+				<button class="btn btn-outline-primary" type="button">詳細表示</button>
+				<button class="btn btn-outline-primary" type="button">更新</button>
+				<form  name="shoppinadd" class="d-flex" method="post" th:action="@{/myhacbook/accountregist/shoppingregist/}">
+					<input type="hidden" name="target" value="202308" />
+				</form>
+				<form name="accountdetail" class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountdetail/month/}">
+					<input type="hidden" name="target" value="202308" />
+				</form>
+				<form name="accountupdate" class="d-flex" method="post" th:action="@{/myhacbook/account/accountupdate/}">
+					<input type="hidden" name="target" value="202308" />
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	
+	<!--/* 家計簿共通JavaScript */-->
+	<script type="text/javascript" src="/js/AccountCommonScript.js"></script>
+	
+</body>
+</html>

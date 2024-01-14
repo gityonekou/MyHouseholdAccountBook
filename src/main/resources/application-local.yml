@@ -1,0 +1,80 @@
+# Webアプリケーション設定
+# ローカルテスト環境用のWebアプリケーション設定です。
+# 環境変数に「SPRING_PROFILES_ACTIVE=local」を追加して実行してください。
+# 詳細はhttps://nainaistar.hatenablog.com/entry/2020/12/15/083000を参照
+
+# 接続先ポート番号:ローカルではデフォルト(省略可)
+#server:
+#  port: 8080
+#
+# Spring設定
+spring:
+  # H2コンソールを有効化(本番環境では無効にすればよい)
+  # ちなみに、開発者ツールを取り込んでいる場合は設定不要(デフォルトでtrue??)
+  #h2:
+  #  console:
+  #    enabled: true
+  #    
+  # DB設定
+  
+  datasource:
+    # コネクションライブラリにHikariCP（ヒカリシーピー）を使う
+    type: com.zaxxer.hikari.HikariDataSource
+    # 利用するドライバ、H2を使う場合はこの値で固定
+    driver-class-name: org.h2.Driver
+    # インメモリで使い、データベース名はtestdbとする
+    # url: jdbc:h2:mem:testdb
+    url: jdbc:h2:mem:testdb;MODE=MYSQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    hikari:
+      pool-name: ConnectionPool
+      leak-detection-threshold: 5000
+      maximum-pool-size: 10
+      minimum-idle: 5
+      username: sa
+      password: sa
+      driver-class-name: org.h2.Driver
+
+  # sql読み込み先
+  sql:
+    init:
+      schema-locations:
+        - classpath:sql/initsql/schema.sql
+        - classpath:org/springframework/security/core/userdetails/jdbc/users.ddl
+      data-locations:
+        - classpath:sql/initsql/data.sql
+      # (DB初期化用SQL↑実行を)常に行う.EMBEDDED=h2dbのとき、の意味. ALWAYSは無条件
+      mode: embedded
+
+  # MyBatisを使用する場合は以下は不要？？
+  #jpa
+  #jpa:
+  #  #data.sqlをschema.sqlの後に読み込むように設定
+  #  defer-datasource-initialization: true
+    
+  #サーブレット設定
+  servlet:
+    multipart:
+      #ファイルアップロードサイズ(未指定の場合のデフォルト値1M)
+      max-file-size: 2MB  
+      
+# ログ出力設定
+logging:
+  file:
+    name: C:/develop/EclipseDevelop/app_log/MyHouseholdAccountBook.log
+  level:
+    org:
+      springframework: info
+    com:
+      zaxxer:
+        hikari: warn
+      yonetani:
+        webapp:
+          accountbook: trace
+    #SQLロギング出力の設定
+    jdbc:
+      sqlonly: info
+      resultsettable: info
+      connection: off
+      sqltiming: off
+      audit: off
+      resultset: off

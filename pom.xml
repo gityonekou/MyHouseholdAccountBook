@@ -11,6 +11,7 @@
 	<groupId>com.yonetani.webapp</groupId>
 	<artifactId>MyHouseholdAccountBook</artifactId>
 	<version>1.0.0-Bata</version>
+	<packaging>jar</packaging>
 	<name>MyHouseholdAccountBook</name>
 	<description>マイ家計簿です(spring boot版)</description>
 	<properties>
@@ -73,16 +74,21 @@
 			<artifactId>mybatis-thymeleaf</artifactId>
 			<version>1.0.4</version>
 		</dependency>
-
+<!-- テスト環境用DB  -->
 		<!-- H2データベースを使用 -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
-			<!-- <version>2.1.214</version> -->
-			<!-- テストだけで使用するのでスコープはテストに設定しています。
-				 テスト以外で使用する場合はコメントアウトで -->
 			<scope>runtime</scope>
 		</dependency>
+
+<!-- 本番環境用DB -->
+<!--		<dependency> -->
+<!-- 			<groupId>org.mariadb.jdbc</groupId> -->
+<!--			<artifactId>mariadb-java-client</artifactId> -->
+<!--			<scope>runtime</scope> -->
+<!--		</dependency> -->
+		
 		<!-- Spring Securityのテストパッケージ(Test実装時にコメントアウト外してセキュリティ関連のテストをする -->
 <!--		<dependency> -->
 <!--			<groupId>org.springframework.security</groupId> -->
@@ -110,6 +116,13 @@
 						</exclude>
 					</excludes>
 				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+				xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<title>マイ家計簿管理者メニュー</title>
+</head>
+<body>
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+	
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">ベース情報管理</h5>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
+			</div>
+			<!-- ベーステーブルファイル登録form -->
+			<div class="card-body">
+				<form method="post" th:action="@{/myhacbook/admin/uploadbaseinfo/}" enctype="multipart/form-data" th:object="${baseInfoFileForm}">
+					<div class="mb-3">
+						<label for="baseInfoFile" class="form-label">ファイルアップロード(ベース情報データ)</label>
+	 					<input type="file" class="form-control" th:field="*{baseInfoFile}">
+	 					<p class="invalid-feedback" th:errors="*{baseInfoFile}"></p>
+					</div>
+					<div class="mb-3">
+						<button class="btn btn-primary" type="submit">登録</button>
+					</div>
+					<div class="mb-3">
+						以下の一覧のベース情報を登録可能です。
+					</div>
+				</form>
+			</div>
+			<!-- ベーステーブル一覧表示エリア -->
+			<div class="card-body">
+				<h5 class="card-title">ベーステーブル一覧</h5>
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item list-group-item-secondary">ベーステーブル名&emsp;：データ件数&emsp;【詳細参照】&emsp;⇒&emsp;テーブル名</li>
+					<li class="list-group-item list-group-item-action">SISYUTU_ITEM_BASE_TABLE&emsp;：<span th:text="${countSisyutuItemBaseTable}"></span>件&emsp;<a th:href="@{/myhacbook/admin/baseinfodetail(target=${sisyutuItemBaseTableName})}">【詳細参照】</a>&emsp;⇒&emsp;支出項目テーブル(SISYUTU_ITEM_TABLE)</li>
+	 				<li class="list-group-item list-group-item-action">SHOP_BASE_TABLE&emsp;：<span th:text="${countShopBaseTable}"></span>件&emsp;<a th:href="@{/myhacbook/admin/baseinfodetail(target=${shopBaseTableName})}">【詳細参照】</a>&emsp;⇒&emsp;店舗テーブル(SHOP_TABLE)</li>
+					<li class="list-group-item list-group-item-action">CODE_TABLE(コードテーブル)&emsp;：<span th:text="${countCodeTable}"></span>件&emsp;<a th:href="@{/myhacbook/admin/baseinfodetail(target=${codeTableName})}">【詳細参照】</a></li>
+				</ul>
+			</div>
+			
+		</div>
+	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+</body>
+</html>

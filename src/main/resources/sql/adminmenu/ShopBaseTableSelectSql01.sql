@@ -1,0 +1,3 @@
+-- 店舗テーブル(BASE):SHOP_BASE_TABLEの全データを取得します。
+SELECT * FROM SHOP_BASE_TABLE
+

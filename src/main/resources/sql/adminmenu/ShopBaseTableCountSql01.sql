@@ -1,0 +1,3 @@
+-- 店舗テーブル(BASE):SHOP_BASE_TABLEの全件数を取得します。
+SELECT COUNT(*) FROM SHOP_BASE_TABLE
+

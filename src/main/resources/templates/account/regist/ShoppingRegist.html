@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<title>マイ家計簿買い物登録</title>
+</head>
+<body>
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">マイ家計簿(買い物登録)</h5>
+				<p class="card-text">何かのメッセージがある場合はここに表示</p>
+			</div>
+			<div class="card-body">
+				買い物登録表示部
+			</div>
+			<div class="card-body">
+				<button class="btn btn-outline-primary" type="button">家計簿参照</button>
+				<button class="btn btn-outline-primary" type="button">買い物更新</button>
+				<form name="accountdetail" class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountmonth/}">
+					<input type="hidden" name="targetYearMonth" value="202308" />
+				</form>
+				<form name="accountupdate" class="d-flex" method="post" th:action="@{/myhacbook/shopping/update/}">
+					<input type="hidden" name="target" value="202308" />
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+</body>
+</html>

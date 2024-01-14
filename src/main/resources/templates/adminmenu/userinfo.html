@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+				xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<title>マイ家計簿管理者メニュー</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="/js/table_tr_click_script.js"></script>
+<style>
+	tr[data-href]{
+	  cursor: pointer;
+	}
+</style>
+</head>
+<body>
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+	
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">ユーザ情報管理</h5>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
+			</div>
+			<div class="card-body">
+				<form method="post" th:action="@{/myhacbook/admin/useradd/}" th:object="${adminMenuUserInfoForm}">
+					<div class="mb-3">
+						<label for="userId" class="form-label">ユーザID</label>
+						<input type="text" class="form-control w30" th:errorclass="is-invalid" th:field="*{userId}" required>
+						<p class="invalid-feedback" th:errors="*{userId}"></p>
+					</div>
+					<div class="mb-3">
+						<label for="userName" class="form-label">ユーザ名</label>
+						<input type="text" class="form-control w30" th:errorclass="is-invalid" th:field="*{userName}" required>
+						<p class="invalid-feedback" th:errors="*{userName}"></p>
+					</div>
+					<div class="mb-3 w30">
+						<label class="form-label">ステータス</label>
+						<div class="col-auto border">
+							<input type="radio" name="userStatus" class="form-check-input" th:field="*{userStatus}" value="userStatusEnabled">
+							<label class="form-check-label" for="userStatusEnabled">：有効&emsp;</label>
+							<input type="radio" name="userStatus" class="form-check-input" th:field="*{userStatus}" value="userStatusDisabled">
+							<label class="form-check-label" for="userStatusDisabled">：無効</label>
+							<p class="invalid-feedback" th:errors="*{userStatus}"></p>
+						</div>
+					</div>
+					<div class="mb-3 w30">
+						<label class="form-label">ユーザロール</label>
+						<div class="col-auto border">
+							<input type="checkbox" class="form-check-input" th:field="*{userRole}" value="userRoleAdmin">
+							<label class="form-check-label" for="userRoleAdmin">：管理者&emsp;</label>
+							<input type="checkbox" class="form-check-input" th:field="*{userRole}" value="userRoleUser">
+							<label class="form-check-label" for="userRoleUser">：ユーザー</label>
+						</div>
+						<p class="invalid-feedback" th:errors="*{userRole}"></p>
+						
+					</div>
+					<div class="mb-3">
+						<label for="userPassword" class="form-label">ユーザパスワード</label>
+						<input type="password" class="form-control w15" th:errorclass="is-invalid" th:field="*{userPassword}" aria-labelledby="passwordHelpInline" required>
+						<p class="invalid-feedback" th:errors="*{userPassword}"></p>
+					</div>
+					<div class="mb-3">
+						<label for="userPasswordRetry" class="form-label">ユーザパスワード(再入力)</label>
+						<input type="password" class="form-control w15" th:errorclass="is-invalid" th:field="*{userPasswordRetry}" aria-labelledby="passwordHelpInline" required>
+						<p class="invalid-feedback" th:errors="*{userPasswordRetry}"></p>
+						<!--/* isSamePasswordの結果を出力 */-->
+						<p class="invalid-feedback" th:errors="*{samePassword}" style="display: block;"></p>
+					</div>
+					<div class="mb-3">
+						<label for="targetYearMonth" class="form-label">決算年月</label>
+						<input type="text" class="form-control w10" th:errorclass="is-invalid" th:field="*{targetYearMonth}" required>
+						<p class="invalid-feedback" th:errors="*{targetYearMonth}"></p>
+					</div>
+
+					<div class="mb-3">
+						<button class="btn btn-primary" type="submit">登録</button>
+						<input type="hidden" th:field="*{action}" />
+					</div>
+				</form>
+			</div>
+			
+			<!-- 作製済みユーザ一覧 -->
+			<th:block th:if="${#lists.size(userInfoList)}>0">
+			<div class="card-body border border-primary">
+				<table class="table table-sm table-borderless table-hover">
+					<thead><tr><th scope="col">ユーザID</th><th scope="col">ユーザ名</th><th scope="col">ステータス</th><th scope="col">ユーザロール</th><th scope="col">決算年月</th></tr></thead>
+					<tbody>
+						<!--/* hrefに複数のパラメータを渡すときは,で区切る "@{/myhacbook/admin/userinfo(userid=${item.userId}, param2=${item.param2})}" */-->
+						<tr th:each="item : ${userInfoList}" th:data-href="@{/myhacbook/admin/userinfo(userid=${item.userId})}">
+							<td th:text="${item.userId}"></td>
+							<td th:text="${item.userName}"></td>
+							<td th:text="${item.userStatus}"></td>
+							<td>
+								<th:block th:each="userrole, userroleStat:${item.role}">
+									<span th:text="${userrole}"></span>
+									<span th:unless="${userroleStat.last}">、</span>
+								</th:block>
+							</td>
+							<td th:text="${item.targetYearMonth}"></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			</th:block>
+		</div>
+	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+</body>
+</html>

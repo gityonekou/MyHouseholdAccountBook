@@ -26,12 +26,12 @@
 						<li class="nav-item dropdown" sec:authorize="hasRole('ADMIN')">
 							<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">管理者メニュー</a>
 							<ul class="dropdown-menu">
-								<li><a class="dropdown-item" th:href="@{/myhacbook/admin/useradd}">ユーザ登録</a></li>
-								<li><a class="dropdown-item" href="#">メニュー2</a></li>
+								<li><a class="dropdown-item" th:href="@{/myhacbook/admin/userinfo/}">ユーザ情報管理</a></li>
+								<li><a class="dropdown-item" th:href="@{/myhacbook/admin/managebaseinfo/}">【保守用】ベース情報管理</a></li>
 								<li><a class="dropdown-item" href="#">メニュー3</a></li>
 								<li><a class="dropdown-item" href="#">DBデータ＊＊など。。。</a></li>
 								<li><hr class="dropdown-divider"></li>
-								<li><a class="dropdown-item" th:href="@{/myhacbook/admin/}">管理者メニューはいらなくなるか？？</a></li>
+								<li><a class="dropdown-item" th:href="@{/myhacbook/topmenu/}">管理者メニューはいらなくなるか？？</a></li>
 							</ul>
 						</li>
 					</ul>

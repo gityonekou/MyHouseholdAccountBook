@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org"
+				xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<title>マイ家計簿管理者メニュー</title>
+</head>
+<body>
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+	
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">ベース情報詳細表示</h5>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
+			</div>
+			<!-- ベーステーブル一覧表示エリア -->
+			<div class="card-body">
+				<h5 class="card-title">ベーステーブル(<span th:text="${targetTableName}"></span>)</h5>
+				<ul class="list-group list-group-flush">
+					<li class="list-group-item list-group-item-secondary"><span th:text="${tableItemsLine}"></span></li>
+					<li class="list-group-item list-group-item-action" th:each="dataLine : ${tableDataList}"><span th:text="${dataLine}"></span></li>
+				</ul>
+			</div>
+			
+		</div>
+	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+</body>
+</html>
