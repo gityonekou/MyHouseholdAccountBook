@@ -11,12 +11,12 @@
  * 2023/10/29 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.application.usecase.baseinfo.manage;
+package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
 
 import org.springframework.stereotype.Service;
 
 import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
-import com.yonetani.webapp.accountbook.presentation.response.baseinfo.manage.ExpenditureItemInfoManageResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ExpenditureItemInfoManageResponse;
 
 import lombok.extern.log4j.Log4j2;
 

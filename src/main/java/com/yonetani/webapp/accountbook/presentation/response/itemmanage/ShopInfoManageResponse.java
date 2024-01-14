@@ -7,7 +7,7 @@
  * 2023/10/29 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.presentation.response.baseinfo.manage;
+package com.yonetani.webapp.accountbook.presentation.response.itemmanage;
 
 import org.springframework.web.servlet.ModelAndView;
 
@@ -31,7 +31,7 @@ public class ShopInfoManageResponse extends AbstractResponse {
 	@Override
 	public ModelAndView build() {
 		// 画面表示のModelとViewを生成
-		ModelAndView modelAndView = createModelAndView("baseinfo/manage/ShopInfoManage");
+		ModelAndView modelAndView = createModelAndView("itemmanage/ShopInfoManage");
 		// TODO 自動生成されたメソッド・スタブ
 		// 各画面表示情報を設定
 		
