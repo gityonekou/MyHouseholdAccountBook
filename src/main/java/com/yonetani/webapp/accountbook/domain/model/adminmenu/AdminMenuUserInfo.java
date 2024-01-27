@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.springframework.util.StringUtils;
 
-import com.yonetani.webapp.accountbook.domain.exception.MyHouseholdAccountBookException;
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookException;
 import com.yonetani.webapp.accountbook.domain.type.adminmenu.UserPassword;
 import com.yonetani.webapp.accountbook.domain.type.adminmenu.UserRoles;
 import com.yonetani.webapp.accountbook.domain.type.adminmenu.UserStatus;

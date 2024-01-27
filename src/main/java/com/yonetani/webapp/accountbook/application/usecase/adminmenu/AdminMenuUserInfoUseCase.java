@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
-import com.yonetani.webapp.accountbook.domain.exception.MyHouseholdAccountBookException;
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookException;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
 import com.yonetani.webapp.accountbook.domain.model.account.shop.Shop;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.AdminMenuUserInfo;

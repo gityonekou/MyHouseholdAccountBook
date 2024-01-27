@@ -17,7 +17,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
-import com.yonetani.webapp.accountbook.domain.exception.MyHouseholdAccountBookException;
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookException;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;

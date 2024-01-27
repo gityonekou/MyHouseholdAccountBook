@@ -24,7 +24,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
-import com.yonetani.webapp.accountbook.domain.exception.MyHouseholdAccountBookException;
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookException;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.AdminMenuUserInfo;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.AdminMenuUserInfoItemList;
 import com.yonetani.webapp.accountbook.domain.model.common.SearchQueryUserId;

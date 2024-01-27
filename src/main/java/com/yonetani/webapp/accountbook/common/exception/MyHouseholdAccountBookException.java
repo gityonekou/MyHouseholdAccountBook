@@ -8,7 +8,7 @@
  * 2023/12/03 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.domain.exception;
+package com.yonetani.webapp.accountbook.common.exception;
 
 /**
  *<pre>

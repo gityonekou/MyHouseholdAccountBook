@@ -15,9 +15,12 @@ package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
 
 import org.springframework.stereotype.Service;
 
+import com.yonetani.webapp.accountbook.common.component.CodeTableItemComponent;
+import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShopInfoManageResponse;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -36,14 +39,39 @@ import lombok.extern.log4j.Log4j2;
  */
 @Service
 @Log4j2
+@RequiredArgsConstructor
 public class ShopInfoManageUseCase {
 
+	// コードテーブル
+	private final CodeTableItemComponent codeTableItem;
+	
+	/**
+	 *<pre>
+	 * 指定したユーザIDに応じた情報管理(お店)画面の表示情報を取得します。
+	 *</pre>
+	 * @param user 表示対象のユーザID
+	 * @return 情報管理(お店)画面の表示情報
+	 *
+	 */
 	public ShopInfoManageResponse readShopInfo(UserSession user) {
 		log.debug("readShopInfo:userid=" + user.getUserId());
+		
+		// 店舗のコードテーブル情報を取得し、リストに設定
+		codeTableItem.getCodeValues(MyHouseholdAccountBookContent.SHOP_KUBUN_CODE);
+		
 		// TODO 自動生成されたメソッド・スタブ
 		return new ShopInfoManageResponse();
 	}
 
+	/**
+	 *<pre>
+	 * 指定したユーザIDと店舗に応じた情報管理(お店)画面の表示情報を取得します。
+	 *</pre>
+	 * @param user
+	 * @param shopid
+	 * @return
+	 *
+	 */
 	public ShopInfoManageResponse readShopInfo(UserSession user, String shopid) {
 		log.debug("readShopInfo:userid=" + user.getUserId() + ",shopid=" + shopid);
 		// TODO 自動生成されたメソッド・スタブ

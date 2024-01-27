@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
-import com.yonetani.webapp.accountbook.domain.exception.MyHouseholdAccountBookException;
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookException;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.ShopBase;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.SisyutuItemBase;
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.ShopBaseTableRepository;
@@ -94,7 +94,7 @@ public class AdminMenuBaseInfoUseCase {
 		
 		try (
 				BufferedInputStream bin = new BufferedInputStream(baseInfoFileForm.getBaseInfoFile().getInputStream());
-				BufferedReader br = new BufferedReader(new InputStreamReader(bin))
+				BufferedReader br = new BufferedReader(new InputStreamReader(bin, "UTF-8"))
 			){
 			
 			// データを最初から読み込み、各データを出力対象のテーブルに出力します。
@@ -181,9 +181,6 @@ public class AdminMenuBaseInfoUseCase {
 					// 店名テーブル:SHOP_TABLEのベースデータ登録の場合
 					} else if(targetTable.equals(MyHouseholdAccountBookContent.SHOP_BASE_TABLE)) {
 						// TODO:登録データのチェック処理を追加予定(データ項目確定後に追加)
-					// コードテーブル:CODE_TABLEのデータ登録の場合
-					} else if(targetTable.equals(MyHouseholdAccountBookContent.CODE_TABLE)) {
-						// TODO:登録データのチェック処理を追加予定(データ項目確定後に追加)
 					}
 					List<String[]> dataList = tableDataMap.get(targetTable);
 					dataList.add(dataItems);
@@ -254,7 +251,6 @@ public class AdminMenuBaseInfoUseCase {
 		switch(targetTable) {
 			case MyHouseholdAccountBookContent.SISYUTU_ITEM_BASE_TABLE:
 			case MyHouseholdAccountBookContent.SHOP_BASE_TABLE:
-			case MyHouseholdAccountBookContent.CODE_TABLE:
 				return true;
 			default:
 				return false;

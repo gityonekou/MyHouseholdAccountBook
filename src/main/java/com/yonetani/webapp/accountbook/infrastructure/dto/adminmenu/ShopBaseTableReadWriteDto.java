@@ -37,7 +37,7 @@ public class ShopBaseTableReadWriteDto {
 	 *</pre>
 	 * @param shopCode 店舗コード
 	 * @param shopName 店舗名
-	 * @return
+	 * @return 店舗テーブル(BASE):SHOP_BASE_TABLE読込・出力情報
 	 *
 	 */
 	public static ShopBaseTableReadWriteDto from(String shopCode, String shopName) {

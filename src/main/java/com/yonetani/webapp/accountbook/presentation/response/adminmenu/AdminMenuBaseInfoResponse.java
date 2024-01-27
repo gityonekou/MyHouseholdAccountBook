@@ -76,7 +76,6 @@ public class AdminMenuBaseInfoResponse extends AbstractResponse {
 		// テーブル名
 		modelAndView.addObject("sisyutuItemBaseTableName", MyHouseholdAccountBookContent.SISYUTU_ITEM_BASE_TABLE);
 		modelAndView.addObject("shopBaseTableName", MyHouseholdAccountBookContent.SHOP_BASE_TABLE);
-		modelAndView.addObject("codeTableName", MyHouseholdAccountBookContent.CODE_TABLE);
 		
 		return modelAndView;
 	}

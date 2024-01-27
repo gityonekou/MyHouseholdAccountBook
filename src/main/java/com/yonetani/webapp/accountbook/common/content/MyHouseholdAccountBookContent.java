@@ -46,6 +46,9 @@ public class MyHouseholdAccountBookContent {
 	// 条件判定：店名テーブル(ベース):SHOP_BASE_TABLE
 	public static final String SHOP_BASE_TABLE = "SHOP_BASE_TABLE";
 	// 条件判定：コードテーブル:CODE_TABLE
-	public static final String CODE_TABLE = "CODE_TABLE";
+	//public static final String CODE_TABLE = "CODE_TABLE";
+	
+	// コード定義区分(ショップ区分:001)
+	public static final String SHOP_KUBUN_CODE = "001";
 	
 }

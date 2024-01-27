@@ -65,8 +65,6 @@ public class AdminMenuBaseInfoDetailUseCase {
 			response.addTableDataList(shopBaseTableRepository.findAll().getValues().stream().map(
 					domain -> domain.toLineString()).collect(Collectors.toUnmodifiableList())
 			);
-		} else if(target.equals(MyHouseholdAccountBookContent.CODE_TABLE)) {
-			
 		} else {
 			response.addMessage("予期しないエラーが発生しました。管理者に問い合わせてください。[targetの値が不正です][target=" + target + "]");
 		}

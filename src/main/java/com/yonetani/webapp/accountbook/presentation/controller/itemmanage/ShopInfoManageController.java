@@ -47,7 +47,6 @@ import lombok.extern.log4j.Log4j2;
 public class ShopInfoManageController {
 	// usecase
 	private final ShopInfoManageUseCase usecase;
-	
 	// UserSession
 	private final UserSession user;
 	

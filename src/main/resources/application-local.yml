@@ -56,7 +56,13 @@ spring:
     multipart:
       #ファイルアップロードサイズ(未指定の場合のデフォルト値1M)
       max-file-size: 2MB  
-      
+  
+# 家計簿プロパティ定義
+accountbook:
+  property:
+    # コード定義ファイル格納場所
+    codetable-file-path: C:/develop/EclipseDevelop/app_property/codetable.csv
+    
 # ログ出力設定
 logging:
   file:
