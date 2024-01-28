@@ -41,7 +41,7 @@ public class ExpenditureItemInfoManageUseCase {
 	public ExpenditureItemInfoManageResponse readExpenditureItemInfo(UserSession user) {
 		log.debug("readExpenditureItemInfo:userid=" + user.getUserId());
 		// TODO 自動生成されたメソッド・スタブ
-		return new ExpenditureItemInfoManageResponse();
+		return ExpenditureItemInfoManageResponse.getInstance();
 	}
 
 }

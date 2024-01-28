@@ -74,7 +74,7 @@ public class CodeTableItemComponent {
 	 * 指定した区分に対応するコードテーブルのキーと値のペア情報を取得します。
 	 *</pre>
 	 * @param kubun 取得対象のコード区分
-	 * @return 対応するコードテーブル情報
+	 * @return 対応するコードテーブル情報、コード区分に対応する値がない場合はnull
 	 *
 	 */
 	public List<CodeAndValuePair> getCodeValues(String kubun) {
@@ -94,11 +94,13 @@ public class CodeTableItemComponent {
 	 * 指定した区分、キーに対応する値を取得します。
 	 *</pre>
 	 * @param kubun 取得対象のコード区分
-	 * @return 対応するコードテーブル情報
+	 * @param key 取得対象のキー
+	 * @return キーに対応する値：コード区分に対応する値がない場合、および、キーに対応する値がない場合はnull
 	 *
 	 */
 	public String getCodeValue(String kubun, String key) {
 		Map<String, String> resultMap = codeMapTable.get(kubun);
-		return resultMap.get(key);
+		// コード区分に対応するマップがない(null)の場合はnullを返却、マップがある場合はそのマップからキーに対応する値を返却
+		return (resultMap == null) ? null : resultMap.get(key);
 	}
 }

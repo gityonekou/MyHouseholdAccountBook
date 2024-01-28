@@ -21,23 +21,17 @@
 		<div class="card">
 			<div class="card-body">
 				<h5 class="card-title">情報管理(お店)</h5>
-				<p class="card-text">何かのメッセージがある場合はここに表示</p>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
 			</div>
 			<div class="card-body">
 				<form name="ShopInfoUpdate" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/shopinfo/update/}">
 					<div class="mb-3">
 						<label for="exampleSelect" class="form-label">グループ</label>
-						<select class="form-select" id="exampleSelect">
-							<option value="" selected>グループメニューを開く</option>
-							<option value="91">食品・日用品店舗</option>
-							<option value="92">ホームセンター</option>
-							<option value="93">衣類店舗</option>
-							<option value="94">家電量販店</option>
-							<option value="95">複合店舗</option>
-							<option value="96">外食</option>
-							<option value="97">ネットショップ</option>
-							<option value="98">イベント</option>
-							<option value="99">その他</option>
+						<select class="form-select" id="shopGroup">
+							<option th:each="item : ${shopGroup.optionList}" th:value="${item.value}" th:text="${item.text}"
+								th:selected="${shopGroup.selectedValue == item.value}"></option>
 						</select>
 					</div>
 					<div class="mb-3">

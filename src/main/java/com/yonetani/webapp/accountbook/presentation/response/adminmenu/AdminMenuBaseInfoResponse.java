@@ -72,7 +72,6 @@ public class AdminMenuBaseInfoResponse extends AbstractResponse {
 		// 各ベーステーブルのカウント結果を設定
 		modelAndView.addObject("countSisyutuItemBaseTable", countSisyutuItemBaseTable);
 		modelAndView.addObject("countShopBaseTable", countShopBaseTable);
-		modelAndView.addObject("countCodeTable", "???");
 		// テーブル名
 		modelAndView.addObject("sisyutuItemBaseTableName", MyHouseholdAccountBookContent.SISYUTU_ITEM_BASE_TABLE);
 		modelAndView.addObject("shopBaseTableName", MyHouseholdAccountBookContent.SHOP_BASE_TABLE);

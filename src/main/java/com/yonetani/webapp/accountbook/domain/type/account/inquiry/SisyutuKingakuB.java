@@ -87,12 +87,8 @@ public class SisyutuKingakuB {
 	 *
 	 */
 	public String toPercentageString() {
-		if(percentage == null) {
-			return "";
-		} else {
-			// スケール0で四捨五入した文字列を返却
-			return percentage.setScale(0, RoundingMode.HALF_UP).toPlainString();
-		}
+		// 値がnullの場合空文字列を返却、null以外の場合はスケール0で四捨五入した文字列を返却
+		return (percentage == null) ? "" : percentage.setScale(0, RoundingMode.HALF_UP).toPlainString();
 	}
 	
 	/**

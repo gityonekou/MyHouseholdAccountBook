@@ -60,11 +60,8 @@ public class NowTargetYearMonth {
 	 */
 	@Override
 	public String toString() {
-		if(yearMonth == null) {
-			return "yearMonth=null";
-		} else {
-			return yearMonth.toString();
-		}
+		// 値がnullの場合固定文字列「yearMonth=null」を返却、null以外の場合値を返却
+		return (yearMonth == null) ? "yearMonth=null" : yearMonth.toString();
 	}
 	
 	/**
@@ -76,10 +73,7 @@ public class NowTargetYearMonth {
 	 *
 	 */
 	public boolean isEmpty() {
-		if(yearMonth == null) {
-			return true;
-		} else {
-			return false;
-		}
+		// 値がnullの場合trueを返却、null以外の場合falseを返却
+		return (yearMonth == null) ? true : false;
 	}
 }

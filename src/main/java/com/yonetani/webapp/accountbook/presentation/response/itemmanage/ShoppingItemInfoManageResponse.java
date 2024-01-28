@@ -13,6 +13,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+
 /**
  *<pre>
  * 情報管理(商品)画面表示情報です。
@@ -23,8 +26,20 @@ import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse
  * @since 家計簿アプリ(1.00.A)
  *
  */
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ShoppingItemInfoManageResponse extends AbstractResponse {
 
+	/**
+	 *<pre>
+	 * デフォルト値からレスポンス情報を生成して返します。
+	 *</pre>
+	 * @return 情報管理(商品)画面表示情報
+	 *
+	 */
+	public static ShoppingItemInfoManageResponse getInstance() {
+		return new ShoppingItemInfoManageResponse();
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

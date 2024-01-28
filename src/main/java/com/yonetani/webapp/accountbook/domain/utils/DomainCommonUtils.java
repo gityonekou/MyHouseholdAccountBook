@@ -42,12 +42,8 @@ public class DomainCommonUtils {
 	 *
 	 */
 	public static synchronized String formatKingaku(BigDecimal value) {
-		// null値の場合、空文字列を返却
-		if(value == null) {
-			return "";
-		}
-		// スケール0で四捨五入+カンマ編集した文字列を返却
-		return kingakuDecimalFormat.format(value.setScale(0, RoundingMode.HALF_UP));
+		// 値がnullの場合空文字列を返却、null以外の場合はスケール0で四捨五入+カンマ編集した文字列を返却
+		return (value == null) ? "" : kingakuDecimalFormat.format(value.setScale(0, RoundingMode.HALF_UP));
 	}
 	
 	/**
@@ -60,12 +56,8 @@ public class DomainCommonUtils {
 	 *
 	 */
 	public static synchronized String formatyyyySPMMSPdd(LocalDate date) {
-		// YYYY/MM/DD形式で返却
-		if(date == null) {
-			return "";
-		} else {
-			return date.format(yyyySPMMSPddformat);
-		}
+		// 値がnullの場合は空文字列を返却、null以外の場合はYYYY/MM/DD形式に変換した値を返却
+		return (date == null) ? "" : date.format(yyyySPMMSPddformat);
 	}
 	
 	/**

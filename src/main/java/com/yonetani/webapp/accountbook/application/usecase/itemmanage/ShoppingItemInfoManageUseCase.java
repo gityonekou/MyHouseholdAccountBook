@@ -41,7 +41,7 @@ public class ShoppingItemInfoManageUseCase {
 	public ShoppingItemInfoManageResponse readShoppingItemInfo(UserSession user) {
 		log.debug("readShoppingItemInfo:userid=" + user.getUserId());
 		// TODO 自動生成されたメソッド・スタブ
-		return new ShoppingItemInfoManageResponse();
+		return ShoppingItemInfoManageResponse.getInstance();
 	}
 
 }
