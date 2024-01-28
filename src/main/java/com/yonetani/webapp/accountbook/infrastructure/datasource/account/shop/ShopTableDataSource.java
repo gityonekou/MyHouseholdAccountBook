@@ -43,7 +43,9 @@ public class ShopTableDataSource implements ShopTableRepository {
 		mapper.insert(ShopReadWriteDto.from(
 				data.getUserId().toString(),
 				data.getShopCode().toString(),
-				data.getShopName().toString()));
+				data.getShopKubunCode().toString(),
+				data.getShopName().toString(),
+				data.getShopSort().toString()));
 
 	}
 

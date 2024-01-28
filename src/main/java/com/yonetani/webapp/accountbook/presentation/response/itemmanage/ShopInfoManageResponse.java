@@ -36,7 +36,7 @@ import lombok.RequiredArgsConstructor;
 public class ShopInfoManageResponse extends AbstractResponse {
 
 	// 店舗グループ
-	private final SelectViewItem shopGroupItem;
+	private final SelectViewItem shopKubunItem;
 	
 	/**
 	 *<pre>
@@ -64,7 +64,7 @@ public class ShopInfoManageResponse extends AbstractResponse {
 		// 画面表示のModelとViewを生成
 		ModelAndView modelAndView = createModelAndView("itemmanage/ShopInfoManage");
 		// 店舗グループを設定
-		modelAndView.addObject("shopGroup", shopGroupItem);
+		modelAndView.addObject("shopKubun", shopKubunItem);
 		// 各画面表示情報を設定
 		
 		

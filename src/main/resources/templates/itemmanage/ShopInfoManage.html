@@ -25,31 +25,34 @@
 					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
 				</th:block>
 			</div>
+			
+			<!-- 店舗情報入力フォーム -->
+			<form name="ShopInfoUpdate" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/shopinfo/update/}">
 			<div class="card-body">
-				<form name="ShopInfoUpdate" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/shopinfo/update/}">
-					<div class="mb-3">
-						<label for="exampleSelect" class="form-label">グループ</label>
-						<select class="form-select" id="shopGroup">
-							<option th:each="item : ${shopGroup.optionList}" th:value="${item.value}" th:text="${item.text}"
-								th:selected="${shopGroup.selectedValue == item.value}"></option>
-						</select>
-					</div>
-					<div class="mb-3">
-						<label for="validationServer01" class="form-label">店舗名</label>
-	 					<input type="text" class="form-control" id="name" value="AVE(エイヴィ) 中央林間店" required>
-					</div>
-					<div class="mb-3">
-						<label for="validationServer01" class="form-label">表示順</label>
-	 					<input type="text" class="form-control w10" id="sort" value="05" required>
-					</div>
-					<div class="mb-3">
-						<button class="btn btn-primary" type="submit">登録</button>
-					</div>
-				</form>
+				<div class="mb-3">
+					<label for="exampleSelect" class="form-label">店舗区分</label>
+					<select class="form-select" id="shopKubun">
+						<option th:each="item : ${shopKubun.optionList}" th:value="${item.value}" th:text="${item.text}"
+							th:selected="${shopKubun.selectedValue == item.value}"></option>
+					</select>
+				</div>
+				<div class="mb-3">
+					<label for="validationServer01" class="form-label">店舗名</label>
+ 					<input type="text" class="form-control" id="name" value="AVE(エイヴィ) 中央林間店" required>
+				</div>
+				<div class="mb-3">
+					<label for="validationServer01" class="form-label">表示順</label>
+ 					<input type="text" class="form-control w10" id="sort" value="05" required>
+				</div>
+				<div class="mb-3">
+					<button class="btn btn-primary" type="submit">登録</button>
+				</div>
 			</div>
+			</form>
+			
 			<!-- お店一覧表示エリア -->
 			<div class="list-group">
-				<a class="list-group-item list-group-item-secondary">表示順&emsp;店名&emsp;：グループ名&emsp;&emsp;※更新する場合は対象行をクリックしてください</a>
+				<a class="list-group-item list-group-item-secondary">表示順&emsp;店名&emsp;：店舗区分&emsp;&emsp;※更新する場合は対象行をクリックしてください</a>
 				<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload?shopid=aaaa}" class="list-group-item list-group-item-action">01&emsp;AVE(エイヴィ)&emsp;：食品・日用品店舗</a>
  				<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload?shopid=aaaa}" class="list-group-item list-group-item-action">02&emsp;ロピア&emsp;：食品・日用品店舗</a>
 				<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload?shopid=aaaa}" class="list-group-item list-group-item-action">03&emsp;イオン&emsp;：複合店舗</a>

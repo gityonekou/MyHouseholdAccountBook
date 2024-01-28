@@ -19,36 +19,39 @@
 				<h5 class="card-title">情報管理(商品)</h5>
 				<p class="card-text">何かのメッセージがある場合はここに表示</p>
 			</div>
+			
+			<!-- 商品情報入力フォーム -->
+			<form name="ShopInfoUpdate" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/shoppingiteminfo/update/}">
 			<div class="card-body">
-				<form name="ShopInfoUpdate" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/shoppingiteminfo/update/}">
-					<div class="mb-3">
-						<label for="exampleSelect" class="form-label">商品グループ</label>
-						<select class="form-select" id="exampleSelect">
-							<option value="" >グループメニューを開く</option>
-							<option value="1" selected>食品・日用品店舗</option>
-							<option value="2">ホームセンター</option>
-							<option value="3">衣類店舗</option>
-							<option value="4">家電量販店</option>
-							<option value="5">複合店舗</option>
-							<option value="6">外食</option>
-							<option value="7">ネットショップ</option>
-							<option value="8">イベント</option>
-							<option value="9">その他</option>
-						</select>
-					</div>
-					<div class="mb-3">
-						<label for="validationServer01" class="form-label">商品名</label>
-	 					<input type="text" class="form-control" id="name" value="商品名　AAA" required>
-					</div>
-					<div class="mb-3">
-						<label for="validationServer01" class="form-label">表示順</label>
-	 					<input type="text" class="form-control w10" id="sort" value="05" required>
-					</div>
-					<div class="mb-3">
-						<button class="btn btn-primary" type="submit">登録</button>
-					</div>
-				</form>
+				<div class="mb-3">
+					<label for="exampleSelect" class="form-label">商品グループ</label>
+					<select class="form-select" id="exampleSelect">
+						<option value="" >グループメニューを開く</option>
+						<option value="1" selected>食品・日用品店舗</option>
+						<option value="2">ホームセンター</option>
+						<option value="3">衣類店舗</option>
+						<option value="4">家電量販店</option>
+						<option value="5">複合店舗</option>
+						<option value="6">外食</option>
+						<option value="7">ネットショップ</option>
+						<option value="8">イベント</option>
+						<option value="9">その他</option>
+					</select>
+				</div>
+				<div class="mb-3">
+					<label for="validationServer01" class="form-label">商品名</label>
+ 					<input type="text" class="form-control" id="name" value="商品名　AAA" required>
+				</div>
+				<div class="mb-3">
+					<label for="validationServer01" class="form-label">表示順</label>
+ 					<input type="text" class="form-control w10" id="sort" value="05" required>
+				</div>
+				<div class="mb-3">
+					<button class="btn btn-primary" type="submit">登録</button>
+				</div>
 			</div>
+			</form>
+			
 			<!-- 商品一覧表示エリア -->
 			<div class="list-group">
 				<a class="list-group-item list-group-item-secondary">表示順&emsp;商品名&emsp;：グループ名&emsp;&emsp;※更新する場合は対象行をクリックしてください</a>

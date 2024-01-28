@@ -30,8 +30,12 @@ public class ShopReadWriteDto {
 	private final String userId;
 	// 店舗コード
 	private final String shopCode;
+	// 店舗区分コード
+	private final String shopKubunCode;
 	// 店舗名
 	private final String shopName;
+	// 店舗表示順
+	private final String shopSort;
 	
 	/**
 	 *<pre>
@@ -39,11 +43,14 @@ public class ShopReadWriteDto {
 	 *</pre>
 	 * @param userId   ユーザID
 	 * @param shopCode 店舗コード
+	 * @param shopKubunCode 店舗区分コード
 	 * @param shopName 店舗名
+	 * @param shopSort 表示順
 	 * @return 店舗テーブル:SHOP_TABLE出力情報
 	 *
 	 */
-	public static ShopReadWriteDto from(String userId, String shopCode, String shopName) {
-		return new ShopReadWriteDto(userId, shopCode, shopName);
+	public static ShopReadWriteDto from(String userId, String shopCode, String shopKubunCode, String shopName, 
+			String shopSort) {
+		return new ShopReadWriteDto(userId, shopCode, shopKubunCode, shopName, shopSort);
 	}
 }

@@ -10,7 +10,9 @@
 package com.yonetani.webapp.accountbook.domain.model.account.shop;
 
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopSort;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
 import lombok.AccessLevel;
@@ -34,8 +36,12 @@ public class Shop {
 	private final UserId userId;
 	// 店舗コード
 	private final ShopCode shopCode;
+	// 店舗区分コード
+	private final ShopKubunCode shopKubunCode;
 	// 店舗名
 	private final ShopName shopName;
+	// 店舗表示順
+	private final ShopSort shopSort;
 	
 	/**
 	 *<pre>
@@ -43,15 +49,19 @@ public class Shop {
 	 *</pre>
 	 * @param userId ユーザID
 	 * @param shopCode 店舗コード
+	 * @param shopKubunCode 店舗区分コード
 	 * @param shopName 店舗名
+	 * @param shopSort 店舗表示順
 	 * @return 店舗テーブル情報を表すドメインモデル
 	 *
 	 */
-	public static Shop from(String userId, String shopCode, String shopName) {
+	public static Shop from(String userId, String shopCode, String shopKubunCode, String shopName, String shopSort) {
 		return new Shop(
 				UserId.from(userId),
 				ShopCode.from(shopCode),
-				ShopName.from(shopName));
+				ShopKubunCode.from(shopKubunCode),
+				ShopName.from(shopName),
+				ShopSort.from(shopSort));
 	}
 	
 	/**
@@ -59,13 +69,17 @@ public class Shop {
 	 */
 	@Override
 	public String toString() {
-		StringBuilder buff = new StringBuilder(100);
+		StringBuilder buff = new StringBuilder(130);
 		buff.append("userId:")
 		.append(userId)
 		.append(",shopCode:")
 		.append(shopCode)
+		.append(",shopKubunCode:")
+		.append(shopKubunCode)
 		.append(",shopName:")
-		.append(shopName);
+		.append(shopName)
+		.append(",shopSort:")
+		.append(shopSort);
 		return buff.toString();
 	}
 }

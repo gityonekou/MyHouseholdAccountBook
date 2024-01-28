@@ -176,11 +176,14 @@ public class AdminMenuUserInfoUseCase {
 						baseData.getSisyutuItemSort().toString())));
 				
 				// 店舗テーブル(BASE)から新規ユーザの店舗テーブルを出力
+				// 店舗区分コード、店舗表示順は店舗コードと同じ値で出力する
 				ShopBaseList shopBaseList = shopBaseTableRepository.findAll();
 				shopBaseList.getValues().forEach(baseData -> shopTableRepository.add(Shop.from(
 						accountBookUser.getUserId().toString(),
 						baseData.getShopCode().toString(),
-						baseData.getShopName().toString())));
+						baseData.getShopCode().toString(),
+						baseData.getShopName().toString(),
+						baseData.getShopCode().toString())));
 				
 				// 処理結果OKを設定(getリダイレクトを行う)
 				response.setTransactionSuccessFull();

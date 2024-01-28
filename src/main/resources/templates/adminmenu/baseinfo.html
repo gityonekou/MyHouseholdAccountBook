@@ -22,21 +22,21 @@
 				</th:block>
 			</div>
 			<!-- ベーステーブルファイル登録form -->
+			<form method="post" th:action="@{/myhacbook/admin/uploadbaseinfo/}" enctype="multipart/form-data" th:object="${baseInfoFileForm}">
 			<div class="card-body">
-				<form method="post" th:action="@{/myhacbook/admin/uploadbaseinfo/}" enctype="multipart/form-data" th:object="${baseInfoFileForm}">
-					<div class="mb-3">
-						<label for="baseInfoFile" class="form-label">ファイルアップロード(ベース情報データ)</label>
-	 					<input type="file" class="form-control" th:field="*{baseInfoFile}">
-	 					<p class="invalid-feedback" th:errors="*{baseInfoFile}"></p>
-					</div>
-					<div class="mb-3">
-						<button class="btn btn-primary" type="submit">登録</button>
-					</div>
-					<div class="mb-3">
-						以下の一覧のベース情報を登録可能です。
-					</div>
-				</form>
+				<div class="mb-3">
+					<label for="baseInfoFile" class="form-label">ファイルアップロード(ベース情報データ)</label>
+ 					<input type="file" class="form-control" th:field="*{baseInfoFile}">
+ 					<p class="invalid-feedback" th:errors="*{baseInfoFile}"></p>
+				</div>
+				<div class="mb-3">
+					<button class="btn btn-primary" type="submit">登録</button>
+				</div>
+				<div class="mb-3">
+					以下の一覧のベース情報を登録可能です。
+				</div>
 			</div>
+			</form>
 			<!-- ベーステーブル一覧表示エリア -->
 			<div class="card-body">
 				<h5 class="card-title">ベーステーブル一覧</h5>
