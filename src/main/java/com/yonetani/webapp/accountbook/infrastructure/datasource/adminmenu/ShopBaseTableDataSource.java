@@ -43,8 +43,9 @@ public class ShopBaseTableDataSource implements ShopBaseTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void add(ShopBase data) {
-		shopBaseTableMapper.insert(ShopBaseTableReadWriteDto.from(
+	public int add(ShopBase data) {
+		// 店舗テーブル(BASE):SHOP_BASE_TABLEにデータを追加
+		return shopBaseTableMapper.insert(ShopBaseTableReadWriteDto.from(
 				data.getShopCode().toString(),
 				data.getShopName().toString()
 				));

@@ -153,4 +153,14 @@ public class AdminMenuUserInfoItemList {
 		}
 	}
 	
+	/**
+	 *<pre>
+	 * 検索結果が設定されているかどうかを判定します。
+	 *</pre>
+	 * @return 空の場合はtrue、値が設定されている場合はfalse
+	 *
+	 */
+	public boolean isEmpty() {
+		return CollectionUtils.isEmpty(values);
+	}
 }

@@ -13,7 +13,7 @@ package com.yonetani.webapp.accountbook.application.usecase.account.utils;
 import org.springframework.stereotype.Component;
 
 import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
-import com.yonetani.webapp.accountbook.domain.model.common.SearchQueryUserId;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.repository.common.AccountBookUserRepository;
 
 import lombok.RequiredArgsConstructor;

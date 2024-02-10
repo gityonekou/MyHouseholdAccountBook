@@ -16,10 +16,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookException;
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
 import com.yonetani.webapp.accountbook.domain.model.account.shop.Shop;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.AdminMenuUserInfo;
@@ -27,7 +27,7 @@ import com.yonetani.webapp.accountbook.domain.model.adminmenu.AdminMenuUserInfoI
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.ShopBaseList;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.SisyutuItemBaseList;
 import com.yonetani.webapp.accountbook.domain.model.common.AccountBookUser;
-import com.yonetani.webapp.accountbook.domain.model.common.SearchQueryUserId;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.AdminMenuUserInfoRepository;
@@ -163,27 +163,51 @@ public class AdminMenuUserInfoUseCase {
 				// ユーザテーブル、ユーザ権限テーブルに新規ユーザを追加
 				adminUserInfoRepository.addUserInfo(userInfo);
 				// 家計簿利用ユーザテーブルに新規ユーザを追加
-				accountBookUserRepository.addAccountBookUser(accountBookUser);
+				int addUserCount = accountBookUserRepository.add(accountBookUser);
+				// 追加件数が1件以上の場合、業務エラー
+				if(addUserCount != 1) {
+					throw new MyHouseholdAccountBookRuntimeException("家計簿利用ユーザテーブルへの追加件数が不正でした。[add data:" + accountBookUser + "]");
+				}
+				
 				// 支出項目テーブル(BASE)から新規ユーザの支出項目テーブルを出力
 				SisyutuItemBaseList sisyutuItemBaseList = sisyutuItemBaseTableRepository.findAll();
-				sisyutuItemBaseList.getValues().forEach(baseData -> sisyutuItemTableRepository.add(SisyutuItem.from(
-						accountBookUser.getUserId().toString(),
-						baseData.getSisyutuItemCode().toString(),
-						baseData.getSisyutuItemName().toString(), 
-						baseData.getSisyutuItemDetailContext().toString(),
-						baseData.getParentSisyutuItemCode().toString(),
-						baseData.getSisyutuItemLevel().toString(),
-						baseData.getSisyutuItemSort().toString())));
+				
+				sisyutuItemBaseList.getValues().forEach(baseData -> {
+						// 登録する支出項目テーブル情報を生成
+						SisyutuItem addData = SisyutuItem.from(
+							accountBookUser.getUserId().toString(),
+							baseData.getSisyutuItemCode().toString(),
+							baseData.getSisyutuItemName().toString(), 
+							baseData.getSisyutuItemDetailContext().toString(),
+							baseData.getParentSisyutuItemCode().toString(),
+							baseData.getSisyutuItemLevel().toString(),
+							baseData.getSisyutuItemSort().toString());
+						// データを登録
+						int addCount = sisyutuItemTableRepository.add(addData);
+						// 追加件数が1件以上の場合、業務エラー
+						if(addCount != 1) {
+							throw new MyHouseholdAccountBookRuntimeException("支出項目テーブル:SISYUTU_ITEM_TABLEへの追加件数が不正でした。[add data:" + addData + "]");
+						}
+					});
 				
 				// 店舗テーブル(BASE)から新規ユーザの店舗テーブルを出力
 				// 店舗区分コード、店舗表示順は店舗コードと同じ値で出力する
 				ShopBaseList shopBaseList = shopBaseTableRepository.findAll();
-				shopBaseList.getValues().forEach(baseData -> shopTableRepository.add(Shop.from(
-						accountBookUser.getUserId().toString(),
-						baseData.getShopCode().toString(),
-						baseData.getShopCode().toString(),
-						baseData.getShopName().toString(),
-						baseData.getShopCode().toString())));
+				shopBaseList.getValues().forEach(baseData -> {
+						// 登録する店舗テーブル情報を生成
+						Shop addData = Shop.from(
+								accountBookUser.getUserId().toString(),
+								baseData.getShopCode().toString(),
+								baseData.getShopCode().toString(),
+								baseData.getShopName().toString(),
+								baseData.getShopCode().toString());
+						// データを登録
+						int addCount = shopTableRepository.add(addData);
+						// 追加件数が1件以上の場合、業務エラー
+						if(addCount != 1) {
+							throw new MyHouseholdAccountBookRuntimeException("店舗テーブルへの追加件数が不正でした。[add data:" + addData + "]");
+						}
+					});
 				
 				// 処理結果OKを設定(getリダイレクトを行う)
 				response.setTransactionSuccessFull();
@@ -193,7 +217,11 @@ public class AdminMenuUserInfoUseCase {
 				// ユーザテーブル、ユーザ権限テーブルのユーザ情報を更新
 				adminUserInfoRepository.updateUserInfo(userInfo);
 				// 家計簿利用ユーザテーブルに新規ユーザを情報を更新
-				accountBookUserRepository.updateAccountBookUser(accountBookUser);
+				int updateCount = accountBookUserRepository.update(accountBookUser);
+				// 更新件数が1件以上の場合、業務エラー
+				if(updateCount != 1) {
+					throw new MyHouseholdAccountBookRuntimeException("家計簿利用ユーザテーブルへの追加件数が不正でした。[add data:" + accountBookUser + "]");
+				}
 				// 処理結果OKを設定(getリダイレクトを行う)
 				response.setTransactionSuccessFull();
 				
@@ -229,7 +257,7 @@ public class AdminMenuUserInfoUseCase {
 		log.debug("検索結果(ユーザ情報一覧のリスト)=" + userInfoList);
 		
 		// ドメインモデル→レスポンスに変換
-		if(CollectionUtils.isEmpty(userInfoList.getValues())) {
+		if(userInfoList.isEmpty()) {
 			// ユーザ情報が0件の場合、メッセージを設定
 			response.addMessage("家計簿ユーザが0件です。");
 		} else {

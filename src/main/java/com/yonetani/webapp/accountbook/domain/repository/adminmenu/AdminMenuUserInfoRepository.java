@@ -17,7 +17,7 @@ package com.yonetani.webapp.accountbook.domain.repository.adminmenu;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookException;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.AdminMenuUserInfo;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.AdminMenuUserInfoItemList;
-import com.yonetani.webapp.accountbook.domain.model.common.SearchQueryUserId;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 
 /**
  *<pre>

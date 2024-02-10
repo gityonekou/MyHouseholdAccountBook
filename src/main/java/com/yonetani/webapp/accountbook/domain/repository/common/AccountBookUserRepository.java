@@ -16,7 +16,7 @@ package com.yonetani.webapp.accountbook.domain.repository.common;
 import com.yonetani.webapp.accountbook.domain.model.common.AccountBookAllUsers;
 import com.yonetani.webapp.accountbook.domain.model.common.AccountBookUser;
 import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
-import com.yonetani.webapp.accountbook.domain.model.common.SearchQueryUserId;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 
 /**
  *<pre>
@@ -48,7 +48,7 @@ public interface AccountBookUserRepository {
 	 *<pre>
 	 * 現在設定されている有効なすべての家計簿利用ユーザ情報を取得します。
 	 *</pre>
-	 * @return
+	 * @return 家計簿利用ユーザ情報
 	 *
 	 */
 	AccountBookAllUsers getAllUsers();
@@ -58,17 +58,19 @@ public interface AccountBookUserRepository {
 	 * 家計簿利用ユーザ情報を新規登録します。
 	 *</pre>
 	 * @param userInfo 登録する家計簿利用ユーザ情報
+	 * @return 登録されたデータの件数
 	 *
 	 */
-	void addAccountBookUser(AccountBookUser userInfo);
+	int add(AccountBookUser userInfo);
 	
 	/**
 	 *<pre>
 	 * 家計簿利用ユーザ情報を更新します。
 	 *</pre>
 	 * @param userInfo 更新する家計簿利用ユーザ情報
+	 * @return 更新されたデータの件数
 	 *
 	 */
-	void updateAccountBookUser(AccountBookUser userInfo);
+	int update(AccountBookUser userInfo);
 	
 }

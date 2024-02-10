@@ -16,8 +16,8 @@ import org.springframework.stereotype.Repository;
 
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenseInquiryItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenseInquiryList;
-import com.yonetani.webapp.accountbook.domain.model.common.SearchQueryUserIdAndYear;
-import com.yonetani.webapp.accountbook.domain.model.common.SearchQueryUserIdAndYearMonth;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenseInquiryRepository;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.IncomeAndExpenseReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthSearchQueryDto;

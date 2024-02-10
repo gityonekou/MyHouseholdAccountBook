@@ -30,16 +30,17 @@ public interface SisyutuItemBaseTableRepository {
 	 *<pre>
 	 * 支出項目テーブル(BASE)情報を新規登録します。
 	 *</pre>
-	 * @param data
+	 * @param data 追加する支出項目テーブル(BASE)情報
+	 * @return 追加されたデータの件数
 	 *
 	 */
-	void add(SisyutuItemBase data);
+	int add(SisyutuItemBase data);
 	
 	/**
 	 *<pre>
 	 * 支出項目テーブル(BASE)情報を全件取得します。
 	 *</pre>
-	 * @param data
+	 * @return 支出項目テーブル(BASE)情報
 	 *
 	 */
 	SisyutuItemBaseList findAll();
@@ -48,7 +49,7 @@ public interface SisyutuItemBaseTableRepository {
 	 *<pre>
 	 * 支出項目テーブル(BASE)情報の全件数を取得します。
 	 *</pre>
-	 * @return
+	 * @return 支出項目テーブル(BASE)情報の全件数
 	 *
 	 */
 	int countAll();

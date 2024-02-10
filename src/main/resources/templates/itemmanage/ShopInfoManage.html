@@ -5,11 +5,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
 		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
 		crossorigin="anonymous">
-<style>
-.w10{
-  width:10%;
-}
-</style>
+<link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
 <title>情報管理(お店)</title>
 </head>
 <body>
@@ -27,25 +23,30 @@
 			</div>
 			
 			<!-- 店舗情報入力フォーム -->
-			<form name="ShopInfoUpdate" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/shopinfo/update/}">
+			<form name="ShopInfoUpdate" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/shopinfo/update/}" th:object="${shopInfoForm}">
 			<div class="card-body">
 				<div class="mb-3">
-					<label for="exampleSelect" class="form-label">店舗区分</label>
-					<select class="form-select" id="shopKubun">
-						<option th:each="item : ${shopKubun.optionList}" th:value="${item.value}" th:text="${item.text}"
-							th:selected="${shopKubun.selectedValue == item.value}"></option>
+					<label for="shopKubun" class="form-label">店舗区分</label>
+					<select class="form-select w20" th:errorclass="is-invalid" th:field="*{shopKubun}" required>
+						<option th:each="item : ${shopKubun.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
 					</select>
+					<p class="invalid-feedback" th:errors="*{shopKubun}"></p>
 				</div>
 				<div class="mb-3">
-					<label for="validationServer01" class="form-label">店舗名</label>
- 					<input type="text" class="form-control" id="name" value="AVE(エイヴィ) 中央林間店" required>
+					<label for="shopName" class="form-label">店舗名</label>
+ 					<input type="text" class="form-control w50" th:errorclass="is-invalid" th:field="*{shopName}" required>
+ 					<p class="invalid-feedback" th:errors="*{shopName}"></p>
 				</div>
 				<div class="mb-3">
 					<label for="validationServer01" class="form-label">表示順</label>
- 					<input type="text" class="form-control w10" id="sort" value="05" required>
+ 					<input type="text" class="form-control w10" th:errorclass="is-invalid" th:field="*{shopSort}">
+ 					<p class="invalid-feedback" th:errors="*{shopSort}"></p>
 				</div>
 				<div class="mb-3">
 					<button class="btn btn-primary" type="submit">登録</button>
+					<input type="hidden" th:field="*{action}" />
+					<input type="hidden" th:field="*{shopCode}" />
+					<input type="hidden" th:field="*{shopSortBefore}" />
 				</div>
 			</div>
 			</form>
@@ -53,29 +54,13 @@
 			<!-- お店一覧表示エリア -->
 			<div class="list-group">
 				<a class="list-group-item list-group-item-secondary">表示順&emsp;店名&emsp;：店舗区分&emsp;&emsp;※更新する場合は対象行をクリックしてください</a>
-				<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload?shopid=aaaa}" class="list-group-item list-group-item-action">01&emsp;AVE(エイヴィ)&emsp;：食品・日用品店舗</a>
- 				<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload?shopid=aaaa}" class="list-group-item list-group-item-action">02&emsp;ロピア&emsp;：食品・日用品店舗</a>
-				<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload?shopid=aaaa}" class="list-group-item list-group-item-action">03&emsp;イオン&emsp;：複合店舗</a>
-				<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload?shopid=aaaa}" class="list-group-item list-group-item-action">04&emsp;いなげや&emsp;：複合店舗</a>
-				<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload?shopid=aaaa}" class="list-group-item list-group-item-action">05&emsp;ファミリーマート(ソリッドスクエア店)&emsp;：食品・日用品店舗</a>
-				<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload?shopid=aaaa}" class="list-group-item list-group-item-action">06&emsp;ユニクロ&emsp;：衣類店舗</a>
-				<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload?shopid=aaaa}" class="list-group-item list-group-item-action">07&emsp;ワークマン&emsp;：衣類店舗</a>
-				<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload?shopid=aaaa}" class="list-group-item list-group-item-action">08&emsp;クリエイト&emsp;：食品・日用品店舗</a>
-				<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload?shopid=aaaa}" class="list-group-item list-group-item-action">09&emsp;カインズホーム&emsp;：ホームセンター</a>
-				<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload?shopid=aaaa}" class="list-group-item list-group-item-action">10&emsp;コーナン&emsp;：ホームセンター</a>
-				<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload?shopid=aaaa}" class="list-group-item list-group-item-action">11&emsp;コンビニ&emsp;：食品・日用品店舗</a>
-				<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload?shopid=aaaa}" class="list-group-item list-group-item-action">12&emsp;イトーヨーカドー&emsp;：食品・日用品店舗</a>
-				<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload?shopid=aaaa}" class="list-group-item list-group-item-action">13&emsp;ドン・キホーテ&emsp;：複合店舗</a>
-				<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload?shopid=aaaa}" class="list-group-item list-group-item-action">14&emsp;オークション&emsp;：ネットショップ</a>
-				<a class="list-group-item list-group-item-secondary">91&emsp;食品・日用品店舗(その他)&emsp;※変更できません</a>
-				<a class="list-group-item list-group-item-secondary">92&emsp;ホームセンター(その他)&emsp;※変更できません</a>
-				<a class="list-group-item list-group-item-secondary">93&emsp;衣類店舗(その他)&emsp;※変更できません</a>
- 				<a class="list-group-item list-group-item-secondary">94&emsp;家電量販店(その他)&emsp;※変更できません</a>
- 				<a class="list-group-item list-group-item-secondary">95&emsp;複合店舗(その他)&emsp;※変更できません</a>
- 				<a class="list-group-item list-group-item-secondary">96&emsp;外食(その他)&emsp;※変更できません</a>
- 				<a class="list-group-item list-group-item-secondary">97&emsp;ネットショップ(その他)&emsp;※変更できません</a>
- 				<a class="list-group-item list-group-item-secondary">98&emsp;イベント(その他)&emsp;※変更できません</a>
- 				<a class="list-group-item list-group-item-secondary">99&emsp;その他&emsp;※変更できません</a>
+				
+				<th:block th:each="shopItem : ${shopList}">
+					<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload(shopCode=${shopItem.shopCode})}" class="list-group-item list-group-item-action"><span th:text="${shopItem.shopSort}"></span>&emsp;<span th:text="${shopItem.shopName}"></span>&emsp;：<span th:text="${shopItem.shopKubunName}"></span></a>
+				</th:block>
+				<th:block th:each="nonEditShopItem : ${nonEditShopList}">
+					<a class="list-group-item list-group-item-secondary"><span th:text="${nonEditShopItem.shopSort}"></span>&emsp;<span th:text="${nonEditShopItem.shopName}"></span>&emsp;※変更できません</a>
+				</th:block>
 			</div>
 		</div>
 	</div>

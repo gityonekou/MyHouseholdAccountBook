@@ -27,7 +27,7 @@ import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookCont
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookException;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.AdminMenuUserInfo;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.AdminMenuUserInfoItemList;
-import com.yonetani.webapp.accountbook.domain.model.common.SearchQueryUserId;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.AdminMenuUserInfoRepository;
 import com.yonetani.webapp.accountbook.domain.type.adminmenu.UserRoles;
 import com.yonetani.webapp.accountbook.infrastructure.dto.adminmenu.AdminMenuUserInfoAuthoritiesDto;

@@ -27,6 +27,7 @@ import org.springframework.util.StringUtils;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookException;
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.ShopBase;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.SisyutuItemBase;
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.ShopBaseTableRepository;
@@ -205,6 +206,7 @@ public class AdminMenuBaseInfoUseCase {
 					// 支出項目テーブル:SISYUTU_ITEM_TABLEのベースデータの場合
 					case MyHouseholdAccountBookContent.SISYUTU_ITEM_BASE_TABLE :
 						dataItemsList.forEach(dataItems -> {
+							// 登録する支出項目テーブル(BASE)情報を生成
 							SisyutuItemBase addData =  SisyutuItemBase.from(
 									dataItems[0],
 									dataItems[1],
@@ -214,16 +216,27 @@ public class AdminMenuBaseInfoUseCase {
 									dataItems[5]
 									);
 							log.debug("SISYUTU_ITEM_BASE_TABLE:addData=" + addData);
-							sisyutuItemBaseTableRepository.add(addData);
+							// データを追加
+							int addCount = sisyutuItemBaseTableRepository.add(addData);
+							// 追加件数が1件以上の場合、業務エラー
+							if(addCount != 1) {
+								throw new MyHouseholdAccountBookRuntimeException("支出項目テーブル(BASE)への追加件数が不正でした。[add data:" + addData + "]");
+							}
 						});
 						break;
 						
 					// 店名テーブル:SHOP_TABLEのベースデータ登録の場合
 					case MyHouseholdAccountBookContent.SHOP_BASE_TABLE :
 						dataItemsList.forEach(dataItems -> {
+							// 登録する店舗テーブル(BASE)情報を生成
 							ShopBase addData = ShopBase.from(dataItems[0], dataItems[1]);
 							log.debug("SHOP_BASE_TABLE:addData=" + addData);
-							shopBaseTableRepository.add(addData);
+							// データを追加
+							int addCount = shopBaseTableRepository.add(addData);
+							// 追加件数が1件以上の場合、業務エラー
+							if(addCount != 1) {
+								throw new MyHouseholdAccountBookRuntimeException("店舗テーブル(BASE)への追加件数が不正でした。[add data:" + addData + "]");
+							}
 						});
 						break;
 						

@@ -10,7 +10,7 @@
 package com.yonetani.webapp.accountbook.domain.repository.account.inquiry;
 
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountYearMeisaiInquiryList;
-import com.yonetani.webapp.accountbook.domain.model.common.SearchQueryUserIdAndYear;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
 
 /**
  *<pre>

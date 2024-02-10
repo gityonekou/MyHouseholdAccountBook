@@ -67,23 +67,19 @@ public class SelectViewItem {
 	// Optionタグの表示情報のリスト
 	private final List<OptionItem> optionList;
 	
-	// selectedチェックを入れるvalue属性の値
-	private final String selectedValue;
-	
 	/**
 	 *<pre>
 	 * 引数の値からSelectViewItem部品を生成して返します。
 	 *</pre>
 	 * @param optionList optionタグに表示する値のリスト
-	 * @param selectedValue selectedを付ける値
 	 * @return SelectViewItem部品
 	 *
 	 */
-	public static SelectViewItem from(List<OptionItem> optionList, String selectedValue) {
+	public static SelectViewItem from(List<OptionItem> optionList) {
 		if(CollectionUtils.isEmpty(optionList)) {
-			return new SelectViewItem(Collections.emptyList(), selectedValue);
+			return new SelectViewItem(Collections.emptyList());
 		} else {
-			return new SelectViewItem(optionList, selectedValue);
+			return new SelectViewItem(optionList);
 		}
 	}
 }

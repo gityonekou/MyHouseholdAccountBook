@@ -12,7 +12,7 @@
 package com.yonetani.webapp.accountbook.domain.repository.account.inquiry;
 
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureItemList;
-import com.yonetani.webapp.accountbook.domain.model.common.SearchQueryUserIdAndYearMonth;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 
 /**
  *<pre>

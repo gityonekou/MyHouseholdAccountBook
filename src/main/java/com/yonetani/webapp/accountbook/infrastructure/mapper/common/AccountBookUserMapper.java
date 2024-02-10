@@ -15,6 +15,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import com.yonetani.webapp.accountbook.infrastructure.dto.common.AccountBookUserDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.common.AccountBookUserWriteDto;
@@ -59,18 +60,20 @@ public interface AccountBookUserMapper {
 	 * 家計簿利用ユーザテーブル:ACCOUNT_BOOK_USERにデータを追加します。
 	 *</pre>
 	 * @param writeDto 家計簿利用ユーザテーブル:ACCOUNT_BOOK_USER出力情報
+	 * @return 家計簿利用ユーザテーブルに追加されたデータ件数
 	 *
 	 */
 	@Insert("sql/common/AccountBookUserInsertSql01.sql")
-	public void insertAccountBookUser(@Param("dto") AccountBookUserWriteDto writeDto);
+	public int insertAccountBookUser(@Param("dto") AccountBookUserWriteDto writeDto);
 	
 	/**
 	 *<pre>
 	 * 家計簿利用ユーザテーブル:ACCOUNT_BOOK_USERの指定ユーザ情報のデータを更新します。
 	 *</pre>
 	 * @param writeDto 家計簿利用ユーザテーブル:ACCOUNT_BOOK_USER出力情報
+	 * @return 家計簿利用ユーザテーブルのデータ更新件数
 	 *
 	 */
-	@Insert("sql/common/AccountBookUserUpdateSql01.sql")
-	public void updateAccountBookUser(@Param("dto") AccountBookUserWriteDto writeDto);
+	@Update("sql/common/AccountBookUserUpdateSql01.sql")
+	public int updateAccountBookUser(@Param("dto") AccountBookUserWriteDto writeDto);
 }

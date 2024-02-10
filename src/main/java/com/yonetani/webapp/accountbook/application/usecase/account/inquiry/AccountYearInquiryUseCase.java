@@ -15,13 +15,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.utils.AccountBookUserInquiryUseCase;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountYearMeisaiInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenseInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
-import com.yonetani.webapp.accountbook.domain.model.common.SearchQueryUserIdAndYear;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.AccountYearMeisaiInquiryRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenseInquiryRepository;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.YearInquiryForm;
@@ -95,7 +94,7 @@ public class AccountYearInquiryUseCase {
 		log.debug("検索結果(支出項目のリスト)=" + resultList);
 		
 		// 年間収支(マージ)のリスト(ドメインモデル)をレスポンスに設定
-		if(CollectionUtils.isEmpty(resultList.getValues())) {
+		if(resultList.isEmpty()) {
 			// 件数が0件の場合、メッセージを設定
 			response.addMessage("年間収支(マージ)取得結果が0件です。");
 		} else {
@@ -169,7 +168,7 @@ public class AccountYearInquiryUseCase {
 		log.debug("検索結果(支出項目のリスト)=" + resultList);
 		
 		// 年間収支(明細)のリスト(ドメインモデル)をレスポンスに設定
-		if(CollectionUtils.isEmpty(resultList.getValues())) {
+		if(resultList.isEmpty()) {
 			// 件数が0件の場合、メッセージを設定
 			response.addMessage("年間収支(明細)取得結果が0件です。");
 		} else {

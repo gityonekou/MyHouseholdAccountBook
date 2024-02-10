@@ -150,7 +150,7 @@ public class AdminMenuUserInfoResponse extends AbstractResponse {
 	
 	/**
 	 *<pre>
-	 * 画面に出力するエラーメッセージから画面返却データのModelAndViewを生成して返します。。
+	 * 画面に出力するエラーメッセージから画面返却データのModelAndViewを生成して返します。
 	 *</pre>
 	 * @param errorMessage 画面に出力するエラーメッセージ
 	 * @return 画面返却データのModelAndView

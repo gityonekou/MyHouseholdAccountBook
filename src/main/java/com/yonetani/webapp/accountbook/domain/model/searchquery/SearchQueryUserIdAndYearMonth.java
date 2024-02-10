@@ -1,6 +1,7 @@
 /**
  * 以下の照会条件の値を表すドメインモデルです。
  * ・ユーザID
+ * ・年月度(YYYYMM)
  *
  *------------------------------------------------
  * 更新履歴
@@ -8,8 +9,9 @@
  * 2023/09/24 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.domain.model.common;
+package com.yonetani.webapp.accountbook.domain.model.searchquery;
 
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
 import lombok.AccessLevel;
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
  *<pre>
  * 以下の照会条件の値を表すドメインモデルです。
  * ・ユーザID
+ * ・年月度(YYYYMM)
  *
  *</pre>
  *
@@ -29,21 +32,28 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class SearchQueryUserId {
+public class SearchQueryUserIdAndYearMonth {
+	
 	// ユーザID
 	private final UserId userId;
+	// 年月(YYYYMM)
+	private final TargetYearMonth yearMonth;
 	
 	/**
 	 *<pre>
 	 * 以下の照会条件の値を表すドメインモデルを生成します。
 	 * ・ユーザID
+	 * ・年月度(YYYYMM)
 	 *</pre>
 	 * @param userId ユーザID
-	 * @return 検索条件(ユーザID)
+	 * @param yearMonth 年月(YYYYMM)
+	 * @return 検索条件(ユーザID, 年月度(YYYYMM))
 	 *
 	 */
-	public static SearchQueryUserId from(String userId) {
-		return new SearchQueryUserId(UserId.from(userId));
+	public static SearchQueryUserIdAndYearMonth from(String userId, String yearMonth) {
+		return new SearchQueryUserIdAndYearMonth(
+				UserId.from(userId),
+				TargetYearMonth.from(yearMonth));
 	}
 	
 	/**
@@ -51,6 +61,6 @@ public class SearchQueryUserId {
 	 */
 	@Override
 	public String toString() {
-		return "userId=" + userId.toString();
+		return "userId=" + userId.toString() + ",yearMonth=" + yearMonth.toString();
 	}
 }

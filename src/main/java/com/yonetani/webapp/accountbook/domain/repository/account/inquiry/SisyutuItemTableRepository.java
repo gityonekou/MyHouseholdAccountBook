@@ -29,8 +29,9 @@ public interface SisyutuItemTableRepository {
 	 *<pre>
 	 * 支出項目テーブル情報を新規登録します。
 	 *</pre>
-	 * @param data
+	 * @param data 追加する支出項目テーブル情報
+	 * @return データ追加件数
 	 *
 	 */
-	void add(SisyutuItem data);
+	int add(SisyutuItem data);
 }

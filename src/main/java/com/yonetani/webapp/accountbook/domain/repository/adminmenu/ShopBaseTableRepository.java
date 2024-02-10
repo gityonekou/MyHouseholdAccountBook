@@ -30,10 +30,11 @@ public interface ShopBaseTableRepository {
 	 *<pre>
 	 * 店舗テーブル(BASE)情報を新規登録します。
 	 *</pre>
-	 * @param data
-	 *
+	 * @param data 追加する店舗テーブル(BASE)情報
+	 * @return データ追加件数
+	 * 
 	 */
-	void add(ShopBase data);
+	int add(ShopBase data);
 	
 	/**
 	 *<pre>

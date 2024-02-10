@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
 import com.yonetani.webapp.accountbook.domain.model.common.AccountBookAllUsers;
 import com.yonetani.webapp.accountbook.domain.model.common.AccountBookUser;
 import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
-import com.yonetani.webapp.accountbook.domain.model.common.SearchQueryUserId;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.repository.common.AccountBookUserRepository;
 import com.yonetani.webapp.accountbook.infrastructure.dto.common.AccountBookUserDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.common.AccountBookUserWriteDto;
@@ -74,8 +74,9 @@ public class AccountBookUserDataSource implements AccountBookUserRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void addAccountBookUser(AccountBookUser userInfo) {
-		mapper.insertAccountBookUser(AccountBookUserWriteDto.from(
+	public int add(AccountBookUser userInfo) {
+		// 家計簿利用ユーザテーブル:ACCOUNT_BOOK_USERにデータを追加
+		return mapper.insertAccountBookUser(AccountBookUserWriteDto.from(
 				userInfo.getUserId().toString(),
 				userInfo.getNowTargetYear().toString(),
 				userInfo.getNowTargetMonth().toString(),
@@ -86,13 +87,13 @@ public class AccountBookUserDataSource implements AccountBookUserRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void updateAccountBookUser(AccountBookUser userInfo) {
-		mapper.updateAccountBookUser(AccountBookUserWriteDto.from(
+	public int update(AccountBookUser userInfo) {
+		// 家計簿利用ユーザテーブル:ACCOUNT_BOOK_USERの指定ユーザ情報のデータを更新します。
+		return mapper.updateAccountBookUser(AccountBookUserWriteDto.from(
 				userInfo.getUserId().toString(),
 				userInfo.getNowTargetYear().toString(),
 				userInfo.getNowTargetMonth().toString(),
 				userInfo.getUserName().toString()));
-		
 	}
 
 }

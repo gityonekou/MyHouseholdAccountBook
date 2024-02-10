@@ -32,8 +32,9 @@ public interface SisyutuItemTableMapper {
 	 * 支出項目テーブル:SISYUTU_ITEM_TABLEにデータを追加します。
 	 *</pre>
 	 * @param writeDto 支出項目テーブル:SISYUTU_ITEM_TABLE出力情報
+	 * @return 支出項目テーブルに追加されたデータ件数
 	 *
 	 */
 	@Insert("sql/account/inquiry/SisyutuItemTableInsertSql01.sql")
-	public void insert(@Param("dto") SisyutuItemReadWriteDto writeDto);
+	public int insert(@Param("dto") SisyutuItemReadWriteDto writeDto);
 }

@@ -15,13 +15,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.utils.AccountBookUserInquiryUseCase;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureItemList;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenseInquiryItem;
 import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
-import com.yonetani.webapp.accountbook.domain.model.common.SearchQueryUserIdAndYearMonth;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.AccountMonthInquiryRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenseInquiryRepository;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.YearMonthInquiryForm;
@@ -135,7 +134,7 @@ public class AccountMonthInquiryUseCase {
 		log.debug("検索結果(支出項目のリスト)=" + resultList);
 
 		// 支出項目のリスト(ドメインモデル)をレスポンスに設定
-		if(CollectionUtils.isEmpty(resultList.getValues())) {
+		if(resultList.isEmpty()) {
 			// 支出項目のリストが0件の場合、メッセージを設定
 			response.addMessage("支出項目のリスト取得結果が0件です。");
 		} else {

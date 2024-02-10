@@ -39,8 +39,9 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void add(SisyutuItem data) {
-		mapper.insert(SisyutuItemReadWriteDto.from(
+	public int add(SisyutuItem data) {
+		// 支出項目テーブル:SISYUTU_ITEM_TABLEにデータを追加します。
+		return mapper.insert(SisyutuItemReadWriteDto.from(
 				data.getUserId().toString(),
 				data.getSisyutuItemCode().toString(),
 				data.getSisyutuItemName().toString(),

@@ -14,14 +14,20 @@
 package com.yonetani.webapp.accountbook.presentation.controller.itemmanage;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase;
+import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm;
 import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShopInfoManageResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -68,19 +74,22 @@ public class ShopInfoManageController {
 	
 	/**
 	 *<pre>
-	 * お店一覧から指定のお店選択時のGET要求時マッピングです。
+	 * 情報管理(お店)画面で、更新対象の店舗選択のGET要求時マッピングです。
 	 *</pre>
+	 * @param shopCode 表示対象の店舗コード
 	 * @return 情報管理(お店)画面
 	 *
 	 */
 	@GetMapping("/updateload")
-	public ModelAndView getTargetLoad(@RequestParam("shopid") String shopid) {
-		log.debug("getTargetLoad:shopid=" + shopid);
+	public ModelAndView getTargetLoad(@RequestParam("shopCode") String shopCode) {
+		log.debug("getTargetLoad:shopCode=" + shopCode);
 		
-		/* 選択ボックスなどの値を取得する方法は以下を参考に
-		 * https://www.tsuchiya.blog/spring-boot-step2/#toc8
-		 */
-		return this.usecase.readShopInfo(this.user, shopid).build();
+		// 店舗コード未設定の場合、エラー
+		if(StringUtils.hasLength(shopCode)) {
+			return this.usecase.readShopInfo(this.user, shopCode).build();
+		} else {
+			return ShopInfoManageResponse.buildBindingError("予期しないエラーが発生しました。管理者に問い合わせてください。[key=shopCode]");
+		}
 	}
 	
 	/**
@@ -91,9 +100,39 @@ public class ShopInfoManageController {
 	 *
 	 */
 	@PostMapping("/update/")
-	public ModelAndView postUpdate() {
-		log.debug("postUpdate:");
-		return this.usecase.readShopInfo(this.user).build();
+	public ModelAndView postUpdate(@ModelAttribute @Validated ShopInfoForm shopForm, BindingResult bindingResult) {
+		log.debug("postUpdate:input=" + shopForm);
+		/* 入力フィールドのバリデーションチェック結果を判定 */
+		// チェック結果エラーの場合
+		if(bindingResult.hasErrors()) {
+			// 初期表示情報を取得し、入力チェックエラーを設定
+			return this.usecase.readShopInfo(this.user).buildBindingError(shopForm);
+		// チェック結果OKの場合
+		} else {
+			/* hidden項目(action)の値チェック */
+			// actionが未設定の場合、予期しないエラー
+			if(!StringUtils.hasLength(shopForm.getAction())) {
+				log.error("予期しないエラー actionのバリデーションチェックでエラー:action=" + shopForm.getAction());
+				return ShopInfoManageResponse.buildBindingError("予期しないエラーが発生しました。管理者に問い合わせてください。[key=action]");
+				
+			// actionに従い、処理を実行
+			} else {
+				return this.usecase.execAction(this.user, shopForm).buildRedirect();
+			}
+		}
+		
 	}
-
+	
+	/**
+	 *<pre>
+	 * お店情報登録・更新完了後のリダイレクト(Get要求時)のマッピングです。
+	 *</pre>
+	 * @return 情報管理(お店)画面
+	 *
+	 */
+	@GetMapping("/updateComplete/")
+	public ModelAndView updateComplete() {
+		log.debug("updateComplete:");
+		return this.usecase.readShopInfo(this.user).buildComplete();
+	}
 }

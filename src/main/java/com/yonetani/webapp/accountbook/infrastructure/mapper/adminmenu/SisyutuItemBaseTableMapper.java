@@ -36,10 +36,11 @@ public interface SisyutuItemBaseTableMapper {
 	 * 支出項目テーブル(BASE):SISYUTU_ITEM_BASE_TABLEにデータを追加します。
 	 *</pre>
 	 * @param writeDto 支出項目テーブル(BASE):SISYUTU_ITEM_BASE_TABLE出力情報
+	 * @return 支出項目テーブル(BASE)に追加されたデータ件数
 	 *
 	 */
 	@Insert("sql/adminmenu/SisyutuItemBaseTableInsertSql01.sql")
-	public void insert(@Param("dto") SisyutuItemBaseTableReadWriteDto writeDto);
+	public int insert(@Param("dto") SisyutuItemBaseTableReadWriteDto writeDto);
 
 	/**
 	 *<pre>

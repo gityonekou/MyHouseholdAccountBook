@@ -167,4 +167,15 @@ public class AccountMonthInquiryExpenditureItemList {
 			return "月毎の支出項目リスト明細:0件";
 		}
 	}
+	
+	/**
+	 *<pre>
+	 * 検索結果が設定されているかどうかを判定します。
+	 *</pre>
+	 * @return 空の場合はtrue、値が設定されている場合はfalse
+	 *
+	 */
+	public boolean isEmpty() {
+		return CollectionUtils.isEmpty(values);
+	}
 }

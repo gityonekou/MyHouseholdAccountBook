@@ -36,10 +36,11 @@ public interface ShopBaseTableMapper {
 	 * 店舗テーブル(BASE):SHOP_BASE_TABLEにデータを追加します。
 	 *</pre>
 	 * @param writeDto 店舗テーブル(BASE):SHOP_BASE_TABLE出力情報
+	 * @return 店舗テーブル(BASE)に追加されたデータ件数
 	 *
 	 */
 	@Insert("sql/adminmenu/ShopBaseTableInsertSql01.sql")
-	public void insert(@Param("dto") ShopBaseTableReadWriteDto writeDto);
+	public int insert(@Param("dto") ShopBaseTableReadWriteDto writeDto);
 
 	/**
 	 *<pre>

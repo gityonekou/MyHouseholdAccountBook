@@ -42,8 +42,9 @@ public class SisyutuItemBaseTableDataSource implements SisyutuItemBaseTableRepos
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void add(SisyutuItemBase data) {
-		sisyutuItemBaseTableMapper.insert(SisyutuItemBaseTableReadWriteDto.from(
+	public int add(SisyutuItemBase data) {
+		// 支出項目テーブル(BASE):SISYUTU_ITEM_BASE_TABLEにデータを追加
+		return sisyutuItemBaseTableMapper.insert(SisyutuItemBaseTableReadWriteDto.from(
 				data.getSisyutuItemCode().toString(),
 				data.getSisyutuItemName().toString(),
 				data.getSisyutuItemDetailContext().toString(),
@@ -51,7 +52,6 @@ public class SisyutuItemBaseTableDataSource implements SisyutuItemBaseTableRepos
 				data.getSisyutuItemLevel().toString(),
 				data.getSisyutuItemSort().toString()
 				));
-
 	}
 
 	/**
