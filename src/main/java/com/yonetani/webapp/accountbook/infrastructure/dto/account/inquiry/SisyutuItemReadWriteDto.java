@@ -40,6 +40,8 @@ public class SisyutuItemReadWriteDto {
 	private final String sisyutuItemLevel;
 	// 支出項目表示順
 	private final String sisyutuItemSort;
+	// 更新可否フラグ
+	private final boolean enableUpdateFlg;
 	
 	/**
 	 *<pre>
@@ -52,6 +54,7 @@ public class SisyutuItemReadWriteDto {
 	 * @param parentSisyutuItemCode 親支出項目コード
 	 * @param sisyutuItemLevel 支出項目レベル(1～5)
 	 * @param sisyutuItemSort 支出項目表示順
+	 * @param enableUpdateFlg 更新可否フラグ
 	 * @return 支出項目テーブル:SISYUTU_ITEM_TABLE出力情報
 	 *
 	 */
@@ -62,7 +65,8 @@ public class SisyutuItemReadWriteDto {
 			String sisyutuItemDetailContext,
 			String parentSisyutuItemCode,
 			String sisyutuItemLevel,
-			String sisyutuItemSort) {
+			String sisyutuItemSort,
+			boolean enableUpdateFlg) {
 		return new SisyutuItemReadWriteDto(
 				userId,
 				sisyutuItemCode,
@@ -70,6 +74,7 @@ public class SisyutuItemReadWriteDto {
 				sisyutuItemDetailContext, 
 				parentSisyutuItemCode,
 				sisyutuItemLevel,
-				sisyutuItemSort);
+				sisyutuItemSort,
+				enableUpdateFlg);
 	}
 }

@@ -173,7 +173,7 @@ public class AdminMenuUserInfoUseCase {
 				SisyutuItemBaseList sisyutuItemBaseList = sisyutuItemBaseTableRepository.findAll();
 				
 				sisyutuItemBaseList.getValues().forEach(baseData -> {
-						// 登録する支出項目テーブル情報を生成
+						// 登録する支出項目テーブル情報を生成(更新不可フラグはデフォルトで不可:falseを設定)
 						SisyutuItem addData = SisyutuItem.from(
 							accountBookUser.getUserId().toString(),
 							baseData.getSisyutuItemCode().toString(),
@@ -181,7 +181,8 @@ public class AdminMenuUserInfoUseCase {
 							baseData.getSisyutuItemDetailContext().toString(),
 							baseData.getParentSisyutuItemCode().toString(),
 							baseData.getSisyutuItemLevel().toString(),
-							baseData.getSisyutuItemSort().toString());
+							baseData.getSisyutuItemSort().toString(),
+							false);
 						// データを登録
 						int addCount = sisyutuItemTableRepository.add(addData);
 						// 追加件数が1件以上の場合、業務エラー

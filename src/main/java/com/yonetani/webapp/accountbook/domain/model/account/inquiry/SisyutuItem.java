@@ -9,6 +9,7 @@
  */
 package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
 
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.EnableUpdateFlg;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ParentSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemDetailContext;
@@ -48,6 +49,8 @@ public class SisyutuItem {
 	private final SisyutuItemLevel sisyutuItemLevel;
 	// 支出項目表示順
 	private final SisyutuItemSort sisyutuItemSort;
+	// 更新可否フラグ
+	private final EnableUpdateFlg enableUpdateFlg;
 	
 	/**
 	 *<pre>
@@ -60,6 +63,7 @@ public class SisyutuItem {
 	 * @param parentSisyutuItemCode 親支出項目コード
 	 * @param sisyutuItemLevel 支出項目レベル(1～5)
 	 * @param sisyutuItemSort 支出項目表示順
+	 * @param enableUpdateFlg 更新可否フラグ
 	 * @return 支出項目テーブル情報を表すドメインモデル
 	 *
 	 */
@@ -70,7 +74,8 @@ public class SisyutuItem {
 			String sisyutuItemDetailContext,
 			String parentSisyutuItemCode,
 			String sisyutuItemLevel,
-			String sisyutuItemSort) {
+			String sisyutuItemSort,
+			boolean enableUpdateFlg) {
 		return new SisyutuItem(
 				UserId.from(userId),
 				SisyutuItemCode.from(sisyutuItemCode),
@@ -78,7 +83,8 @@ public class SisyutuItem {
 				SisyutuItemDetailContext.from(sisyutuItemDetailContext),
 				ParentSisyutuItemCode.from(parentSisyutuItemCode),
 				SisyutuItemLevel.from(sisyutuItemLevel),
-				SisyutuItemSort.from(sisyutuItemSort));
+				SisyutuItemSort.from(sisyutuItemSort),
+				EnableUpdateFlg.from(enableUpdateFlg));
 		
 	}
 	
@@ -101,7 +107,9 @@ public class SisyutuItem {
 		.append(",sisyutuItemLevel:")
 		.append(sisyutuItemLevel)
 		.append(",sisyutuItemSort:")
-		.append(sisyutuItemSort);
+		.append(sisyutuItemSort)
+		.append(",enableUpdateFlg:")
+		.append(enableUpdateFlg);
 		return buff.toString();
 	}
 }

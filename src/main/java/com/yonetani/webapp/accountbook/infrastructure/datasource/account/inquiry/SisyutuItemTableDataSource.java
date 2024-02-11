@@ -48,7 +48,8 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 				data.getSisyutuItemDetailContext().toString(),
 				data.getParentSisyutuItemCode().toString(),
 				data.getSisyutuItemLevel().toString(),
-				data.getSisyutuItemSort().toString()));
+				data.getSisyutuItemSort().toString(),
+				data.getEnableUpdateFlg().getValue()));
 
 	}
 
