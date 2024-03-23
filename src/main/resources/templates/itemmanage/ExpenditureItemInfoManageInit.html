@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<title>情報管理(支出項目)</title>
+</head>
+<body>
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">情報管理(支出項目)　対象選択</h5>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
+			</div>
+			
+			<div class="card-body">
+				<div class="mb-3">
+					<p class="card-text">支出項目一覧から新規追加する支出項目が属する支出項目、または、更新対象の支出項目を選択してください。</p>
+				</div>
+			</div>
+			
+			<!-- 支出項目一覧表示エリア -->
+			<div class="card-body">
+				<p class="card-text">支出項目01～02は名称・項目数固定です。03～05までを登録できます。</p>
+				<ul class="list-unstyled">
+					
+					<!--/* 支出項目レベル１のデータを繰り返すリストブロックー */-->
+					<li class="mt-1 border border-dark" th:each="item : ${expenditureItemList}">
+						<div class="bg-info">
+						<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+							aria-expanded="false" th:data-bs-target="'#area_'+${item.sisyutuItemCode}" th:aria-controls="'area_'+${item.sisyutuItemCode}">▼<span th:text="${item.sisyutuItemName}"></span></button>
+							：<a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/managebaseinfo/expenditeminfo/actselect(sisyutuItemCode=${item.sisyutuItemCode})}">メンテ(説明文のみ)</a>
+							：<span th:text="${item.sisyutuItemDetailContext}"></span>
+						</div>
+						<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${item.sisyutuItemCode}">
+							
+							<!--/* 支出項目レベル２のデータを繰り返すリストブロックー */-->
+							<li class="mt-1 border border-primary" th:each="childItem : ${item.childItemList}">
+							<th:block th:if="${#lists.size(childItem.childItemList)}==0">
+								<div class="bg-warning">
+								<button class="btn d-inline-flex align-items-center collapsed border-0">■<span th:text="${childItem.sisyutuItemName}"></span></button>
+								：<a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/managebaseinfo/expenditeminfo/actselect(sisyutuItemCode=${childItem.sisyutuItemCode})}">３を追加・メンテ(説明文のみ)</a>
+								：<span th:text="${childItem.sisyutuItemDetailContext}"></span>
+								</div>
+							</th:block>
+							<th:block th:if="${#lists.size(childItem.childItemList)}>0">
+								<div class="bg-warning">
+								<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+									aria-expanded="false" th:data-bs-target="'#area_'+${childItem.sisyutuItemCode}" th:aria-controls="'area_'+${childItem.sisyutuItemCode}">▼<span th:text="${childItem.sisyutuItemName}"></span></button>
+									：<a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/managebaseinfo/expenditeminfo/actselect(sisyutuItemCode=${childItem.sisyutuItemCode})}">３を追加・メンテ(説明文のみ)</a>
+									：<span th:text="${childItem.sisyutuItemDetailContext}"></span>
+								</div>
+								<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${childItem.sisyutuItemCode}">
+
+									<!--/* 支出項目レベル３のデータを繰り返すリストブロックー */-->
+									<li th:each="nest3ChildItem : ${childItem.childItemList}">
+									<th:block th:if="${#lists.size(nest3ChildItem.childItemList)}==0">
+										<button class="btn d-inline-flex align-items-center collapsed border-0">■<span th:text="${nest3ChildItem.sisyutuItemName}"></span></button>
+										：<a class="btn btn-outline-info btn-sm" th:href="@{/myhacbook/managebaseinfo/expenditeminfo/actselect(sisyutuItemCode=${nest3ChildItem.sisyutuItemCode})}">４を追加・メンテ</a>
+										：<span th:text="${nest3ChildItem.sisyutuItemDetailContext}"></span>
+									</th:block>
+									<th:block th:if="${#lists.size(nest3ChildItem.childItemList)}>0">
+										<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+											aria-expanded="false" th:data-bs-target="'#area_'+${nest3ChildItem.sisyutuItemCode}" th:aria-controls="'area_'+${nest3ChildItem.sisyutuItemCode}">▼<span th:text="${nest3ChildItem.sisyutuItemName}"></span></button>
+											：<a class="btn btn-outline-info btn-sm" th:href="@{/myhacbook/managebaseinfo/expenditeminfo/actselect(sisyutuItemCode=${nest3ChildItem.sisyutuItemCode})}">４を追加・メンテ</a>
+											：<span th:text="${nest3ChildItem.sisyutuItemDetailContext}"></span>
+										<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${nest3ChildItem.sisyutuItemCode}">
+										
+											<!--/* 支出項目レベル４のデータを繰り返すリストブロックー */-->
+											<li th:each="nest4ChildItem : ${nest3ChildItem.childItemList}">
+											<th:block th:if="${#lists.size(nest4ChildItem.childItemList)}==0">
+												<button class="btn d-inline-flex align-items-center collapsed border-0">■<span th:text="${nest4ChildItem.sisyutuItemName}"></span></button>
+												：<a class="btn btn-outline-info btn-sm" th:href="@{/myhacbook/managebaseinfo/expenditeminfo/actselect(sisyutuItemCode=${nest4ChildItem.sisyutuItemCode})}">５を追加・メンテ</a>
+												：<span th:text="${nest4ChildItem.sisyutuItemDetailContext}"></span>
+											</th:block>
+											<th:block th:if="${#lists.size(nest4ChildItem.childItemList)}>0">
+												<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+													aria-expanded="false" th:data-bs-target="'#area_'+${nest4ChildItem.sisyutuItemCode}" th:aria-controls="'area_'+${nest4ChildItem.sisyutuItemCode}">▼<span th:text="${nest4ChildItem.sisyutuItemName}"></span></button>
+													：<a class="btn btn-outline-info btn-sm" th:href="@{/myhacbook/managebaseinfo/expenditeminfo/actselect(sisyutuItemCode=${nest4ChildItem.sisyutuItemCode})}">５を追加・メンテ</a>
+													：<span th:text="${nest4ChildItem.sisyutuItemDetailContext}"></span>
+												<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${nest4ChildItem.sisyutuItemCode}">
+												
+													<!--/* 支出項目レベル５のデータを繰り返すリストブロックー */-->
+													<li th:each="nest5ChildItem : ${nest4ChildItem.childItemList}">
+													<th:block th:if="${#lists.size(nest5ChildItem.childItemList)}==0">
+														<button class="btn d-inline-flex align-items-center collapsed border-0">■<span th:text="${nest5ChildItem.sisyutuItemName}"></span></button>
+														：<a class="btn btn-outline-info btn-sm" th:href="@{/myhacbook/managebaseinfo/expenditeminfo/actselect(sisyutuItemCode=${nest5ChildItem.sisyutuItemCode})}">メンテ</a>
+														：<span th:text="${nest5ChildItem.sisyutuItemDetailContext}"></span>
+													</th:block>
+													<th:block th:if="${#lists.size(nest5ChildItem.childItemList)}>0">
+														<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+															aria-expanded="false" th:data-bs-target="'#area_'+${nest5ChildItem.sisyutuItemCode}" th:aria-controls="'area_'+${nest5ChildItem.sisyutuItemCode}">▼<span th:text="${nest5ChildItem.sisyutuItemName}"></span></button>
+															：<p class="btn btn-outline-info btn-sm">ここが表示される場合はエラーです</p>
+															：<span th:text="${nest5ChildItem.sisyutuItemDetailContext}"></span>
+														<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${nest5ChildItem.sisyutuItemCode}">
+														
+															<!--/* 支出項目レベル６のデータを繰り返すリストブロックー＝仕様範囲外なので、エラーとなる */-->
+															<li>仕様範囲外データ表示中１：エラーです。管理者に問い合わせてください</li>
+															<li>仕様範囲外データ表示中２：エラーです。管理者に問い合わせてください</li>
+															<li>仕様範囲外データ表示中３：エラーです。管理者に問い合わせてください</li>
+														</ul>
+													</th:block>
+													</li>
+												</ul>
+											</th:block>
+											</li>
+										</ul>
+									</th:block>
+									</li>
+								</ul>
+							</th:block>
+							</li>
+						</ul>
+					</li>
+				</ul>
+
+			</div>
+			
+		</div>
+	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	
+</body>
+</html>

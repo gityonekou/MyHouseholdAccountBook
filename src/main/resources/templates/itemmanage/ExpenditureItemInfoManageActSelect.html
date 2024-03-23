@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<title>情報管理(支出項目)</title>
+</head>
+<body>
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card" th:object="${sisyutuItem}">
+			<div class="card-body">
+				<h5 class="card-title">情報管理(支出項目)　処理選択</h5>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
+			</div>
+			
+			<!-- 選択支出項目詳細情報 -->
+			<div class="card-body">
+				<div class="mb-3">
+					<label class="form-label">親の支出項目名：<span th:text="*{parentSisyutuItemName}"></span></label>
+				</div>
+				<div class="mb-3">
+					<label class="form-label">支出項目名：<span th:text="*{sisyutuItemName}"></span></label>
+				</div>
+				<div class="mb-3">
+					<label for="sisyutuItemDetailContext" class="form-label">支出項目詳細内容：</label>
+					<p class="card-text"><span>　<span><span th:text="*{sisyutuItemDetailContext}"></span></p>
+				</div>
+				<div class="mb-3">
+					<form name="ExpendItemInfoB" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/expenditeminfo/updateload/}">
+						<button th:if="!${addBtnDisabled}" class="btn btn-primary" name="actionAdd" id="expend-item-action-add-btn" type="submit" disabled>属する支出項目を新規追加</button>
+						<button th:if="${addBtnDisabled}" class="btn btn-primary" name="actionAdd" id="expend-item-action-add-btn" type="submit">属する支出項目を新規追加</button>
+						<button class="btn btn-primary" name="actionUpdate" id="expend-item-action-upd-btn" type="submit">更新</button>
+						<button class="btn btn-primary" name="actionCancel" id="expend-item-action-cancel-btn" type="submit">キャンセル</button>
+						<input type="hidden" th:field="*{sisyutuItemCode}" />
+					</form>
+				</div>
+			</div>
+			
+			<!-- 支出項目が属する親項目に登録されている項目のリスト -->
+			<div class="card-body">
+				<p class="h6">親の支出項目に属する支出項目一覧</p>
+				<p class="card-text">：<span th:text="*{parentSisyutuItemName}"></span></p>
+				<ul class="list-group">
+					<li th:each="memberItem : ${parentSisyutuItemMemberNameList}" class="list-group-item" th:text="${memberItem}"></li>
+				</ul>
+			</div>
+			
+		</div>
+	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	
+</body>
+</html>

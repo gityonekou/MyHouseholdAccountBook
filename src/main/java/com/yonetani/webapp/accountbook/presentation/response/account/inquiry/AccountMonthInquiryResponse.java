@@ -194,7 +194,7 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 	public static ModelAndView buildBindingError(YearMonthInquiryForm target) {
 		AccountMonthInquiryResponse res = new AccountMonthInquiryResponse();
 		// エラーメッセージを設定
-		res.addMessage("リクエスト情報が不正です。管理者に問い合わせてください。key=YearMonthInquiryForm");
+		res.addErrorMessage("リクエスト情報が不正です。管理者に問い合わせてください。key=YearMonthInquiryForm");
 		// 画面表示のModelとViewを生成
 		ModelAndView modelAndView = res.build();
 		// バリデーションチェックを行ったform入力情報をセット

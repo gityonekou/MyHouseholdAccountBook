@@ -165,19 +165,12 @@ public class ShopInfoManageResponse extends AbstractResponse {
 	}
 	
 	/**
-	 *<pre>
-	 * 情報管理(お店)画面初期表示(get要求)にリダイレクトします
-	 *</pre>
-	 * @return 画面返却データのModelAndView
-	 *
+	 * {@inheritDoc}
 	 */
 	@Override
-	public ModelAndView buildRedirect() {
-		if(isTransactionSuccessFull()) {
-			return new ModelAndView("redirect:/myhacbook/managebaseinfo/shopinfo/updateComplete/");
-		} else {
-			return super.buildRedirect();
-		}
+	protected String getRedirectUrl() {
+		// お店情報登録完了後、リダイレクトするURL
+		return "redirect:/myhacbook/managebaseinfo/shopinfo/updateComplete/";
 	}
 	
 	/**
@@ -192,7 +185,7 @@ public class ShopInfoManageResponse extends AbstractResponse {
 	public static ModelAndView buildBindingError(String errorMessage) {
 		ShopInfoManageResponse res = ShopInfoManageResponse.getInstance(null);
 		// エラーメッセージを設定
-		res.addMessage(errorMessage);
+		res.addErrorMessage(errorMessage);
 		// 画面表示のModelとViewを生成して返却
 		return res.build();
 	}

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<title>情報管理(支出項目)</title>
+</head>
+<body>
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">情報管理(支出項目)</h5>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
+			</div>
+			
+			<!-- 支出項目入力フォーム -->
+			<form name="ExpendItemInfo" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/expenditeminfo/update/}" th:object="${expenditureItemInfoForm}">
+			<div class="card-body">
+				<div class="mb-3">
+					<label class="form-label">親の支出項目名：<span th:text="${parentSisyutuItemName}"></span></label>
+				</div>
+				<div class="mb-3">
+					<label for="sisyutuItemName" class="form-label">支出項目名</label>
+ 					<input type="text" class="form-control w50" th:errorclass="is-invalid" th:field="*{sisyutuItemName}" required>
+ 					<p class="invalid-feedback" th:errors="*{sisyutuItemName}"></p>
+				</div>
+				<div class="mb-3">
+					<label for="sisyutuItemDetailContext" class="form-label">支出項目詳細内容</label>
+ 					<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{sisyutuItemDetailContext}">
+ 					<p class="invalid-feedback" th:errors="*{sisyutuItemDetailContext}"></p>
+				</div>
+				<div class="mb-3">
+					<label for="sisyutuItemSort" class="form-label">支出項目表示順</label>
+ 					<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{sisyutuItemSort}">
+ 					<p class="invalid-feedback" th:errors="*{sisyutuItemSort}"></p>
+				</div>
+				<div class="mb-3">
+					<button class="btn btn-primary" type="submit">登録</button>
+					<input type="hidden" th:field="*{action}" />
+					<input type="hidden" th:field="*{sisyutuItemCode}" />
+					<input type="hidden" th:field="*{parentSisyutuItemCode}" />
+					<input type="hidden" th:field="*{sisyutuItemLevel}" />
+					<input type="hidden" th:field="*{enableUpdateFlg}" />
+				</div>
+			</div>
+			</form>
+			
+			<!-- 支出項目一覧表示エリア -->
+			<div class="card-body">
+				<p class="card-text">登録済み支出項目一覧</p>
+				<ul class="list-unstyled">
+					
+					<!--/* 支出項目レベル１のデータを繰り返すリストブロックー */-->
+					<li class="mt-1 border border-dark" th:each="item : ${expenditureItemList}">
+						<div class="bg-info">
+						<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+							aria-expanded="false" th:data-bs-target="'#area_'+${item.sisyutuItemCode}" th:aria-controls="'area_'+${item.sisyutuItemCode}">▼<span th:text="${item.sisyutuItemName}"></span></button>
+							：<span th:text="${item.sisyutuItemDetailContext}"></span>
+						</div>
+						<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${item.sisyutuItemCode}">
+							
+							<!--/* 支出項目レベル２のデータを繰り返すリストブロックー */-->
+							<li class="mt-1 border border-primary" th:each="childItem : ${item.childItemList}">
+							<th:block th:if="${#lists.size(childItem.childItemList)}==0">
+								<div class="bg-warning">
+								<button class="btn d-inline-flex align-items-center collapsed border-0">■<span th:text="${childItem.sisyutuItemName}"></span></button>
+								：<span th:text="${childItem.sisyutuItemDetailContext}"></span>
+								</div>
+							</th:block>
+							<th:block th:if="${#lists.size(childItem.childItemList)}>0">
+								<div class="bg-warning">
+								<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+									aria-expanded="false" th:data-bs-target="'#area_'+${childItem.sisyutuItemCode}" th:aria-controls="'area_'+${childItem.sisyutuItemCode}">▼<span th:text="${childItem.sisyutuItemName}"></span></button>
+									：<a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/managebaseinfo/expenditeminfo/updateload(sisyutuItemCode=${childItem.sisyutuItemCode})}">３：表示順変更はここでする？</a>
+									：<span th:text="${childItem.sisyutuItemDetailContext}"></span>
+								</div>
+								<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${childItem.sisyutuItemCode}">
+
+									<!--/* 支出項目レベル３のデータを繰り返すリストブロックー */-->
+									<li th:each="nest3ChildItem : ${childItem.childItemList}">
+									<th:block th:if="${#lists.size(nest3ChildItem.childItemList)}==0">
+										<button class="btn d-inline-flex align-items-center collapsed border-0">■<span th:text="${nest3ChildItem.sisyutuItemName}"></span></button>
+										：<span th:text="${nest3ChildItem.sisyutuItemDetailContext}"></span>
+									</th:block>
+									<th:block th:if="${#lists.size(nest3ChildItem.childItemList)}>0">
+										<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+											aria-expanded="false" th:data-bs-target="'#area_'+${nest3ChildItem.sisyutuItemCode}" th:aria-controls="'area_'+${nest3ChildItem.sisyutuItemCode}">▼<span th:text="${nest3ChildItem.sisyutuItemName}"></span></button>
+											：<a class="btn btn-outline-info btn-sm" th:href="@{/myhacbook/managebaseinfo/expenditeminfo/updateload(sisyutuItemCode=${nest3ChildItem.sisyutuItemCode})}">４：表示順変更はここでする？</a>
+											：<span th:text="${nest3ChildItem.sisyutuItemDetailContext}"></span>
+										<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${nest3ChildItem.sisyutuItemCode}">
+										
+											<!--/* 支出項目レベル４のデータを繰り返すリストブロックー */-->
+											<li th:each="nest4ChildItem : ${nest3ChildItem.childItemList}">
+											<th:block th:if="${#lists.size(nest4ChildItem.childItemList)}==0">
+												<button class="btn d-inline-flex align-items-center collapsed border-0">■<span th:text="${nest4ChildItem.sisyutuItemName}"></span></button>
+												：<span th:text="${nest4ChildItem.sisyutuItemDetailContext}"></span>
+											</th:block>
+											<th:block th:if="${#lists.size(nest4ChildItem.childItemList)}>0">
+												<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+													aria-expanded="false" th:data-bs-target="'#area_'+${nest4ChildItem.sisyutuItemCode}" th:aria-controls="'area_'+${nest4ChildItem.sisyutuItemCode}">▼<span th:text="${nest4ChildItem.sisyutuItemName}"></span></button>
+													：<a class="btn btn-outline-info btn-sm" th:href="@{/myhacbook/managebaseinfo/expenditeminfo/updateload(sisyutuItemCode=${nest4ChildItem.sisyutuItemCode})}">５：表示順変更はここでする？</a>
+													：<span th:text="${nest4ChildItem.sisyutuItemDetailContext}"></span>
+												<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${nest4ChildItem.sisyutuItemCode}">
+												
+													<!--/* 支出項目レベル５のデータを繰り返すリストブロックー */-->
+													<li th:each="nest5ChildItem : ${nest4ChildItem.childItemList}">
+													<th:block th:if="${#lists.size(nest5ChildItem.childItemList)}==0">
+														<button class="btn d-inline-flex align-items-center collapsed border-0">■<span th:text="${nest5ChildItem.sisyutuItemName}"></span></button>
+														：<span th:text="${nest5ChildItem.sisyutuItemDetailContext}"></span>
+													</th:block>
+													<th:block th:if="${#lists.size(nest5ChildItem.childItemList)}>0">
+														<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+															aria-expanded="false" th:data-bs-target="'#area_'+${nest5ChildItem.sisyutuItemCode}" th:aria-controls="'area_'+${nest5ChildItem.sisyutuItemCode}">▼<span th:text="${nest5ChildItem.sisyutuItemName}"></span></button>
+															：<p class="btn btn-outline-info btn-sm">ここが表示される場合はエラーです</p>
+															：<span th:text="${nest5ChildItem.sisyutuItemDetailContext}"></span>
+														<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${nest5ChildItem.sisyutuItemCode}">
+														
+															<!--/* 支出項目レベル６のデータを繰り返すリストブロックー＝仕様範囲外なので、エラーとなる */-->
+															<li>仕様範囲外データ表示中１：エラーです。管理者に問い合わせてください</li>
+															<li>仕様範囲外データ表示中２：エラーです。管理者に問い合わせてください</li>
+															<li>仕様範囲外データ表示中３：エラーです。管理者に問い合わせてください</li>
+														</ul>
+													</th:block>
+													</li>
+												</ul>
+											</th:block>
+											</li>
+										</ul>
+									</th:block>
+									</li>
+								</ul>
+							</th:block>
+							</li>
+						</ul>
+					</li>
+				</ul>
+
+			</div>
+			
+		</div>
+	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	
+</body>
+</html>

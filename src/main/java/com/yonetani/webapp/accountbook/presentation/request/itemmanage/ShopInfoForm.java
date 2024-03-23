@@ -1,5 +1,5 @@
 /**
- * 情報管理(お店)画面の店舗情報が格納されたformデータです。
+ * 情報管理(お店)画面の店舗情報が格納されたフォームデータです。
  *
  *------------------------------------------------
  * 更新履歴
@@ -11,13 +11,13 @@ package com.yonetani.webapp.accountbook.presentation.request.itemmanage;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
  *<pre>
- * 情報管理(お店)画面の店舗情報が格納されたformデータです。
+ * 情報管理(お店)画面の店舗情報が格納されたフォームデータです。
  *
  *</pre>
  *
@@ -35,9 +35,10 @@ public class ShopInfoForm {
 	private String shopSortBefore;
 	
 	// 店舗区分
-	@NotNull
+	@NotBlank
 	private String shopKubun;
 	// 店舗名
+	@NotBlank
 	@Size(min = 1, max = 50)
 	private String shopName;
 	// 表示順

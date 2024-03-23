@@ -59,9 +59,7 @@ public class ShopInfoManageController {
 	/**
 	 *<pre>
 	 * 情報管理(お店)画面表示のGET要求時マッピングです。
-	 * 以下GETリクエストに対応します。
-	 * ・トップメニューからの遷移(初期表示)
-	 * ・お店情報登録・更新成功時→リダイレクト
+	 * トップメニューからの遷移(初期表示)時のGETリクエストに対応します。
 	 *</pre>
 	 * @return 情報管理(お店)画面
 	 *
@@ -96,6 +94,8 @@ public class ShopInfoManageController {
 	 *<pre>
 	 * お店情報登録・更新のPOST要求時マッピングです。
 	 *</pre>
+	 * @param shopForm 入力フォーム情報
+	 * @param bindingResult フォームのバリデーションチェック結果
 	 * @return 情報管理(お店)画面
 	 *
 	 */

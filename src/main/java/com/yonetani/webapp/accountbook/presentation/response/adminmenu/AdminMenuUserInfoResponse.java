@@ -133,19 +133,12 @@ public class AdminMenuUserInfoResponse extends AbstractResponse {
 	}
 	
 	/**
-	 *<pre>
-	 * ユーザ登録画面初期表示(get要求)にリダイレクトします
-	 *</pre>
-	 * @return 画面返却データのModelAndView
-	 *
+	 * {@inheritDoc}
 	 */
 	@Override
-	public ModelAndView buildRedirect() {
-		if(isTransactionSuccessFull()) {
-			return new ModelAndView("redirect:/myhacbook/admin/completeUseraAdd/");
-		} else {
-			return super.buildRedirect();
-		}
+	protected String getRedirectUrl() {
+		// ユーザ登録完了後、リダイレクトするURL
+		return "redirect:/myhacbook/admin/completeUseraAdd/";
 	}
 	
 	/**
@@ -159,7 +152,7 @@ public class AdminMenuUserInfoResponse extends AbstractResponse {
 	public static ModelAndView buildBindingError(String errorMessage) {
 		AdminMenuUserInfoResponse res = new AdminMenuUserInfoResponse();
 		// エラーメッセージを設定
-		res.addMessage(errorMessage);
+		res.addErrorMessage(errorMessage);
 		// 画面表示のModelとViewを生成して返却
 		return res.build();
 	}
@@ -194,7 +187,7 @@ public class AdminMenuUserInfoResponse extends AbstractResponse {
 		// バリデーションチェックを行った入力フォームの値を設定
 		res.setAdminMenuUserInfoForm(userForm);
 		// エラーメッセージを設定
-		res.addMessage(errorMessage);
+		res.addErrorMessage(errorMessage);
 		// 画面表示のModelとViewを生成して返却
 		return res.build();
 	}

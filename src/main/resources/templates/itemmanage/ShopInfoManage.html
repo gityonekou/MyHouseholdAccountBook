@@ -54,13 +54,8 @@
 			<!-- お店一覧表示エリア -->
 			<div class="list-group">
 				<a class="list-group-item list-group-item-secondary">表示順&emsp;店名&emsp;：店舗区分&emsp;&emsp;※更新する場合は対象行をクリックしてください</a>
-				
-				<th:block th:each="shopItem : ${shopList}">
-					<a th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload(shopCode=${shopItem.shopCode})}" class="list-group-item list-group-item-action"><span th:text="${shopItem.shopSort}"></span>&emsp;<span th:text="${shopItem.shopName}"></span>&emsp;：<span th:text="${shopItem.shopKubunName}"></span></a>
-				</th:block>
-				<th:block th:each="nonEditShopItem : ${nonEditShopList}">
-					<a class="list-group-item list-group-item-secondary"><span th:text="${nonEditShopItem.shopSort}"></span>&emsp;<span th:text="${nonEditShopItem.shopName}"></span>&emsp;※変更できません</a>
-				</th:block>
+				<a th:each="shopItem : ${shopList}" th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload(shopCode=${shopItem.shopCode})}" class="list-group-item list-group-item-action"><span th:text="${shopItem.shopSort}"></span>&emsp;<span th:text="${shopItem.shopName}"></span>&emsp;：<span th:text="${shopItem.shopKubunName}"></span></a>
+				<a th:each="nonEditShopItem : ${nonEditShopList}" class="list-group-item list-group-item-secondary"><span th:text="${nonEditShopItem.shopSort}"></span>&emsp;<span th:text="${nonEditShopItem.shopName}"></span>&emsp;※変更できません</a>
 			</div>
 		</div>
 	</div>

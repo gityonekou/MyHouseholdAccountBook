@@ -43,7 +43,7 @@ public @interface FileRequired {
 	@Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 	@Retention(RetentionPolicy.RUNTIME)
 	@Documented
-	@interface List {
+	public static @interface List {
 		FileRequired[] value();
 	}
 }

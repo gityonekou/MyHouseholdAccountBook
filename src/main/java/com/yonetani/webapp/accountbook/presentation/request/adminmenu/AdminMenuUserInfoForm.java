@@ -1,5 +1,5 @@
 /**
- * ユーザ情報管理画面のユーザ登録情報が格納されたformデータです。
+ * ユーザ情報管理画面のユーザ登録情報が格納されたフォームデータです。
  *
  *------------------------------------------------
  * 更新履歴
@@ -13,15 +13,15 @@ import java.util.List;
 import java.util.Objects;
 
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
  *<pre>
- * ユーザ情報管理画面のユーザ登録情報が格納されたformデータです。
+ * ユーザ情報管理画面のユーザ登録情報が格納されたフォームデータです。
  *
  *</pre>
  *
@@ -36,17 +36,17 @@ public class AdminMenuUserInfoForm {
 	private String action;
 	
 	// ユーザID
-	@NotNull
+	@NotBlank
 	@Size(min = 6, max = 50)
 	private String userId;
 	
 	// ユーザ名
-	@NotNull
+	@NotBlank
 	@Size(max = 100)
 	private String userName;
 	
 	// ステータス(有効)
-	@NotNull
+	@NotBlank
 	private String userStatus;
 	
 	// ユーザロール
@@ -54,19 +54,19 @@ public class AdminMenuUserInfoForm {
 	private List<String> userRole;
 	
 	// ユーザパスワード
-	@NotNull
+	@NotBlank
 	@Size(min = 8,max = 15)
 	@Pattern(regexp = "^[0-9a-zA-Z]+$")
 	private String userPassword;
 	
 	// ユーザパスワード(再入力)
-	@NotNull
+	@NotBlank
 	@Size(min = 8,max = 15)
 	@Pattern(regexp = "^[0-9a-zA-Z]+$")
 	private String userPasswordRetry;
 	
 	// 決算年月
-	@NotNull
+	@NotBlank
 	@Size(min = 6,max = 6)
 	private String targetYearMonth;
 	

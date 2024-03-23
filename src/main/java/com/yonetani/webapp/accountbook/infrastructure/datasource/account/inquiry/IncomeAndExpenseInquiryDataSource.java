@@ -53,14 +53,8 @@ public class IncomeAndExpenseInquiryDataSource implements IncomeAndExpenseInquir
 				searchQuery.getUserId().toString(),
 				searchQuery.getYear().toString()));
 		// 検索結果をドメインモデルに変換して返却
-		return IncomeAndExpenseInquiryList.from(result.stream().map(
-					dto ->	IncomeAndExpenseInquiryItem.from(
-							dto.getTargetMonth(),
-							dto.getIncomeKingaku(),
-							dto.getExpenseKingaku(),
-							dto.getExpenseYoteiKingaku(),
-							dto.getSyuusiKingaku()
-							)).collect(Collectors.toUnmodifiableList()));
+		return IncomeAndExpenseInquiryList.from(result.stream().map(dto ->	 createIncomeAndExpenseInquiryItem(dto))
+					.collect(Collectors.toUnmodifiableList()));
 	}
 
 	/**
@@ -76,16 +70,31 @@ public class IncomeAndExpenseInquiryDataSource implements IncomeAndExpenseInquir
 				));
 		// 検索結果をドメインモデルに変換して返却
 		if(result != null) {
-			return IncomeAndExpenseInquiryItem.from(
-					result.getTargetMonth(),
-					result.getIncomeKingaku(),
-					result.getExpenseKingaku(),
-					result.getExpenseYoteiKingaku(),
-					result.getSyuusiKingaku()
-					);
+			return createIncomeAndExpenseInquiryItem(result);
 		} else {
 			return IncomeAndExpenseInquiryItem.fromEmpty();
 		}
 	}
 
+	/**
+	 *<pre>
+	 * 引数で指定した収支テーブル:INCOME_AND_EXPENSE_TABLEテーブルの各項目のDTOから収支情報ドメインモデルを生成して返します。
+	 *</pre>
+	 * @param dto 収支テーブル:INCOME_AND_EXPENSE_TABLEテーブルの各項目のDTO
+	 * @return 収支情報ドメインモデル
+	 *
+	 */
+	private IncomeAndExpenseInquiryItem createIncomeAndExpenseInquiryItem(IncomeAndExpenseReadDto dto) {
+		return IncomeAndExpenseInquiryItem.from(
+				// 対象月
+				dto.getTargetMonth(),
+				// 収入金額
+				dto.getIncomeKingaku(),
+				// 支出金額
+				dto.getExpenseKingaku(),
+				// 支出予定金額
+				dto.getExpenseYoteiKingaku(),
+				// 収支
+				dto.getSyuusiKingaku());
+	}
 }

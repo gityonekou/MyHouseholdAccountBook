@@ -80,7 +80,7 @@ public class ShopInfoManageUseCase {
 		// 店舗グループをもとにレスポンスを生成
 		if(shopGroupList == null) {
 			ShopInfoManageResponse response = ShopInfoManageResponse.getInstance(null);
-			response.addMessage("コード定義ファイルに「店舗グループ情報：" + MyHouseholdAccountBookContent.SHOP_KUBUN_CODE + "」が登録されていません。管理者に問い合わせてください");
+			response.addErrorMessage("コード定義ファイルに「店舗グループ情報：" + MyHouseholdAccountBookContent.SHOP_KUBUN_CODE + "」が登録されていません。管理者に問い合わせてください");
 			return response;
 		}
 		// 店舗グループの選択ボックスは入力先でデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定
@@ -123,15 +123,23 @@ public class ShopInfoManageUseCase {
 		// 店舗IDに対応する店舗情報を取得
 		Shop shop = shopRepository.findByIdAndShopCode(SearchQueryUserIdAndShopCode.from(user.getUserId(), shopCode));
 		if(shop == null) {
-			response.addMessage("更新対象の店舗情報が存在しません。管理者に問い合わせてください。shopCode:" + shopCode);
+			response.addErrorMessage("更新対象の店舗情報が存在しません。管理者に問い合わせてください。shopCode:" + shopCode);
 		} else {
+			// 店舗情報のformデータ
 			ShopInfoForm form = new ShopInfoForm();
+			// アクション
 			form.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE);
+			// 店舗コード
 			form.setShopCode(shop.getShopCode().toString());
+			// 店舗区分
 			form.setShopKubun(shop.getShopKubunCode().toString());
+			// 店舗名
 			form.setShopName(shop.getShopName().toString());
+			// 表示順
 			form.setShopSort(Integer.parseInt(shop.getShopSort().toString()));
+			// 表示順(更新比較用)
 			form.setShopSortBefore(shop.getShopSort().toString());
+			
 			response.setShopInfoForm(form);
 		}
 		return response;
@@ -164,8 +172,7 @@ public class ShopInfoManageUseCase {
 			count++;
 			// 登録済み店舗数が900件より多い場合、エラー
 			if(count >= 900) {
-				log.error("登録済み店舗数が900件以上あります。");
-				response.addMessage("店舗は900件以上登録できません。管理者に問い合わせてください。");
+				response.addErrorMessage("店舗は900件以上登録できません。管理者に問い合わせてください。");
 				return response;
 			}
 			
@@ -195,15 +202,14 @@ public class ShopInfoManageUseCase {
 			int addCount = shopRepository.add(shop);
 			// 追加件数が1件以上の場合、業務エラー
 			if(addCount != 1) {
-				throw new MyHouseholdAccountBookRuntimeException("店舗テーブルへの追加件数が不正でした。[add data:" + shop + "]");
+				throw new MyHouseholdAccountBookRuntimeException("店舗テーブルへの追加件数が不正でした。[件数=" + addCount + "][add data:" + shop + "]");
 			}
 			
 		// 更新の場合
 		} else if (shopForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
 			// 旧表示順の値をチェック
 			if(!StringUtils.hasLength(shopForm.getShopSortBefore())) {
-				log.error("旧表示順の値が不正です: ShopSortBefore=" + shopForm.getShopSortBefore());
-				response.addMessage("旧表示順の値が不正です。管理者に問い合わせてください。ShopSortBefore=" + shopForm.getShopSortBefore());
+				response.addErrorMessage("旧表示順の値が不正です。管理者に問い合わせてください。ShopSortBefore=" + shopForm.getShopSortBefore());
 				return response;
 			}
 			
@@ -254,12 +260,11 @@ public class ShopInfoManageUseCase {
 			int updateCount = shopRepository.update(shop);
 			// 更新件数が1件以上の場合、業務エラー
 			if(updateCount != 1) {
-				throw new MyHouseholdAccountBookRuntimeException("店舗テーブルへの更新件数が不正でした。[add data:" + shop + "]");
+				throw new MyHouseholdAccountBookRuntimeException("店舗テーブルへの更新件数が不正でした。[件数=" + updateCount + "][update data:" + shop + "]");
 			}
 			
 		} else {
-			log.error("未定義のアクションが指定されました: action=" + shopForm.getAction());
-			response.addMessage("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + shopForm.getAction());
+			response.addErrorMessage("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + shopForm.getAction());
 			return response;
 			
 		}

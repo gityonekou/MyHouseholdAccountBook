@@ -64,6 +64,20 @@ public class AdminMenuServiceController {
 	
 	/**
 	 *<pre>
+	 * ★パッチ充て用に急遽作った処理：後で、パッチ充て処理として本格対応する（家計簿ベース完了後）
+	 *</pre>
+	 *
+	 */
+	@PostMapping("/custominfo/")
+	public ModelAndView postCustomInfo() {
+		log.debug("postCustomInfo:");
+		
+		// 指定ファイルの情報をベーステーブルに出力します。
+		return this.userInfoUseCase.customInfo().buildRedirect();
+	}
+	
+	/**
+	 *<pre>
 	 * 管理者画面メニュー ユーザ登録画面初期表示のGet要求時のマッピングです。
 	 *</pre>
 	 * @return ユーザ登録画面情報

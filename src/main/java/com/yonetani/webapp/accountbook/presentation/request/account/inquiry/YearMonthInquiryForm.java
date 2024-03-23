@@ -1,6 +1,6 @@
 /**
  * マイ家計簿
- * 家計簿照会画面の検索条件:年月の値が格納されたformデータです。
+ * 家計簿照会画面の検索条件:年月の値が格納されたフォームデータです。
  *
  *------------------------------------------------
  * 更新履歴
@@ -10,14 +10,14 @@
  */
 package com.yonetani.webapp.accountbook.presentation.request.account.inquiry;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 /**
  *<pre>
  * マイ家計簿
- * 家計簿照会画面の検索条件:年月の値が格納されたformデータです。
+ * 家計簿照会画面の検索条件:年月の値が格納されたフォームデータです。
  *
  *</pre>
  *
@@ -28,7 +28,7 @@ import lombok.Data;
 @Data
 public class YearMonthInquiryForm {
 	// 検索条件：年月
-	@NotNull
+	@NotBlank
 	@Size(max = 6)
 	private String targetYearMonth;
 

@@ -14,6 +14,8 @@ import java.util.List;
 
 import org.springframework.web.servlet.ModelAndView;
 
+import lombok.extern.log4j.Log4j2;
+
 /**
  *<pre>
  * 各画面情報のレスポンスの基底クラスです。
@@ -24,6 +26,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @since 家計簿アプリ(1.00.A)
  *
  */
+@Log4j2
 public abstract class AbstractResponse {
 
 	// 画面に出力するメッセージ
@@ -31,6 +34,37 @@ public abstract class AbstractResponse {
 	
 	// 処理結果
 	private boolean transactionSuccessFull = false;
+	
+	// エラー有無フラグ
+	private boolean errorResponse = false;
+	
+	/**
+	 *<pre>
+	 * 表示メッセージ「エラー」を追加します。
+	 *</pre>
+	 * @param message
+	 *
+	 */
+	public void addErrorMessage(String message) {
+		messages.add(message);
+		log.error(message);
+		if(!errorResponse) {
+			errorResponse = true;
+		}
+	}
+	
+	/**
+	 *<pre>
+	 * メッセージにエラーメッセージが設定されているかどうかを返します。
+	 *</pre>
+	 * @return メッセージにエラーメッセージが設定されているかどうか<br>
+	 * レスポンスにエラーが設定されている場合、true<br>
+	 * レスポンスにエラー未設定の場合、false
+	 *
+	 */
+	public boolean isErrorResponse() {
+		return errorResponse;
+	}
 	
 	/**
 	 *<pre>
@@ -52,6 +86,17 @@ public abstract class AbstractResponse {
 	 */
 	public boolean hasMessages() {
 		return !messages.isEmpty();
+	}
+	
+	/**
+	 *<pre>
+	 * 現在設定されているメッセージのリストを返します。
+	 *</pre>
+	 * @return
+	 *
+	 */
+	public List<String> getdMessagesList() {
+		return messages;
 	}
 	
 	/**
@@ -84,7 +129,7 @@ public abstract class AbstractResponse {
 	 * トランザクション処理がすべて正常に完了したかどうかのフラグを取得します。
 	 * @return transactionSuccessFull
 	 */
-	protected boolean isTransactionSuccessFull() {
+	public boolean isTransactionSuccessFull() {
 		return transactionSuccessFull;
 	}
 
@@ -99,14 +144,32 @@ public abstract class AbstractResponse {
 	
 	/**
 	 *<pre>
-	 * リダイレクト処理です。
-	 * トランザクション処理完了後、リダイレクトが必要な場合はこのメソッドをオーバーライドして実装してください。
+	 * トランザクションリが完了した場合にリダイレクトするURLを返します。
+	 * デフォルトはトップ画面(トップメニュー画面)です。
+	 * 遷移先を変更する場合はこのメソッドをオーバーライドして実装してください。
 	 *</pre>
+	 * @return トランザクションリが完了した場合にリダイレクトするURL
+	 *
+	 */
+	protected String getRedirectUrl() {
+		return "redirect:/myhacbook/topmenu/";
+	}
+	
+	/**
+	 *<pre>
+	 * リダイレクト処理です。
+	 *</pre>
+	 * @param redirectViewName トランザクションリが完了した場合にリダイレクトするURL
+	 * @param errorViewName トランザクション処理化完了しなかった場合に遷移するURL
 	 * @return 画面返却データのModelAndView
 	 *
 	 */
-	public ModelAndView buildRedirect() {
-		return build();
+	public final ModelAndView buildRedirect() {
+		if(isTransactionSuccessFull()) {
+			return new ModelAndView(getRedirectUrl());
+		} else {
+			return build();
+		}
 	}
 	
 	/**
@@ -114,7 +177,7 @@ public abstract class AbstractResponse {
 	 * リダイレクト後の画面返却データのModelAndViewを生成して返します。
 	 * 画面表示メッセージは共通で「処理が正常に完了しました。」となります。
 	 *</pre>
-	 * @return
+	 * @return 画面返却データのModelAndView
 	 *
 	 */
 	public ModelAndView buildComplete() {

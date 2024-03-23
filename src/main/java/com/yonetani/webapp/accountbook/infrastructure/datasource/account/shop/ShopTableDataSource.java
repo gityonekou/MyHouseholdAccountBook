@@ -53,15 +53,28 @@ public class ShopTableDataSource implements ShopTableRepository {
 	@Override
 	public int add(Shop data) {
 		// 店舗情報を店舗テーブルに出力
-		return mapper.insert(ShopReadWriteDto.from(
-				data.getUserId().toString(),
-				data.getShopCode().toString(),
-				data.getShopKubunCode().toString(),
-				data.getShopName().toString(),
-				data.getShopSort().toString()));
+		return mapper.insert(createShopReadWriteDto(data));
 
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int update(Shop data) {
+		// 店舗テーブル:SHOP_TABLEを更新
+		return mapper.update(createShopReadWriteDto(data));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int updateShopSort(Shop data) {
+		// 店舗テーブル:SHOP_TABLEの表示順の値を更新
+		return mapper.updateShopSort(createShopReadWriteDto(data));
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -74,13 +87,7 @@ public class ShopTableDataSource implements ShopTableRepository {
 			return ShopInquiryList.from(null);
 		} else {
 			// 検索結果ありの場合、ドメインに変換して返却
-			return ShopInquiryList.from(searchResult.stream().map(dto ->
-				Shop.from(
-						dto.getUserId(),
-						dto.getShopCode(),
-						dto.getShopKubunCode(),
-						dto.getShopName(),
-						dto.getShopSort())).collect(Collectors.toUnmodifiableList()));
+			return ShopInquiryList.from(searchResult.stream().map(dto -> createShop(dto)).collect(Collectors.toUnmodifiableList()));
 		}
 		
 	}
@@ -98,41 +105,8 @@ public class ShopTableDataSource implements ShopTableRepository {
 			return null;
 		} else {
 			// 検索結果をドメインに変換して返却
-			return Shop.from(
-					result.getUserId(),
-					result.getShopCode(),
-					result.getShopKubunCode(), 
-					result.getShopName(), 
-					result.getShopSort());
+			return createShop(result);
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int update(Shop data) {
-		// 店舗テーブル:SHOP_TABLEを更新
-		return mapper.update(ShopReadWriteDto.from(
-				data.getUserId().toString(),
-				data.getShopCode().toString(),
-				data.getShopKubunCode().toString(),
-				data.getShopName().toString(),
-				data.getShopSort().toString()));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int updateShopSort(Shop data) {
-		// 店舗テーブル:SHOP_TABLEの表示順の値を更新
-		return mapper.updateShopSort(ShopReadWriteDto.from(
-				data.getUserId().toString(),
-				data.getShopCode().toString(),
-				data.getShopKubunCode().toString(),
-				data.getShopName().toString(),
-				data.getShopSort().toString()));
 	}
 	
 	/**
@@ -157,13 +131,7 @@ public class ShopTableDataSource implements ShopTableRepository {
 			return ShopInquiryList.from(null);
 		} else {
 			// 検索結果ありの場合、ドメインに変換して返却
-			return ShopInquiryList.from(searchResult.stream().map(dto ->
-				Shop.from(
-						dto.getUserId(),
-						dto.getShopCode(),
-						dto.getShopKubunCode(),
-						dto.getShopName(),
-						dto.getShopSort())).collect(Collectors.toUnmodifiableList()));
+			return ShopInquiryList.from(searchResult.stream().map(dto -> createShop(dto)).collect(Collectors.toUnmodifiableList()));
 		}
 	}
 	
@@ -183,13 +151,51 @@ public class ShopTableDataSource implements ShopTableRepository {
 			return ShopInquiryList.from(null);
 		} else {
 			// 検索結果ありの場合、ドメインに変換して返却
-			return ShopInquiryList.from(searchResult.stream().map(dto ->
-				Shop.from(
-						dto.getUserId(),
-						dto.getShopCode(),
-						dto.getShopKubunCode(),
-						dto.getShopName(),
-						dto.getShopSort())).collect(Collectors.toUnmodifiableList()));
+			return ShopInquiryList.from(searchResult.stream().map(dto -> createShop(dto)).collect(Collectors.toUnmodifiableList()));
 		}
+	}
+	
+	/**
+	 *<pre>
+	 * 引数で指定した店舗テーブル:SHOP_TABLE読込・出力情報から店舗テーブル情報ドメインモデルを生成して返します。
+	 *</pre>
+	 * @param dto 店舗テーブル:SHOP_TABLE読込・出力情報
+	 * @return 店舗テーブル情報ドメインモデル
+	 *
+	 */
+	private Shop createShop(ShopReadWriteDto dto) {
+		return Shop.from(
+				// ユーザID
+				dto.getUserId(),
+				// 店舗コード
+				dto.getShopCode(),
+				// 店舗区分コード
+				dto.getShopKubunCode(),
+				// 店舗名
+				dto.getShopName(),
+				// 店舗表示順
+				dto.getShopSort());
+	}
+	
+	/**
+	 *<pre>
+	 * 引数で指定した店舗テーブル情報ドメインモデルからDTOを生成して返します。
+	 *</pre>
+	 * @param data　店舗テーブル情報ドメインモデル
+	 * @return 店舗テーブル:SHOP_TABLE読込・出力情報
+	 *
+	 */
+	private ShopReadWriteDto createShopReadWriteDto(Shop data) {
+		return ShopReadWriteDto.from(
+				// ユーザID
+				data.getUserId().toString(),
+				// 店舗コード
+				data.getShopCode().toString(),
+				// 店舗区分コード
+				data.getShopKubunCode().toString(),
+				// 店舗名
+				data.getShopName().toString(),
+				// 店舗表示順
+				data.getShopSort().toString());
 	}
 }

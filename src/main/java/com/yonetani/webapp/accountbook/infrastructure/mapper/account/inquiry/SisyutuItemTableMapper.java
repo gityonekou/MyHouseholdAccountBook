@@ -9,11 +9,17 @@
  */
 package com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.SisyutuItemReadWriteDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndSisyutuItemCodeSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSearchQueryDto;
 
 /**
  *<pre>
@@ -37,4 +43,62 @@ public interface SisyutuItemTableMapper {
 	 */
 	@Insert("sql/account/inquiry/SisyutuItemTableInsertSql01.sql")
 	public int insert(@Param("dto") SisyutuItemReadWriteDto writeDto);
+	
+	/**
+	 *<pre>
+	 * 支出項目テーブル:SISYUTU_ITEM_TABLEの情報を指定の支出項目情報で更新します。
+	 *</pre>
+	 * @param writeDto 支出項目テーブル:SISYUTU_ITEM_TABLE出力情報
+	 * @return 支出項目テーブルを更新した件数
+	 *
+	 */
+	@Update("sql/account/inquiry/SisyutuItemTableUpdateSql01.sql")
+	public int update(@Param("dto") SisyutuItemReadWriteDto writeDto);
+
+	/**
+	 *<pre>
+	 * 支出項目テーブル:SISYUTU_ITEM_TABLEの支出項目詳細内容項目の値を更新します。
+	 *</pre>
+	 * @param writeDto 支出項目テーブル:SISYUTU_ITEM_TABLE出力情報
+	 * @return 支出項目テーブルを更新した件数
+	 *
+	 */
+	@Update("sql/account/inquiry/SisyutuItemTableUpdateSql02.sql")
+	public int updateSisyutuItemDetailContext(@Param("dto") SisyutuItemReadWriteDto writeDto);
+	
+	/**
+	 *<pre>
+	 * 指定のユーザIDを条件に支出項目テーブル:SISYUTU_ITEM_TABLEを参照します。
+	 *</pre>
+	 * @param search 検索条件:ユーザID
+	 * @return 支出項目テーブル:SISYUTU_ITEM_TABLE参照結果のリスト
+	 *
+	 */
+	@Select("sql/account/inquiry/SisyutuItemTableSelectSql01.sql")
+	public List<SisyutuItemReadWriteDto> findById(@Param("dto") UserIdSearchQueryDto search);
+	
+	/**
+	 *<pre>
+	 * 指定のユーザID、支出項目コードを条件に支出項目テーブル:SISYUTU_ITEM_TABLEを参照します。
+	 *</pre>
+	 * @param search 検索条件:ユーザID、支出項目コード
+	 * @return 支出項目テーブル:SISYUTU_ITEM_TABLE参照結果
+	 *
+	 */
+	@Select("sql/account/inquiry/SisyutuItemTableSelectSql02.sql")
+	public SisyutuItemReadWriteDto findByIdAndSisyutuItemCode(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
+	
+	
+	/**
+	 *<pre>
+	 * 指定のユーザID、親の支出項目コードを条件に支出項目テーブル:SISYUTU_ITEM_TABLEを参照し、
+	 * 親の支出項目に属する支出項目の名称一覧を取得します。
+	 *</pre>
+	 * @param search 検索条件:ユーザID、支出項目コード
+	 * @return 親の支出項目に属する支出項目の名称の参照結果(リスト情報)
+	 *
+	 */
+	@Select("sql/account/inquiry/ParentSisyutuItemMemberNameSelectSql01.sql")
+	public List<String> searchParentSisyutuItemMemberNameList(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
+	
 }

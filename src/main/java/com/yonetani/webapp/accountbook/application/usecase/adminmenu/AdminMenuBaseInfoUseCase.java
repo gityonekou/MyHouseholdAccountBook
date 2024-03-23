@@ -119,33 +119,33 @@ public class AdminMenuBaseInfoUseCase {
 						int closeIndex = readLine.indexOf(']', 2);
 						if(closeIndex == -1) {
 							// 閉じかっこがない場合
-							response.addMessage("読み込みデータが不正です。[行数=" + linecount + "][" + readLine + "]");
+							response.addErrorMessage("読み込みデータが不正です。[行数=" + linecount + "][" + readLine + "]");
 							break;
 						}
 						targetTable = readLine.substring(2, closeIndex);
 						if(!StringUtils.hasLength(targetTable)) {
 							// 出力対象のテーブル名が指定されていない場合
-							response.addMessage("読み込みデータが不正です。[行数=" + linecount + "][" + readLine + "]");
+							response.addErrorMessage("読み込みデータが不正です。[行数=" + linecount + "][" + readLine + "]");
 							break;
 						}
 						// キー(テーブル名)が既に登録されている場合、エラー終了する
 						if(tableDataMap.containsKey(targetTable)) {
 							// 出力対象のテーブル名が指定されていない場合
-							response.addMessage("読み込みデータが不正です。テーブル名が重複いしています。[行数=" 
+							response.addErrorMessage("読み込みデータが不正です。テーブル名が重複いしています。[行数=" 
 									+ linecount + "][" + readLine + "]");
 							break;
 						}
 						// 指定テーブルのリポジトリーが存在するかをチェック
 						if(!checkTargetTableKey(targetTable)) {
 							// 出力対象のテーブル名が不正な値の場合
-							response.addMessage("読み込みデータが不正です。テーブル名に対応するリポジトリーがありません。[行数=" 
+							response.addErrorMessage("読み込みデータが不正です。テーブル名に対応するリポジトリーがありません。[行数=" 
 									+ linecount + "][" + readLine + "]");
 							break;
 						}
 						// キー(テーブル名)と新規の文字列リストを登録
 						tableDataMap.put(targetTable, new ArrayList<String[]>());
 					} else {
-						response.addMessage("読み込みデータが不正です。'##'か'#[テーブル名]'である必要があります。[行数=" 
+						response.addErrorMessage("読み込みデータが不正です。'##'か'#[テーブル名]'である必要があります。[行数=" 
 									+ linecount + "][" + readLine + "]");
 						break;
 					}
@@ -153,7 +153,7 @@ public class AdminMenuBaseInfoUseCase {
 				} else {
 					// テーブル名が未設定の場合エラー
 					if(targetTable == null) {
-						response.addMessage("読み込みデータが不正です。出力対象のテーブルが指定されていません。[行数=" 
+						response.addErrorMessage("読み込みデータが不正です。出力対象のテーブルが指定されていません。[行数=" 
 									+ linecount + "][" + readLine + "]");
 						break;
 					}
@@ -165,18 +165,18 @@ public class AdminMenuBaseInfoUseCase {
 					if(targetTable.equals(MyHouseholdAccountBookContent.SISYUTU_ITEM_BASE_TABLE)) {
 						// データ項目は6項目
 						if(dataItems.length != 6) {
-							response.addMessage("読み込みデータが不正です。項目数不正。[行数=" + linecount + "][" + readLine + "]");
+							response.addErrorMessage("読み込みデータが不正です。項目数不正。[行数=" + linecount + "][" + readLine + "]");
 							break;
 						}
 						// 支出項目レベルは1～5の数値
 						try {
 							int level = Integer.parseInt(dataItems[4]);
 							if(level < 1 || level > 5) {
-								response.addMessage("読み込みデータが不正です。支出項目レベル。[行数=" + linecount + "][" + readLine + "]");
+								response.addErrorMessage("読み込みデータが不正です。支出項目レベル。[行数=" + linecount + "][" + readLine + "]");
 								break;
 							}
 						} catch(NumberFormatException ex) {
-							response.addMessage("読み込みデータが不正です。支出項目レベル。[行数=" + linecount + "][" + readLine + "]");
+							response.addErrorMessage("読み込みデータが不正です。支出項目レベル。[行数=" + linecount + "][" + readLine + "]");
 							break;
 						}
 					// 店名テーブル:SHOP_TABLEのベースデータ登録の場合
@@ -194,7 +194,7 @@ public class AdminMenuBaseInfoUseCase {
 		}
 		
 		// 読み込みデータを指定のテーブル出力ドメインを用いてDB出力する
-		if(!response.hasMessages()) {
+		if(!response.isErrorResponse()) {
 		
 			// 登録されているテーブルキーの数分データ出力を繰り返す
 			for(String key : tableDataMap.keySet()) {

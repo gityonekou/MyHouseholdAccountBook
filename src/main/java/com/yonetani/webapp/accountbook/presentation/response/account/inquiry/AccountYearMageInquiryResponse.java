@@ -181,7 +181,7 @@ public class AccountYearMageInquiryResponse extends AbstractResponse {
 	public static ModelAndView buildBindingError(YearInquiryForm target) {
 		AccountYearMageInquiryResponse res = new AccountYearMageInquiryResponse();
 		// エラーメッセージを設定
-		res.addMessage("リクエスト情報が不正です。管理者に問い合わせてください。key=YearInquiryForm");
+		res.addErrorMessage("リクエスト情報が不正です。管理者に問い合わせてください。key=YearInquiryForm");
 		// 画面表示のModelとViewを生成
 		ModelAndView modelAndView = res.build();
 		// form入力情報をセット

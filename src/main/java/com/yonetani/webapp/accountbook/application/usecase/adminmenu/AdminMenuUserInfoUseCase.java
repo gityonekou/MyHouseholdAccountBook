@@ -106,7 +106,7 @@ public class AdminMenuUserInfoUseCase {
 		AdminMenuUserInfo userInfo = adminUserInfoRepository.getUserInfo(SearchQueryUserId.from(userId));
 		if(userInfo.isEmpty()) {
 			// 検索結果なしの場合
-			response.addMessage("選択したユーザIDに対応するユーザ情報がありません。管理者に問い合わせてください。[userid:"
+			response.addErrorMessage("選択したユーザIDに対応するユーザ情報がありません。管理者に問い合わせてください。[userid:"
 					+ userId + "]");
 		} else {
 			// 取得したユーザ情報をもとにFormデータを作成し、レスポンスに設定
@@ -230,19 +230,57 @@ public class AdminMenuUserInfoUseCase {
 				log.error("未定義のアクションが指定されました: action=" + userInfoForm.getAction());
 				// 未定義のアクション
 				response.setAdminMenuUserInfoForm(userInfoForm);
-				response.addMessage("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + userInfoForm.getAction());
+				response.addErrorMessage("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + userInfoForm.getAction());
 			}
 		} catch (MyHouseholdAccountBookException ex) {
 			// 業務エラー発生時
 			log.error(ex);
 			// 未定義のアクション
 			response.setAdminMenuUserInfoForm(userInfoForm);
-			response.addMessage("業務エラーが発生しました。管理者に問い合わせてください。[message:" + ex.getLocalizedMessage() + "]");
+			response.addErrorMessage("業務エラーが発生しました。管理者に問い合わせてください。[message:" + ex.getLocalizedMessage() + "]");
 		}
 		
 		return response;
 	}
 	
+	/**
+	 *<pre>
+	 * 【メソッドの説明を入力してください】
+	 * ★パッチ充て用に急遽作った処理：後で、パッチ充て処理として本格対応する（家計簿ベース完了後）
+	 *</pre>
+	 * @return
+	 *
+	 */
+	@Transactional
+	public AdminMenuUserInfoResponse customInfo() {
+		log.debug("customInfo: ");
+		// レスポンスを生成
+		AdminMenuUserInfoResponse response = AdminMenuUserInfoResponse.getInstance();
+		// 支出項目テーブル(BASE)から新規ユーザの支出項目テーブルを出力
+		SisyutuItemBaseList sisyutuItemBaseList = sisyutuItemBaseTableRepository.findAll();
+		
+		sisyutuItemBaseList.getValues().forEach(baseData -> {
+				// 登録する支出項目テーブル情報を生成(更新不可フラグはデフォルトで不可:falseを設定)
+				SisyutuItem addData = SisyutuItem.from(
+					"koukiyonetani",
+					baseData.getSisyutuItemCode().toString(),
+					baseData.getSisyutuItemName().toString(), 
+					baseData.getSisyutuItemDetailContext().toString(),
+					baseData.getParentSisyutuItemCode().toString(),
+					baseData.getSisyutuItemLevel().toString(),
+					baseData.getSisyutuItemSort().toString(),
+					false);
+				// データを登録
+				int addCount = sisyutuItemTableRepository.add(addData);
+				// 追加件数が1件以上の場合、業務エラー
+				if(addCount != 1) {
+					throw new MyHouseholdAccountBookRuntimeException("支出項目テーブル:SISYUTU_ITEM_TABLEへの追加件数が不正でした。[add data:" + addData + "]");
+				}
+			});
+		// 処理結果OKを設定(getリダイレクトを行う)
+		response.setTransactionSuccessFull();
+		return response;
+	}
 	/**
 	 *<pre>
 	 * ユーザ情報の一覧(ドメインモデル)を取得し、結果レスポンスに設定して返します。

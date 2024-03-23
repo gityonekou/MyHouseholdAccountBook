@@ -31,7 +31,7 @@ import lombok.Setter;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AdminMenuBaseInfoResponse extends AbstractResponse {
-
+	
 	// ベース情報ファイル登録フォーム
 	@Setter
 	private AdminMenuUploadBaseInfoFileForm adminMenuUploadBaseInfoFileForm;
@@ -80,18 +80,12 @@ public class AdminMenuBaseInfoResponse extends AbstractResponse {
 	}
 
 	/**
-	 *<pre>
-	 * ベース情報管理初期表示(get要求)にリダイレクトします
-	 *</pre>
-	 * @return 画面返却データのModelAndView
+	 * {@inheritDoc}
 	 */
 	@Override
-	public ModelAndView buildRedirect() {
-		if(isTransactionSuccessFull()) {
-			return new ModelAndView("redirect:/myhacbook/admin/completeUploadBaseInfo/");
-		} else {
-			return super.buildRedirect();
-		}
+	protected String getRedirectUrl() {
+		// ベース情報登録完了後、リダイレクトするURL
+		return "redirect:/myhacbook/admin/completeUploadBaseInfo/";
 	}
 	
 	/**
@@ -121,7 +115,7 @@ public class AdminMenuBaseInfoResponse extends AbstractResponse {
 	public static ModelAndView buildBindingError(AdminMenuUploadBaseInfoFileForm baseInfoFileForm, String message) {
 		AdminMenuBaseInfoResponse response = new AdminMenuBaseInfoResponse();
 		response.setAdminMenuUploadBaseInfoFileForm(baseInfoFileForm);
-		response.addMessage(message);
+		response.addErrorMessage(message);
 		return response.build();
 	}
 
@@ -135,8 +129,7 @@ public class AdminMenuBaseInfoResponse extends AbstractResponse {
 	 */
 	public static ModelAndView buildBindingError(String message) {
 		AdminMenuBaseInfoResponse response = new AdminMenuBaseInfoResponse();
-		response.addMessage(message);
+		response.addErrorMessage(message);
 		return response.build();
 	}
-	
 }

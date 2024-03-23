@@ -89,6 +89,18 @@
 			</div>
 			</form>
 			
+			<!-- カスタムデータ登録form -->
+			<form method="post" th:action="@{/myhacbook/admin/custominfo/}">
+			<div class="card-body">
+				★データパッチを適応する場合、以下ボタンを押下★＜今回は限定で1ユーザ用＞<br>
+				対象ユーザID：＊＊＊
+				<div class="mb-3">
+					<button class="btn btn-primary" type="submit">データ更新</button>
+				</div>
+			</div>
+			</form>
+			
+			
 			<!-- 作製済みユーザ一覧 -->
 			<th:block th:if="${#lists.size(userInfoList)}>0">
 			<div class="card-body border border-primary">

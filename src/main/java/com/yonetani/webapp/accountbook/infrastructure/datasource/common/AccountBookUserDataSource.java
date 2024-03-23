@@ -76,11 +76,7 @@ public class AccountBookUserDataSource implements AccountBookUserRepository {
 	@Override
 	public int add(AccountBookUser userInfo) {
 		// 家計簿利用ユーザテーブル:ACCOUNT_BOOK_USERにデータを追加
-		return mapper.insertAccountBookUser(AccountBookUserWriteDto.from(
-				userInfo.getUserId().toString(),
-				userInfo.getNowTargetYear().toString(),
-				userInfo.getNowTargetMonth().toString(),
-				userInfo.getUserName().toString()));
+		return mapper.insertAccountBookUser(createAccountBookUserWriteDto(userInfo));
 	}
 
 	/**
@@ -89,11 +85,27 @@ public class AccountBookUserDataSource implements AccountBookUserRepository {
 	@Override
 	public int update(AccountBookUser userInfo) {
 		// 家計簿利用ユーザテーブル:ACCOUNT_BOOK_USERの指定ユーザ情報のデータを更新します。
-		return mapper.updateAccountBookUser(AccountBookUserWriteDto.from(
+		return mapper.updateAccountBookUser(createAccountBookUserWriteDto(userInfo));
+	}
+	
+	/**
+	 *<pre>
+	 * 引数で指定した家計簿利用ユーザのユーザ情報ドメインモデルからDTOを生成して返します。
+	 *</pre>
+	 * @param userInfo 家計簿利用ユーザのユーザ情報
+	 * @return 家計簿利用ユーザテーブル:ACCOUNT_BOOK_USER出力情報
+	 *
+	 */
+	private AccountBookUserWriteDto createAccountBookUserWriteDto(AccountBookUser userInfo) {
+		return AccountBookUserWriteDto.from(
+				// ユーザID
 				userInfo.getUserId().toString(),
+				// 現在の対象年
 				userInfo.getNowTargetYear().toString(),
+				// 現在の対象月
 				userInfo.getNowTargetMonth().toString(),
-				userInfo.getUserName().toString()));
+				// ユーザ名
+				userInfo.getUserName().toString());
 	}
 
 }

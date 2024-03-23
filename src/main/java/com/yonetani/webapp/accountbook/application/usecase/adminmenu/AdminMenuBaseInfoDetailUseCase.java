@@ -66,7 +66,7 @@ public class AdminMenuBaseInfoDetailUseCase {
 					domain -> domain.toLineString()).collect(Collectors.toUnmodifiableList())
 			);
 		} else {
-			response.addMessage("予期しないエラーが発生しました。管理者に問い合わせてください。[targetの値が不正です][target=" + target + "]");
+			response.addErrorMessage("予期しないエラーが発生しました。管理者に問い合わせてください。[targetの値が不正です][target=" + target + "]");
 		}
 		// 初期表示のレスポンスを返却
 		return response;
