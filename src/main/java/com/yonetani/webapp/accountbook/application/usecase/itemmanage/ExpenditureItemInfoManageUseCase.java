@@ -290,10 +290,24 @@ public class ExpenditureItemInfoManageUseCase {
 		
 		// 新規登録の場合
 		if(inputForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
-			// 支出項目コードを自動採番して設定
-			//inputForm.setSisyutuItemCode("支出項目コード:自動採番");
-			// 支出項目表示順を設定
+			/* 支出項目コードを自動採番して設定 */
+			// 現在登録されている支出項目数を取得
+			int count = sisyutuItemRepository.countById(SearchQueryUserId.from(user.getUserId()));
+			// 支出項目コード番号発番
+			count++;
+			// 登録済み支出項目数が2000件より多い場合、エラー
+			if(count > 2000) {
+				response.addErrorMessage("支出項目は2000件以上登録できません。管理者に問い合わせてください。");
+				return response;
+			}
+			
+			// +1した値を4桁で0パディングして支出項目コードに設定
+			inputForm.setSisyutuItemCode(String.format("%04d", count));
+			
+			/* 支出項目表示順を設定 */
 			//inputForm.setSisyutuItemSort("");
+			
+			/* 支出項目情報を新規追加する */ 
 			// 新規追加する支出項目情報(ドメイン)を生成
 			SisyutuItem addData = createSisyutuItem(user.getUserId().toString(), inputForm);
 			// データを登録

@@ -88,5 +88,15 @@ public interface SisyutuItemTableRepository {
 	 *
 	 */
 	SisyutuItemNameList searchParentSisyutuItemMemberNameList(SearchQueryUserIdAndSisyutuItemCode search);
+
+	/**
+	 *<pre>
+	 * 新規の支出項目コード発番用にユーザIDに対応する支出項目情報が何件あるかを取得します。
+	 *</pre>
+	 * @param userId 検索対象のユーザID
+	 * @return 指定条件に該当するデータの件数
+	 *
+	 */
+	int countById(SearchQueryUserId userId);
 	
 }

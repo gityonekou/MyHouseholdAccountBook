@@ -127,6 +127,15 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 	}
 	
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int countById(SearchQueryUserId userId) {
+		// ユーザIDで検索し、登録されている支出項目の件数を返す
+		return mapper.countById(UserIdSearchQueryDto.from(userId.getUserId().toString()));
+	}
+	
+	/**
 	 *<pre>
 	 * 引数で指定した支出項目テーブル:SISYUTU_ITEM_TABLE読込・出力情報から支出項目テーブル情報ドメインモデルを生成して返します。
 	 *</pre>

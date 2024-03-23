@@ -94,4 +94,13 @@ public class ExpenditureItemInfoManageUpdateResponse extends AbstractExpenditure
 		setExpenditureItemInfoForm(inputForm);
 		return build();
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected String getRedirectUrl() {
+		// 支出項目情報登録完了後、リダイレクトするURL
+		return "redirect:/myhacbook/managebaseinfo/expenditeminfo/updateComplete/";
+	}
 }

@@ -100,5 +100,16 @@ public interface SisyutuItemTableMapper {
 	 */
 	@Select("sql/account/inquiry/ParentSisyutuItemMemberNameSelectSql01.sql")
 	public List<String> searchParentSisyutuItemMemberNameList(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
+
+	/**
+	 *<pre>
+	 * 指定のユーザIDに対応する支出項目情報が何件あるかを取得します。
+	 *</pre>
+	 * @param userId 検索条件:ユーザID
+	 * @return 指定条件に該当するデータの件数
+	 *
+	 */
+	@Select("sql/account/inquiry/SisyutuItemTableCountSql01.sql")
+	public int countById(@Param("dto") UserIdSearchQueryDto userId);
 	
 }

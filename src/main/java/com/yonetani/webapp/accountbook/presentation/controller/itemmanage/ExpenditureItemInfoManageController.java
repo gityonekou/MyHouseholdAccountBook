@@ -189,4 +189,17 @@ public class ExpenditureItemInfoManageController {
 			}
 		}
 	}
+	
+	/**
+	 *<pre>
+	 * 支出項目情報登録・更新完了後のリダイレクト(Get要求時)のマッピングです。
+	 *</pre>
+	 * @return 情報管理(支出項目)の対象選択画面
+	 *
+	 */
+	@GetMapping("/updateComplete/")
+	public ModelAndView updateComplete() {
+		log.debug("updateComplete:");
+		return this.usecase.readInitInfo(this.user).buildComplete();
+	}
 }
