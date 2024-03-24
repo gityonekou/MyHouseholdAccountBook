@@ -131,10 +131,10 @@ public class ExpenditureItemInfoManageActSelectResponse extends AbstractResponse
 		// 新規追加ボタンのアクティブ・非アクティブを設定
 		if(sisyutuItem != null && sisyutuItem.getSisyutuItemLevel() != 1 && sisyutuItem.getSisyutuItemLevel() != 5) {
 			// nullでない、かつ、支出項目レベルが1、5以外の場合は新規にデータを追加可能
-			modelAndView.addObject("addBtnDisabled", Boolean.TRUE);
+			modelAndView.addObject("addBtnEnabled", Boolean.TRUE);
 		} else {
 			// 上記以外は追加不可
-			modelAndView.addObject("addBtnDisabled", Boolean.FALSE);
+			modelAndView.addObject("addBtnEnabled", Boolean.FALSE);
 		}
 		return modelAndView;
 	}

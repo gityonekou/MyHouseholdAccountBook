@@ -9,9 +9,15 @@
  */
 package com.yonetani.webapp.accountbook.presentation.response.itemmanage;
 
+import java.util.Collections;
+import java.util.List;
+
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ExpenditureItemInfoForm;
+import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
+import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +42,8 @@ public class ExpenditureItemInfoManageUpdateResponse extends AbstractExpenditure
 	// 親の支出項目名
 	@Setter
 	private String parentSisyutuItemName;
+	// 親に属する子の選択リスト
+	private SelectViewItem parentMembersItem;
 	
 	/**
 	 *<pre>
@@ -46,6 +54,22 @@ public class ExpenditureItemInfoManageUpdateResponse extends AbstractExpenditure
 	 */
 	public static ExpenditureItemInfoManageUpdateResponse getInstance() {
 		return new ExpenditureItemInfoManageUpdateResponse();
+	}
+	
+	/**
+	 *<pre>
+	 * 親に属する子の選択リストを設定します。
+	 * 表示順を変更するための選択リストの表示データとなります。
+	 *</pre>
+	 * @param addList　親に属する子のリスト
+	 *
+	 */
+	public void setParentMembersItemList(List<OptionItem> addList) {
+		if(CollectionUtils.isEmpty(addList)) {
+			parentMembersItem = SelectViewItem.from(Collections.emptyList());
+		} else {
+			parentMembersItem = SelectViewItem.from(addList);
+		}
 	}
 	
 	/**
@@ -62,6 +86,12 @@ public class ExpenditureItemInfoManageUpdateResponse extends AbstractExpenditure
 		modelAndView.addObject("expenditureItemInfoForm",expenditureItemInfoForm);
 		// 親の支出項目名
 		modelAndView.addObject("parentSisyutuItemName",parentSisyutuItemName);
+		// 親に属する子のリスト
+		if(parentMembersItem == null) {
+			parentMembersItem = SelectViewItem.from(Collections.emptyList());
+		}
+		modelAndView.addObject("parentMembers",parentMembersItem);
+		
 		return modelAndView;
 	}
 	

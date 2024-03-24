@@ -12,7 +12,6 @@ package com.yonetani.webapp.accountbook.domain.repository.account.inquiry;
 
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItemInquiryList;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItemNameList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 
@@ -81,13 +80,13 @@ public interface SisyutuItemTableRepository {
 	
 	/**
 	 *<pre>
-	 * ユーザID、親の支出項目コードを条件に、親の支出項目に属する支出項目の名称一覧を取得します。
+	 * ユーザID、親の支出項目コードを条件に、親の支出項目に属する支出項目情報を取得します。
 	 *</pre>
 	 * @param search 検索対象のユーザID、親の支出項目コード
 	 * @return 親の支出項目に属する支出項目の名称一覧
 	 *
 	 */
-	SisyutuItemNameList searchParentSisyutuItemMemberNameList(SearchQueryUserIdAndSisyutuItemCode search);
+	SisyutuItemInquiryList searchParentMemberSisyutuItemList(SearchQueryUserIdAndSisyutuItemCode search);
 
 	/**
 	 *<pre>

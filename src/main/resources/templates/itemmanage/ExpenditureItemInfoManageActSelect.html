@@ -36,8 +36,8 @@
 				</div>
 				<div class="mb-3">
 					<form name="ExpendItemInfoB" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/expenditeminfo/updateload/}">
-						<button th:if="!${addBtnDisabled}" class="btn btn-primary" name="actionAdd" id="expend-item-action-add-btn" type="submit" disabled>属する支出項目を新規追加</button>
-						<button th:if="${addBtnDisabled}" class="btn btn-primary" name="actionAdd" id="expend-item-action-add-btn" type="submit">属する支出項目を新規追加</button>
+						<button th:if="${addBtnEnabled}" class="btn btn-primary" name="actionAdd" id="expend-item-action-add-btn" type="submit">属する支出項目を新規追加</button>
+						<button th:unless="${addBtnEnabled}" class="btn btn-primary" name="actionAdd" id="expend-item-action-add-btn" type="submit" disabled>属する支出項目を新規追加</button>
 						<button class="btn btn-primary" name="actionUpdate" id="expend-item-action-upd-btn" type="submit">更新</button>
 						<button class="btn btn-primary" name="actionCancel" id="expend-item-action-cancel-btn" type="submit">キャンセル</button>
 						<input type="hidden" th:field="*{sisyutuItemCode}" />

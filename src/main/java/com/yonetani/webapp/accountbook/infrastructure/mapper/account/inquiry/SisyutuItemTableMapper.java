@@ -92,14 +92,14 @@ public interface SisyutuItemTableMapper {
 	/**
 	 *<pre>
 	 * 指定のユーザID、親の支出項目コードを条件に支出項目テーブル:SISYUTU_ITEM_TABLEを参照し、
-	 * 親の支出項目に属する支出項目の名称一覧を取得します。
+	 * 親の支出項目に属する支出項目情報(リスト)を取得します。
 	 *</pre>
 	 * @param search 検索条件:ユーザID、支出項目コード
-	 * @return 親の支出項目に属する支出項目の名称の参照結果(リスト情報)
+	 * @return 親の支出項目に属する支出項目情報のリスト
 	 *
 	 */
 	@Select("sql/account/inquiry/ParentSisyutuItemMemberNameSelectSql01.sql")
-	public List<String> searchParentSisyutuItemMemberNameList(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
+	public List<SisyutuItemReadWriteDto> searchParentSisyutuItemMemberNameList(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
 
 	/**
 	 *<pre>

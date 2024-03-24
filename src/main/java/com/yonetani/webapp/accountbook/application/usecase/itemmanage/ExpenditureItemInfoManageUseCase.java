@@ -25,12 +25,12 @@ import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookCont
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItemInquiryList;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItemNameList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuItemTableRepository;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ExpenditureItemInfoForm;
 import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
+import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractExpenditureItemInfoManageResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ExpenditureItemInfoManageActSelectResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ExpenditureItemInfoManageInitResponse;
@@ -137,12 +137,12 @@ public class ExpenditureItemInfoManageUseCase {
 			// 支出項目レベルが2以上の場合に親の支出項目に属する支出項目一覧を取得する
 			if(sisyutuItem.getSisyutuItemLevel().getValue() >= 2) {
 				// 親の支出項目に属する支出項目一覧をを取得
-				SisyutuItemNameList sisyutuItemNameList = sisyutuItemRepository.searchParentSisyutuItemMemberNameList(
+				SisyutuItemInquiryList sisyutuItemNameList = sisyutuItemRepository.searchParentMemberSisyutuItemList(
 						SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItem.getParentSisyutuItemCode().toString()));
-				// 親の支出項目に属する支出項目一覧をレスポンスに設定
+				// 親の支出項目に属する支出項目情報から名称を取得し、名称一覧をレスポンスに設定
 				if(!sisyutuItemNameList.isEmpty()) {
 					response.addParentSisyutuItemMemberNameList(sisyutuItemNameList.getValues().stream().map(
-							domain -> domain.toString()).collect(Collectors.toUnmodifiableList()));
+							domain -> domain.getSisyutuItemName().toString()).collect(Collectors.toUnmodifiableList()));
 				}
 			}
 			
@@ -201,16 +201,13 @@ public class ExpenditureItemInfoManageUseCase {
 			response.setExpenditureItemInfoForm(
 					createExpenditureItemInfoForm(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, addSisyutuItem));
 			
-			// 親の支出項目名を設定
-			List<String> errorMsgList = new ArrayList<String>();
-			response.setParentSisyutuItemName(getParentSisyutuItemName(user, addSisyutuItem, errorMsgList));
-			// エラーメッセージをレスポンスに設定
-			errorMsgList.forEach(message -> response.addErrorMessage(message));
+			// 親の支出項目名と表示順選択リストをレスポンスに設定
+			setParentMembers(user, addSisyutuItem, response);
 			
 			return response;
 		}
 	}
-	
+
 	/**
 	 *<pre>
 	 * 指定したユーザIDと支出項目コードに応じた情報管理(支出項目) 更新画面の表示情報取得処理です。
@@ -243,11 +240,8 @@ public class ExpenditureItemInfoManageUseCase {
 			response.setExpenditureItemInfoForm(
 					createExpenditureItemInfoForm(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE, sisyutuItem));
 			
-			// 親の支出項目名を設定
-			List<String> errorMsgList = new ArrayList<String>();
-			response.setParentSisyutuItemName(getParentSisyutuItemName(user, sisyutuItem, errorMsgList));
-			// エラーメッセージをレスポンスに設定
-			errorMsgList.forEach(message -> response.addErrorMessage(message));
+			// 親の支出項目名と表示順選択リストをレスポンスに設定
+			setParentMembers(user, sisyutuItem, response);
 			
 			return response;
 		}
@@ -260,14 +254,18 @@ public class ExpenditureItemInfoManageUseCase {
 	 * 主に、バリデーションチェック結果でNGの場合に画面表示する支出項目一覧情報を設定するために呼び出します。
 	 *</pre>
 	 * @param user 表示対象のユーザID
+	 * @param inputForm 支出項目入力フォームの入力値
 	 * @return 情報管理(支出項目) 更新画面の表示情報
 	 *
 	 */
-	public ExpenditureItemInfoManageUpdateResponse readUpdateInitInfo(UserSession user) {
+	public ExpenditureItemInfoManageUpdateResponse readUpdateInitInfo(UserSession user, ExpenditureItemInfoForm inputForm) {
 		log.debug("readUpdateInitInfo:userid=" + user.getUserId());
 		// ログインユーザの支出項目一覧情報を取得しレスポンスに設定
 		ExpenditureItemInfoManageUpdateResponse response = ExpenditureItemInfoManageUpdateResponse.getInstance();
 		setSisyutuItemInquiryList(user, response);
+		
+		// 親の支出項目名と表示順選択リストをレスポンスに設定
+		setParentMembers(user, createSisyutuItem(user.getUserId().toString(), inputForm), response);
 		
 		return response;
 	}
@@ -409,6 +407,32 @@ public class ExpenditureItemInfoManageUseCase {
 					domain.getEnableUpdateFlg().getValue())
 			).collect(Collectors.toUnmodifiableList()));
 		}
+	}
+	
+	/**
+	 *<pre>
+	 * 親の支出項目名と表示順選択リストをレスポンスに設定します。
+	 *</pre>
+	 * @param user 支出項目一覧を取得するユーザ情報
+	 * @param sisyutuItem 取得対象の支出項目情報
+	 * @param response 情報管理(支出項目) 更新画面の表示情報(レスポンス)
+	 *
+	 */
+	private void setParentMembers(UserSession user, SisyutuItem sisyutuItem,
+			ExpenditureItemInfoManageUpdateResponse response) {
+		
+		// 親の支出項目名を設定
+		List<String> errorMsgList = new ArrayList<String>();
+		response.setParentSisyutuItemName(getParentSisyutuItemName(user, sisyutuItem, errorMsgList));
+		
+		// 親に属する子のリストを作成
+		//★修正中
+		List<OptionItem> optionList = new ArrayList<>();
+		optionList.add(OptionItem.from("0201010000", "グループメニューを開く"));
+		response.setParentMembersItemList(optionList);
+		
+		// エラーメッセージをレスポンスに設定
+		errorMsgList.forEach(message -> response.addErrorMessage(message));
 	}
 	
 	/**

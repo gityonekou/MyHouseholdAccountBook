@@ -16,11 +16,9 @@ import org.springframework.stereotype.Repository;
 
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItemInquiryList;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItemNameList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuItemTableRepository;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemName;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.SisyutuItemReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndSisyutuItemCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSearchQueryDto;
@@ -111,17 +109,17 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SisyutuItemNameList searchParentSisyutuItemMemberNameList(SearchQueryUserIdAndSisyutuItemCode search) {
+	public SisyutuItemInquiryList searchParentMemberSisyutuItemList(SearchQueryUserIdAndSisyutuItemCode search) {
 		// 検索結果を取得
-		List<String> searchResult = mapper.searchParentSisyutuItemMemberNameList(
+		List<SisyutuItemReadWriteDto> searchResult = mapper.searchParentSisyutuItemMemberNameList(
 				UserIdAndSisyutuItemCodeSearchQueryDto.from(
 						search.getUserId().toString(), search.getSisyutuItemCode().toString()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
-			return SisyutuItemNameList.from(null);
+			return SisyutuItemInquiryList.from(null);
 		} else {
 			// 検索結果ありの場合、ドメインに変換して返却
-			return SisyutuItemNameList.from(searchResult.stream().map(dto -> SisyutuItemName.from(dto))
+			return SisyutuItemInquiryList.from(searchResult.stream().map(dto -> createSisyutuItem(dto))
 				.collect(Collectors.toUnmodifiableList()));
 		}
 	}

@@ -30,7 +30,8 @@
 				</div>
 				<div class="mb-3">
 					<label for="sisyutuItemName" class="form-label">支出項目名</label>
- 					<input type="text" class="form-control w50" th:errorclass="is-invalid" th:field="*{sisyutuItemName}" required>
+ 					<input th:if="*{enableUpdateFlg}" type="text" class="form-control w50" th:errorclass="is-invalid" th:field="*{sisyutuItemName}" required>
+ 					<input th:unless="*{enableUpdateFlg}" type="text" class="form-control w50" th:errorclass="is-invalid" th:field="*{sisyutuItemName}" disabled>
  					<p class="invalid-feedback" th:errors="*{sisyutuItemName}"></p>
 				</div>
 				<div class="mb-3">
@@ -39,8 +40,13 @@
  					<p class="invalid-feedback" th:errors="*{sisyutuItemDetailContext}"></p>
 				</div>
 				<div class="mb-3">
-					<label for="sisyutuItemSort" class="form-label">支出項目表示順</label>
- 					<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{sisyutuItemSort}">
+					<label for="sisyutuItemSort" class="form-label">表示順選択</label>
+					<select th:if="*{enableUpdateFlg}" class="form-select w20" th:errorclass="is-invalid" th:field="*{sisyutuItemSort}" required>
+						<option th:each="item : ${parentMembers.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+					</select>
+					<select th:unless="*{enableUpdateFlg}" class="form-select w20" th:errorclass="is-invalid" th:field="*{sisyutuItemSort}" disabled>
+						<option th:each="item : ${parentMembers.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+					</select>
  					<p class="invalid-feedback" th:errors="*{sisyutuItemSort}"></p>
 				</div>
 				<div class="mb-3">
@@ -50,6 +56,8 @@
 					<input type="hidden" th:field="*{parentSisyutuItemCode}" />
 					<input type="hidden" th:field="*{sisyutuItemLevel}" />
 					<input type="hidden" th:field="*{enableUpdateFlg}" />
+					<input th:unless="*{enableUpdateFlg}" type="hidden" th:field="*{sisyutuItemName}">
+					<input th:unless="*{enableUpdateFlg}" type="hidden" th:field="*{sisyutuItemSort}">
 				</div>
 			</div>
 			</form>
