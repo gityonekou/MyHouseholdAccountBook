@@ -66,6 +66,18 @@ public interface SisyutuItemTableMapper {
 	@Update("sql/account/inquiry/SisyutuItemTableUpdateSql02.sql")
 	public int updateSisyutuItemDetailContext(@Param("dto") SisyutuItemReadWriteDto writeDto);
 	
+	
+	/**
+	 *<pre>
+	 * 支出項目テーブル:SISYUTU_ITEM_TABLEの支出項目表示順項目の値を更新します。
+	 *</pre>
+	 * @param writeDto 支出項目テーブル:SISYUTU_ITEM_TABLE出力情報
+	 * @return 支出項目テーブルを更新した件数
+	 *
+	 */
+	@Update("sql/account/inquiry/SisyutuItemTableUpdateSql03.sql")
+	public int updateSisyutuItemSort(@Param("dto") SisyutuItemReadWriteDto writeDto);
+	
 	/**
 	 *<pre>
 	 * 指定のユーザIDを条件に支出項目テーブル:SISYUTU_ITEM_TABLEを参照します。

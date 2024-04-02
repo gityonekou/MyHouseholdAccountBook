@@ -175,7 +175,7 @@ public class ExpenditureItemInfoManageController {
 		// チェック結果エラーの場合
 		if(bindingResult.hasErrors()) {
 			// 初期表示情報を取得し、入力チェックエラーを設定
-			return this.usecase.readUpdateInitInfo(this.user, inputForm).buildBindingError(inputForm);
+			return this.usecase.readUpdateBindingErrorSetInfo(this.user, inputForm).buildBindingError(inputForm);
 		// チェック結果OKの場合
 		} else {
 			/* hidden項目(action)の値チェック */

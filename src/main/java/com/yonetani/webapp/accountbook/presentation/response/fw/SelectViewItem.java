@@ -49,10 +49,12 @@ public class SelectViewItem {
 		private final String value;
 		// text属性の値
 		private final String text;
+		// disabled属性の値
+		private final boolean disabled;
 		
 		/**
 		 *<pre>
-		 * optionタブの情報を生成して返します
+		 * optionタブの情報を生成して返します。生成されるoptionタグのdisabledの値はfalse(選択可能)となります。
 		 *</pre>
 		 * @param value value属性の値
 		 * @param text text属性の値
@@ -60,7 +62,23 @@ public class SelectViewItem {
 		 *
 		 */
 		public static OptionItem from(String value, String text) {
-			return new OptionItem(value, text);
+			return new OptionItem(value, text, false);
+		}
+		
+		/**
+		 *<pre>
+		 * disabled属性の値を指定してoptionタブの情報を生成して返します。
+		 * disabled属性の値にtureを指定した場合、このoption項目は選択不可(disabled)な状態で表示します。
+		 * disabled属性の値にfalseを指定した場合、このoption項目を選択可能な状態で表示します。
+		 *</pre>
+		 * @param value value属性の値
+		 * @param text text属性の値
+		 * @param disabled disabled属性の値
+		 * @return value
+		 *
+		 */
+		public static OptionItem from(String value, String text, boolean disabled) {
+			return new OptionItem(value, text, disabled);
 		}
 	}
 	

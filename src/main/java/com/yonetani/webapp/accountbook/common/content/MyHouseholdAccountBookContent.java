@@ -51,4 +51,8 @@ public class MyHouseholdAccountBookContent {
 	// コード定義区分(ショップ区分:001)
 	public static final String SHOP_KUBUN_CODE = "001";
 	
+	// 支出項目コード仮登録データ:9999
+	public static final String SISYUTU_ITEM_CODE_TEMPORARY_VALUE = "9999";
+	// 支出項目表示順のその他項目の値:99
+	public static final String OTHER_SISYUTU_ITEM_SORT_VALUE = "99";
 }

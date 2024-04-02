@@ -74,6 +74,15 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public int updateSisyutuItemSort(SisyutuItem data) {
+		// 支出項目テーブル:SISYUTU_ITEM_TABLEの支出項目表示順項目の値を更新します。
+		return mapper.updateSisyutuItemSort(createSisyutuItemReadWriteDto(data));
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public SisyutuItemInquiryList findById(SearchQueryUserId userId) {
 		// 検索結果を取得
 		List<SisyutuItemReadWriteDto> searchResult = mapper.findById(UserIdSearchQueryDto.from(userId.getUserId().toString()));

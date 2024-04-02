@@ -42,7 +42,7 @@
 				<div class="mb-3">
 					<label for="sisyutuItemSort" class="form-label">表示順選択</label>
 					<select th:if="*{enableUpdateFlg}" class="form-select w20" th:errorclass="is-invalid" th:field="*{sisyutuItemSort}" required>
-						<option th:each="item : ${parentMembers.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+						<option th:each="item : ${parentMembers.optionList}" th:value="${item.value}" th:text="${item.text}" th:disabled="${item.disabled}"></option>
 					</select>
 					<select th:unless="*{enableUpdateFlg}" class="form-select w20" th:errorclass="is-invalid" th:field="*{sisyutuItemSort}" disabled>
 						<option th:each="item : ${parentMembers.optionList}" th:value="${item.value}" th:text="${item.text}"></option>

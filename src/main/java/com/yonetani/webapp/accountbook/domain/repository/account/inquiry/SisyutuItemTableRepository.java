@@ -60,6 +60,16 @@ public interface SisyutuItemTableRepository {
 	
 	/**
 	 *<pre>
+	 * 支出項目テーブル情報のうち、支出項目表示順の値を更新します。
+	 *</pre>
+	 * @param data 更新データ
+	 * @return 更新件数
+	 *
+	 */
+	int updateSisyutuItemSort(SisyutuItem data);
+	
+	/**
+	 *<pre>
 	 * ユーザIDに対応する支出項目情報を取得します。
 	 *</pre>
 	 * @param userId 検索対象のユーザID

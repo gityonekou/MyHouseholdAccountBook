@@ -44,6 +44,7 @@ public class ExpenditureItemInfoForm {
 	// 支出項目レベル(1～5)
 	private String sisyutuItemLevel;
 	// 支出項目表示順
+	@NotBlank
 	private String sisyutuItemSort;
 	// 更新可否フラグ
 	private boolean enableUpdateFlg;
