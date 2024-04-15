@@ -35,10 +35,10 @@
 					<p class="card-text"><span>　<span><span th:text="*{sisyutuItemDetailContext}"></span></p>
 				</div>
 				<div class="mb-3">
-					<form name="ExpendItemInfoB" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/expenditeminfo/updateload/}">
-						<button class="btn btn-primary" name="actionAdd" id="expend-item-action-add-btn" type="submit" th:disabled="${addBtnDisabled}">属する支出項目を新規追加</button>
-						<button class="btn btn-primary" name="actionUpdate" id="expend-item-action-upd-btn" type="submit">更新</button>
-						<button class="btn btn-primary" name="actionCancel" id="expend-item-action-cancel-btn" type="submit">キャンセル</button>
+					<form name="ExpendItemInfoActSelect" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/expenditeminfo/updateload/}">
+						<button class="btn btn-primary" name="actionAdd" type="submit" th:disabled="${addBtnDisabled}">属する支出項目を新規追加</button>
+						<button class="btn btn-primary" name="actionUpdate" type="submit">更新</button>
+						<button class="btn btn-primary" name="actionCancel" type="submit">キャンセル</button>
 						<input type="hidden" th:field="*{sisyutuItemCode}" />
 					</form>
 				</div>

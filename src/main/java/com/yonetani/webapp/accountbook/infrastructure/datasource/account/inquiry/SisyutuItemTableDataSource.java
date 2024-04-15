@@ -18,9 +18,11 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemSortBetweenAB;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuItemTableRepository;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.SisyutuItemReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndSisyutuItemCodeSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndSisyutuItemSortBetweenABSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry.SisyutuItemTableMapper;
 
@@ -95,14 +97,32 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 						.collect(Collectors.toUnmodifiableList()));
 		}
 	}
-
+	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SisyutuItem findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search) {
+	public SisyutuItemInquiryList findById(SearchQueryUserIdAndSisyutuItemSortBetweenAB search) {
 		// 検索結果を取得
-		SisyutuItemReadWriteDto searchResult = mapper.findByIdAndSisyutuItemCode(
+		List<SisyutuItemReadWriteDto> searchResult = mapper.findById(UserIdAndSisyutuItemSortBetweenABSearchQueryDto.from(
+				search.getUserId().toString(), search.getSisyutuItemSortA().toString(), search.getSisyutuItemSortB().toString()));
+		if(searchResult == null) {
+			// 検索結果なしの場合、0件データを返却
+			return SisyutuItemInquiryList.from(null);
+		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
+			return SisyutuItemInquiryList.from(searchResult.stream().map(dto -> createSisyutuItem(dto))
+						.collect(Collectors.toUnmodifiableList()));
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public SisyutuItem findById(SearchQueryUserIdAndSisyutuItemCode search) {
+		// 検索結果を取得
+		SisyutuItemReadWriteDto searchResult = mapper.findById(
 				UserIdAndSisyutuItemCodeSearchQueryDto.from(
 						search.getUserId().toString(), search.getSisyutuItemCode().toString()));
 		if(searchResult == null) {

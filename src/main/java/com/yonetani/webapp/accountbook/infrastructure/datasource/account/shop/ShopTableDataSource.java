@@ -19,11 +19,11 @@ import com.yonetani.webapp.accountbook.domain.model.account.shop.ShopInquiryList
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSort;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSortAB;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSortBetweenAB;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.shop.ShopReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopCodeSearchQueryDto;
-import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopSortABSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopSortBetweenABSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopSortSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.shop.ShopTableMapper;
@@ -96,9 +96,9 @@ public class ShopTableDataSource implements ShopTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Shop findByIdAndShopCode(SearchQueryUserIdAndShopCode search) {
+	public Shop findById(SearchQueryUserIdAndShopCode search) {
 		// 指定条件で店舗情報を取得
-		ShopReadWriteDto result = mapper.findByIdAndShopCode(UserIdAndShopCodeSearchQueryDto.from(
+		ShopReadWriteDto result = mapper.findById(UserIdAndShopCodeSearchQueryDto.from(
 				search.getUserId().toString(), search.getShopCode().toString()));
 		if(result == null) {
 			// 対象データなしの場合、nullを返却
@@ -122,9 +122,9 @@ public class ShopTableDataSource implements ShopTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ShopInquiryList findByIdAndGreaterThanShopSort(SearchQueryUserIdAndShopSort search) {
+	public ShopInquiryList findById(SearchQueryUserIdAndShopSort search) {
 		// 検索結果を取得
-		List<ShopReadWriteDto> searchResult = mapper.findByIdAndGreaterThanShopSort(
+		List<ShopReadWriteDto> searchResult = mapper.findById(
 				UserIdAndShopSortSearchQueryDto.from(search.getUserId().toString(), search.getShopSort().toString()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
@@ -139,10 +139,10 @@ public class ShopTableDataSource implements ShopTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ShopInquiryList findByIdAndShopSortBetween(SearchQueryUserIdAndShopSortAB search) {
+	public ShopInquiryList findById(SearchQueryUserIdAndShopSortBetweenAB search) {
 		// 検索結果を取得
-		List<ShopReadWriteDto> searchResult = mapper.findByIdAndShopSortBetween(
-				UserIdAndShopSortABSearchQueryDto.from(
+		List<ShopReadWriteDto> searchResult = mapper.findById(
+				UserIdAndShopSortBetweenABSearchQueryDto.from(
 						search.getUserId().toString(),
 						search.getShopCodeA().toString(),
 						search.getShopCodeB().toString()));

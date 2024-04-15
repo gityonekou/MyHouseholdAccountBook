@@ -29,7 +29,7 @@ import com.yonetani.webapp.accountbook.domain.model.common.CodeAndValuePair;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSort;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSortAB;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSortBetweenAB;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm;
 import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
@@ -119,7 +119,7 @@ public class ShopInfoManageUseCase {
 		// 店舗一覧情報を取得
 		ShopInfoManageResponse response = readShopInfo(user);
 		// 店舗IDに対応する店舗情報を取得
-		Shop shop = shopRepository.findByIdAndShopCode(SearchQueryUserIdAndShopCode.from(user.getUserId(), shopCode));
+		Shop shop = shopRepository.findById(SearchQueryUserIdAndShopCode.from(user.getUserId(), shopCode));
 		if(shop == null) {
 			response.addErrorMessage("更新対象の店舗情報が存在しません。管理者に問い合わせてください。shopCode:" + shopCode);
 		} else {
@@ -181,7 +181,7 @@ public class ShopInfoManageUseCase {
 			// 表示順<店舗コードの値の場合、既存の表示順を1ずらしていく
 			} else if(shopForm.getShopSort() < count){
 				// 指定した表示順より大きい表示順の値の店舗情報を取得
-				ShopInquiryList sortList = shopRepository.findByIdAndGreaterThanShopSort(SearchQueryUserIdAndShopSort.from(
+				ShopInquiryList sortList = shopRepository.findById(SearchQueryUserIdAndShopSort.from(
 						user.getUserId(), String.format("%03d", shopForm.getShopSort())));
 				if(!sortList.isEmpty()) {
 					sortList.getValues().forEach(data -> sortValueUpdateList.add(createChopData(data, 1)));
@@ -227,7 +227,7 @@ public class ShopInfoManageUseCase {
 					// 検索条件(between a and b)のbの値を設定　＝　旧表示順 - 1の値
 					int searchBIntVal = Integer.parseInt(shopForm.getShopSortBefore()) - 1;
 					// 新表示順～旧表示順 -1間のデータを取得
-					ShopInquiryList sortList = shopRepository.findByIdAndShopSortBetween(SearchQueryUserIdAndShopSortAB.from(
+					ShopInquiryList sortList = shopRepository.findById(SearchQueryUserIdAndShopSortBetweenAB.from(
 							user.getUserId(), newShopSortValue, String.format("%03d", searchBIntVal)));
 					if(!sortList.isEmpty()) {
 						// 既存データの表示順= 表示順 + 1
@@ -239,7 +239,7 @@ public class ShopInfoManageUseCase {
 					// 検索条件(between a and b)のAの値を設定　＝　旧表示順 + 1の値
 					int searchAIntVal = Integer.parseInt(shopForm.getShopSortBefore()) + 1;
 					// 旧表示順+1 ～新表示順間のデータを取得
-					ShopInquiryList sortList = shopRepository.findByIdAndShopSortBetween(SearchQueryUserIdAndShopSortAB.from(
+					ShopInquiryList sortList = shopRepository.findById(SearchQueryUserIdAndShopSortBetweenAB.from(
 							user.getUserId(), String.format("%03d", searchAIntVal), newShopSortValue));
 					if(!sortList.isEmpty()) {
 						// 既存データの表示順= 表示順 - 1

@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class UserIdAndShopSortABSearchQueryDto {
+public class UserIdAndShopSortBetweenABSearchQueryDto {
 	// ユーザID
 	private final String userId;
 	// 店舗表示順A
@@ -48,7 +48,7 @@ public class UserIdAndShopSortABSearchQueryDto {
 	 * @return テーブルの検索条件：ユーザID、店舗表示順A、店舗表示順B
 	 *
 	 */
-	public static UserIdAndShopSortABSearchQueryDto from(String userId, String shopSortA,  String shopSortB) {
-		return new UserIdAndShopSortABSearchQueryDto(userId, shopSortA, shopSortB);
+	public static UserIdAndShopSortBetweenABSearchQueryDto from(String userId, String shopSortA,  String shopSortB) {
+		return new UserIdAndShopSortBetweenABSearchQueryDto(userId, shopSortA, shopSortB);
 	}
 }

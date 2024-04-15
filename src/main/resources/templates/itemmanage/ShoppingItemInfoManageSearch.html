@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="/js/table_tr_click_script.js"></script>
+<link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<title>情報管理(商品)</title>
+</head>
+<body>
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">情報管理(飲食日用品　商品検索結果)</h5>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
+			</div>
+			
+			<!-- 商品名検索エリア -->
+			<form name="ShoppingItemInfoSearch" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/shoppingiteminfo/search/}" th:object="${shoppingItemInfoSearchForm}">
+			<div class="card-body">
+				<p class="h6">★飲食日用品　商品検索★</p>
+				<div class="mb-3 w30">
+					<label class="form-label">検索対象</label>
+					<div class="col-auto border">
+						<input type="radio" name="UserStatusRadios" class="form-check-input" id="userstatusA">
+						<label class="form-check-label" for="userstatusA">：品名&emsp;</label>
+						<input type="radio" name="UserStatusRadios" class="form-check-input" id="userstatusB" checked>
+						<label class="form-check-label" for="userstatusB">：商品名&emsp;</label>
+						<input type="radio" name="UserStatusRadios" class="form-check-input" id="userstatusC">
+						<label class="form-check-label" for="userstatusC">：会社名</label>
+					</div>
+				</div>
+					<div class="mb-3">
+					<label for="search_name" class="form-label">検索条件入力</label>
+ 					<input type="text" class="form-control" id="search_name" value="ポテトチップス" required>
+				</div>
+				<div class="mb-3">
+					<button class="btn btn-primary" name="search" type="submit">検索</button>
+					<button class="btn btn-primary" name="searchCancel" type="submit">キャンセル</button>
+				</div>
+			</div>
+			</form>
+			
+			<!-- 商品名一覧表示エリア -->
+			<div class="card-body">
+				<p class="h6">ポテトチップス検索結果</p>
+				<p class="card-text">対象の商品を選択してください。</p>
+				<table class="table table-sm table-bordered table-hover">
+					<thead>
+						<tr class="table-secondary">
+							<th scope="col" class="w15">支出項目名</th>
+							<th scope="col" class="w15">品名</th>
+							<th scope="col">商品名</th>
+							<th scope="col">会社名</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:data-href="@{/myhacbook/managebaseinfo/shoppingiteminfo/select?shoppingItemCode=020202}">
+							<td>＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠</td>
+							<td>＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠</td>
+							<td>商品名</td>
+							<td>会社名</td>
+						</tr>
+						<tr class="table-warning" th:data-href="@{/myhacbook/managebaseinfo/shoppingiteminfo/select?shoppingItemCode=020202}">
+							<td>支出項目名</td>
+							<td>品名</td>
+							<td>商品名</td>
+							<td>会社名</td>
+						</tr>
+						<tr th:data-href="@{/myhacbook/managebaseinfo/shoppingiteminfo/select?shoppingItemCode=020202}">
+							<td>支出項目名</td>
+							<td>品名</td>
+							<td>商品名</td>
+							<td>会社名</td>
+						</tr>
+						<tr class="table-warning" th:data-href="@{/myhacbook/managebaseinfo/shoppingiteminfo/select?shoppingItemCode=020202}">
+							<td>支出項目名</td>
+							<td>品名</td>
+							<td>商品名</td>
+							<td>会社名</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	
+</body>
+</html>

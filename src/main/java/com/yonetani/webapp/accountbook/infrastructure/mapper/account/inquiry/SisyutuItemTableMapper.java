@@ -19,6 +19,7 @@ import org.apache.ibatis.annotations.Update;
 
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.SisyutuItemReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndSisyutuItemCodeSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndSisyutuItemSortBetweenABSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSearchQueryDto;
 
 /**
@@ -98,8 +99,18 @@ public interface SisyutuItemTableMapper {
 	 *
 	 */
 	@Select("sql/account/inquiry/SisyutuItemTableSelectSql02.sql")
-	public SisyutuItemReadWriteDto findByIdAndSisyutuItemCode(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
+	public SisyutuItemReadWriteDto findById(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
 	
+	/**
+	 *<pre>
+	 * 指定のユーザID、支出項目表示順A～支出項目表示順Bを条件に支出項目テーブル:SISYUTU_ITEM_TABLEを参照します。
+	 *</pre>
+	 * @param search 検索条件:ユーザID、支出項目表示順A、支出項目表示順B
+	 * @return 支出項目テーブル:SISYUTU_ITEM_TABLE参照結果
+	 *
+	 */
+	@Select("sql/account/inquiry/SisyutuItemTableSelectSql03.sql")
+	public List<SisyutuItemReadWriteDto> findById(@Param("dto") UserIdAndSisyutuItemSortBetweenABSearchQueryDto search);
 	
 	/**
 	 *<pre>

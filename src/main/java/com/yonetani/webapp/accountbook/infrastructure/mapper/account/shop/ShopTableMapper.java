@@ -19,7 +19,7 @@ import org.apache.ibatis.annotations.Update;
 
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.shop.ShopReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopCodeSearchQueryDto;
-import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopSortABSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopSortBetweenABSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopSortSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSearchQueryDto;
 
@@ -89,7 +89,7 @@ public interface ShopTableMapper {
 	 *
 	 */
 	@Select("sql/account/shop/ShopTableSelectSql02.sql")
-	public ShopReadWriteDto findByIdAndShopCode(@Param("dto") UserIdAndShopCodeSearchQueryDto search);
+	public ShopReadWriteDto findById(@Param("dto") UserIdAndShopCodeSearchQueryDto search);
 	
 	/**
 	 *<pre>
@@ -100,7 +100,7 @@ public interface ShopTableMapper {
 	 *
 	 */
 	@Select("sql/account/shop/ShopTableSelectSql03.sql")
-	public List<ShopReadWriteDto> findByIdAndGreaterThanShopSort(@Param("dto") UserIdAndShopSortSearchQueryDto search);
+	public List<ShopReadWriteDto> findById(@Param("dto") UserIdAndShopSortSearchQueryDto search);
 	
 	/**
 	 *<pre>
@@ -111,7 +111,7 @@ public interface ShopTableMapper {
 	 *
 	 */
 	@Select("sql/account/shop/ShopTableSelectSql04.sql")
-	public List<ShopReadWriteDto> findByIdAndShopSortBetween(@Param("dto") UserIdAndShopSortABSearchQueryDto search);
+	public List<ShopReadWriteDto> findById(@Param("dto") UserIdAndShopSortBetweenABSearchQueryDto search);
 	
 	/**
 	 *<pre>

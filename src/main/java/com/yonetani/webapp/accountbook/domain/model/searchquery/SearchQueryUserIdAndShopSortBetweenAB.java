@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class SearchQueryUserIdAndShopSortAB {
+public class SearchQueryUserIdAndShopSortBetweenAB {
 	// ユーザID
 	private final UserId userId;
 	// 店舗コード
@@ -53,8 +53,8 @@ public class SearchQueryUserIdAndShopSortAB {
 	 * @return 検索条件(ユーザID, 店舗コードA, 店舗コードA)
 	 *
 	 */
-	public static SearchQueryUserIdAndShopSortAB from(String userId, String shopCodeA, String shopCodeB) {
-		return new SearchQueryUserIdAndShopSortAB(UserId.from(userId), ShopCode.from(shopCodeA), ShopCode.from(shopCodeB));
+	public static SearchQueryUserIdAndShopSortBetweenAB from(String userId, String shopCodeA, String shopCodeB) {
+		return new SearchQueryUserIdAndShopSortBetweenAB(UserId.from(userId), ShopCode.from(shopCodeA), ShopCode.from(shopCodeB));
 	}
 	
 	/**

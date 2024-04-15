@@ -2,7 +2,9 @@
  * 支出項目情報管理ユースケースです。
  * ・情報管理(支出項目) 対象選択画面の表示情報取得
  * ・情報管理(支出項目) 処理選択画面の表示情報取得
- * ・情報管理(支出項目) 更新画面の表示情報取得(追加時、更新時)
+ * ・情報管理(支出項目) 更新画面の表示情報取得(追加時)
+ * ・情報管理(支出項目) 更新画面の表示情報取得(更新時)
+ * ・情報管理(支出項目) 更新画面の表示情報取得(バリデーションチェックNG時)
  * ・支出項目情報の追加・更新
  *
  *------------------------------------------------
@@ -45,7 +47,9 @@ import lombok.extern.log4j.Log4j2;
  * 支出項目情報管理ユースケースです。
  * ・情報管理(支出項目) 対象選択画面の表示情報取得
  * ・情報管理(支出項目) 処理選択画面の表示情報取得
- * ・情報管理(支出項目) 更新画面の表示情報取得(追加時、更新時)
+ * ・情報管理(支出項目) 更新画面の表示情報取得(追加時)
+ * ・情報管理(支出項目) 更新画面の表示情報取得(更新時)
+ * ・情報管理(支出項目) 更新画面の表示情報取得(バリデーションチェックNG時)
  * ・支出項目情報の追加・更新
  *
  *</pre>
@@ -101,7 +105,7 @@ public class ExpenditureItemInfoManageUseCase {
 		}
 		
 		// 支出項目コードに対応する支出項目情報を取得
-		SisyutuItem sisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
+		SisyutuItem sisyutuItem = sisyutuItemRepository.findById(
 				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
 		if(sisyutuItem == null) {
 			// 選択した支出項目コードに対応する支出項目情報が存在しない場合、init画面を再表示させるためnullを設定
@@ -171,7 +175,7 @@ public class ExpenditureItemInfoManageUseCase {
 		}
 		
 		// 支出項目コードに対応する支出項目情報(親となる支出項目情報)を取得
-		SisyutuItem parentSisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
+		SisyutuItem parentSisyutuItem = sisyutuItemRepository.findById(
 				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
 		if(parentSisyutuItem == null) {
 			// 選択した支出項目コードに対応する支出項目情報が存在しない場合エラーを設定
@@ -243,7 +247,7 @@ public class ExpenditureItemInfoManageUseCase {
 		}
 		
 		// 支出項目コードに対応する支出項目情報を取得
-		SisyutuItem sisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
+		SisyutuItem sisyutuItem = sisyutuItemRepository.findById(
 				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
 		if(sisyutuItem == null) {
 			// 選択した支出項目コードに対応する支出項目情報が存在しない場合エラーを設定
@@ -649,7 +653,7 @@ public class ExpenditureItemInfoManageUseCase {
 		// 繰り返しを終了する
 		do {
 			// 親支出項目コードに対応する支出項目情報を取得
-			SisyutuItem parentSisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
+			SisyutuItem parentSisyutuItem = sisyutuItemRepository.findById(
 					SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), parentSisyutuItemCode));
 			if(parentSisyutuItem == null) {
 				errorMsgList.add("更新対象の支出項目情報が属する親の支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" 

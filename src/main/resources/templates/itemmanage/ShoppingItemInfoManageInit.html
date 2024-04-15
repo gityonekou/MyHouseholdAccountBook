@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<title>情報管理(商品)</title>
+</head>
+<body>
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">情報管理(飲食日用品)</h5>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
+			</div>
+			
+			<!-- 商品名検索エリア -->
+			<form name="ShoppingItemInfoSearch" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/shoppingiteminfo/search/}">
+			<div class="card-body">
+				<p class="h6">■飲食日用品　商品検索■</p>
+				<div class="mb-3 w30">
+					<label class="form-label">検索対象</label>
+					<div class="col-auto border">
+						<input type="radio" name="UserStatusRadios" class="form-check-input" id="userstatusA">
+						<label class="form-check-label" for="userstatusA">：品名&emsp;</label>
+						<input type="radio" name="UserStatusRadios" class="form-check-input" id="userstatusB">
+						<label class="form-check-label" for="userstatusB">：商品名&emsp;</label>
+						<input type="radio" name="UserStatusRadios" class="form-check-input" id="userstatusC">
+						<label class="form-check-label" for="userstatusC">：会社名</label>
+					</div>
+				</div>
+					<div class="mb-3">
+					<label for="search_name" class="form-label">検索条件入力</label>
+ 					<input type="text" class="form-control" id="search_name" value="" required>
+				</div>
+				<div class="mb-3">
+					<button class="btn btn-primary" name="search" type="submit">検索</button>
+				</div>
+			</div>
+			</form>
+			
+			<!-- 支出項目一覧表示エリア -->
+			<div class="card-body">
+				<p class="h6">★飲食日用品支出項目一覧★</p>
+				<ul class="list-unstyled">
+					<li class="mt-1 border border-dark">
+						<div class="bg-info">▼<span>飲食日用品</span></div>
+						<ul class="list-unstyled ps-3">
+							<li class="mt-1 border border-primary">
+								<div class="bg-warning">
+								<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+									aria-expanded="false" data-bs-target="#area_0014" aria-controls="area_0014">▼<span>日用消耗品</span></button>
+								：<span>日用消耗品詳細を入力</span>
+								</div>
+								<ul class="list-unstyled ps-3 collapse" id="area_0014">
+									<li>
+										<button class="btn d-inline-flex align-items-center collapsed border-0">■<span>キッチン用品</span></button>
+										：<a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/managebaseinfo/shoppingiteminfo/addload?sisyutuItemCode=0011}">>商品を追加</a>
+										：<a class="btn btn-outline-info btn-sm" th:href="@{/myhacbook/managebaseinfo/shoppingiteminfo/searchbysisyutuitem?sisyutuItemCode=0011}">>商品を検索</a>
+										：<span>キッチン用品詳細を入力</span>
+									
+									
+									</li>
+									<li>
+									
+										<button class="btn d-inline-flex align-items-center collapsed border-0">■<span>洗面所用品</span></button>
+										：<a class="btn text-bg-success btn-sm" href="./ManageShoppingItemUpd.html">商品を追加</a>
+										：<a class="btn btn-outline-info btn-sm" href="./ManageShoppingItemSearch.html">商品を検索</a>
+										：<span>洗面所用品詳細を入力 歯磨き粉、歯ブラシなど</span>
+									</li>
+								</ul>
+							</li>
+							
+							<li class="mt-1 border border-primary">
+							
+								<div class="bg-warning">
+								<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+									aria-expanded="false" data-bs-target="#area_0015" aria-controls="area_0015">▼<span>食費</span></button>
+								：<span>日用消耗品詳細を入力</span>
+								</div>
+								<ul class="list-unstyled ps-3 collapse" id="area_0015">
+
+									
+									<li class="mt-1 border border-primary">
+									
+										<button class="btn d-inline-flex align-items-center collapsed border-0">■<span>国民年金保険</span></button>
+										：<a class="btn text-bg-success btn-sm" href="./ManageShoppingItemUpd.html">商品を追加</a>
+										：<a class="btn btn-outline-info btn-sm" href="./ManageShoppingItemSearch.html">商品を検索</a>
+										：<span>国民年金保険詳細を入力</span>
+									
+									
+									</li>
+									
+									<li class="mt-1 border border-primary">
+										<div class="bg-warning">
+										<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+											aria-expanded="false" data-bs-target="#area_0020" aria-controls="area_0020">▼<span>乳製品</span></button>
+										：<span>乳製品詳細を入力</span>
+										</div>
+										<ul class="list-unstyled ps-3 collapse" id="area_0020">
+
+											
+											<li>
+											
+												<button class="btn d-inline-flex align-items-center collapsed border-0">■<span>牛乳</span></button>
+												：<a class="btn text-bg-success btn-sm" href="./ManageShoppingItemUpd.html">商品を追加</a>
+												：<a class="btn btn-outline-info btn-sm" href="./ManageShoppingItemSearch.html">商品を検索</a>
+												：<span>牛乳詳細を入力</span>
+											
+											
+											</li>
+											
+											<li>
+											
+												<button class="btn d-inline-flex align-items-center collapsed border-0">■<span>加工乳</span></button>
+												：<a class="btn text-bg-success btn-sm" href="./ManageShoppingItemUpd.html">商品を追加</a>
+												：<a class="btn btn-outline-info btn-sm" href="./ManageShoppingItemSearch.html">商品を検索</a>
+												：<span>加工乳詳細を入力</span>
+											
+											
+											</li>
+											
+											<li>
+											
+												<button class="btn d-inline-flex align-items-center collapsed border-0">■<span>ヨーグルト大</span></button>
+												：<a class="btn text-bg-success btn-sm" href="./ManageShoppingItemUpd.html">商品を追加</a>
+												：<a class="btn btn-outline-info btn-sm" href="./ManageShoppingItemSearch.html">商品を検索</a>
+												：<span>ヨーグルト大詳細を入力</span>
+											
+											
+											</li>
+										</ul>
+									</li>
+
+									<li class="mt-1 border border-primary">
+									
+										<button class="btn d-inline-flex align-items-center collapsed border-0">■<span>健康保険</span></button>
+										：<a class="btn text-bg-success btn-sm" href="./ManageShoppingItemUpd.html">商品を追加</a>
+										：<a class="btn btn-outline-info btn-sm" href="./ManageShoppingItemSearch.html">商品を検索</a>
+										：<span>健康保険詳細を入力</span>
+									
+									
+									</li>
+									
+									<li class="mt-1 border border-primary">
+									
+										<button class="btn d-inline-flex align-items-center collapsed border-0">■<span>その他食費</span></button>
+										：<a class="btn text-bg-success btn-sm" href="./ManageShoppingItemUpd.html">商品を追加</a>
+										：<a class="btn btn-outline-info btn-sm" href="./ManageShoppingItemSearch.html">商品を検索</a>
+										：<span>その他食費詳細を入力</span>
+									
+									
+									</li>
+									
+								</ul>
+							</li>
+						</ul>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	
+</body>
+</html>

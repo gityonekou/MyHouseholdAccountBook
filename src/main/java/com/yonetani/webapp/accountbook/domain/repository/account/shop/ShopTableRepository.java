@@ -15,7 +15,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.shop.ShopInquiryList
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSort;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSortAB;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSortBetweenAB;
 
 /**
  *<pre>
@@ -77,7 +77,7 @@ public interface ShopTableRepository {
 	 * @return 店舗情報のリスト
 	 *
 	 */
-	ShopInquiryList findByIdAndGreaterThanShopSort(SearchQueryUserIdAndShopSort search);
+	ShopInquiryList findById(SearchQueryUserIdAndShopSort search);
 	
 	/**
 	 *<pre>
@@ -91,7 +91,7 @@ public interface ShopTableRepository {
 	 * @return 店舗情報のリスト
 	 *
 	 */
-	ShopInquiryList findByIdAndShopSortBetween(SearchQueryUserIdAndShopSortAB search);
+	ShopInquiryList findById(SearchQueryUserIdAndShopSortBetweenAB search);
 	
 	/**
 	 *<pre>
@@ -101,7 +101,7 @@ public interface ShopTableRepository {
 	 * @return 店舗情報
 	 *
 	 */
-	Shop findByIdAndShopCode(SearchQueryUserIdAndShopCode search);
+	Shop findById(SearchQueryUserIdAndShopCode search);
 	
 	/**
 	 *<pre>

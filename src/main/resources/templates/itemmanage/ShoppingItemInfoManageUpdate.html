@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<title>情報管理(商品)</title>
+</head>
+<body>
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">情報管理(飲食日用品)</h5>
+				<p class="card-text">何かのメッセージがある場合はここに表示</p>
+			</div>
+			
+			<form name="ShoppingItemInfoUpdate" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/shoppingiteminfo/update/}" th:object="${shoppingItemInfoUpdateForm}">
+			<div class="card-body">
+				<div class="mb-3">
+					<p class="h6">支出項目名：飲食日用品＞日用消耗品＞リビング用品</p>
+				</div>
+				<div class="mb-3">
+					<label for="ryaku_name" class="form-label">品名</label>
+ 					<input type="text" class="form-control" id="ryaku_name" value="テスト商品" required>
+				</div>
+				<div class="mb-3">
+					<label for="validationServer01" class="form-label">商品名</label>
+ 					<input type="text" class="form-control" id="name" value="テスト商品AAAの名前" required>
+				</div>
+				<div class="mb-3">
+					<label for="validationServer01" class="form-label">会社名</label>
+ 					<input type="text" class="form-control" id="name" value="テスト商品AAAを作った会社" required>
+				</div>
+				<div class="mb-3">
+					<label for="validationServer01" class="form-label">商品詳細</label>
+ 					<input type="text" class="form-control" id="name" value="テスト商品AAAの詳細" required>
+				</div>
+				<div class="mb-3">
+					<button class="btn btn-primary" type="submit">登録</button>
+					<input type="hidden" th:field="*{action}" />
+				</div>
+			</div>
+			</form>
+		</div>
+	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	
+</body>
+</html>

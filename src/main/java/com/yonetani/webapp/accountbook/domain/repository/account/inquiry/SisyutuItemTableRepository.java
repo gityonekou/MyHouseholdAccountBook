@@ -14,6 +14,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemSortBetweenAB;
 
 /**
  *<pre>
@@ -77,7 +78,17 @@ public interface SisyutuItemTableRepository {
 	 *
 	 */
 	SisyutuItemInquiryList findById(SearchQueryUserId userId);
-
+	
+	/**
+	 *<pre>
+	 * ユーザID、支出項目表示順A～支出項目表示順Bに対応する支出項目情報を取得します。
+	 *</pre>
+	 * @param search 検索対象のユーザID、支出項目表示順A、支出項目表示順B
+	 * @return 支出項目情報のリスト
+	 *
+	 */
+	SisyutuItemInquiryList findById(SearchQueryUserIdAndSisyutuItemSortBetweenAB from);
+	
 	/**
 	 *<pre>
 	 * ユーザID、支出項目コードに対応する支出項目情報を取得します。
@@ -86,7 +97,7 @@ public interface SisyutuItemTableRepository {
 	 * @return 支出項目情報
 	 *
 	 */
-	SisyutuItem findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search);
+	SisyutuItem findById(SearchQueryUserIdAndSisyutuItemCode search);
 	
 	/**
 	 *<pre>
