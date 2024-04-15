@@ -53,6 +53,85 @@
 					<li class="mt-1 border border-dark">
 						<div class="bg-info">▼<span>飲食日用品</span></div>
 						<ul class="list-unstyled ps-3">
+							
+							<!--/* 支出項目レベル２のデータを繰り返すリストブロックー */-->
+							<li class="mt-1 border border-primary" th:each="item : ${expenditureItemList}">
+								<div class="bg-info">
+								<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+									aria-expanded="false" th:data-bs-target="'#area_'+${item.sisyutuItemCode}" th:aria-controls="'area_'+${item.sisyutuItemCode}">▼<span th:text="${item.sisyutuItemName}"></span></button>
+									：<span th:text="${item.sisyutuItemDetailContext}"></span>
+								</div>
+								<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${item.sisyutuItemCode}">
+
+									<!--/* 支出項目レベル３のデータを繰り返すリストブロックー */-->
+									<li th:each="nest3ChildItem : ${item.childItemList}">
+									<th:block th:if="${#lists.size(nest3ChildItem.childItemList)}==0">
+										<button class="btn d-inline-flex align-items-center collapsed border-0">■<span th:text="${nest3ChildItem.sisyutuItemName}"></span></button>
+										：<a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/managebaseinfo/shoppingiteminfo/addload(sisyutuItemCode=${nest3ChildItem.sisyutuItemCode})}">商品を追加</a>
+										：<a class="btn btn-outline-info btn-sm" th:href="@{/myhacbook/managebaseinfo/shoppingiteminfo/searchbysisyutuitem(sisyutuItemCode=${nest3ChildItem.sisyutuItemCode})}">商品を検索</a>
+										：<span th:text="${nest3ChildItem.sisyutuItemDetailContext}"></span>
+									</th:block>
+									<th:block th:if="${#lists.size(nest3ChildItem.childItemList)}>0">
+										<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+											aria-expanded="false" th:data-bs-target="'#area_'+${nest3ChildItem.sisyutuItemCode}" th:aria-controls="'area_'+${nest3ChildItem.sisyutuItemCode}">▼<span th:text="${nest3ChildItem.sisyutuItemName}"></span></button>
+											：<span th:text="${nest3ChildItem.sisyutuItemDetailContext}"></span>
+										<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${nest3ChildItem.sisyutuItemCode}">
+										
+											<!--/* 支出項目レベル４のデータを繰り返すリストブロックー */-->
+											<li th:each="nest4ChildItem : ${nest3ChildItem.childItemList}">
+											<th:block th:if="${#lists.size(nest4ChildItem.childItemList)}==0">
+												<button class="btn d-inline-flex align-items-center collapsed border-0">■<span th:text="${nest4ChildItem.sisyutuItemName}"></span></button>
+												：<a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/managebaseinfo/shoppingiteminfo/addload(sisyutuItemCode=${nest4ChildItem.sisyutuItemCode})}">商品を追加</a>
+												：<a class="btn btn-outline-info btn-sm" th:href="@{/myhacbook/managebaseinfo/shoppingiteminfo/searchbysisyutuitem(sisyutuItemCode=${nest4ChildItem.sisyutuItemCode})}">商品を検索</a>
+												：<span th:text="${nest4ChildItem.sisyutuItemDetailContext}"></span>
+											</th:block>
+											<th:block th:if="${#lists.size(nest4ChildItem.childItemList)}>0">
+												<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+													aria-expanded="false" th:data-bs-target="'#area_'+${nest4ChildItem.sisyutuItemCode}" th:aria-controls="'area_'+${nest4ChildItem.sisyutuItemCode}">▼<span th:text="${nest4ChildItem.sisyutuItemName}"></span></button>
+													：<span th:text="${nest4ChildItem.sisyutuItemDetailContext}"></span>
+												<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${nest4ChildItem.sisyutuItemCode}">
+												
+													<!--/* 支出項目レベル５のデータを繰り返すリストブロックー */-->
+													<li th:each="nest5ChildItem : ${nest4ChildItem.childItemList}">
+													<th:block th:if="${#lists.size(nest5ChildItem.childItemList)}==0">
+														<button class="btn d-inline-flex align-items-center collapsed border-0">■<span th:text="${nest5ChildItem.sisyutuItemName}"></span></button>
+														：<a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/managebaseinfo/shoppingiteminfo/addload(sisyutuItemCode=${nest5ChildItem.sisyutuItemCode})}">商品を追加</a>
+														：<a class="btn btn-outline-info btn-sm" th:href="@{/myhacbook/managebaseinfo/shoppingiteminfo/searchbysisyutuitem(sisyutuItemCode=${nest5ChildItem.sisyutuItemCode})}">商品を検索</a>
+														：<span th:text="${nest5ChildItem.sisyutuItemDetailContext}"></span>
+													</th:block>
+													<th:block th:if="${#lists.size(nest5ChildItem.childItemList)}>0">
+														<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+															aria-expanded="false" th:data-bs-target="'#area_'+${nest5ChildItem.sisyutuItemCode}" th:aria-controls="'area_'+${nest5ChildItem.sisyutuItemCode}">▼<span th:text="${nest5ChildItem.sisyutuItemName}"></span></button>
+															：<p class="btn btn-outline-info btn-sm">ここが表示される場合はエラーです</p>
+															：<span th:text="${nest5ChildItem.sisyutuItemDetailContext}"></span>
+														<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${nest5ChildItem.sisyutuItemCode}">
+														
+															<!--/* 支出項目レベル６のデータを繰り返すリストブロックー＝仕様範囲外なので、エラーとなる */-->
+															<li>仕様範囲外データ表示中１：エラーです。管理者に問い合わせてください</li>
+															<li>仕様範囲外データ表示中２：エラーです。管理者に問い合わせてください</li>
+															<li>仕様範囲外データ表示中３：エラーです。管理者に問い合わせてください</li>
+														</ul>
+													</th:block>
+													</li>
+												</ul>
+											</th:block>
+											</li>
+										</ul>
+									</th:block>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+				</ul>
+							
+							
+							<!-- サンプル表示領域　後で消す -->
+				<ul class="list-unstyled">
+					<li class="mt-1 border border-dark">
+						<div class="bg-info">▼<span>飲食日用品</span></div>
+						<ul class="list-unstyled ps-3">
+							
 							<li class="mt-1 border border-primary">
 								<div class="bg-warning">
 								<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"

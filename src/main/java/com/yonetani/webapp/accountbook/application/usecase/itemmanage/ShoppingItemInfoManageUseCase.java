@@ -79,7 +79,7 @@ public class ShoppingItemInfoManageUseCase {
 		ShoppingItemInfoManageInitResponse response = ShoppingItemInfoManageInitResponse.getInstance();
 		
 		// 支出項目：飲食日用品から、日用消耗品と飲食の項目をすべて取得(表示順から取得する)
-		SisyutuItemInquiryList sisyutuItemSearchResult = sisyutuItemRepository.findById(
+		SisyutuItemInquiryList sisyutuItemSearchResult = sisyutuItemRepository.findByIdAndSisyutuItemSortBetween(
 				SearchQueryUserIdAndSisyutuItemSortBetweenAB.from(
 						// 検索条件:ユーザID
 						user.getUserId(),

@@ -89,7 +89,7 @@ public interface ShopTableMapper {
 	 *
 	 */
 	@Select("sql/account/shop/ShopTableSelectSql02.sql")
-	public ShopReadWriteDto findById(@Param("dto") UserIdAndShopCodeSearchQueryDto search);
+	public ShopReadWriteDto findByIdAndShopCode(@Param("dto") UserIdAndShopCodeSearchQueryDto search);
 	
 	/**
 	 *<pre>
@@ -100,7 +100,7 @@ public interface ShopTableMapper {
 	 *
 	 */
 	@Select("sql/account/shop/ShopTableSelectSql03.sql")
-	public List<ShopReadWriteDto> findById(@Param("dto") UserIdAndShopSortSearchQueryDto search);
+	public List<ShopReadWriteDto> findByIdAndShopSort(@Param("dto") UserIdAndShopSortSearchQueryDto search);
 	
 	/**
 	 *<pre>
@@ -111,7 +111,7 @@ public interface ShopTableMapper {
 	 *
 	 */
 	@Select("sql/account/shop/ShopTableSelectSql04.sql")
-	public List<ShopReadWriteDto> findById(@Param("dto") UserIdAndShopSortBetweenABSearchQueryDto search);
+	public List<ShopReadWriteDto> findByIdAndShopSortBetween(@Param("dto") UserIdAndShopSortBetweenABSearchQueryDto search);
 	
 	/**
 	 *<pre>

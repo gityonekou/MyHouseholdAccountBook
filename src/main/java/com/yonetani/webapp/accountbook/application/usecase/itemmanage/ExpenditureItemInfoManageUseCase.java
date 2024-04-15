@@ -105,7 +105,7 @@ public class ExpenditureItemInfoManageUseCase {
 		}
 		
 		// 支出項目コードに対応する支出項目情報を取得
-		SisyutuItem sisyutuItem = sisyutuItemRepository.findById(
+		SisyutuItem sisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
 				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
 		if(sisyutuItem == null) {
 			// 選択した支出項目コードに対応する支出項目情報が存在しない場合、init画面を再表示させるためnullを設定
@@ -175,7 +175,7 @@ public class ExpenditureItemInfoManageUseCase {
 		}
 		
 		// 支出項目コードに対応する支出項目情報(親となる支出項目情報)を取得
-		SisyutuItem parentSisyutuItem = sisyutuItemRepository.findById(
+		SisyutuItem parentSisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
 				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
 		if(parentSisyutuItem == null) {
 			// 選択した支出項目コードに対応する支出項目情報が存在しない場合エラーを設定
@@ -247,7 +247,7 @@ public class ExpenditureItemInfoManageUseCase {
 		}
 		
 		// 支出項目コードに対応する支出項目情報を取得
-		SisyutuItem sisyutuItem = sisyutuItemRepository.findById(
+		SisyutuItem sisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
 				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
 		if(sisyutuItem == null) {
 			// 選択した支出項目コードに対応する支出項目情報が存在しない場合エラーを設定
@@ -653,7 +653,7 @@ public class ExpenditureItemInfoManageUseCase {
 		// 繰り返しを終了する
 		do {
 			// 親支出項目コードに対応する支出項目情報を取得
-			SisyutuItem parentSisyutuItem = sisyutuItemRepository.findById(
+			SisyutuItem parentSisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
 					SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), parentSisyutuItemCode));
 			if(parentSisyutuItem == null) {
 				errorMsgList.add("更新対象の支出項目情報が属する親の支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" 

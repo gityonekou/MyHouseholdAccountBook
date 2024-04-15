@@ -102,9 +102,9 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SisyutuItemInquiryList findById(SearchQueryUserIdAndSisyutuItemSortBetweenAB search) {
+	public SisyutuItemInquiryList findByIdAndSisyutuItemSortBetween(SearchQueryUserIdAndSisyutuItemSortBetweenAB search) {
 		// 検索結果を取得
-		List<SisyutuItemReadWriteDto> searchResult = mapper.findById(UserIdAndSisyutuItemSortBetweenABSearchQueryDto.from(
+		List<SisyutuItemReadWriteDto> searchResult = mapper.findByIdAndSisyutuItemSortBetween(UserIdAndSisyutuItemSortBetweenABSearchQueryDto.from(
 				search.getUserId().toString(), search.getSisyutuItemSortA().toString(), search.getSisyutuItemSortB().toString()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
@@ -120,9 +120,9 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SisyutuItem findById(SearchQueryUserIdAndSisyutuItemCode search) {
+	public SisyutuItem findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search) {
 		// 検索結果を取得
-		SisyutuItemReadWriteDto searchResult = mapper.findById(
+		SisyutuItemReadWriteDto searchResult = mapper.findByIdAndSisyutuItemCode(
 				UserIdAndSisyutuItemCodeSearchQueryDto.from(
 						search.getUserId().toString(), search.getSisyutuItemCode().toString()));
 		if(searchResult == null) {

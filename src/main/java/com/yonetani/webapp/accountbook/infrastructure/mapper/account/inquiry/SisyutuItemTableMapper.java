@@ -99,7 +99,7 @@ public interface SisyutuItemTableMapper {
 	 *
 	 */
 	@Select("sql/account/inquiry/SisyutuItemTableSelectSql02.sql")
-	public SisyutuItemReadWriteDto findById(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
+	public SisyutuItemReadWriteDto findByIdAndSisyutuItemCode(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
 	
 	/**
 	 *<pre>
@@ -110,7 +110,7 @@ public interface SisyutuItemTableMapper {
 	 *
 	 */
 	@Select("sql/account/inquiry/SisyutuItemTableSelectSql03.sql")
-	public List<SisyutuItemReadWriteDto> findById(@Param("dto") UserIdAndSisyutuItemSortBetweenABSearchQueryDto search);
+	public List<SisyutuItemReadWriteDto> findByIdAndSisyutuItemSortBetween(@Param("dto") UserIdAndSisyutuItemSortBetweenABSearchQueryDto search);
 	
 	/**
 	 *<pre>

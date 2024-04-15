@@ -96,9 +96,9 @@ public class ShopTableDataSource implements ShopTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Shop findById(SearchQueryUserIdAndShopCode search) {
+	public Shop findByIdAndShopCode(SearchQueryUserIdAndShopCode search) {
 		// 指定条件で店舗情報を取得
-		ShopReadWriteDto result = mapper.findById(UserIdAndShopCodeSearchQueryDto.from(
+		ShopReadWriteDto result = mapper.findByIdAndShopCode(UserIdAndShopCodeSearchQueryDto.from(
 				search.getUserId().toString(), search.getShopCode().toString()));
 		if(result == null) {
 			// 対象データなしの場合、nullを返却
@@ -122,9 +122,9 @@ public class ShopTableDataSource implements ShopTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ShopInquiryList findById(SearchQueryUserIdAndShopSort search) {
+	public ShopInquiryList findByIdAndShopSort(SearchQueryUserIdAndShopSort search) {
 		// 検索結果を取得
-		List<ShopReadWriteDto> searchResult = mapper.findById(
+		List<ShopReadWriteDto> searchResult = mapper.findByIdAndShopSort(
 				UserIdAndShopSortSearchQueryDto.from(search.getUserId().toString(), search.getShopSort().toString()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
@@ -139,9 +139,9 @@ public class ShopTableDataSource implements ShopTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ShopInquiryList findById(SearchQueryUserIdAndShopSortBetweenAB search) {
+	public ShopInquiryList findByIdAndShopSortBetween(SearchQueryUserIdAndShopSortBetweenAB search) {
 		// 検索結果を取得
-		List<ShopReadWriteDto> searchResult = mapper.findById(
+		List<ShopReadWriteDto> searchResult = mapper.findByIdAndShopSortBetween(
 				UserIdAndShopSortBetweenABSearchQueryDto.from(
 						search.getUserId().toString(),
 						search.getShopCodeA().toString(),

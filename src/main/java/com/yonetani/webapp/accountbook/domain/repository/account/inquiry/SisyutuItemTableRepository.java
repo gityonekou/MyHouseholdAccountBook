@@ -87,7 +87,7 @@ public interface SisyutuItemTableRepository {
 	 * @return 支出項目情報のリスト
 	 *
 	 */
-	SisyutuItemInquiryList findById(SearchQueryUserIdAndSisyutuItemSortBetweenAB from);
+	SisyutuItemInquiryList findByIdAndSisyutuItemSortBetween(SearchQueryUserIdAndSisyutuItemSortBetweenAB from);
 	
 	/**
 	 *<pre>
@@ -97,7 +97,7 @@ public interface SisyutuItemTableRepository {
 	 * @return 支出項目情報
 	 *
 	 */
-	SisyutuItem findById(SearchQueryUserIdAndSisyutuItemCode search);
+	SisyutuItem findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search);
 	
 	/**
 	 *<pre>

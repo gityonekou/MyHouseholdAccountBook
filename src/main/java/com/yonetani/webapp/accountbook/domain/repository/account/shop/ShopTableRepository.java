@@ -77,7 +77,7 @@ public interface ShopTableRepository {
 	 * @return 店舗情報のリスト
 	 *
 	 */
-	ShopInquiryList findById(SearchQueryUserIdAndShopSort search);
+	ShopInquiryList findByIdAndShopSort(SearchQueryUserIdAndShopSort search);
 	
 	/**
 	 *<pre>
@@ -91,7 +91,7 @@ public interface ShopTableRepository {
 	 * @return 店舗情報のリスト
 	 *
 	 */
-	ShopInquiryList findById(SearchQueryUserIdAndShopSortBetweenAB search);
+	ShopInquiryList findByIdAndShopSortBetween(SearchQueryUserIdAndShopSortBetweenAB search);
 	
 	/**
 	 *<pre>
@@ -101,7 +101,7 @@ public interface ShopTableRepository {
 	 * @return 店舗情報
 	 *
 	 */
-	Shop findById(SearchQueryUserIdAndShopCode search);
+	Shop findByIdAndShopCode(SearchQueryUserIdAndShopCode search);
 	
 	/**
 	 *<pre>
