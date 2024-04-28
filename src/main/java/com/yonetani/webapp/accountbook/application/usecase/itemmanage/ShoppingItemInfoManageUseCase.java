@@ -268,7 +268,6 @@ public class ShoppingItemInfoManageUseCase {
 		// レスポンスを生成
 		ShoppingItemInfoManageUpdateResponse response = ShoppingItemInfoManageUpdateResponse.getInstance(null);
 		
-		
 		// 新規登録の場合
 		if(inputForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
 			
@@ -278,6 +277,7 @@ public class ShoppingItemInfoManageUseCase {
 		} else {
 			throw new MyHouseholdAccountBookRuntimeException("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + inputForm.getAction());
 		}
+		
 		// トランザクション完了
 		response.setTransactionSuccessFull();
 		

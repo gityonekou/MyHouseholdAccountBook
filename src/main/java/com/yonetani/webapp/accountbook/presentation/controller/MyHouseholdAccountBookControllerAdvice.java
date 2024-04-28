@@ -84,7 +84,7 @@ public class MyHouseholdAccountBookControllerAdvice {
 	@ExceptionHandler({ MyHouseholdAccountBookRuntimeException.class , MyHouseholdAccountBookException.class })
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ModelAndView handleMyHouseholdAccountBookException(Exception ex) {
-		log.error("handle :handleMyHouseholdAccountBookException Exception [message=" + ex.getLocalizedMessage() + "]");
+		log.error("[handle]:handleMyHouseholdAccountBookException Exception [message=" + ex.getLocalizedMessage() + "]");
 		ModelAndView model = createErrorMessage(ex);
 	    model.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);	
 		return model;
@@ -102,7 +102,7 @@ public class MyHouseholdAccountBookControllerAdvice {
 	@ExceptionHandler({ DataAccessException.class })
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ModelAndView handleDataAccessException(DataAccessException ex) {
-		log.error("handle :handleDataAccessException Exception [message=" + ex.getLocalizedMessage() + "]");
+		log.error("[handle]:handleDataAccessException Exception [message=" + ex.getLocalizedMessage() + "]");
 		ModelAndView model = createErrorMessage(ex);
 	    model.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);	
 		return model;
@@ -120,7 +120,7 @@ public class MyHouseholdAccountBookControllerAdvice {
 	@ExceptionHandler({ Exception.class })
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ModelAndView handleException(Exception ex) {
-		log.error("handle :handleException Exception [message=" + ex.getLocalizedMessage() + "]");
+		log.error("[handle]:handleException Exception [message=" + ex.getLocalizedMessage() + "]");
 		ModelAndView model = createErrorMessage(ex);
 	    model.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);	
 		return model;
@@ -136,7 +136,7 @@ public class MyHouseholdAccountBookControllerAdvice {
 	 *
 	 */
 	private ModelAndView createErrorMessage(Exception ex) {
-		log.error(ex);
+		log.error(ex.getLocalizedMessage(), ex);
 		
 		// エラーメッセージとエラー発生日時をModelAndViewに設定し、エラーページ情報を生成する
 		ModelAndView model = new ModelAndView();
