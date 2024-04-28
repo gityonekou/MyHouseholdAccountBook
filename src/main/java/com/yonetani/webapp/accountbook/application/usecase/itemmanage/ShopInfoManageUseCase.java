@@ -77,9 +77,7 @@ public class ShopInfoManageUseCase {
 		List<CodeAndValuePair> shopGroupList = codeTableItem.getCodeValues(MyHouseholdAccountBookContent.SHOP_KUBUN_CODE);
 		// 店舗グループをもとにレスポンスを生成
 		if(shopGroupList == null) {
-			ShopInfoManageResponse response = ShopInfoManageResponse.getInstance(null);
-			response.addErrorMessage("コード定義ファイルに「店舗グループ情報：" + MyHouseholdAccountBookContent.SHOP_KUBUN_CODE + "」が登録されていません。管理者に問い合わせてください");
-			return response;
+			throw new MyHouseholdAccountBookRuntimeException("コード定義ファイルに「店舗グループ情報：" + MyHouseholdAccountBookContent.SHOP_KUBUN_CODE + "」が登録されていません。管理者に問い合わせてください");
 		}
 		// 店舗グループの選択ボックスは入力先でデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定
 		ShopInfoManageResponse response = ShopInfoManageResponse.getInstance(shopGroupList.stream().map(pair ->
@@ -121,7 +119,7 @@ public class ShopInfoManageUseCase {
 		// 店舗IDに対応する店舗情報を取得
 		Shop shop = shopRepository.findByIdAndShopCode(SearchQueryUserIdAndShopCode.from(user.getUserId(), shopCode));
 		if(shop == null) {
-			response.addErrorMessage("更新対象の店舗情報が存在しません。管理者に問い合わせてください。shopCode:" + shopCode);
+			throw new MyHouseholdAccountBookRuntimeException("更新対象の店舗情報が存在しません。管理者に問い合わせてください。shopCode:" + shopCode);
 		} else {
 			// 店舗情報のformデータ
 			ShopInfoForm form = new ShopInfoForm();
@@ -207,8 +205,8 @@ public class ShopInfoManageUseCase {
 		} else if (shopForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
 			// 旧表示順の値をチェック
 			if(!StringUtils.hasLength(shopForm.getShopSortBefore())) {
-				response.addErrorMessage("旧表示順の値が不正です。管理者に問い合わせてください。ShopSortBefore=" + shopForm.getShopSortBefore());
-				return response;
+				throw new MyHouseholdAccountBookRuntimeException("旧表示順の値が不正です。管理者に問い合わせてください。ShopSortBefore=" + shopForm.getShopSortBefore());
+				
 			}
 			
 			// 新しい表示順の値 > (900番より小さい)データ件数の場合、新しい表示順の値を(900番より小さい)データ件数に変更
@@ -262,8 +260,7 @@ public class ShopInfoManageUseCase {
 			}
 			
 		} else {
-			response.addErrorMessage("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + shopForm.getAction());
-			return response;
+			throw new MyHouseholdAccountBookRuntimeException("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + shopForm.getAction());
 			
 		}
 		

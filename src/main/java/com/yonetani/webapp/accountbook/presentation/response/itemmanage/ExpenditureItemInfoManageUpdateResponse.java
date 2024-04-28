@@ -111,19 +111,6 @@ public class ExpenditureItemInfoManageUpdateResponse extends AbstractExpenditure
 		// 画面表示のModelとViewを生成して返却
 		return res.build();
 	}
-
-	/**
-	 *<pre>
-	 * バリデーションチェックを行った入力フォームの値から画面返却データのModelAndViewを生成して返します。
-	 *</pre>
-	 * @param inputForm バリデーションチェックを行った入力フォームの値
-	 * @return 画面返却データのModelAndView
-	 *
-	 */
-	public ModelAndView buildBindingError(ExpenditureItemInfoForm inputForm) {
-		setExpenditureItemInfoForm(inputForm);
-		return build();
-	}
 	
 	/**
 	 * {@inheritDoc}

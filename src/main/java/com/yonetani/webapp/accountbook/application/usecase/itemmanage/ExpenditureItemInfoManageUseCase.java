@@ -98,26 +98,21 @@ public class ExpenditureItemInfoManageUseCase {
 		log.debug("readExpenditureItemInfo:userid=" + user.getUserId() + ",sisyutuItemCode=" + sisyutuItemCode);
 		// 支出項目コードの入力チェック
 		if(!StringUtils.hasLength(sisyutuItemCode)) {
-			// 支出項目コードの入力チェックNGの場合、init画面を再表示させるためnullを設定
-			ExpenditureItemInfoManageActSelectResponse response = ExpenditureItemInfoManageActSelectResponse.getInstance(null);
-			response.addErrorMessage("予期しないエラーが発生しました。管理者に問い合わせてください。[key=sisyutuItemCode] is empty");
-			return response;
+			// 支出項目コードの入力チェックNGの場合エラー画面に遷移
+			throw new MyHouseholdAccountBookRuntimeException("予期しないエラーが発生しました。管理者に問い合わせてください。[key=sisyutuItemCode] is empty");
 		}
 		
 		// 支出項目コードに対応する支出項目情報を取得
 		SisyutuItem sisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
 				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
 		if(sisyutuItem == null) {
-			// 選択した支出項目コードに対応する支出項目情報が存在しない場合、init画面を再表示させるためnullを設定
-			ExpenditureItemInfoManageActSelectResponse response = ExpenditureItemInfoManageActSelectResponse.getInstance(null);
-			response.addErrorMessage("更新対象の支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" + sisyutuItemCode);
-			return response;
+			// 選択した支出項目コードに対応する支出項目情報が存在しない場合エラー画面に遷移
+			throw new MyHouseholdAccountBookRuntimeException("更新対象の支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" + sisyutuItemCode);
 			
 		} else {
 			/* 所属する親の支出項目名を設定 */
 			// 更新対象の支出項目情報の支出項目レベルが1以外の場合、親の親支出項目情報を設定
-			List<String> errorMsgList = new ArrayList<String>();
-			String parentSisyutuItemName = getParentSisyutuItemName(user, sisyutuItem, errorMsgList);
+			String parentSisyutuItemName = getParentSisyutuItemName(user, sisyutuItem);
 			
 			/* 支出項目情報からレスポンスを生成 */
 			ExpenditureItemInfoManageActSelectResponse response
@@ -135,8 +130,6 @@ public class ExpenditureItemInfoManageUseCase {
 						sisyutuItem.getSisyutuItemLevel().getValue(),
 						// 更新可否フラグ
 						sisyutuItem.getEnableUpdateFlg().getValue()));
-			// エラーメッセージをレスポンスに設定(遷移先は選択画面)
-			errorMsgList.forEach(message -> response.addErrorMessage(message));
 			
 			/* 親の支出項目に属する支出項目一覧を設定 */
 			// 支出項目レベルが2以上の場合に親の支出項目に属する支出項目一覧を取得する
@@ -178,9 +171,8 @@ public class ExpenditureItemInfoManageUseCase {
 		SisyutuItem parentSisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
 				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
 		if(parentSisyutuItem == null) {
-			// 選択した支出項目コードに対応する支出項目情報が存在しない場合エラーを設定
-			response.addErrorMessage("選択した親の支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" + sisyutuItemCode);
-			return response;
+			// 選択した支出項目コードに対応する支出項目情報が存在しない場合エラーを設定;
+			throw new MyHouseholdAccountBookRuntimeException("選択した親の支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" + sisyutuItemCode);
 			
 		} else {
 			// 新規登録する支出項目情報を仮作成
@@ -251,8 +243,7 @@ public class ExpenditureItemInfoManageUseCase {
 				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
 		if(sisyutuItem == null) {
 			// 選択した支出項目コードに対応する支出項目情報が存在しない場合エラーを設定
-			response.addErrorMessage("更新対象の支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" + sisyutuItemCode);
-			return response;
+			throw new MyHouseholdAccountBookRuntimeException("更新対象の支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" + sisyutuItemCode);
 			
 		} else {
 			// 作成した更新用フォームデータをレスポンスに設定
@@ -271,7 +262,7 @@ public class ExpenditureItemInfoManageUseCase {
 	
 	/**
 	 *<pre>
-	 * 情報管理(支出項目) 更新画面で更新実行時にバリデーションチェックNGとなった場合の各画面表示項目を取得します。
+	 * 情報管理(支出項目) 更新画面で登録実行時にバリデーションチェックNGとなった場合の各画面表示項目を取得します。
 	 * バリデーションチェック結果でNGの場合に呼び出してください。
 	 *</pre>
 	 * @param user 表示対象のユーザID
@@ -284,6 +275,7 @@ public class ExpenditureItemInfoManageUseCase {
 		
 		// ログインユーザの支出項目一覧情報を取得しレスポンスに設定
 		ExpenditureItemInfoManageUpdateResponse response = ExpenditureItemInfoManageUpdateResponse.getInstance();
+		response.setExpenditureItemInfoForm(inputForm);
 		setSisyutuItemInquiryList(user, response);
 		
 		// フォームデータから支出項目情報を作成
@@ -301,9 +293,7 @@ public class ExpenditureItemInfoManageUseCase {
 			
 		// 新規登録・更新アクション以外の場合
 		} else if (!inputForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
-			response.addErrorMessage("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + inputForm.getAction());
-			return response;
-			
+			throw new MyHouseholdAccountBookRuntimeException("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + inputForm.getAction());
 		}
 		// 表示順選択リストをレスポンスに設定
 		response.setParentMembersItemList(optionList);
@@ -482,9 +472,7 @@ public class ExpenditureItemInfoManageUseCase {
 			
 		// 新規登録・更新アクション以外の場合
 		} else {
-			response.addErrorMessage("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + inputForm.getAction());
-			return response;
-			
+			throw new MyHouseholdAccountBookRuntimeException("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + inputForm.getAction());
 		}
 		
 		// 処理結果OKを設定(getリダイレクトを行う)
@@ -508,15 +496,15 @@ public class ExpenditureItemInfoManageUseCase {
 	private boolean execCheckAndSetSisyutuItemInquiryList(UserSession user, String sisyutuItemCode, AbstractExpenditureItemInfoManageResponse response) {
 		// 支出項目コードの入力チェック
 		if(!StringUtils.hasLength(sisyutuItemCode)) {
-			// 支出項目コードの入力チェックNGの場合、init画面を再表示させるためnullを設定
-			response.addErrorMessage("予期しないエラーが発生しました。管理者に問い合わせてください。[key=sisyutuItemCode] is empty");
-			return false;
+			// 支出項目コードの入力チェックNGの場合エラー画面を表示
+			throw new MyHouseholdAccountBookRuntimeException("予期しないエラーが発生しました。管理者に問い合わせてください。[key=sisyutuItemCode] is empty");
 		}
 		
 		// ログインユーザの支出項目一覧情報を取得しレスポンスに設定
 		setSisyutuItemInquiryList(user, response);
 		if(response.hasMessages()) {
-			// 更新情報登録画面表示時、支出項目一覧は必ず存在するのでメッセージが設定されている場合はエラー
+			// 更新情報登録画面表示時、支出項目一覧は必ず存在するのでメッセージが設定されている場合はエラーとなるが、
+			// エラー画面ではなく業務画面の注意メッセージとして表示する
 			response.addErrorMessage("予期しないエラーが発生しました。管理者に問い合わせてください。[支出項目一覧] is empty");
 			return false;
 		}
@@ -566,12 +554,8 @@ public class ExpenditureItemInfoManageUseCase {
 	private void setParentMembers(UserSession user, SisyutuItem sisyutuItem,
 			ExpenditureItemInfoManageUpdateResponse response) {
 		
-		/* 親の支出項目名を設定 */
-		List<String> errorMsgList = new ArrayList<String>();
-		response.setParentSisyutuItemName(getParentSisyutuItemName(user, sisyutuItem, errorMsgList));
-		
-		// エラーメッセージをレスポンスに設定
-		errorMsgList.forEach(message -> response.addErrorMessage(message));
+		// 親の支出項目名を設定
+		response.setParentSisyutuItemName(getParentSisyutuItemName(user, sisyutuItem));
 	}
 	
 	/**
@@ -630,11 +614,10 @@ public class ExpenditureItemInfoManageUseCase {
 	 *</pre>
 	 * @param user  支出項目一覧を取得するユーザ情報
 	 * @param sisyutuItem  取得対象の支出項目情報
-	 * @param errorMsgList エラーメッセージの格納先
 	 * @return 親の支出項目の名称を＞区切りで連結した値
 	 *
 	 */
-	private String getParentSisyutuItemName(UserSession user, SisyutuItem sisyutuItem, List<String> errorMsgList) {
+	private String getParentSisyutuItemName(UserSession user, SisyutuItem sisyutuItem) {
 		
 		// 入力支出項目情報チェック(支出項目がレベル1の場合は、親が存在しないので空文字列を返す
 		if(sisyutuItem.getSisyutuItemLevel().getValue() <= 1) {
@@ -656,9 +639,8 @@ public class ExpenditureItemInfoManageUseCase {
 			SisyutuItem parentSisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
 					SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), parentSisyutuItemCode));
 			if(parentSisyutuItem == null) {
-				errorMsgList.add("更新対象の支出項目情報が属する親の支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" 
-						+ sisyutuItemCode + ", parentSisyutuItemCode:" + parentSisyutuItemCode);
-				break;
+				throw new MyHouseholdAccountBookRuntimeException("更新対象の支出項目情報が属する親の支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" 
+						+ sisyutuItemCode + ", [sisyutuItemCodeの値からさかのぼって調査必要です]:[存在しない親コード=parentSisyutuItemCode:" + parentSisyutuItemCode + "]");
 			} else {
 				parentSisyutuItemNameList.add(parentSisyutuItem.getSisyutuItemName().toString());
 			}
@@ -677,7 +659,7 @@ public class ExpenditureItemInfoManageUseCase {
 		
 		// 予期しないエラー(いるかどうかは不明だけど、DBに不正データが格納される)
 		if(parentSisyutuItemNameList.size() > 5) {
-			errorMsgList.add("予期しないエラー(DBデータ不正による繰り返し不正。管理者に問い合わせてください。sisyutuItemCode:" 
+			throw new MyHouseholdAccountBookRuntimeException("予期しないエラー(DBデータ不正による繰り返し不正。管理者に問い合わせてください。sisyutuItemCode:" 
 					+ sisyutuItemCode + ", parentSisyutuItemCode:" + parentSisyutuItemCode);
 		}
 		

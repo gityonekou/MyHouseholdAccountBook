@@ -60,4 +60,8 @@ public class MyHouseholdAccountBookContent {
 	// 支出項目(食費)の支出項目表示順最大値
 	public static final String SISYUTU_ITEM_INSYOKU_SORT_MAX_VALUE = "0503999999";
 	
+	// 商品登録画面で基準店舗選択ボックスに表示する店舗の店舗区分コード
+	// 飲食日用品(901)、ホームセンター(902)、薬局/薬局複合店(905)、複合店舗(907)
+	public static final String[] STANDARD_SHOPSLIST_KUBUN_CODE = {"901","902","905","907"};
+	
 }

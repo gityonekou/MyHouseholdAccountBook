@@ -141,7 +141,7 @@ public class UserRoles {
 	 * @throws MyHouseholdAccountBookException 文字列のリストに([userRoleAdmin][userRoleUser])以外の文字列が含まれている場合
 	 *
 	 */
-	public static UserRoles fromString(List<String> userRoles) throws MyHouseholdAccountBookException {
+	public static UserRoles fromString(List<String> userRoles)  {
 		if(CollectionUtils.isEmpty(userRoles)) {
 			return new UserRoles(Collections.emptyList());
 		} else {

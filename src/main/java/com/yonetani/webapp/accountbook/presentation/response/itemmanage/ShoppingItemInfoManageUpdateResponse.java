@@ -9,10 +9,16 @@
  */
 package com.yonetani.webapp.accountbook.presentation.response.itemmanage;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
+import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
+import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -35,29 +41,29 @@ public class ShoppingItemInfoManageUpdateResponse extends AbstractResponse {
 	@Setter
 	private ShoppingItemInfoUpdateForm shoppingItemInfoUpdateForm;
 	
+	// 支出項目名
+	@Setter
+	private String sisyutuItemName;
+	
+	// 店舗グループ
+	private final SelectViewItem standardShopsList;
+	
 	/**
 	 *<pre>
 	 * デフォルト値からレスポンス情報を生成して返します。
 	 *</pre>
+	 * @param addList 基準店舗選択ボックスの表示情報リスト
 	 * @return 情報管理(商品)更新情報入力画面情報
 	 *
 	 */
-	public static ShoppingItemInfoManageUpdateResponse getInstance() {
-		return new ShoppingItemInfoManageUpdateResponse();
-	}
-	
-	/**
-	 *<pre>
-	 * バリデーションチェックを行った入力フォームの値から画面返却データのModelAndViewを生成して返します。
-	 *</pre>
-	 * @param inputForm バリデーションチェックを行った入力フォームの値
-	 * @return 画面返却データのModelAndView
-	 *
-	 */
-	public static ModelAndView buildBindingError(ShoppingItemInfoUpdateForm inputForm) {
-		ShoppingItemInfoManageUpdateResponse response = ShoppingItemInfoManageUpdateResponse.getInstance();
-		response.setShoppingItemInfoUpdateForm(inputForm);
-		return response.build();
+	public static ShoppingItemInfoManageUpdateResponse getInstance(List<OptionItem> addList) {
+		List<OptionItem> optionList = new ArrayList<>();
+		optionList.add(OptionItem.from("", "選択なし"));
+		if(!CollectionUtils.isEmpty(addList)) {
+			optionList.addAll(addList);
+		}
+		// 基準店舗選択ボックスの表示情報リストを元に情報管理(商品)更新情報入力画面情報を生成
+		return new ShoppingItemInfoManageUpdateResponse(SelectViewItem.from(optionList));
 	}
 	
 	/**
@@ -70,7 +76,7 @@ public class ShoppingItemInfoManageUpdateResponse extends AbstractResponse {
 	 *
 	 */
 	public static ModelAndView buildBindingError(String errorMessage) {
-		ShoppingItemInfoManageUpdateResponse res = ShoppingItemInfoManageUpdateResponse.getInstance();
+		ShoppingItemInfoManageUpdateResponse res = ShoppingItemInfoManageUpdateResponse.getInstance(null);
 		// エラーメッセージを設定
 		res.addErrorMessage(errorMessage);
 		// 画面表示のModelとViewを生成して返却
@@ -88,11 +94,11 @@ public class ShoppingItemInfoManageUpdateResponse extends AbstractResponse {
 		if(shoppingItemInfoUpdateForm == null) {
 			shoppingItemInfoUpdateForm = new ShoppingItemInfoUpdateForm();
 		}
-// TODO:
-shoppingItemInfoUpdateForm.setAction("add");
-		
 		modelAndView.addObject("shoppingItemInfoUpdateForm", shoppingItemInfoUpdateForm);
-		
+		// 支出項目名
+		modelAndView.addObject("sisyutuItemName", sisyutuItemName);
+		// 基準店舗選択ボックス
+		modelAndView.addObject("standardShopsList", standardShopsList);
 		
 		return modelAndView;
 	}

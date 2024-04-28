@@ -1,4 +1,5 @@
 /**
+ * 以下の照会条件の値を表すドメインモデルです。
  * ・ユーザID
  * ・店舗表示順A
  * ・店舗表示順B
@@ -11,7 +12,7 @@
  */
 package com.yonetani.webapp.accountbook.domain.model.searchquery;
 
-import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopSort;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
 import lombok.AccessLevel;
@@ -36,10 +37,10 @@ import lombok.RequiredArgsConstructor;
 public class SearchQueryUserIdAndShopSortBetweenAB {
 	// ユーザID
 	private final UserId userId;
-	// 店舗コード
-	private final ShopCode shopCodeA;
-	// 店舗コード
-	private final ShopCode shopCodeB;
+	// 店舗表示順A
+	private final ShopSort shopSortA;
+	// 店舗表示順B
+	private final ShopSort shopSortB;
 	
 	/**
 	 *<pre>
@@ -48,13 +49,13 @@ public class SearchQueryUserIdAndShopSortBetweenAB {
 	 * ・店舗コード
 	 *</pre>
 	 * @param userId ユーザID
-	 * @param shopCodeA 店舗コードA
-	 * @param shopCodeB 店舗コードB
-	 * @return 検索条件(ユーザID, 店舗コードA, 店舗コードA)
+	 * @param shopSortA 店舗表示順A
+	 * @param shopSortB 店舗表示順B
+	 * @return 検索条件(ユーザID, 店舗表示順A, 店舗表示順B)
 	 *
 	 */
-	public static SearchQueryUserIdAndShopSortBetweenAB from(String userId, String shopCodeA, String shopCodeB) {
-		return new SearchQueryUserIdAndShopSortBetweenAB(UserId.from(userId), ShopCode.from(shopCodeA), ShopCode.from(shopCodeB));
+	public static SearchQueryUserIdAndShopSortBetweenAB from(String userId, String shopSortA, String shopSortB) {
+		return new SearchQueryUserIdAndShopSortBetweenAB(UserId.from(userId), ShopSort.from(shopSortA), ShopSort.from(shopSortB));
 	}
 	
 	/**
@@ -62,6 +63,6 @@ public class SearchQueryUserIdAndShopSortBetweenAB {
 	 */
 	@Override
 	public String toString() {
-		return "userId=" + userId.toString() + ",shopCodeA=" + shopCodeA.toString() + ",shopCodeB=" + shopCodeB.toString();
+		return "userId=" + userId.toString() + ",shopSortA=" + shopSortA.toString() + ",shopSortB=" + shopSortB.toString();
 	}
 }

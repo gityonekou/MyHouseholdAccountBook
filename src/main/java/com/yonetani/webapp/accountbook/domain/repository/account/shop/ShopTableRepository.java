@@ -14,6 +14,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.shop.Shop;
 import com.yonetani.webapp.accountbook.domain.model.account.shop.ShopInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopKubunCodeList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSort;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSortBetweenAB;
 
@@ -92,6 +93,16 @@ public interface ShopTableRepository {
 	 *
 	 */
 	ShopInquiryList findByIdAndShopSortBetween(SearchQueryUserIdAndShopSortBetweenAB search);
+	
+	/**
+	 *<pre>
+	 * ユーザIDと指定の店舗区分コード(リスト値)に対応する店舗情報を取得します。
+	 *</pre>
+	 * @param search 検索対象のユーザIDと店舗区分コード(リスト値)
+	 * @return 店舗情報のリスト
+	 *
+	 */
+	ShopInquiryList findByIdAndShopKubunCodeList(SearchQueryUserIdAndShopKubunCodeList search);
 	
 	/**
 	 *<pre>

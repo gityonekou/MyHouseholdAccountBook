@@ -9,6 +9,7 @@
  * ・情報管理(商品)更新画面情報取得(選択した商品を更新)
  * ・指定の商品情報取得
  * ・商品情報の追加・更新
+ * ・商品情報の追加・更新のバリデーションチェックNG時
  *
  *------------------------------------------------
  * 更新履歴
@@ -18,17 +19,27 @@
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.yonetani.webapp.accountbook.common.component.SisyutuItemComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItemInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.account.shop.ShopInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopKubunCodeList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemSortBetweenAB;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuItemTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoSearchForm;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
+import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractExpenditureItemInfoManageResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageActSelect;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageInitResponse;
@@ -49,6 +60,7 @@ import lombok.extern.log4j.Log4j2;
  * ・情報管理(商品)更新画面情報取得(選択した商品を更新)
  * ・指定の商品情報取得
  * ・商品情報の追加・更新
+ * ・商品情報の追加・更新のバリデーションチェックNG時
  *
  *</pre>
  *
@@ -63,6 +75,12 @@ public class ShoppingItemInfoManageUseCase {
 
 	// 支出項目テーブル:SISYUTU_ITEM_TABLE参照リポジトリー
 	private final SisyutuItemTableRepository sisyutuItemRepository;
+	
+	// 支出項目情報取得コンポーネント
+	private final SisyutuItemComponent sisyutuItemComponent;
+	
+	// 店舗情報取得リポジトリー
+	private final ShopTableRepository shopRepository;
 	
 	/**
 	 *<pre>
@@ -159,8 +177,23 @@ public class ShoppingItemInfoManageUseCase {
 			String sisyutuItemCode) {
 		log.debug("readAddShoppingItemInfoBySisyutuItem:userid=" + user.getUserId() + ",sisyutuItemCode=" + sisyutuItemCode);
 		
-		// レスポンスを生成
-		ShoppingItemInfoManageUpdateResponse response = ShoppingItemInfoManageUpdateResponse.getInstance();
+		// 基準店舗選択ボックス表示情報を設定したレスポンスを生成
+		ShoppingItemInfoManageUpdateResponse response = createShoppingItemInfoManageUpdateResponse(user.getUserId());
+		
+		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
+		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, sisyutuItemCode));
+		
+		/* 更新商品情報入力フォームを生成しレスポンスに設定 */
+		// 更新商品情報入力フォームを生成
+		ShoppingItemInfoUpdateForm addItemForm = new ShoppingItemInfoUpdateForm();
+		// 新規追加
+		addItemForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_ADD);
+		// 属する支出項目コード
+		addItemForm.setSisyutuItemCode(sisyutuItemCode);
+		
+		// 更新商品情報入力フォームをレスポンスに設定
+		response.setShoppingItemInfoUpdateForm(addItemForm);
+		
 		return response;
 	}
 	
@@ -197,7 +230,7 @@ public class ShoppingItemInfoManageUseCase {
 		log.debug("readAddShoppingItemInfoByShoppingItem:userid=" + user.getUserId() + ",shoppingItemCode=" + shoppingItemCode);
 		
 		// レスポンスを生成
-		ShoppingItemInfoManageUpdateResponse response = ShoppingItemInfoManageUpdateResponse.getInstance();
+		ShoppingItemInfoManageUpdateResponse response = ShoppingItemInfoManageUpdateResponse.getInstance(null);
 		return response;
 	}
 	
@@ -215,7 +248,7 @@ public class ShoppingItemInfoManageUseCase {
 		log.debug("readUpdateShoppingItemInfo:userid=" + user.getUserId() + ",shoppingItemCode=" + shoppingItemCode);
 		
 		// レスポンスを生成
-		ShoppingItemInfoManageUpdateResponse response = ShoppingItemInfoManageUpdateResponse.getInstance();
+		ShoppingItemInfoManageUpdateResponse response = ShoppingItemInfoManageUpdateResponse.getInstance(null);
 		return response;
 	}
 	
@@ -228,14 +261,91 @@ public class ShoppingItemInfoManageUseCase {
 	 * @return 情報管理(商品)の更新画面情報
 	 *
 	 */
+	@Transactional
 	public ShoppingItemInfoManageUpdateResponse execAction(UserSession user, ShoppingItemInfoUpdateForm inputForm) {
 		log.debug("execAction:userid=" + user.getUserId() + ",inputForm=" + inputForm);
 		
 		// レスポンスを生成
-		ShoppingItemInfoManageUpdateResponse response = ShoppingItemInfoManageUpdateResponse.getInstance();
+		ShoppingItemInfoManageUpdateResponse response = ShoppingItemInfoManageUpdateResponse.getInstance(null);
 		
+		
+		// 新規登録の場合
+		if(inputForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
+			
+		// 更新の場合
+		} else if (inputForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
+			
+		} else {
+			throw new MyHouseholdAccountBookRuntimeException("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + inputForm.getAction());
+		}
 		// トランザクション完了
 		response.setTransactionSuccessFull();
+		
+		return response;
+	}
+
+	/**
+	 *<pre>
+	 * 情報管理(商品)更新画面で登録実行時にバリデーションチェックNGとなった場合の各画面表示項目を取得します。
+	 * バリデーションチェック結果でNGの場合に呼び出してください。
+	 *</pre>
+	 * @param user 表示対象のユーザID
+	 * @param inputForm 商品情報入力フォームの入力値
+	 * @return 情報管理(商品)の更新画面情報
+	 *
+	 */
+	public ShoppingItemInfoManageUpdateResponse readUpdateBindingErrorSetInfo(UserSession user,
+			ShoppingItemInfoUpdateForm inputForm) {
+		log.debug("readUpdateBindingErrorSetInfo:userid=" + user.getUserId() + ",inputForm=" + inputForm);
+		
+		// 基準店舗選択ボックス表示情報を設定したレスポンスを生成
+		ShoppingItemInfoManageUpdateResponse response = createShoppingItemInfoManageUpdateResponse(user.getUserId());
+		// レスポンスに入力フォームを設定
+		response.setShoppingItemInfoUpdateForm(inputForm);
+		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
+		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, inputForm.getSisyutuItemCode()));
+		
+		return response;
+	}
+	
+	
+	/**
+	 *<pre>
+	 * 基準店舗選択ボックスの表示情報を取得し、情報管理(商品)更新画面レスポンス情報を生成して返します。
+	 *</pre>
+	 * @param userId 表示対象のユーザID
+	 * @return 情報管理(商品)の更新画面情報
+	 *
+	 */
+	private ShoppingItemInfoManageUpdateResponse createShoppingItemInfoManageUpdateResponse(String userId) {
+		
+		// レスポンス
+		ShoppingItemInfoManageUpdateResponse response = null;
+		
+		// 基準店舗選択ボックスの対象店舗コード検索条件を設定
+		List<String> standardShopsList = Arrays.asList(MyHouseholdAccountBookContent.STANDARD_SHOPSLIST_KUBUN_CODE);
+		
+		// 基準店舗選択ボックスの表示情報を取得
+		ShopInquiryList shopSearchResult = shopRepository.findByIdAndShopKubunCodeList(
+				SearchQueryUserIdAndShopKubunCodeList.from(
+						// ユーザID
+						userId,
+						// 店舗区分コードのリスト
+						standardShopsList.stream().map(item -> ShopKubunCode.from(item)).collect(Collectors.toUnmodifiableList())));
+		if(shopSearchResult.isEmpty()) {
+			// 店舗情報が0件の場合、メッセージを設定
+			response = ShoppingItemInfoManageUpdateResponse.getInstance(null);
+			response.addMessage("店舗情報取得結果が0件です。");
+		} else {
+			// 店舗情報をレスポンスに設定
+			response = ShoppingItemInfoManageUpdateResponse.getInstance(shopSearchResult.getValues().stream().map(domain ->
+				OptionItem.from(
+						// 店舗コード
+						domain.getShopCode().toString(),
+						// 店舗名
+						domain.getShopName().toString()
+				)).collect(Collectors.toUnmodifiableList()));
+		}
 		
 		return response;
 	}

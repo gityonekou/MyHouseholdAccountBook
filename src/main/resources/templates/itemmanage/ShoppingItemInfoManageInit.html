@@ -56,7 +56,7 @@
 							
 							<!--/* 支出項目レベル２のデータを繰り返すリストブロックー */-->
 							<li class="mt-1 border border-primary" th:each="item : ${expenditureItemList}">
-								<div class="bg-info">
+								<div class="bg-warning">
 								<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
 									aria-expanded="false" th:data-bs-target="'#area_'+${item.sisyutuItemCode}" th:aria-controls="'area_'+${item.sisyutuItemCode}">▼<span th:text="${item.sisyutuItemName}"></span></button>
 									：<span th:text="${item.sisyutuItemDetailContext}"></span>
@@ -64,7 +64,7 @@
 								<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${item.sisyutuItemCode}">
 
 									<!--/* 支出項目レベル３のデータを繰り返すリストブロックー */-->
-									<li th:each="nest3ChildItem : ${item.childItemList}">
+									<li class="mt-1 border border-primary" th:each="nest3ChildItem : ${item.childItemList}">
 									<th:block th:if="${#lists.size(nest3ChildItem.childItemList)}==0">
 										<button class="btn d-inline-flex align-items-center collapsed border-0">■<span th:text="${nest3ChildItem.sisyutuItemName}"></span></button>
 										：<a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/managebaseinfo/shoppingiteminfo/addload(sisyutuItemCode=${nest3ChildItem.sisyutuItemCode})}">商品を追加</a>
@@ -72,13 +72,15 @@
 										：<span th:text="${nest3ChildItem.sisyutuItemDetailContext}"></span>
 									</th:block>
 									<th:block th:if="${#lists.size(nest3ChildItem.childItemList)}>0">
+										<div class="bg-warning">
 										<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
 											aria-expanded="false" th:data-bs-target="'#area_'+${nest3ChildItem.sisyutuItemCode}" th:aria-controls="'area_'+${nest3ChildItem.sisyutuItemCode}">▼<span th:text="${nest3ChildItem.sisyutuItemName}"></span></button>
 											：<span th:text="${nest3ChildItem.sisyutuItemDetailContext}"></span>
+										</div>
 										<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${nest3ChildItem.sisyutuItemCode}">
 										
 											<!--/* 支出項目レベル４のデータを繰り返すリストブロックー */-->
-											<li th:each="nest4ChildItem : ${nest3ChildItem.childItemList}">
+											<li class="mt-1 border border-primary" th:each="nest4ChildItem : ${nest3ChildItem.childItemList}">
 											<th:block th:if="${#lists.size(nest4ChildItem.childItemList)}==0">
 												<button class="btn d-inline-flex align-items-center collapsed border-0">■<span th:text="${nest4ChildItem.sisyutuItemName}"></span></button>
 												：<a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/managebaseinfo/shoppingiteminfo/addload(sisyutuItemCode=${nest4ChildItem.sisyutuItemCode})}">商品を追加</a>
@@ -86,9 +88,11 @@
 												：<span th:text="${nest4ChildItem.sisyutuItemDetailContext}"></span>
 											</th:block>
 											<th:block th:if="${#lists.size(nest4ChildItem.childItemList)}>0">
+												<div class="bg-warning">
 												<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
 													aria-expanded="false" th:data-bs-target="'#area_'+${nest4ChildItem.sisyutuItemCode}" th:aria-controls="'area_'+${nest4ChildItem.sisyutuItemCode}">▼<span th:text="${nest4ChildItem.sisyutuItemName}"></span></button>
 													：<span th:text="${nest4ChildItem.sisyutuItemDetailContext}"></span>
+												</div>
 												<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${nest4ChildItem.sisyutuItemCode}">
 												
 													<!--/* 支出項目レベル５のデータを繰り返すリストブロックー */-->
@@ -119,125 +123,6 @@
 										</ul>
 									</th:block>
 									</li>
-								</ul>
-							</li>
-						</ul>
-					</li>
-				</ul>
-							
-							
-							<!-- サンプル表示領域　後で消す -->
-				<ul class="list-unstyled">
-					<li class="mt-1 border border-dark">
-						<div class="bg-info">▼<span>飲食日用品</span></div>
-						<ul class="list-unstyled ps-3">
-							
-							<li class="mt-1 border border-primary">
-								<div class="bg-warning">
-								<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
-									aria-expanded="false" data-bs-target="#area_0014" aria-controls="area_0014">▼<span>日用消耗品</span></button>
-								：<span>日用消耗品詳細を入力</span>
-								</div>
-								<ul class="list-unstyled ps-3 collapse" id="area_0014">
-									<li>
-										<button class="btn d-inline-flex align-items-center collapsed border-0">■<span>キッチン用品</span></button>
-										：<a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/managebaseinfo/shoppingiteminfo/addload?sisyutuItemCode=0011}">>商品を追加</a>
-										：<a class="btn btn-outline-info btn-sm" th:href="@{/myhacbook/managebaseinfo/shoppingiteminfo/searchbysisyutuitem?sisyutuItemCode=0011}">>商品を検索</a>
-										：<span>キッチン用品詳細を入力</span>
-									
-									
-									</li>
-									<li>
-									
-										<button class="btn d-inline-flex align-items-center collapsed border-0">■<span>洗面所用品</span></button>
-										：<a class="btn text-bg-success btn-sm" href="./ManageShoppingItemUpd.html">商品を追加</a>
-										：<a class="btn btn-outline-info btn-sm" href="./ManageShoppingItemSearch.html">商品を検索</a>
-										：<span>洗面所用品詳細を入力 歯磨き粉、歯ブラシなど</span>
-									</li>
-								</ul>
-							</li>
-							
-							<li class="mt-1 border border-primary">
-							
-								<div class="bg-warning">
-								<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
-									aria-expanded="false" data-bs-target="#area_0015" aria-controls="area_0015">▼<span>食費</span></button>
-								：<span>日用消耗品詳細を入力</span>
-								</div>
-								<ul class="list-unstyled ps-3 collapse" id="area_0015">
-
-									
-									<li class="mt-1 border border-primary">
-									
-										<button class="btn d-inline-flex align-items-center collapsed border-0">■<span>国民年金保険</span></button>
-										：<a class="btn text-bg-success btn-sm" href="./ManageShoppingItemUpd.html">商品を追加</a>
-										：<a class="btn btn-outline-info btn-sm" href="./ManageShoppingItemSearch.html">商品を検索</a>
-										：<span>国民年金保険詳細を入力</span>
-									
-									
-									</li>
-									
-									<li class="mt-1 border border-primary">
-										<div class="bg-warning">
-										<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
-											aria-expanded="false" data-bs-target="#area_0020" aria-controls="area_0020">▼<span>乳製品</span></button>
-										：<span>乳製品詳細を入力</span>
-										</div>
-										<ul class="list-unstyled ps-3 collapse" id="area_0020">
-
-											
-											<li>
-											
-												<button class="btn d-inline-flex align-items-center collapsed border-0">■<span>牛乳</span></button>
-												：<a class="btn text-bg-success btn-sm" href="./ManageShoppingItemUpd.html">商品を追加</a>
-												：<a class="btn btn-outline-info btn-sm" href="./ManageShoppingItemSearch.html">商品を検索</a>
-												：<span>牛乳詳細を入力</span>
-											
-											
-											</li>
-											
-											<li>
-											
-												<button class="btn d-inline-flex align-items-center collapsed border-0">■<span>加工乳</span></button>
-												：<a class="btn text-bg-success btn-sm" href="./ManageShoppingItemUpd.html">商品を追加</a>
-												：<a class="btn btn-outline-info btn-sm" href="./ManageShoppingItemSearch.html">商品を検索</a>
-												：<span>加工乳詳細を入力</span>
-											
-											
-											</li>
-											
-											<li>
-											
-												<button class="btn d-inline-flex align-items-center collapsed border-0">■<span>ヨーグルト大</span></button>
-												：<a class="btn text-bg-success btn-sm" href="./ManageShoppingItemUpd.html">商品を追加</a>
-												：<a class="btn btn-outline-info btn-sm" href="./ManageShoppingItemSearch.html">商品を検索</a>
-												：<span>ヨーグルト大詳細を入力</span>
-											
-											
-											</li>
-										</ul>
-									</li>
-
-									<li class="mt-1 border border-primary">
-									
-										<button class="btn d-inline-flex align-items-center collapsed border-0">■<span>健康保険</span></button>
-										：<a class="btn text-bg-success btn-sm" href="./ManageShoppingItemUpd.html">商品を追加</a>
-										：<a class="btn btn-outline-info btn-sm" href="./ManageShoppingItemSearch.html">商品を検索</a>
-										：<span>健康保険詳細を入力</span>
-									
-									
-									</li>
-									
-									<li class="mt-1 border border-primary">
-									
-										<button class="btn d-inline-flex align-items-center collapsed border-0">■<span>その他食費</span></button>
-										：<a class="btn text-bg-success btn-sm" href="./ManageShoppingItemUpd.html">商品を追加</a>
-										：<a class="btn btn-outline-info btn-sm" href="./ManageShoppingItemSearch.html">商品を検索</a>
-										：<span>その他食費詳細を入力</span>
-									
-									
-									</li>
-									
 								</ul>
 							</li>
 						</ul>

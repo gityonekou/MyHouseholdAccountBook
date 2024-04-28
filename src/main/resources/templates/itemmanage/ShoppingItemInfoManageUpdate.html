@@ -17,33 +17,61 @@
 		<div class="card">
 			<div class="card-body">
 				<h5 class="card-title">情報管理(飲食日用品)</h5>
-				<p class="card-text">何かのメッセージがある場合はここに表示</p>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
 			</div>
 			
 			<form name="ShoppingItemInfoUpdate" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/shoppingiteminfo/update/}" th:object="${shoppingItemInfoUpdateForm}">
 			<div class="card-body">
 				<div class="mb-3">
-					<p class="h6">支出項目名：飲食日用品＞日用消耗品＞リビング用品</p>
+					<p class="h6">支出項目名：<span th:text="${sisyutuItemName}"></span></p>
 				</div>
 				<div class="mb-3">
-					<label for="ryaku_name" class="form-label">品名</label>
- 					<input type="text" class="form-control" id="ryaku_name" value="テスト商品" required>
+					<label for="shoppingItemKubunName" class="form-label">商品区分名</label>
+ 					<input type="text" class="form-control w30" th:errorclass="is-invalid" th:field="*{shoppingItemKubunName}" required>
+ 					<p class="invalid-feedback" th:errors="*{shoppingItemKubunName}"></p>
+ 					
 				</div>
 				<div class="mb-3">
-					<label for="validationServer01" class="form-label">商品名</label>
- 					<input type="text" class="form-control" id="name" value="テスト商品AAAの名前" required>
+					<label for="shoppingItemName" class="form-label">商品名</label>
+ 					<input type="text" class="form-control w50" th:errorclass="is-invalid" th:field="*{shoppingItemName}" required>
+ 					<p class="invalid-feedback" th:errors="*{shoppingItemName}"></p>
 				</div>
 				<div class="mb-3">
-					<label for="validationServer01" class="form-label">会社名</label>
- 					<input type="text" class="form-control" id="name" value="テスト商品AAAを作った会社" required>
+					<label for="shoppingItemDetailContext" class="form-label">商品詳細</label>
+ 					<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{shoppingItemDetailContext}">
+ 					<p class="invalid-feedback" th:errors="*{shoppingItemDetailContext}"></p>
+ 					
 				</div>
 				<div class="mb-3">
-					<label for="validationServer01" class="form-label">商品詳細</label>
- 					<input type="text" class="form-control" id="name" value="テスト商品AAAの詳細" required>
+					<label for="companyName" class="form-label">会社名</label>
+ 					<input type="text" class="form-control w50" th:errorclass="is-invalid" th:field="*{companyName}" required>
+ 					<p class="invalid-feedback" th:errors="*{companyName}"></p>
+				</div>
+				<div class="mb-3">
+					<label for="standardShopCode" class="form-label">基準店舗</label>
+					<select class="form-select w20" th:errorclass="is-invalid" th:field="*{standardShopCode}">
+						<option th:each="item : ${standardShopsList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+					</select>
+ 					<p class="invalid-feedback" th:errors="*{standardShopCode}"></p>
+ 					<!--/* 必須チェックの結果を出力 */-->
+					<p class="invalid-feedback" th:errors="*{needCheckStandardPrice}" style="display: block;"></p>
+				</div>
+				<div class="mb-3">
+					<label for="standardPrice" class="form-label">基準価格</label>
+					<div class="input-group w10">
+ 						<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{standardPrice}">円
+ 						<p class="invalid-feedback" th:errors="*{standardPrice}"></p>
+ 					</div>
+ 					<!--/* 必須チェックの結果を出力 */-->
+					<p class="invalid-feedback" th:errors="*{needCheckStandardPrice}" style="display: block;"></p>
 				</div>
 				<div class="mb-3">
 					<button class="btn btn-primary" type="submit">登録</button>
 					<input type="hidden" th:field="*{action}" />
+					<input type="hidden" th:field="*{shoppingItemCode}" />
+					<input type="hidden" th:field="*{sisyutuItemCode}" />
 				</div>
 			</div>
 			</form>

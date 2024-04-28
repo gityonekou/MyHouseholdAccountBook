@@ -189,8 +189,7 @@ public class AdminMenuBaseInfoUseCase {
 			}
 			
 		} catch(IOException ex) {
-			response.addMessage(ex.getLocalizedMessage());
-			return response;
+			throw new MyHouseholdAccountBookRuntimeException(ex);
 		}
 		
 		// 読み込みデータを指定のテーブル出力ドメインを用いてDB出力する

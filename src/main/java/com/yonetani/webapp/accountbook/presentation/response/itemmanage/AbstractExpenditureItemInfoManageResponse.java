@@ -83,8 +83,8 @@ public abstract class AbstractExpenditureItemInfoManageResponse extends Abstract
 				String sisyutuItemDetailContext,
 				String sisyutuItemLevel,
 				boolean enableUpdateFlg) {
-			ExpenditureItem returnItem = new ExpenditureItem(sisyutuItemCode, sisyutuItemName, sisyutuItemDetailContext, sisyutuItemLevel,
-					enableUpdateFlg);
+			ExpenditureItem returnItem = new ExpenditureItem(sisyutuItemCode, sisyutuItemName, sisyutuItemDetailContext,
+					sisyutuItemLevel, enableUpdateFlg);
 			return returnItem;
 		}
 		

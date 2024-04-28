@@ -19,6 +19,7 @@ import org.apache.ibatis.annotations.Update;
 
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.shop.ShopReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopCodeSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopKubunCodeListSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopSortBetweenABSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopSortSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSearchQueryDto;
@@ -112,6 +113,17 @@ public interface ShopTableMapper {
 	 */
 	@Select("sql/account/shop/ShopTableSelectSql04.sql")
 	public List<ShopReadWriteDto> findByIdAndShopSortBetween(@Param("dto") UserIdAndShopSortBetweenABSearchQueryDto search);
+	
+	/**
+	 *<pre>
+	 * 指定のユーザIDと指定した店舗区分コードのリスト(in条件に指定する店舗区分コード)のデータを条件に店舗テーブル:SHOP_TABLEを参照します。
+	 *</pre>
+	 * @param search 検索条件:ユーザID、店舗区分コードのリスト(in条件に指定する店舗区分コード)
+	 * @return 店舗テーブル:SHOP_TABLE参照結果のリスト
+	 *
+	 */
+	@Select("sql/account/shop/ShopTableSelectSql05.sql")
+	public List<ShopReadWriteDto> findByIdAndShopKubunCodeList(@Param("dto") UserIdAndShopKubunCodeListSearchQueryDto search);
 	
 	/**
 	 *<pre>

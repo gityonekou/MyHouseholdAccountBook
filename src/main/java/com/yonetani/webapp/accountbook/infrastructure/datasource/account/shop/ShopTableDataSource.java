@@ -18,11 +18,13 @@ import com.yonetani.webapp.accountbook.domain.model.account.shop.Shop;
 import com.yonetani.webapp.accountbook.domain.model.account.shop.ShopInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopKubunCodeList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSort;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSortBetweenAB;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.shop.ShopReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopCodeSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopKubunCodeListSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopSortBetweenABSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopSortSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSearchQueryDto;
@@ -144,8 +146,27 @@ public class ShopTableDataSource implements ShopTableRepository {
 		List<ShopReadWriteDto> searchResult = mapper.findByIdAndShopSortBetween(
 				UserIdAndShopSortBetweenABSearchQueryDto.from(
 						search.getUserId().toString(),
-						search.getShopCodeA().toString(),
-						search.getShopCodeB().toString()));
+						search.getShopSortA().toString(),
+						search.getShopSortB().toString()));
+		if(searchResult == null) {
+			// 検索結果なしの場合、0件データを返却
+			return ShopInquiryList.from(null);
+		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
+			return ShopInquiryList.from(searchResult.stream().map(dto -> createShop(dto)).collect(Collectors.toUnmodifiableList()));
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ShopInquiryList findByIdAndShopKubunCodeList(SearchQueryUserIdAndShopKubunCodeList search) {
+		// 検索結果を取得
+		List<ShopReadWriteDto> searchResult = mapper.findByIdAndShopKubunCodeList(
+				UserIdAndShopKubunCodeListSearchQueryDto.from(
+						search.getUserId().toString(),
+						search.getShopKubunCodeList().stream().map(model -> model.toString()).collect(Collectors.toUnmodifiableList())));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return ShopInquiryList.from(null);

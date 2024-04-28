@@ -37,8 +37,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.ExpenditureItemInfoManageUseCase;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ExpenditureItemInfoForm;
 import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ExpenditureItemInfoManageActSelectResponse;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ExpenditureItemInfoManageInitResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ExpenditureItemInfoManageUpdateResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -105,18 +103,8 @@ public class ExpenditureItemInfoManageController {
 	@GetMapping("/actselect")
 	public ModelAndView getActSelect(@RequestParam("sisyutuItemCode") String sisyutuItemCode) {
 		log.debug("getActSelect:sisyutuItemCode=" + sisyutuItemCode);
-		// 選択した支出項目情報のレスポンスを取得
-		ExpenditureItemInfoManageActSelectResponse response = this.usecase.readActSelectItemInfo(this.user, sisyutuItemCode);
-		// 選択した支出項目情報有無を判定
-		if(response.isErrorResponse()) {
-			// 支出項目情報なしの場合、エラーとしてinit画面に遷移
-			ExpenditureItemInfoManageInitResponse initResponse = this.usecase.readInitInfo(this.user);
-			response.getdMessagesList().forEach(message -> initResponse.addErrorMessage(message));
-			return initResponse.build();
-		} else {
-			// 支出項目情報ありの場合、選択画面に遷移
-			return response.build();
-		}
+		// 選択した支出項目情報のレスポンスを取得し、選択画面に遷移
+		return this.usecase.readActSelectItemInfo(this.user, sisyutuItemCode).build();
 	}
 	
 	/**
@@ -177,7 +165,7 @@ public class ExpenditureItemInfoManageController {
 		// チェック結果エラーの場合
 		if(bindingResult.hasErrors()) {
 			// 初期表示情報を取得し、入力チェックエラーを設定
-			return this.usecase.readUpdateBindingErrorSetInfo(this.user, inputForm).buildBindingError(inputForm);
+			return this.usecase.readUpdateBindingErrorSetInfo(this.user, inputForm).build();
 		// チェック結果OKの場合
 		} else {
 			/* hidden項目(action)の値チェック */

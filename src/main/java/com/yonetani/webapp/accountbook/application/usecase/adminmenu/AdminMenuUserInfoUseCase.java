@@ -106,7 +106,7 @@ public class AdminMenuUserInfoUseCase {
 		AdminMenuUserInfo userInfo = adminUserInfoRepository.getUserInfo(SearchQueryUserId.from(userId));
 		if(userInfo.isEmpty()) {
 			// 検索結果なしの場合
-			response.addErrorMessage("選択したユーザIDに対応するユーザ情報がありません。管理者に問い合わせてください。[userid:"
+			throw new MyHouseholdAccountBookRuntimeException("選択したユーザIDに対応するユーザ情報がありません。管理者に問い合わせてください。[userid:"
 					+ userId + "]");
 		} else {
 			// 取得したユーザ情報をもとにFormデータを作成し、レスポンスに設定
@@ -227,17 +227,10 @@ public class AdminMenuUserInfoUseCase {
 				response.setTransactionSuccessFull();
 				
 			} else {
-				log.error("未定義のアクションが指定されました: action=" + userInfoForm.getAction());
-				// 未定義のアクション
-				response.setAdminMenuUserInfoForm(userInfoForm);
-				response.addErrorMessage("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + userInfoForm.getAction());
+				throw new MyHouseholdAccountBookRuntimeException("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + userInfoForm.getAction());
 			}
 		} catch (MyHouseholdAccountBookException ex) {
-			// 業務エラー発生時
-			log.error(ex);
-			// 未定義のアクション
-			response.setAdminMenuUserInfoForm(userInfoForm);
-			response.addErrorMessage("業務エラーが発生しました。管理者に問い合わせてください。[message:" + ex.getLocalizedMessage() + "]");
+			throw new MyHouseholdAccountBookRuntimeException("業務エラーが発生しました。管理者に問い合わせてください。[message:" + ex.getLocalizedMessage() + "]", ex);
 		}
 		
 		return response;
