@@ -44,21 +44,21 @@ public interface ShopTableRepository {
 	 *<pre>
 	 * 店舗テーブル情報を更新します。
 	 *</pre>
-	 * @param shop 更新データ
+	 * @param data 更新データ
 	 * @return 更新されたデータの件数
 	 *
 	 */
-	int update(Shop shop);
+	int update(Shop data);
 	
 	/**
 	 *<pre>
 	 * 店舗テーブル情報のうち、店舗表示順の値を更新します。
 	 *</pre>
-	 * @param shop 更新データ
+	 * @param data 更新データ
 	 * @return 更新されたデータの件数
 	 *
 	 */
-	int updateShopSort(Shop shop);
+	int updateShopSort(Shop data);
 	
 	/**
 	 *<pre>

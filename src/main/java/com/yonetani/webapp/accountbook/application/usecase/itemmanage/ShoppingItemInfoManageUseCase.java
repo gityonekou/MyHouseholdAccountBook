@@ -31,11 +31,15 @@ import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookCont
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.shop.ShopInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItem;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopKubunCodeList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemSortBetweenAB;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.shoppingitem.ShoppingItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
+import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoSearchForm;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
@@ -73,14 +77,17 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class ShoppingItemInfoManageUseCase {
 
-	// 支出項目テーブル:SISYUTU_ITEM_TABLE参照リポジトリー
+	// 支出項目テーブル:SISYUTU_ITEM_TABLEリポジトリー
 	private final SisyutuItemTableRepository sisyutuItemRepository;
 	
 	// 支出項目情報取得コンポーネント
 	private final SisyutuItemComponent sisyutuItemComponent;
 	
-	// 店舗情報取得リポジトリー
+	// 店舗テーブル:SHOP_TABLEリポジトリー
 	private final ShopTableRepository shopRepository;
+	
+	// 商品テーブル:SHOPPING_ITEM_TABLEリポジトリー
+	private final ShoppingItemTableRepository shoppingItemRepository;
 	
 	/**
 	 *<pre>
@@ -271,8 +278,38 @@ public class ShoppingItemInfoManageUseCase {
 		// 新規登録の場合
 		if(inputForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
 			
+			// 新規採番する商品コードの値を取得
+			int count = shoppingItemRepository.countById(SearchQueryUserId.from(user.getUserId()));
+			count++;
+			if(count > 99999) {
+				response.addErrorMessage("商品情報は99999件以上登録できません。管理者に問い合わせてください。");
+				return response;
+			}
+			
+			// 商品コードを入力フォームに設定
+			inputForm.setShoppingItemCode(String.format("%05d", count));
+			
+			// 商品情報を作成
+			ShoppingItem addData = createSisyutuItem(user.getUserId().toString(), inputForm);
+			
+			// 商品テーブルに登録
+			int addCount = shoppingItemRepository.add(addData);
+			// 追加件数が1件以上の場合、業務エラー
+			if(addCount != 1) {
+				throw new MyHouseholdAccountBookRuntimeException("商品テーブル:SHOPPING_ITEM_TABLEへの追加件数が不正でした。[件数=" + addCount + "][add data:" + addData + "]");
+			}
+			
 		// 更新の場合
 		} else if (inputForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
+			// 商品情報を作成
+			ShoppingItem updateData = createSisyutuItem(user.getUserId().toString(), inputForm);
+			
+			// 商品テーブルに登録(支出項目コードは更新対象外項目なので注意)
+			int updateCount = shoppingItemRepository.update(updateData);
+			// 更新件数が1件以上の場合、業務エラー
+			if(updateCount != 1) {
+				throw new MyHouseholdAccountBookRuntimeException("商品テーブル:SHOPPING_ITEM_TABLEへの更新件数が不正でした。[件数=" + updateCount + "][update data:" + updateData + "]");
+			}
 			
 		} else {
 			throw new MyHouseholdAccountBookRuntimeException("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + inputForm.getAction());
@@ -283,7 +320,7 @@ public class ShoppingItemInfoManageUseCase {
 		
 		return response;
 	}
-
+	
 	/**
 	 *<pre>
 	 * 情報管理(商品)更新画面で登録実行時にバリデーションチェックNGとなった場合の各画面表示項目を取得します。
@@ -307,7 +344,6 @@ public class ShoppingItemInfoManageUseCase {
 		
 		return response;
 	}
-	
 	
 	/**
 	 *<pre>
@@ -348,5 +384,36 @@ public class ShoppingItemInfoManageUseCase {
 		}
 		
 		return response;
+	}
+	
+	/**
+	 *<pre>
+	 * 引数のフォームデータから商品情報(ドメイン)を生成して返します。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param inputForm フォームデータ
+	 * @return 商品情報(ドメイン)
+	 *
+	 */
+	private ShoppingItem createSisyutuItem(String userId, ShoppingItemInfoUpdateForm inputForm) {
+		return ShoppingItem.from(
+				// ユーザID
+				userId,
+				// 商品コード
+				inputForm.getShoppingItemCode(),
+				// 商品区分名
+				inputForm.getShoppingItemKubunName(),
+				// 商品名
+				inputForm.getShoppingItemName(),
+				// 商品詳細
+				inputForm.getShoppingItemDetailContext(),
+				// 支出項目コード
+				inputForm.getSisyutuItemCode(),
+				// 会社名
+				inputForm.getCompanyName(),
+				// 基準店舗コード
+				inputForm.getStandardShopCode(),
+				// 基準価格
+				DomainCommonUtils.convertBigDecimal(inputForm.getStandardPrice(), 0));
 	}
 }

@@ -1,5 +1,5 @@
 /**
- * 店舗テーブル:SHOP_TABLEのデータ追加・更新・参照検索を行うマッパーです
+ * 店舗テーブル:SHOP_TABLEのデータ追加・更新・参照を行うマッパーです
  *
  *------------------------------------------------
  * 更新履歴
@@ -26,7 +26,7 @@ import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSear
 
 /**
  *<pre>
- * 店舗テーブル:SHOP_TABLEのデータ追加・更新・参照検索を行うマッパーです
+ * 店舗テーブル:SHOP_TABLEのデータ追加・更新・参照を行うマッパーです
  *
  *</pre>
  *

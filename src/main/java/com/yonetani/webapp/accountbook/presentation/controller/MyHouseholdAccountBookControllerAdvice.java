@@ -130,8 +130,7 @@ public class MyHouseholdAccountBookControllerAdvice {
 	 *<pre>
 	 * ModelAndViewにエラーメッセージと発生日時の値を設定します。
 	 *</pre>
-	 * @param ex 例外内容
-	 * @param model メッセージ設定先のModelAndView
+	 * @param ex 発生した例外
 	 * @return エラーページのModelAndView
 	 *
 	 */

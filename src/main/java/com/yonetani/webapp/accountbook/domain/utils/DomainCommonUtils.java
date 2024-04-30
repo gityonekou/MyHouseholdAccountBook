@@ -77,6 +77,22 @@ public class DomainCommonUtils {
 		} else {
 			return target.add(augend);
 		}
-		
+	}
+	
+	/**
+	 *<pre>
+	 * 引数で指定した値をBigDecimalに変換して返します。値がnullの場合、nullを返却します。
+	 *</pre>
+	 * @param value BigDecimalに変換する値
+	 * @param scale 小数点以下桁数
+	 * @return 引数の値をBigDecimalに変換した値
+	 *
+	 */
+	public static BigDecimal convertBigDecimal(Integer value, int scale) {
+		// 値がnullの場合、nullを返します。
+		if(value == null) {
+			return null;
+		}
+		return BigDecimal.valueOf(value.longValue(), scale);
 	}
 }

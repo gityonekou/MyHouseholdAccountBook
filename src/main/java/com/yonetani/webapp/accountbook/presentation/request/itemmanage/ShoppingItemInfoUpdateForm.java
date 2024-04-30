@@ -68,9 +68,13 @@ public class ShoppingItemInfoUpdateForm {
 	 * 
 	 * @return 基準店舗を選択した場合で基準価格の設定ありならtrue、空ならfalse
 	 */
-	@AssertTrue(message = "基準店舗か基準価格が未選択です。")
+	@AssertTrue(message = "基準店舗が未選択か基準価格が未入力です。")
 	public boolean isNeedCheckStandardPrice() {
-		// 基準店舗を選択した場合で基準価格の設定ありならtrue、空ならfalse
+		// 基準店舗コードが未選択、基準価格が未入力の場合、true
+		if(!StringUtils.hasLength(standardShopCode) && standardPrice == null) {
+			return true;
+		}
+		// 基準店舗を選択した場合で基準価格の設定ありならtrue、空ならfalse 
 		return (StringUtils.hasLength(standardShopCode) && standardPrice != null) ? true : false;
 	}
 }
