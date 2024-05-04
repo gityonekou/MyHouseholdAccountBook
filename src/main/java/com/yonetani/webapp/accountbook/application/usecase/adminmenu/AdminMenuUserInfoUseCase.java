@@ -210,8 +210,8 @@ public class AdminMenuUserInfoUseCase {
 						}
 					});
 				
-				// 処理結果OKを設定(getリダイレクトを行う)
-				response.setTransactionSuccessFull();
+				// 完了メッセージ
+				response.addMessage("ユーザを追加しました。[ユーザID:" + userInfo.getUserId() + "][ユーザ名:" + userInfo.getUserName() + "]");
 				
 			// 更新の場合
 			} else if (userInfoForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
@@ -223,12 +223,18 @@ public class AdminMenuUserInfoUseCase {
 				if(updateCount != 1) {
 					throw new MyHouseholdAccountBookRuntimeException("家計簿利用ユーザテーブルへの追加件数が不正でした。[add data:" + accountBookUser + "]");
 				}
-				// 処理結果OKを設定(getリダイレクトを行う)
-				response.setTransactionSuccessFull();
+
+				// 完了メッセージ
+				response.addMessage("ユーザを更新しました。[ユーザID:" + userInfo.getUserId() + "][ユーザ名:" + userInfo.getUserName() + "]");
+				
 				
 			} else {
 				throw new MyHouseholdAccountBookRuntimeException("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + userInfoForm.getAction());
 			}
+			
+			// 処理結果OKを設定(getリダイレクトを行う)
+			response.setTransactionSuccessFull();
+			
 		} catch (MyHouseholdAccountBookException ex) {
 			throw new MyHouseholdAccountBookRuntimeException("業務エラーが発生しました。管理者に問い合わせてください。[message:" + ex.getLocalizedMessage() + "]", ex);
 		}
@@ -270,6 +276,9 @@ public class AdminMenuUserInfoUseCase {
 					throw new MyHouseholdAccountBookRuntimeException("支出項目テーブル:SISYUTU_ITEM_TABLEへの追加件数が不正でした。[add data:" + addData + "]");
 				}
 			});
+		// 完了メッセージ
+		response.addMessage("パッチ当て処理が完了しました。");
+		
 		// 処理結果OKを設定(getリダイレクトを行う)
 		response.setTransactionSuccessFull();
 		return response;

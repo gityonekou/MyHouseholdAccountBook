@@ -62,10 +62,10 @@ public interface ShoppingItemTableRepository {
 	
 	/**
 	 *<pre>
-	 * ユーザIDと指定の支出項目コードに対応する商品情報を取得します。
+	 * ユーザIDと指定の支出項目コードに対応する商品情報の検索結果を取得します。
 	 *</pre>
 	 * @param search 検索対象のユーザID、支出項目コード
-	 * @return 商品情報のリスト
+	 * @return 商品情報の検索結果
 	 *
 	 */
 	ShoppingItemInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search);

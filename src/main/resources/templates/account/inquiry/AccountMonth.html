@@ -50,10 +50,10 @@
 							<!-- 月毎収支まとめ表示エリア -->
 							<div class="card-body">
 								<ul class="list-group">
-									<li class="list-group-item list-group-item-info">収入額：<span th:text="${syuunyuuKingaku}"></span>円</li>
-									<li class="list-group-item">支出予定額：<span th:text="${sisyutuYoteiKingaku}"></span>円</li>
-									<li class="list-group-item">支出額：<span th:text="${sisyutuKingaku}"></span>円</li>
-									<li class="list-group-item list-group-item-info">収支：<span th:text="${syuusiKingaku}"></span>円</li>
+									<li class="list-group-item list-group-item-info">収入額：<span th:text="${syuunyuuKingaku}"></span></li>
+									<li class="list-group-item">支出予定額：<span th:text="${sisyutuYoteiKingaku}"></span></li>
+									<li class="list-group-item">支出額：<span th:text="${sisyutuKingaku}"></span></li>
+									<li class="list-group-item list-group-item-info">収支：<span th:text="${syuusiKingaku}"></span></li>
 								</ul>
 							</div>
 							<!-- 月毎支出表示(レベル2項目)表示エリア -->
@@ -64,14 +64,14 @@
 									<tbody>
 										<th:block th:each="item : ${expenditureItemList}">
 											<tr class="table-success border border-success" th:if="${item.sisyutuItemLevel == 1}">
-												<td th:if="${#strings.isEmpty(item.percentage)}">■<span th:text="${item.sisyutuItemName}"></span>：<span th:text="${item.sisyutuKingaku}"></span>円</td>
-												<td th:if="!${#strings.isEmpty(item.percentage)}">■<span th:text="${item.sisyutuItemName}"></span>：<span th:text="${item.sisyutuKingaku}"></span>円&emsp;<code>(B:<span th:text="${item.sisyutuKingakuB}"></span>円 <span th:text="${item.percentage}"></span>%)</code></td>
+												<td th:if="${#strings.isEmpty(item.percentage)}">■<span th:text="${item.sisyutuItemName}"></span>：<span th:text="${item.sisyutuKingaku}"></span></td>
+												<td th:if="!${#strings.isEmpty(item.percentage)}">■<span th:text="${item.sisyutuItemName}"></span>：<span th:text="${item.sisyutuKingaku}"></span>&emsp;<code>(B:<span th:text="${item.sisyutuKingakuB}"></span>：<span th:text="${item.percentage}"></span>%)</code></td>
 												<td th:if="${item.closingFlg}"><span th:text="${item.siharaiDate}"></span></td>
 												<td th:if="!${item.closingFlg}"><code th:text="${item.siharaiDate}"></code></td>
 											</tr>
 											<tr th:if="${item.sisyutuItemLevel == 2}">
-												<td th:if="${#strings.isEmpty(item.percentage)}">&emsp;・<span th:text="${item.sisyutuItemName}"></span>：<span th:text="${item.sisyutuKingaku}"></span>円</td>
-												<td th:if="!${#strings.isEmpty(item.percentage)}">&emsp;・<span th:text="${item.sisyutuItemName}"></span>：<span th:text="${item.sisyutuKingaku}"></span>円&emsp;<code>(B:<span th:text="${item.sisyutuKingakuB}"></span>円 <span th:text="${item.percentage}"></span>%)</code></td>
+												<td th:if="${#strings.isEmpty(item.percentage)}">&emsp;・<span th:text="${item.sisyutuItemName}"></span>：<span th:text="${item.sisyutuKingaku}"></span></td>
+												<td th:if="!${#strings.isEmpty(item.percentage)}">&emsp;・<span th:text="${item.sisyutuItemName}"></span>：<span th:text="${item.sisyutuKingaku}"></span>&emsp;<code>(B:<span th:text="${item.sisyutuKingakuB}"></span>：<span th:text="${item.percentage}"></span>%)</code></td>
 												<td th:if="${item.closingFlg}"><span th:text="${item.siharaiDate}"></span></td>
 												<td th:if="!${item.closingFlg}"><code th:text="${item.siharaiDate}"></code></td>
 											</tr>

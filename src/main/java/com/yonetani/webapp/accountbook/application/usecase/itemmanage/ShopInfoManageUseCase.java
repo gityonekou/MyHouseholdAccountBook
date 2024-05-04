@@ -201,6 +201,9 @@ public class ShopInfoManageUseCase {
 				throw new MyHouseholdAccountBookRuntimeException("店舗テーブルへの追加件数が不正でした。[件数=" + addCount + "][add data:" + shop + "]");
 			}
 			
+			// 完了メッセージ
+			response.addMessage("新規店舗を追加しました。[code:" + shop.getShopCode() + "]" + shop.getShopName());
+			
 		// 更新の場合
 		} else if (shopForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
 			// 旧表示順の値をチェック
@@ -258,6 +261,9 @@ public class ShopInfoManageUseCase {
 			if(updateCount != 1) {
 				throw new MyHouseholdAccountBookRuntimeException("店舗テーブルへの更新件数が不正でした。[件数=" + updateCount + "][update data:" + shop + "]");
 			}
+			
+			// 完了メッセージ
+			response.addMessage("店舗を更新しました。[code:" + shop.getShopCode() + "]" + shop.getShopName());
 			
 		} else {
 			throw new MyHouseholdAccountBookRuntimeException("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + shopForm.getAction());

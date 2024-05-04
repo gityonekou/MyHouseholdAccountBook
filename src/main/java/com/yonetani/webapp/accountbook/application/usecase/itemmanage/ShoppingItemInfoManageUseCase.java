@@ -32,8 +32,11 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.shop.ShopInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItem;
+import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopKubunCodeList;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemSortBetweenAB;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
@@ -45,7 +48,9 @@ import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingI
 import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractExpenditureItemInfoManageResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractShoppingItemInfoManageSearchResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageActSelect;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageActSelect.SelectShoppingItemInfo;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageInitResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageSearchResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageUpdateResponse;
@@ -165,8 +170,35 @@ public class ShoppingItemInfoManageUseCase {
 	public ShoppingItemInfoManageActSelect readActSelectItemInfo(UserSession user, String shoppingItemCode) {
 		log.debug("readActSelectItemInfo:userid=" + user.getUserId() + ",shoppingItemCode=" + shoppingItemCode);
 		
-		// レスポンスを生成
-		ShoppingItemInfoManageActSelect response = ShoppingItemInfoManageActSelect.getInstance(null);
+		// 選択した商品コードに対応する商品情報を取得
+		ShoppingItem searchResult = shoppingItemRepository.findByIdAndShoppingItemCode(
+				SearchQueryUserIdAndShoppingItemCode.from(user.getUserId(), shoppingItemCode));
+		if(searchResult == null) {
+			throw new MyHouseholdAccountBookRuntimeException("選択した商品が商品テーブル:SHOPPING_ITEM_TABLEに存在しません。管理者に問い合わせてください。[shoppingItemCode=" + shoppingItemCode + "]");
+		}
+		// 選択した商品情報をもとにレスポンスを生成
+		ShoppingItemInfoManageActSelect response = ShoppingItemInfoManageActSelect.getInstance(
+				SelectShoppingItemInfo.from(
+						// 商品コード
+						searchResult.getShoppingItemCode().toString(),
+						// 商品区分名
+						searchResult.getShoppingItemKubunName().toString(),
+						// 商品名
+						searchResult.getShoppingItemName().toString(),
+						// 商品詳細
+						searchResult.getShoppingItemDetailContext().toString(),
+						// 支出項目名(＞で区切った値)
+						sisyutuItemComponent.getSisyutuItemName(user, searchResult.getSisyutuItemCode().toString()),
+						/// 会社名
+						searchResult.getCompanyName().toString()));
+		
+		// 指定した検索条件に一致する商品一覧を取得
+		// TODO:セッションのデータをコントローラーから渡してもらう必要あり
+		
+		// 商品検索結果情報の明細リストを設定
+		
+		// 商品検索結果名を設定
+		response.setSearchResultNameValue("対応中：");
 		
 		return response;
 	}
@@ -193,7 +225,7 @@ public class ShoppingItemInfoManageUseCase {
 		/* 更新商品情報入力フォームを生成しレスポンスに設定 */
 		// 更新商品情報入力フォームを生成
 		ShoppingItemInfoUpdateForm addItemForm = new ShoppingItemInfoUpdateForm();
-		// 新規追加
+		// アクション：新規登録
 		addItemForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_ADD);
 		// 属する支出項目コード
 		addItemForm.setSisyutuItemCode(sisyutuItemCode);
@@ -219,7 +251,21 @@ public class ShoppingItemInfoManageUseCase {
 		// レスポンスを生成
 		ShoppingItemInfoManageSearchResponse response = ShoppingItemInfoManageSearchResponse.getInstance();
 		
+		// 選択した支出項目名を取得(＞で区切った値)
+		String sisyutuItemName = sisyutuItemComponent.getSisyutuItemName(user, sisyutuItemCode);
 		
+		// 指定した支出項目コードに属する商品一覧を取得
+		ShoppingItemInquiryList searchResult = shoppingItemRepository.findByIdAndSisyutuItemCode(
+				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
+		if(searchResult.isEmpty()) {
+			response.addMessage("指定した支出項目「" + sisyutuItemName + "」に登録されている商品は0件です。");
+		} else {
+			// 商品検索結果をレスポンスに設定
+			response.addShoppingItemList(createShoppingItemList(searchResult));
+			// 商品検索結果名を設定
+			response.setSearchResultNameValue("支出項目：" + sisyutuItemName);
+			
+		}
 		return response;
 	}
 	
@@ -236,8 +282,41 @@ public class ShoppingItemInfoManageUseCase {
 			String shoppingItemCode) {
 		log.debug("readAddShoppingItemInfoByShoppingItem:userid=" + user.getUserId() + ",shoppingItemCode=" + shoppingItemCode);
 		
-		// レスポンスを生成
-		ShoppingItemInfoManageUpdateResponse response = ShoppingItemInfoManageUpdateResponse.getInstance(null);
+		// 基準店舗選択ボックス表示情報を設定したレスポンスを生成
+		ShoppingItemInfoManageUpdateResponse response = createShoppingItemInfoManageUpdateResponse(user.getUserId());
+		
+		// 選択した商品コードに対応する商品情報を取得
+		ShoppingItem searchResult = shoppingItemRepository.findByIdAndShoppingItemCode(
+				SearchQueryUserIdAndShoppingItemCode.from(user.getUserId(), shoppingItemCode));
+		if(searchResult == null) {
+			throw new MyHouseholdAccountBookRuntimeException("選択した商品が商品テーブル:SHOPPING_ITEM_TABLEに存在しません。管理者に問い合わせてください。[shoppingItemCode=" + shoppingItemCode + "]");
+		}
+		
+		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
+		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, searchResult.getSisyutuItemCode().toString()));
+		
+		/* 更新商品情報入力フォームを生成し取得した商品情報をレスポンスに設定 */
+		// 更新商品情報入力フォームを生成
+		ShoppingItemInfoUpdateForm addItemForm = new ShoppingItemInfoUpdateForm();
+		// アクション：新規登録
+		addItemForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_ADD);
+		// 属する支出項目コード
+		addItemForm.setSisyutuItemCode(searchResult.getSisyutuItemCode().toString());
+		// 商品区分名
+		addItemForm.setShoppingItemKubunName(searchResult.getShoppingItemKubunName().toString());
+		// 商品名
+		addItemForm.setShoppingItemName("★新規★" + searchResult.getShoppingItemName().toString());
+		// 商品詳細
+		addItemForm.setShoppingItemDetailContext(searchResult.getShoppingItemDetailContext().toString());
+		// 会社名
+		addItemForm.setCompanyName(searchResult.getCompanyName().toString());
+		
+		// 更新商品情報入力フォームをレスポンスに設定
+		response.setShoppingItemInfoUpdateForm(addItemForm);
+		
+		// コピーした情報を新規登録する旨をメッセージ表示
+		response.addMessage("「コピーして商品を新規追加」が選択されています。");
+		
 		return response;
 	}
 	
@@ -254,8 +333,43 @@ public class ShoppingItemInfoManageUseCase {
 	public ShoppingItemInfoManageUpdateResponse readUpdateShoppingItemInfo(UserSession user, String shoppingItemCode) {
 		log.debug("readUpdateShoppingItemInfo:userid=" + user.getUserId() + ",shoppingItemCode=" + shoppingItemCode);
 		
-		// レスポンスを生成
-		ShoppingItemInfoManageUpdateResponse response = ShoppingItemInfoManageUpdateResponse.getInstance(null);
+		// 基準店舗選択ボックス表示情報を設定したレスポンスを生成
+		ShoppingItemInfoManageUpdateResponse response = createShoppingItemInfoManageUpdateResponse(user.getUserId());
+		
+		// 選択した商品コードに対応する商品情報を取得
+		ShoppingItem searchResult = shoppingItemRepository.findByIdAndShoppingItemCode(
+				SearchQueryUserIdAndShoppingItemCode.from(user.getUserId(), shoppingItemCode));
+		if(searchResult == null) {
+			throw new MyHouseholdAccountBookRuntimeException("選択した商品が商品テーブル:SHOPPING_ITEM_TABLEに存在しません。管理者に問い合わせてください。[shoppingItemCode=" + shoppingItemCode + "]");
+		}
+		
+		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
+		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, searchResult.getSisyutuItemCode().toString()));
+		
+		/* 更新商品情報入力フォームを生成し取得した商品情報をレスポンスに設定 */
+		// 更新商品情報入力フォームを生成
+		ShoppingItemInfoUpdateForm addItemForm = new ShoppingItemInfoUpdateForm();
+		// アクション：更新
+		addItemForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE);
+		// 商品コード
+		addItemForm.setShoppingItemCode(searchResult.getShoppingItemCode().toString());
+		// 属する支出項目コード
+		addItemForm.setSisyutuItemCode(searchResult.getSisyutuItemCode().toString());
+		// 商品区分名
+		addItemForm.setShoppingItemKubunName(searchResult.getShoppingItemKubunName().toString());
+		// 商品名
+		addItemForm.setShoppingItemName(searchResult.getShoppingItemName().toString());
+		// 商品詳細
+		addItemForm.setShoppingItemDetailContext(searchResult.getShoppingItemDetailContext().toString());
+		// 会社名
+		addItemForm.setCompanyName(searchResult.getCompanyName().toString());
+		// 基準店舗コード
+		addItemForm.setStandardShopCode(searchResult.getShopCode().toString());
+		// 基準価格
+		addItemForm.setStandardPrice(DomainCommonUtils.convertInteger(searchResult.getStandardPrice().getValue()));
+		
+		// 更新商品情報入力フォームをレスポンスに設定
+		response.setShoppingItemInfoUpdateForm(addItemForm);
 		return response;
 	}
 	
@@ -299,6 +413,9 @@ public class ShoppingItemInfoManageUseCase {
 				throw new MyHouseholdAccountBookRuntimeException("商品テーブル:SHOPPING_ITEM_TABLEへの追加件数が不正でした。[件数=" + addCount + "][add data:" + addData + "]");
 			}
 			
+			// 完了メッセージ
+			response.addMessage("新規商品を追加しました。[code:" + addData.getShoppingItemCode() + "]" + addData.getShoppingItemName());
+			
 		// 更新の場合
 		} else if (inputForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
 			// 商品情報を作成
@@ -310,6 +427,9 @@ public class ShoppingItemInfoManageUseCase {
 			if(updateCount != 1) {
 				throw new MyHouseholdAccountBookRuntimeException("商品テーブル:SHOPPING_ITEM_TABLEへの更新件数が不正でした。[件数=" + updateCount + "][update data:" + updateData + "]");
 			}
+			
+			// 完了メッセージ
+			response.addMessage("商品を更新しました。[code:" + updateData.getShoppingItemCode() + "]" + updateData.getShoppingItemName());
 			
 		} else {
 			throw new MyHouseholdAccountBookRuntimeException("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + inputForm.getAction());
@@ -415,5 +535,36 @@ public class ShoppingItemInfoManageUseCase {
 				inputForm.getStandardShopCode(),
 				// 基準価格
 				DomainCommonUtils.convertBigDecimal(inputForm.getStandardPrice(), 0));
+	}
+	
+	/**
+	 *<pre>
+	 * 引数の商品検索結果情報(ドメイン)から商品一覧明細情報を生成して返します。
+	 * 
+	 *</pre>
+	 * @param searchResult 商品検索結果情報(ドメイン)
+	 * @return 商品検索結果画面の商品一覧明細情報
+	 *
+	 */
+	private List<AbstractShoppingItemInfoManageSearchResponse.ShoppingItemListItem> createShoppingItemList(ShoppingItemInquiryList searchResult) {
+		return searchResult.getValues().stream().map(domain -> 
+			AbstractShoppingItemInfoManageSearchResponse.ShoppingItemListItem.from(
+				// 商品コード
+				domain.getShoppingItemCode().toString(),
+				// 商品区分名
+				domain.getShoppingItemKubunName().toString(),
+				// 商品名
+				domain.getShoppingItemName().toString(),
+				// 商品詳細
+				domain.getShoppingItemDetailContext().toString(),
+				// 支出項目名
+				domain.getSisyutuItemName().toString(),
+				// 会社名
+				domain.getCompanyName().toString(),
+				// 基準店舗名
+				domain.getStandardShopName().toString(),
+				// 基準価格
+				domain.getStandardPrice().toString())
+		).collect(Collectors.toUnmodifiableList());
 	}
 }

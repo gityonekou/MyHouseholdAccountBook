@@ -31,6 +31,8 @@ public class DomainCommonUtils {
 	private static final DecimalFormat kingakuDecimalFormat = new DecimalFormat("#,###");
 	// 日付フォーマット(YYYY/MM/DD)
 	private static final DateTimeFormatter yyyySPMMSPddformat = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+	// 円
+	private static final String YEN = "円";
 	
 	/**
 	 *<pre>
@@ -44,6 +46,20 @@ public class DomainCommonUtils {
 	public static synchronized String formatKingaku(BigDecimal value) {
 		// 値がnullの場合空文字列を返却、null以外の場合はスケール0で四捨五入+カンマ編集した文字列を返却
 		return (value == null) ? "" : kingakuDecimalFormat.format(value.setScale(0, RoundingMode.HALF_UP));
+	}
+	
+	/**
+	 *<pre>
+	 * 金額の値をスケール0で四捨五入+カンマ編集した文字列を返却します。値の最後には円を付与します。
+	 * nullの場合は空文字列が返却されます。
+	 *</pre>
+	 * @param value フォーマット編集する金額の値
+	 * @return フォーマット編集した金額の値(円を付与)、nullの場合は空文字列
+	 *
+	 */
+	public static synchronized String formatKingakuAndYen(BigDecimal value) {
+		// 値がnullの場合空文字列を返却、null以外の場合はスケール0で四捨五入+カンマ編集し、最後に円を付与した文字列を返却
+		return (value == null) ? "" : kingakuDecimalFormat.format(value.setScale(0, RoundingMode.HALF_UP)) + YEN;
 	}
 	
 	/**
@@ -81,9 +97,9 @@ public class DomainCommonUtils {
 	
 	/**
 	 *<pre>
-	 * 引数で指定した値をBigDecimalに変換して返します。値がnullの場合、nullを返却します。
+	 * 引数で指定した整数値をBigDecimalに変換して返します。値がnullの場合、nullを返却します。
 	 *</pre>
-	 * @param value BigDecimalに変換する値
+	 * @param value BigDecimalに変換する整数値
 	 * @param scale 小数点以下桁数
 	 * @return 引数の値をBigDecimalに変換した値
 	 *
@@ -94,5 +110,27 @@ public class DomainCommonUtils {
 			return null;
 		}
 		return BigDecimal.valueOf(value.longValue(), scale);
+	}
+	
+	/**
+	 *<pre>
+	 * 引数で指定したBigDecimalの値をIntegerに変換して返します。値がnullの場合、nullを返却します。
+	 * 小数点以下は切り捨てて、整数値に変換した値を返します。
+	 * 
+	 *</pre>
+	 * @param value Integerに変換する値
+	 * @return 引数の値をIntegerに変換した値
+	 *
+	 */
+	public static Integer convertInteger(BigDecimal value) {
+		// 値がnullの場合、nullを返します。
+		if(value == null) {
+			return null;
+		}
+		// スケールを0に設定、小数点以下は切り捨て
+		value = value.setScale(0, RoundingMode.HALF_DOWN);
+		
+		// 整数値に変換して返却
+		return Integer.valueOf(value.intValueExact());
 	}
 }

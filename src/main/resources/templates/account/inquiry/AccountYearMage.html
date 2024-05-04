@@ -66,17 +66,20 @@
 						<table class="table table-sm table-borderless">
 							<thead><tr class="table-secondary"><th scope="col">年月</th><th scope="col">収入</th><th scope="col">支出（支出予定）</th><th scope="col">収支</th></tr></thead>
 							<tbody>
-								<tr th:each="item : ${mageInquiryList}">
+								<th:block th:each="item, itemStat : ${mageInquiryList}">
+								<th:block th:if="${itemStat.odd}"><tr></th:block>
+								<th:block th:if="${itemStat.even}"><tr class="table-warning"></th:block>
 									<td><span th:text="${item.month}"></span>月</td>
-									<td><span th:text="${item.syuunyuuKingaku}"></span>円</td>
-									<td><span th:text="${item.sisyutuKingaku}"></span>円&emsp;（<span th:text="${item.sisyutuYoteiKingaku}"></span>円）</td>
-									<td><span th:text="${item.syuusiKingaku}"></span>円</td>
+									<td th:text="${item.syuunyuuKingaku}">収入</td>
+									<td><span th:text="${item.sisyutuKingaku}"></span>&emsp;（<span th:text="${item.sisyutuYoteiKingaku}"></span>）</td>
+									<td th:text="${item.syuusiKingaku}">収支</td>
 								</tr>
+								</th:block>
 								<tr class="table-success">
 									<td>合計</td>
-									<td><span th:text="${syuunyuuKingakuGoukei}"></span>円</td>
-									<td><span th:text="${sisyutuKingakuGoukei}"></span>円&emsp;（<span th:text="${sisyutuYoteiKingakuGoukei}"></span>円）</td>
-									<td><span th:text="${syuusiKingakuGoukei}"></span>円</td>
+									<td th:text="${syuunyuuKingakuGoukei}">収入合計</td>
+									<td><span th:text="${sisyutuKingakuGoukei}"></span>&emsp;（<span th:text="${sisyutuYoteiKingakuGoukei}"></span>）</td>
+									<td th:text="${syuusiKingakuGoukei}">収支合計</td>
 								</tr>
 							</tbody>
 						</table>

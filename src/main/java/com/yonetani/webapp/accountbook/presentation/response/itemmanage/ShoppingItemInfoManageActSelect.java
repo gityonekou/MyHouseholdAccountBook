@@ -12,9 +12,8 @@ package com.yonetani.webapp.accountbook.presentation.response.itemmanage;
 
 import org.springframework.web.servlet.ModelAndView;
 
-import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
-
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -29,11 +28,52 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class ShoppingItemInfoManageActSelect extends AbstractResponse {
+public class ShoppingItemInfoManageActSelect extends AbstractShoppingItemInfoManageSearchResponse {
 	
-	// TODO:
-	private class SelectShoppingItemInfo {
+	/**
+	 *<pre>
+	 * 選択商品の詳細情報です。
+	 *
+	 *</pre>
+	 *
+	 * @author ：Kouki Yonetani
+	 * @since 家計簿アプリ(1.00.A)
+	 *
+	 */
+	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+	@Getter
+	public static class SelectShoppingItemInfo {
+		// 商品コード
+		private final String shoppingItemCode;
+		// 商品区分名
+		private final String shoppingItemKubunName;
+		// 商品名
+		private final String shoppingItemName;
+		// 商品詳細
+		private final String shoppingItemDetailContext;
+		// 支出項目名
+		private final String sisyutuItemName;
+		// 会社名
+		private final String companyName;
 		
+		/**
+		 *<pre>
+		 * 引数の値から選択商品の詳細情報を生成して返します。
+		 *</pre>
+		 * @param shoppingItemCode 商品コード
+		 * @param shoppingItemKubunName 商品区分名
+		 * @param shoppingItemName 商品名
+		 * @param shoppingItemDetailContext 商品詳細
+		 * @param sisyutuItemName 支出項目名
+		 * @param companyName 会社名
+		 * @return 選択商品の詳細情報
+		 *
+		 */
+		public static SelectShoppingItemInfo from(String shoppingItemCode, String shoppingItemKubunName, String shoppingItemName,
+				String shoppingItemDetailContext, String sisyutuItemName, String companyName) {
+			return new SelectShoppingItemInfo(shoppingItemCode, shoppingItemKubunName, shoppingItemName,
+					shoppingItemDetailContext, sisyutuItemName, companyName);
+		}
 	}
 	
 	// 選択した商品の情報

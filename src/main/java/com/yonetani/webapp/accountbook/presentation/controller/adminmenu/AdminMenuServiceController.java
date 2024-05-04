@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.application.usecase.adminmenu.AdminMenuBaseInfoDetailUseCase;
 import com.yonetani.webapp.accountbook.application.usecase.adminmenu.AdminMenuBaseInfoUseCase;
@@ -31,6 +32,7 @@ import com.yonetani.webapp.accountbook.presentation.request.adminmenu.AdminMenuU
 import com.yonetani.webapp.accountbook.presentation.request.adminmenu.AdminMenuUserInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.adminmenu.AdminMenuBaseInfoResponse;
 import com.yonetani.webapp.accountbook.presentation.response.adminmenu.AdminMenuUserInfoResponse;
+import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -66,14 +68,15 @@ public class AdminMenuServiceController {
 	 *<pre>
 	 * ★パッチ充て用に急遽作った処理：後で、パッチ充て処理として本格対応する（家計簿ベース完了後）
 	 *</pre>
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
 	 *
 	 */
 	@PostMapping("/custominfo/")
-	public ModelAndView postCustomInfo() {
+	public ModelAndView postCustomInfo(RedirectAttributes redirectAttributes) {
 		log.debug("postCustomInfo:");
 		
 		// 指定ファイルの情報をベーステーブルに出力します。
-		return this.userInfoUseCase.customInfo().buildRedirect();
+		return this.userInfoUseCase.customInfo().buildRedirect(redirectAttributes);
 	}
 	
 	/**
@@ -113,11 +116,13 @@ public class AdminMenuServiceController {
 	 *</pre>
 	 * @param userForm ユーザ情報入力フォームの入力値
 	 * @param bindingResult バリデーション結果
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
 	 * @return ユーザ登録画面情報
 	 *
 	 */
 	@PostMapping("/useradd/")
-	public ModelAndView postUserAdd(@ModelAttribute @Validated AdminMenuUserInfoForm userForm, BindingResult bindingResult) {
+	public ModelAndView postUserAdd(@ModelAttribute @Validated AdminMenuUserInfoForm userForm, BindingResult bindingResult,
+			RedirectAttributes redirectAttributes) {
 		log.debug("postUserInfo: input=" + userForm);
 		
 		/* 入力フィールドのバリデーションチェック結果を判定 */
@@ -135,7 +140,7 @@ public class AdminMenuServiceController {
 				
 			// actionに従い、処理を実行
 			} else {
-				return this.userInfoUseCase.execAction(userForm).buildRedirect();
+				return this.userInfoUseCase.execAction(userForm).buildRedirect(redirectAttributes);
 			}
 		}
 	}
@@ -144,13 +149,14 @@ public class AdminMenuServiceController {
 	 *<pre>
 	 * 管理者画面メニュー ユーザ登録完了後のリダイレクト(Get要求時)のマッピングです。
 	 *</pre>
+	 * @param redirectMessages リダイレクト元から引き継いだメッセージ
 	 * @return ユーザ登録画面情報
 	 *
 	 */
 	@GetMapping("/completeUseraAdd/")
-	public ModelAndView completeUseraAdd() {
-		log.debug("completeUseraAdd:");
-		return this.userInfoUseCase.read().buildComplete();
+	public ModelAndView completeUseraAdd(@ModelAttribute CompleteRedirectMessages redirectMessages) {
+		log.debug("completeUseraAdd: input=" + redirectMessages);
+		return this.userInfoUseCase.read().buildComplete(redirectMessages);
 	}
 	
 	/**
@@ -171,12 +177,16 @@ public class AdminMenuServiceController {
 	 * 管理者画面メニュー ベース情報管理のマッピングです
 	 * アップロードしたファイルをベース情報に登録します。
 	 *</pre>
+	 * @param baseInfoFileForm ベース情報ファイル登録フォームの入力値
+	 * @param bindingResult バリデーション結果
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
 	 * @return ベース情報管理画面
 	 *
 	 */
 	@PostMapping("/uploadbaseinfo/")
-	public ModelAndView postUploadBaseInfo(@Validated AdminMenuUploadBaseInfoFileForm baseInfoFileForm, BindingResult bindingResult) {
-		log.debug("postUploadBaseInfo:baseInfoFileForm=" + baseInfoFileForm.getBaseInfoFile());
+	public ModelAndView postUploadBaseInfo(@Validated AdminMenuUploadBaseInfoFileForm baseInfoFileForm, BindingResult bindingResult,
+			RedirectAttributes redirectAttributes) {
+		log.debug("postUploadBaseInfo: baseInfoFileForm=" + baseInfoFileForm.getBaseInfoFile());
 		
 		// ファイルアップロードのサンプルはこちらが良いです。
 		// https://qiita.com/MizoguchiKenji/items/0aa1f2b385e73c36c24d
@@ -192,7 +202,7 @@ public class AdminMenuServiceController {
 
 		} else {
 			// 指定ファイルの情報をベーステーブルに出力します。
-			return this.baseInfoUseCase.upload(baseInfoFileForm).buildRedirect();
+			return this.baseInfoUseCase.upload(baseInfoFileForm).buildRedirect(redirectAttributes);
 		}
 	}
 	
@@ -200,13 +210,14 @@ public class AdminMenuServiceController {
 	 *<pre>
 	 * 管理者画面メニュー ベース情報管理アップロード完了後のリダイレクト(Get要求時)のマッピングです。
 	 *</pre>
+	 * @param redirectMessages リダイレクト元から引き継いだメッセージ
 	 * @return ベース情報管理画面
 	 *
 	 */
 	@GetMapping("/completeUploadBaseInfo/")
-	public ModelAndView completeUploadBaseInfo() {
-		log.debug("completeUploadBaseInfo:");
-		return this.baseInfoUseCase.read().buildComplete();
+	public ModelAndView completeUploadBaseInfo(@ModelAttribute CompleteRedirectMessages redirectMessages) {
+		log.debug("completeUploadBaseInfo: input=" + redirectMessages);
+		return this.baseInfoUseCase.read().buildComplete(redirectMessages);
 	}
 	
 	/**

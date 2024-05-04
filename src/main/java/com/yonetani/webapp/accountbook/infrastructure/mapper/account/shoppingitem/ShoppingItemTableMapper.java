@@ -17,6 +17,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import com.yonetani.webapp.accountbook.infrastructure.dto.account.shoppingitem.ShoppingItemInquiryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.shoppingitem.ShoppingItemReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShoppingItemCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndSisyutuItemCodeSearchQueryDto;
@@ -69,14 +70,16 @@ public interface ShoppingItemTableMapper {
 	
 	/**
 	 *<pre>
-	 * 指定のユーザID、支出項目コードを条件に商品テーブル:SHOPPING_ITEM_TABLEを参照します。
+	 * 商品テーブル:SHOPPING_ITEM_TABLE、支出項目テーブル:SISYUTU_ITEM_TABLE、店舗テーブル:SHOP_TABLEから
+	 * 指定のユーザID、支出項目コードを条件に商品情報を検索します。
+	 * 
 	 *</pre>
 	 * @param search 検索条件:ユーザID、支出項目コード
-	 * @return 商品テーブル:SHOPPING_ITEM_TABLE参照結果のリスト
+	 * @return 商品情報参照結果のリスト
 	 *
 	 */
-	@Select("sql/account/shoppingitem/ShoppingItemTableSelectSql02.sql")
-	public List<ShoppingItemReadWriteDto> findByIdAndSisyutuItemCode(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
+	@Select("sql/account/shoppingitem/ShoppingItemInquirySelectSql01.sql")
+	public List<ShoppingItemInquiryReadDto> findByIdAndSisyutuItemCode(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
 	
 	/**
 	 *<pre>

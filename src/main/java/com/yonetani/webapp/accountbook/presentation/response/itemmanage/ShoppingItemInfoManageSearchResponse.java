@@ -12,11 +12,9 @@ package com.yonetani.webapp.accountbook.presentation.response.itemmanage;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoSearchForm;
-import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 /**
  *<pre>
@@ -29,11 +27,7 @@ import lombok.Setter;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class ShoppingItemInfoManageSearchResponse extends AbstractResponse {
-
-	// 商品検索条件情報入力フォーム
-	@Setter
-	private ShoppingItemInfoSearchForm shoppingItemInfoSearchForm;
+public class ShoppingItemInfoManageSearchResponse extends AbstractShoppingItemInfoManageSearchResponse {
 	
 	/**
 	 *<pre>
@@ -66,14 +60,6 @@ public class ShoppingItemInfoManageSearchResponse extends AbstractResponse {
 	@Override
 	public ModelAndView build() {
 		// 画面表示のModelとViewを生成
-		ModelAndView modelAndView = createModelAndView("itemmanage/ShoppingItemInfoManageSearch");
-		// 商品検索条件情報入力フォーム
-		if(shoppingItemInfoSearchForm == null) {
-			shoppingItemInfoSearchForm = new ShoppingItemInfoSearchForm();
-		}
-		modelAndView.addObject("shoppingItemInfoSearchForm", shoppingItemInfoSearchForm);
-		
-		
-		return modelAndView;
+		return createModelAndView("itemmanage/ShoppingItemInfoManageSearch");
 	}
 }

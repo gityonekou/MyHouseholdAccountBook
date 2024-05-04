@@ -33,10 +33,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.ExpenditureItemInfoManageUseCase;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ExpenditureItemInfoForm;
 import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
+import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ExpenditureItemInfoManageUpdateResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -102,7 +104,7 @@ public class ExpenditureItemInfoManageController {
 	 */
 	@GetMapping("/actselect")
 	public ModelAndView getActSelect(@RequestParam("sisyutuItemCode") String sisyutuItemCode) {
-		log.debug("getActSelect:sisyutuItemCode=" + sisyutuItemCode);
+		log.debug("getActSelect: sisyutuItemCode=" + sisyutuItemCode);
 		// 選択した支出項目情報のレスポンスを取得し、選択画面に遷移
 		return this.usecase.readActSelectItemInfo(this.user, sisyutuItemCode).build();
 	}
@@ -117,7 +119,7 @@ public class ExpenditureItemInfoManageController {
 	 */
 	@PostMapping(value = "/updateload/", params = "actionAdd")
 	public ModelAndView postActionAddLoad(@RequestParam("sisyutuItemCode") String sisyutuItemCode) {
-		log.debug("postActionAddLoad:sisyutuItemCode=" + sisyutuItemCode);
+		log.debug("postActionAddLoad: sisyutuItemCode=" + sisyutuItemCode);
 		return this.usecase.readAddExpenditureItemInfo(this.user, sisyutuItemCode).build();
 	}
 	
@@ -131,7 +133,7 @@ public class ExpenditureItemInfoManageController {
 	 */
 	@PostMapping(value="/updateload/", params = "actionUpdate")
 	public ModelAndView postActionUpdateLoad(@RequestParam("sisyutuItemCode") String sisyutuItemCode) {
-		log.debug("postActionUpdateLoad:sisyutuItemCode=" + sisyutuItemCode);
+		log.debug("postActionUpdateLoad: sisyutuItemCode=" + sisyutuItemCode);
 		return this.usecase.readUpdateExpenditureItemInfo(this.user, sisyutuItemCode).build();
 	}
 	
@@ -155,12 +157,14 @@ public class ExpenditureItemInfoManageController {
 	 *</pre>
 	 * @param inputForm 入力フォーム情報
 	 * @param bindingResult フォームのバリデーションチェック結果
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
 	 * @return 登録成功時：リダイレクト、登録失敗時:情報管理(支出項目)更新画面
 	 *
 	 */
 	@PostMapping("/update/")
-	public ModelAndView postUpdate(@ModelAttribute @Validated ExpenditureItemInfoForm inputForm, BindingResult bindingResult) {
-		log.debug("postUpdate:input=" + inputForm);
+	public ModelAndView postUpdate(@ModelAttribute @Validated ExpenditureItemInfoForm inputForm, BindingResult bindingResult,
+			RedirectAttributes redirectAttributes) {
+		log.debug("postUpdate: input=" + inputForm);
 		/* 入力フィールドのバリデーションチェック結果を判定 */
 		// チェック結果エラーの場合
 		if(bindingResult.hasErrors()) {
@@ -175,7 +179,7 @@ public class ExpenditureItemInfoManageController {
 				return ExpenditureItemInfoManageUpdateResponse.buildBindingError("予期しないエラーが発生しました。管理者に問い合わせてください。[key=action]");
 			// actionに従い、処理を実行
 			} else {
-				return this.usecase.execAction(this.user, inputForm).buildRedirect();
+				return this.usecase.execAction(this.user, inputForm).buildRedirect(redirectAttributes);
 			}
 		}
 	}
@@ -184,12 +188,13 @@ public class ExpenditureItemInfoManageController {
 	 *<pre>
 	 * 支出項目情報登録・更新完了後のリダイレクト(Get要求時)のマッピングです。
 	 *</pre>
+	 * @param redirectMessages リダイレクト元から引き継いだメッセージ
 	 * @return 情報管理(支出項目)の対象選択画面
 	 *
 	 */
 	@GetMapping("/updateComplete/")
-	public ModelAndView updateComplete() {
-		log.debug("updateComplete:");
-		return this.usecase.readInitInfo(this.user).buildComplete();
+	public ModelAndView updateComplete(@ModelAttribute CompleteRedirectMessages redirectMessages) {
+		log.debug("updateComplete: input=" + redirectMessages);
+		return this.usecase.readInitInfo(this.user).buildComplete(redirectMessages);
 	}
 }

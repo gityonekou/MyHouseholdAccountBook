@@ -75,7 +75,7 @@ public class SisyutuKingakuB {
 	 */
 	public String toSisyutuKingakuBString() {
 		// スケール0で四捨五入+カンマ編集した文字列を返却
-		return DomainCommonUtils.formatKingaku(value);
+		return DomainCommonUtils.formatKingakuAndYen(value);
 	}
 	
 	/**

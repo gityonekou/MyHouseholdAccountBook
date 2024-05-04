@@ -194,7 +194,7 @@ public class AdminMenuBaseInfoUseCase {
 		
 		// 読み込みデータを指定のテーブル出力ドメインを用いてDB出力する
 		if(!response.isErrorResponse()) {
-		
+			
 			// 登録されているテーブルキーの数分データ出力を繰り返す
 			for(String key : tableDataMap.keySet()) {
 				
@@ -216,11 +216,12 @@ public class AdminMenuBaseInfoUseCase {
 									);
 							log.debug("SISYUTU_ITEM_BASE_TABLE:addData=" + addData);
 							// データを追加
-							int addCount = sisyutuItemBaseTableRepository.add(addData);
+							int count = sisyutuItemBaseTableRepository.add(addData);
 							// 追加件数が1件以上の場合、業務エラー
-							if(addCount != 1) {
+							if(count != 1) {
 								throw new MyHouseholdAccountBookRuntimeException("支出項目テーブル(BASE)への追加件数が不正でした。[add data:" + addData + "]");
 							}
+							
 						});
 						break;
 						
@@ -231,9 +232,9 @@ public class AdminMenuBaseInfoUseCase {
 							ShopBase addData = ShopBase.from(dataItems[0], dataItems[1]);
 							log.debug("SHOP_BASE_TABLE:addData=" + addData);
 							// データを追加
-							int addCount = shopBaseTableRepository.add(addData);
+							int count = shopBaseTableRepository.add(addData);
 							// 追加件数が1件以上の場合、業務エラー
-							if(addCount != 1) {
+							if(count != 1) {
 								throw new MyHouseholdAccountBookRuntimeException("店舗テーブル(BASE)への追加件数が不正でした。[add data:" + addData + "]");
 							}
 						});
@@ -244,6 +245,9 @@ public class AdminMenuBaseInfoUseCase {
 					default :	
 				}
 			}
+			// 完了メッセージ
+			response.addMessage("データを登録しました。");
+			
 			// 正常終了
 			response.setTransactionSuccessFull();
 		}

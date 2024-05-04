@@ -31,26 +31,26 @@
 					<div class="card-body">
 						<p class="h6">■選択商品詳細■</p>
 						<div class="mb-3">
-							<label class="form-label">支出項目名：飲食日用品＞日用消耗品＞キッチン用品</label>
+							<label class="form-label">支出項目名：<span th:text="*{sisyutuItemName}"></span></label>
 						</div>
 						<div class="mb-3">
-							<label for="name" class="form-label">品名：調理器具の商品</label>
+							<label for="name" class="form-label">商品区分名：<span th:text="*{shoppingItemKubunName}"></span></label>
 						</div>
 						<div class="mb-3">
-							<label for="name" class="form-label">商品名：テスト商品AAAの名前</label>
+							<label for="name" class="form-label">商品名：<span th:text="*{shoppingItemName}"></span></label>
 						</div>
 						<div class="mb-3">
-							<label for="name" class="form-label">会社名：テスト商品AAAの製造会社名</label>
+							<label for="name" class="form-label">会社名：<span th:text="*{companyName}"></span></label>
 						</div>
 						<div class="mb-3">
 							<label for="tooltip" class="form-label">商品詳細：</label>
-							<p class="card-text"><span>　<span>★包丁などとあわせて、調理器具に変更でよい？？　鍋・フライパン・電子レンジ加熱皿</p>
+							<p class="card-text"><span>　<span><span th:text="*{shoppingItemDetailContext}"></span></p>
 						</div>
 						<div class="mb-3">
 							<button class="btn btn-primary" name="actionAdd" type="submit">コピーして商品を新規追加</button>
 							<button class="btn btn-primary" name="actionUpdate" type="submit">更新</button>
 							<button class="btn btn-primary" name="actionCancel" type="submit">キャンセル</button>
-							<input type="hidden" name="shoppingItemCode" value="99999" />
+							<input type="hidden" th:field="*{shoppingItemCode}" />
 						</div>
 					</div>
 					</form>
@@ -59,7 +59,6 @@
 			
 			<!-- 商品名検索・検索結果一覧表示エリア -->
 			<div class="card-body">
-			
 				<div class="card">
 				
 					<!-- 商品名検索条件入力エリア -->
@@ -70,7 +69,7 @@
 							<label class="form-label">検索対象</label>
 							<div class="col-auto border">
 								<input type="radio" name="UserStatusRadios" class="form-check-input" id="userstatusA">
-								<label class="form-check-label" for="userstatusA">：品名&emsp;</label>
+								<label class="form-check-label" for="userstatusA">：商品区分名&emsp;</label>
 								<input type="radio" name="UserStatusRadios" class="form-check-input" id="userstatusB" checked>
 								<label class="form-check-label" for="userstatusB">：商品名&emsp;</label>
 								<input type="radio" name="UserStatusRadios" class="form-check-input" id="userstatusC">
@@ -89,42 +88,31 @@
 					
 					<!-- 商品名一覧表示エリア -->
 					<div class="card-body">
-						<p class="h6">ポテトチップス検索結果</p>
+						<p class="h6">検索結果：<span th:text="${searchResultNameValue}">検索結果名称</span></p>
 						<p class="card-text">対象の商品を選択してください。</p>
 						<table class="table table-sm table-bordered table-hover">
 							<thead>
 								<tr class="table-secondary">
+									<th scope="col" class="w15">商品区分名</th>
+									<th scope="col" class="w30">商品名</th>
 									<th scope="col" class="w15">支出項目名</th>
-									<th scope="col" class="w15">品名</th>
-									<th scope="col">商品名</th>
-									<th scope="col">会社名</th>
+									<th scope="col" class="w15">会社名</th>
+									<th scope="col" class="w15">基準店舗</th>
+									<th scope="col">基準価格</th>
 								</tr>
 							</thead>
 							<tbody>
-								<tr th:data-href="@{/myhacbook/managebaseinfo/shoppingiteminfo/select?shoppingItemCode=020202}">
-									<td>＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠</td>
-									<td>＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠</td>
-									<td>商品名</td>
-									<td>会社名</td>
+								<th:block th:each="item, itemStat : ${shoppingItemList}">
+								<th:block th:if="${itemStat.odd}"><tr th:data-href="@{/myhacbook/managebaseinfo/shoppingiteminfo/select(shoppingItemCode=${item.shoppingItemCode})}"></th:block>
+								<th:block th:if="${itemStat.even}"><tr class="table-warning" th:data-href="@{/myhacbook/managebaseinfo/shoppingiteminfo/select(shoppingItemCode=${item.shoppingItemCode})}"></th:block>
+									<td th:text="${item.shoppingItemKubunName}">商品区分名</td>
+									<td th:text="${item.shoppingItemName}">商品名</td>
+									<td th:text="${item.sisyutuItemName}">支出項目名</td>
+									<td th:text="${item.companyName}">会社名</td>
+									<td th:text="${item.standardShopName}">基準店舗</td>
+									<td th:text="${item.standardPrice}">基準価格</td>
 								</tr>
-								<tr class="table-warning" th:data-href="@{/myhacbook/managebaseinfo/shoppingiteminfo/select?shoppingItemCode=020202}">
-									<td>支出項目名</td>
-									<td>品名</td>
-									<td>商品名</td>
-									<td>会社名</td>
-								</tr>
-								<tr th:data-href="@{/myhacbook/managebaseinfo/shoppingiteminfo/select?shoppingItemCode=020202}">
-									<td>支出項目名</td>
-									<td>品名</td>
-									<td>商品名</td>
-									<td>会社名</td>
-								</tr>
-								<tr class="table-warning" th:data-href="@{/myhacbook/managebaseinfo/shoppingiteminfo/select?shoppingItemCode=020202}">
-									<td>支出項目名</td>
-									<td>品名</td>
-									<td>商品名</td>
-									<td>会社名</td>
-								</tr>
+								</th:block>
 							</tbody>
 						</table>
 					</div>

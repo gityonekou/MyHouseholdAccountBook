@@ -23,10 +23,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm;
 import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
+import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShopInfoManageResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -80,7 +82,7 @@ public class ShopInfoManageController {
 	 */
 	@GetMapping("/updateload")
 	public ModelAndView getTargetLoad(@RequestParam("shopCode") String shopCode) {
-		log.debug("getTargetLoad:shopCode=" + shopCode);
+		log.debug("getTargetLoad: shopCode=" + shopCode);
 		
 		// 店舗コード未設定の場合、エラー
 		if(StringUtils.hasLength(shopCode)) {
@@ -96,12 +98,14 @@ public class ShopInfoManageController {
 	 *</pre>
 	 * @param shopForm 入力フォーム情報
 	 * @param bindingResult フォームのバリデーションチェック結果
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
 	 * @return 情報管理(お店)画面
 	 *
 	 */
 	@PostMapping("/update/")
-	public ModelAndView postUpdate(@ModelAttribute @Validated ShopInfoForm shopForm, BindingResult bindingResult) {
-		log.debug("postUpdate:input=" + shopForm);
+	public ModelAndView postUpdate(@ModelAttribute @Validated ShopInfoForm shopForm, BindingResult bindingResult,
+			RedirectAttributes redirectAttributes) {
+		log.debug("postUpdate: input=" + shopForm);
 		/* 入力フィールドのバリデーションチェック結果を判定 */
 		// チェック結果エラーの場合
 		if(bindingResult.hasErrors()) {
@@ -117,7 +121,7 @@ public class ShopInfoManageController {
 				
 			// actionに従い、処理を実行
 			} else {
-				return this.usecase.execAction(this.user, shopForm).buildRedirect();
+				return this.usecase.execAction(this.user, shopForm).buildRedirect(redirectAttributes);
 			}
 		}
 		
@@ -127,12 +131,13 @@ public class ShopInfoManageController {
 	 *<pre>
 	 * お店情報登録・更新完了後のリダイレクト(Get要求時)のマッピングです。
 	 *</pre>
+	 * @param redirectMessages リダイレクト元から引き継いだメッセージ
 	 * @return 情報管理(お店)画面
 	 *
 	 */
 	@GetMapping("/updateComplete/")
-	public ModelAndView updateComplete() {
-		log.debug("updateComplete:");
-		return this.usecase.readShopInfo(this.user).buildComplete();
+	public ModelAndView updateComplete(@ModelAttribute CompleteRedirectMessages redirectMessages) {
+		log.debug("updateComplete: input=" + redirectMessages);
+		return this.usecase.readShopInfo(this.user).buildComplete(redirectMessages);
 	}
 }

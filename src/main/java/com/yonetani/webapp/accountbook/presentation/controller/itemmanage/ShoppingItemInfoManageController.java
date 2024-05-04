@@ -38,11 +38,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShoppingItemInfoManageUseCase;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoSearchForm;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
+import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageInitResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageSearchResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageUpdateResponse;
 
@@ -115,7 +118,7 @@ public class ShoppingItemInfoManageController {
 	 */
 	@PostMapping(value = "/search/", params = "search")
 	public ModelAndView postSearch(@ModelAttribute @Validated ShoppingItemInfoSearchForm inputForm, BindingResult bindingResult) {
-		log.debug("postSearchLoad:input=" + inputForm);
+		log.debug("postSearchLoad: input=" + inputForm);
 		/* 入力フィールドのバリデーションチェック結果を判定 */
 		// チェック結果エラーの場合
 		if(bindingResult.hasErrors()) {
@@ -123,7 +126,17 @@ public class ShoppingItemInfoManageController {
 			return ShoppingItemInfoManageSearchResponse.buildBindingError(inputForm);
 		// チェック結果OKの場合
 		} else {
-			return this.usecase.execSearch(this.user, inputForm).buildRedirect();
+			// 検索を実行
+			ShoppingItemInfoManageSearchResponse searchResult = this.usecase.execSearch(this.user, inputForm);
+			if(searchResult.isShoppingItemListEmpty()) {
+				// 検索結果なしの場合、初期表示画面に戻る
+				ShoppingItemInfoManageInitResponse initResponse = this.usecase.readInitInfo(this.user);
+				searchResult.getMessagesList().forEach(message -> initResponse.addMessage(message));
+				return initResponse.build();
+			} else {
+				// 検索結果ありの場合、検索結果表示画面に遷移
+				return searchResult.build();
+			}
 		}
 	}
 	
@@ -151,7 +164,7 @@ public class ShoppingItemInfoManageController {
 	 */
 	@GetMapping("/select")
 	public ModelAndView getActSelect(@RequestParam("shoppingItemCode") String shoppingItemCode) {
-		log.debug("getSelectShoppingItem:shoppingItemCode=" + shoppingItemCode);
+		log.debug("getSelectShoppingItem: shoppingItemCode=" + shoppingItemCode);
 		return this.usecase.readActSelectItemInfo(this.user, shoppingItemCode).build();
 	}
 	
@@ -165,7 +178,7 @@ public class ShoppingItemInfoManageController {
 	 */
 	@GetMapping("/addload")
 	public ModelAndView getAddLoad(@RequestParam("sisyutuItemCode") String sisyutuItemCode) {
-		log.debug("getAddLoad:sisyutuItemCode=" + sisyutuItemCode);
+		log.debug("getAddLoad: sisyutuItemCode=" + sisyutuItemCode);
 		return this.usecase.readAddShoppingItemInfoBySisyutuItem(this.user, sisyutuItemCode).build();
 	}
 	
@@ -179,8 +192,19 @@ public class ShoppingItemInfoManageController {
 	 */
 	@GetMapping("/searchbysisyutuitem")
 	public ModelAndView getSearchBySisyutuItem(@RequestParam("sisyutuItemCode") String sisyutuItemCode) {
-		log.debug("getSearchBySisyutuItem:sisyutuItemCode=" + sisyutuItemCode);
-		return this.usecase.execSearchBySisyutuItem(this.user, sisyutuItemCode).build();
+		log.debug("getSearchBySisyutuItem: sisyutuItemCode=" + sisyutuItemCode);
+		
+		// 検索を実行
+		ShoppingItemInfoManageSearchResponse searchResult = this.usecase.execSearchBySisyutuItem(this.user, sisyutuItemCode);
+		if(searchResult.isShoppingItemListEmpty()) {
+			// 検索結果なしの場合、初期表示画面に戻る
+			ShoppingItemInfoManageInitResponse initResponse = this.usecase.readInitInfo(this.user);
+			searchResult.getMessagesList().forEach(message -> initResponse.addMessage(message));
+			return initResponse.build();
+		} else {
+			// 検索結果ありの場合、検索結果表示画面に遷移
+			return searchResult.build();
+		}
 	}
 	
 	/**
@@ -193,7 +217,7 @@ public class ShoppingItemInfoManageController {
 	 */
 	@PostMapping(value = "/updateload/", params = "actionAdd")
 	public ModelAndView postActionAddLoad(@RequestParam("shoppingItemCode") String shoppingItemCode) {
-		log.debug("postActionAddLoad:shoppingItemCode=" + shoppingItemCode);
+		log.debug("postActionAddLoad: shoppingItemCode=" + shoppingItemCode);
 		return this.usecase.readAddShoppingItemInfoByShoppingItem(this.user, shoppingItemCode).build();
 	}
 	
@@ -207,7 +231,7 @@ public class ShoppingItemInfoManageController {
 	 */
 	@PostMapping(value="/updateload/", params = "actionUpdate")
 	public ModelAndView postActionUpdateLoad(@RequestParam("shoppingItemCode") String shoppingItemCode) {
-		log.debug("postActionUpdateLoad:shoppingItemCode=" + shoppingItemCode);
+		log.debug("postActionUpdateLoad: shoppingItemCode=" + shoppingItemCode);
 		return this.usecase.readUpdateShoppingItemInfo(this.user, shoppingItemCode).build();
 	}
 	
@@ -231,12 +255,14 @@ public class ShoppingItemInfoManageController {
 	 *</pre>
 	 * @param inputForm 入力フォーム情報
 	 * @param bindingResult フォームのバリデーションチェック結果
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
 	 * @return 登録成功時：リダイレクト、登録失敗時:情報管理(商品)更新画面
 	 *
 	 */
 	@PostMapping("/update/")
-	public ModelAndView postUpdate(@ModelAttribute @Validated ShoppingItemInfoUpdateForm inputForm, BindingResult bindingResult) {
-		log.debug("postUpdate:input=" + inputForm);
+	public ModelAndView postUpdate(@ModelAttribute @Validated ShoppingItemInfoUpdateForm inputForm, BindingResult bindingResult,
+			RedirectAttributes redirectAttributes) {
+		log.debug("postUpdate: input=" + inputForm);
 		/* 入力フィールドのバリデーションチェック結果を判定 */
 		// チェック結果エラーの場合
 		if(bindingResult.hasErrors()) {
@@ -251,7 +277,7 @@ public class ShoppingItemInfoManageController {
 				return ShoppingItemInfoManageUpdateResponse.buildBindingError("予期しないエラーが発生しました。管理者に問い合わせてください。[key=action]");
 			// actionに従い、処理を実行
 			} else {
-				return this.usecase.execAction(this.user, inputForm).buildRedirect();
+				return this.usecase.execAction(this.user, inputForm).buildRedirect(redirectAttributes);
 			}
 		}
 	}
@@ -260,12 +286,13 @@ public class ShoppingItemInfoManageController {
 	 *<pre>
 	 * 商品情報登録・更新完了後のリダイレクト(Get要求時)のマッピングです。
 	 *</pre>
+	 * @param redirectMessages リダイレクト元から引き継いだメッセージ
 	 * @return 情報管理(商品)初期表示画面
 	 *
 	 */
 	@GetMapping("/updateComplete/")
-	public ModelAndView updateComplete() {
-		log.debug("updateComplete:");
-		return this.usecase.readInitInfo(this.user).buildComplete();
+	public ModelAndView updateComplete(@ModelAttribute CompleteRedirectMessages redirectMessages) {
+		log.debug("updateComplete: input=" + redirectMessages);
+		return this.usecase.readInitInfo(this.user).buildComplete(redirectMessages);
 	}
 }

@@ -12,7 +12,9 @@ package com.yonetani.webapp.accountbook.presentation.response.fw;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -95,7 +97,7 @@ public abstract class AbstractResponse {
 	 * @return
 	 *
 	 */
-	public List<String> getdMessagesList() {
+	public List<String> getMessagesList() {
 		return messages;
 	}
 	
@@ -164,9 +166,16 @@ public abstract class AbstractResponse {
 	 * @return 画面返却データのModelAndView
 	 *
 	 */
-	public final ModelAndView buildRedirect() {
+	public final ModelAndView buildRedirect(RedirectAttributes redirectAttributes) {
 		if(isTransactionSuccessFull()) {
+			// メッセージをフラッシュスコープに設定
+			CompleteRedirectMessages redirectMessages = new CompleteRedirectMessages();
+			redirectMessages.setRedirectMessages(messages);
+			redirectAttributes.addFlashAttribute(redirectMessages);
+			
+			// リダイレクト
 			return new ModelAndView(getRedirectUrl());
+			
 		} else {
 			return build();
 		}
@@ -175,13 +184,17 @@ public abstract class AbstractResponse {
 	/**
 	 *<pre>
 	 * リダイレクト後の画面返却データのModelAndViewを生成して返します。
-	 * 画面表示メッセージは共通で「処理が正常に完了しました。」となります。
+	 * 
 	 *</pre>
+	 * @param redirectMessages リダイレクト元から引き継いだメッセージ
 	 * @return 画面返却データのModelAndView
 	 *
 	 */
-	public ModelAndView buildComplete() {
-		addMessage("処理が正常に完了しました。");
+	public ModelAndView buildComplete(CompleteRedirectMessages redirectMessages) {
+		// リダイレクト元から引き継いだメッセージを画面表示メッセージに設定
+		if(!CollectionUtils.isEmpty(redirectMessages.getRedirectMessages())) {
+			redirectMessages.getRedirectMessages().forEach(data -> addMessage(data));
+		}
 		return build();
 	}
 }

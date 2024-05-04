@@ -366,6 +366,9 @@ public class ExpenditureItemInfoManageUseCase {
 				updateAllSisyutuItemSort(parentMemberList, func, +1);	
 				
 			}
+			
+			// 完了メッセージ
+			response.addMessage("新規支出項目を追加しました。[code:" + addData.getSisyutuItemCode() + "]" + addData.getSisyutuItemName());
 					
 		// 更新の場合
 		} else if (inputForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
@@ -469,6 +472,9 @@ public class ExpenditureItemInfoManageUseCase {
 					updateAllSisyutuItemSort(parentMemberList, func, +1);
 				}
 			}
+			
+			// 完了メッセージ
+			response.addMessage("支出項目を更新しました。[code:" + updateData.getSisyutuItemCode() + "]" + updateData.getSisyutuItemName());
 			
 		// 新規登録・更新アクション以外の場合
 		} else {
