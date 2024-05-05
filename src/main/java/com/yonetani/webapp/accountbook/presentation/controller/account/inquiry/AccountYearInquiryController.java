@@ -22,9 +22,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.inquiry.AccountYearInquiryUseCase;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.YearInquiryForm;
-import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearMageInquiryResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearMeisaiInquiryResponse;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -50,8 +50,8 @@ public class AccountYearInquiryController {
 	
 	// usecase
 	private final AccountYearInquiryUseCase usecasee;
-	// UserSession
-	private final UserSession user;
+	// ログインユーザセッションBean
+	private final LoginUserSession loginUserSession;
 	
 	/**
 	 *<pre>
@@ -70,9 +70,14 @@ public class AccountYearInquiryController {
 	public ModelAndView postAccountYearMage(@ModelAttribute @Validated YearInquiryForm target, BindingResult bindingResult) {
 		log.debug("postAccountYearMage:target="+ target);
 		if(bindingResult.hasErrors()) {
-			return AccountYearMageInquiryResponse.buildBindingError(target);
+			return AccountYearMageInquiryResponse.buildBindingError(loginUserSession.getLoginUserInfo(), target);
 		} else {
-			return this.usecasee.readMage(this.user, target).build();
+			// 画面表示データを読込
+			return this.usecasee.readMage(loginUserSession.getLoginUserInfo(), target)
+					// レスポンスにログインユーザ名を設定
+					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					// レスポンスからModelAndViewを生成
+					.build();
 		}
 	}
 	
@@ -93,9 +98,14 @@ public class AccountYearInquiryController {
 	public ModelAndView postAccountYearMeisai(@ModelAttribute @Validated YearInquiryForm target, BindingResult bindingResult) {
 		log.debug("postAccountYearMeisai:target="+ target);
 		if(bindingResult.hasErrors()) {
-			return AccountYearMeisaiInquiryResponse.buildBindingError(target);
+			return AccountYearMeisaiInquiryResponse.buildBindingError(loginUserSession.getLoginUserInfo(), target);
 		} else {
-			return this.usecasee.readMeisai(this.user, target).build();
+			// 画面表示データを読込
+			return this.usecasee.readMeisai(loginUserSession.getLoginUserInfo(), target)
+					// レスポンスにログインユーザ名を設定
+					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					// レスポンスからModelAndViewを生成
+					.build();
 		}
 	}
 }

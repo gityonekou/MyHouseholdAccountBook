@@ -32,9 +32,9 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSortBetweenAB;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm;
-import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShopInfoManageResponse;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -70,7 +70,7 @@ public class ShopInfoManageUseCase {
 	 * @return 情報管理(お店)画面の表示情報
 	 *
 	 */
-	public ShopInfoManageResponse readShopInfo(UserSession user) {
+	public ShopInfoManageResponse readShopInfo(LoginUserInfo user) {
 		log.debug("readShopInfo:userid=" + user.getUserId());
 		
 		// 店舗のコードテーブル情報を取得し、リストに設定
@@ -111,7 +111,7 @@ public class ShopInfoManageUseCase {
 	 * @return 情報管理(お店)画面の表示情報
 	 *
 	 */
-	public ShopInfoManageResponse readShopInfo(UserSession user, String shopCode) {
+	public ShopInfoManageResponse readShopInfo(LoginUserInfo user, String shopCode) {
 		log.debug("readShopInfo:userid=" + user.getUserId() + ",shopCode=" + shopCode);
 		
 		// 店舗一覧情報を取得
@@ -151,7 +151,7 @@ public class ShopInfoManageUseCase {
 	 *
 	 */
 	@Transactional
-	public ShopInfoManageResponse execAction(UserSession user, ShopInfoForm shopForm) {
+	public ShopInfoManageResponse execAction(LoginUserInfo user, ShopInfoForm shopForm) {
 		log.debug("execAction:userid=" + user.getUserId() + ",shopForm=" + shopForm);
 		ShopInfoManageResponse response = ShopInfoManageResponse.getInstance(null);
 		

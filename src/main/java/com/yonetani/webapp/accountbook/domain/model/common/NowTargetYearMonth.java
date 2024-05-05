@@ -17,7 +17,6 @@ import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 /**
  *<pre>
@@ -34,9 +33,6 @@ import lombok.Setter;
 public class NowTargetYearMonth {
 	// 年月
 	private final TargetYearMonth yearMonth;
-	// エラー時のメッセージ
-	@Setter
-	private String message;
 	
 	/**
 	 *<pre>

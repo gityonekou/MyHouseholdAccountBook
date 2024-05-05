@@ -12,6 +12,7 @@ package com.yonetani.webapp.accountbook.presentation.response.itemmanage;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoSearchForm;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -44,13 +45,18 @@ public class ShoppingItemInfoManageSearchResponse extends AbstractShoppingItemIn
 	 *<pre>
 	 * バリデーションチェックを行った入力フォームの値から画面返却データのModelAndViewを生成して返します。
 	 *</pre>
+	 * @param loginUserInfo ログインユーザ情報
 	 * @param inputForm バリデーションチェックを行った入力フォームの値
 	 * @return 画面返却データのModelAndView
 	 *
 	 */
-	public static ModelAndView buildBindingError(ShoppingItemInfoSearchForm inputForm) {
+	public static ModelAndView buildBindingError(LoginUserInfo loginUserInfo, ShoppingItemInfoSearchForm inputForm) {
 		ShoppingItemInfoManageSearchResponse response = ShoppingItemInfoManageSearchResponse.getInstance();
+		// ログインユーザ名を設定
+		response.setLoginUserName(loginUserInfo.getUserName());
+		// 入力フォームの値を設定
 		response.setShoppingItemInfoSearchForm(inputForm);
+		// レスポンスからModelAndViewを生成
 		return response.build();
 	}
 	

@@ -39,16 +39,26 @@ public interface AccountBookUserRepository {
 	 * 指定したユーザIDに対応する現在の対象年・月の値を取得します。
 	 *</pre>
 	 * @param searchQuery 検索条件(ユーザID)
-	 * @return ユーザ情報
+	 * @return ユーザIDに対応する現在の対象年・月の値
 	 *
 	 */
 	NowTargetYearMonth getNowTargetYearMonth(SearchQueryUserId searchQuery);
 	
 	/**
 	 *<pre>
+	 * 指定したユーザIDに対応するユーザ情報を取得します。
+	 *</pre>
+	 * @param searchQuery 検索条件(ユーザID)
+	 * @return 家計簿利用ユーザ情報
+	 *
+	 */
+	AccountBookUser getUserInfo(SearchQueryUserId searchQuery);
+	
+	/**
+	 *<pre>
 	 * 現在設定されている有効なすべての家計簿利用ユーザ情報を取得します。
 	 *</pre>
-	 * @return 家計簿利用ユーザ情報
+	 * @return 家計簿利用ユーザ情報のリスト情報
 	 *
 	 */
 	AccountBookAllUsers getAllUsers();

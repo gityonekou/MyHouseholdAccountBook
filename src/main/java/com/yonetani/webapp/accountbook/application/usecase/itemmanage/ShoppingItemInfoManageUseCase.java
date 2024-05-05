@@ -45,7 +45,6 @@ import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoSearchForm;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoUpdateForm;
-import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractExpenditureItemInfoManageResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractShoppingItemInfoManageSearchResponse;
@@ -54,6 +53,7 @@ import com.yonetani.webapp.accountbook.presentation.response.itemmanage.Shopping
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageInitResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageSearchResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageUpdateResponse;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -103,7 +103,7 @@ public class ShoppingItemInfoManageUseCase {
 	 * @return 情報管理(商品) 初期表示画面の表示情報
 	 *
 	 */
-	public ShoppingItemInfoManageInitResponse readInitInfo(UserSession user) {
+	public ShoppingItemInfoManageInitResponse readInitInfo(LoginUserInfo user) {
 		log.debug("readInitInfo:userid=" + user.getUserId());
 		// レスポンス
 		ShoppingItemInfoManageInitResponse response = ShoppingItemInfoManageInitResponse.getInstance();
@@ -148,7 +148,7 @@ public class ShoppingItemInfoManageUseCase {
 	 * @return 情報管理(商品)の商品検索画面情報
 	 *
 	 */
-	public ShoppingItemInfoManageSearchResponse execSearch(UserSession user, ShoppingItemInfoSearchForm inputForm) {
+	public ShoppingItemInfoManageSearchResponse execSearch(LoginUserInfo user, ShoppingItemInfoSearchForm inputForm) {
 		log.debug("execSearch:userid=" + user.getUserId() + ",inputForm=" + inputForm);
 		
 		// レスポンスを生成
@@ -167,7 +167,7 @@ public class ShoppingItemInfoManageUseCase {
 	 * @return 情報管理(商品)処理選択画面の表示情報
 	 *
 	 */
-	public ShoppingItemInfoManageActSelect readActSelectItemInfo(UserSession user, String shoppingItemCode) {
+	public ShoppingItemInfoManageActSelect readActSelectItemInfo(LoginUserInfo user, String shoppingItemCode) {
 		log.debug("readActSelectItemInfo:userid=" + user.getUserId() + ",shoppingItemCode=" + shoppingItemCode);
 		
 		// 選択した商品コードに対応する商品情報を取得
@@ -212,7 +212,7 @@ public class ShoppingItemInfoManageUseCase {
 	 * @return 情報管理(商品)の更新画面情報
 	 *
 	 */
-	public ShoppingItemInfoManageUpdateResponse readAddShoppingItemInfoBySisyutuItem(UserSession user,
+	public ShoppingItemInfoManageUpdateResponse readAddShoppingItemInfoBySisyutuItem(LoginUserInfo user,
 			String sisyutuItemCode) {
 		log.debug("readAddShoppingItemInfoBySisyutuItem:userid=" + user.getUserId() + ",sisyutuItemCode=" + sisyutuItemCode);
 		
@@ -245,7 +245,7 @@ public class ShoppingItemInfoManageUseCase {
 	 * @return 情報管理(商品)の商品検索画面情報
 	 *
 	 */
-	public ShoppingItemInfoManageSearchResponse execSearchBySisyutuItem(UserSession user, String sisyutuItemCode) {
+	public ShoppingItemInfoManageSearchResponse execSearchBySisyutuItem(LoginUserInfo user, String sisyutuItemCode) {
 		log.debug("execSearchBySisyutuItem:userid=" + user.getUserId() + ",sisyutuItemCode=" + sisyutuItemCode);
 		
 		// レスポンスを生成
@@ -278,7 +278,7 @@ public class ShoppingItemInfoManageUseCase {
 	 * @return 情報管理(商品)の更新画面情報
 	 *
 	 */
-	public ShoppingItemInfoManageUpdateResponse readAddShoppingItemInfoByShoppingItem(UserSession user,
+	public ShoppingItemInfoManageUpdateResponse readAddShoppingItemInfoByShoppingItem(LoginUserInfo user,
 			String shoppingItemCode) {
 		log.debug("readAddShoppingItemInfoByShoppingItem:userid=" + user.getUserId() + ",shoppingItemCode=" + shoppingItemCode);
 		
@@ -330,7 +330,7 @@ public class ShoppingItemInfoManageUseCase {
 	 * @return 情報管理(商品)の更新画面情報(商品更新時)
 	 *
 	 */
-	public ShoppingItemInfoManageUpdateResponse readUpdateShoppingItemInfo(UserSession user, String shoppingItemCode) {
+	public ShoppingItemInfoManageUpdateResponse readUpdateShoppingItemInfo(LoginUserInfo user, String shoppingItemCode) {
 		log.debug("readUpdateShoppingItemInfo:userid=" + user.getUserId() + ",shoppingItemCode=" + shoppingItemCode);
 		
 		// 基準店舗選択ボックス表示情報を設定したレスポンスを生成
@@ -383,7 +383,7 @@ public class ShoppingItemInfoManageUseCase {
 	 *
 	 */
 	@Transactional
-	public ShoppingItemInfoManageUpdateResponse execAction(UserSession user, ShoppingItemInfoUpdateForm inputForm) {
+	public ShoppingItemInfoManageUpdateResponse execAction(LoginUserInfo user, ShoppingItemInfoUpdateForm inputForm) {
 		log.debug("execAction:userid=" + user.getUserId() + ",inputForm=" + inputForm);
 		
 		// レスポンスを生成
@@ -451,7 +451,7 @@ public class ShoppingItemInfoManageUseCase {
 	 * @return 情報管理(商品)の更新画面情報
 	 *
 	 */
-	public ShoppingItemInfoManageUpdateResponse readUpdateBindingErrorSetInfo(UserSession user,
+	public ShoppingItemInfoManageUpdateResponse readUpdateBindingErrorSetInfo(LoginUserInfo user,
 			ShoppingItemInfoUpdateForm inputForm) {
 		log.debug("readUpdateBindingErrorSetInfo:userid=" + user.getUserId() + ",inputForm=" + inputForm);
 		

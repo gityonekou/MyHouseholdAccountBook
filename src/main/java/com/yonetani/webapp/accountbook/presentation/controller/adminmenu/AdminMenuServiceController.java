@@ -33,6 +33,7 @@ import com.yonetani.webapp.accountbook.presentation.request.adminmenu.AdminMenuU
 import com.yonetani.webapp.accountbook.presentation.response.adminmenu.AdminMenuBaseInfoResponse;
 import com.yonetani.webapp.accountbook.presentation.response.adminmenu.AdminMenuUserInfoResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -63,6 +64,8 @@ public class AdminMenuServiceController {
 	private final AdminMenuBaseInfoUseCase baseInfoUseCase;
 	// admin usecase(ベース情報詳細表示)
 	private final AdminMenuBaseInfoDetailUseCase baseInfoDetailUseCase;
+	// ログインユーザセッションBean
+	private final LoginUserSession loginUserSession;
 	
 	/**
 	 *<pre>
@@ -89,7 +92,12 @@ public class AdminMenuServiceController {
 	@GetMapping("/userinfo/")
 	public ModelAndView getUserInfo() {
 		log.debug("getUserInfo:");
-		return this.userInfoUseCase.read().build();
+		// 画面表示データ読込
+		return this.userInfoUseCase.read()
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -104,9 +112,15 @@ public class AdminMenuServiceController {
 	public ModelAndView getUserInfo(@RequestParam(name = "userid") String userid) {
 		log.debug("getUserInfo: userid=" + userid);
 		if(StringUtils.hasLength(userid)) {
-			return this.userInfoUseCase.read(userid).build();
+			// 画面表示データを読込
+			return this.userInfoUseCase.read(userid)
+					// レスポンスにログインユーザ名を設定
+					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					// レスポンスからModelAndViewを生成
+					.build();
 		} else {
-			return AdminMenuUserInfoResponse.buildBindingError("予期しないエラーが発生しました。管理者に問い合わせてください。[key=userid]");
+			return AdminMenuUserInfoResponse.buildBindingError(loginUserSession.getLoginUserInfo(),
+					"予期しないエラーが発生しました。管理者に問い合わせてください。[key=userid]");
 		}
 	}
 	
@@ -128,7 +142,7 @@ public class AdminMenuServiceController {
 		/* 入力フィールドのバリデーションチェック結果を判定 */
 		// チェック結果エラーの場合
 		if(bindingResult.hasErrors()) {
-			return AdminMenuUserInfoResponse.buildBindingError(userForm);
+			return AdminMenuUserInfoResponse.buildBindingError(loginUserSession.getLoginUserInfo(), userForm);
 			
 		// チェック結果OKの場合
 		} else {
@@ -136,7 +150,10 @@ public class AdminMenuServiceController {
 			// actionが未設定の場合、予期しないエラー
 			if(!StringUtils.hasLength(userForm.getAction())) {
 				log.error("予期しないエラー actionのバリデーションチェックでエラー:action=" + userForm.getAction());
-				return AdminMenuUserInfoResponse.buildBindingError(userForm, "予期しないエラーが発生しました。管理者に問い合わせてください。[key=action]");
+				return AdminMenuUserInfoResponse.buildBindingError(
+						loginUserSession.getLoginUserInfo(),
+						userForm,
+						"予期しないエラーが発生しました。管理者に問い合わせてください。[key=action]");
 				
 			// actionに従い、処理を実行
 			} else {
@@ -156,7 +173,12 @@ public class AdminMenuServiceController {
 	@GetMapping("/completeUseraAdd/")
 	public ModelAndView completeUseraAdd(@ModelAttribute CompleteRedirectMessages redirectMessages) {
 		log.debug("completeUseraAdd: input=" + redirectMessages);
-		return this.userInfoUseCase.read().buildComplete(redirectMessages);
+		// 画面表示データ読込
+		return this.userInfoUseCase.read()
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.buildComplete(redirectMessages);
 	}
 	
 	/**
@@ -169,7 +191,12 @@ public class AdminMenuServiceController {
 	@GetMapping("/managebaseinfo/")
 	public ModelAndView getManageBaseInfo() {
 		log.debug("getManageBaseInfo:");
-		return this.baseInfoUseCase.read().build();
+		// 画面表示データ読込
+		return this.baseInfoUseCase.read()
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -193,11 +220,13 @@ public class AdminMenuServiceController {
 		if(bindingResult.hasErrors()) {
 			// ファイルアップロード(ベース情報データ)の入力チェックでエラーの場合
 			if(bindingResult.hasFieldErrors("baseInfoFile")) {
-				return AdminMenuBaseInfoResponse.buildBindingError(baseInfoFileForm,
+				return AdminMenuBaseInfoResponse.buildBindingError(
+						loginUserSession.getLoginUserInfo(),
+						baseInfoFileForm,
 						bindingResult.getFieldError("baseInfoFile").getDefaultMessage());
 			// 上記以外の場合
 			} else {
-				return AdminMenuBaseInfoResponse.buildBindingError(baseInfoFileForm);
+				return AdminMenuBaseInfoResponse.buildBindingError(loginUserSession.getLoginUserInfo(), baseInfoFileForm);
 			}
 
 		} else {
@@ -217,7 +246,12 @@ public class AdminMenuServiceController {
 	@GetMapping("/completeUploadBaseInfo/")
 	public ModelAndView completeUploadBaseInfo(@ModelAttribute CompleteRedirectMessages redirectMessages) {
 		log.debug("completeUploadBaseInfo: input=" + redirectMessages);
-		return this.baseInfoUseCase.read().buildComplete(redirectMessages);
+		// 画面表示データ読込
+		return this.baseInfoUseCase.read()
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.buildComplete(redirectMessages);
 	}
 	
 	/**
@@ -231,9 +265,15 @@ public class AdminMenuServiceController {
 	public ModelAndView getBaseInfoDetail(@RequestParam(name = "target") String target) {
 		log.debug("getBaseInfoDetail: target=" + target);
 		if(StringUtils.hasLength(target)) {
-			return this.baseInfoDetailUseCase.read(target).build();
+			// 画面表示データ読込
+			return this.baseInfoDetailUseCase.read(target)
+					// レスポンスにログインユーザ名を設定
+					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					// レスポンスからModelAndViewを生成
+					.build();
 		} else {
-			return AdminMenuBaseInfoResponse.buildBindingError("予期しないエラーが発生しました。管理者に問い合わせてください。[key=target]");
+			return AdminMenuBaseInfoResponse.buildBindingError(
+					loginUserSession.getLoginUserInfo(), "予期しないエラーが発生しました。管理者に問い合わせてください。[key=target]");
 		}
 	}
 }

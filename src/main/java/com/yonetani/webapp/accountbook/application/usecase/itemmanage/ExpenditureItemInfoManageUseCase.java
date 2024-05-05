@@ -32,12 +32,12 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuItemTableRepository;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ExpenditureItemInfoForm;
-import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractExpenditureItemInfoManageResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ExpenditureItemInfoManageActSelectResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ExpenditureItemInfoManageInitResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ExpenditureItemInfoManageUpdateResponse;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -74,7 +74,7 @@ public class ExpenditureItemInfoManageUseCase {
 	 * @return 情報管理(支出項目) 対象選択画面の表示情報
 	 *
 	 */
-	public ExpenditureItemInfoManageInitResponse readInitInfo(UserSession user) {
+	public ExpenditureItemInfoManageInitResponse readInitInfo(LoginUserInfo user) {
 		log.debug("readExpenditureItemInfo:userid=" + user.getUserId());
 		// レスポンス生成
 		ExpenditureItemInfoManageInitResponse response = ExpenditureItemInfoManageInitResponse.getInstance();
@@ -94,7 +94,7 @@ public class ExpenditureItemInfoManageUseCase {
 	 * @return 情報管理(支出項目) 処理選択画面の表示情報
 	 *
 	 */
-	public ExpenditureItemInfoManageActSelectResponse readActSelectItemInfo(UserSession user, String sisyutuItemCode) {
+	public ExpenditureItemInfoManageActSelectResponse readActSelectItemInfo(LoginUserInfo user, String sisyutuItemCode) {
 		log.debug("readExpenditureItemInfo:userid=" + user.getUserId() + ",sisyutuItemCode=" + sisyutuItemCode);
 		// 支出項目コードの入力チェック
 		if(!StringUtils.hasLength(sisyutuItemCode)) {
@@ -158,7 +158,7 @@ public class ExpenditureItemInfoManageUseCase {
 	 * @return 情報管理(支出項目) 更新画面の表示情報(支出項目新規追加時)
 	 *
 	 */
-	public ExpenditureItemInfoManageUpdateResponse readAddExpenditureItemInfo(UserSession user, String sisyutuItemCode) {
+	public ExpenditureItemInfoManageUpdateResponse readAddExpenditureItemInfo(LoginUserInfo user, String sisyutuItemCode) {
 		log.debug("readAddExpenditureItemInfo:userid=" + user.getUserId() + ",sisyutuItemCode=" + sisyutuItemCode);
 		
 		// 支出項目コードチェックと支出項目一覧情報設定
@@ -229,7 +229,7 @@ public class ExpenditureItemInfoManageUseCase {
 	 * @return 情報管理(支出項目) 更新画面の表示情報(支出項目更新時)
 	 *
 	 */
-	public ExpenditureItemInfoManageUpdateResponse readUpdateExpenditureItemInfo(UserSession user, String sisyutuItemCode) {
+	public ExpenditureItemInfoManageUpdateResponse readUpdateExpenditureItemInfo(LoginUserInfo user, String sisyutuItemCode) {
 		log.debug("readUpdateExpenditureItemInfo:userid=" + user.getUserId() + ",sisyutuItemCode=" + sisyutuItemCode);
 		
 		// 支出項目コードチェックと支出項目一覧情報設定
@@ -270,7 +270,7 @@ public class ExpenditureItemInfoManageUseCase {
 	 * @return 情報管理(支出項目) 更新画面の表示情報
 	 *
 	 */
-	public ExpenditureItemInfoManageUpdateResponse readUpdateBindingErrorSetInfo(UserSession user, ExpenditureItemInfoForm inputForm) {
+	public ExpenditureItemInfoManageUpdateResponse readUpdateBindingErrorSetInfo(LoginUserInfo user, ExpenditureItemInfoForm inputForm) {
 		log.debug("readUpdateBindingErrorSetInfo:userid=" + user.getUserId() + ",inputForm=" + inputForm);
 		
 		// ログインユーザの支出項目一覧情報を取得しレスポンスに設定
@@ -311,7 +311,7 @@ public class ExpenditureItemInfoManageUseCase {
 	 *
 	 */
 	@Transactional
-	public ExpenditureItemInfoManageUpdateResponse execAction(UserSession user, ExpenditureItemInfoForm inputForm) {
+	public ExpenditureItemInfoManageUpdateResponse execAction(LoginUserInfo user, ExpenditureItemInfoForm inputForm) {
 		log.debug("execAction:userid=" + user.getUserId() + ",inputForm=" + inputForm);
 		
 		// レスポンス
@@ -499,7 +499,7 @@ public class ExpenditureItemInfoManageUseCase {
 	 * @return チェック結果(OKの場合、true、NGの場合、false
 	 *
 	 */
-	private boolean execCheckAndSetSisyutuItemInquiryList(UserSession user, String sisyutuItemCode, AbstractExpenditureItemInfoManageResponse response) {
+	private boolean execCheckAndSetSisyutuItemInquiryList(LoginUserInfo user, String sisyutuItemCode, AbstractExpenditureItemInfoManageResponse response) {
 		// 支出項目コードの入力チェック
 		if(!StringUtils.hasLength(sisyutuItemCode)) {
 			// 支出項目コードの入力チェックNGの場合エラー画面を表示
@@ -526,7 +526,7 @@ public class ExpenditureItemInfoManageUseCase {
 	 * @param response 支出項目一覧を設定するレスポンス
 	 *
 	 */
-	private void setSisyutuItemInquiryList(UserSession user, AbstractExpenditureItemInfoManageResponse response) {
+	private void setSisyutuItemInquiryList(LoginUserInfo user, AbstractExpenditureItemInfoManageResponse response) {
 		// ログインユーザの支出項目一覧情報を取得
 		SisyutuItemInquiryList sisyutuItemSearchResult = sisyutuItemRepository.findById(SearchQueryUserId.from(user.getUserId()));
 		if(sisyutuItemSearchResult.isEmpty()) {
@@ -557,7 +557,7 @@ public class ExpenditureItemInfoManageUseCase {
 	 * @param response 情報管理(支出項目) 更新画面の表示情報(レスポンス)
 	 *
 	 */
-	private void setParentMembers(UserSession user, SisyutuItem sisyutuItem,
+	private void setParentMembers(LoginUserInfo user, SisyutuItem sisyutuItem,
 			ExpenditureItemInfoManageUpdateResponse response) {
 		
 		// 親の支出項目名を設定
@@ -573,7 +573,7 @@ public class ExpenditureItemInfoManageUseCase {
 	 * @return 表示順選択リスト(可変配列)
 	 *
 	 */
-	private List<OptionItem> getParentMembersItemList(UserSession user, SisyutuItem sisyutuItem) {
+	private List<OptionItem> getParentMembersItemList(LoginUserInfo user, SisyutuItem sisyutuItem) {
 		/* 親に属する子のリストを作成し、表示順選択リストに設定 */
 		// 支出項目レベルが2以上の場合に親の支出項目に属する支出項目一覧を取得する
 		List<OptionItem> optionList = new ArrayList<>();
@@ -623,7 +623,7 @@ public class ExpenditureItemInfoManageUseCase {
 	 * @return 親の支出項目の名称を＞区切りで連結した値
 	 *
 	 */
-	private String getParentSisyutuItemName(UserSession user, SisyutuItem sisyutuItem) {
+	private String getParentSisyutuItemName(LoginUserInfo user, SisyutuItem sisyutuItem) {
 		
 		// 入力支出項目情報チェック(支出項目がレベル1の場合は、親が存在しないので空文字列を返す
 		if(sisyutuItem.getSisyutuItemLevel().getValue() <= 1) {

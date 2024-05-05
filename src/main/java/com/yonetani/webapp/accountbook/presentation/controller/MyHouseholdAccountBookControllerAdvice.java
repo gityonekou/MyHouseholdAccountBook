@@ -24,7 +24,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookException;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 /**
@@ -41,7 +44,11 @@ import lombok.extern.log4j.Log4j2;
  */
 @ControllerAdvice
 @Log4j2
+@RequiredArgsConstructor
 public class MyHouseholdAccountBookControllerAdvice {
+	
+	// ログインユーザセッションBean
+	private final LoginUserSession loginUserSession;
 	
     /**
      *<pre>
@@ -142,6 +149,12 @@ public class MyHouseholdAccountBookControllerAdvice {
 		model.addObject("errorMessage", ex.getLocalizedMessage());
 		DateTimeFormatter dateTimeFormat = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss SSS");
 		model.addObject("errorTimestamp", LocalDateTime.now().format(dateTimeFormat));
+		LoginUserInfo userInfo = loginUserSession.getLoginUserInfo();
+		if(userInfo != null) {
+			model.addObject("loginUserName", userInfo.getUserName());
+		} else {
+			model.addObject("loginUserName", "[null]");
+		}
 		model.setViewName("error");
 		return model;
 	}

@@ -23,8 +23,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.inquiry.AccountMonthInquiryUseCase;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.YearMonthInquiryForm;
-import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -50,9 +50,8 @@ public class AccountMonthInquiryController {
 
 	// usecase
 	private final AccountMonthInquiryUseCase usecase;
-	
-	// UserSession
-	private final UserSession user;
+	// ログインユーザセッションBean
+	private final LoginUserSession loginUserSession;
 	
 	/**
 	 *<pre>
@@ -64,7 +63,12 @@ public class AccountMonthInquiryController {
 	@GetMapping
 	public ModelAndView getInitAccountMonth() {
 		log.debug("getInitAccountMonth:");
-		return this.usecase.read(this.user).build();
+		// 画面表示データ読込
+		return this.usecase.read(loginUserSession.getLoginUserInfo())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -82,12 +86,14 @@ public class AccountMonthInquiryController {
 		log.debug("postAccountMonth:target="+ target);
 		
 		if(bindingResult.hasErrors()) {
-			return AccountMonthInquiryResponse.buildBindingError(target);
+			return AccountMonthInquiryResponse.buildBindingError(loginUserSession.getLoginUserInfo(), target);
 		} else {
-			return this.usecase.read(this.user, target).build();
+			// 画面表示情報読込
+			return this.usecase.read(loginUserSession.getLoginUserInfo(), target)
+					// レスポンスにログインユーザ名を設定
+					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					// レスポンスからModelAndViewを生成
+					.build();
 		}
-		
-		
 	}
-	
 }

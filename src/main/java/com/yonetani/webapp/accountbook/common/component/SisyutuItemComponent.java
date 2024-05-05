@@ -18,7 +18,7 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuItemTableRepository;
-import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -50,7 +50,7 @@ public class SisyutuItemComponent {
 	 * @return 支出項目の名称を＞区切りで連結した値 名称取得に失敗した場合はnullを返却
 	 *
 	 */
-	public String getSisyutuItemName(UserSession user, String sisyutuItemCode) {
+	public String getSisyutuItemName(LoginUserInfo user, String sisyutuItemCode) {
 		log.debug("getSisyutuItemName:sisyutuItemCode=" + sisyutuItemCode);
 		
 		// 指定した支出項目の存在チェック

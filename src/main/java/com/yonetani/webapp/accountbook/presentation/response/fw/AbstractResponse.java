@@ -33,7 +33,8 @@ public abstract class AbstractResponse {
 
 	// 画面に出力するメッセージ
 	private List<String> messages = new ArrayList<>();
-	
+	// ログインユーザ名
+	private String loginUserName;
 	// 処理結果
 	private boolean transactionSuccessFull = false;
 	
@@ -100,6 +101,18 @@ public abstract class AbstractResponse {
 	public List<String> getMessagesList() {
 		return messages;
 	}
+	/**
+	 *<pre>
+	 * レスポンスにログインユーザ名を設定します。
+	 *</pre>
+	 * @param loginUserName ログインユーザ名
+	 * @return このレスポンス
+	 *
+	 */
+	public AbstractResponse setLoginUserName(String loginUserName) {
+		this.loginUserName = loginUserName;
+		return this;
+	}
 	
 	/**
 	 *<pre>
@@ -113,6 +126,7 @@ public abstract class AbstractResponse {
 	protected ModelAndView createModelAndView(String viewName) {
 		ModelAndView modelAndView = new ModelAndView(viewName);
 		modelAndView.addObject("messages", messages);
+		modelAndView.addObject("loginUserName", loginUserName);
 		return modelAndView;
 	}
 	

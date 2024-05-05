@@ -54,20 +54,24 @@ public class AccountBookUserDataSource implements AccountBookUserRepository {
 			return NowTargetYearMonth.from(result.getNowTargetYear(), result.getNowTargetMonth());
 		}
 	}
-
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public AccountBookUser getUserInfo(SearchQueryUserId searchQuery) {
+		AccountBookUserDto result = mapper.selectUser(UserIdSearchQueryDto.from(searchQuery.getUserId().toString()));
+		return result != null ? createAccountBookUser(result) : null;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public AccountBookAllUsers getAllUsers() {
 		// 検索結果を取得
-		return AccountBookAllUsers.from(mapper.selectAllUsers().stream().map(dto ->
-			AccountBookUser.from(
-					dto.getUserId(),
-					dto.getNowTargetYear(),
-					dto.getNowTargetMonth(),
-					dto.getUserName())
-			).collect(Collectors.toUnmodifiableList()));
+		return AccountBookAllUsers.from(mapper.selectAllUsers().stream().map(dto -> createAccountBookUser(dto))
+				.collect(Collectors.toUnmodifiableList()));
 	}
 
 	/**
@@ -107,5 +111,24 @@ public class AccountBookUserDataSource implements AccountBookUserRepository {
 				// ユーザ名
 				userInfo.getUserName().toString());
 	}
-
+	
+	/**
+	 *<pre>
+	 * 引数で指定した家計簿利用ユーザテーブル:ACCOUNT_BOOK_USER出力情報から家計簿利用ユーザ情報ドメインモデルを生成して返します。
+	 *</pre>
+	 * @param dto 家計簿利用ユーザテーブル:ACCOUNT_BOOK_USER出力情報
+	 * @return 家計簿利用ユーザ情報ドメインモデル
+	 *
+	 */
+	private AccountBookUser createAccountBookUser(AccountBookUserDto dto) {
+		return AccountBookUser.from(
+				// ユーザID
+				dto.getUserId(),
+				// 現在の対象年
+				dto.getNowTargetYear(),
+				// 現在の対象月
+				dto.getNowTargetMonth(),
+				// ユーザ名
+				dto.getUserName());
+	}
 }

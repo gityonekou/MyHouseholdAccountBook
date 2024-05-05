@@ -20,6 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.YearInquiryForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -174,14 +175,17 @@ public class AccountYearMageInquiryResponse extends AbstractResponse {
 	 *<pre>
 	 * 入力値にエラーがある場合のレスポンス情報から画面返却データのModelAndViewを生成して返します。
 	 *</pre>
+	 * @param loginUserInfo ログインユーザ情報
 	 * @param target (form入力値:年)
 	 * @return 画面返却データのModelAndView
 	 *
 	 */
-	public static ModelAndView buildBindingError(YearInquiryForm target) {
+	public static ModelAndView buildBindingError(LoginUserInfo loginUserInfo, YearInquiryForm target) {
 		AccountYearMageInquiryResponse res = new AccountYearMageInquiryResponse();
 		// エラーメッセージを設定
 		res.addErrorMessage("リクエスト情報が不正です。管理者に問い合わせてください。key=YearInquiryForm");
+		// ログインユーザ名を設定
+		res.setLoginUserName(loginUserInfo.getUserName());
 		// 画面表示のModelとViewを生成
 		ModelAndView modelAndView = res.build();
 		// form入力情報をセット

@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.yonetani.webapp.accountbook.application.usecase.account.utils.AccountBookUserInquiryUseCase;
+import com.yonetani.webapp.accountbook.common.component.AccountBookUserInquiryUseCase;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountYearMeisaiInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenseInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
@@ -24,11 +24,11 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.AccountYearMeisaiInquiryRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenseInquiryRepository;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.YearInquiryForm;
-import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearMageInquiryResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearMageInquiryResponse.MageInquiryListItem;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearMeisaiInquiryResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearMeisaiInquiryResponse.MeisaiInquiryListItem;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -68,7 +68,7 @@ public class AccountYearInquiryUseCase {
 	 * @return 年間収支(マージ)情報
 	 *
 	 */
-	public AccountYearMageInquiryResponse readMage(UserSession user, YearInquiryForm request) {
+	public AccountYearMageInquiryResponse readMage(LoginUserInfo user, YearInquiryForm request) {
 		log.debug("read:userid=" + user.getUserId() + ",form=" + request);
 		
 		// レスポンスを生成
@@ -76,12 +76,7 @@ public class AccountYearInquiryUseCase {
 		
 		/* ユーザIDに対応する現在の対象年月の値を取得 */
 		NowTargetYearMonth yearMonth = userInquiry.getNowTargetYearMonth(user.getUserId());
-		if(yearMonth.isEmpty()) {
-			response.addMessage(yearMonth.getMessage());
-			return response;
-		} else {
-			response.setTargetYearMonth(yearMonth.getYearMonth().toString());
-		}
+		response.setTargetYearMonth(yearMonth.getYearMonth().toString());
 		
 		/* ユーザID,入力された対象年度を条件に年間収支(マージ)のリストを取得 */
 		// フォームオブジェクトからドメインオブジェクトに変換
@@ -142,7 +137,7 @@ public class AccountYearInquiryUseCase {
 	 * @return 年間収支(明細)情報
 	 *
 	 */
-	public AccountYearMeisaiInquiryResponse readMeisai(UserSession user, YearInquiryForm request) {
+	public AccountYearMeisaiInquiryResponse readMeisai(LoginUserInfo user, YearInquiryForm request) {
 		log.debug("read:userid=" + user.getUserId() + ",form=" + request);
 		
 		// レスポンスを生成
@@ -150,12 +145,7 @@ public class AccountYearInquiryUseCase {
 		
 		/* ユーザIDに対応する現在の対象年月の値を取得 */
 		NowTargetYearMonth yearMonth = userInquiry.getNowTargetYearMonth(user.getUserId());
-		if(yearMonth.isEmpty()) {
-			response.addMessage(yearMonth.getMessage());
-			return response;
-		} else {
-			response.setTargetYearMonth(yearMonth.getYearMonth().toString());
-		}
+		response.setTargetYearMonth(yearMonth.getYearMonth().toString());
 		
 		/* ユーザID,入力された対象年度を条件に年間収支(明細)のリストを取得 */
 		// フォームオブジェクトからドメインオブジェクトに変換

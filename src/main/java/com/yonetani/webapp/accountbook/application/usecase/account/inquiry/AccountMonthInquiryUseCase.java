@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.yonetani.webapp.accountbook.application.usecase.account.utils.AccountBookUserInquiryUseCase;
+import com.yonetani.webapp.accountbook.common.component.AccountBookUserInquiryUseCase;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureItemList;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenseInquiryItem;
 import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
@@ -24,9 +24,9 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.AccountMonthInquiryRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenseInquiryRepository;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.YearMonthInquiryForm;
-import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse.ExpenditureItem;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -63,7 +63,7 @@ public class AccountMonthInquiryUseCase {
 	 * @return 月間収支情報(レスポンス)
 	 *
 	 */
-	public AccountMonthInquiryResponse read(UserSession user) {
+	public AccountMonthInquiryResponse read(LoginUserInfo user) {
 		log.debug("read:userid=" + user.getUserId());
 		
 		// レスポンスを生成
@@ -71,20 +71,12 @@ public class AccountMonthInquiryUseCase {
 		
 		/* ユーザIDに対応する現在の対象年月の値を取得 */
 		NowTargetYearMonth yearMonth = userInquiry.getNowTargetYearMonth(user.getUserId());
-		if(yearMonth.isEmpty()) {
-			response.addMessage(yearMonth.getMessage());
-			return response;
-		} else {
-			response.setYearMonth(yearMonth.getYearMonth().toString());
-		}
+		response.setYearMonth(yearMonth.getYearMonth().toString());
 		
 		/* ユーザID,現在の対象年月を条件に支出項目のリストと収支金額を取得 */
 		// ユーザID,現在の対象年月をドメインオブジェクトに変換
-		SearchQueryUserIdAndYearMonth inquiryModel;
-		
-			inquiryModel = SearchQueryUserIdAndYearMonth.from(
+		SearchQueryUserIdAndYearMonth inquiryModel = SearchQueryUserIdAndYearMonth.from(
 					user.getUserId(), yearMonth.getYearMonth().toString());
-		
 		// 支出項目のリストと収支金額を取得
 		execRead(inquiryModel, response);
 		
@@ -100,7 +92,7 @@ public class AccountMonthInquiryUseCase {
 	 * @return 月間収支情報(レスポンス)
 	 *
 	 */
-	public AccountMonthInquiryResponse read(UserSession user, YearMonthInquiryForm request) {
+	public AccountMonthInquiryResponse read(LoginUserInfo user, YearMonthInquiryForm request) {
 		log.debug("read:userid=" + user.getUserId() + ",form=" + request);
 		
 		// レスポンスを生成

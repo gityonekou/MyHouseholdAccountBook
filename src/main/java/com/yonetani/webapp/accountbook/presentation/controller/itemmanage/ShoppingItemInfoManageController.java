@@ -1,6 +1,6 @@
 /**
  * 商品情報管理画面を担当するコントローラーです。
- * 商品情報管理画面は以下4つの画面で構成されていますが、そのすべての画面遷移を子のコントローラーで
+ * 商品情報管理画面は以下4つの画面で構成されていますが、そのすべての画面遷移をこのコントローラーで
  * 管理します。
  * ・情報管理(商品)初期表示画面:商品を登録する支出項目一覧、商品検索条件入力
  * ・情報管理(商品)検索結果画面
@@ -43,11 +43,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShoppingItemInfoManageUseCase;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoSearchForm;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoUpdateForm;
-import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageInitResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageSearchResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageUpdateResponse;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -55,7 +55,7 @@ import lombok.extern.log4j.Log4j2;
 /**
  *<pre>
  * 商品情報管理画面を担当するコントローラーです。
- * 商品情報管理画面は以下4つの画面で構成されていますが、そのすべての画面遷移を子のコントローラーで
+ * 商品情報管理画面は以下4つの画面で構成されていますが、そのすべての画面遷移をこのコントローラーで
  * 管理します。
  * ・情報管理(商品)初期表示画面:商品を登録する支出項目一覧、商品検索条件入力
  * ・情報管理(商品)検索結果画面
@@ -88,8 +88,8 @@ import lombok.extern.log4j.Log4j2;
 public class ShoppingItemInfoManageController {
 	// UseCase
 	private final ShoppingItemInfoManageUseCase usecase;
-	// UserSession
-	private final UserSession user;
+	// ログインユーザセッションBean
+	private final LoginUserSession loginUserSession;
 	
 	
 	/**
@@ -103,7 +103,12 @@ public class ShoppingItemInfoManageController {
 	@GetMapping("/initload/")
 	public ModelAndView getInitLoad() {
 		log.debug("getInitLoad:");
-		return this.usecase.readInitInfo(this.user).build();
+		// 画面表示データ読込
+		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -123,17 +128,25 @@ public class ShoppingItemInfoManageController {
 		// チェック結果エラーの場合
 		if(bindingResult.hasErrors()) {
 			// 初期表示情報を取得し、入力チェックエラーを設定
-			return ShoppingItemInfoManageSearchResponse.buildBindingError(inputForm);
+			return ShoppingItemInfoManageSearchResponse.buildBindingError(loginUserSession.getLoginUserInfo(), inputForm);
 		// チェック結果OKの場合
 		} else {
 			// 検索を実行
-			ShoppingItemInfoManageSearchResponse searchResult = this.usecase.execSearch(this.user, inputForm);
+			ShoppingItemInfoManageSearchResponse searchResult = this.usecase.execSearch(
+					loginUserSession.getLoginUserInfo(), inputForm);
 			if(searchResult.isShoppingItemListEmpty()) {
 				// 検索結果なしの場合、初期表示画面に戻る
-				ShoppingItemInfoManageInitResponse initResponse = this.usecase.readInitInfo(this.user);
+				// 画面表示情報を取得
+				ShoppingItemInfoManageInitResponse initResponse = this.usecase.readInitInfo(loginUserSession.getLoginUserInfo());
+				// エラーメッセージを引き継ぎ
 				searchResult.getMessagesList().forEach(message -> initResponse.addMessage(message));
+				// ログインユーザ名を設定
+				initResponse.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName());
+				// レスポンスからModelAndViewを生成
 				return initResponse.build();
 			} else {
+				// ログインユーザ名を設定
+				searchResult.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName());
 				// 検索結果ありの場合、検索結果表示画面に遷移
 				return searchResult.build();
 			}
@@ -151,7 +164,12 @@ public class ShoppingItemInfoManageController {
 	@PostMapping(value = "/search/", params = "searchCancel")
 	public ModelAndView postSearchCancel() {
 		log.debug("postSearchCancel:");
-		return this.usecase.readInitInfo(this.user).build();
+		// 画面表示情報を取得
+		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -165,7 +183,12 @@ public class ShoppingItemInfoManageController {
 	@GetMapping("/select")
 	public ModelAndView getActSelect(@RequestParam("shoppingItemCode") String shoppingItemCode) {
 		log.debug("getSelectShoppingItem: shoppingItemCode=" + shoppingItemCode);
-		return this.usecase.readActSelectItemInfo(this.user, shoppingItemCode).build();
+		// 画面表示情報を取得
+		return this.usecase.readActSelectItemInfo(loginUserSession.getLoginUserInfo(), shoppingItemCode)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -179,7 +202,12 @@ public class ShoppingItemInfoManageController {
 	@GetMapping("/addload")
 	public ModelAndView getAddLoad(@RequestParam("sisyutuItemCode") String sisyutuItemCode) {
 		log.debug("getAddLoad: sisyutuItemCode=" + sisyutuItemCode);
-		return this.usecase.readAddShoppingItemInfoBySisyutuItem(this.user, sisyutuItemCode).build();
+		// 画面表示情報を取得
+		return this.usecase.readAddShoppingItemInfoBySisyutuItem(loginUserSession.getLoginUserInfo(), sisyutuItemCode)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -195,13 +223,21 @@ public class ShoppingItemInfoManageController {
 		log.debug("getSearchBySisyutuItem: sisyutuItemCode=" + sisyutuItemCode);
 		
 		// 検索を実行
-		ShoppingItemInfoManageSearchResponse searchResult = this.usecase.execSearchBySisyutuItem(this.user, sisyutuItemCode);
+		ShoppingItemInfoManageSearchResponse searchResult = this.usecase.execSearchBySisyutuItem(
+				loginUserSession.getLoginUserInfo(), sisyutuItemCode);
 		if(searchResult.isShoppingItemListEmpty()) {
 			// 検索結果なしの場合、初期表示画面に戻る
-			ShoppingItemInfoManageInitResponse initResponse = this.usecase.readInitInfo(this.user);
+			// 初期表示画面情報を取得
+			ShoppingItemInfoManageInitResponse initResponse = this.usecase.readInitInfo(loginUserSession.getLoginUserInfo());
+			// 引き継ぎエラーメッセージを設定
 			searchResult.getMessagesList().forEach(message -> initResponse.addMessage(message));
+			// レスポンスにログインユーザ名を設定
+			initResponse.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName());
+			// レスポンスからModelAndViewを生成
 			return initResponse.build();
 		} else {
+			// レスポンスにログインユーザ名を設定
+			searchResult.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName());
 			// 検索結果ありの場合、検索結果表示画面に遷移
 			return searchResult.build();
 		}
@@ -218,7 +254,12 @@ public class ShoppingItemInfoManageController {
 	@PostMapping(value = "/updateload/", params = "actionAdd")
 	public ModelAndView postActionAddLoad(@RequestParam("shoppingItemCode") String shoppingItemCode) {
 		log.debug("postActionAddLoad: shoppingItemCode=" + shoppingItemCode);
-		return this.usecase.readAddShoppingItemInfoByShoppingItem(this.user, shoppingItemCode).build();
+		// 画面表示情報を取得
+		return this.usecase.readAddShoppingItemInfoByShoppingItem(loginUserSession.getLoginUserInfo(), shoppingItemCode)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -232,7 +273,12 @@ public class ShoppingItemInfoManageController {
 	@PostMapping(value="/updateload/", params = "actionUpdate")
 	public ModelAndView postActionUpdateLoad(@RequestParam("shoppingItemCode") String shoppingItemCode) {
 		log.debug("postActionUpdateLoad: shoppingItemCode=" + shoppingItemCode);
-		return this.usecase.readUpdateShoppingItemInfo(this.user, shoppingItemCode).build();
+		// 画面表示情報を取得
+		return this.usecase.readUpdateShoppingItemInfo(loginUserSession.getLoginUserInfo(), shoppingItemCode)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -246,7 +292,12 @@ public class ShoppingItemInfoManageController {
 	@PostMapping(value = "/updateload/", params = "actionCancel")
 	public ModelAndView postActionCancel() {
 		log.debug("postActionCancel:");
-		return this.usecase.readInitInfo(this.user).build();
+		// 画面表示情報を取得
+		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -267,17 +318,23 @@ public class ShoppingItemInfoManageController {
 		// チェック結果エラーの場合
 		if(bindingResult.hasErrors()) {
 			// 初期表示情報を取得し、入力チェックエラーを設定
-			return this.usecase.readUpdateBindingErrorSetInfo(this.user, inputForm).build();
+			return this.usecase.readUpdateBindingErrorSetInfo(loginUserSession.getLoginUserInfo(), inputForm)
+					// レスポンスにログインユーザ名を設定
+					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					// レスポンスからModelAndViewを生成
+					.build();
+			
 		// チェック結果OKの場合
 		} else {
 			/* hidden項目(action)の値チェック */
 			// actionが未設定の場合、予期しないエラー
 			if(!StringUtils.hasLength(inputForm.getAction())) {
 				log.error("予期しないエラー actionのバリデーションチェックでエラー:action=" + inputForm.getAction());
-				return ShoppingItemInfoManageUpdateResponse.buildBindingError("予期しないエラーが発生しました。管理者に問い合わせてください。[key=action]");
+				return ShoppingItemInfoManageUpdateResponse.buildBindingError(
+						loginUserSession.getLoginUserInfo(), "予期しないエラーが発生しました。管理者に問い合わせてください。[key=action]");
 			// actionに従い、処理を実行
 			} else {
-				return this.usecase.execAction(this.user, inputForm).buildRedirect(redirectAttributes);
+				return this.usecase.execAction(loginUserSession.getLoginUserInfo(), inputForm).buildRedirect(redirectAttributes);
 			}
 		}
 	}
@@ -293,6 +350,12 @@ public class ShoppingItemInfoManageController {
 	@GetMapping("/updateComplete/")
 	public ModelAndView updateComplete(@ModelAttribute CompleteRedirectMessages redirectMessages) {
 		log.debug("updateComplete: input=" + redirectMessages);
-		return this.usecase.readInitInfo(this.user).buildComplete(redirectMessages);
+		
+		// 画面表示情報を取得
+		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.buildComplete(redirectMessages);
 	}
 }

@@ -27,9 +27,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm;
-import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShopInfoManageResponse;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -55,8 +55,8 @@ import lombok.extern.log4j.Log4j2;
 public class ShopInfoManageController {
 	// usecase
 	private final ShopInfoManageUseCase usecase;
-	// UserSession
-	private final UserSession user;
+	// ログインユーザセッションBean
+	private final LoginUserSession loginUserSession;
 	
 	/**
 	 *<pre>
@@ -69,7 +69,12 @@ public class ShopInfoManageController {
 	@GetMapping("/initload/")
 	public ModelAndView getInitLoad() {
 		log.debug("getInitLoad:");
-		return this.usecase.readShopInfo(this.user).build();
+		// 画面表示情報を取得
+		return this.usecase.readShopInfo(loginUserSession.getLoginUserInfo())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -86,9 +91,15 @@ public class ShopInfoManageController {
 		
 		// 店舗コード未設定の場合、エラー
 		if(StringUtils.hasLength(shopCode)) {
-			return this.usecase.readShopInfo(this.user, shopCode).build();
+			return this.usecase.readShopInfo(loginUserSession.getLoginUserInfo(), shopCode)
+					// レスポンスにログインユーザ名を設定
+					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					// レスポンスからModelAndViewを生成
+					.build();
+			
 		} else {
-			return ShopInfoManageResponse.buildBindingError("予期しないエラーが発生しました。管理者に問い合わせてください。[key=shopCode]");
+			return ShopInfoManageResponse.buildBindingError(
+					loginUserSession.getLoginUserInfo(), "予期しないエラーが発生しました。管理者に問い合わせてください。[key=shopCode]");
 		}
 	}
 	
@@ -110,18 +121,24 @@ public class ShopInfoManageController {
 		// チェック結果エラーの場合
 		if(bindingResult.hasErrors()) {
 			// 初期表示情報を取得し、入力チェックエラーを設定
-			return this.usecase.readShopInfo(this.user).buildBindingError(shopForm);
+			return this.usecase.readShopInfo(loginUserSession.getLoginUserInfo())
+					// レスポンスにログインユーザ名を設定(AbstractResponseの同メソッドをオーバーライド済み)
+					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					// レスポンスからModelAndViewを生成
+					.buildBindingError(shopForm);
+			
 		// チェック結果OKの場合
 		} else {
 			/* hidden項目(action)の値チェック */
 			// actionが未設定の場合、予期しないエラー
 			if(!StringUtils.hasLength(shopForm.getAction())) {
 				log.error("予期しないエラー actionのバリデーションチェックでエラー:action=" + shopForm.getAction());
-				return ShopInfoManageResponse.buildBindingError("予期しないエラーが発生しました。管理者に問い合わせてください。[key=action]");
+				return ShopInfoManageResponse.buildBindingError(
+						loginUserSession.getLoginUserInfo(), "予期しないエラーが発生しました。管理者に問い合わせてください。[key=action]");
 				
 			// actionに従い、処理を実行
 			} else {
-				return this.usecase.execAction(this.user, shopForm).buildRedirect(redirectAttributes);
+				return this.usecase.execAction(loginUserSession.getLoginUserInfo(), shopForm).buildRedirect(redirectAttributes);
 			}
 		}
 		
@@ -138,6 +155,11 @@ public class ShopInfoManageController {
 	@GetMapping("/updateComplete/")
 	public ModelAndView updateComplete(@ModelAttribute CompleteRedirectMessages redirectMessages) {
 		log.debug("updateComplete: input=" + redirectMessages);
-		return this.usecase.readShopInfo(this.user).buildComplete(redirectMessages);
+		// 画面表示情報を取得
+		return this.usecase.readShopInfo(loginUserSession.getLoginUserInfo())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.buildComplete(redirectMessages);
 	}
 }

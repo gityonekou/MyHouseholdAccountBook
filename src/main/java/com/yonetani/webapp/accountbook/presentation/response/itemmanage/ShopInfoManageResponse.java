@@ -20,6 +20,7 @@ import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoF
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -166,6 +167,19 @@ public class ShopInfoManageResponse extends AbstractResponse {
 	
 	/**
 	 * {@inheritDoc}
+	 * <pre>
+	 * ShopInfoManageResponseで同メソッドを呼び出した後、ShopInfoManageResponse独自定義のメソッド
+	 * を呼び出す必要があるためAbstractResponseの同メソッドをオーバーライド
+	 * </pre>
+	 */
+	@Override
+	public ShopInfoManageResponse setLoginUserName(String loginUserName) {
+		super.setLoginUserName(loginUserName);
+		return this;
+	}
+	
+	/**
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected String getRedirectUrl() {
@@ -178,14 +192,17 @@ public class ShopInfoManageResponse extends AbstractResponse {
 	 * 画面に出力するエラーメッセージから画面返却データのModelAndViewを生成して返します。
 	 * 画面表示データはすべて空となるので注意してください。
 	 *</pre>
+	 * @param loginUserInfo ログインユーザ情報
 	 * @param errorMessage 画面に出力するエラーメッセージ
 	 * @return 画面返却データのModelAndView
 	 *
 	 */
-	public static ModelAndView buildBindingError(String errorMessage) {
+	public static ModelAndView buildBindingError(LoginUserInfo loginUserInfo, String errorMessage) {
 		ShopInfoManageResponse res = ShopInfoManageResponse.getInstance(null);
 		// エラーメッセージを設定
 		res.addErrorMessage(errorMessage);
+		// ログインユーザ名を設定
+		res.setLoginUserName(loginUserInfo.getUserName());
 		// 画面表示のModelとViewを生成して返却
 		return res.build();
 	}

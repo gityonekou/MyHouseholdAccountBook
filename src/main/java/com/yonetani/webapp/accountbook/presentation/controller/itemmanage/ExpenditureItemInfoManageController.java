@@ -37,9 +37,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.ExpenditureItemInfoManageUseCase;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ExpenditureItemInfoForm;
-import com.yonetani.webapp.accountbook.presentation.request.session.UserSession;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ExpenditureItemInfoManageUpdateResponse;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -75,8 +75,8 @@ import lombok.extern.log4j.Log4j2;
 public class ExpenditureItemInfoManageController {
 	// UseCase
 	private final ExpenditureItemInfoManageUseCase usecase;
-	// UserSession
-	private final UserSession user;
+	// ログインユーザセッションBean
+	private final LoginUserSession loginUserSession;
 	
 	/**
 	 *<pre>
@@ -90,7 +90,12 @@ public class ExpenditureItemInfoManageController {
 	@GetMapping("/initload/")
 	public ModelAndView getInitLoad() {
 		log.debug("getInitLoad:");
-		return this.usecase.readInitInfo(this.user).build();
+		// 画面表示情報を取得
+		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -106,7 +111,11 @@ public class ExpenditureItemInfoManageController {
 	public ModelAndView getActSelect(@RequestParam("sisyutuItemCode") String sisyutuItemCode) {
 		log.debug("getActSelect: sisyutuItemCode=" + sisyutuItemCode);
 		// 選択した支出項目情報のレスポンスを取得し、選択画面に遷移
-		return this.usecase.readActSelectItemInfo(this.user, sisyutuItemCode).build();
+		return this.usecase.readActSelectItemInfo(loginUserSession.getLoginUserInfo(), sisyutuItemCode)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -120,7 +129,12 @@ public class ExpenditureItemInfoManageController {
 	@PostMapping(value = "/updateload/", params = "actionAdd")
 	public ModelAndView postActionAddLoad(@RequestParam("sisyutuItemCode") String sisyutuItemCode) {
 		log.debug("postActionAddLoad: sisyutuItemCode=" + sisyutuItemCode);
-		return this.usecase.readAddExpenditureItemInfo(this.user, sisyutuItemCode).build();
+		// 画面表示情報を取得
+		return this.usecase.readAddExpenditureItemInfo(loginUserSession.getLoginUserInfo(), sisyutuItemCode)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -134,7 +148,12 @@ public class ExpenditureItemInfoManageController {
 	@PostMapping(value="/updateload/", params = "actionUpdate")
 	public ModelAndView postActionUpdateLoad(@RequestParam("sisyutuItemCode") String sisyutuItemCode) {
 		log.debug("postActionUpdateLoad: sisyutuItemCode=" + sisyutuItemCode);
-		return this.usecase.readUpdateExpenditureItemInfo(this.user, sisyutuItemCode).build();
+		// 画面表示情報を取得
+		return this.usecase.readUpdateExpenditureItemInfo(loginUserSession.getLoginUserInfo(), sisyutuItemCode)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -148,7 +167,12 @@ public class ExpenditureItemInfoManageController {
 	@PostMapping(value = "/updateload/", params = "actionCancel")
 	public ModelAndView postActionCancel() {
 		log.debug("postActionCancel:");
-		return this.usecase.readInitInfo(this.user).build();
+		// 画面表示情報を取得
+		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -169,17 +193,23 @@ public class ExpenditureItemInfoManageController {
 		// チェック結果エラーの場合
 		if(bindingResult.hasErrors()) {
 			// 初期表示情報を取得し、入力チェックエラーを設定
-			return this.usecase.readUpdateBindingErrorSetInfo(this.user, inputForm).build();
+			return this.usecase.readUpdateBindingErrorSetInfo(loginUserSession.getLoginUserInfo(), inputForm)
+					// レスポンスにログインユーザ名を設定
+					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					// レスポンスからModelAndViewを生成
+					.build();
+			
 		// チェック結果OKの場合
 		} else {
 			/* hidden項目(action)の値チェック */
 			// actionが未設定の場合、予期しないエラー
 			if(!StringUtils.hasLength(inputForm.getAction())) {
 				log.error("予期しないエラー actionのバリデーションチェックでエラー:action=" + inputForm.getAction());
-				return ExpenditureItemInfoManageUpdateResponse.buildBindingError("予期しないエラーが発生しました。管理者に問い合わせてください。[key=action]");
+				return ExpenditureItemInfoManageUpdateResponse.buildBindingError(
+						loginUserSession.getLoginUserInfo(), "予期しないエラーが発生しました。管理者に問い合わせてください。[key=action]");
 			// actionに従い、処理を実行
 			} else {
-				return this.usecase.execAction(this.user, inputForm).buildRedirect(redirectAttributes);
+				return this.usecase.execAction(loginUserSession.getLoginUserInfo(), inputForm).buildRedirect(redirectAttributes);
 			}
 		}
 	}
@@ -195,6 +225,11 @@ public class ExpenditureItemInfoManageController {
 	@GetMapping("/updateComplete/")
 	public ModelAndView updateComplete(@ModelAttribute CompleteRedirectMessages redirectMessages) {
 		log.debug("updateComplete: input=" + redirectMessages);
-		return this.usecase.readInitInfo(this.user).buildComplete(redirectMessages);
+		// 画面表示情報を取得
+		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.buildComplete(redirectMessages);
 	}
 }

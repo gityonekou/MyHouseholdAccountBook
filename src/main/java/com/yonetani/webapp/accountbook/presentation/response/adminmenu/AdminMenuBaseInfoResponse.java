@@ -14,6 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.presentation.request.adminmenu.AdminMenuUploadBaseInfoFileForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -92,13 +93,16 @@ public class AdminMenuBaseInfoResponse extends AbstractResponse {
 	 *<pre>
 	 * バリデーションチェックを行った入力フォームの値から画面返却データのModelAndViewを生成して返します。
 	 *</pre>
+	 * @param loginUserInfo ログインユーザ情報
 	 * @param baseInfoFileForm バリデーションチェックを行った入力フォームの値
 	 * @return 画面返却データのModelAndView
 	 *
 	 */
-	public static ModelAndView buildBindingError(AdminMenuUploadBaseInfoFileForm baseInfoFileForm) {
+	public static ModelAndView buildBindingError(
+			LoginUserInfo loginUserInfo, AdminMenuUploadBaseInfoFileForm baseInfoFileForm) {
 		AdminMenuBaseInfoResponse response = new AdminMenuBaseInfoResponse();
 		response.setAdminMenuUploadBaseInfoFileForm(baseInfoFileForm);
+		response.setLoginUserName(loginUserInfo.getUserName());
 		return response.build();
 	}
 	
@@ -107,15 +111,18 @@ public class AdminMenuBaseInfoResponse extends AbstractResponse {
 	 * バリデーションチェックを行った入力フォームの値から画面返却データのModelAndViewを生成して返します。
 	 * 付加情報として、画面に出力するメッセージを設定します。
 	 *</pre>
+	 * @param loginUserInfo ログインユーザ情報
 	 * @param baseInfoFileForm バリデーションチェックを行った入力フォームの値
 	 * @param message 画面に出力するメッセージ
 	 * @return 画面返却データのModelAndView
 	 *
 	 */
-	public static ModelAndView buildBindingError(AdminMenuUploadBaseInfoFileForm baseInfoFileForm, String message) {
+	public static ModelAndView buildBindingError(
+			LoginUserInfo loginUserInfo, AdminMenuUploadBaseInfoFileForm baseInfoFileForm, String message) {
 		AdminMenuBaseInfoResponse response = new AdminMenuBaseInfoResponse();
 		response.setAdminMenuUploadBaseInfoFileForm(baseInfoFileForm);
 		response.addErrorMessage(message);
+		response.setLoginUserName(loginUserInfo.getUserName());
 		return response.build();
 	}
 
@@ -123,13 +130,15 @@ public class AdminMenuBaseInfoResponse extends AbstractResponse {
 	 *<pre>
 	 * 指定したエラーメッセージをもとに画面返却データのModelAndViewを生成して返します。
 	 *</pre>
+	 * @param loginUserInfo ログインユーザ情報
 	 * @param message 画面に出力するメッセージ
 	 * @return 画面返却データのModelAndView
 	 *
 	 */
-	public static ModelAndView buildBindingError(String message) {
+	public static ModelAndView buildBindingError(LoginUserInfo loginUserInfo, String message) {
 		AdminMenuBaseInfoResponse response = new AdminMenuBaseInfoResponse();
 		response.addErrorMessage(message);
+		response.setLoginUserName(loginUserInfo.getUserName());
 		return response.build();
 	}
 }
