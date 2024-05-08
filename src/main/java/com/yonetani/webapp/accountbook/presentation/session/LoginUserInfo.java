@@ -1,5 +1,5 @@
 /**
- * ログインユーザ情報です。
+ * セッションに設定するログインユーザ情報です。
  *
  *------------------------------------------------
  * 更新履歴
@@ -9,13 +9,15 @@
  */
 package com.yonetani.webapp.accountbook.presentation.session;
 
+import java.io.Serializable;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
  *<pre>
- * ログインユーザ情報です。
+ * セッションに設定するログインユーザ情報です。
  *
  *</pre>
  *
@@ -25,7 +27,9 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class LoginUserInfo {
+public class LoginUserInfo implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
 	// ログインユーザID
 	private final String userId;
 	// ログインユーザ名

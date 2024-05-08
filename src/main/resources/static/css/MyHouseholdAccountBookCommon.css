@@ -1,5 +1,8 @@
 @charset "UTF-8";
 
+.w5{
+  width:5%;
+}
 .w10{
   width:10%;
 }
@@ -8,6 +11,9 @@
 }
 .w20{
   width:20%;
+}
+.w25{
+  width:25%;
 }
 .w30{
   width:30%;

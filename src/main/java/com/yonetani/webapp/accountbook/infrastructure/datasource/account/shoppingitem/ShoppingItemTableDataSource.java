@@ -129,6 +129,8 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 				data.getShoppingItemName().toString(),
 				// 商品詳細
 				data.getShoppingItemDetailContext().toString(),
+				// 商品JANコード
+				data.getShoppingItemJanCode().toString(),
 				// 支出項目コード
 				data.getSisyutuItemCode().toString(),
 				// 会社名
@@ -159,6 +161,8 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 				dto.getShoppingItemName(),
 				// 商品詳細
 				dto.getShoppingItemDetailContext(),
+				// 商品JANコード
+				dto.getShoppingItemJanCode(),
 				// 支出項目コード
 				dto.getSisyutuItemCode(),
 				// 会社名
@@ -187,6 +191,8 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 				dto.getShoppingItemName(),
 				// 商品詳細
 				dto.getShoppingItemDetailContext(),
+				// 商品JANコード
+				dto.getShoppingItemJanCode(),
 				// 支出項目名
 				dto.getSisyutuItemName(),
 				// 会社名

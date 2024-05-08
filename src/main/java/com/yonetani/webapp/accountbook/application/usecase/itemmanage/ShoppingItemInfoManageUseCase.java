@@ -21,6 +21,7 @@ package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -54,6 +55,7 @@ import com.yonetani.webapp.accountbook.presentation.response.itemmanage.Shopping
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageSearchResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageUpdateResponse;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
+import com.yonetani.webapp.accountbook.presentation.session.ShoppingItemSearchInfo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -163,13 +165,20 @@ public class ShoppingItemInfoManageUseCase {
 	 * 指定したユーザIDと商品コードに応じた情報管理(商品)処理選択画面の表示情報を取得します。
 	 *</pre>
 	 * @param user 表示対象のユーザID
+	 * @param shoppingItemSearchInfo 検索条件情報
 	 * @param shoppingItemCode 表示対象商品の商品コード
 	 * @return 情報管理(商品)処理選択画面の表示情報
 	 *
 	 */
-	public ShoppingItemInfoManageActSelect readActSelectItemInfo(LoginUserInfo user, String shoppingItemCode) {
-		log.debug("readActSelectItemInfo:userid=" + user.getUserId() + ",shoppingItemCode=" + shoppingItemCode);
+	public ShoppingItemInfoManageActSelect readActSelectItemInfo(LoginUserInfo user, 
+			ShoppingItemSearchInfo shoppingItemSearchInfo, String shoppingItemCode) {
+		log.debug("readActSelectItemInfo:userid=" + user.getUserId() + ",shoppingItemSearchInfo=["
+			+ shoppingItemSearchInfo + "],shoppingItemCode=" + shoppingItemCode);
 		
+		// セッションに設定されている商品検索条件のnull判定
+		if(shoppingItemSearchInfo == null) {
+			throw new MyHouseholdAccountBookRuntimeException("セッションに設定されている商品検索条件がnullです。管理者に問い合わせてください。");
+		}
 		// 選択した商品コードに対応する商品情報を取得
 		ShoppingItem searchResult = shoppingItemRepository.findByIdAndShoppingItemCode(
 				SearchQueryUserIdAndShoppingItemCode.from(user.getUserId(), shoppingItemCode));
@@ -187,18 +196,40 @@ public class ShoppingItemInfoManageUseCase {
 						searchResult.getShoppingItemName().toString(),
 						// 商品詳細
 						searchResult.getShoppingItemDetailContext().toString(),
+						// 商品JANコード
+						searchResult.getShoppingItemJanCode().toString(),
 						// 支出項目名(＞で区切った値)
 						sisyutuItemComponent.getSisyutuItemName(user, searchResult.getSisyutuItemCode().toString()),
-						/// 会社名
+						// 会社名
 						searchResult.getCompanyName().toString()));
 		
-		// 指定した検索条件に一致する商品一覧を取得
-		// TODO:セッションのデータをコントローラーから渡してもらう必要あり
-		
-		// 商品検索結果情報の明細リストを設定
-		
-		// 商品検索結果名を設定
-		response.setSearchResultNameValue("対応中：");
+		/* 指定した検索条件に一致する商品一覧を取得 */
+		// 検索条件が支出項目コードで商品を検索の場合
+		if(Objects.equals(shoppingItemSearchInfo.getSearchActType(), MyHouseholdAccountBookContent.ACT_SEARCH_SISYUTU_ITEM)) {
+			
+			// 選択した支出項目名を取得(＞で区切った値)
+			String sisyutuItemName = sisyutuItemComponent.getSisyutuItemName(user, shoppingItemSearchInfo.getSisyutuItemCode());
+			
+			// 指定した支出項目コードに属する商品一覧を取得
+			ShoppingItemInquiryList searchItemListResult = shoppingItemRepository.findByIdAndSisyutuItemCode(
+					SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), shoppingItemSearchInfo.getSisyutuItemCode()));
+			if(searchItemListResult.isEmpty()) {
+				throw new MyHouseholdAccountBookRuntimeException("指定した支出項目「" + sisyutuItemName + "」に登録されている商品が0件です。管理者に問い合わせてください。");
+			} else {
+				// 商品検索結果をレスポンスに設定
+				response.addShoppingItemList(createShoppingItemList(searchItemListResult));
+				// 商品検索結果名を設定
+				response.setSearchResultNameValue("支出項目：" + sisyutuItemName);
+				
+			}
+			
+		// 検索条件が商品検索条件で商品を検索の場合
+		} else if (Objects.equals(shoppingItemSearchInfo.getSearchActType(), MyHouseholdAccountBookContent.ACT_SEARCH_SHOPPING_ITEM)) {
+			
+		} else {
+			throw new MyHouseholdAccountBookRuntimeException("セッションに設定されている商品検索条件が不正です。管理者に問い合わせてください。[searchActType="
+					+ shoppingItemSearchInfo.getSearchActType() + "]");
+		}
 		
 		return response;
 	}
@@ -361,6 +392,8 @@ public class ShoppingItemInfoManageUseCase {
 		addItemForm.setShoppingItemName(searchResult.getShoppingItemName().toString());
 		// 商品詳細
 		addItemForm.setShoppingItemDetailContext(searchResult.getShoppingItemDetailContext().toString());
+		// 商品JANコード
+		addItemForm.setShoppingItemJanCode(searchResult.getShoppingItemJanCode().toString());
 		// 会社名
 		addItemForm.setCompanyName(searchResult.getCompanyName().toString());
 		// 基準店舗コード
@@ -527,6 +560,8 @@ public class ShoppingItemInfoManageUseCase {
 				inputForm.getShoppingItemName(),
 				// 商品詳細
 				inputForm.getShoppingItemDetailContext(),
+				// 商品JANコード
+				inputForm.getShoppingItemJanCode(),
 				// 支出項目コード
 				inputForm.getSisyutuItemCode(),
 				// 会社名
@@ -557,6 +592,8 @@ public class ShoppingItemInfoManageUseCase {
 				domain.getShoppingItemName().toString(),
 				// 商品詳細
 				domain.getShoppingItemDetailContext().toString(),
+				// 商品JANコード
+				domain.getShoppingItemJanCode().toString(),
 				// 支出項目名
 				domain.getSisyutuItemName().toString(),
 				// 会社名

@@ -64,4 +64,10 @@ public class MyHouseholdAccountBookContent {
 	// 飲食日用品(901)、ホームセンター(902)、薬局/薬局複合店(905)、複合店舗(907)
 	public static final String[] STANDARD_SHOPSLIST_KUBUN_CODE = {"901","902","905","907"};
 	
+	// 商品情報を検索条件に商品を検索
+	public static final String ACT_SEARCH_SHOPPING_ITEM = "ActSearchShoppingItem";
+	
+	// 支出項目情報を検索条件に商品を検索
+	public static final String ACT_SEARCH_SISYUTU_ITEM = "ActSearchSisyutuItem";
+	
 }

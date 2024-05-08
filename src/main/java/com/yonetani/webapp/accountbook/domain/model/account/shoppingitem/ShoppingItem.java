@@ -15,6 +15,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCo
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCompanyName;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemJanCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemKubunName;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemName;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemStandardPrice;
@@ -48,6 +49,8 @@ public class ShoppingItem {
 	private final ShoppingItemName shoppingItemName;
 	// 商品詳細
 	private final ShoppingItemDetailContext shoppingItemDetailContext;
+	// 商品JANコード(13桁 or 8桁 or ISBNコード:10桁)
+	private final ShoppingItemJanCode shoppingItemJanCode;
 	// 支出項目コード
 	private final SisyutuItemCode sisyutuItemCode;
 	// 会社名
@@ -66,6 +69,7 @@ public class ShoppingItem {
 	 * @param shoppingItemKubunName 商品区分名
 	 * @param shoppingItemName 商品名
 	 * @param shoppingItemDetailContext 商品詳細
+	 * @param shoppingItemJanCode 商品JANコード
 	 * @param sisyutuItemCode 支出項目コード
 	 * @param companyName 会社名
 	 * @param shopCode 基準店舗コード
@@ -79,6 +83,7 @@ public class ShoppingItem {
 			String shoppingItemKubunName,
 			String shoppingItemName,
 			String shoppingItemDetailContext,
+			String shoppingItemJanCode,
 			String sisyutuItemCode,
 			String companyName,
 			String shopCode,
@@ -90,6 +95,7 @@ public class ShoppingItem {
 				ShoppingItemKubunName.from(shoppingItemKubunName),
 				ShoppingItemName.from(shoppingItemName),
 				ShoppingItemDetailContext.from(shoppingItemDetailContext),
+				ShoppingItemJanCode.from(shoppingItemJanCode),
 				SisyutuItemCode.from(sisyutuItemCode),
 				ShoppingItemCompanyName.from(companyName),
 				ShoppingItemStandardShopCode.from(shopCode),
@@ -101,7 +107,7 @@ public class ShoppingItem {
 	 */
 	@Override
 	public String toString() {
-		StringBuilder buff = new StringBuilder(300);
+		StringBuilder buff = new StringBuilder(360);
 		buff.append("userId:")
 		.append(userId)
 		.append(",shoppingItemCode:")
@@ -112,6 +118,8 @@ public class ShoppingItem {
 		.append(shoppingItemName)
 		.append(",shoppingItemDetailContext:")
 		.append(shoppingItemDetailContext)
+		.append(",shoppingItemJanCode:")
+		.append(shoppingItemJanCode)
 		.append(",sisyutuItemCode:")
 		.append(sisyutuItemCode)
 		.append(",companyName:")

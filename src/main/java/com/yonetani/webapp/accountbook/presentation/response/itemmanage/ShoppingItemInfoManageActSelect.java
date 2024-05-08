@@ -51,6 +51,8 @@ public class ShoppingItemInfoManageActSelect extends AbstractShoppingItemInfoMan
 		private final String shoppingItemName;
 		// 商品詳細
 		private final String shoppingItemDetailContext;
+		// 商品JANコード
+		private final String shoppingItemJanCode;
 		// 支出項目名
 		private final String sisyutuItemName;
 		// 会社名
@@ -64,15 +66,16 @@ public class ShoppingItemInfoManageActSelect extends AbstractShoppingItemInfoMan
 		 * @param shoppingItemKubunName 商品区分名
 		 * @param shoppingItemName 商品名
 		 * @param shoppingItemDetailContext 商品詳細
+		 * @param shoppingItemJanCode 商品JANコード
 		 * @param sisyutuItemName 支出項目名
 		 * @param companyName 会社名
 		 * @return 選択商品の詳細情報
 		 *
 		 */
 		public static SelectShoppingItemInfo from(String shoppingItemCode, String shoppingItemKubunName, String shoppingItemName,
-				String shoppingItemDetailContext, String sisyutuItemName, String companyName) {
+				String shoppingItemDetailContext, String shoppingItemJanCode, String sisyutuItemName, String companyName) {
 			return new SelectShoppingItemInfo(shoppingItemCode, shoppingItemKubunName, shoppingItemName,
-					shoppingItemDetailContext, sisyutuItemName, companyName);
+					shoppingItemDetailContext, shoppingItemJanCode, sisyutuItemName, companyName);
 		}
 	}
 	

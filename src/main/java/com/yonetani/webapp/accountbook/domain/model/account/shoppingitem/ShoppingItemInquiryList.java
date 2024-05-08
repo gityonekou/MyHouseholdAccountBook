@@ -20,6 +20,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCompanyName;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemJanCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemKubunName;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemName;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemStandardPrice;
@@ -63,6 +64,8 @@ public class ShoppingItemInquiryList {
 		private final ShoppingItemName shoppingItemName;
 		// 商品詳細
 		private final ShoppingItemDetailContext shoppingItemDetailContext;
+		// 商品JANコード
+		private final ShoppingItemJanCode shoppingItemJanCode;
 		// 支出項目名
 		private final SisyutuItemName sisyutuItemName;
 		// 会社名
@@ -80,6 +83,7 @@ public class ShoppingItemInquiryList {
 		 * @param shoppingItemKubunName 商品区分名
 		 * @param shoppingItemName 商品名
 		 * @param shoppingItemDetailContext 商品詳細
+		 * @param shoppingItemJanCode 商品JANコード
 		 * @param sisyutuItemName 支出項目名
 		 * @param companyName 会社名
 		 * @param standardShopName 基準店舗名
@@ -92,6 +96,7 @@ public class ShoppingItemInquiryList {
 				String shoppingItemKubunName,
 				String shoppingItemName,
 				String shoppingItemDetailContext,
+				String shoppingItemJanCode,
 				String sisyutuItemName,
 				String companyName,
 				String standardShopName,
@@ -102,6 +107,7 @@ public class ShoppingItemInquiryList {
 					ShoppingItemKubunName.from(shoppingItemKubunName),
 					ShoppingItemName.from(shoppingItemName),
 					ShoppingItemDetailContext.from(shoppingItemDetailContext),
+					ShoppingItemJanCode.from(shoppingItemJanCode),
 					SisyutuItemName.from(sisyutuItemName),
 					ShoppingItemCompanyName.from(companyName),
 					ShopName.from(standardShopName),
@@ -113,7 +119,7 @@ public class ShoppingItemInquiryList {
 		 */
 		@Override
 		public String toString() {
-			StringBuilder buff = new StringBuilder(340);
+			StringBuilder buff = new StringBuilder(370);
 			buff.append("shoppingItemCode:")
 			.append(shoppingItemCode)
 			.append(",shoppingItemKubunName:")
@@ -122,6 +128,8 @@ public class ShoppingItemInquiryList {
 			.append(shoppingItemName)
 			.append(",shoppingItemDetailContext:")
 			.append(shoppingItemDetailContext)
+			.append(",shoppingItemJanCode:")
+			.append(shoppingItemJanCode)
 			.append(",sisyutuItemName:")
 			.append(sisyutuItemName)
 			.append(",companyName:")
@@ -160,7 +168,7 @@ public class ShoppingItemInquiryList {
 	@Override
 	public String toString() {
 		if(values.size() > 0) {
-			StringBuilder buff = new StringBuilder((values.size() + 1) * 340);
+			StringBuilder buff = new StringBuilder((values.size() + 1) * 370);
 			buff.append("商品検索結果:")
 			.append(values.size())
 			.append("件:");

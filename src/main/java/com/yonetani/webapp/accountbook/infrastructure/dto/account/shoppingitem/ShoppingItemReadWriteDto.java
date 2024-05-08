@@ -38,6 +38,8 @@ public class ShoppingItemReadWriteDto {
 	private final String shoppingItemName;
 	// 商品詳細
 	private final String shoppingItemDetailContext;
+	// 商品JANコード(13桁 or 8桁 or ISBNコード:10桁)
+	private final String shoppingItemJanCode;
 	// 支出項目コード
 	private final String sisyutuItemCode;
 	// 会社名
@@ -56,6 +58,7 @@ public class ShoppingItemReadWriteDto {
 	 * @param shoppingItemKubunName 商品区分名
 	 * @param shoppingItemName 商品名
 	 * @param shoppingItemDetailContext 商品詳細
+	 * @param shoppingItemJanCode 商品JANコード
 	 * @param sisyutuItemCode 支出項目コード
 	 * @param companyName 会社名
 	 * @param standardShopCode 基準店舗コード
@@ -69,6 +72,7 @@ public class ShoppingItemReadWriteDto {
 			String shoppingItemKubunName,
 			String shoppingItemName,
 			String shoppingItemDetailContext,
+			String shoppingItemJanCode,
 			String sisyutuItemCode,
 			String companyName,
 			String standardShopCode,
@@ -79,6 +83,7 @@ public class ShoppingItemReadWriteDto {
 				shoppingItemKubunName,
 				shoppingItemName, 
 				shoppingItemDetailContext,
+				shoppingItemJanCode,
 				sisyutuItemCode,
 				companyName,
 				standardShopCode,

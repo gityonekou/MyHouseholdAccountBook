@@ -40,6 +40,9 @@
 							<label for="name" class="form-label">商品名：<span th:text="*{shoppingItemName}"></span></label>
 						</div>
 						<div class="mb-3">
+							<label for="name" class="form-label">JANコード：<span th:text="*{shoppingItemJanCode}"></span></label>
+						</div>
+						<div class="mb-3">
 							<label for="name" class="form-label">会社名：<span th:text="*{companyName}"></span></label>
 						</div>
 						<div class="mb-3">
@@ -94,10 +97,11 @@
 							<thead>
 								<tr class="table-secondary">
 									<th scope="col" class="w15">商品区分名</th>
-									<th scope="col" class="w30">商品名</th>
+									<th scope="col" class="w25">商品名</th>
 									<th scope="col" class="w15">支出項目名</th>
+									<th scope="col" class="w10">JANコード</th>
 									<th scope="col" class="w15">会社名</th>
-									<th scope="col" class="w15">基準店舗</th>
+									<th scope="col" class="w10">基準店舗</th>
 									<th scope="col">基準価格</th>
 								</tr>
 							</thead>
@@ -108,6 +112,7 @@
 									<td th:text="${item.shoppingItemKubunName}">商品区分名</td>
 									<td th:text="${item.shoppingItemName}">商品名</td>
 									<td th:text="${item.sisyutuItemName}">支出項目名</td>
+									<td th:text="${item.shoppingItemJanCode}">JANコード</td>
 									<td th:text="${item.companyName}">会社名</td>
 									<td th:text="${item.standardShopName}">基準店舗</td>
 									<td th:text="${item.standardPrice}">基準価格</td>

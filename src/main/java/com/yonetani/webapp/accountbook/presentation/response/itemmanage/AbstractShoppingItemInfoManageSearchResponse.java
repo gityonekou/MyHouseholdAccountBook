@@ -63,6 +63,8 @@ public abstract class AbstractShoppingItemInfoManageSearchResponse extends Abstr
 		private final String shoppingItemName;
 		// 商品詳細
 		private final String shoppingItemDetailContext;
+		// 商品JANコード
+		private final String shoppingItemJanCode;
 		// 支出項目名
 		private final String sisyutuItemName;
 		// 会社名
@@ -80,6 +82,7 @@ public abstract class AbstractShoppingItemInfoManageSearchResponse extends Abstr
 		 * @param shoppingItemKubunName 商品区分名
 		 * @param shoppingItemName 商品名
 		 * @param shoppingItemDetailContext 商品詳細
+		 * @param shoppingItemJanCode 商品JANコード
 		 * @param sisyutuItemName 支出項目名
 		 * @param companyName 会社名
 		 * @param standardShopName 基準店舗名
@@ -88,9 +91,11 @@ public abstract class AbstractShoppingItemInfoManageSearchResponse extends Abstr
 		 *
 		 */
 		public static ShoppingItemListItem from(String shoppingItemCode, String shoppingItemKubunName, String shoppingItemName,
-				String shoppingItemDetailContext, String sisyutuItemName, String companyName, String standardShopName, String standardPrice) {
+				String shoppingItemDetailContext, String shoppingItemJanCode, String sisyutuItemName, 
+				String companyName, String standardShopName, String standardPrice) {
 			return new ShoppingItemListItem(shoppingItemCode, shoppingItemKubunName, shoppingItemName,
-					shoppingItemDetailContext, sisyutuItemName, companyName, standardShopName, standardPrice);
+					shoppingItemDetailContext, shoppingItemJanCode, sisyutuItemName,
+					companyName, standardShopName, standardPrice);
 		}
 	}
 	

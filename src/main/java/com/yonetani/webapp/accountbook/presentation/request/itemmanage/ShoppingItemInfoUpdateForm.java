@@ -52,6 +52,10 @@ public class ShoppingItemInfoUpdateForm {
 	// 商品詳細
 	@Size(max = 300)
 	private String shoppingItemDetailContext;
+	// 商品JANコード(13桁 or 8桁 or ISBNコード:10桁)
+	@NotBlank
+	@Size(min = 8, max = 13)
+	private String shoppingItemJanCode;
 	// 会社名
 	@NotBlank
 	@Size(min = 1, max = 100)

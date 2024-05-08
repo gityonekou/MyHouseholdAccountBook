@@ -41,6 +41,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShoppingItemInfoManageUseCase;
+import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoSearchForm;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
@@ -48,6 +49,8 @@ import com.yonetani.webapp.accountbook.presentation.response.itemmanage.Shopping
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageSearchResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageUpdateResponse;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
+import com.yonetani.webapp.accountbook.presentation.session.ShoppingItemSearchInfo;
+import com.yonetani.webapp.accountbook.presentation.session.ShoppingItemSearchSession;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -90,7 +93,8 @@ public class ShoppingItemInfoManageController {
 	private final ShoppingItemInfoManageUseCase usecase;
 	// ログインユーザセッションBean
 	private final LoginUserSession loginUserSession;
-	
+	// 商品検索条件セッションBean
+	private final ShoppingItemSearchSession searchSession;
 	
 	/**
 	 *<pre>
@@ -184,7 +188,7 @@ public class ShoppingItemInfoManageController {
 	public ModelAndView getActSelect(@RequestParam("shoppingItemCode") String shoppingItemCode) {
 		log.debug("getSelectShoppingItem: shoppingItemCode=" + shoppingItemCode);
 		// 画面表示情報を取得
-		return this.usecase.readActSelectItemInfo(loginUserSession.getLoginUserInfo(), shoppingItemCode)
+		return this.usecase.readActSelectItemInfo(loginUserSession.getLoginUserInfo(), searchSession.getShoppingItemSearchInfo(), shoppingItemCode)
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
@@ -235,7 +239,11 @@ public class ShoppingItemInfoManageController {
 			initResponse.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName());
 			// レスポンスからModelAndViewを生成
 			return initResponse.build();
+			
 		} else {
+			// 入力情報をセッションに設定
+			searchSession.setShoppingItemSearchInfo(ShoppingItemSearchInfo.from(
+					MyHouseholdAccountBookContent.ACT_SEARCH_SISYUTU_ITEM, null, null, null, sisyutuItemCode));
 			// レスポンスにログインユーザ名を設定
 			searchResult.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName());
 			// 検索結果ありの場合、検索結果表示画面に遷移

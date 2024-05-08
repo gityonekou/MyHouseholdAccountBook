@@ -45,6 +45,11 @@
  					
 				</div>
 				<div class="mb-3">
+					<label for="shoppingItemJanCode" class="form-label">商品JANコード</label>
+ 					<input type="text" class="form-control w10" th:errorclass="is-invalid" th:field="*{shoppingItemJanCode}" required>
+ 					<p class="invalid-feedback" th:errors="*{shoppingItemJanCode}"></p>
+				</div>
+				<div class="mb-3">
 					<label for="companyName" class="form-label">会社名</label>
  					<input type="text" class="form-control w50" th:errorclass="is-invalid" th:field="*{companyName}" required>
  					<p class="invalid-feedback" th:errors="*{companyName}"></p>

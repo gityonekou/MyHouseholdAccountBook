@@ -36,6 +36,8 @@ public class ShoppingItemInquiryReadDto {
 	private final String shoppingItemName;
 	// 商品詳細
 	private final String shoppingItemDetailContext;
+	// 商品JANコード
+	private final String shoppingItemJanCode;
 	// 支出項目名
 	private final String sisyutuItemName;
 	// 会社名
