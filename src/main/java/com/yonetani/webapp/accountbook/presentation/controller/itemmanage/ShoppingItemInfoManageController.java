@@ -9,6 +9,7 @@
  * 
  * 画面遷移
  * ・情報管理(商品)初期表示画面：トップメニューからの遷移(初期表示)(GET)
+ * ・情報管理(商品)検索結果画面：初期表示画面で入力した検索条件に一致する検索結果を表示(POST)
  * ・情報管理(商品)検索結果画面：入力した検索条件に一致する検索結果を表示(POST)
  * ・検索画面のキャンセルボタンを選択時(POST)
  * ・情報管理(商品)処理選択画面：検索結果画面から任意の商品を選択時(GET)
@@ -41,7 +42,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShoppingItemInfoManageUseCase;
-import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoSearchForm;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
@@ -49,7 +49,6 @@ import com.yonetani.webapp.accountbook.presentation.response.itemmanage.Shopping
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageSearchResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageUpdateResponse;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
-import com.yonetani.webapp.accountbook.presentation.session.ShoppingItemSearchInfo;
 import com.yonetani.webapp.accountbook.presentation.session.ShoppingItemSearchSession;
 
 import lombok.RequiredArgsConstructor;
@@ -67,6 +66,7 @@ import lombok.extern.log4j.Log4j2;
  * 
  * 画面遷移
  * ・情報管理(商品)初期表示画面：トップメニューからの遷移(初期表示)(GET)
+ * ・情報管理(商品)検索結果画面：初期表示画面で入力した検索条件に一致する検索結果を表示(POST)
  * ・情報管理(商品)検索結果画面：入力した検索条件に一致する検索結果を表示(POST)
  * ・検索画面のキャンセルボタンを選択時(POST)
  * ・情報管理(商品)処理選択画面：検索結果画面から任意の商品を選択時(GET)
@@ -107,12 +107,57 @@ public class ShoppingItemInfoManageController {
 	@GetMapping("/initload/")
 	public ModelAndView getInitLoad() {
 		log.debug("getInitLoad:");
+		// 商品検索条件セッションをクリア
+		searchSession.clearData();
 		// 画面表示データ読込
-		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo())
-				// レスポンスにログインユーザ名を設定
-				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+		return getShoppingItemInfoManageInitResponse(null)
 				// レスポンスからModelAndViewを生成
 				.build();
+	}
+	
+	/**
+	 *<pre>
+	 * 情報管理(商品)初期表示画面からの商品情報検索時のPOST要求時マッピングです。
+	 * 情報管理(商品)検索結果画面に遷移します。
+	 *</pre>
+	 * @param inputForm 入力フォーム情報
+	 * @param bindingResult フォームのバリデーションチェック結果
+	 * @return 情報管理(商品)検索結果画面
+	 *
+	 */
+	@PostMapping(value = "/search/", params = "searchInit")
+	public ModelAndView postSearchInit(@ModelAttribute @Validated ShoppingItemInfoSearchForm inputForm, BindingResult bindingResult) {
+		log.debug("postSearchInit: input=" + inputForm);
+		/* 入力フィールドのバリデーションチェック結果を判定 */
+		// チェック結果エラーの場合
+		if(bindingResult.hasErrors()) {
+			// 初期表示情報を取得し、入力チェックエラーを設定
+			return getShoppingItemInfoManageInitResponse(inputForm)
+					// レスポンスからModelAndViewを生成
+					.build();
+			
+		// チェック結果OKの場合
+		} else {
+			// 検索を実行
+			ShoppingItemInfoManageSearchResponse searchResult = this.usecase.execSearch(
+					loginUserSession.getLoginUserInfo(), inputForm);
+			if(searchResult.isShoppingItemListEmpty()) {
+				// 検索結果なしの場合、初期表示画面に戻る
+				// 画面表示情報を取得
+				ShoppingItemInfoManageInitResponse initResponse = getShoppingItemInfoManageInitResponse(inputForm);
+				// エラーメッセージを引き継ぎ
+				searchResult.getMessagesList().forEach(message -> initResponse.addMessage(message));
+				// レスポンスからModelAndViewを生成
+				return initResponse.build();
+			} else {
+				// 入力情報をセッションに設定
+				searchSession.setShoppingItemSearchInfo(searchResult.getShoppingItemSearchInfo());
+				// ログインユーザ名を設定
+				searchResult.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName());
+				// 検索結果ありの場合、検索結果表示画面に遷移
+				return searchResult.build();
+			}
+		}
 	}
 	
 	/**
@@ -127,7 +172,7 @@ public class ShoppingItemInfoManageController {
 	 */
 	@PostMapping(value = "/search/", params = "search")
 	public ModelAndView postSearch(@ModelAttribute @Validated ShoppingItemInfoSearchForm inputForm, BindingResult bindingResult) {
-		log.debug("postSearchLoad: input=" + inputForm);
+		log.debug("postSearch: input=" + inputForm);
 		/* 入力フィールドのバリデーションチェック結果を判定 */
 		// チェック結果エラーの場合
 		if(bindingResult.hasErrors()) {
@@ -136,24 +181,13 @@ public class ShoppingItemInfoManageController {
 		// チェック結果OKの場合
 		} else {
 			// 検索を実行
-			ShoppingItemInfoManageSearchResponse searchResult = this.usecase.execSearch(
-					loginUserSession.getLoginUserInfo(), inputForm);
-			if(searchResult.isShoppingItemListEmpty()) {
-				// 検索結果なしの場合、初期表示画面に戻る
-				// 画面表示情報を取得
-				ShoppingItemInfoManageInitResponse initResponse = this.usecase.readInitInfo(loginUserSession.getLoginUserInfo());
-				// エラーメッセージを引き継ぎ
-				searchResult.getMessagesList().forEach(message -> initResponse.addMessage(message));
-				// ログインユーザ名を設定
-				initResponse.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName());
-				// レスポンスからModelAndViewを生成
-				return initResponse.build();
-			} else {
-				// ログインユーザ名を設定
-				searchResult.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName());
-				// 検索結果ありの場合、検索結果表示画面に遷移
-				return searchResult.build();
-			}
+			ShoppingItemInfoManageSearchResponse searchResult = this.usecase.execSearch(loginUserSession.getLoginUserInfo(), inputForm);
+			// 入力情報をセッションに設定
+			searchSession.setShoppingItemSearchInfo(searchResult.getShoppingItemSearchInfo());
+			// レスポンスにログインユーザ名を設定
+			return searchResult.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					// レスポンスからModelAndViewを生成
+					.build();
 		}
 	}
 	
@@ -168,10 +202,10 @@ public class ShoppingItemInfoManageController {
 	@PostMapping(value = "/search/", params = "searchCancel")
 	public ModelAndView postSearchCancel() {
 		log.debug("postSearchCancel:");
+		// 商品検索条件セッションをクリア
+		searchSession.clearData();
 		// 画面表示情報を取得
-		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo())
-				// レスポンスにログインユーザ名を設定
-				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+		return getShoppingItemInfoManageInitResponse(null)
 				// レスポンスからModelAndViewを生成
 				.build();
 	}
@@ -186,7 +220,7 @@ public class ShoppingItemInfoManageController {
 	 */
 	@GetMapping("/select")
 	public ModelAndView getActSelect(@RequestParam("shoppingItemCode") String shoppingItemCode) {
-		log.debug("getSelectShoppingItem: shoppingItemCode=" + shoppingItemCode);
+		log.debug("getActSelect: shoppingItemCode=" + shoppingItemCode);
 		// 画面表示情報を取得
 		return this.usecase.readActSelectItemInfo(loginUserSession.getLoginUserInfo(), searchSession.getShoppingItemSearchInfo(), shoppingItemCode)
 				// レスポンスにログインユーザ名を設定
@@ -232,18 +266,15 @@ public class ShoppingItemInfoManageController {
 		if(searchResult.isShoppingItemListEmpty()) {
 			// 検索結果なしの場合、初期表示画面に戻る
 			// 初期表示画面情報を取得
-			ShoppingItemInfoManageInitResponse initResponse = this.usecase.readInitInfo(loginUserSession.getLoginUserInfo());
+			ShoppingItemInfoManageInitResponse initResponse = getShoppingItemInfoManageInitResponse(null);
 			// 引き継ぎエラーメッセージを設定
 			searchResult.getMessagesList().forEach(message -> initResponse.addMessage(message));
-			// レスポンスにログインユーザ名を設定
-			initResponse.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName());
 			// レスポンスからModelAndViewを生成
 			return initResponse.build();
 			
 		} else {
 			// 入力情報をセッションに設定
-			searchSession.setShoppingItemSearchInfo(ShoppingItemSearchInfo.from(
-					MyHouseholdAccountBookContent.ACT_SEARCH_SISYUTU_ITEM, null, null, null, sisyutuItemCode));
+			searchSession.setShoppingItemSearchInfo(searchResult.getShoppingItemSearchInfo());
 			// レスポンスにログインユーザ名を設定
 			searchResult.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName());
 			// 検索結果ありの場合、検索結果表示画面に遷移
@@ -300,10 +331,10 @@ public class ShoppingItemInfoManageController {
 	@PostMapping(value = "/updateload/", params = "actionCancel")
 	public ModelAndView postActionCancel() {
 		log.debug("postActionCancel:");
+		// 商品検索条件セッションをクリア
+		searchSession.clearData();
 		// 画面表示情報を取得
-		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo())
-				// レスポンスにログインユーザ名を設定
-				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+		return getShoppingItemInfoManageInitResponse(null)
 				// レスポンスからModelAndViewを生成
 				.build();
 	}
@@ -358,12 +389,29 @@ public class ShoppingItemInfoManageController {
 	@GetMapping("/updateComplete/")
 	public ModelAndView updateComplete(@ModelAttribute CompleteRedirectMessages redirectMessages) {
 		log.debug("updateComplete: input=" + redirectMessages);
-		
+		// 商品検索条件セッションをクリア
+		searchSession.clearData();
 		// 画面表示情報を取得
-		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo())
-				// レスポンスにログインユーザ名を設定
-				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+		return getShoppingItemInfoManageInitResponse(null)
 				// レスポンスからModelAndViewを生成
 				.buildComplete(redirectMessages);
+	}
+	
+	/**
+	 *<pre>
+	 * 情報管理(商品)初期表示画面の表示情報を取得して返します。
+	 *</pre>
+	 * @param inputForm 入力フォーム情報
+	 * @return 情報管理(商品)初期表示画面
+	 *
+	 */
+	private ShoppingItemInfoManageInitResponse getShoppingItemInfoManageInitResponse(ShoppingItemInfoSearchForm inputForm) {
+		// 画面表示情報を取得
+		ShoppingItemInfoManageInitResponse initResponse = this.usecase.readInitInfo(loginUserSession.getLoginUserInfo());
+		// 検索条件入力値を設定
+		initResponse.setShoppingItemInfoSearchForm(inputForm);
+		// ログインユーザ名を設定
+		initResponse.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName());
+		return initResponse;
 	}
 }

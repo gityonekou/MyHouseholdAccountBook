@@ -32,28 +32,25 @@ public class ShoppingItemSearchInfo implements Serializable {
 	
 	// 検索タイプ(ActSearchShoppingItem　or ActSearchSisyutuItem)
 	private final String searchActType;
-	// 商品区分名
-	private final String shoppingItemKubunName;
-	// 商品名
-	private final String shoppingItemName;
-	// 会社名
-	private final String companyName;
-	// 支出項目コード
+	// 検索対象(検索条件が商品検索条件で商品を検索の場合の検索項目)
+	private final String searchTargetKubun;
+	// 検索条件(検索条件が商品検索条件で商品を検索の場合の検索項目)
+	private final String searchValue;
+	// 支出項目コード(検索条件が支出項目コードで商品を検索の場合の検索項目)
 	private final String sisyutuItemCode;
 	/**
 	 *<pre>
 	 * 引数の値から商品検索条件情報を生成して返します。
 	 *</pre>
 	 * @param searchActType 検索タイプ
-	 * @param shoppingItemKubunName 商品区分名
-	 * @param shoppingItemName 商品名
-	 * @param companyName 会社名
-	 * @param sisyutuItemCode 支出項目コード
+	 * @param searchTargetKubun 検索対象(検索条件が商品検索条件で商品を検索の場合の検索項目)
+	 * @param searchValue 検索条件(検索条件が商品検索条件で商品を検索の場合の検索項目)
+	 * @param sisyutuItemCode 支出項目コード(検索条件が支出項目コードで商品を検索の場合の検索項目)
 	 * @return セッションに設定する商品検索条件
 	 *
 	 */
-	public static ShoppingItemSearchInfo from(String searchActType, String shoppingItemKubunName, String shoppingItemName, String companyName, String sisyutuItemCode) {
-		return new ShoppingItemSearchInfo(searchActType, shoppingItemKubunName, shoppingItemName, companyName, sisyutuItemCode);
+	public static ShoppingItemSearchInfo from(String searchActType, String searchTargetKubun, String searchValue, String sisyutuItemCode) {
+		return new ShoppingItemSearchInfo(searchActType, searchTargetKubun, searchValue, sisyutuItemCode);
 	}
 	
 	/**
@@ -64,12 +61,10 @@ public class ShoppingItemSearchInfo implements Serializable {
 		StringBuilder buff = new StringBuilder(40);
 		buff.append("searchActType:")
 		.append(searchActType)
-		.append(",shoppingItemKubunName:")
-		.append(shoppingItemKubunName)
-		.append(",shoppingItemName:")
-		.append(shoppingItemName)
-		.append(",companyName:")
-		.append(companyName)
+		.append(",searchTargetKubun:")
+		.append(searchTargetKubun)
+		.append(",searchValue:")
+		.append(searchValue)
 		.append(",sisyutuItemCode:")
 		.append(sisyutuItemCode);
 		return buff.toString();

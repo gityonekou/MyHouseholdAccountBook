@@ -34,6 +34,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItemI
 import com.yonetani.webapp.accountbook.domain.model.account.shop.ShopInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItem;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItemInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryShoppingItemInfoSearchCondition;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopKubunCodeList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemCode;
@@ -101,7 +102,7 @@ public class ShoppingItemInfoManageUseCase {
 	 * 指定したユーザIDに応じた情報管理(商品) 初期表示画面の表示情報を取得します。
 	 * ユーザIDをもとに支出項目一覧情報(日用消耗品と食費)を取得し、画面表示データに設定します。
 	 *</pre>
-	 * @param user 表示対象のユーザID
+	 * @param user ログインユーザ情報
 	 * @return 情報管理(商品) 初期表示画面の表示情報
 	 *
 	 */
@@ -145,7 +146,7 @@ public class ShoppingItemInfoManageUseCase {
 	 *<pre>
 	 * 入力した商品検索条件をもとに商品情報を取得します。
 	 *</pre>
-	 * @param user 表示対象のユーザID
+	 * @param user ログインユーザ情報
 	 * @param inputForm 商品検索条件入力フォームの入力値
 	 * @return 情報管理(商品)の商品検索画面情報
 	 *
@@ -155,7 +156,18 @@ public class ShoppingItemInfoManageUseCase {
 		
 		// レスポンスを生成
 		ShoppingItemInfoManageSearchResponse response = ShoppingItemInfoManageSearchResponse.getInstance();
-		
+		// 検索条件入力フォームの入力値をレスポンスに設定
+		response.setShoppingItemInfoSearchForm(inputForm);
+		// 検索を実行
+		execActSearchShoppingItem(
+				// ユーザID
+				user.getUserId(),
+				// 検索対象(検索条件入力フォーム設定値)
+				inputForm.getSearchTargetKubun(),
+				// 検索条件(検索条件入力フォーム設定値)
+				inputForm.getSearchValue(),
+				// 情報管理(商品)画面の商品検索結果画面情報
+				response);
 		
 		return response;
 	}
@@ -164,7 +176,7 @@ public class ShoppingItemInfoManageUseCase {
 	 *<pre>
 	 * 指定したユーザIDと商品コードに応じた情報管理(商品)処理選択画面の表示情報を取得します。
 	 *</pre>
-	 * @param user 表示対象のユーザID
+	 * @param user ログインユーザ情報
 	 * @param shoppingItemSearchInfo 検索条件情報
 	 * @param shoppingItemCode 表示対象商品の商品コード
 	 * @return 情報管理(商品)処理選択画面の表示情報
@@ -207,25 +219,37 @@ public class ShoppingItemInfoManageUseCase {
 		// 検索条件が支出項目コードで商品を検索の場合
 		if(Objects.equals(shoppingItemSearchInfo.getSearchActType(), MyHouseholdAccountBookContent.ACT_SEARCH_SISYUTU_ITEM)) {
 			
-			// 選択した支出項目名を取得(＞で区切った値)
-			String sisyutuItemName = sisyutuItemComponent.getSisyutuItemName(user, shoppingItemSearchInfo.getSisyutuItemCode());
-			
-			// 指定した支出項目コードに属する商品一覧を取得
-			ShoppingItemInquiryList searchItemListResult = shoppingItemRepository.findByIdAndSisyutuItemCode(
-					SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), shoppingItemSearchInfo.getSisyutuItemCode()));
-			if(searchItemListResult.isEmpty()) {
-				throw new MyHouseholdAccountBookRuntimeException("指定した支出項目「" + sisyutuItemName + "」に登録されている商品が0件です。管理者に問い合わせてください。");
-			} else {
-				// 商品検索結果をレスポンスに設定
-				response.addShoppingItemList(createShoppingItemList(searchItemListResult));
-				// 商品検索結果名を設定
-				response.setSearchResultNameValue("支出項目：" + sisyutuItemName);
-				
-			}
+			// 検索を実行
+			execActSearchSisyutuItem(
+					// ログインユーザ情報
+					user,
+					// 支出項目コード
+					shoppingItemSearchInfo.getSisyutuItemCode(),
+					// 情報管理(商品)画面の商品検索結果画面情報
+					response);
 			
 		// 検索条件が商品検索条件で商品を検索の場合
 		} else if (Objects.equals(shoppingItemSearchInfo.getSearchActType(), MyHouseholdAccountBookContent.ACT_SEARCH_SHOPPING_ITEM)) {
+			/* 検索条件入力フォームを設定 */
+			// 検索条件入力フォームを生成
+			ShoppingItemInfoSearchForm searchForm = new ShoppingItemInfoSearchForm();
+			// 検索対象
+			searchForm.setSearchTargetKubun(shoppingItemSearchInfo.getSearchTargetKubun());
+			// 検索条件
+			searchForm.setSearchValue(shoppingItemSearchInfo.getSearchValue());
+			// 検索条件入力フォームをレスポンスに設定
+			response.setShoppingItemInfoSearchForm(searchForm);
 			
+			/* 検索を実行 */
+			execActSearchShoppingItem(
+					// ユーザID
+					user.getUserId(),
+					// 検索対象(検索条件入力フォーム設定値)
+					shoppingItemSearchInfo.getSearchTargetKubun(),
+					// 検索条件(検索条件入力フォーム設定値)
+					shoppingItemSearchInfo.getSearchValue(),
+					// 情報管理(商品)画面の商品検索結果画面情報
+					response);
 		} else {
 			throw new MyHouseholdAccountBookRuntimeException("セッションに設定されている商品検索条件が不正です。管理者に問い合わせてください。[searchActType="
 					+ shoppingItemSearchInfo.getSearchActType() + "]");
@@ -238,7 +262,7 @@ public class ShoppingItemInfoManageUseCase {
 	 *<pre>
 	 * 指定した支出項目の情報を取得し、追加する商品が属する支出項目の情報として情報管理(商品)更新画面情報の表示情報を取得します。
 	 *</pre>
-	 * @param user ログインユーザID
+	 * @param user ログインユーザ情報
 	 * @param sisyutuItemCode 追加する商品が所属する支出項目の支出項目コード
 	 * @return 情報管理(商品)の更新画面情報
 	 *
@@ -281,22 +305,9 @@ public class ShoppingItemInfoManageUseCase {
 		
 		// レスポンスを生成
 		ShoppingItemInfoManageSearchResponse response = ShoppingItemInfoManageSearchResponse.getInstance();
+		// 検索を実行
+		execActSearchSisyutuItem(user, sisyutuItemCode, response);
 		
-		// 選択した支出項目名を取得(＞で区切った値)
-		String sisyutuItemName = sisyutuItemComponent.getSisyutuItemName(user, sisyutuItemCode);
-		
-		// 指定した支出項目コードに属する商品一覧を取得
-		ShoppingItemInquiryList searchResult = shoppingItemRepository.findByIdAndSisyutuItemCode(
-				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
-		if(searchResult.isEmpty()) {
-			response.addMessage("指定した支出項目「" + sisyutuItemName + "」に登録されている商品は0件です。");
-		} else {
-			// 商品検索結果をレスポンスに設定
-			response.addShoppingItemList(createShoppingItemList(searchResult));
-			// 商品検索結果名を設定
-			response.setSearchResultNameValue("支出項目：" + sisyutuItemName);
-			
-		}
 		return response;
 	}
 	
@@ -304,7 +315,7 @@ public class ShoppingItemInfoManageUseCase {
 	 *<pre>
 	 * 指定した商品の情報を取得し、追加する商品情報のコピー情報として情報管理(商品)更新画面情報の表示情報を取得します。
 	 *</pre>
-	 * @param user ログインユーザID
+	 * @param user ログインユーザ情報
 	 * @param shoppingItemCode コピー元となる商品の商品コード
 	 * @return 情報管理(商品)の更新画面情報
 	 *
@@ -356,7 +367,7 @@ public class ShoppingItemInfoManageUseCase {
 	 * 指定したユーザIDと商品コードに応じた情報管理(商品) 更新画面の表示情報取得処理です。
 	 * 選択した商品を更新するための情報を取得して画面返却情報に設定します。
 	 *</pre>
-	 * @param user 表示対象のユーザID
+	 * @param user ログインユーザ情報
 	 * @param shoppingItemCode 更新対象の商品コード
 	 * @return 情報管理(商品)の更新画面情報(商品更新時)
 	 *
@@ -410,7 +421,7 @@ public class ShoppingItemInfoManageUseCase {
 	 *<pre>
 	 * 商品情報入力フォームの入力値に従い、アクション(登録 or 更新)を実行します
 	 *</pre>
-	 * @param user ログインユーザID
+	 * @param user ログインユーザ情報
 	 * @param inputForm 商品情報入力フォームの入力値
 	 * @return 情報管理(商品)の更新画面情報
 	 *
@@ -603,5 +614,124 @@ public class ShoppingItemInfoManageUseCase {
 				// 基準価格
 				domain.getStandardPrice().toString())
 		).collect(Collectors.toUnmodifiableList());
+	}
+	
+	/**
+	 *<pre>
+	 * 商品情報を検索条件に商品を検索し、結果をレスポンスに設定します。
+	 * 情報管理(商品)画面の商品検索結果画面情報にセッションに設定する商品検索条件を設定します。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param searchTargetKubun 検索対象(検索条件入力フォーム設定値)
+	 * @param searchValue 検索条件(検索条件入力フォーム設定値)
+	 * @param response 情報管理(商品)画面の商品検索結果画面情報
+	 *
+	 */
+	private void execActSearchShoppingItem(
+			String userId, String searchTargetKubun, String searchValue, AbstractShoppingItemInfoManageSearchResponse response) {
+		
+		/* 商品検索条件のドメインと検索名を設定 */
+		SearchQueryShoppingItemInfoSearchCondition searchCondition = null;
+		String searchResultNameValue = null;
+		
+		// 検索条件が商品区分名の場合
+		if(Objects.equals(searchTargetKubun, MyHouseholdAccountBookContent.SEARCH_TARGET_SHOPPING_ITEM_KUBUN_NAME)) {
+			// 検索条件を設定
+			searchCondition = SearchQueryShoppingItemInfoSearchCondition.from(
+					// ユーザID
+					userId,
+					// 商品区分名
+					searchValue,
+					// 商品名
+					null,
+					// 会社名
+					null);
+			
+			// 商品検索名を設定
+			searchResultNameValue = "商品区分名：" + searchValue;
+			
+		// 検索条件が商品名の場合
+		} else if(Objects.equals(searchTargetKubun, MyHouseholdAccountBookContent.SEARCH_TARGET_SHOPPING_ITEM_NAME)) {
+			// 検索条件を設定
+			searchCondition = SearchQueryShoppingItemInfoSearchCondition.from(
+					// ユーザID
+					userId,
+					// 商品区分名
+					null,
+					// 商品名
+					searchValue,
+					// 会社名
+					null);
+			
+			// 商品検索名を設定
+			searchResultNameValue = "商品名：" + searchValue;
+			
+		// 検索条件が会社名の場合
+		} else if(Objects.equals(searchTargetKubun, MyHouseholdAccountBookContent.SEARCH_TARGET_COMPANY_NAME)) {
+			// 検索条件を設定
+			searchCondition = SearchQueryShoppingItemInfoSearchCondition.from(
+					// ユーザID
+					userId,
+					// 商品区分名
+					null,
+					// 商品名
+					null,
+					// 会社名
+					searchValue);
+			
+			// 商品検索名を設定
+			searchResultNameValue = "会社名：" + searchValue;
+			
+		// 上記以外の場合は不正値としてエラー
+		} else {
+			throw new MyHouseholdAccountBookRuntimeException("商品検索条件が不正です。管理者に問い合わせてください。[searchTargetKubun="
+					+ searchTargetKubun + "]");
+		}
+		
+		// セッションに設定する商品検索条件を設定
+		response.setShoppingItemSearchInfo(
+				ShoppingItemSearchInfo.from(MyHouseholdAccountBookContent.ACT_SEARCH_SHOPPING_ITEM, searchTargetKubun, searchValue, null));
+		
+		// 指定した検索条件に一致する商品情報の一覧を取得
+		ShoppingItemInquiryList searchResult = shoppingItemRepository.selectShoppingItemInfoSearchCondition(searchCondition);
+		if(searchResult.isEmpty()) {
+			response.addMessage("指定した検索条件に一致する商品は0件です。");
+		} else {
+			// 商品検索結果をレスポンスに設定
+			response.addShoppingItemList(createShoppingItemList(searchResult));
+			// 商品検索結果名を設定
+			response.setSearchResultNameValue(searchResultNameValue);
+			
+		}
+	}
+	
+	/**
+	 *<pre>
+	 * 支出項目コードを検索条件に商品を検索し、結果をレスポンスに設定します。
+	 * 情報管理(商品)画面の商品検索結果画面情報にセッションに設定する商品検索条件を設定します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param sisyutuItemCode 支出項目コード
+	 * @param response 情報管理(商品)画面の商品検索結果画面情報
+	 *
+	 */
+	private void execActSearchSisyutuItem(LoginUserInfo user, String sisyutuItemCode, AbstractShoppingItemInfoManageSearchResponse response) {
+		// 選択した支出項目名を取得(＞で区切った値)
+		String sisyutuItemName = sisyutuItemComponent.getSisyutuItemName(user, sisyutuItemCode);
+		
+		// 指定した支出項目コードに属する商品一覧を取得
+		ShoppingItemInquiryList searchResult = shoppingItemRepository.findByIdAndSisyutuItemCode(
+				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
+		if(searchResult.isEmpty()) {
+			response.addMessage("指定した支出項目「" + sisyutuItemName + "」に登録されている商品は0件です。");
+		} else {
+			// 商品検索結果をレスポンスに設定
+			response.addShoppingItemList(createShoppingItemList(searchResult));
+			// 商品検索結果名を設定
+			response.setSearchResultNameValue("支出項目：" + sisyutuItemName);
+			// セッションに設定する商品検索条件を設定
+			response.setShoppingItemSearchInfo(
+					ShoppingItemSearchInfo.from(MyHouseholdAccountBookContent.ACT_SEARCH_SISYUTU_ITEM, null, null, sisyutuItemCode));
+		}
 	}
 }

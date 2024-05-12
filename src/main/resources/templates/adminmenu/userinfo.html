@@ -46,9 +46,9 @@
 				<div class="mb-3 w30">
 					<label class="form-label">ステータス</label>
 					<div class="col-auto border">
-						<input type="radio" name="userStatus" class="form-check-input" th:field="*{userStatus}" value="userStatusEnabled">
+						<input type="radio" name="userStatus" class="form-check-input" th:errorclass="is-invalid" th:field="*{userStatus}" value="userStatusEnabled">
 						<label class="form-check-label" for="userStatusEnabled">：有効&emsp;</label>
-						<input type="radio" name="userStatus" class="form-check-input" th:field="*{userStatus}" value="userStatusDisabled">
+						<input type="radio" name="userStatus" class="form-check-input" th:errorclass="is-invalid" th:field="*{userStatus}" value="userStatusDisabled">
 						<label class="form-check-label" for="userStatusDisabled">：無効</label>
 						<p class="invalid-feedback" th:errors="*{userStatus}"></p>
 					</div>
@@ -56,13 +56,12 @@
 				<div class="mb-3 w30">
 					<label class="form-label">ユーザロール</label>
 					<div class="col-auto border">
-						<input type="checkbox" class="form-check-input" th:field="*{userRole}" value="userRoleAdmin">
+						<input type="checkbox" class="form-check-input" th:errorclass="is-invalid" th:field="*{userRole}" value="userRoleAdmin">
 						<label class="form-check-label" for="userRoleAdmin">：管理者&emsp;</label>
-						<input type="checkbox" class="form-check-input" th:field="*{userRole}" value="userRoleUser">
+						<input type="checkbox" class="form-check-input" th:errorclass="is-invalid" th:field="*{userRole}" value="userRoleUser">
 						<label class="form-check-label" for="userRoleUser">：ユーザー</label>
+						<p class="invalid-feedback" th:errors="*{userRole}"></p>
 					</div>
-					<p class="invalid-feedback" th:errors="*{userRole}"></p>
-					
 				</div>
 				<div class="mb-3">
 					<label for="userPassword" class="form-label">ユーザパスワード</label>

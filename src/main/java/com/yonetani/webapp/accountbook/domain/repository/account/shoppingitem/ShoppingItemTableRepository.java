@@ -12,6 +12,7 @@ package com.yonetani.webapp.accountbook.domain.repository.account.shoppingitem;
 
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItem;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItemInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryShoppingItemInfoSearchCondition;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
@@ -70,6 +71,17 @@ public interface ShoppingItemTableRepository {
 	 */
 	ShoppingItemInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search);
 	
+
+	/**
+	 *<pre>
+	 * 指定の商品情報検索条件に一致する商品情報の検索結果を取得します。
+	 *</pre>
+	 * @param search 商品検索条件
+	 * @return 商品情報の検索結果
+	 *
+	 */
+	ShoppingItemInquiryList selectShoppingItemInfoSearchCondition(SearchQueryShoppingItemInfoSearchCondition search);
+	
 	/**
 	 *<pre>
 	 * 新規の商品コード発番用にユーザIDに対応する商品情報が何件あるかを取得します。
@@ -79,4 +91,5 @@ public interface ShoppingItemTableRepository {
 	 *
 	 */
 	int countById(SearchQueryUserId userId);
+	
 }

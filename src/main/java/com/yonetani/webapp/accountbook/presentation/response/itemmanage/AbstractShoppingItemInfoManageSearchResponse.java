@@ -20,6 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoSearchForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
+import com.yonetani.webapp.accountbook.presentation.session.ShoppingItemSearchInfo;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -109,6 +110,10 @@ public abstract class AbstractShoppingItemInfoManageSearchResponse extends Abstr
 	// 商品検索結果名
 	@Setter
 	private String searchResultNameValue;
+	// セッションに設定する商品検索条件
+	@Setter
+	@Getter
+	private ShoppingItemSearchInfo shoppingItemSearchInfo;
 	
 	/**
 	 * {@inheritDoc}

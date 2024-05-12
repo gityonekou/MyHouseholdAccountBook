@@ -104,7 +104,6 @@ public class ShoppingItemInfoManageActSelect extends AbstractShoppingItemInfoMan
 		// 更新商品情報入力フォーム
 		modelAndView.addObject("shoppingItemInfo", shoppingItemInfo);
 		
-		
 		return modelAndView;
 	}
 

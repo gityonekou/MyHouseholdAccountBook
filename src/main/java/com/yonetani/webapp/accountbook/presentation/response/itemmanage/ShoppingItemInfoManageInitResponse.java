@@ -12,8 +12,11 @@ package com.yonetani.webapp.accountbook.presentation.response.itemmanage;
 
 import org.springframework.web.servlet.ModelAndView;
 
+import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoSearchForm;
+
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 /**
  *<pre>
@@ -29,6 +32,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ShoppingItemInfoManageInitResponse extends AbstractExpenditureItemInfoManageResponse {
 
+	// 検索条件入力フォーム
+	@Setter
+	private ShoppingItemInfoSearchForm shoppingItemInfoSearchForm;
+	
 	/**
 	 *<pre>
 	 * デフォルト値からレスポンス情報を生成して返します。
@@ -47,11 +54,12 @@ public class ShoppingItemInfoManageInitResponse extends AbstractExpenditureItemI
 	public ModelAndView build() {
 		// 画面表示のModelとViewを生成
 		ModelAndView modelAndView = createModelAndView("itemmanage/ShoppingItemInfoManageInit");
-		// TODO 自動生成されたメソッド・スタブ
-		// 各画面表示情報を設定
-		
+		// 検索条件入力フォーム
+		if(shoppingItemInfoSearchForm == null) {
+			shoppingItemInfoSearchForm = new ShoppingItemInfoSearchForm();
+		}
+		modelAndView.addObject("shoppingItemInfoSearchForm", shoppingItemInfoSearchForm);
 		
 		return modelAndView;
 	}
-
 }

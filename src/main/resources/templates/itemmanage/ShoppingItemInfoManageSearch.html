@@ -31,17 +31,19 @@
 				<div class="mb-3 w30">
 					<label class="form-label">検索対象</label>
 					<div class="col-auto border">
-						<input type="radio" name="UserStatusRadios" class="form-check-input" id="userstatusA">
-						<label class="form-check-label" for="userstatusA">：商品区分名&emsp;</label>
-						<input type="radio" name="UserStatusRadios" class="form-check-input" id="userstatusB" checked>
-						<label class="form-check-label" for="userstatusB">：商品名&emsp;</label>
-						<input type="radio" name="UserStatusRadios" class="form-check-input" id="userstatusC">
-						<label class="form-check-label" for="userstatusC">：会社名</label>
+						<input type="radio" name="searchTargetKubun" class="form-check-input" th:errorclass="is-invalid" th:field="*{searchTargetKubun}" value="itemKubun">
+						<label class="form-check-label" for="itemKubun">：商品区分名&emsp;</label>
+						<input type="radio" name="searchTargetKubun" class="form-check-input" th:errorclass="is-invalid" th:field="*{searchTargetKubun}" value="itemName">
+						<label class="form-check-label" for="itemName">：商品名&emsp;</label>
+						<input type="radio" name="searchTargetKubun" class="form-check-input" th:errorclass="is-invalid" th:field="*{searchTargetKubun}" value="companyName">
+						<label class="form-check-label" for="companyName">：会社名</label>
+						<p class="invalid-feedback" th:errors="*{searchTargetKubun}"></p>
 					</div>
 				</div>
 					<div class="mb-3">
 					<label for="search_name" class="form-label">検索条件入力</label>
- 					<input type="text" class="form-control" id="search_name" value="ポテトチップス" required>
+ 					<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{searchValue}">
+ 					<p class="invalid-feedback" th:errors="*{searchValue}"></p>
 				</div>
 				<div class="mb-3">
 					<button class="btn btn-primary" name="search" type="submit">検索</button>

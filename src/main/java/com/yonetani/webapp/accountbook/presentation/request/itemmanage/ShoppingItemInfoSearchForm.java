@@ -9,6 +9,7 @@
  */
 package com.yonetani.webapp.accountbook.presentation.request.itemmanage;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /**
@@ -24,7 +25,9 @@ import lombok.Data;
 @Data
 public class ShoppingItemInfoSearchForm {
 	// 検索対象
-	
+	@NotBlank
+	private String searchTargetKubun;
 	// 検索条件
-	
+	@NotBlank
+	private String searchValue;
 }
