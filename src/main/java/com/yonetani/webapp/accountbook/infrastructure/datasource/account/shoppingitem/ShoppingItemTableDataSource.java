@@ -19,12 +19,14 @@ import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.Shoppin
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryShoppingItemInfoSearchCondition;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemJanCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.shoppingitem.ShoppingItemTableRepository;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.shoppingitem.ShoppingItemInquiryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.shoppingitem.ShoppingItemReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.ShoppingItemInfoSearchConditionSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShoppingItemCodeSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShoppingItemJanCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndSisyutuItemCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.shoppingitem.ShoppingItemTableMapper;
@@ -106,6 +108,24 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 	 * {@inheritDoc}
 	 */
 	@Override
+	public ShoppingItemInquiryList findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode search) {
+		// 検索結果を取得
+		List<ShoppingItemInquiryReadDto> searchResult = mapper.findByIdAndShoppingItemJanCode(UserIdAndShoppingItemJanCodeSearchQueryDto.from(
+				search.getUserId().toString(), search.getShoppingItemJanCode().toString()));
+		if(searchResult == null) {
+			// 検索結果なしの場合、0件データを返却
+			return ShoppingItemInquiryList.from(null);
+		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
+			return ShoppingItemInquiryList.from(searchResult.stream().map(dto -> createShoppingItemInquiryItem(dto))
+						.collect(Collectors.toUnmodifiableList()));
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public ShoppingItemInquiryList selectShoppingItemInfoSearchCondition(
 			SearchQueryShoppingItemInfoSearchCondition search) {
 		// 検索結果を取得
@@ -118,7 +138,9 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 						// 商品名
 						search.getShoppingItemName().toString(),
 						// 会社名
-						search.getCompanyName().toString()));
+						search.getCompanyName().toString(),
+						// 商品JANコード
+						search.getShoppingItemJanCode().toString()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return ShoppingItemInquiryList.from(null);
@@ -134,8 +156,18 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 	 */
 	@Override
 	public int countById(SearchQueryUserId userId) {
-		// ユーザIDで検索し、登録されている支出項目の件数を返す
+		// ユーザIDで検索し、登録されている商品の件数を返す
 		return mapper.countById(UserIdSearchQueryDto.from(userId.getUserId().toString()));
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int countByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode search) {
+		// ユーザID、商品JANコードで検索し、登録されている商品の件数を返す
+		return mapper.countByIdAndShoppingItemJanCode(UserIdAndShoppingItemJanCodeSearchQueryDto.from(
+				search.getUserId().toString(), search.getShoppingItemJanCode().toString()));
 	}
 	
 	/**

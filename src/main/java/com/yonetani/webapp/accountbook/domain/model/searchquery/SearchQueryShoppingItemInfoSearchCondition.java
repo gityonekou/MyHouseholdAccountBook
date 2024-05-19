@@ -15,6 +15,7 @@
 package com.yonetani.webapp.accountbook.domain.model.searchquery;
 
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCompanyName;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemJanCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemKubunName;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemName;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
@@ -49,6 +50,8 @@ public class SearchQueryShoppingItemInfoSearchCondition {
 	private final ShoppingItemName shoppingItemName;
 	// 会社名
 	private final ShoppingItemCompanyName companyName;
+	// 商品JANコード
+	private final ShoppingItemJanCode shoppingItemJanCode;
 	
 	/**
 	 *<pre>
@@ -57,17 +60,19 @@ public class SearchQueryShoppingItemInfoSearchCondition {
 	 * ・商品区分名：任意(null可)
 	 * ・商品名：任意(null可)
 	 * ・会社名：任意(null可)
+	 * ・商品JANコード：任意(null可)
 	 * ※商品区分名、商品名、会社名のどれかは必須
 	 *</pre>
 	 * @param userId ユーザID
 	 * @param shoppingItemKubunName 商品区分名
 	 * @param shoppingItemName 商品名
 	 * @param companyName 会社名
-	 * @return 検索条件(ユーザID, 商品区分名, 商品名, 会社名)
+	 * @param shoppingItemJanCode 商品JANコード
+	 * @return 検索条件(ユーザID, 商品区分名, 商品名, 会社名, 商品JANコード)
 	 *
 	 */
 	public static SearchQueryShoppingItemInfoSearchCondition from(String userId, String shoppingItemKubunName, 
-			String shoppingItemName, String companyName) {
+			String shoppingItemName, String companyName, String shoppingItemJanCode) {
 		return new SearchQueryShoppingItemInfoSearchCondition(
 						// ユーザID
 						UserId.from(userId),
@@ -76,7 +81,9 @@ public class SearchQueryShoppingItemInfoSearchCondition {
 						// 商品名
 						ShoppingItemName.from(shoppingItemName),
 						// 会社名
-						ShoppingItemCompanyName.from(companyName));
+						ShoppingItemCompanyName.from(companyName),
+						// 商品JANコード
+						ShoppingItemJanCode.from(shoppingItemJanCode));
 	}
 	
 	/**
@@ -85,7 +92,7 @@ public class SearchQueryShoppingItemInfoSearchCondition {
 	@Override
 	public String toString() {
 		
-		StringBuilder buff = new StringBuilder(250);
+		StringBuilder buff = new StringBuilder(280);
 		buff.append("userId:")
 		.append(userId)
 		.append(",shoppingItemKubunName:")
@@ -93,7 +100,9 @@ public class SearchQueryShoppingItemInfoSearchCondition {
 		.append(",shoppingItemName:")
 		.append(shoppingItemName)
 		.append(",companyName:")
-		.append(companyName);
+		.append(companyName)
+		.append(",shoppingItemJanCode:")
+		.append(shoppingItemJanCode);
 		return buff.toString();
 	}
 }

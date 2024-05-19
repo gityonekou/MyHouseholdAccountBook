@@ -74,5 +74,6 @@ public class MyHouseholdAccountBookContent {
 	public static final String SEARCH_TARGET_SHOPPING_ITEM_NAME = "itemName";
 	// 会社名を検索条件に商品を検索
 	public static final String SEARCH_TARGET_COMPANY_NAME = "companyName";
-	
+	// 商品JANコードを検索条件に商品を検索
+	public static final String SEARCH_TARGET_SHOPPING_ITEM_JAN_CODE = "janCode";
 }

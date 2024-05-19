@@ -42,6 +42,8 @@ public class ShoppingItemInfoSearchConditionSearchQueryDto {
 	private final String shoppingItemName;
 	// 会社名
 	private final String companyName;
+	// 商品JANコード
+	private final String shoppingItemJanCode;
 	
 	/**
 	 *<pre>
@@ -51,12 +53,13 @@ public class ShoppingItemInfoSearchConditionSearchQueryDto {
 	 * @param shoppingItemKubunName 商品区分名
 	 * @param shoppingItemName 商品名
 	 * @param companyName 会社名
-	 * @return テーブルの検索条件：ユーザID、商品区分名、商品名、会社名
+	 * @param shoppingItemJanCode 商品JANコード
+	 * @return テーブルの検索条件：ユーザID、商品区分名、商品名、会社名、商品JANコード
 	 *
 	 */
 	public static ShoppingItemInfoSearchConditionSearchQueryDto from(String userId, String shoppingItemKubunName, 
-			String shoppingItemName, String companyName) {
+			String shoppingItemName, String companyName, String shoppingItemJanCode) {
 		return new ShoppingItemInfoSearchConditionSearchQueryDto(userId, shoppingItemKubunName, 
-				shoppingItemName, companyName);
+				shoppingItemName, companyName, shoppingItemJanCode);
 	}
 }

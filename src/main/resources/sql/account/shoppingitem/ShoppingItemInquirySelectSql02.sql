@@ -19,4 +19,7 @@ SELECT A.SHOPPING_ITEM_CODE, A.SHOPPING_ITEM_KUBUN_NAME, A.SHOPPING_ITEM_NAME, A
          /*[# mb:bind="patternCompanyName=|%${#likes.escapeWildcard(dto.companyName)}%|" /]*/
          AND A.COMPANY_NAME             LIKE /*[# mb:p="patternCompanyName"]*/ 4 /*[/]*/
       /*[/]*/
+      /*[# th:if="${dto.shoppingItemJanCode} != null"]*/
+         AND A.SHOPPING_ITEM_JAN_CODE = /*[# mb:p="dto.shoppingItemJanCode"]*/ 5 /*[/]*/ 
+      /*[/]*/
   ORDER BY A.SHOPPING_ITEM_CODE DESC

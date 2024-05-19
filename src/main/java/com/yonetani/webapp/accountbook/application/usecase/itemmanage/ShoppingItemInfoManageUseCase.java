@@ -38,15 +38,18 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryShopp
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopKubunCodeList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemJanCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemSortBetweenAB;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.shoppingitem.ShoppingItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemJanCode;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoSearchForm;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoUpdateForm;
+import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractExpenditureItemInfoManageResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractShoppingItemInfoManageSearchResponse;
@@ -431,10 +434,17 @@ public class ShoppingItemInfoManageUseCase {
 		log.debug("execAction:userid=" + user.getUserId() + ",inputForm=" + inputForm);
 		
 		// レスポンスを生成
-		ShoppingItemInfoManageUpdateResponse response = ShoppingItemInfoManageUpdateResponse.getInstance(null);
+		ShoppingItemInfoManageUpdateResponse response = createShoppingItemInfoManageUpdateResponse(user.getUserId());
+		response.setShoppingItemInfoUpdateForm(inputForm);
 		
 		// 新規登録の場合
 		if(inputForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
+			
+			// 商品JANコードが既に登録済みでないかを確認
+			if(!checkShoppingItemJanCode(user.getUserId(), inputForm.getShoppingItemJanCode(), response)) {
+				// 登録済みの場合、処理終了(エラーメッセージを更新画面に表示
+				return response;
+			}
 			
 			// 新規採番する商品コードの値を取得
 			int count = shoppingItemRepository.countById(SearchQueryUserId.from(user.getUserId()));
@@ -462,6 +472,24 @@ public class ShoppingItemInfoManageUseCase {
 			
 		// 更新の場合
 		} else if (inputForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
+			
+			/* 商品JANコードが変更されている場合、既に登録済みでないかを確認 */
+			// 変更対象の商品情報を取得
+			ShoppingItem searchResult = shoppingItemRepository.findByIdAndShoppingItemCode(
+					SearchQueryUserIdAndShoppingItemCode.from(user.getUserId(), inputForm.getShoppingItemCode()));
+			if(searchResult == null) {
+				throw new MyHouseholdAccountBookRuntimeException("選択した商品が商品テーブル:SHOPPING_ITEM_TABLEに存在しません。管理者に問い合わせてください。[shoppingItemCode=" + inputForm.getShoppingItemCode() + "]");
+			}
+			// 商品JANコードが変更されている場合
+			if(!searchResult.getShoppingItemJanCode().equals(ShoppingItemJanCode.from(inputForm.getShoppingItemJanCode()))) {
+				// 商品JANコードが既に登録済みでないかを確認
+				if(!checkShoppingItemJanCode(user.getUserId(), inputForm.getShoppingItemJanCode(), response)) {
+					// 登録済みの場合、処理終了(エラーメッセージを更新画面に表示
+					return response;
+				}
+			}
+			
+			/* 商品更新 */
 			// 商品情報を作成
 			ShoppingItem updateData = createSisyutuItem(user.getUserId().toString(), inputForm);
 			
@@ -645,6 +673,8 @@ public class ShoppingItemInfoManageUseCase {
 					// 商品名
 					null,
 					// 会社名
+					null,
+					//商品JANコード
 					null);
 			
 			// 商品検索名を設定
@@ -661,6 +691,8 @@ public class ShoppingItemInfoManageUseCase {
 					// 商品名
 					searchValue,
 					// 会社名
+					null,
+					//商品JANコード
 					null);
 			
 			// 商品検索名を設定
@@ -677,10 +709,30 @@ public class ShoppingItemInfoManageUseCase {
 					// 商品名
 					null,
 					// 会社名
-					searchValue);
+					searchValue,
+					// 商品JANコード
+					null);
 			
 			// 商品検索名を設定
 			searchResultNameValue = "会社名：" + searchValue;
+			
+		// 検索条件が商品JANコードの場合
+		} else if(Objects.equals(searchTargetKubun, MyHouseholdAccountBookContent.SEARCH_TARGET_SHOPPING_ITEM_JAN_CODE)) {
+			// 検索条件を設定
+			searchCondition = SearchQueryShoppingItemInfoSearchCondition.from(
+					// ユーザID
+					userId,
+					// 商品区分名
+					null,
+					// 商品名
+					null,
+					// 会社名
+					null,
+					// 商品JANコード
+					searchValue);
+			
+			// 商品検索名を設定
+			searchResultNameValue = "商品JANコード：" + searchValue;
 			
 		// 上記以外の場合は不正値としてエラー
 		} else {
@@ -732,6 +784,43 @@ public class ShoppingItemInfoManageUseCase {
 			// セッションに設定する商品検索条件を設定
 			response.setShoppingItemSearchInfo(
 					ShoppingItemSearchInfo.from(MyHouseholdAccountBookContent.ACT_SEARCH_SISYUTU_ITEM, null, null, sisyutuItemCode));
+		}
+	}
+	
+	/**
+	 *<pre>
+	 * 指定した商品JANコードが登録済みの商品JANコードかどうかをチェックします。
+	 *</pre>
+	 * @param userId ログインユーザID
+	 * @param shoppingItemJanCode 商品JANコード
+	 * @param response 画面情報
+	 * @return 商品JANコードが未登録の場合チェックOK:true、商品JANコードが既に登録済みの場合チェックNG:false
+	 *
+	 */
+	private boolean checkShoppingItemJanCode(String userId, String shoppingItemJanCode, AbstractResponse response) {
+		// 商品JANコードで検索するための条件を生成
+		SearchQueryUserIdAndShoppingItemJanCode searchJanCode = SearchQueryUserIdAndShoppingItemJanCode.from(
+				// ユーザID
+				userId,
+				// 商品JANコード
+				shoppingItemJanCode);
+		
+		// 商品JANコードに対応する商品の登録件数を取得
+		int checkCount = shoppingItemRepository.countByIdAndShoppingItemJanCode(searchJanCode);
+		// 商品JANコードが既に登録済みの場合、登録済み(チェックNG:false)を返却
+		if(checkCount > 0) {
+			// エラーメッセージを設定
+			response.addMessage("既に登録済みの商品JANコードが指定されています。[商品JANコード:" + shoppingItemJanCode + "]");
+			// 既に登録済みの商品JANコードに対応する商品情報を取得
+			ShoppingItemInquiryList searchJanCodeList = shoppingItemRepository.findByIdAndShoppingItemJanCode(searchJanCode);
+			if(!searchJanCodeList.isEmpty()) {
+				response.addMessage("商品名：" + searchJanCodeList.getValues().get(0).getShoppingItemName());
+			}
+			return false;
+			
+		// 商品JANコードが未登録の場合、未登録(チェックOK:true)を返却
+		} else {
+			return true;
 		}
 	}
 }

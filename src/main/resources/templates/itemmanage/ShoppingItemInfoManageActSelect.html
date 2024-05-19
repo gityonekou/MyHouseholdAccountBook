@@ -68,7 +68,7 @@
 					<form name="ShoppingItemInfoSearch" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/shoppingiteminfo/search/}" th:object="${shoppingItemInfoSearchForm}">
 					<div class="card-body">
 						<p class="h6">■飲食日用品　商品検索■</p>
-						<div class="mb-3 w30">
+						<div class="mb-3 w50">
 							<label class="form-label">検索対象</label>
 							<div class="col-auto border">
 								<input type="radio" name="searchTargetKubun" class="form-check-input" th:errorclass="is-invalid" th:field="*{searchTargetKubun}" value="itemKubun">
@@ -76,7 +76,9 @@
 								<input type="radio" name="searchTargetKubun" class="form-check-input" th:errorclass="is-invalid" th:field="*{searchTargetKubun}" value="itemName">
 								<label class="form-check-label" for="itemName">：商品名&emsp;</label>
 								<input type="radio" name="searchTargetKubun" class="form-check-input" th:errorclass="is-invalid" th:field="*{searchTargetKubun}" value="companyName">
-								<label class="form-check-label" for="companyName">：会社名</label>
+								<label class="form-check-label" for="companyName">：会社名&emsp;</label>
+								<input type="radio" name="searchTargetKubun" class="form-check-input" th:errorclass="is-invalid" th:field="*{searchTargetKubun}" value="janCode">
+								<label class="form-check-label" for="companyName">：JANコード</label>
 								<p class="invalid-feedback" th:errors="*{searchTargetKubun}"></p>
 							</div>
 						</div>

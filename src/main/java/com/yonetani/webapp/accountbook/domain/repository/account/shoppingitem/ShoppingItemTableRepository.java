@@ -15,6 +15,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.Shoppin
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryShoppingItemInfoSearchCondition;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemJanCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 
 /**
@@ -71,7 +72,16 @@ public interface ShoppingItemTableRepository {
 	 */
 	ShoppingItemInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search);
 	
-
+	/**
+	 *<pre>
+	 * ユーザIDと指定の商品JANコードに対応する商品情報の検索結果を取得します。
+	 *</pre>
+	 * @param search 検索対象のユーザID、商品JANコード
+	 * @return 商品情報の検索結果
+	 *
+	 */
+	ShoppingItemInquiryList findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode search);
+	
 	/**
 	 *<pre>
 	 * 指定の商品情報検索条件に一致する商品情報の検索結果を取得します。
@@ -91,5 +101,15 @@ public interface ShoppingItemTableRepository {
 	 *
 	 */
 	int countById(SearchQueryUserId userId);
+	
+	/**
+	 *<pre>
+	 * ユーザIDと指定の商品JANコードに対応する商品情報が何件あるかを取得します。
+	 *</pre>
+	 * @param search 検索対象のユーザID、商品JANコード
+	 * @return 指定条件に該当するデータの件数
+	 *
+	 */
+	int countByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode search);
 	
 }

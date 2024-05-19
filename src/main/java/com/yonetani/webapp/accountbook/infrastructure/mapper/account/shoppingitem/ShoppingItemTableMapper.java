@@ -21,6 +21,7 @@ import com.yonetani.webapp.accountbook.infrastructure.dto.account.shoppingitem.S
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.shoppingitem.ShoppingItemReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.ShoppingItemInfoSearchConditionSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShoppingItemCodeSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShoppingItemJanCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndSisyutuItemCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSearchQueryDto;
 
@@ -97,6 +98,18 @@ public interface ShoppingItemTableMapper {
 	
 	/**
 	 *<pre>
+	 * 商品テーブル:SHOPPING_ITEM_TABLE、支出項目テーブル:SISYUTU_ITEM_TABLE、店舗テーブル:SHOP_TABLEから
+	 * 指定のユーザID、商品JANコードを条件に商品情報を検索します。
+	 *</pre>
+	 * @param search 検索条件:ユーザID、商品JANコード
+	 * @return 商品情報参照結果のリスト
+	 *
+	 */
+	@Select("sql/account/shoppingitem/ShoppingItemInquirySelectSql03.sql")
+	public List<ShoppingItemInquiryReadDto> findByIdAndShoppingItemJanCode(@Param("dto") UserIdAndShoppingItemJanCodeSearchQueryDto search);
+	
+	/**
+	 *<pre>
 	 * 指定のユーザIDに対応する商品情報が何件あるかを取得します。
 	 *</pre>
 	 * @param userId 検索条件:ユーザID
@@ -105,5 +118,16 @@ public interface ShoppingItemTableMapper {
 	 */
 	@Select("sql/account/shoppingitem/ShoppingItemTableCountSql01.sql")
 	public int countById(@Param("dto") UserIdSearchQueryDto userId);
+	
+	/**
+	 *<pre>
+	 * 指定のユーザID、商品JANコードに対応する商品情報が何件あるかを取得します。
+	 *</pre>
+	 * @param search 検索条件:ユーザID、商品JANコード
+	 * @return 指定条件に該当するデータの件数
+	 *
+	 */
+	@Select("sql/account/shoppingitem/ShoppingItemTableCountSql02.sql")
+	public int countByIdAndShoppingItemJanCode(@Param("dto") UserIdAndShoppingItemJanCodeSearchQueryDto search);
 	
 }
