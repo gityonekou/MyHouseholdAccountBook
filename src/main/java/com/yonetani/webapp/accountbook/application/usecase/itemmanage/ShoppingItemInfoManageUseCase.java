@@ -53,8 +53,8 @@ import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractExpenditureItemInfoManageResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractShoppingItemInfoManageSearchResponse;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageActSelect;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageActSelect.SelectShoppingItemInfo;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageActSelectResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageActSelectResponse.SelectShoppingItemInfo;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageInitResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageSearchResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageUpdateResponse;
@@ -66,6 +66,7 @@ import lombok.extern.log4j.Log4j2;
 
 /**
  *<pre>
+ * 商品情報管理ユースケースです。
  * ・情報管理(商品)初期表示画面情報取得(支出項目一覧情報を取得)
  * ・情報管理(商品)検索結果画面情報取得(商品検索結果を取得)
  * ・情報管理(商品)処理選択画面情報取得(選択商品へのアクション選択)
@@ -185,7 +186,7 @@ public class ShoppingItemInfoManageUseCase {
 	 * @return 情報管理(商品)処理選択画面の表示情報
 	 *
 	 */
-	public ShoppingItemInfoManageActSelect readActSelectItemInfo(LoginUserInfo user, 
+	public ShoppingItemInfoManageActSelectResponse readActSelectItemInfo(LoginUserInfo user, 
 			ShoppingItemSearchInfo shoppingItemSearchInfo, String shoppingItemCode) {
 		log.debug("readActSelectItemInfo:userid=" + user.getUserId() + ",shoppingItemSearchInfo=["
 			+ shoppingItemSearchInfo + "],shoppingItemCode=" + shoppingItemCode);
@@ -201,7 +202,7 @@ public class ShoppingItemInfoManageUseCase {
 			throw new MyHouseholdAccountBookRuntimeException("選択した商品が商品テーブル:SHOPPING_ITEM_TABLEに存在しません。管理者に問い合わせてください。[shoppingItemCode=" + shoppingItemCode + "]");
 		}
 		// 選択した商品情報をもとにレスポンスを生成
-		ShoppingItemInfoManageActSelect response = ShoppingItemInfoManageActSelect.getInstance(
+		ShoppingItemInfoManageActSelectResponse response = ShoppingItemInfoManageActSelectResponse.getInstance(
 				SelectShoppingItemInfo.from(
 						// 商品コード
 						searchResult.getShoppingItemCode().toString(),
@@ -438,7 +439,7 @@ public class ShoppingItemInfoManageUseCase {
 		response.setShoppingItemInfoUpdateForm(inputForm);
 		
 		// 新規登録の場合
-		if(inputForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
+		if(Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
 			
 			// 商品JANコードが既に登録済みでないかを確認
 			if(!checkShoppingItemJanCode(user.getUserId(), inputForm.getShoppingItemJanCode(), response)) {
@@ -471,7 +472,7 @@ public class ShoppingItemInfoManageUseCase {
 			response.addMessage("新規商品を追加しました。[code:" + addData.getShoppingItemCode() + "]" + addData.getShoppingItemName());
 			
 		// 更新の場合
-		} else if (inputForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
+		} else if (Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
 			
 			/* 商品JANコードが変更されている場合、既に登録済みでないかを確認 */
 			// 変更対象の商品情報を取得
@@ -515,7 +516,7 @@ public class ShoppingItemInfoManageUseCase {
 	
 	/**
 	 *<pre>
-	 * 情報管理(商品)更新画面で登録実行時にバリデーションチェックNGとなった場合の各画面表示項目を取得します。
+	 * 情報管理(商品)更新画面で登録実行時のバリデーションチェックNGとなった場合の各画面表示項目を取得します。
 	 * バリデーションチェック結果でNGの場合に呼び出してください。
 	 *</pre>
 	 * @param user 表示対象のユーザID

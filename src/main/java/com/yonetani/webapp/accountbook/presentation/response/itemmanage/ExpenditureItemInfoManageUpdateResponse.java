@@ -18,7 +18,6 @@ import org.springframework.web.servlet.ModelAndView;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ExpenditureItemInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
-import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -94,26 +93,6 @@ public class ExpenditureItemInfoManageUpdateResponse extends AbstractExpenditure
 		modelAndView.addObject("parentMembers",parentMembersItem);
 		
 		return modelAndView;
-	}
-	
-	/**
-	 *<pre>
-	 * 画面に出力するエラーメッセージから画面返却データのModelAndViewを生成して返します。
-	 * 画面表示データはすべて空となるので注意してください。
-	 *</pre>
-	 * @param loginUserInfo ログインユーザ情報
-	 * @param errorMessage 画面に出力するエラーメッセージ
-	 * @return 画面返却データのModelAndView
-	 *
-	 */
-	public static ModelAndView buildBindingError(LoginUserInfo loginUserInfo, String errorMessage) {
-		ExpenditureItemInfoManageUpdateResponse res = ExpenditureItemInfoManageUpdateResponse.getInstance();
-		// エラーメッセージを設定
-		res.addErrorMessage(errorMessage);
-		// ログインユーザ名を設定
-		res.setLoginUserName(loginUserInfo.getUserName());
-		// 画面表示のModelとViewを生成して返却
-		return res.build();
 	}
 	
 	/**

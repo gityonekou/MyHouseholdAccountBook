@@ -17,6 +17,7 @@ package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -322,7 +323,7 @@ public class ExpenditureItemInfoManageUseCase {
 				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), inputForm.getParentSisyutuItemCode().toString()));
 		
 		// 新規登録の場合
-		if(inputForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
+		if(Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
 			/* 支出項目コードを自動採番して設定 */
 			// 現在登録されている支出項目数を取得
 			int count = sisyutuItemRepository.countById(SearchQueryUserId.from(user.getUserId()));
@@ -371,7 +372,7 @@ public class ExpenditureItemInfoManageUseCase {
 			response.addMessage("新規支出項目を追加しました。[code:" + addData.getSisyutuItemCode() + "]" + addData.getSisyutuItemName());
 					
 		// 更新の場合
-		} else if (inputForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
+		} else if (Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
 			
 			// 更新する支出項目情報(ドメイン)を生成
 			SisyutuItem updateData = createSisyutuItem(user.getUserId().toString(), inputForm);

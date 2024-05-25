@@ -30,7 +30,6 @@
 package com.yonetani.webapp.accountbook.presentation.controller.itemmanage;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,7 +46,6 @@ import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingI
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageInitResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageSearchResponse;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShoppingItemInfoManageUpdateResponse;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 import com.yonetani.webapp.accountbook.presentation.session.ShoppingItemSearchSession;
 
@@ -365,16 +363,8 @@ public class ShoppingItemInfoManageController {
 			
 		// チェック結果OKの場合
 		} else {
-			/* hidden項目(action)の値チェック */
-			// actionが未設定の場合、予期しないエラー
-			if(!StringUtils.hasLength(inputForm.getAction())) {
-				log.error("予期しないエラー actionのバリデーションチェックでエラー:action=" + inputForm.getAction());
-				return ShoppingItemInfoManageUpdateResponse.buildBindingError(
-						loginUserSession.getLoginUserInfo(), "予期しないエラーが発生しました。管理者に問い合わせてください。[key=action]");
 			// actionに従い、処理を実行
-			} else {
-				return this.usecase.execAction(loginUserSession.getLoginUserInfo(), inputForm).buildRedirect(redirectAttributes);
-			}
+			return this.usecase.execAction(loginUserSession.getLoginUserInfo(), inputForm).buildRedirect(redirectAttributes);
 		}
 	}
 	

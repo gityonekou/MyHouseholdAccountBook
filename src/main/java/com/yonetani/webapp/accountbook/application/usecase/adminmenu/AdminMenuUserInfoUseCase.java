@@ -12,10 +12,12 @@
  */
 package com.yonetani.webapp.accountbook.application.usecase.adminmenu;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookException;
@@ -99,6 +101,10 @@ public class AdminMenuUserInfoUseCase {
 	public AdminMenuUserInfoResponse read(String userId) {
 		log.debug("read: userId=" + userId);
 		
+		// 入力チェック:ユーザID未設定の場合エラー
+		if(StringUtils.hasLength(userId)) {
+			throw new MyHouseholdAccountBookRuntimeException("予期しないエラーが発生しました。管理者に問い合わせてください。[userid:" + userId + "]");
+		}
 		// ユーザ情報の一覧をレスポンスに設定
 		AdminMenuUserInfoResponse response = applyUserInfoList(AdminMenuUserInfoResponse.getInstance());
 		
@@ -159,7 +165,7 @@ public class AdminMenuUserInfoUseCase {
 					userInfoForm.getUserName());
 			
 			// 新規登録の場合
-			if(userInfoForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
+			if(Objects.equals(userInfoForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
 				// ユーザテーブル、ユーザ権限テーブルに新規ユーザを追加
 				adminUserInfoRepository.addUserInfo(userInfo);
 				// 家計簿利用ユーザテーブルに新規ユーザを追加
@@ -214,7 +220,7 @@ public class AdminMenuUserInfoUseCase {
 				response.addMessage("ユーザを追加しました。[ユーザID:" + userInfo.getUserId() + "][ユーザ名:" + userInfo.getUserName() + "]");
 				
 			// 更新の場合
-			} else if (userInfoForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
+			} else if (Objects.equals(userInfoForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
 				// ユーザテーブル、ユーザ権限テーブルのユーザ情報を更新
 				adminUserInfoRepository.updateUserInfo(userInfo);
 				// 家計簿利用ユーザテーブルに新規ユーザを情報を更新

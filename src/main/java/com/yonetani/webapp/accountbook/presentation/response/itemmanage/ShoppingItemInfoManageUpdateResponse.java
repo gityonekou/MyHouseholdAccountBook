@@ -19,7 +19,6 @@ import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingI
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
-import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -65,26 +64,6 @@ public class ShoppingItemInfoManageUpdateResponse extends AbstractResponse {
 		}
 		// 基準店舗選択ボックスの表示情報リストを元に情報管理(商品)更新情報入力画面情報を生成
 		return new ShoppingItemInfoManageUpdateResponse(SelectViewItem.from(optionList));
-	}
-	
-	/**
-	 *<pre>
-	 * 画面に出力するエラーメッセージから画面返却データのModelAndViewを生成して返します。
-	 * 画面表示データはすべて空となるので注意してください。
-	 *</pre>
-	 * @param loginUserInfo ログインユーザ情報
-	 * @param errorMessage 画面に出力するエラーメッセージ
-	 * @return 画面返却データのModelAndView
-	 *
-	 */
-	public static ModelAndView buildBindingError(LoginUserInfo loginUserInfo, String errorMessage) {
-		ShoppingItemInfoManageUpdateResponse res = ShoppingItemInfoManageUpdateResponse.getInstance(null);
-		// エラーメッセージを設定
-		res.addErrorMessage(errorMessage);
-		// ログインユーザ名を設定
-		res.setLoginUserName(loginUserInfo.getUserName());
-		// 画面表示のModelとViewを生成して返却
-		return res.build();
 	}
 	
 	/**

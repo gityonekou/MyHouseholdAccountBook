@@ -14,6 +14,7 @@ package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -114,6 +115,10 @@ public class ShopInfoManageUseCase {
 	public ShopInfoManageResponse readShopInfo(LoginUserInfo user, String shopCode) {
 		log.debug("readShopInfo:userid=" + user.getUserId() + ",shopCode=" + shopCode);
 		
+		// 入力チェック:店舗コード未設定の場合、エラー
+		if(StringUtils.hasLength(shopCode)) {
+			throw new MyHouseholdAccountBookRuntimeException("予期しないエラーが発生しました。管理者に問い合わせてください。shopCode:" + shopCode);
+		}
 		// 店舗一覧情報を取得
 		ShopInfoManageResponse response = readShopInfo(user);
 		// 店舗IDに対応する店舗情報を取得
@@ -162,7 +167,7 @@ public class ShopInfoManageUseCase {
 		List<Shop> sortValueUpdateList = new ArrayList<>();
 		
 		// 新規登録の場合
-		if(shopForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
+		if(Objects.equals(shopForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
 			/* 新規店舗情報を追加 */
 			// 新規店舗コード番号発番
 			count++;
@@ -205,7 +210,7 @@ public class ShopInfoManageUseCase {
 			response.addMessage("新規店舗を追加しました。[code:" + shop.getShopCode() + "]" + shop.getShopName());
 			
 		// 更新の場合
-		} else if (shopForm.getAction().equals(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
+		} else if (Objects.equals(shopForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
 			// 旧表示順の値をチェック
 			if(!StringUtils.hasLength(shopForm.getShopSortBefore())) {
 				throw new MyHouseholdAccountBookRuntimeException("旧表示順の値が不正です。管理者に問い合わせてください。ShopSortBefore=" + shopForm.getShopSortBefore());

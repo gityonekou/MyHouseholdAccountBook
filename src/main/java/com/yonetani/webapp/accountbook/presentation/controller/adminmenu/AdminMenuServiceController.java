@@ -111,17 +111,13 @@ public class AdminMenuServiceController {
 	@GetMapping("/userinfo")
 	public ModelAndView getUserInfo(@RequestParam(name = "userid") String userid) {
 		log.debug("getUserInfo: userid=" + userid);
-		if(StringUtils.hasLength(userid)) {
-			// 画面表示データを読込
-			return this.userInfoUseCase.read(userid)
-					// レスポンスにログインユーザ名を設定
-					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
-					// レスポンスからModelAndViewを生成
-					.build();
-		} else {
-			return AdminMenuUserInfoResponse.buildBindingError(loginUserSession.getLoginUserInfo(),
-					"予期しないエラーが発生しました。管理者に問い合わせてください。[key=userid]");
-		}
+		
+		// 画面表示データを読込
+		return this.userInfoUseCase.read(userid)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -146,19 +142,8 @@ public class AdminMenuServiceController {
 			
 		// チェック結果OKの場合
 		} else {
-			/* hidden項目(action)の値チェック */
-			// actionが未設定の場合、予期しないエラー
-			if(!StringUtils.hasLength(userForm.getAction())) {
-				log.error("予期しないエラー actionのバリデーションチェックでエラー:action=" + userForm.getAction());
-				return AdminMenuUserInfoResponse.buildBindingError(
-						loginUserSession.getLoginUserInfo(),
-						userForm,
-						"予期しないエラーが発生しました。管理者に問い合わせてください。[key=action]");
-				
 			// actionに従い、処理を実行
-			} else {
-				return this.userInfoUseCase.execAction(userForm).buildRedirect(redirectAttributes);
-			}
+			return this.userInfoUseCase.execAction(userForm).buildRedirect(redirectAttributes);
 		}
 	}
 	

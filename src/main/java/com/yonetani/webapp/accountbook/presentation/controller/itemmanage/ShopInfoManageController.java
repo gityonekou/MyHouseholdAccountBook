@@ -14,7 +14,6 @@
 package com.yonetani.webapp.accountbook.presentation.controller.itemmanage;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +27,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShopInfoManageResponse;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
 import lombok.RequiredArgsConstructor;
@@ -89,18 +87,12 @@ public class ShopInfoManageController {
 	public ModelAndView getTargetLoad(@RequestParam("shopCode") String shopCode) {
 		log.debug("getTargetLoad: shopCode=" + shopCode);
 		
-		// 店舗コード未設定の場合、エラー
-		if(StringUtils.hasLength(shopCode)) {
-			return this.usecase.readShopInfo(loginUserSession.getLoginUserInfo(), shopCode)
-					// レスポンスにログインユーザ名を設定
-					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
-					// レスポンスからModelAndViewを生成
-					.build();
-			
-		} else {
-			return ShopInfoManageResponse.buildBindingError(
-					loginUserSession.getLoginUserInfo(), "予期しないエラーが発生しました。管理者に問い合わせてください。[key=shopCode]");
-		}
+		// 画面表示情報を取得
+		return this.usecase.readShopInfo(loginUserSession.getLoginUserInfo(), shopCode)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -129,17 +121,8 @@ public class ShopInfoManageController {
 			
 		// チェック結果OKの場合
 		} else {
-			/* hidden項目(action)の値チェック */
-			// actionが未設定の場合、予期しないエラー
-			if(!StringUtils.hasLength(shopForm.getAction())) {
-				log.error("予期しないエラー actionのバリデーションチェックでエラー:action=" + shopForm.getAction());
-				return ShopInfoManageResponse.buildBindingError(
-						loginUserSession.getLoginUserInfo(), "予期しないエラーが発生しました。管理者に問い合わせてください。[key=action]");
-				
 			// actionに従い、処理を実行
-			} else {
-				return this.usecase.execAction(loginUserSession.getLoginUserInfo(), shopForm).buildRedirect(redirectAttributes);
-			}
+			return this.usecase.execAction(loginUserSession.getLoginUserInfo(), shopForm).buildRedirect(redirectAttributes);
 		}
 		
 	}

@@ -141,25 +141,6 @@ public class AdminMenuUserInfoResponse extends AbstractResponse {
 		// ユーザ登録完了後、リダイレクトするURL
 		return "redirect:/myhacbook/admin/completeUseraAdd/";
 	}
-	
-	/**
-	 *<pre>
-	 * 画面に出力するエラーメッセージから画面返却データのModelAndViewを生成して返します。
-	 *</pre>
-	 * @param loginUserInfo ログインユーザ情報
-	 * @param errorMessage 画面に出力するエラーメッセージ
-	 * @return 画面返却データのModelAndView
-	 *
-	 */
-	public static ModelAndView buildBindingError(LoginUserInfo loginUserInfo, String errorMessage) {
-		AdminMenuUserInfoResponse res = new AdminMenuUserInfoResponse();
-		// エラーメッセージを設定
-		res.addErrorMessage(errorMessage);
-		// ログインユーザ名を設定
-		res.setLoginUserName(loginUserInfo.getUserName());
-		// 画面表示のModelとViewを生成して返却
-		return res.build();
-	}
 
 	/**
 	 *<pre>
@@ -174,28 +155,6 @@ public class AdminMenuUserInfoResponse extends AbstractResponse {
 		AdminMenuUserInfoResponse res = new AdminMenuUserInfoResponse();
 		// バリデーションチェックを行った入力フォームの値を設定
 		res.setAdminMenuUserInfoForm(userForm);
-		// ログインユーザ名を設定
-		res.setLoginUserName(loginUserInfo.getUserName());
-		// 画面表示のModelとViewを生成して返却
-		return res.build();
-	}
-
-	/**
-	 *<pre>
-	 * バリデーションチェックを行った入力フォームの値と画面に出力するエラーメッセージから画面返却データのModelAndViewを生成して返します。
-	 *</pre>
-	 * @param loginUserInfo ログインユーザ情報
-	 * @param userForm バリデーションチェックを行った入力フォームの値
-	 * @param errorMessage 画面に出力するエラーメッセージ
-	 * @return 画面返却データのModelAndView
-	 *
-	 */
-	public static ModelAndView buildBindingError(LoginUserInfo loginUserInfo, AdminMenuUserInfoForm userForm, String errorMessage) {
-		AdminMenuUserInfoResponse res = new AdminMenuUserInfoResponse();
-		// バリデーションチェックを行った入力フォームの値を設定
-		res.setAdminMenuUserInfoForm(userForm);
-		// エラーメッセージを設定
-		res.addErrorMessage(errorMessage);
 		// ログインユーザ名を設定
 		res.setLoginUserName(loginUserInfo.getUserName());
 		// 画面表示のModelとViewを生成して返却

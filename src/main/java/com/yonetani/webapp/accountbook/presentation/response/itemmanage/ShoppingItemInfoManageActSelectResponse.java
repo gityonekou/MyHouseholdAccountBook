@@ -1,6 +1,6 @@
 /**
  * 情報管理(商品)の処理選択画面表示情報です。
- * 選択した商品から追加・更新のアクション選択時のレスポンスデータとなります。
+ * 選択した商品から追加・更新のアクション選択時の画面表示情報を持ちます。
  *
  *------------------------------------------------
  * 更新履歴
@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 /**
  *<pre>
  * 情報管理(商品)の処理選択画面表示情報です。
- * 選択した商品から追加・更新のアクション選択時のレスポンスデータとなります。
+ * 選択した商品から追加・更新のアクション選択時の画面表示情報を持ちます。
  *
  *</pre>
  *
@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class ShoppingItemInfoManageActSelect extends AbstractShoppingItemInfoManageSearchResponse {
+public class ShoppingItemInfoManageActSelectResponse extends AbstractShoppingItemInfoManageSearchResponse {
 	
 	/**
 	 *<pre>
@@ -90,8 +90,8 @@ public class ShoppingItemInfoManageActSelect extends AbstractShoppingItemInfoMan
 	 * @return 情報管理(商品)処理選択画面情報
 	 *
 	 */
-	public static ShoppingItemInfoManageActSelect getInstance(SelectShoppingItemInfo selectItemInfo) {
-		return new ShoppingItemInfoManageActSelect(selectItemInfo);
+	public static ShoppingItemInfoManageActSelectResponse getInstance(SelectShoppingItemInfo selectItemInfo) {
+		return new ShoppingItemInfoManageActSelectResponse(selectItemInfo);
 	}
 	
 	/**
