@@ -168,7 +168,7 @@ public class AccountMonthInquiryUseCase {
 				domain.getSisyutuKingaku().toString(),
 				domain.getSisyutuKingakuB().toSisyutuKingakuBString(),
 				domain.getSisyutuKingakuB().toPercentageString(),
-				domain.getSiharaiDate().toString(),
+				domain.getShiharaiDate().toString(),
 				domain.getClosingFlg().getValue())).collect(Collectors.toUnmodifiableList());
 	}
 	

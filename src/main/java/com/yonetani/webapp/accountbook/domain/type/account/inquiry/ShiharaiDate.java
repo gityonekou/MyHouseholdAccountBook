@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
-public class SiharaiDate {
+public class ShiharaiDate {
 	// 支払日
 	private final LocalDate value;
 	
@@ -41,8 +41,8 @@ public class SiharaiDate {
 	 * @return 「支払日」項目ドメインタイプ
 	 *
 	 */
-	public static SiharaiDate from(LocalDate datetime) {
-		return new SiharaiDate(datetime);
+	public static ShiharaiDate from(LocalDate datetime) {
+		return new ShiharaiDate(datetime);
 	}
 	
 	/**

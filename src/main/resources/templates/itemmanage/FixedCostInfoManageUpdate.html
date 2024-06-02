@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<title>情報管理(固定費)</title>
+</head>
+<body>
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+	
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">情報管理(固定費)</h5>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
+			</div>
+			
+			<!-- 固定費編集表示エリア -->
+			<form name="FixedCostInfoUpdate" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/fixedcostinfo/update/}" th:object="${fixedCostInfoUpdateForm}">
+			<div class="card-body">
+				<p class="h6">■登録エリア■</p>
+				<div class="mb-3">
+					<label class="form-label">支出項目名：<span th:text="${sisyutuItemName}"></span></label>
+				</div>
+				<div class="mb-3">
+					<label for="fixedCostName" class="form-label">支払い名</label>
+ 					<input type="text" class="form-control w30" th:errorclass="is-invalid" th:field="*{fixedCostName}" required>
+ 					<p class="invalid-feedback" th:errors="*{fixedCostName}"></p>
+				</div>
+				<div class="mb-3">
+					<label for="fixedCostDetailContext" class="form-label">支払い内容詳細</label>
+ 					<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{fixedCostDetailContext}" required>
+ 					<p class="invalid-feedback" th:errors="*{fixedCostDetailContext}"></p>
+				</div>
+				<div class="mb-3">
+					<label for="shiharaiTuki" class="form-label">支払い月</label>
+					<select class="form-select w20" th:errorclass="is-invalid" th:field="*{shiharaiTuki}">
+						<option th:each="item : ${shiharaiTukiSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+					</select>
+ 					<p class="invalid-feedback" th:errors="*{shiharaiTuki}"></p>
+ 					<!--/* 必須チェックの結果を出力 */-->
+					<p class="invalid-feedback" th:errors="*{needCheckShiharaiTukiOptionalContext}" style="display: block;"></p>
+				</div>
+				<div class="mb-3">
+					<label for="shiharaiTukiOptionalContext" class="form-label">■その他任意を選択時、支払い月の内容を入力してください。</label>
+ 					<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{shiharaiTukiOptionalContext}">
+ 					<p class="invalid-feedback" th:errors="*{fixedCostDetailContext}"></p>
+ 					<!--/* 必須チェックの結果を出力 */-->
+					<p class="invalid-feedback" th:errors="*{needCheckShiharaiTukiOptionalContext}" style="display: block;"></p>
+				</div>
+				<div class="mb-3">
+					<label for="shiharaiKingaku" class="form-label w10">支払い金額</label>
+					<div class="input-group w10">
+ 						<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{shiharaiKingaku}">円
+ 						<p class="invalid-feedback" th:errors="*{shiharaiKingaku}"></p>
+ 					</div>
+				</div>
+				<div class="mb-3">
+					<button class="btn btn-primary" type="submit">登録</button>
+					<input type="hidden" th:field="*{action}" />
+					<input type="hidden" th:field="*{fixedCostCode}" />
+					<input type="hidden" th:field="*{sisyutuItemCode}" />
+				</div>
+			</div>
+			</form>
+		</div>
+		
+	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	
+</body>
+</html>

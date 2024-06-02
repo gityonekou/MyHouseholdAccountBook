@@ -75,10 +75,10 @@ public class ShopInfoManageUseCase {
 		log.debug("readShopInfo:userid=" + user.getUserId());
 		
 		// 店舗のコードテーブル情報を取得し、リストに設定
-		List<CodeAndValuePair> shopGroupList = codeTableItem.getCodeValues(MyHouseholdAccountBookContent.SHOP_KUBUN_CODE);
+		List<CodeAndValuePair> shopGroupList = codeTableItem.getCodeValues(MyHouseholdAccountBookContent.CODE_DEFINES_SHOP_KUBUN);
 		// 店舗グループをもとにレスポンスを生成
 		if(shopGroupList == null) {
-			throw new MyHouseholdAccountBookRuntimeException("コード定義ファイルに「店舗グループ情報：" + MyHouseholdAccountBookContent.SHOP_KUBUN_CODE + "」が登録されていません。管理者に問い合わせてください");
+			throw new MyHouseholdAccountBookRuntimeException("コード定義ファイルに「店舗グループ情報：" + MyHouseholdAccountBookContent.CODE_DEFINES_SHOP_KUBUN + "」が登録されていません。管理者に問い合わせてください");
 		}
 		// 店舗グループの選択ボックスは入力先でデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定
 		ShopInfoManageResponse response = ShopInfoManageResponse.getInstance(shopGroupList.stream().map(pair ->
@@ -95,7 +95,7 @@ public class ShopInfoManageUseCase {
 				ShopInfoManageResponse.ShopListItem.from(
 						domain.getShopCode().toString(),
 						domain.getShopName().toString(),
-						codeTableItem.getCodeValue(MyHouseholdAccountBookContent.SHOP_KUBUN_CODE, domain.getShopKubunCode().toString()),
+						codeTableItem.getCodeValue(MyHouseholdAccountBookContent.CODE_DEFINES_SHOP_KUBUN, domain.getShopKubunCode().toString()),
 						domain.getShopSort().toString())
 			).collect(Collectors.toUnmodifiableList()));
 		}

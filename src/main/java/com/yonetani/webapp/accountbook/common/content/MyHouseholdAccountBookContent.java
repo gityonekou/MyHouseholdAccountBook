@@ -49,7 +49,11 @@ public class MyHouseholdAccountBookContent {
 	//public static final String CODE_TABLE = "CODE_TABLE";
 	
 	// コード定義区分(ショップ区分:001)
-	public static final String SHOP_KUBUN_CODE = "001";
+	public static final String CODE_DEFINES_SHOP_KUBUN = "001";
+	// コード定義区分(固定費支払い月:002)
+	public static final String CODE_DEFINES_FIXED_COST_SHIHARAI_TUKI = "002";
+	// コード定義:固定費支払い月でその他任意(40)を選択時
+	public static final String SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE = "40";
 	
 	// 支出項目コード仮登録データ:9999
 	public static final String SISYUTU_ITEM_CODE_TEMPORARY_VALUE = "9999";
@@ -76,4 +80,5 @@ public class MyHouseholdAccountBookContent {
 	public static final String SEARCH_TARGET_COMPANY_NAME = "companyName";
 	// 商品JANコードを検索条件に商品を検索
 	public static final String SEARCH_TARGET_SHOPPING_ITEM_JAN_CODE = "janCode";
+	
 }

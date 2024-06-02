@@ -1,5 +1,5 @@
 /**
- * 情報管理(商品)の更新情報入力画面情報です。
+ * 情報管理(商品)更新画面表示情報です。
  *
  *------------------------------------------------
  * 更新履歴
@@ -26,7 +26,7 @@ import lombok.Setter;
 
 /**
  *<pre>
- * 情報管理(商品)の更新情報入力画面情報です。
+ * 情報管理(商品)更新画面表示情報です。
  *
  *</pre>
  *
@@ -38,32 +38,37 @@ import lombok.Setter;
 public class ShoppingItemInfoManageUpdateResponse extends AbstractResponse {
 	
 	// 更新商品情報入力フォーム
-	@Setter
-	private ShoppingItemInfoUpdateForm shoppingItemInfoUpdateForm;
+	private final ShoppingItemInfoUpdateForm shoppingItemInfoUpdateForm;
+	// 店舗グループ
+	private final SelectViewItem standardShopsList;
 	
 	// 支出項目名
 	@Setter
 	private String sisyutuItemName;
 	
-	// 店舗グループ
-	private final SelectViewItem standardShopsList;
-	
 	/**
 	 *<pre>
 	 * デフォルト値からレスポンス情報を生成して返します。
 	 *</pre>
+	 * @param inputForm  更新商品情報入力フォーム
 	 * @param addList 基準店舗選択ボックスの表示情報リスト
 	 * @return 情報管理(商品)更新情報入力画面情報
 	 *
 	 */
-	public static ShoppingItemInfoManageUpdateResponse getInstance(List<OptionItem> addList) {
+	public static ShoppingItemInfoManageUpdateResponse getInstance(ShoppingItemInfoUpdateForm inputForm, List<OptionItem> addList) {
+		// 更新商品情報入力フォームがnullなら空データを設定
+		if(inputForm == null) {
+			inputForm = new ShoppingItemInfoUpdateForm();
+		}
+		// 基準店舗選択ボックスの表示情報リストを生成
 		List<OptionItem> optionList = new ArrayList<>();
 		optionList.add(OptionItem.from("", "選択なし"));
 		if(!CollectionUtils.isEmpty(addList)) {
 			optionList.addAll(addList);
 		}
-		// 基準店舗選択ボックスの表示情報リストを元に情報管理(商品)更新情報入力画面情報を生成
-		return new ShoppingItemInfoManageUpdateResponse(SelectViewItem.from(optionList));
+		
+		// 入力フォームと基準店舗選択ボックスの表示情報リストを元に情報管理(商品)更新情報入力画面情報を生成
+		return new ShoppingItemInfoManageUpdateResponse(inputForm, SelectViewItem.from(optionList));
 	}
 	
 	/**
@@ -74,9 +79,6 @@ public class ShoppingItemInfoManageUpdateResponse extends AbstractResponse {
 		// 画面表示のModelとViewを生成
 		ModelAndView modelAndView = createModelAndView("itemmanage/ShoppingItemInfoManageUpdate");
 		// 更新商品情報入力フォーム
-		if(shoppingItemInfoUpdateForm == null) {
-			shoppingItemInfoUpdateForm = new ShoppingItemInfoUpdateForm();
-		}
 		modelAndView.addObject("shoppingItemInfoUpdateForm", shoppingItemInfoUpdateForm);
 		// 支出項目名
 		modelAndView.addObject("sisyutuItemName", sisyutuItemName);

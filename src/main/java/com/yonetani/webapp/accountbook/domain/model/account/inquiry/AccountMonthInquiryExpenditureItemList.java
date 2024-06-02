@@ -17,7 +17,7 @@ import java.util.List;
 import org.springframework.util.CollectionUtils;
 
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ClosingFlg;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SiharaiDate;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ShiharaiDate;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemLevel;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemName;
@@ -66,7 +66,7 @@ public class AccountMonthInquiryExpenditureItemList {
 		// 支出金額b(支出金額B, 割合)
 		private final SisyutuKingakuB sisyutuKingakuB;
 		// 支払日
-		private final SiharaiDate siharaiDate;
+		private final ShiharaiDate shiharaiDate;
 		// 支払い済みフラグ
 		private final ClosingFlg closingFlg;
 		
@@ -99,7 +99,7 @@ public class AccountMonthInquiryExpenditureItemList {
 					SisyutuItemLevel.from(sisyutuItemLevel),
 					SisyutuKingaku.from(sisyutuKingaku),
 					SisyutuKingakuB.from(sisyutuKingaku, sisyutuKingakuB),
-					SiharaiDate.from(siharaiDate),
+					ShiharaiDate.from(siharaiDate),
 					ClosingFlg.from(closingFlg));
 		}
 		
@@ -119,8 +119,8 @@ public class AccountMonthInquiryExpenditureItemList {
 			.append(sisyutuKingaku)
 			.append(",sisyutuKingakuB:")
 			.append(sisyutuKingakuB)
-			.append(",siharaiDate:")
-			.append(siharaiDate)
+			.append(",shiharaiDate:")
+			.append(shiharaiDate)
 			.append(",closingFlg:")
 			.append(closingFlg);
 			return buff.toString();

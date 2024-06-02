@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="/js/table_tr_click_script.js"></script>
+<title>情報管理(固定費)</title>
+</head>
+<body>
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">情報管理(固定費)</h5>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
+			</div>
+			
+			
+			<!-- 選択支出情報表示エリア -->
+			<div class="card-body">
+				<div class="card">
+					<div class="card-body">
+						<p class="h6">■選択固定費詳細■</p>
+						<form action="./ManageFixedCostUpd.html">
+							<div class="mb-3">
+								<label class="form-label">支出項目名：飲食日用品＞日用消耗品＞キッチン用品</label>
+							</div>
+							<div class="mb-3">
+								<label for="name" class="form-label">支払い名：毎月家賃支払い</label>
+							</div>
+							<div class="mb-3">
+								<label for="name" class="form-label">支払い内容詳細：毎月家賃支払いの詳細。未設定可</label>
+							</div>
+							<div class="mb-3">
+								<label for="name" class="form-label">支払い月：毎月 or その他任意(その他任意の詳細をここに表示)</label>
+							</div>
+							<div class="mb-3">
+								<label for="name" class="form-label">支払い金額：30,000円</label>
+							</div>
+							<div class="mb-3">
+								<button class="btn btn-primary" type="submit">更新</button>
+								<button class="btn btn-primary" type="submit">キャンセル</button>
+								<span>&emsp;</span>
+								<span>&emsp;</span>
+								<span>&emsp;</span>
+								<button class="btn btn-primary" type="submit">削除</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			
+			
+			<!-- 固定費一覧表示エリア -->
+			<div class="card-body">
+				<div class="card">
+					<div class="card-body">
+						<p class="h6">■登録済み固定費一覧■</p>
+						<p class="card-text">更新対象の固定支出項目を選択してください。</p>
+						<table class="table table-sm table-bordered table-hover">
+							<thead>
+								<tr class="table-secondary">
+								<th scope="col" class="w20">支出項目名</th>
+								<th scope="col" class="w30">支払い名</th>
+								<th scope="col" class="w10">支払い月</th>
+								<th scope="col" class="w15">支払い金額</th>
+								<th scope="col">その他任意詳細</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr data-href="./ManageFixedCostActSelect.html">
+									<td>＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠</td>
+									<td>＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠</td>
+									<td>その他任意</td>
+									<td align="right">12,999,999円</td>
+									<td></td>
+								</tr>
+								<tr class="table-warning" data-href="./ManageFixedCostActSelect.html">
+									<td>支出項目名</td>
+									<td>支払い名１</td>
+									<td>奇数月</td>
+									<td align="right">1,280円</td>
+									<td></td>
+								</tr>
+								<tr class="table-success">
+									<td colspan="3">奇数月合計(その他任意含む)</td>
+									<td align="right">253,280円</td>
+									<td></td>
+								</tr>
+								<tr class="table-success">
+									<td colspan="3">偶数月合計(その他任意含む)</td>
+									<td align="right">293,880円</td>
+									<td></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	
+</body>
+</html>

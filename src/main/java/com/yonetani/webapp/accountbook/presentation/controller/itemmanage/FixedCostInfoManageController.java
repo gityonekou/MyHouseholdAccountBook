@@ -20,6 +20,7 @@
  * ・情報管理(固定費)更新画面(追加・更新)で登録ボタン押下時(POST)
  * 　→登録成功：初期表示画面
  * 　→登録失敗：情報管理(固定費)更新画面(追加・更新)
+ * ・固定費情報登録・更新成功時→リダイレクト(GET)
  *
  *------------------------------------------------
  * 更新履歴
@@ -42,6 +43,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.FixedCostInfoManageUseCase;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostInfoUpdateForm;
+import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
 import lombok.RequiredArgsConstructor;
@@ -70,6 +72,7 @@ import lombok.extern.log4j.Log4j2;
  * ・情報管理(固定費)更新画面(追加・更新)で登録ボタン押下時(POST)
  * 　→登録成功：初期表示画面
  * 　→登録失敗：情報管理(固定費)更新画面(追加・更新)
+ * ・固定費情報登録・更新成功時→リダイレクト(GET)
  *
  *</pre>
  *
@@ -264,5 +267,24 @@ public class FixedCostInfoManageController {
 			// actionに従い、処理を実行
 			return this.usecase.execAction(loginUserSession.getLoginUserInfo(), inputForm).buildRedirect(redirectAttributes);
 		}
+	}
+	
+	/**
+	 *<pre>
+	 * 固定費情報登録・更新完了後のリダイレクト(Get要求時)のマッピングです。
+	 *</pre>
+	 * @param redirectMessages リダイレクト元から引き継いだメッセージ
+	 * @return 情報管理(固定費)初期表示画面
+	 *
+	 */
+	@GetMapping("/updateComplete/")
+	public ModelAndView updateComplete(@ModelAttribute CompleteRedirectMessages redirectMessages) {
+		log.debug("updateComplete: input=" + redirectMessages);
+		// 画面表示情報を取得
+		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.buildComplete(redirectMessages);
 	}
 }
