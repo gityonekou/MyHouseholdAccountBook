@@ -24,6 +24,7 @@ import org.springframework.web.servlet.ModelAndView;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 /**
  *<pre>
@@ -92,6 +93,12 @@ public abstract class AbstractFixedCostItemListResponse extends AbstractExpendit
 	
 	// 固定費一覧情報
 	private List<FixedCostItem> fixedCostItemList = new ArrayList<>();
+	// 奇数月合計
+	@Setter
+	private String oddMonthGoukei;
+	// 偶数月合計
+	@Setter
+	private String anEvenMonthGoukei;
 	
 	/**
 	 * {@inheritDoc}
@@ -102,6 +109,10 @@ public abstract class AbstractFixedCostItemListResponse extends AbstractExpendit
 		
 		// 固定費一覧情報を設定
 		modelAndView.addObject("fixedCostItemList", fixedCostItemList);
+		// 奇数月合計を設定
+		modelAndView.addObject("oddMonthGoukei", oddMonthGoukei);
+		// 偶数月合計を設定
+		modelAndView.addObject("anEvenMonthGoukei", anEvenMonthGoukei);
 		
 		return modelAndView;
 	}

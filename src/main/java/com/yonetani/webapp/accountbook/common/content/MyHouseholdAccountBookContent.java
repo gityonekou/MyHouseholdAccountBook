@@ -52,6 +52,12 @@ public class MyHouseholdAccountBookContent {
 	public static final String CODE_DEFINES_SHOP_KUBUN = "001";
 	// コード定義区分(固定費支払月:002)
 	public static final String CODE_DEFINES_FIXED_COST_SHIHARAI_TUKI = "002";
+	// コード定義:固定費支払月で毎月(00)を選択時
+	public static final String SHIHARAI_TUKI_EVERY_SELECTED_VALUE = "00";
+	// コード定義:固定費支払月で奇数月(20)を選択時
+	public static final String SHIHARAI_TUKI_ODD_SELECTED_VALUE = "20";
+	// コード定義:固定費支払月で偶数月(30)を選択時
+	public static final String SHIHARAI_TUKI_AN_EVEN_SELECTED_VALUE = "30";
 	// コード定義:固定費支払月でその他任意(40)を選択時
 	public static final String SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE = "40";
 	

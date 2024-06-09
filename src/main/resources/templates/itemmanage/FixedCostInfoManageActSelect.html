@@ -96,13 +96,13 @@
 								</tr>
 								</th:block>
 								<tr class="table-success">
-									<td colspan="3">奇数月合計(その他任意含む)</td>
-									<td align="right">253,280円</td>
+									<td colspan="3">奇数月合計(毎月、奇数月、その他任意の合計値)</td>
+									<td align="right" th:text="${oddMonthGoukei}">奇数月合計</td>
 									<td></td>
 								</tr>
 								<tr class="table-success">
-									<td colspan="3">偶数月合計(その他任意含む)</td>
-									<td align="right">293,880円</td>
+									<td colspan="3">偶数月合計(毎月、偶数月、その他任意の合計値)</td>
+									<td align="right" th:text="${anEvenMonthGoukei}">偶数月合計</td>
 									<td></td>
 								</tr>
 							</tbody>

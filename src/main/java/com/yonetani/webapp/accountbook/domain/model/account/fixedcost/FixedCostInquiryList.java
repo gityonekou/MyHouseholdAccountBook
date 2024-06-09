@@ -12,9 +12,11 @@ package com.yonetani.webapp.accountbook.domain.model.account.fixedcost;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.util.CollectionUtils;
 
+import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostName;
@@ -22,6 +24,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostSh
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiTukiOptionalContext;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ShiharaiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemName;
+import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -128,6 +131,10 @@ public class FixedCostInquiryList {
 	
 	// 固定費一覧明細情報のリスト
 	private final List<FixedCostInquiryItem> values;
+	// 奇数月合計
+	private final ShiharaiKingaku oddMonthGoukei;
+	// 偶数月合計
+	private final ShiharaiKingaku anEvenMonthGoukei;
 	
 	/**
 	 *<pre>
@@ -139,9 +146,49 @@ public class FixedCostInquiryList {
 	 */
 	public static FixedCostInquiryList from(List<FixedCostInquiryItem> values) {
 		if(CollectionUtils.isEmpty(values)) {
-			return new FixedCostInquiryList(Collections.emptyList());
+			return new FixedCostInquiryList(
+					// 固定費一覧明細情報のリスト:空
+					Collections.emptyList(),
+					// 奇数月合計=0
+					ShiharaiKingaku.from(BigDecimal.ZERO),
+					// 偶数月合計=0
+					ShiharaiKingaku.from(BigDecimal.ZERO));
 		} else {
-			return new FixedCostInquiryList(values);
+			/* 各種合計値を計算 */
+			// 奇数月合計
+			BigDecimal oddMonthGoukeiWk = BigDecimal.ZERO;
+			// 偶数月合計
+			BigDecimal anEvenMonthGoukeiWk = BigDecimal.ZERO;
+			// 固定費支払月（毎月、奇数月、偶数月、任意）の値に応じて固定費一覧明細リスト情報のリストの件数分
+			// 支払金額の値を奇数月合計、偶数月合計の値に加算
+			for(FixedCostInquiryItem item : values) {
+				
+				// 支払月が毎月、またはその他任意の場合、奇数・偶数をそれぞれ加算
+				if(Objects.equals(item.getFixedCostShiharaiTuki().toString(),
+						MyHouseholdAccountBookContent.SHIHARAI_TUKI_EVERY_SELECTED_VALUE)
+					|| Objects.equals(item.getFixedCostShiharaiTuki().toString(),
+							MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE)) {
+					oddMonthGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(oddMonthGoukeiWk, item.getShiharaiKingaku().getValue());
+					anEvenMonthGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(anEvenMonthGoukeiWk, item.getShiharaiKingaku().getValue());
+					
+				// 支払月が奇数月の場合、奇数月を加算
+				} else if(Objects.equals(item.getFixedCostShiharaiTuki().toString(),
+						MyHouseholdAccountBookContent.SHIHARAI_TUKI_ODD_SELECTED_VALUE)) {
+					oddMonthGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(oddMonthGoukeiWk, item.getShiharaiKingaku().getValue());
+					
+				// 支払月が偶数月の場合、偶数月を加算
+				} else if(Objects.equals(item.getFixedCostShiharaiTuki().toString(),
+						MyHouseholdAccountBookContent.SHIHARAI_TUKI_AN_EVEN_SELECTED_VALUE)) {
+					anEvenMonthGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(anEvenMonthGoukeiWk, item.getShiharaiKingaku().getValue());
+				}
+			}
+			return new FixedCostInquiryList(
+					// 固定費一覧明細情報のリスト
+					values,
+					// 奇数月合計
+					ShiharaiKingaku.from(oddMonthGoukeiWk),
+					// 偶数月合計
+					ShiharaiKingaku.from(anEvenMonthGoukeiWk));
 		}
 	}
 	

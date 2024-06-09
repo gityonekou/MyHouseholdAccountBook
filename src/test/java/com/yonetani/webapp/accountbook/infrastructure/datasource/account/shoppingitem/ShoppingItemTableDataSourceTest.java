@@ -69,7 +69,13 @@ class ShoppingItemTableDataSourceTest {
 	 */
 	@Test
 	void testAdd() {
-		repository.add(ShoppingItem.from("test", "0001", null, null, null, null, null, null, null, null));
+		// テストデータ1を読み込み、ShoppingItemの各パラメータに設定
+		ShoppingItem data = ShoppingItem.from("test", "0001", null, null, null, null, null, null, null, null);
+		// データ追加
+		int count = repository.add(data);
+		// count=1であること
+		
+		
 		fail("まだ実装されていません");
 	}
 
