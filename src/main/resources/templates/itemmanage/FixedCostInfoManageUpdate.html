@@ -50,7 +50,7 @@
 				</div>
 				<div class="mb-3">
 					<label for="shiharaiTukiOptionalContext" class="form-label">■その他任意を選択時、支払月の内容を入力してください。</label>
- 					<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{shiharaiTukiOptionalContext}">
+ 					<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{shiharaiTukiOptionalContext}" placeholder="支払月でその他任意選択の場合、支払月の内容は必須入力">
  					<p class="invalid-feedback" th:errors="*{fixedCostDetailContext}"></p>
  					<!--/* 必須チェックの結果を出力 */-->
 					<p class="invalid-feedback" th:errors="*{needCheckShiharaiTukiOptionalContext}" style="display: block;"></p>
