@@ -45,32 +45,30 @@
 				<div class="card">
 					<div class="card-body">
 						<p class="h6">■登録済み固定費一覧■</p>
+						<!--/* 登録済み固定費一覧が設定されている場合のみ選択してくださいのメッセージを表示 */-->
+						<th:block th:if="${#lists.size(fixedCostItemList)} > 0">
 						<p class="card-text">更新対象の固定支出項目を選択してください。</p>
 						<table class="table table-sm table-bordered table-hover">
 							<thead>
 								<tr class="table-secondary">
 								<th scope="col" class="w20">支出項目名</th>
-								<th scope="col" class="w30">支払い名</th>
-								<th scope="col" class="w10">支払い月</th>
-								<th scope="col" class="w15">支払い金額</th>
+								<th scope="col" class="w30">支払名</th>
+								<th scope="col" class="w10">支払月</th>
+								<th scope="col" class="w15">支払金額</th>
 								<th scope="col">その他任意詳細</th>
 								</tr>
 							</thead>
 							<tbody>
-								<tr data-href="./ManageFixedCostActSelect.html">
-									<td>＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠</td>
-									<td>＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠</td>
-									<td>その他任意</td>
-									<td align="right">12,999,999円</td>
-									<td></td>
+								<th:block th:each="item, itemStat : ${fixedCostItemList}">
+								<th:block th:if="${itemStat.odd}"><tr th:data-href="@{/myhacbook/managebaseinfo/fixedcostinfo/select(fixedCostCode=${item.fixedCostCode})}"></th:block>
+								<th:block th:if="${itemStat.even}"><tr class="table-warning" th:data-href="@{/myhacbook/managebaseinfo/fixedcostinfo/select(fixedCostCode=${item.fixedCostCode})}"></th:block>
+									<td th:text="${item.sisyutuItemName}">支出項目名</td>
+									<td th:text="${item.shiharaiName}">支払名</td>
+									<td th:text="${item.shiharaiTuki}">支払月</td>
+									<td th:text="${item.shiharaiKingaku}">支払金額</td>
+									<td th:text="${item.optionalContext}">その他任意詳細</td>
 								</tr>
-								<tr class="table-warning" data-href="./ManageFixedCostActSelect.html">
-									<td>支出項目名</td>
-									<td>支払い名１</td>
-									<td>奇数月</td>
-									<td align="right">1,280円</td>
-									<td></td>
-								</tr>
+								</th:block>
 								<tr class="table-success">
 									<td colspan="3">奇数月合計(その他任意含む)</td>
 									<td align="right">253,280円</td>
@@ -83,6 +81,7 @@
 								</tr>
 							</tbody>
 						</table>
+						</th:block>
 					</div>
 				</div>
 			</div>

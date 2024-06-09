@@ -30,18 +30,18 @@
 					<label class="form-label">支出項目名：<span th:text="${sisyutuItemName}"></span></label>
 				</div>
 				<div class="mb-3">
-					<label for="fixedCostName" class="form-label">支払い名</label>
+					<label for="fixedCostName" class="form-label">支払名</label>
  					<input type="text" class="form-control w30" th:errorclass="is-invalid" th:field="*{fixedCostName}" required>
  					<p class="invalid-feedback" th:errors="*{fixedCostName}"></p>
 				</div>
 				<div class="mb-3">
-					<label for="fixedCostDetailContext" class="form-label">支払い内容詳細</label>
- 					<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{fixedCostDetailContext}" required>
+					<label for="fixedCostDetailContext" class="form-label">支払内容詳細</label>
+ 					<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{fixedCostDetailContext}">
  					<p class="invalid-feedback" th:errors="*{fixedCostDetailContext}"></p>
 				</div>
 				<div class="mb-3">
-					<label for="shiharaiTuki" class="form-label">支払い月</label>
-					<select class="form-select w20" th:errorclass="is-invalid" th:field="*{shiharaiTuki}">
+					<label for="shiharaiTuki" class="form-label">支払月</label>
+					<select class="form-select w20" th:errorclass="is-invalid" th:field="*{shiharaiTuki}" required>
 						<option th:each="item : ${shiharaiTukiSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
 					</select>
  					<p class="invalid-feedback" th:errors="*{shiharaiTuki}"></p>
@@ -49,16 +49,16 @@
 					<p class="invalid-feedback" th:errors="*{needCheckShiharaiTukiOptionalContext}" style="display: block;"></p>
 				</div>
 				<div class="mb-3">
-					<label for="shiharaiTukiOptionalContext" class="form-label">■その他任意を選択時、支払い月の内容を入力してください。</label>
+					<label for="shiharaiTukiOptionalContext" class="form-label">■その他任意を選択時、支払月の内容を入力してください。</label>
  					<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{shiharaiTukiOptionalContext}">
  					<p class="invalid-feedback" th:errors="*{fixedCostDetailContext}"></p>
  					<!--/* 必須チェックの結果を出力 */-->
 					<p class="invalid-feedback" th:errors="*{needCheckShiharaiTukiOptionalContext}" style="display: block;"></p>
 				</div>
 				<div class="mb-3">
-					<label for="shiharaiKingaku" class="form-label w10">支払い金額</label>
+					<label for="shiharaiKingaku" class="form-label w10">支払金額</label>
 					<div class="input-group w10">
- 						<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{shiharaiKingaku}">円
+ 						<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{shiharaiKingaku}" required>円
  						<p class="invalid-feedback" th:errors="*{shiharaiKingaku}"></p>
  					</div>
 				</div>

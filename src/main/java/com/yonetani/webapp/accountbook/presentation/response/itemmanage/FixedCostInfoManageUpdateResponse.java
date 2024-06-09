@@ -39,7 +39,7 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 	
 	// 固定費情報が格納されたフォームデータです。
 	private final FixedCostInfoUpdateForm fixedCostInfoUpdateForm;
-	// 支払い月選択ボックス
+	// 支払月選択ボックス
 	private final SelectViewItem shiharaiTukiSelectList;
 	// 支出項目名
 	@Setter
@@ -50,7 +50,7 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 	 * デフォルト値からレスポンス情報を生成して返します。
 	 *</pre>
 	 * @param inputForm 固定費情報が格納されたフォームデータ
-	 * @param addList 支払い月選択ボックスの表示情報リスト
+	 * @param addList 支払月選択ボックスの表示情報リスト
 	 * @return 情報管理(固定費)更新画面表示情報
 	 *
 	 */
@@ -58,13 +58,13 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 		if(inputForm == null) {
 			inputForm = new FixedCostInfoUpdateForm();
 		}
-		// 支払い月選択ボックスの表示情報リストを生成
+		// 支払月選択ボックスの表示情報リストを生成
 		List<OptionItem> optionList = new ArrayList<>();
-		optionList.add(OptionItem.from("", "支払い月を選択してください"));
+		optionList.add(OptionItem.from("", "支払月を選択してください"));
 		if(!CollectionUtils.isEmpty(addList)) {
 			optionList.addAll(addList);
 		}
-		// 入力フォームと支払い月選択ボックスの表示情報リストを元に情報管理(固定費)更新画面表示情報を生成
+		// 入力フォームと支払月選択ボックスの表示情報リストを元に情報管理(固定費)更新画面表示情報を生成
 		return new FixedCostInfoManageUpdateResponse(inputForm, SelectViewItem.from(optionList));
 	}
 	
@@ -77,7 +77,7 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 		ModelAndView modelAndView = createModelAndView("itemmanage/FixedCostInfoManageUpdate");
 		// 更新商品情報入力フォーム
 		modelAndView.addObject("fixedCostInfoUpdateForm", fixedCostInfoUpdateForm);
-		// 支払い月選択ボックス
+		// 支払月選択ボックス
 		modelAndView.addObject("shiharaiTukiSelectList", shiharaiTukiSelectList);
 		// 支出項目名
 		modelAndView.addObject("sisyutuItemName", sisyutuItemName);

@@ -23,15 +23,23 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.yonetani.webapp.accountbook.common.component.CodeTableItemComponent;
 import com.yonetani.webapp.accountbook.common.component.SisyutuItemComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCost;
+import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.common.CodeAndValuePair;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostCode;
+import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
+import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractFixedCostItemListResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractFixedCostItemListResponse.FixedCostItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageActSelectResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageInitResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageUpdateResponse;
@@ -68,6 +76,8 @@ public class FixedCostInfoManageUseCase {
 	private final SisyutuItemComponent sisyutuItemComponent;
 	// コードテーブル
 	private final CodeTableItemComponent codeTableItem;
+	// 固定費テーブル:FIXED_COST_TABLEリポジトリー
+	private final FixedCostTableRepository fixedCostRepository;
 	
 	/**
 	 *<pre>
@@ -103,7 +113,50 @@ public class FixedCostInfoManageUseCase {
 	public FixedCostInfoManageActSelectResponse readActSelectItemInfo(LoginUserInfo user, String fixedCostCode) {
 		log.debug("readActSelectItemInfo:userid=" + user.getUserId() + ",fixedCostCode=" + fixedCostCode);
 		
-		return FixedCostInfoManageActSelectResponse.getInstance();
+		/* 固定費コードに対応する固定費情報を取得 */
+		FixedCost searchResult = fixedCostRepository.findByIdAndFixedCostCode(
+				SearchQueryUserIdAndFixedCostCode.from(user.getUserId(), fixedCostCode));
+		if(searchResult == null) {
+			throw new MyHouseholdAccountBookRuntimeException("選択した固定費が固定費テーブル:FIXED_COST_TABLEに存在しません。管理者に問い合わせてください。[fixedCostCode=" + fixedCostCode + "]");
+		}
+		/* 固定費支払月の値を元に支払月詳細の値を設定 */
+		// 固定費支払月をコード変換した値を支払月詳細の値に設定
+		String shiharaiTukiDetailContext = codeTableItem.getCodeValue(
+				// コード区分：固定費支払月
+				MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_TUKI,
+				// 固定費支払月
+				searchResult.getFixedCostShiharaiTuki().toString());
+		// 固定費支払月の値が「その他任意」の場合、支払月詳細の値に「"(" ＋ 「固定費支払月任意詳細」＋")"」を追加
+		if(Objects.equals(
+				// 固定費支払月の値
+				searchResult.getFixedCostShiharaiTuki().toString(),
+				// コード区分：固定費支払月：その他任意(40)
+				MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE
+			)) {
+			// 支払月詳細の値 =「固定費支払月の値をコード変換した値」＋"(" ＋ 「固定費支払月任意詳細」＋")"
+			//shiharaiTukiDetailContext += "(" + null + ")";
+			shiharaiTukiDetailContext += "(" + searchResult.getFixedCostShiharaiTukiOptionalContext().toString() + ")";
+		}
+		/* レスポンスの生成 */
+		// 固定費情報をもとにレスポンスを生成
+		FixedCostInfoManageActSelectResponse response = FixedCostInfoManageActSelectResponse.getInstance(
+				FixedCostInfoManageActSelectResponse.SelectFixedCostInfo.from(
+						// 固定費コード
+						searchResult.getFixedCostCode().toString(),
+						// 支出項目名(＞で区切った値)
+						sisyutuItemComponent.getSisyutuItemName(user, searchResult.getSisyutuItemCode().toString()),
+						// 支払名
+						searchResult.getFixedCostName().toString(),
+						// 支払内容詳細
+						searchResult.getFixedCostDetailContext().toString(),
+						// 支払月詳細
+						shiharaiTukiDetailContext,
+						// 支払金額
+						searchResult.getShiharaiKingaku().toString()));
+		// 固定費一覧をレスポンスに設定
+		setFixedCostItemList(user, response);
+		
+		return response;
 	}
 	
 	/**
@@ -141,9 +194,11 @@ public class FixedCostInfoManageUseCase {
 	 */
 	public FixedCostInfoManageInitResponse readRegisteredFixedCostInfoBySisyutuItem(LoginUserInfo user, String sisyutuItemCode) {
 		log.debug("readRegisteredFixedCostInfoBySisyutuItem:userid=" + user.getUserId() + ",sisyutuItemCode=" + sisyutuItemCode);
-		// 情報管理(固定費)処理選択画面の表示情報を取得
+		// 情報管理(固定費)初期表示画面の表示情報を取得
 		FixedCostInfoManageInitResponse response = getInitResponse(user, true);
-		// 登録済みの固定費一覧を取得し画面表示情報に設定
+		
+		// 既に登録済みの支出項目の固定費一覧を取得
+		// TODO:上記を取得
 		
 		return response;
 	}
@@ -171,9 +226,7 @@ public class FixedCostInfoManageUseCase {
 		// 属する支出項目コード
 		addForm.setSisyutuItemCode(sisyutuItemCode);
 		// 画面表示情報を取得
-		FixedCostInfoManageUpdateResponse response = getUpdateResponse(addForm);
-		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
-		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, sisyutuItemCode));
+		FixedCostInfoManageUpdateResponse response = getUpdateResponse(user, addForm);
 		
 		return response;
 	}
@@ -192,7 +245,34 @@ public class FixedCostInfoManageUseCase {
 	public FixedCostInfoManageUpdateResponse readUpdateFixedCostInfo(LoginUserInfo user, String fixedCostCode) {
 		log.debug("readUpdateFixedCostInfo:userid=" + user.getUserId() + ",fixedCostCode=" + fixedCostCode);
 		
-		return getUpdateResponse(null);
+		// 固定費コードに対応する固定費情報を取得
+		FixedCost searchResult = fixedCostRepository.findByIdAndFixedCostCode(
+				SearchQueryUserIdAndFixedCostCode.from(user.getUserId(), fixedCostCode));
+		if(searchResult == null) {
+			throw new MyHouseholdAccountBookRuntimeException("選択した固定費が固定費テーブル:FIXED_COST_TABLEに存在しません。管理者に問い合わせてください。[fixedCostCode=" + fixedCostCode + "]");
+		}
+		
+		// 固定費情報入力フォームデータを生成
+		FixedCostInfoUpdateForm updateForm = new FixedCostInfoUpdateForm();
+		// アクション：更新
+		updateForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE);
+		// 固定費コード
+		updateForm.setFixedCostCode(searchResult.getFixedCostCode().toString());
+		// 属する支出項目コード
+		updateForm.setSisyutuItemCode(searchResult.getSisyutuItemCode().toString());
+		// 固定費名(支払名)
+		updateForm.setFixedCostName(searchResult.getFixedCostName().toString());
+		// 固定費内容詳細(支払内容詳細)
+		updateForm.setFixedCostDetailContext(searchResult.getFixedCostDetailContext().toString());
+		// 支払月
+		updateForm.setShiharaiTuki(searchResult.getFixedCostShiharaiTuki().toString());
+		// 支払月任意詳細
+		updateForm.setShiharaiTukiOptionalContext(searchResult.getFixedCostShiharaiTukiOptionalContext().toString());
+		// 支払金額
+		updateForm.setShiharaiKingaku(DomainCommonUtils.convertInteger(searchResult.getShiharaiKingaku().getValue()));
+		
+		// 支払い月選択ボックス、支出項目名をレスポンスに設定し返却
+		return getUpdateResponse(user, updateForm);
 	}
 
 	/**
@@ -211,9 +291,27 @@ public class FixedCostInfoManageUseCase {
 	public FixedCostInfoManageActSelectResponse execDelete(LoginUserInfo user, String fixedCostCode) {
 		log.debug("execDelete:userid=" + user.getUserId() + ",fixedCostCode=" + fixedCostCode);
 		
-		return FixedCostInfoManageActSelectResponse.getInstance();
+		// 固定費コードに対応する固定費情報を取得
+		FixedCost searchResult = fixedCostRepository.findByIdAndFixedCostCode(
+				SearchQueryUserIdAndFixedCostCode.from(user.getUserId(), fixedCostCode));
+		if(searchResult == null) {
+			throw new MyHouseholdAccountBookRuntimeException("選択した固定費が固定費テーブル:FIXED_COST_TABLEに存在しません。管理者に問い合わせてください。[fixedCostCode=" + fixedCostCode + "]");
+		}
+		// レスポンスを生成(エラー時はエラー画面に遷移するので固定費情報は使用しない:nullを指定)
+		FixedCostInfoManageActSelectResponse response = FixedCostInfoManageActSelectResponse.getInstance(null);
+		
+		// 削除処理を実行
+		
+		// 削除成功の場合は初期画面にリダイレクトとなるためトランザクション完了を設定
+		
+		// 削除失敗の場合は画面表示情報を取得し設定
+		// TODO:そもそも、エラー時は予期しないエラーとしてエラー画面が正しい気がするか。。
+		// TODO:削除失敗で、正常処理とする扱いをどうするかを検討必要(既に論理削除済みがあるか。
+		
+		
+		return response;
 	}
-
+	
 	/**
 	 *<pre>
 	 * 固定費情報追加・更新時のパラメータチェックエラー時処理
@@ -231,7 +329,7 @@ public class FixedCostInfoManageUseCase {
 			FixedCostInfoUpdateForm inputForm) {
 		log.debug("readUpdateBindingErrorSetInfo:userid=" + user.getUserId() + ",inputForm=" + inputForm);
 		
-		return getUpdateResponse(inputForm);
+		return getUpdateResponse(user, inputForm);
 	}
 
 	/**
@@ -246,30 +344,55 @@ public class FixedCostInfoManageUseCase {
 	 * @return 情報管理(固定費)更新画面の表示情報
 	 *
 	 */
+	@Transactional
 	public FixedCostInfoManageUpdateResponse execAction(LoginUserInfo user, FixedCostInfoUpdateForm inputForm) {
 		log.debug("execAction:userid=" + user.getUserId() + ",inputForm=" + inputForm);
 		
 		// レスポンスを取得
-		FixedCostInfoManageUpdateResponse response = getUpdateResponse(inputForm);
+		FixedCostInfoManageUpdateResponse response = getUpdateResponse(user, inputForm);
 		
 		// 新規登録の場合
 		if(Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
 			
-			// 追加する固定費情報
-			FixedCost addData = FixedCost.from("00000", "テスト固定費");
+			// 新規採番する固定費コードの値を取得
+			int count = fixedCostRepository.countById(SearchQueryUserId.from(user.getUserId()));
+			count++;
+			if(count > 9999) {
+				response.addErrorMessage("固定費情報は9999件以上登録できません。管理者に問い合わせてください。");
+				return response;
+			}
 			
+			// 固定費コードを入力フォームに設定
+			inputForm.setFixedCostCode(String.format("%04d", count));
+			
+			// 追加する固定費情報
+			FixedCost addData = createFixedCost(user.getUserId(), inputForm);
+			
+			// 固定費テーブルに登録
+			int addCount = fixedCostRepository.add(addData);
+			// 追加件数が1件以上の場合、業務エラー
+			if(addCount != 1) {
+				throw new MyHouseholdAccountBookRuntimeException("固定費テーブル:FIXED_COST_TABLEへの追加件数が不正でした。[件数=" + addCount + "][add data:" + addData + "]");
+			}
 			
 			// 完了メッセージ
-			response.addMessage("新規固定費を追加しました。[code:" + addData.getFixedCostItemCode() + "]" + addData.getFixedCostItemName());
+			response.addMessage("新規固定費を追加しました。[code:" + addData.getFixedCostCode() + "]" + addData.getFixedCostName());
 			
 		// 更新の場合
 		} else if (Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
 			
 			// 更新する固定費情報
-			FixedCost updateData = FixedCost.from("00000", "テスト固定費");
+			FixedCost updateData = createFixedCost(user.getUserId(), inputForm);
+			
+			// 固定費テーブルに登録(支出項目コードは更新対象外項目なので注意)
+			int updateCount = fixedCostRepository.update(updateData);
+			// 更新件数が1件以上の場合、業務エラー
+			if(updateCount != 1) {
+				throw new MyHouseholdAccountBookRuntimeException("固定費テーブル:FIXED_COST_TABLEへの更新件数が不正でした。[件数=" + updateCount + "][update data:" + updateData + "]");
+			}
 			
 			// 完了メッセージ
-			response.addMessage("固定費を更新しました。[code:" + updateData.getFixedCostItemCode() + "]" + updateData.getFixedCostItemName());
+			response.addMessage("固定費を更新しました。[code:" + updateData.getFixedCostCode() + "]" + updateData.getFixedCostName());
 			
 		} else {
 			throw new MyHouseholdAccountBookRuntimeException("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + inputForm.getAction());
@@ -294,14 +417,32 @@ public class FixedCostInfoManageUseCase {
 	private FixedCostInfoManageInitResponse getInitResponse(LoginUserInfo user, boolean registeredFlg) {
 		// レスポンスを生成
 		FixedCostInfoManageInitResponse response = FixedCostInfoManageInitResponse.getInstance(registeredFlg);
-		
-		// 支出項目を取得
+		// 支出項目一覧をレスポンスに設定
 		sisyutuItemComponent.setSisyutuItemList(user, response);
-		
-		// 固定費一覧を取得
-		
+		// 固定費一覧をレスポンスに設定
+		setFixedCostItemList(user, response);
 		
 		return response;
+	}
+	
+	/**
+	 *<pre>
+	 * 固定費一覧情報を取得し、引数で渡されたレスポンス(固定費一覧画面情報)に設定します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param response 固定費一覧画面情報
+	 *
+	 */
+	private void setFixedCostItemList(LoginUserInfo user, AbstractFixedCostItemListResponse response) {
+		// 固定費一覧を取得
+		FixedCostInquiryList searchResult = fixedCostRepository.findById(SearchQueryUserId.from(user.getUserId()));
+		if(searchResult.isEmpty()) {
+			// 登録済み固定費情報が0件の場合、メッセージを設定
+			response.addMessage("登録済み固定費情報が0件です。");
+		} else {
+			// 固定費一覧情報をレスポンスに設定
+			response.addFixedCostItemList(createFixedCostItemList(searchResult));
+		}
 	}
 	
 	/**
@@ -312,22 +453,87 @@ public class FixedCostInfoManageUseCase {
 	 * @return 情報管理(固定費)更新画面表示情報
 	 *
 	 */
-	private FixedCostInfoManageUpdateResponse getUpdateResponse(FixedCostInfoUpdateForm inputForm) {
+	private FixedCostInfoManageUpdateResponse getUpdateResponse(LoginUserInfo user, FixedCostInfoUpdateForm inputForm) {
 		
-		// コードテーブル情報から支払い月選択ボックスの表示情報を取得し、リストに設定
+		// コードテーブル情報から支払月選択ボックスの表示情報を取得し、リストに設定
 		List<CodeAndValuePair> shiharaiTukiList = codeTableItem.getCodeValues(MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_TUKI);
-		// 支払い月選択ボックス表示情報をもとにレスポンスを生成
+		// 支払月選択ボックス表示情報をもとにレスポンスを生成
 		if(shiharaiTukiList == null) {
 			throw new MyHouseholdAccountBookRuntimeException("コード定義ファイルに「固定費支払月情報：" 
 					+ MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_TUKI + "」が登録されていません。管理者に問い合わせてください");
 		}
 		
-		// レスポンスを生成し返却
-		return FixedCostInfoManageUpdateResponse.getInstance(
+		// レスポンスを生成
+		FixedCostInfoManageUpdateResponse response = FixedCostInfoManageUpdateResponse.getInstance(
 				// 固定費情報入力フォーム
 				inputForm,
-				// 支払い月選択ボックスの表示情報リストはデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定
+				// 支払月選択ボックスの表示情報リストはデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定
 				shiharaiTukiList.stream().map(pair ->
 				OptionItem.from(pair.getCode().toString(), pair.getCodeValue().toString())).collect(Collectors.toList()));
+		
+		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
+		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, inputForm.getSisyutuItemCode()));
+		
+		return response;
+		
+	}
+	
+	/**
+	 *<pre>
+	 * 引数のフォームデータから固定費情報(ドメイン)を生成して返します。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param inputForm フォームデータ
+	 * @return 固定費情報(ドメイン)
+	 *
+	 */
+	private FixedCost createFixedCost(String userId,  FixedCostInfoUpdateForm inputForm) {
+		return FixedCost.from(
+				// ユーザID
+				userId,
+				// 固定費コード
+				inputForm.getFixedCostCode(),
+				// 固定費名(支払名)
+				inputForm.getFixedCostName(),
+				// 固定費内容詳細(支払内容詳細)
+				inputForm.getFixedCostDetailContext(),
+				// 支出項目コード
+				inputForm.getSisyutuItemCode(),
+				// 固定費支払月(支払月)
+				inputForm.getShiharaiTuki(),
+				// 固定費支払月任意詳細
+				inputForm.getShiharaiTukiOptionalContext(),
+				// 支払金額
+				DomainCommonUtils.convertBigDecimal(inputForm.getShiharaiKingaku(), 0));
+	}
+	
+	/**
+	 *<pre>
+	 * 引数の固定費一覧情報(ドメイン)から画面表示する固定費一覧明細情報のリストを生成して返します。
+	 *</pre>
+	 * @param searchResult 固定費一覧情報(ドメイン)
+	 * @return 画面表示する固定費一覧明細情報のリスト
+	 *
+	 */
+	private List<FixedCostItem> createFixedCostItemList(FixedCostInquiryList searchResult) {
+		return searchResult.getValues().stream().map(domain ->
+			AbstractFixedCostItemListResponse.FixedCostItem.from(
+				// 固定費コード
+				domain.getFixedCostCode().toString(),
+				// 支出項目名
+				domain.getSisyutuItemName().toString(),
+				// 支払名：固定費名を設定を設定
+				domain.getFixedCostName().toString(),
+				// 支払月：固定費支払月の値をコード変換して設定
+				codeTableItem.getCodeValue(
+						// コード区分：固定費支払月
+						MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_TUKI,
+						// 固定費支払月
+						domain.getFixedCostShiharaiTuki().toString()),
+				// 支払金額
+				domain.getShiharaiKingaku().toString(),
+				// その他任意詳細：固定費支払月任意詳細
+				domain.getFixedCostShiharaiTukiOptionalContext().toString())
+		).collect(Collectors.toUnmodifiableList());
 	}
 }

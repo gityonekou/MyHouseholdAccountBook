@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class FixedCostInfoManageInitResponse extends AbstractExpenditureItemInfoManageResponse {
+public class FixedCostInfoManageInitResponse extends AbstractFixedCostItemListResponse {
 	// 登録済み表示エリアを表示するかどうかのフラグ
 	private final boolean registeredFlg;
 	

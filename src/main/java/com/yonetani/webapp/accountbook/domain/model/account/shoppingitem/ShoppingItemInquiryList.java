@@ -142,7 +142,6 @@ public class ShoppingItemInquiryList {
 		}
 	}
 	
-	
 	// 商品情報検索結果明細情報のリスト
 	private final List<ShoppingItemInquiryItem> values;
 	

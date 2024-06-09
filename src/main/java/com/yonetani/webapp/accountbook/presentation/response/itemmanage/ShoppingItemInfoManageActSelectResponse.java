@@ -101,7 +101,7 @@ public class ShoppingItemInfoManageActSelectResponse extends AbstractShoppingIte
 	public ModelAndView build() {
 		// 画面表示のModelとViewを生成
 		ModelAndView modelAndView = createModelAndView("itemmanage/ShoppingItemInfoManageActSelect");
-		// 更新商品情報入力フォーム
+		// 選択した商品情報
 		modelAndView.addObject("shoppingItemInfo", shoppingItemInfo);
 		
 		return modelAndView;

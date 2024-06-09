@@ -356,30 +356,30 @@ public class ShoppingItemInfoManageUseCase {
 		
 		/* 更新商品情報入力フォームを生成し取得した商品情報をレスポンスに設定 */
 		// 更新商品情報入力フォームを生成
-		ShoppingItemInfoUpdateForm addItemForm = new ShoppingItemInfoUpdateForm();
+		ShoppingItemInfoUpdateForm updateItemForm = new ShoppingItemInfoUpdateForm();
 		// アクション：更新
-		addItemForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE);
+		updateItemForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE);
 		// 商品コード
-		addItemForm.setShoppingItemCode(searchResult.getShoppingItemCode().toString());
+		updateItemForm.setShoppingItemCode(searchResult.getShoppingItemCode().toString());
 		// 属する支出項目コード
-		addItemForm.setSisyutuItemCode(searchResult.getSisyutuItemCode().toString());
+		updateItemForm.setSisyutuItemCode(searchResult.getSisyutuItemCode().toString());
 		// 商品区分名
-		addItemForm.setShoppingItemKubunName(searchResult.getShoppingItemKubunName().toString());
+		updateItemForm.setShoppingItemKubunName(searchResult.getShoppingItemKubunName().toString());
 		// 商品名
-		addItemForm.setShoppingItemName(searchResult.getShoppingItemName().toString());
+		updateItemForm.setShoppingItemName(searchResult.getShoppingItemName().toString());
 		// 商品詳細
-		addItemForm.setShoppingItemDetailContext(searchResult.getShoppingItemDetailContext().toString());
+		updateItemForm.setShoppingItemDetailContext(searchResult.getShoppingItemDetailContext().toString());
 		// 商品JANコード
-		addItemForm.setShoppingItemJanCode(searchResult.getShoppingItemJanCode().toString());
+		updateItemForm.setShoppingItemJanCode(searchResult.getShoppingItemJanCode().toString());
 		// 会社名
-		addItemForm.setCompanyName(searchResult.getCompanyName().toString());
+		updateItemForm.setCompanyName(searchResult.getCompanyName().toString());
 		// 基準店舗コード
-		addItemForm.setStandardShopCode(searchResult.getShopCode().toString());
+		updateItemForm.setStandardShopCode(searchResult.getShopCode().toString());
 		// 基準価格
-		addItemForm.setStandardPrice(DomainCommonUtils.convertInteger(searchResult.getStandardPrice().getValue()));
+		updateItemForm.setStandardPrice(DomainCommonUtils.convertInteger(searchResult.getStandardPrice().getValue()));
 		
 		// 基準店舗選択ボックス表示情報を設定したレスポンスを生成
-		ShoppingItemInfoManageUpdateResponse response = createShoppingItemInfoManageUpdateResponse(user.getUserId(), addItemForm);
+		ShoppingItemInfoManageUpdateResponse response = createShoppingItemInfoManageUpdateResponse(user.getUserId(), updateItemForm);
 		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
 		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, searchResult.getSisyutuItemCode().toString()));
 		
