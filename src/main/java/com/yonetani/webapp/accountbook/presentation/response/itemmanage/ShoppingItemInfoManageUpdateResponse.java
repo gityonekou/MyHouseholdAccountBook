@@ -93,7 +93,7 @@ public class ShoppingItemInfoManageUpdateResponse extends AbstractResponse {
 	 */
 	@Override
 	protected String getRedirectUrl() {
-		// 支出項目情報登録完了後、リダイレクトするURL
+		// 商品情報登録完了後、リダイレクトするURL
 		return "redirect:/myhacbook/managebaseinfo/shoppingiteminfo/updateComplete/";
 	}
 }

@@ -121,6 +121,7 @@ public class ExpenditureItemInfoManageController {
 	 * 情報管理(支出項目)の処理選択画面で追加アクションを選択時のPOST要求マッピングです。
 	 * 情報管理(支出項目)の更新画面に遷移します。
 	 *</pre>
+	 * @param sisyutuItemCode 新規追加する支出項目が属する支出項目コード(親の支出項目)
 	 * @return 情報管理(支出項目)の更新画面
 	 *
 	 */
@@ -140,6 +141,7 @@ public class ExpenditureItemInfoManageController {
 	 * 情報管理(支出項目)の処理選択画面で更新アクションを選択時のPOST要求マッピングです。
 	 * 情報管理(支出項目)の更新画面に遷移します。
 	 *</pre>
+	 * @param sisyutuItemCode 更新対象の支出項目コード
 	 * @return 情報管理(支出項目)の更新画面
 	 *
 	 */

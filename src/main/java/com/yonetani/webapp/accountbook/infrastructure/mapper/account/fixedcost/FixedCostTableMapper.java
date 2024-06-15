@@ -20,6 +20,7 @@ import org.apache.ibatis.annotations.Update;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostInquiryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndFixedCostCodeSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndSisyutuItemCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSearchQueryDto;
 
 /**
@@ -59,6 +60,17 @@ public interface FixedCostTableMapper {
 	
 	/**
 	 *<pre>
+	 * 固定費テーブル:FIXED_COST_TABLEの情報から指定した固定費の情報を論理削除します。
+	 *</pre>
+	 * @param writeDto 固定費テーブル:FIXED_COST_TABLE出力情報
+	 * @return 固定費テーブルを更新した件数
+	 *
+	 */
+	@Update("sql/account/fixedcost/FixedCostTableUpdateSql02.sql")
+	int delete(@Param("dto") FixedCostReadWriteDto writeDto);
+	
+	/**
+	 *<pre>
 	 * 指定のユーザID、固定費コードを条件に固定費テーブル:FIXED_COST_TABLEを参照します。
 	 *</pre>
 	 * @param search 検索条件:ユーザID、固定費コード
@@ -82,6 +94,18 @@ public interface FixedCostTableMapper {
 	
 	/**
 	 *<pre>
+	 * 固定費テーブル:FIXED_COST_TABLE、支出項目テーブル:SISYUTU_ITEM_TABLEから指定のユーザID、固定費コードを条件に
+	 * 固定費情報を参照します。
+	 *</pre>
+	 * @param search 検索条件:ユーザID、支出項目コード
+	 * @return 固定費情報参照結果のリスト
+	 *
+	 */
+	@Select("sql/account/fixedcost/FixedCostInquirySelectSql02.sql")
+	List<FixedCostInquiryReadDto> findByIdAndSisyutuItemCode(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
+	
+	/**
+	 *<pre>
 	 * 指定のユーザIDに対応する固定費情報が何件あるかを取得します。
 	 *</pre>
 	 * @param userId 検索条件:ユーザID
@@ -90,5 +114,16 @@ public interface FixedCostTableMapper {
 	 */
 	@Select("sql/account/fixedcost/FixedCostTableCountSql01.sql")
 	int countById(@Param("dto") UserIdSearchQueryDto userId);
+
+	/**
+	 *<pre>
+	 * 指定のユーザID、支出項目コードに対応する固定費情報が何件あるかを取得します。
+	 *</pre>
+	 * @param search 検索条件:ユーザID、支出項目コード
+	 * @return 指定条件に該当するデータの件数
+	 *
+	 */
+	@Select("sql/account/fixedcost/FixedCostTableCountSql02.sql")
+	int countBySisyutuItemCode(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
 	
 }

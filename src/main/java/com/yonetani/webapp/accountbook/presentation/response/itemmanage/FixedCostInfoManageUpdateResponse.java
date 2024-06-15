@@ -41,6 +41,8 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 	private final FixedCostInfoUpdateForm fixedCostInfoUpdateForm;
 	// 支払月選択ボックス
 	private final SelectViewItem shiharaiTukiSelectList;
+	// 支払日選択ボックス
+	private final SelectViewItem shiharaiDaySelectList;
 	// 支出項目名
 	@Setter
 	private String sisyutuItemName;
@@ -50,22 +52,30 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 	 * デフォルト値からレスポンス情報を生成して返します。
 	 *</pre>
 	 * @param inputForm 固定費情報が格納されたフォームデータ
-	 * @param addList 支払月選択ボックスの表示情報リスト
+	 * @param addTukiList 支払月選択ボックスの表示情報リスト
+	 * @param addDayList 支払日選択ボックスの表示情報リスト
 	 * @return 情報管理(固定費)更新画面表示情報
 	 *
 	 */
-	public static FixedCostInfoManageUpdateResponse getInstance(FixedCostInfoUpdateForm inputForm, List<OptionItem> addList) {
+	public static FixedCostInfoManageUpdateResponse getInstance(FixedCostInfoUpdateForm inputForm, List<OptionItem> addTukiList,
+			List<OptionItem> addDayList) {
 		if(inputForm == null) {
 			inputForm = new FixedCostInfoUpdateForm();
 		}
 		// 支払月選択ボックスの表示情報リストを生成
-		List<OptionItem> optionList = new ArrayList<>();
-		optionList.add(OptionItem.from("", "支払月を選択してください"));
-		if(!CollectionUtils.isEmpty(addList)) {
-			optionList.addAll(addList);
+		List<OptionItem> optionTukiList = new ArrayList<>();
+		optionTukiList.add(OptionItem.from("", "支払月を選択してください"));
+		if(!CollectionUtils.isEmpty(addTukiList)) {
+			optionTukiList.addAll(addTukiList);
 		}
-		// 入力フォームと支払月選択ボックスの表示情報リストを元に情報管理(固定費)更新画面表示情報を生成
-		return new FixedCostInfoManageUpdateResponse(inputForm, SelectViewItem.from(optionList));
+		// 支払日選択ボックスの表示情報リストを生成
+		List<OptionItem> optionDayList = new ArrayList<>();
+		optionDayList.add(OptionItem.from("", "支払日を選択してください"));
+		if(!CollectionUtils.isEmpty(addDayList)) {
+			optionDayList.addAll(addDayList);
+		}
+		// 入力フォームと支払月選択ボックス・支払日選択ボックスの表示情報リストを元に情報管理(固定費)更新画面表示情報を生成
+		return new FixedCostInfoManageUpdateResponse(inputForm, SelectViewItem.from(optionTukiList), SelectViewItem.from(optionDayList));
 	}
 	
 	/**
@@ -79,6 +89,8 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 		modelAndView.addObject("fixedCostInfoUpdateForm", fixedCostInfoUpdateForm);
 		// 支払月選択ボックス
 		modelAndView.addObject("shiharaiTukiSelectList", shiharaiTukiSelectList);
+		// 支払日選択ボックス
+		modelAndView.addObject("shiharaiDaySelectList", shiharaiDaySelectList);
 		// 支出項目名
 		modelAndView.addObject("sisyutuItemName", sisyutuItemName);
 		
@@ -90,7 +102,7 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 	 */
 	@Override
 	protected String getRedirectUrl() {
-		// 支出項目情報登録完了後、リダイレクトするURL
+		// 固定費登録完了後、リダイレクトするURL
 		return "redirect:/myhacbook/managebaseinfo/fixedcostinfo/updateComplete/";
 	}
 }

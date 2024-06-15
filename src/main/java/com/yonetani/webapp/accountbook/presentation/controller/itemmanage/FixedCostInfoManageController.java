@@ -115,6 +115,7 @@ public class FixedCostInfoManageController {
 	 * 固定費一覧から任意の明細を選択時のGET要求マッピングです。
 	 * 情報管理(固定費)処理選択画面に遷移します。
 	 *</pre>
+	 * @param fixedCostCode 表示対象の固定費コード
 	 * @return 情報管理(固定費)処理選択画面
 	 *
 	 */
@@ -136,6 +137,7 @@ public class FixedCostInfoManageController {
 	 * 情報管理(固定費)更新画面に遷移します。
 	 * 選択した支出項目に属する固定費が登録済みの場合、初期表示画面に該当メッセージを表示しOK・NGを選択します。
 	 *</pre>
+	 * @param sisyutuItemCode 判定対象の支出項目コード
 	 * @return 支出項目にすでに固定費が未登録の場合は情報管理(固定費)更新画面、支出項目にすでに固定費が登録済みの場合は初期表示画面(メッセージ表示)
 	 *
 	 */
@@ -169,6 +171,7 @@ public class FixedCostInfoManageController {
 	 * このアクションが呼ばれます。
 	 * 情報管理(固定費)更新画面に遷移します。
 	 *</pre>
+	 * @param sisyutuItemCode 追加する固定費が所属する支出項目の支出項目コード
 	 * @return 情報管理(固定費)更新画面
 	 *
 	 */
@@ -176,7 +179,7 @@ public class FixedCostInfoManageController {
 	public ModelAndView postActionAddLoad(@RequestParam("sisyutuItemCode") String sisyutuItemCode) {
 		log.debug("postActionAddLoad: sisyutuItemCode=" + sisyutuItemCode);
 		// 画面表示情報を取得
-		return this.usecase.readUpdateFixedCostInfo(loginUserSession.getLoginUserInfo(), sisyutuItemCode)
+		return this.usecase.readAddFixedCostInfoBySisyutuItem(loginUserSession.getLoginUserInfo(), sisyutuItemCode)
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
@@ -188,6 +191,7 @@ public class FixedCostInfoManageController {
 	 * 選択した固定費に対して、更新操作を選択時のPOST要求マッピングです。
 	 * 情報管理(固定費)更新画面に遷移します。
 	 *</pre>
+	 * @param fixedCostCode 更新対象の固定費コード
 	 * @return 情報管理(固定費)更新画面
 	 *
 	 */
@@ -207,18 +211,16 @@ public class FixedCostInfoManageController {
 	 * 選択した固定費に対して、削除操作を選択時のPOST要求マッピングです。
 	 * 削除が完了した場合、情報管理(固定費)初期表示画面に遷移します。
 	 *</pre>
+	 * @param fixedCostCode 削除対象の固定費コード
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
 	 * @return 情報管理(固定費)初期表示画面
 	 *
 	 */
 	@PostMapping(value="/delete/")
-	public ModelAndView postDelete(@RequestParam("fixedCostCode") String fixedCostCode) {
+	public ModelAndView postDelete(@RequestParam("fixedCostCode") String fixedCostCode, RedirectAttributes redirectAttributes) {
 		log.debug("postDelete: fixedCostCode=" + fixedCostCode);
 		// 画面表示情報を取得
-		return this.usecase.execDelete(loginUserSession.getLoginUserInfo(), fixedCostCode)
-				// レスポンスにログインユーザ名を設定
-				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
-				// レスポンスからModelAndViewを生成
-				.build();
+		return this.usecase.execDelete(loginUserSession.getLoginUserInfo(), fixedCostCode).buildRedirect(redirectAttributes);
 	}
 	
 	/**

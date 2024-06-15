@@ -213,6 +213,7 @@ public class ShoppingItemInfoManageController {
 	 * 検索結果画面から任意の商品を選択時のGET要求マッピングです。
 	 * 情報管理(商品)処理選択画面に遷移します。
 	 *</pre>
+	 * @param shoppingItemCode 表示対象商品の商品コード
 	 * @return 情報管理(商品)処理選択画面
 	 *
 	 */
@@ -232,6 +233,7 @@ public class ShoppingItemInfoManageController {
 	 * 対象の支出項目を選択して商品を追加時のGET要求マッピングです。
 	 * 情報管理(商品)更新画面に遷移します。
 	 *</pre>
+	 * @param sisyutuItemCode 追加する商品が所属する支出項目の支出項目コード
 	 * @return 情報管理(商品)更新画面
 	 *
 	 */
@@ -251,6 +253,7 @@ public class ShoppingItemInfoManageController {
 	 * 対象の支出項目を選択して商品を検索時のGET要求マッピングです。
 	 * 情報管理(商品)検索結果画面に遷移します。
 	 *</pre>
+	 * @param sisyutuItemCode 商品が属する支出項目の支出項目コード
 	 * @return 情報管理(商品)検索結果画面
 	 *
 	 */
@@ -285,6 +288,7 @@ public class ShoppingItemInfoManageController {
 	 * 選択した商品と同一の情報で商品を追加時のPOST要求マッピングです。
 	 * 情報管理(商品)更新画面に遷移します。
 	 *</pre>
+	 * @param shoppingItemCode コピー元となる商品の商品コード
 	 * @return 情報管理(商品)更新画面
 	 *
 	 */
@@ -304,6 +308,7 @@ public class ShoppingItemInfoManageController {
 	 * 選択した商品に対して、更新操作を選択時のPOST要求マッピングです。
 	 * 情報管理(商品)更新画面に遷移します。
 	 *</pre>
+	 * @param shoppingItemCode 更新対象の商品コード
 	 * @return 情報管理(商品)更新画面
 	 *
 	 */

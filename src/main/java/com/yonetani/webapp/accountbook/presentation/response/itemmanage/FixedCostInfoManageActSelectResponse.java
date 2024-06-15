@@ -53,6 +53,8 @@ public class FixedCostInfoManageActSelectResponse extends AbstractFixedCostItemL
 		private final String shiharaiDetailContext;
 		// 支払月詳細：支払月 or その他任意(その他任意の詳細をここに表示)
 		private final String shiharaiTukiDetailContext;
+		// 支払日
+		private final String shiharaiDay;
 		// 支払金額
 		private final String shiharaiKingaku;
 		
@@ -65,14 +67,17 @@ public class FixedCostInfoManageActSelectResponse extends AbstractFixedCostItemL
 		 * @param shiharaiName 支払名
 		 * @param shiharaiDetailContext 支払内容詳細
 		 * @param shiharaiTukiDetailContext 支払月詳細
+		 * @param shiharaiDay 支払日
 		 * @param shiharaiKingaku 支払金額
 		 * @return 選択固定費の詳細情報
 		 *
 		 */
 		public static SelectFixedCostInfo from(String fixedCostCode, String sisyutuItemName, String shiharaiName,
-				String shiharaiDetailContext, String shiharaiTukiDetailContext, String shiharaiKingaku) {
+				String shiharaiDetailContext, String shiharaiTukiDetailContext, String shiharaiDay,
+				String shiharaiKingaku) {
 			return new SelectFixedCostInfo(fixedCostCode, sisyutuItemName, shiharaiName,
-					shiharaiDetailContext, shiharaiTukiDetailContext, shiharaiKingaku);
+					shiharaiDetailContext, shiharaiTukiDetailContext, shiharaiDay,
+					shiharaiKingaku);
 		}
 	}
 	
@@ -101,5 +106,14 @@ public class FixedCostInfoManageActSelectResponse extends AbstractFixedCostItemL
 		// 選択した固定費の情報を設定
 		modelAndView.addObject("fixedCostInfo", fixedCostInfo);
 		return modelAndView;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected String getRedirectUrl() {
+		// 固定費削除完了後、リダイレクトするURL
+		return "redirect:/myhacbook/managebaseinfo/fixedcostinfo/updateComplete/";
 	}
 }

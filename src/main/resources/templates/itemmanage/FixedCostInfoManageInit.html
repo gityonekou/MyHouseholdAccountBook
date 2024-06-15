@@ -25,20 +25,35 @@
 			</div>
 			
 			<!-- 選択支出情報表示エリア -->
+			<th:block th:if="${registeredFlg}">
 			<div class="card-body">
 				<div class="card">
 					<div class="card-body">
 						<p class="h6">■確認■</p>
-						<p class="card-text">選択した支出項目「家賃支払い」にはすでに2件の固定費支払いが登録されています。新規で追加しますか？</p>
-						<form action="./ManageFixedCostUpd.html">
+						<p class="card-text">選択した支出項目「<span th:text="${registeredFixedCostInfoList.get(0).sisyutuItemName}">支出項目名</span>」には<span th:text="${#lists.size(registeredFixedCostInfoList)}">件数</span>件の固定費情報が登録されています。新規で追加しますか？</p>
+						<table class="table table-sm table-bordered">
+							<tbody>
+								<th:block th:each="item : ${registeredFixedCostInfoList}">
+								<tr>
+									<td th:text="${item.shiharaiName}" class="w20">支払名</td>
+									<td class="w20"><span th:text="${item.shiharaiTuki}">支払月</span>(<span th:text="${item.shiharaiDay}">支払日</span>)</td>
+									<td th:text="${item.shiharaiKingaku}" class="w10" align="right">支払金額</td>
+									<td></td>
+								</tr>
+								</th:block>
+							</tbody>
+						</table>
+						<form name="FixedCostAddSelectInfo" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/fixedcostinfo/updateload/}" th:object="${sisyutuItemCodeInfo}">
 							<div class="mb-3">
-								<button class="btn btn-primary" type="submit">新規で追加</button>
-								<button class="btn btn-primary" type="submit">キャンセル</button>
+								<button class="btn btn-primary" name="actionAdd" type="submit">新規で追加</button>
+								<button class="btn btn-primary" name="actionCancel" type="submit">キャンセル</button>
+								<input type="hidden" th:field="*{sisyutuItemCode}" />
 							</div>
 						</form>
 					</div>
 				</div>
 			</div>
+			</th:block>
 			
 			<!-- 固定費一覧表示エリア -->
 			<div class="card-body">
@@ -52,9 +67,10 @@
 							<thead>
 								<tr class="table-secondary">
 								<th scope="col" class="w20">支出項目名</th>
-								<th scope="col" class="w30">支払名</th>
+								<th scope="col" class="w25">支払名</th>
 								<th scope="col" class="w10">支払月</th>
-								<th scope="col" class="w15">支払金額</th>
+								<th scope="col" class="w10">支払日</th>
+								<th scope="col" class="w10">支払金額</th>
 								<th scope="col">その他任意詳細</th>
 								</tr>
 							</thead>
@@ -65,18 +81,19 @@
 									<td th:text="${item.sisyutuItemName}">支出項目名</td>
 									<td th:text="${item.shiharaiName}">支払名</td>
 									<td th:text="${item.shiharaiTuki}">支払月</td>
-									<td th:text="${item.shiharaiKingaku}">支払金額</td>
+									<td th:text="${item.shiharaiDay}">支払日</td>
+									<td th:text="${item.shiharaiKingaku}" align="right">支払金額</td>
 									<td th:text="${item.optionalContext}">その他任意詳細</td>
 								</tr>
 								</th:block>
 								<tr class="table-success">
-									<td colspan="3">奇数月合計(毎月、奇数月、その他任意の合計値)</td>
-									<td align="right" th:text="${oddMonthGoukei}">奇数月合計</td>
+									<td colspan="4">奇数月合計(毎月、奇数月、その他任意の合計値)</td>
+									<td th:text="${oddMonthGoukei}" align="right">奇数月合計</td>
 									<td></td>
 								</tr>
 								<tr class="table-success">
-									<td colspan="3">偶数月合計(毎月、偶数月、その他任意の合計値)</td>
-									<td align="right" th:text="${anEvenMonthGoukei}">偶数月合計</td>
+									<td colspan="4">偶数月合計(毎月、偶数月、その他任意の合計値)</td>
+									<td th:text="${anEvenMonthGoukei}" align="right">偶数月合計</td>
 									<td></td>
 								</tr>
 							</tbody>

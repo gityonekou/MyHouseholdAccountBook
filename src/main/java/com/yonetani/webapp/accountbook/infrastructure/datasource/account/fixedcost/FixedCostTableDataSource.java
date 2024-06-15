@@ -18,10 +18,12 @@ import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCost;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostInquiryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndFixedCostCodeSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndSisyutuItemCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.fixedcost.FixedCostTableMapper;
 
@@ -66,6 +68,15 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public int delete(FixedCost data) {
+		// 固定費テーブル:FIXED_COST_TABLEの情報から指定した固定費の情報を論理削除します。
+		return mapper.delete(createFixedCostReadWriteDto(data));
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public FixedCost findByIdAndFixedCostCode(SearchQueryUserIdAndFixedCostCode search) {
 		// 検索結果を取得
 		FixedCostReadWriteDto searchResult = mapper.findByIdAndFixedCostCode(UserIdAndFixedCostCodeSearchQueryDto.from(
@@ -101,9 +112,44 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public FixedCostInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search) {
+		// 検索結果を取得
+		List<FixedCostInquiryReadDto> searchResult = mapper.findByIdAndSisyutuItemCode(
+				UserIdAndSisyutuItemCodeSearchQueryDto.from(
+						// ユーザID
+						search.getUserId().toString(),
+						// 支出項目コード
+						search.getSisyutuItemCode().toString()));
+		if(searchResult == null) {
+			// 検索結果なしの場合、0件データを返却
+			return FixedCostInquiryList.from(null);
+		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
+			return FixedCostInquiryList.from(searchResult.stream().map(dto -> createFixedCostInquiryItem(dto))
+						.collect(Collectors.toUnmodifiableList()));
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int countById(SearchQueryUserId userId) {
-		// ユーザIDで検索し、登録されている商品の件数を返す
+		// ユーザIDで検索し、登録されている固定費情報の件数を返す
 		return mapper.countById(UserIdSearchQueryDto.from(userId.getUserId().toString()));
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int countBySisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search) {
+		// ユーザID、支出項目コードで検索し、登録されている固定費情報の件数を返す
+		return mapper.countBySisyutuItemCode(UserIdAndSisyutuItemCodeSearchQueryDto.from(
+				// ユーザID
+				search.getUserId().toString(),
+				// 支出項目コード
+				search.getSisyutuItemCode().toString()));
 	}
 	
 	/**
@@ -130,6 +176,8 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 				dto.getFixedCostShiharaiTuki(),
 				// 固定費支払月任意詳細
 				dto.getFixedCostShiharaiTukiOptionalContext(),
+				// 固定費支払日(支払日)
+				dto.getFixedCostShiharaiDay(),
 				// 支払金額
 				dto.getShiharaiKingaku());
 	}
@@ -158,6 +206,8 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 				data.getFixedCostShiharaiTuki().toString(),
 				// 固定費支払月任意詳細
 				data.getFixedCostShiharaiTukiOptionalContext().toString(),
+				// 固定費支払日(支払日)
+				data.getFixedCostShiharaiDay().toString(),
 				// 支払金額
 				data.getShiharaiKingaku().getValue());
 	}
@@ -184,6 +234,8 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 				dto.getFixedCostShiharaiTuki(),
 				// 固定費支払月任意詳細
 				dto.getFixedCostShiharaiTukiOptionalContext(),
+				// 固定費支払日(支払日)
+				dto.getFixedCostShiharaiDay(),
 				// 支払金額
 				dto.getShiharaiKingaku());
 	}

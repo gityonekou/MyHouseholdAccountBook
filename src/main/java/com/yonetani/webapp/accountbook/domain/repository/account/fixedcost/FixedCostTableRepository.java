@@ -14,6 +14,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCost;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 
 /**
  *<pre>
@@ -50,6 +51,16 @@ public interface FixedCostTableRepository {
 	
 	/**
 	 *<pre>
+	 * 固定費テーブル情報から指定した固定費の情報を論理削除します。
+	 *</pre>
+	 * @param data 削除データ
+	 * @return 削除されたデータの件数
+	 *
+	 */
+	int delete(FixedCost data);
+	
+	/**
+	 *<pre>
 	 * ユーザIDと指定の固定費コードに対応する固定費情報を取得します。
 	 *</pre>
 	 * @param search 検索対象のユーザID、固定費コード
@@ -70,6 +81,16 @@ public interface FixedCostTableRepository {
 	
 	/**
 	 *<pre>
+	 * 検索条件に該当する固定費情報の検索結果を取得します。
+	 *</pre>
+	 * @param search 検索対象のユーザID、支出項目コード
+	 * @return 固定費一覧情報の検索結果
+	 *
+	 */
+	FixedCostInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search);
+	
+	/**
+	 *<pre>
 	 * 新規の固定費コード発番用にユーザIDに対応する固定費情報が何件あるかを取得します。
 	 *</pre>
 	 * @param userId 検索対象のユーザID
@@ -77,4 +98,15 @@ public interface FixedCostTableRepository {
 	 *
 	 */
 	int countById(SearchQueryUserId userId);
+
+	/**
+	 *<pre>
+	 * 検索条件に該当する固定費情報が何件あるかを取得します。
+	 *</pre>
+	 * @param search 検索対象のユーザID、支出項目コード
+	 * @return 指定条件に該当するデータの件数
+	 *
+	 */
+	int countBySisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search);
+	
 }

@@ -57,6 +57,9 @@ public class FixedCostInfoUpdateForm {
 	// 支払月任意詳細
 	@Size(max = 300)
 	private String shiharaiTukiOptionalContext;
+	// 支払日
+	@NotBlank
+	private String shiharaiDay;
 	// 支払金額
 	@NotNull
 	@Min(1)

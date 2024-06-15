@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostName;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiDay;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiTuki;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiTukiOptionalContext;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ShiharaiKingaku;
@@ -51,6 +52,8 @@ public class FixedCost {
 	private final FixedCostShiharaiTuki fixedCostShiharaiTuki;
 	// 固定費支払月任意詳細
 	private final FixedCostShiharaiTukiOptionalContext fixedCostShiharaiTukiOptionalContext;
+	// 固定費支払日(支払日)
+	private final FixedCostShiharaiDay fixedCostShiharaiDay;
 	// 支払金額
 	private final ShiharaiKingaku shiharaiKingaku;
 	
@@ -65,6 +68,7 @@ public class FixedCost {
 	 * @param sisyutuItemCode 支出項目コード
 	 * @param fixedCostShiharaiTuki 固定費支払月(支払月)
 	 * @param fixedCostShiharaiTukiOptionalContext 固定費支払月任意詳細
+	 * @param fixedCostShiharaiDay 固定費支払日(支払日)
 	 * @param shiharaiKingaku 支払金額
 	 * @return 固定費情報を表すドメインモデル
 	 *
@@ -77,6 +81,7 @@ public class FixedCost {
 			String sisyutuItemCode,
 			String fixedCostShiharaiTuki,
 			String fixedCostShiharaiTukiOptionalContext,
+			String fixedCostShiharaiDay,
 			BigDecimal shiharaiKingaku) {
 		return new FixedCost(
 				UserId.from(userId),
@@ -86,6 +91,7 @@ public class FixedCost {
 				SisyutuItemCode.from(sisyutuItemCode),
 				FixedCostShiharaiTuki.from(fixedCostShiharaiTuki),
 				FixedCostShiharaiTukiOptionalContext.from(fixedCostShiharaiTukiOptionalContext),
+				FixedCostShiharaiDay.from(fixedCostShiharaiDay),
 				ShiharaiKingaku.from(shiharaiKingaku));
 	}
 	
@@ -94,7 +100,7 @@ public class FixedCost {
 	 */
 	@Override
 	public String toString() {
-		StringBuilder buff = new StringBuilder(360);
+		StringBuilder buff = new StringBuilder(385);
 		buff.append("userId:")
 		.append(userId)
 		.append(",fixedCostCode:")
@@ -109,6 +115,8 @@ public class FixedCost {
 		.append(fixedCostShiharaiTuki)
 		.append(",fixedCostShiharaiTukiOptionalContext:")
 		.append(fixedCostShiharaiTukiOptionalContext)
+		.append(",fixedCostShiharaiDay:")
+		.append(fixedCostShiharaiDay)
 		.append(",shiharaiKingaku:")
 		.append(shiharaiKingaku);
 		return buff.toString();

@@ -12,10 +12,16 @@
  */
 package com.yonetani.webapp.accountbook.presentation.response.itemmanage;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 /**
  *<pre>
@@ -32,8 +38,45 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class FixedCostInfoManageInitResponse extends AbstractFixedCostItemListResponse {
+	
+	/**
+	 *<pre>
+	 * 支出項目コード情報(選択した支出項目コードに属する固定費が登録済みの場合、値を設定)
+	 *
+	 *</pre>
+	 *
+	 * @author ：Kouki Yonetani
+	 * @since 家計簿アプリ(1.00.A)
+	 *
+	 */
+	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+	@Getter
+	public static class SisyutuItemCodeInfo {
+		// 支出項目コード
+		private final String sisyutuItemCode;
+		
+		/**
+		 *<pre>
+		 * 引数の値から支出項目コード情報を生成して返します。
+		 *</pre>
+		 * @param sisyutuItemCode 支出項目コード
+		 * @return 支出項目コード情報
+		 *
+		 */
+		public static SisyutuItemCodeInfo from(String sisyutuItemCode) {
+			return new SisyutuItemCodeInfo(sisyutuItemCode);
+		}
+	}
+	
 	// 登録済み表示エリアを表示するかどうかのフラグ
 	private final boolean registeredFlg;
+	
+	// 選択した支出項目コード
+	@Setter
+	private SisyutuItemCodeInfo sisyutuItemCodeInfo;
+	
+	// 既に登録済みの支出項目の固定費一覧
+	private List<FixedCostItem> registeredFixedCostInfoList = new ArrayList<>(); 
 	
 	/**
 	 *<pre>
@@ -48,14 +91,32 @@ public class FixedCostInfoManageInitResponse extends AbstractFixedCostItemListRe
 	}
 	
 	/**
+	 *<pre>
+	 * 既に登録済みの支出項目の固定費一覧明細リストを追加します。
+	 *</pre>
+	 * @param addList 追加する固定費一覧明細リスト
+	 *
+	 */
+	public void addRegisteredFixedCostInfoList(List<FixedCostItem> addList) {
+		if(!CollectionUtils.isEmpty(addList)) {
+			registeredFixedCostInfoList.addAll(addList);
+		}
+	}
+	
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public ModelAndView build() {
 		// 画面表示のModelとViewを生成
 		ModelAndView modelAndView = createModelAndView("itemmanage/FixedCostInfoManageInit");
-		// 固定費一覧
+		// 登録済み表示エリアを表示するかどうかのフラグ
 		modelAndView.addObject("registeredFlg", registeredFlg);
+		// 選択した支出項目コード情報
+		modelAndView.addObject("sisyutuItemCodeInfo", sisyutuItemCodeInfo);
+		// 既に登録済みの支出項目の固定費一覧情報を設定
+		modelAndView.addObject("registeredFixedCostInfoList", registeredFixedCostInfoList);
+		
 		return modelAndView;
 	}
 

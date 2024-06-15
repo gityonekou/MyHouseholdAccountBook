@@ -60,6 +60,8 @@ public class MyHouseholdAccountBookContent {
 	public static final String SHIHARAI_TUKI_AN_EVEN_SELECTED_VALUE = "30";
 	// コード定義:固定費支払月でその他任意(40)を選択時
 	public static final String SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE = "40";
+	// コード定義区分(固定費支払日:003)
+	public static final String CODE_DEFINES_FIXED_COST_SHIHARAI_DAY = "003";
 	
 	// 支出項目コード仮登録データ:9999
 	public static final String SISYUTU_ITEM_CODE_TEMPORARY_VALUE = "9999";

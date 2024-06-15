@@ -40,6 +40,8 @@ public class FixedCostInquiryReadDto {
 	private final String fixedCostShiharaiTuki;
 	// 固定費支払月任意詳細
 	private final String fixedCostShiharaiTukiOptionalContext;
+	// 固定費支払日(支払日)
+	private final String fixedCostShiharaiDay;
 	// 支払金額
 	private final BigDecimal shiharaiKingaku;
 }

@@ -8,6 +8,7 @@
 <link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="/js/table_tr_click_script.js"></script>
+<script src="/js/itemmanage/ManageFixedCost.js"></script>
 <title>情報管理(固定費)</title>
 </head>
 <body>
@@ -41,7 +42,7 @@
 							<label for="name" class="form-label">支払内容詳細：<span th:text="*{shiharaiDetailContext}"></span></label>
 						</div>
 						<div class="mb-3">
-							<label for="name" class="form-label">支払月：<span th:text="*{shiharaiTukiDetailContext}"></span></label>
+							<label for="name" class="form-label">支払日：<span th:text="*{shiharaiTukiDetailContext}"></span><span th:text="*{shiharaiDay}"></span></label>
 						</div>
 						<div class="mb-3">
 							<label for="name" class="form-label">支払金額：<span th:text="*{shiharaiKingaku}"></span></label>
@@ -53,7 +54,7 @@
 							<span>&emsp;</span>
 							<span>&emsp;</span>
 							<!--/* 削除時は確認ダイアログを表示してからOKなら削除用のフォームを実行 */-->
-							<button class="btn btn-primary" type="button">削除</button>
+							<button class="btn btn-primary" name="actionDelete" id="fixed-cost-action-delete-btn" type="button">削除</button>
 							<input type="hidden" th:field="*{fixedCostCode}" />
 						</div>
 					</div>
@@ -78,9 +79,10 @@
 							<thead>
 								<tr class="table-secondary">
 								<th scope="col" class="w20">支出項目名</th>
-								<th scope="col" class="w30">支払名</th>
+								<th scope="col" class="w25">支払名</th>
 								<th scope="col" class="w10">支払月</th>
-								<th scope="col" class="w15">支払金額</th>
+								<th scope="col" class="w10">支払日</th>
+								<th scope="col" class="w10">支払金額</th>
 								<th scope="col">その他任意詳細</th>
 								</tr>
 							</thead>
@@ -91,18 +93,19 @@
 									<td th:text="${item.sisyutuItemName}">支出項目名</td>
 									<td th:text="${item.shiharaiName}">支払名</td>
 									<td th:text="${item.shiharaiTuki}">支払月</td>
-									<td th:text="${item.shiharaiKingaku}">支払金額</td>
+									<td th:text="${item.shiharaiDay}">支払日</td>
+									<td th:text="${item.shiharaiKingaku}" align="right">支払金額</td>
 									<td th:text="${item.optionalContext}">その他任意詳細</td>
 								</tr>
 								</th:block>
 								<tr class="table-success">
-									<td colspan="3">奇数月合計(毎月、奇数月、その他任意の合計値)</td>
-									<td align="right" th:text="${oddMonthGoukei}">奇数月合計</td>
+									<td colspan="4">奇数月合計(毎月、奇数月、その他任意の合計値)</td>
+									<td th:text="${oddMonthGoukei}" align="right">奇数月合計</td>
 									<td></td>
 								</tr>
 								<tr class="table-success">
-									<td colspan="3">偶数月合計(毎月、偶数月、その他任意の合計値)</td>
-									<td align="right" th:text="${anEvenMonthGoukei}">偶数月合計</td>
+									<td colspan="4">偶数月合計(毎月、偶数月、その他任意の合計値)</td>
+									<td th:text="${anEvenMonthGoukei}" align="right">偶数月合計</td>
 									<td></td>
 								</tr>
 							</tbody>

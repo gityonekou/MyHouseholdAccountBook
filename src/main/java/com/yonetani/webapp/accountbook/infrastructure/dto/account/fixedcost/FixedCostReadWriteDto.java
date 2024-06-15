@@ -42,6 +42,8 @@ public class FixedCostReadWriteDto {
 	private final String fixedCostShiharaiTuki;
 	// 固定費支払月任意詳細
 	private final String fixedCostShiharaiTukiOptionalContext;
+	// 固定費支払日(支払日)
+	private final String fixedCostShiharaiDay;
 	// 支払金額
 	private final BigDecimal shiharaiKingaku;
 	
@@ -56,6 +58,7 @@ public class FixedCostReadWriteDto {
 	 * @param sisyutuItemCode 支出項目コード
 	 * @param fixedCostShiharaiTuki 固定費支払月(支払月)
 	 * @param fixedCostShiharaiTukiOptionalContext 固定費支払月任意詳細
+	 * @param fixedCostShiharaiDay 固定費支払日(支払日)
 	 * @param shiharaiKingaku 支払金額
 	 * @return 固定費テーブル:FIXED_COST_TABLE出力情報
 	 *
@@ -68,6 +71,7 @@ public class FixedCostReadWriteDto {
 			String sisyutuItemCode,
 			String fixedCostShiharaiTuki,
 			String fixedCostShiharaiTukiOptionalContext,
+			String fixedCostShiharaiDay,
 			BigDecimal shiharaiKingaku) {
 		return new FixedCostReadWriteDto(
 				userId,
@@ -77,6 +81,7 @@ public class FixedCostReadWriteDto {
 				sisyutuItemCode,
 				fixedCostShiharaiTuki,
 				fixedCostShiharaiTukiOptionalContext,
+				fixedCostShiharaiDay,
 				shiharaiKingaku);
 	}
 }
