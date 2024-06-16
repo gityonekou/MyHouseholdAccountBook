@@ -106,7 +106,7 @@ public class AccountMonthInquiryController {
 		log.debug("postBeforeAccountMonth:beforeYearMonth="+ beforeYearMonth + ",returnYearMonth:=" + returnYearMonth);
 		
 		// 画面表示情報読込
-		return this.usecase.read(loginUserSession.getLoginUserInfo(), beforeYearMonth)
+		return this.usecase.read(loginUserSession.getLoginUserInfo(), beforeYearMonth, returnYearMonth)
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
@@ -129,7 +129,7 @@ public class AccountMonthInquiryController {
 		log.debug("postNextAccountMonth:nextYearMonth="+ nextYearMonth + ",returnYearMonth:=" + returnYearMonth);
 		
 		// 画面表示情報読込
-		return this.usecase.read(loginUserSession.getLoginUserInfo(), nextYearMonth)
+		return this.usecase.read(loginUserSession.getLoginUserInfo(), nextYearMonth, returnYearMonth)
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成

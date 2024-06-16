@@ -72,11 +72,12 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 		 *<pre>
 		 * 引数の値から表示する月の対象年月情報を生成して返します。
 		 *</pre>
-		 * @param targetYearMonth 表示対象の年月(YYYMM) 
+		 * @param targetYearMonth 表示対象の年月(YYYMM)
+		 * @param returnYearMonth 戻り時の表示対象年月
 		 * @return 表示する月の対象年月情報
 		 *
 		 */
-		public static TargetYearMonthInfo from(String targetYearMonth) {
+		public static TargetYearMonthInfo from(String targetYearMonth, String returnYearMonth) {
 			// 念のため、ここで入力値チェックを行う
 			if(!StringUtils.hasLength(targetYearMonth) || targetYearMonth.length() != 6) {
 				throw new MyHouseholdAccountBookRuntimeException("対象年月の値が不正です。管理者に問い合わせてください。[targetYearMonth=" + targetYearMonth + "]");
@@ -89,7 +90,7 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 					// 対象年月
 					targetYearMonth,
 					// 戻り時の表示対象年月
-					targetYearMonth,
+					returnYearMonth,
 					// 対象年
 					targetYearMonth.substring(0, 4),
 					// 前月
@@ -101,6 +102,19 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 					// 「yyyy年MM月度」の月の値
 					targetYearMonth.substring(4)
 					);
+		}
+		
+		/**
+		 *<pre>
+		 * 引数の値から表示する月の対象年月情報を生成して返します。
+		 * 戻り時の表示対象年月の値は引数で指定した対象年月と同じ値が設定されます。
+		 *</pre>
+		 * @param targetYearMonth 表示対象の年月(YYYMM)
+		 * @return 表示する月の対象年月情報
+		 *
+		 */
+		public static TargetYearMonthInfo from(String targetYearMonth) {
+			return TargetYearMonthInfo.from(targetYearMonth, targetYearMonth);
 		}
 	}
 	
@@ -171,6 +185,9 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 	private List<ExpenditureItem> expenditureItemList = new ArrayList<>();
 	
 	// 指定月の収支情報
+	// 表示する月の収支情報が登録済みかどうかのフラグ(デフォルトはデータあり)
+	@Setter
+	private boolean syuusiDataFlg = true;
 	// 収入金額
 	@Setter
 	private String syuunyuuKingaku;
@@ -219,21 +236,28 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 	 */
 	@Override
 	public ModelAndView build() {
-		// 画面表示のModelとViewを生成
-		ModelAndView modelAndView = createModelAndView("account/inquiry/AccountMonth");
-		// 対象年、対象月、前月、次月の値を設定
-		modelAndView.addObject("targetYearMonthInfo", targetYearMonthInfo);
-		// 収入金額
-		modelAndView.addObject("syuunyuuKingaku", syuunyuuKingaku);
-		// 支出金額
-		modelAndView.addObject("sisyutuKingaku", sisyutuKingaku);
-		// 支出予定金額
-		modelAndView.addObject("sisyutuYoteiKingaku", sisyutuYoteiKingaku);
-		// 収支金額
-		modelAndView.addObject("syuusiKingaku", syuusiKingaku);
-		// 月毎の支出項目明細リストを追加
-		modelAndView.addObject("expenditureItemList", expenditureItemList);
-		
-		return modelAndView;
+		if(syuusiDataFlg) {
+			// 指定月の収支情報ありの場合、マイ家計簿(各月の収支)画面のModelとViewを生成
+			ModelAndView modelAndView = createModelAndView("account/inquiry/AccountMonth");
+			// 対象年、対象月、前月、次月の値を設定
+			modelAndView.addObject("targetYearMonthInfo", targetYearMonthInfo);
+			// 収入金額
+			modelAndView.addObject("syuunyuuKingaku", syuunyuuKingaku);
+			// 支出金額
+			modelAndView.addObject("sisyutuKingaku", sisyutuKingaku);
+			// 支出予定金額
+			modelAndView.addObject("sisyutuYoteiKingaku", sisyutuYoteiKingaku);
+			// 収支金額
+			modelAndView.addObject("syuusiKingaku", syuusiKingaku);
+			// 月毎の支出項目明細リストを追加
+			modelAndView.addObject("expenditureItemList", expenditureItemList);
+			return modelAndView;
+		} else {
+			// 指定月の収支情報なしの場合、マイ家計簿(各月の収支：収支登録確認)画面のModelとViewを生成
+			ModelAndView modelAndView = createModelAndView("account/inquiry/AccountMonthRegistCheck");
+			// 対象年、対象月、前月、次月の値を設定
+			modelAndView.addObject("targetYearMonthInfo", targetYearMonthInfo);
+			return modelAndView;
+		}
 	}
 }

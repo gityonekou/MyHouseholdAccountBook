@@ -103,6 +103,29 @@ public class AccountMonthInquiryUseCase {
 	
 	/**
 	 *<pre>
+	 * 要求された指定月の収支を取得します。
+	 *</pre>
+	 * @param user ユーザ情報
+	 * @param targetYearMonth 表示対象の年月
+	 * @param returnYearMonth 戻り先の対象の年月
+	 * @return
+	 *
+	 */
+	public AccountMonthInquiryResponse read(LoginUserInfo user, String targetYearMonth, String returnYearMonth) {
+		log.debug("read:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",returnYearMonth=" + returnYearMonth);
+		
+		// レスポンスを生成
+		AccountMonthInquiryResponse response = AccountMonthInquiryResponse.getInstance(
+				TargetYearMonthInfo.from(targetYearMonth, returnYearMonth));
+		
+		// ユーザID,入力された対象年月を条件に支出項目のリストと収支金額を取得
+		execRead(user, targetYearMonth, response);
+		
+		return response;
+	}
+	
+	/**
+	 *<pre>
 	 * 支出項目のリストと収支金額を取得します。
 	 *</pre>
 	 * @param user ユーザ情報
@@ -138,6 +161,7 @@ public class AccountMonthInquiryUseCase {
 			
 			// 検索結果が0件の場合、メッセージを設定
 			response.addMessage("該当月の収支データがありません。");
+			response.setSyuusiDataFlg(false);
 			
 		} else {
 			// 収支情報(ドメインモデル)から収支情報(レスポンス)への変換
