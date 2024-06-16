@@ -13,17 +13,12 @@
 package com.yonetani.webapp.accountbook.presentation.controller.account.inquiry;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.inquiry.AccountYearInquiryUseCase;
-import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.YearInquiryForm;
-import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearMageInquiryResponse;
-import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearMeisaiInquiryResponse;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
 import lombok.RequiredArgsConstructor;
@@ -55,57 +50,144 @@ public class AccountYearInquiryController {
 	
 	/**
 	 *<pre>
-	 * 現在の決算年の年間収支(マージ)画面表示のPOST要求時マッピングです。
-	 * 以下画面リクエスト時の処理を行います。
-	 * ・初期表示
-	 * ・前年度
-	 * ・次年度
+	 * 年間収支(マージ)画面表示のPOST要求時マッピングです。他のタブからの遷移時に呼び出されます。
+	 * 
 	 *</pre>
-	 * @param target 表示対象の年度
-	 * @param bindingResult バリデーション結果
+	 * @param targetYear 表示対象の年度
+	 * @param returnYearMonth 各月の収支画面に戻る場合に表示する年月の値
 	 * @return マイ家計簿 年間収支(マージ)画面
 	 *
 	 */
 	@PostMapping("/mage/")
-	public ModelAndView postAccountYearMage(@ModelAttribute @Validated YearInquiryForm target, BindingResult bindingResult) {
-		log.debug("postAccountYearMage:target="+ target);
-		if(bindingResult.hasErrors()) {
-			return AccountYearMageInquiryResponse.buildBindingError(loginUserSession.getLoginUserInfo(), target);
-		} else {
-			// 画面表示データを読込
-			return this.usecasee.readMage(loginUserSession.getLoginUserInfo(), target)
-					// レスポンスにログインユーザ名を設定
-					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
-					// レスポンスからModelAndViewを生成
-					.build();
-		}
+	public ModelAndView postAccountYearMage(
+			@RequestParam("targetYear") String targetYear,
+			@RequestParam("returnYearMonth") String returnYearMonth) {
+		log.debug("postAccountYearMage:targetYear="+ targetYear + ",returnYearMonth:=" + returnYearMonth);
+		
+		// 画面表示データを読込
+		return this.usecasee.readMage(loginUserSession.getLoginUserInfo(), targetYear, returnYearMonth)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
 	 *<pre>
-	 * 現在の決算年の年間収支(明細)画面表示のPOST要求時マッピングです。
-	 * 以下画面リクエスト時の処理を行います。
-	 * ・初期表示
-	 * ・前年度
-	 * ・次年度
+	 * 前年度の年間収支(マージ)画面表示のPOST要求時マッピングです。
+	 * 
 	 *</pre>
-	 * @param target 表示対象の年度
-	 * @param bindingResult バリデーション結果
+	 * @param beforeYear 表示する前年の値(表示対象の年度)
+	 * @param returnYearMonth 各月の収支画面に戻る場合に表示する年月の値
+	 * @return マイ家計簿 年間収支(マージ)画面
+	 *
+	 */
+	@PostMapping(value="/magetargetcontrol/", params = "targetBeforeBtn")
+	public ModelAndView postBeforeAccountYearMage(
+			@RequestParam("beforeYear") String beforeYear,
+			@RequestParam("returnYearMonth") String returnYearMonth) {
+		log.debug("postBeforeAccountYearMage:beforeYear="+ beforeYear + ",returnYearMonth:=" + returnYearMonth);
+		
+		// 画面表示データを読込
+		return this.usecasee.readMage(loginUserSession.getLoginUserInfo(), beforeYear, returnYearMonth)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+	
+	/**
+	 *<pre>
+	 * 翌年度の年間収支(マージ)画面表示のPOST要求時マッピングです。
+	 * 
+	 *</pre>
+	 * @param nextYear 表示する翌年の値(表示対象の年度)
+	 * @param returnYearMonth 各月の収支画面に戻る場合に表示する年月の値
+	 * @return マイ家計簿 年間収支(マージ)画面
+	 *
+	 */
+	@PostMapping(value="/magetargetcontrol/", params = "targetNextBtn")
+	public ModelAndView postNextAccountYearMage(
+			@RequestParam("nextYear") String nextYear,
+			@RequestParam("returnYearMonth") String returnYearMonth) {
+		log.debug("postNextAccountYearMage:nextYear="+ nextYear + ",returnYearMonth:=" + returnYearMonth);
+		
+		// 画面表示データを読込
+		return this.usecasee.readMage(loginUserSession.getLoginUserInfo(), nextYear, returnYearMonth)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+	
+	/**
+	 *<pre>
+	 * 年間収支(明細)画面表示のPOST要求時マッピングです。他のタブからの遷移時に呼び出されます。
+	 * 
+	 *</pre>
+	 * @param targetYear 表示対象の年度
+	 * @param returnYearMonth 各月の収支画面に戻る場合に表示する年月の値
 	 * @return マイ家計簿 年間収支(明細)画面
 	 *
 	 */
 	@PostMapping("/meisai/")
-	public ModelAndView postAccountYearMeisai(@ModelAttribute @Validated YearInquiryForm target, BindingResult bindingResult) {
-		log.debug("postAccountYearMeisai:target="+ target);
-		if(bindingResult.hasErrors()) {
-			return AccountYearMeisaiInquiryResponse.buildBindingError(loginUserSession.getLoginUserInfo(), target);
-		} else {
-			// 画面表示データを読込
-			return this.usecasee.readMeisai(loginUserSession.getLoginUserInfo(), target)
-					// レスポンスにログインユーザ名を設定
-					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
-					// レスポンスからModelAndViewを生成
-					.build();
-		}
+	public ModelAndView postAccountYearMeisai(
+			@RequestParam("targetYear") String targetYear,
+			@RequestParam("returnYearMonth") String returnYearMonth) {
+		log.debug("postAccountYearMeisai:targetYear="+ targetYear + ",returnYearMonth:=" + returnYearMonth);
+		
+		// 画面表示データを読込
+		return this.usecasee.readMeisai(loginUserSession.getLoginUserInfo(), targetYear, returnYearMonth)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+	
+	/**
+	 *<pre>
+	 * 前年度の年間収支(明細)画面表示のPOST要求時マッピングです。
+	 * 
+	 *</pre>
+	 * @param beforeYear 表示する前年の値(表示対象の年度)
+	 * @param returnYearMonth 各月の収支画面に戻る場合に表示する年月の値
+	 * @return マイ家計簿 年間収支(明細)画面
+	 *
+	 */
+	@PostMapping(value="/meisaitargetcontrol/", params = "targetBeforeBtn")
+	public ModelAndView postBeforeAccountYearMeisai(
+			@RequestParam("beforeYear") String beforeYear,
+			@RequestParam("returnYearMonth") String returnYearMonth) {
+		log.debug("postBeforeAccountYearMeisai:beforeYear="+ beforeYear + ",returnYearMonth:=" + returnYearMonth);
+		
+		// 画面表示データを読込
+		return this.usecasee.readMeisai(loginUserSession.getLoginUserInfo(), beforeYear, returnYearMonth)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+	
+	/**
+	 *<pre>
+	 * 翌年度の年間収支(明細)画面表示のPOST要求時マッピングです。
+	 *</pre>
+	 * @param nextYear 表示する翌年の値(表示対象の年度)
+	 * @param returnYearMonth 各月の収支画面に戻る場合に表示する年月の値
+	 * @return マイ家計簿 年間収支(明細)画面
+	 *
+	 */
+	@PostMapping(value="/meisaitargetcontrol/", params = "targetNextBtn")
+	public ModelAndView postNextAccountYearMeisai(
+			@RequestParam("nextYear") String nextYear,
+			@RequestParam("returnYearMonth") String returnYearMonth) {
+		log.debug("postNextAccountYearMeisai:nextYear="+ nextYear + ",returnYearMonth:=" + returnYearMonth);
+		
+		// 画面表示データを読込
+		return this.usecasee.readMeisai(loginUserSession.getLoginUserInfo(), nextYear, returnYearMonth)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 }

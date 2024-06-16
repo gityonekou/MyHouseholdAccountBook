@@ -8,13 +8,6 @@
 		crossorigin="anonymous">
 <link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
 <title>マイ家計簿管理者メニュー</title>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="/js/table_tr_click_script.js"></script>
-<style>
-	tr[data-href]{
-	  cursor: pointer;
-	}
-</style>
 </head>
 <body>
 	<!--/* ヘッダー */-->
@@ -128,5 +121,9 @@
 	
 	<!--/* フッター共通jsのインクルード) */-->
 	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	<!--/* jqueryでテーブル行の選択時アクションを実行 */-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script type="text/javascript" th:src="@{/js/table_tr_click_script.js}"></script>
+	
 </body>
 </html>

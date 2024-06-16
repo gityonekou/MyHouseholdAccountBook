@@ -40,9 +40,8 @@
 	
 	<!--/* フッター共通jsのインクルード) */-->
 	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
-	
-	<!--/* 家計簿共通JavaScript */-->
-	<script type="text/javascript" src="/js/AccountCommonScript.js"></script>
+	<!--/* 家計簿参照で使用するJavaScript */-->
+	<script type="text/javascript" th:src="@{/js/AccountCommonScript.js}"></script>
 	
 </body>
 </html>

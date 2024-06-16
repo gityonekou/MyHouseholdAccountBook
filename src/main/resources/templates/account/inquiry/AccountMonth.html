@@ -13,7 +13,7 @@
 
 	<!--/* ボディ部 */-->
 	<div class="col">
-		<div class="card">
+		<div class="card" th:object="${targetYearMonthInfo}">
 			<div class="card-body">
 				<h5 class="card-title">マイ家計簿(各月の収支)</h5>
 				<th:block th:each="message : ${messages}">
@@ -26,11 +26,12 @@
 						<button class="nav-link active" id="nav-kakutuki-syuusi-tab" data-bs-toggle="tab" data-bs-target="#nav-kakutuki-syuusi" type="button" role="tab" aria-controls="nav-kakutuki-syuusi" aria-selected="true" disabled>各月の収支</button>
 					<form class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountyear/mage/}">
 						<button class="nav-link" type="submit">年間収支</button>
-						<input type="hidden" name="targetYear" th:value="${targetYear}" />
+						<input type="hidden" th:field="*{targetYear}" />
+						<input type="hidden" th:field="*{returnYearMonth}" />
 					</form>
 					<form class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/paymentconfirmation/}">
 						<button class="nav-link" type="submit">支払い確認</button>
-						<input type="hidden" name="targetYearMonth" th:value="${targetYearMonth}" />
+						<input type="hidden" th:field="*{targetYearMonth}" />
 					</form>
 					</div>
 				</nav>
@@ -38,12 +39,11 @@
 					<!-- 各月収支タブエリア -->
 					<div class="tab-pane fade show active" id="nav-kakutuki-syuusi" role="tabpanel" aria-labelledby="nav-kakutuki-syuusi-tab">
 						<!-- 表示対象の月切り替えボタンエリア -->
-						<p class="card-text"><button class="btn btn-outline-primary" id="account-month-before-btn" type="button">＜</button>&emsp;■ <span th:text="${viewYear}"></span>年<span th:text="${viewMonth}"></span>月度 ■&emsp;<button class="btn btn-outline-primary" id="account-month-next-btn" type="button">＞</button></p>
-						<form name="AccountMonthBefore" class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountmonth/}">
-							<input type="hidden" name="targetYearMonth" th:value="${beforeYearMonth}" />
-						</form>
-						<form name="AccountMonthNext" class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountmonth/}">
-							<input type="hidden" name="targetYearMonth" th:value="${nextYearMonth}" />
+						<form name="AccountMonthBefore" class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountmonth/targetcontrol/}">
+							<p class="card-text"><button class="btn btn-outline-primary" name="targetBeforeBtn" type="submit">＜</button>&emsp;■ <span th:text="*{viewYear}"></span>年<span th:text="*{viewMonth}"></span>月度 ■&emsp;<button class="btn btn-outline-primary" name="targetNextBtn" type="submit">＞</button></p>
+							<input type="hidden" th:field="*{beforeYearMonth}" />
+							<input type="hidden" th:field="*{nextYearMonth}" />
+							<input type="hidden" th:field="*{returnYearMonth}" />
 						</form>
 						<!-- 収支表示 -->
 						<div class="card">
@@ -99,13 +99,13 @@
 				<button class="btn btn-outline-primary" id="account-month-detai-btn" type="button">詳細表示</button>
 				<button class="btn btn-outline-primary" type="button">更新</button>
 				<form name="ShoppinAdd" class="d-flex" method="post" th:action="@{/myhacbook/accountregist/shoppingregist/}">
-					<input type="hidden" name="targetYearMonth" th:value="${targetYearMonth}" />
+					<input type="hidden" th:field="*{targetYearMonth}" />
 				</form>
 				<form name="AccountMonthDetail" class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountdetail/month/}">
-					<input type="hidden" name="targetYearMonth" th:value="${targetYearMonth}" />
+					<input type="hidden" th:field="*{targetYearMonth}" />
 				</form>
 				<form name="accountupdate" class="d-flex" method="post" th:action="@{/myhacbook/account/accountupdate/}">
-					<input type="hidden" name="targetYearMonth" th:value="${targetYearMonth}" />
+					<input type="hidden" th:field="*{targetYearMonth}" />
 				</form>
 			</div>
 		</div>
@@ -113,9 +113,8 @@
 	
 	<!--/* フッター共通jsのインクルード) */-->
 	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
-	
-	<!--/* 家計簿共通JavaScript */-->
-	<script type="text/javascript" src="/js/AccountCommonScript.js"></script>
+	<!--/* 家計簿参照で使用するJavaScript */-->
+	<script type="text/javascript" th:src="@{/js/AccountCommonScript.js}"></script>
 	
 </body>
 </html>

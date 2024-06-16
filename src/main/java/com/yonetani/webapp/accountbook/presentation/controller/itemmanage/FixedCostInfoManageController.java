@@ -216,7 +216,7 @@ public class FixedCostInfoManageController {
 	 * @return 情報管理(固定費)初期表示画面
 	 *
 	 */
-	@PostMapping(value="/delete/")
+	@PostMapping("/delete/")
 	public ModelAndView postDelete(@RequestParam("fixedCostCode") String fixedCostCode, RedirectAttributes redirectAttributes) {
 		log.debug("postDelete: fixedCostCode=" + fixedCostCode);
 		// 画面表示情報を取得

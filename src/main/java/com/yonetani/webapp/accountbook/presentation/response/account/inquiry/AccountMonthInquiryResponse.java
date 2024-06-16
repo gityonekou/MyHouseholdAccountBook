@@ -18,9 +18,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.YearMonthInquiryForm;
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
-import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -42,7 +41,72 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 
 	/**
 	 *<pre>
-	 * 月毎の支出項目明細です
+	 * 表示する月の対象年月情報です。
+	 * 対象年、対象月、前月、次月、戻り時の表示年月の値を持ちます
+	 *
+	 *</pre>
+	 *
+	 * @author ：Kouki Yonetani
+	 * @since 家計簿アプリ(1.00.A)
+	 *
+	 */
+	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+	@Getter
+	public static class TargetYearMonthInfo {
+		// 対象年月
+		private final String targetYearMonth;
+		// 戻り時の表示対象年月
+		private final String returnYearMonth;
+		// 対象年
+		private final String targetYear;
+		// 前月
+		private final String beforeYearMonth;
+		// 翌月
+		private final String nextYearMonth;
+		// 「yyyy年MM月度」の年の値
+		private final String viewYear;
+		// 「yyyy年MM月度」の月の値
+		private final String viewMonth;
+		
+		/**
+		 *<pre>
+		 * 引数の値から表示する月の対象年月情報を生成して返します。
+		 *</pre>
+		 * @param targetYearMonth 表示対象の年月(YYYMM) 
+		 * @return 表示する月の対象年月情報
+		 *
+		 */
+		public static TargetYearMonthInfo from(String targetYearMonth) {
+			// 念のため、ここで入力値チェックを行う
+			if(!StringUtils.hasLength(targetYearMonth) || targetYearMonth.length() != 6) {
+				throw new MyHouseholdAccountBookRuntimeException("対象年月の値が不正です。管理者に問い合わせてください。[targetYearMonth=" + targetYearMonth + "]");
+			}
+			// 現在の対象年月からカレンダーを生成(前月・翌月の値取得用)
+			LocalDate yearMonthCalendar = LocalDate.parse(targetYearMonth + "01", DateTimeFormatter.ofPattern("yyyyMMdd"));
+			DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMM");
+			
+			return new TargetYearMonthInfo(
+					// 対象年月
+					targetYearMonth,
+					// 戻り時の表示対象年月
+					targetYearMonth,
+					// 対象年
+					targetYearMonth.substring(0, 4),
+					// 前月
+					yearMonthCalendar.minusMonths(1).format(format),
+					// 翌月
+					yearMonthCalendar.plusMonths(1).format(format),
+					// 「yyyy年MM月度」の年の値
+					targetYearMonth.substring(0, 4),
+					// 「yyyy年MM月度」の月の値
+					targetYearMonth.substring(4)
+					);
+		}
+	}
+	
+	/**
+	 *<pre>
+	 * 月毎の支出金額情報明細です
 	 *
 	 *</pre>
 	 *
@@ -70,7 +134,7 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 		
 		/**
 		 *<pre>
-		 * 月毎の支出項目明細を生成して返します。
+		 * 月毎の支出金額情報明細を生成して返します。
 		 *</pre>
 		 * @param sisyutuItemLevel 支出項目レベル
 		 * @param sisyutuItemName 支出項目名
@@ -79,7 +143,7 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 		 * @praam percentage 支出金額B割合
 		 * @param siharaiDate 支払日
 		 * @param closingFlg 支払い済みフラグ
-		 * @return 月毎の支出項目明細
+		 * @return 月毎の支出金額情報明細
 		 *
 		 */
 		public static ExpenditureItem form(
@@ -100,9 +164,13 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 					closingFlg);
 		}
 	}
-	// 対象年月度(YYYYMM)
-	@Setter
-	private String yearMonth;
+	
+	// 表示する月の対象年月情報
+	private final TargetYearMonthInfo targetYearMonthInfo;
+	// 月毎の支出金額情報明細のリストです。
+	private List<ExpenditureItem> expenditureItemList = new ArrayList<>();
+	
+	// 指定月の収支情報
 	// 収入金額
 	@Setter
 	private String syuunyuuKingaku;
@@ -115,32 +183,17 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 	// 収支金額
 	@Setter
 	private String syuusiKingaku;
-	// 月毎の支出項目明細のリストです。
-	private List<ExpenditureItem> expenditureItemList = new ArrayList<>();
 	
 	/**
 	 *<pre>
-	 * デフォルト値からレスポンス情報を生成して返します。
+	 * 表示する月の対象年月情報からレスポンス情報を生成して返します。
 	 *</pre>
+	 * @param targetYearMonthInfo 表示する月の対象年月情報
 	 * @return マイ家計簿の各月の収支画面表示情報
 	 *
 	 */
-	public static AccountMonthInquiryResponse getInstance() {
-		return new AccountMonthInquiryResponse();
-	}
-	
-	/**
-	 *<pre>
-	 * 指定月の収支取得用リクエスト情報からレスポンス情報を生成して返します。
-	 *</pre>
-	 * @param request 指定月の収支取得用リクエスト情報
-	 * @return マイ家計簿の各月の収支画面表示情報
-	 *
-	 */
-	public static synchronized AccountMonthInquiryResponse getInstance(YearMonthInquiryForm request) {
-		AccountMonthInquiryResponse res = new AccountMonthInquiryResponse();
-		res.setYearMonth(request.getTargetYearMonth());
-		return res;
+	public static AccountMonthInquiryResponse getInstance(TargetYearMonthInfo targetYearMonthInfo) {
+		return new AccountMonthInquiryResponse(targetYearMonthInfo);
 	}
 	
 	/**
@@ -169,7 +222,7 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 		// 画面表示のModelとViewを生成
 		ModelAndView modelAndView = createModelAndView("account/inquiry/AccountMonth");
 		// 対象年、対象月、前月、次月の値を設定
-		setTargetYearMonth(modelAndView);
+		modelAndView.addObject("targetYearMonthInfo", targetYearMonthInfo);
 		// 収入金額
 		modelAndView.addObject("syuunyuuKingaku", syuunyuuKingaku);
 		// 支出金額
@@ -182,62 +235,5 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 		modelAndView.addObject("expenditureItemList", expenditureItemList);
 		
 		return modelAndView;
-	}
-	
-	/**
-	 *<pre>
-	 * 入力値にエラーがある場合のレスポンス情報から画面返却データのModelAndViewを生成して返します。
-	 *</pre>
-	 * @param loginUserInfo ログインユーザ情報
-	 * @param target (form入力値:年月)
-	 * @return 画面返却データのModelAndView
-	 *
-	 */
-	public static ModelAndView buildBindingError(LoginUserInfo loginUserInfo, YearMonthInquiryForm target) {
-		AccountMonthInquiryResponse res = new AccountMonthInquiryResponse();
-		// エラーメッセージを設定
-		res.addErrorMessage("リクエスト情報が不正です。管理者に問い合わせてください。key=YearMonthInquiryForm");
-		// ログインユーザ名を設定
-		res.setLoginUserName(loginUserInfo.getUserName());
-		// 画面表示のModelとViewを生成
-		ModelAndView modelAndView = res.build();
-		// バリデーションチェックを行ったform入力情報をセット
-		modelAndView.addObject("yearMonthInquiryForm", target);
-		return modelAndView;
-	}
-	
-	/**
-	 *<pre>
-	 * 画面返却データに対象年月項目の各値を設定します。
-	 * 画面表示項目の以下値を設定します。
-	 * ・「yyyy年MM月度」の年の値
-	 * ・「yyyy年MM月度」の月の値
-	 * ・現在の対象年月
-	 * ・前月の対象年月
-	 * ・翌月の対象年月
-	 *</pre>
-	 * @param view　ModelAndView
-	 *
-	 */
-	private void setTargetYearMonth(ModelAndView view) {
-		if(StringUtils.hasLength(yearMonth)) {
-			// 「yyyy年MM月度」の年の値
-			view.addObject("viewYear", yearMonth.substring(0, 4));
-			// 「yyyy年MM月度」の月の値
-			view.addObject("viewMonth", yearMonth.substring(4));
-			// 対象年月(form)
-			view.addObject("targetYearMonth", yearMonth);
-			// 対象年(form)
-			view.addObject("targetYear", yearMonth.substring(0, 4));
-			
-			/* 現在の対象年月からカレンダーを生成し、前月・翌月の値を取得 */
-			LocalDate yearMonthCalendar = LocalDate.parse(yearMonth + "01", DateTimeFormatter.ofPattern("yyyyMMdd"));
-			DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMM");
-			
-			// 前月(form)
-			view.addObject("beforeYearMonth", yearMonthCalendar.minusMonths(1).format(format));
-			// 翌月(form)
-			view.addObject("nextYearMonth", yearMonthCalendar.plusMonths(1).format(format));
-		}
 	}
 }

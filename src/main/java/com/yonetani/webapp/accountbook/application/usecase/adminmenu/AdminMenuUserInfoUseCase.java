@@ -102,7 +102,7 @@ public class AdminMenuUserInfoUseCase {
 		log.debug("read: userId=" + userId);
 		
 		// 入力チェック:ユーザID未設定の場合エラー
-		if(StringUtils.hasLength(userId)) {
+		if(!StringUtils.hasLength(userId)) {
 			throw new MyHouseholdAccountBookRuntimeException("予期しないエラーが発生しました。管理者に問い合わせてください。[userid:" + userId + "]");
 		}
 		// ユーザ情報の一覧をレスポンスに設定

@@ -46,6 +46,9 @@ public class FixedCostReadWriteDto {
 	private final String fixedCostShiharaiDay;
 	// 支払金額
 	private final BigDecimal shiharaiKingaku;
+	// 削除フラグ(論理削除状態にするためのフラグ)
+	// 注意:アプリ側からこの値を直接利用することはありませんSQLで直接値を指定し、検索条件とします
+	private boolean deleteFlg;
 	
 	/**
 	 *<pre>

@@ -13,17 +13,13 @@
 package com.yonetani.webapp.accountbook.presentation.controller.account.inquiry;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.inquiry.AccountMonthInquiryUseCase;
-import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.YearMonthInquiryForm;
-import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
 import lombok.RequiredArgsConstructor;
@@ -33,8 +29,10 @@ import lombok.extern.log4j.Log4j2;
  *<pre>
  * マイ家計簿の各月の収支画面表示を担当するコントローラーです。
  * 以下画面遷移を担当します。
- * ・現在の決算月の収支画面初期表示(get)
- * ・指定月の収支画面表示(post)
+ * ・トップメニューからの遷移(初期表示)(GET)→各月の収支初期表示画面
+ * ・他タブからの遷移時(post)
+ * ・前の月の収支表示時(post)
+ * ・次の月の収支表示時(post)
  *
  *</pre>
  *
@@ -56,6 +54,7 @@ public class AccountMonthInquiryController {
 	/**
 	 *<pre>
 	 * 現在の決算月の収支画面初期表示のGET要求時マッピングです。
+	 * トップメニューからの遷移(初期表示)時に呼び出されます。
 	 *</pre>
 	 * @return マイ家計簿(各月の収支)画面
 	 *
@@ -73,27 +72,67 @@ public class AccountMonthInquiryController {
 	
 	/**
 	 *<pre>
-	 * 指定月の収支画面表示のPOST要求時マッピングです。
-	 * 次月・前月のリンク、および直接年月を指定して表示する場合に対応します。
+	 * 指定月の収支画面表示のPOST要求時マッピングです。他のタブからの遷移時に呼び出されます。
 	 *</pre>
-	 * @param target 表示対象の年月
-	 * @param bindingResult バリデーション結果
+	 * @param targetYearMonth 表示対象の年月
 	 * @return マイ家計簿(各月の収支)画面
 	 *
 	 */
 	@PostMapping
-	public ModelAndView postAccountMonth(@ModelAttribute @Validated YearMonthInquiryForm target, BindingResult bindingResult) {
-		log.debug("postAccountMonth:target="+ target);
+	public ModelAndView postAccountMonth(@RequestParam("targetYearMonth") String targetYearMonth) {
+		log.debug("postAccountMonth:targetYearMonth="+ targetYearMonth);
 		
-		if(bindingResult.hasErrors()) {
-			return AccountMonthInquiryResponse.buildBindingError(loginUserSession.getLoginUserInfo(), target);
-		} else {
-			// 画面表示情報読込
-			return this.usecase.read(loginUserSession.getLoginUserInfo(), target)
-					// レスポンスにログインユーザ名を設定
-					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
-					// レスポンスからModelAndViewを生成
-					.build();
-		}
+		// 画面表示情報読込
+		return this.usecase.read(loginUserSession.getLoginUserInfo(), targetYearMonth)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+	
+	/**
+	 *<pre>
+	 * 前月の収支画面表示のPOST要求時マッピングです。
+	 *</pre>
+	 * @param beforeYearMonth 前月の年月(表示対象の年月の値)
+	 * @param returnYearMonth 戻り時の年月(遷移元画面で表示した年月の値)
+	 * @return マイ家計簿(各月の収支)画面
+	 *
+	 */
+	@PostMapping(value="/targetcontrol/", params = "targetBeforeBtn")
+	public ModelAndView postBeforeAccountMonth(
+			@RequestParam("beforeYearMonth") String beforeYearMonth,
+			@RequestParam("returnYearMonth") String returnYearMonth) {
+		log.debug("postBeforeAccountMonth:beforeYearMonth="+ beforeYearMonth + ",returnYearMonth:=" + returnYearMonth);
+		
+		// 画面表示情報読込
+		return this.usecase.read(loginUserSession.getLoginUserInfo(), beforeYearMonth)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+	
+	/**
+	 *<pre>
+	 * 次月の収支画面表示のPOST要求時マッピングです。
+	 *</pre>
+	 * @param nextYearMonth 次月の年月(表示対象の年月の値)
+	 * @param returnYearMonth 戻り時の年月(遷移元画面で表示した年月の値)
+	 * @return マイ家計簿(各月の収支)画面
+	 *
+	 */
+	@PostMapping(value="/targetcontrol/", params = "targetNextBtn")
+	public ModelAndView postNextAccountMonth(
+			@RequestParam("nextYearMonth") String nextYearMonth,
+			@RequestParam("returnYearMonth") String returnYearMonth) {
+		log.debug("postNextAccountMonth:nextYearMonth="+ nextYearMonth + ",returnYearMonth:=" + returnYearMonth);
+		
+		// 画面表示情報読込
+		return this.usecase.read(loginUserSession.getLoginUserInfo(), nextYearMonth)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 }

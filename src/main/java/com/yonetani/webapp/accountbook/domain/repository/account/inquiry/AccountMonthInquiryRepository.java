@@ -1,7 +1,7 @@
 /**
- * マイ家計簿 指定月の支出項目リスト取得を行うリポジトリーです。
+ * マイ家計簿 指定月の支出金額情報取得を行うリポジトリーです。
  * 以下のIFを提供します。
- * ・指定ユーザ、指定月の支出項目リスト取得
+ * ・指定ユーザ、指定月の支出金額情報取得
  *
  *------------------------------------------------
  * 更新履歴
@@ -16,9 +16,9 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 
 /**
  *<pre>
- * マイ家計簿 指定月の支出項目リスト取得を行うリポジトリーです。
+ * マイ家計簿 指定月の支出金額情報取得を行うリポジトリーです。
  * 以下のIFを提供します。
- * ・指定ユーザ、指定月の支出項目リスト取得
+ * ・指定ユーザ、指定月の支出金額情報取得
  *
  *</pre>
  *
@@ -30,10 +30,10 @@ public interface AccountMonthInquiryRepository {
 	
 	/**
 	 *<pre>
-	 * 指定月に対応する支出項目のリストを取得します。
+	 * 指定月に対応する支出金額情報を取得します。
 	 *</pre>
 	 * @param searchQuery 検索条件(ユーザID, 年月)
-	 * @return 月毎の支出項目のリスト結果
+	 * @return 月毎の支出金額情報取得結果
 	 *
 	 */
 	AccountMonthInquiryExpenditureItemList selectExpenditureItem(SearchQueryUserIdAndYearMonth searchQuery);

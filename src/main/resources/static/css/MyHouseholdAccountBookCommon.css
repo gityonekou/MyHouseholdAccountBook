@@ -21,3 +21,6 @@
 .w50{
   width:50%;
 }
+tr[data-href]{
+  cursor: pointer;
+}

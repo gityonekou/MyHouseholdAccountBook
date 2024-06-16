@@ -9,18 +9,13 @@
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.inquiry;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.YearInquiryForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
-import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -39,7 +34,7 @@ import lombok.Setter;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AccountYearMageInquiryResponse extends AbstractResponse {
-
+	
 	/**
 	 *<pre>
 	 * 年間収支(マージ)情報の明細データです
@@ -90,14 +85,8 @@ public class AccountYearMageInquiryResponse extends AbstractResponse {
 			};
 		}
 	}
-	// 対象年度(YYYY)
-	@Setter
-	private String year;
-	
-	// 現在の対象年月(YYYYMM:ユーザ情報テーブル設定値)
-	@Setter
-	private String targetYearMonth;
-	
+	// 表示する年の対象年月情報
+	private final AccountYearInquiryTargetYearInfo targetYearInfo;
 	// 年間収支(マージ)情報のリストです。
 	private List<MageInquiryListItem> mageInquiryList = new ArrayList<>();
 	
@@ -118,14 +107,12 @@ public class AccountYearMageInquiryResponse extends AbstractResponse {
 	 *<pre>
 	 * 指定年の収支取得用リクエスト情報からレスポンス情報を生成して返します。
 	 *</pre>
-	 * @param request 指定年の収支取得用リクエスト情報
+	 * @param targetYearInfo 表示する対象年月情報
 	 * @return マイ家計簿の年間収支(マージ)画面表示情報
 	 *
 	 */
-	public static AccountYearMageInquiryResponse getInstance(YearInquiryForm request) {
-		AccountYearMageInquiryResponse res = new AccountYearMageInquiryResponse();
-		res.setYear(request.getTargetYear());
-		return res;
+	public static AccountYearMageInquiryResponse getInstance(AccountYearInquiryTargetYearInfo targetYearInfo) {
+		return new AccountYearMageInquiryResponse(targetYearInfo);
 	}
 
 	/**
@@ -153,10 +140,8 @@ public class AccountYearMageInquiryResponse extends AbstractResponse {
 	public ModelAndView build() {
 		// 画面表示のModelとViewを生成
 		ModelAndView modelAndView = createModelAndView("account/inquiry/AccountYearMage");
-		// 対象年度、現在の対象年月、前年度、翌年度の値を設定
-		setTargetYear(modelAndView);
-		// 現在の対象年月(form)
-		modelAndView.addObject("targetYearMonth", targetYearMonth);
+		// 表示する年の対象年月情報を設定
+		modelAndView.addObject("targetYearInfo", targetYearInfo);
 		// 月毎の支出項目明細リストを追加
 		modelAndView.addObject("mageInquiryList", mageInquiryList);
 		// 収入金額合計
@@ -169,54 +154,5 @@ public class AccountYearMageInquiryResponse extends AbstractResponse {
 		modelAndView.addObject("syuusiKingakuGoukei", syuusiKingakuGoukei);
 		
 		return modelAndView;
-	}
-	
-	/**
-	 *<pre>
-	 * 入力値にエラーがある場合のレスポンス情報から画面返却データのModelAndViewを生成して返します。
-	 *</pre>
-	 * @param loginUserInfo ログインユーザ情報
-	 * @param target (form入力値:年)
-	 * @return 画面返却データのModelAndView
-	 *
-	 */
-	public static ModelAndView buildBindingError(LoginUserInfo loginUserInfo, YearInquiryForm target) {
-		AccountYearMageInquiryResponse res = new AccountYearMageInquiryResponse();
-		// エラーメッセージを設定
-		res.addErrorMessage("リクエスト情報が不正です。管理者に問い合わせてください。key=YearInquiryForm");
-		// ログインユーザ名を設定
-		res.setLoginUserName(loginUserInfo.getUserName());
-		// 画面表示のModelとViewを生成
-		ModelAndView modelAndView = res.build();
-		// form入力情報をセット
-		modelAndView.addObject("yearInquiryForm", target);
-		return modelAndView;
-	}
-	
-	/**
-	 *<pre>
-	 * 画面返却データに対象年度項目の各値を設定します。
-	 * 画面表示項目の以下値を設定します。
-	 * ・「yyyy年度」の年の値
-	 * ・前年度
-	 * ・翌年度
-	 *</pre>
-	 * @param view　ModelAndView
-	 *
-	 */
-	private void setTargetYear(ModelAndView view) {
-		if(StringUtils.hasLength(year)) {
-			// 「yyyy年度」の年の値
-			view.addObject("targetYear", year);
-			
-			/* 現在の対象年度からカレンダーを生成し、前年・翌年の値を取得 */
-			LocalDate yearCalendar = LocalDate.parse(year + "0101", DateTimeFormatter.ofPattern("yyyyMMdd"));
-			DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy");
-			
-			// 前月(form)
-			view.addObject("beforeYear", yearCalendar.minusYears(1).format(format));
-			// 翌月(form)
-			view.addObject("nextYear", yearCalendar.plusYears(1).format(format));
-		}
 	}
 }

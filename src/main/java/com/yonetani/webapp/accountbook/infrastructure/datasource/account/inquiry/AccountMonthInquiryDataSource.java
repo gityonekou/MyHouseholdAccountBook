@@ -1,5 +1,5 @@
 /**
- * AccountMonthInquiryRepository(マイ家計簿 指定月の支出項目リスト取得)を実装したデータソースです
+ * AccountMonthInquiryRepository(マイ家計簿 指定月の支出金額情報取得)を実装したデータソースです
  *
  *------------------------------------------------
  * 更新履歴
@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  *<pre>
- * AccountMonthInquiryRepository(マイ家計簿 指定月の支出項目リスト取得)を実装したデータソースです
+ * AccountMonthInquiryRepository(マイ家計簿 指定月の支出金額情報取得)を実装したデータソースです
  *
  *</pre>
  *
@@ -58,7 +58,7 @@ public class AccountMonthInquiryDataSource implements AccountMonthInquiryReposit
 	 * 検索結果をドメインモデルに変換して返却
 	 *</pre>
 	 * @param resultDto 各月の収支取得結果(DTO)
-	 * @return 月毎の支出項目のリスト結果ドメインモデル
+	 * @return 月毎の支出金額情報のリスト結果ドメインモデル
 	 *
 	 */
 	private AccountMonthInquiryExpenditureItemList convertExpenditureItemList(List<SisyutuKingakuAndSisyutuItemReadDto> resultDto) {

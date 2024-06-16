@@ -6,9 +6,6 @@
 		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
 		crossorigin="anonymous">
 <link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="/js/table_tr_click_script.js"></script>
-<script src="/js/itemmanage/ManageFixedCost.js"></script>
 <title>情報管理(固定費)</title>
 </head>
 <body>
@@ -120,6 +117,11 @@
 	
 	<!--/* フッター共通jsのインクルード) */-->
 	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	<!--/* jqueryでテーブル行の選択時アクションを実行 */-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script type="text/javascript" th:src="@{/js/table_tr_click_script.js}"></script>
+	<!--/* 固定費登録で使用するJavaScript */-->
+	<script type="text/javascript" th:src="@{/js/itemmanage/ManageFixedCost.js}"></script>
 	
 </body>
 </html>

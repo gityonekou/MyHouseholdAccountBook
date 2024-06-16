@@ -9,18 +9,13 @@
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.inquiry;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.YearInquiryForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
-import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -115,14 +110,8 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 					syuusiKingaku);
 		}
 	}
-	// 対象年度(YYYY)
-	@Setter
-	private String year;
-	
-	// 現在の対象年月(YYYYMM:ユーザ情報テーブル設定値)
-	@Setter
-	private String targetYearMonth;
-	
+	// 表示する年の対象年月情報
+	private final AccountYearInquiryTargetYearInfo targetYearInfo;
 	// 年間収支(明細)情報のリストです。
 	private List<MeisaiInquiryListItem> meisaiInquiryList = new ArrayList<>();
 	
@@ -158,14 +147,12 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 	 *<pre>
 	 *  指定年の収支取得用リクエスト情報からレスポンス情報を生成して返します。
 	 *</pre>
-	 * @param request 指定年の収支取得用リクエスト情報
+	 * @param targetYearInfo 表示する対象年月情報
 	 * @return マイ家計簿の年間収支(明細)画面表示情報
 	 *
 	 */
-	public static AccountYearMeisaiInquiryResponse getInstance(YearInquiryForm request) {
-		AccountYearMeisaiInquiryResponse res = new AccountYearMeisaiInquiryResponse();
-		res.setYear(request.getTargetYear());
-		return res;
+	public static AccountYearMeisaiInquiryResponse getInstance(AccountYearInquiryTargetYearInfo targetYearInfo) {
+		return new AccountYearMeisaiInquiryResponse(targetYearInfo);
 	}
 	
 	/**
@@ -193,10 +180,8 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 	public ModelAndView build() {
 		// 画面表示のModelとViewを生成
 		ModelAndView modelAndView = createModelAndView("account/inquiry/AccountYearMeisai");
-		// 対象年度、現在の対象年月、前年度、翌年度の値を設定
-		setTargetYear(modelAndView);
-		// 現在の対象年月(form)
-		modelAndView.addObject("targetYearMonth", targetYearMonth);
+		// 表示する年の対象年月情報を設定
+		modelAndView.addObject("targetYearInfo", targetYearInfo);
 		// 年間収支(明細)リストを追加
 		modelAndView.addObject("meisaiInquiryList", meisaiInquiryList);
 		// 事業経費合計
@@ -219,54 +204,5 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 		modelAndView.addObject("syuusiKingakuGoukei", syuusiKingakuGoukei);
 		
 		return modelAndView;
-	}
-	
-	/**
-	 *<pre>
-	 * 入力値にエラーがある場合のレスポンス情報から画面返却データのModelAndViewを生成して返します。
-	 *</pre>
-	 * @param loginUserInfo ログインユーザ情報
-	 * @param target (form入力値:年)
-	 * @return 画面返却データのModelAndView
-	 *
-	 */
-	public static ModelAndView buildBindingError(LoginUserInfo loginUserInfo, YearInquiryForm target) {
-		AccountYearMeisaiInquiryResponse res = new AccountYearMeisaiInquiryResponse();
-		// エラーメッセージを設定
-		res.addErrorMessage("リクエスト情報が不正です。管理者に問い合わせてください。key=YearInquiryForm");
-		// ログインユーザ名を設定
-		res.setLoginUserName(loginUserInfo.getUserName());
-		// 画面表示のModelとViewを生成
-		ModelAndView modelAndView = res.build();
-		// form入力情報をセット
-		modelAndView.addObject("yearInquiryForm", target);
-		return modelAndView;
-	}
-	
-	/**
-	 *<pre>
-	 * 画面返却データに対象年度項目の各値を設定します。
-	 * 画面表示項目の以下値を設定します。
-	 * ・「yyyy年度」の年の値
-	 * ・前年度
-	 * ・翌年度
-	 *</pre>
-	 * @param view　ModelAndView
-	 *
-	 */
-	private void setTargetYear(ModelAndView view) {
-		if(StringUtils.hasLength(year)) {
-			// 「yyyy年度」の年の値
-			view.addObject("targetYear", year);
-			
-			/* 現在の対象年度からカレンダーを生成し、前年・翌年の値を取得 */
-			LocalDate yearCalendar = LocalDate.parse(year + "0101", DateTimeFormatter.ofPattern("yyyyMMdd"));
-			DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy");
-			
-			// 前月(form)
-			view.addObject("beforeYear", yearCalendar.minusYears(1).format(format));
-			// 翌月(form)
-			view.addObject("nextYear", yearCalendar.plusYears(1).format(format));
-		}
 	}
 }

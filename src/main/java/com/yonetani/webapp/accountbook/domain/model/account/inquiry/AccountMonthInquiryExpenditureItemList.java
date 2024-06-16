@@ -1,5 +1,5 @@
 /**
- * 月毎の支出項目の取得結果(リスト情報)の値を表すドメインモデルです
+ * 月毎の支出金額情報の取得結果(リスト情報)の値を表すドメインモデルです
  *
  *------------------------------------------------
  * 更新履歴
@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  *<pre>
- * 月毎の支出項目の取得結果(リスト情報)の値を表すドメインモデルです
+ * 月毎の支出金額情報の取得結果(リスト情報)の値を表すドメインモデルです
  *
  *</pre>
  *
@@ -44,7 +44,7 @@ public class AccountMonthInquiryExpenditureItemList {
 	
 	/**
 	 *<pre>
-	 * 月毎の支出項目明細です
+	 * 月毎の支出金額情報明細です
 	 *
 	 *</pre>
 	 *
@@ -72,7 +72,7 @@ public class AccountMonthInquiryExpenditureItemList {
 		
 		/**
 		 *<pre>
-		 * 引数の値から月毎の支出項目明細ドメインモデルを生成して返します。
+		 * 引数の値から月毎の支出金額情報明細ドメインモデルを生成して返します。
 		 *</pre>
 		 * @param sisyutuItemCode 支出項目コード
 		 * @param sisyutuItemName 支出項目名
@@ -132,9 +132,9 @@ public class AccountMonthInquiryExpenditureItemList {
 	
 	/**
 	 *<pre>
-	 * 月毎の支出項目明細(ドメインモデル)のリストからAccountMonthInquiryExpenditureItemListのドメインモデルを生成して返します。
+	 * 月毎の支出金額情報明細(ドメインモデル)のリストからAccountMonthInquiryExpenditureItemListのドメインモデルを生成して返します。
 	 *</pre>
-	 * @param values 月毎の支出項目明細(ドメインモデル)のリスト
+	 * @param values 月毎の支出金額情報明細(ドメインモデル)のリスト
 	 * @return AccountMonthInquiryExpenditureItemListのドメインモデル
 	 *
 	 */
@@ -152,7 +152,7 @@ public class AccountMonthInquiryExpenditureItemList {
 	public String toString() {
 		if(values.size() > 0) {
 			StringBuilder buff = new StringBuilder((values.size() + 1) * 200);
-			buff.append("月毎の支出項目リスト明細:")
+			buff.append("月毎の支出金額情報リスト明細:")
 			.append(values.size())
 			.append("件:");
 			for(int i = 0; i < values.size(); i++) {
@@ -164,7 +164,7 @@ public class AccountMonthInquiryExpenditureItemList {
 			}
 			return buff.toString();
 		} else {
-			return "月毎の支出項目リスト明細:0件";
+			return "月毎の支出金額情報リスト明細:0件";
 		}
 	}
 	
