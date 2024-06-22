@@ -43,6 +43,7 @@
 							<p class="card-text"><button class="btn btn-outline-primary" name="targetBeforeBtn" type="submit">＜</button>&emsp;■ <span th:text="*{viewYear}"></span>年<span th:text="*{viewMonth}"></span>月度 ■&emsp;<button class="btn btn-outline-primary" name="targetNextBtn" type="submit">＞</button></p>
 							<input type="hidden" th:field="*{beforeYearMonth}" />
 							<input type="hidden" th:field="*{nextYearMonth}" />
+							<!--/* 画面表示の段階で指定した年月の収支情報があるので、returnYearMonthの値にtargetYearMonthの値を設定する */-->
 							<input type="hidden" name="returnYearMonth" th:value="*{targetYearMonth}" />
 						</form>
 						<!-- 収支表示 -->

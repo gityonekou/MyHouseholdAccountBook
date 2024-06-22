@@ -1,0 +1,6 @@
+-- データ1、データ2、データ3追加
+INSERT INTO SHOPPING_ITEM_TABLE (USER_ID, SHOPPING_ITEM_CODE, SHOPPING_ITEM_KUBUN_NAME, SHOPPING_ITEM_NAME, SHOPPING_ITEM_DETAIL_CONTEXT, SHOPPING_ITEM_JAN_CODE, SISYUTU_ITEM_CODE, COMPANY_NAME, STANDARD_SHOP_CODE, STANDARD_PRICE) VALUES
+  ('TEST-USER-ID', '00001', '商品区分名１_変更前', '商品名１_変更前', '商品詳細１_変更前', '2234567890100', '0011', '会社名１_変更前', '011', 2180.00),
+  ('TEST-USER-ID', '00002', '商品区分名２_変更前', '商品名２_変更前', '商品詳細２_変更前', '2234567890200', '0022', '会社名２_変更前', '022', 2280.00),
+  ('TEST-USER-ID', '00003', '商品区分名３_変更前', '商品名３_変更前', '商品詳細３_変更前', '2234567890300', '0033', '会社名３_変更前', '033', 2380.00);
+

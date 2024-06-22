@@ -98,6 +98,7 @@ public class DomainCommonUtils {
 	/**
 	 *<pre>
 	 * 引数で指定した整数値をBigDecimalに変換して返します。値がnullの場合、nullを返却します。
+	 * 指定したスケールで小数点以下切り上げを実施します。
 	 *</pre>
 	 * @param value BigDecimalに変換する整数値
 	 * @param scale 小数点以下桁数
@@ -109,7 +110,21 @@ public class DomainCommonUtils {
 		if(value == null) {
 			return null;
 		}
-		return BigDecimal.valueOf(value.longValue(), scale);
+		// 整数の値に指定したスケール分0を追加
+		StringBuilder numBuff = new StringBuilder(value.toString());
+		if(scale > 0) {
+			numBuff.append(".");
+			for(int i = 0; i < scale; i++) {
+				numBuff.append("0");
+			}
+		}
+		
+		// 整数の値を文字列変換
+		BigDecimal bigVal = new BigDecimal(numBuff.toString());
+		// スケールを設定(小数点以下切り上げ)
+		bigVal.setScale(scale, RoundingMode.HALF_UP);
+		
+		return bigVal;
 	}
 	
 	/**
