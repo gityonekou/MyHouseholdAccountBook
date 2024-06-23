@@ -31,7 +31,7 @@
 								<button class="btn btn-primary" type="button" id="incomeAndExpenseRegistBtn">新規登録</button>
 								<button class="btn btn-primary" type="button" id="cancelBtn">キャンセル</button>
 							</div>
-							<form name="IncomeAndExpenseRegistForm" class="d-flex" method="post" th:action="@{/myhacbook/accountregist/incomeandexpense/}">
+							<form name="IncomeAndExpenseRegistForm" class="d-flex" method="post" th:action="@{/myhacbook/accountregist/incomeandexpenditure/initload/}">
 								<input type="hidden" th:field="*{targetYearMonth}" />
 								<input type="hidden" th:field="*{returnYearMonth}" />
 							</form>
@@ -46,6 +46,6 @@
 	<!--/* フッター共通jsのインクルード) */-->
 	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
 	<!--/* 家計簿参照で使用するJavaScript */-->
-	<script type="text/javascript" th:src="@{/js/inquiry/AccountMonthRegistCheck.js}"></script>
+	<script type="text/javascript" th:src="@{/js/account/inquiry/AccountMonthRegistCheck.js}"></script>
 </body>
 </html>
