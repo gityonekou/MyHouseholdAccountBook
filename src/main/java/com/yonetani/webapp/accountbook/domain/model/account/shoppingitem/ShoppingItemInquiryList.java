@@ -28,6 +28,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.Shopping
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -55,6 +56,7 @@ public class ShoppingItemInquiryList {
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@Getter
+	@ToString
 	public static class ShoppingItemInquiryItem {
 		// 商品コード
 		private final ShoppingItemCode shoppingItemCode;
@@ -112,33 +114,6 @@ public class ShoppingItemInquiryList {
 					ShoppingItemCompanyName.from(companyName),
 					ShopName.from(standardShopName),
 					ShoppingItemStandardPrice.from(standardPrice));
-		}
-		
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			StringBuilder buff = new StringBuilder(370);
-			buff.append("shoppingItemCode:")
-			.append(shoppingItemCode)
-			.append(",shoppingItemKubunName:")
-			.append(shoppingItemKubunName)
-			.append(",shoppingItemName:")
-			.append(shoppingItemName)
-			.append(",shoppingItemDetailContext:")
-			.append(shoppingItemDetailContext)
-			.append(",shoppingItemJanCode:")
-			.append(shoppingItemJanCode)
-			.append(",sisyutuItemName:")
-			.append(sisyutuItemName)
-			.append(",companyName:")
-			.append(companyName)
-			.append(",standardShopName:")
-			.append(standardShopName)
-			.append(",standardPrice:")
-			.append(standardPrice);
-			return buff.toString();
 		}
 	}
 	

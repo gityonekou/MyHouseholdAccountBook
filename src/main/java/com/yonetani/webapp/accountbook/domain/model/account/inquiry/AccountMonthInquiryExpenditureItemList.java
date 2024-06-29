@@ -27,6 +27,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingak
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -54,6 +55,7 @@ public class AccountMonthInquiryExpenditureItemList {
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@Getter
+	@ToString
 	public static class ExpenditureItem {
 		// 支出項目コード
 		private final SisyutuItemCode sisyutuItemCode;
@@ -101,29 +103,6 @@ public class AccountMonthInquiryExpenditureItemList {
 					SisyutuKingakuB.from(sisyutuKingaku, sisyutuKingakuB),
 					ShiharaiDate.from(siharaiDate),
 					ClosingFlg.from(closingFlg));
-		}
-		
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			StringBuilder buff = new StringBuilder(200);
-			buff.append("sisyutuItemCode:")
-			.append(sisyutuItemCode)
-			.append(",sisyutuItemName:")
-			.append(sisyutuItemName)
-			.append(",sisyutuItemLevel:")
-			.append(sisyutuItemLevel)
-			.append(",sisyutuKingaku:")
-			.append(sisyutuKingaku)
-			.append(",sisyutuKingakuB:")
-			.append(sisyutuKingakuB)
-			.append(",shiharaiDate:")
-			.append(shiharaiDate)
-			.append(",closingFlg:")
-			.append(closingFlg);
-			return buff.toString();
 		}
 	}
 	

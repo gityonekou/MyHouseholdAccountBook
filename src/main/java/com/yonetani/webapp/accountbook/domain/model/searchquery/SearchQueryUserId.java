@@ -15,6 +15,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -29,6 +30,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
 public class SearchQueryUserId {
 	// ユーザID
 	private final UserId userId;
@@ -44,13 +46,5 @@ public class SearchQueryUserId {
 	 */
 	public static SearchQueryUserId from(String userId) {
 		return new SearchQueryUserId(UserId.from(userId));
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		return "userId=" + userId.toString();
 	}
 }

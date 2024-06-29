@@ -15,6 +15,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
 public class ShopBase {
 	// 店舗コード
 	private final ShopCode shopCode;
@@ -45,19 +47,6 @@ public class ShopBase {
 	 */
 	public static ShopBase from(String shopCode, String shopName) {
 		return new ShopBase(ShopCode.from(shopCode), ShopName.from(shopName));
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		StringBuilder buff = new StringBuilder(60);
-		buff.append("shopCode:")
-		.append(shopCode)
-		.append(",shopName:")
-		.append(shopName);
-		return buff.toString();
 	}
 	
 	/**

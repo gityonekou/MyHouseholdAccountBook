@@ -31,6 +31,7 @@ import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -58,6 +59,7 @@ public class AccountYearMeisaiInquiryList {
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@Getter
+	@ToString
 	public static class MeisaiInquiryListItem {
 		// 対象月
 		private final TargetMonth month;
@@ -120,35 +122,6 @@ public class AccountYearMeisaiInquiryList {
 					SisyutuKingakuB.from(sisyutuKingaku, sisyutuKingakuB),
 					SisyutuKingaku.from(sisyutuKingaku),
 					SyuusiKingaku.from(syuusiKingaku));
-		}
-		
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			StringBuilder buff = new StringBuilder(320);
-			buff.append("month:")
-			.append(month)
-			.append(",jigyouKeihiKingaku:")
-			.append(jigyouKeihiKingaku)
-			.append(",koteiHikazeiKingaku:")
-			.append(koteiHikazeiKingaku)
-			.append(",koteiKazeiKingaku:")
-			.append(koteiKazeiKingaku)
-			.append(",iruiJyuukyoSetubiKingaku:")
-			.append(iruiJyuukyoSetubiKingaku)
-			.append(",insyokuNitiyouhinKingaku:")
-			.append(insyokuNitiyouhinKingaku)
-			.append(",syumiGotakuKingaku:")
-			.append(syumiGotakuKingaku)
-			.append(",sisyutuKingakuB:")
-			.append(sisyutuKingakuB)
-			.append(",sisyutuKingaku:")
-			.append(sisyutuKingaku)
-			.append(",syuusiKingaku:")
-			.append(syuusiKingaku);
-			return buff.toString();
 		}
 	}
 	

@@ -25,6 +25,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -38,6 +39,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
 public class ShoppingItem {
 	// ユーザID
 	private final UserId userId;
@@ -100,34 +102,5 @@ public class ShoppingItem {
 				ShoppingItemCompanyName.from(companyName),
 				ShoppingItemStandardShopCode.from(shopCode),
 				ShoppingItemStandardPrice.from(standardPrice));
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		StringBuilder buff = new StringBuilder(360);
-		buff.append("userId:")
-		.append(userId)
-		.append(",shoppingItemCode:")
-		.append(shoppingItemCode)
-		.append(",shoppingItemKubunName:")
-		.append(shoppingItemKubunName)
-		.append(",shoppingItemName:")
-		.append(shoppingItemName)
-		.append(",shoppingItemDetailContext:")
-		.append(shoppingItemDetailContext)
-		.append(",shoppingItemJanCode:")
-		.append(shoppingItemJanCode)
-		.append(",sisyutuItemCode:")
-		.append(sisyutuItemCode)
-		.append(",companyName:")
-		.append(companyName)
-		.append(",shopCode:")
-		.append(shopCode)
-		.append(",standardPrice:")
-		.append(standardPrice);
-		return buff.toString();
 	}
 }

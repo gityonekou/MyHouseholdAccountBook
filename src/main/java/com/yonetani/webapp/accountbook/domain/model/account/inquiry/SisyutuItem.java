@@ -21,6 +21,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -34,6 +35,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
 public class SisyutuItem {
 	// ユーザID
 	private final UserId userId;
@@ -86,30 +88,5 @@ public class SisyutuItem {
 				SisyutuItemSort.from(sisyutuItemSort),
 				EnableUpdateFlg.from(enableUpdateFlg));
 		
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		StringBuilder buff = new StringBuilder(240);
-		buff.append("userId:")
-		.append(userId)
-		.append(",sisyutuItemCode:")
-		.append(sisyutuItemCode)
-		.append(",sisyutuItemName:")
-		.append(sisyutuItemName)
-		.append(",sisyutuItemDetailContext:")
-		.append(sisyutuItemDetailContext)
-		.append(",parentSisyutuItemCode:")
-		.append(parentSisyutuItemCode)
-		.append(",sisyutuItemLevel:")
-		.append(sisyutuItemLevel)
-		.append(",sisyutuItemSort:")
-		.append(sisyutuItemSort)
-		.append(",enableUpdateFlg:")
-		.append(enableUpdateFlg);
-		return buff.toString();
 	}
 }

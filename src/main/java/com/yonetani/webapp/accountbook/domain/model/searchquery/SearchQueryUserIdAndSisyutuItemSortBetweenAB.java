@@ -18,6 +18,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -34,6 +35,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
 public class SearchQueryUserIdAndSisyutuItemSortBetweenAB {
 	
 	// ユーザID
@@ -59,14 +61,5 @@ public class SearchQueryUserIdAndSisyutuItemSortBetweenAB {
 	public static SearchQueryUserIdAndSisyutuItemSortBetweenAB from(String userId, String sisyutuItemSortA, String sisyutuItemSortB) {
 		return new SearchQueryUserIdAndSisyutuItemSortBetweenAB(
 				UserId.from(userId), SisyutuItemSort.from(sisyutuItemSortA), SisyutuItemSort.from(sisyutuItemSortB));
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		return "userId=" + userId.toString() + ",sisyutuItemSortA=" + sisyutuItemSortA.toString() + ",sisyutuItemSortB="
-					+ sisyutuItemSortB.toString();
 	}
 }

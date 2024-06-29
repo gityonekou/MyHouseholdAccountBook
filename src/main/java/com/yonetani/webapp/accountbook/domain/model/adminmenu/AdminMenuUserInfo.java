@@ -24,6 +24,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.UserName;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -37,6 +38,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString(exclude="userPassword")
 public class AdminMenuUserInfo {
 
 	// ユーザID
@@ -135,24 +137,5 @@ public class AdminMenuUserInfo {
 		} else {
 			return false;
 		}
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		StringBuilder buff = new StringBuilder(150);
-		buff.append("userId:")
-		.append(userId)
-		.append(",userName:")
-		.append(userName)
-		.append(",userStatus:")
-		.append(userStatus)
-		.append(",userRole:[")
-		.append(userRole)
-		.append(",userPassword:[****],targetYearMonth:")
-		.append(targetYearMonth);
-		return buff.toString();
 	}
 }

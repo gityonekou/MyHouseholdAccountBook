@@ -17,6 +17,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -30,6 +31,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
 public class NowTargetYearMonth {
 	// 年月
 	private final TargetYearMonth yearMonth;
@@ -50,14 +52,6 @@ public class NowTargetYearMonth {
 		} else {
 			return new NowTargetYearMonth(TargetYearMonth.from(year + month));
 		}
-	}
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		// 値がnullの場合固定文字列「yearMonth=null」を返却、null以外の場合値を返却
-		return (yearMonth == null) ? "yearMonth=null" : yearMonth.toString();
 	}
 	
 	/**

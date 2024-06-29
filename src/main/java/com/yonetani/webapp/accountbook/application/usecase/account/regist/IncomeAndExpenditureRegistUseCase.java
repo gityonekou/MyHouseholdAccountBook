@@ -36,20 +36,42 @@ public class IncomeAndExpenditureRegistUseCase {
 	
 	/**
 	 *<pre>
-	 * 収支登録画面の表示情報取得
+	 * 収支登録画面の表示情報取得(新規登録時)
 	 * 
-	 * 引数で指定した対象年月の収支情報を取得し画面表示情報に設定します。
+	 * 引数で指定した対象年月の収支情報を新規に作成し画面表示情報に設定します。
 	 * 
 	 *</pre>
 	 * @param user ログインユーザ情報
-	 * @param targetYearMonth 表示対象の対象年月
-	 * @param returnYearMonth 戻り時の対象年月
+	 * @param targetYearMonth 収支を新規登録する対象年月の値
+	 * @param returnYearMonth 月度収支画面に戻るときに表示する対象年月の値
 	 * @return 収支登録画面の表示情報
 	 *
 	 */
 	public IncomeAndExpenditureRegistResponse readInitInfo(
 			LoginUserInfo user, String targetYearMonth, String returnYearMonth) {
 		log.debug("readInitInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",returnYearMonth=" + returnYearMonth);
+		
+		// TODO 自動生成されたメソッド・スタブ
+		
+		return IncomeAndExpenditureRegistResponse.getInstance();
+	}
+
+	/**
+	 *<pre>
+	 * 収支登録画面の表示情報取得(更新時)
+	 * 
+	 * 引数で指定した対象年月の収支情報を取得し画面表示情報に設定します。
+	 * 
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param targetYearMonth 収支更新対象の対象年月の値
+	 * @return 収支登録画面の表示情報
+	 *
+	 */
+	public IncomeAndExpenditureRegistResponse readUpdateInfo(LoginUserInfo user, String targetYearMonth) {
+		log.debug("readUpdateInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+		
+		// TODO 自動生成されたメソッド・スタブ
 		
 		return IncomeAndExpenditureRegistResponse.getInstance();
 	}

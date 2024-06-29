@@ -19,6 +19,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemSo
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -32,6 +33,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
 public class SisyutuItemBase {
 	// 支出項目コード
 	private final SisyutuItemCode sisyutuItemCode;
@@ -73,27 +75,6 @@ public class SisyutuItemBase {
 				ParentSisyutuItemCode.from(parentSisyutuItemCode),
 				SisyutuItemLevel.from(sisyutuItemLevel),
 				SisyutuItemSort.from(sisyutuItemSort));
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		StringBuilder buff = new StringBuilder(250);
-		buff.append("sisyutuItemCode:")
-		.append(sisyutuItemCode)
-		.append(",sisyutuItemName:")
-		.append(sisyutuItemName)
-		.append(",sisyutuItemDetailContext:")
-		.append(sisyutuItemDetailContext)
-		.append(",parentSisyutuItemCode:")
-		.append(parentSisyutuItemCode)
-		.append(",sisyutuItemLevel:")
-		.append(sisyutuItemLevel)
-		.append(",sisyutuItemSort:")
-		.append(sisyutuItemSort);
-		return buff.toString();
 	}
 	
 	/**

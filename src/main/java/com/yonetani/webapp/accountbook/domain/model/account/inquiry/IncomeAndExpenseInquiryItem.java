@@ -22,6 +22,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -35,6 +36,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
 public class IncomeAndExpenseInquiryItem {
 	// 対象月
 	private final TargetMonth month;
@@ -82,25 +84,6 @@ public class IncomeAndExpenseInquiryItem {
 	 */
 	public static IncomeAndExpenseInquiryItem fromEmpty() {
 		return new IncomeAndExpenseInquiryItem(null, null, null, null, null);
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		StringBuilder buff = new StringBuilder(110);
-		buff.append("month:")
-		.append(month)
-		.append(",syuunyuuKingaku:")
-		.append(syuunyuuKingaku)
-		.append(",sisyutuKingaku:")
-		.append(sisyutuKingaku)
-		.append(",sisyutuYoteiKingaku:")
-		.append(sisyutuYoteiKingaku)
-		.append(",syuusiKingaku:")
-		.append(syuusiKingaku);
-		return buff.toString();
 	}
 	
 	/**

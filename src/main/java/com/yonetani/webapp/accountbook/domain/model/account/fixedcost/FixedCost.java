@@ -24,6 +24,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -37,6 +38,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
 public class FixedCost {
 	// ユーザID
 	private final UserId userId;
@@ -93,32 +95,5 @@ public class FixedCost {
 				FixedCostShiharaiTukiOptionalContext.from(fixedCostShiharaiTukiOptionalContext),
 				FixedCostShiharaiDay.from(fixedCostShiharaiDay),
 				ShiharaiKingaku.from(shiharaiKingaku));
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		StringBuilder buff = new StringBuilder(385);
-		buff.append("userId:")
-		.append(userId)
-		.append(",fixedCostCode:")
-		.append(fixedCostCode)
-		.append(",fixedCostName:")
-		.append(fixedCostName)
-		.append(",fixedCostDetailContext:")
-		.append(fixedCostDetailContext)
-		.append(",sisyutuItemCode:")
-		.append(sisyutuItemCode)
-		.append(",fixedCostShiharaiTuki:")
-		.append(fixedCostShiharaiTuki)
-		.append(",fixedCostShiharaiTukiOptionalContext:")
-		.append(fixedCostShiharaiTukiOptionalContext)
-		.append(",fixedCostShiharaiDay:")
-		.append(fixedCostShiharaiDay)
-		.append(",shiharaiKingaku:")
-		.append(shiharaiKingaku);
-		return buff.toString();
 	}
 }

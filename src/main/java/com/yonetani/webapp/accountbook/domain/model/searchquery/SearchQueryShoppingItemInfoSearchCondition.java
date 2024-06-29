@@ -23,6 +23,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -41,6 +42,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
 public class SearchQueryShoppingItemInfoSearchCondition {
 	// ユーザID
 	private final UserId userId;
@@ -84,25 +86,5 @@ public class SearchQueryShoppingItemInfoSearchCondition {
 						ShoppingItemCompanyName.from(companyName),
 						// 商品JANコード
 						ShoppingItemJanCode.from(shoppingItemJanCode));
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		
-		StringBuilder buff = new StringBuilder(280);
-		buff.append("userId:")
-		.append(userId)
-		.append(",shoppingItemKubunName:")
-		.append(shoppingItemKubunName)
-		.append(",shoppingItemName:")
-		.append(shoppingItemName)
-		.append(",companyName:")
-		.append(companyName)
-		.append(",shoppingItemJanCode:")
-		.append(shoppingItemJanCode);
-		return buff.toString();
 	}
 }

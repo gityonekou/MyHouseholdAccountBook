@@ -18,6 +18,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -34,6 +35,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
 public class SearchQueryUserIdAndShopSortBetweenAB {
 	// ユーザID
 	private final UserId userId;
@@ -56,13 +58,5 @@ public class SearchQueryUserIdAndShopSortBetweenAB {
 	 */
 	public static SearchQueryUserIdAndShopSortBetweenAB from(String userId, String shopSortA, String shopSortB) {
 		return new SearchQueryUserIdAndShopSortBetweenAB(UserId.from(userId), ShopSort.from(shopSortA), ShopSort.from(shopSortB));
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		return "userId=" + userId.toString() + ",shopSortA=" + shopSortA.toString() + ",shopSortB=" + shopSortB.toString();
 	}
 }

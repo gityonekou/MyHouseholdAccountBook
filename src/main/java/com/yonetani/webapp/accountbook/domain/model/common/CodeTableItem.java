@@ -19,6 +19,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.CodeKubun;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -32,6 +33,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
 public class CodeTableItem {
 	// コード区分
 	private final CodeKubun kubun;
@@ -53,35 +55,5 @@ public class CodeTableItem {
 		} else {
 			return new CodeTableItem(CodeKubun.from(kubun), keyValueList);
 		}
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		if(keyValueList.size() > 0) {
-			StringBuilder buff = new StringBuilder((keyValueList.size() + 1) * 40);
-			buff.append("kubun:")
-			.append(kubun)
-			.append(",keyValueList:")
-			.append(keyValueList.size())
-			.append("件:");
-			for(int i = 0; i < keyValueList.size(); i++) {
-				buff.append("[[")
-				.append(i)
-				.append("][")
-				.append(keyValueList.get(i))
-				.append("]]");
-			}
-			return buff.toString();
-		} else {
-			StringBuilder buff = new StringBuilder(40);
-			buff.append("kubun:")
-			.append(kubun)
-			.append(",keyValueList:0件");
-			return buff.toString();
-		}
-		
 	}
 }

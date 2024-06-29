@@ -43,6 +43,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.regist.IncomeAndExpenditureRegistUseCase;
+import com.yonetani.webapp.accountbook.presentation.response.account.regist.IncomeAndExpenditureRegistResponse;
+import com.yonetani.webapp.accountbook.presentation.session.IncomeAndExpenditureRegistSession;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
 import lombok.RequiredArgsConstructor;
@@ -95,31 +97,62 @@ public class IncomeAndExpenditureRegistController {
 	// ユーザーセッション
 	private final LoginUserSession loginUserSession;
 	// 収支一覧セッション
-	//private final IncomeAndExpenseRegistListSession registListSession;
+	private final IncomeAndExpenditureRegistSession registListSession;
 	
 	/**
 	 *<pre>
-	 * 収支登録画面初期表示のPOST要求時マッピングです。
+	 * 新規で月度収支を登録する場合の収支登録画面初期表示のPOST要求時マッピングです。
 	 * 以下画面遷移に対応します。
 	 *・収支登録確認画面からの遷移(指定月の収支情報なし)(POST)→収支登録画面(収入登録エリアをアクティブ)
 	 *
 	 *</pre>
-	 * @param targetYearMonth
-	 * @param returnYearMonth
-	 * @return
+	 * @param targetYearMonth 収支を新規登録する対象年月の値
+	 * @param returnYearMonth 月度収支画面に戻るときに表示する対象年月の値
+	 * @return 収支登録画面情報
 	 *
 	 */
 	@PostMapping("/initload/")
 	public ModelAndView getInitLoad(
 			@RequestParam("targetYearMonth") String targetYearMonth,
 			@RequestParam("returnYearMonth") String returnYearMonth) {
-		log.debug("getInitLoad:targetYearMonth="+ targetYearMonth + ",returnYearMonth:=" + returnYearMonth);
-		
+		log.debug("getInitLoad:targetYearMonth="+ targetYearMonth + ",returnYearMonth=" + returnYearMonth);
+		// 収支登録セッション情報をクリア
+		registListSession.clearData();
 		// 画面表示データ読込
-		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo(), targetYearMonth, returnYearMonth)
-				// レスポンスにログインユーザ名を設定
-				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
-				// レスポンスからModelAndViewを生成
-				.build();
+		IncomeAndExpenditureRegistResponse response = this.usecase.readInitInfo(loginUserSession.getLoginUserInfo(), targetYearMonth, returnYearMonth);
+		// 新しい収支登録情報をセッションに設定
+		registListSession.setIncomeAndExpenditureRegistInfo(response.getIncomeAndExpenditureRegistInfo());
+		/* 画面表示情報返却 */
+		// 画面表示情報にログインユーザ名を設定
+		return response.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+		// レスポンスからModelAndViewを生成
+		.build();
+	}
+	
+	/**
+	 *<pre>
+	 * 指定した年月の収支を更新する場合の収支登録画面初期表示のPOST要求時マッピングです。
+	 * 以下画面遷移に対応します。
+	 *・各家計簿参照画面から更新ボタン押下(POST)→収支登録画面(収入と支出の一覧表示)
+	 *
+	 *</pre>
+	 * @param targetYearMonth 更新対象の収支の年月の値
+	 * @return 収支登録画面情報
+	 *
+	 */
+	@PostMapping("/updateload/")
+	public ModelAndView getUpdateLoad(@RequestParam("targetYearMonth") String targetYearMonth) {
+		log.debug("getUpdateLoad:targetYearMonth="+ targetYearMonth);
+		// 収支登録セッション情報をクリア
+		registListSession.clearData();
+		// 画面表示データ読込
+		IncomeAndExpenditureRegistResponse response = this.usecase.readUpdateInfo(loginUserSession.getLoginUserInfo(), targetYearMonth);
+		// 新しい収支登録情報をセッションに設定
+		registListSession.setIncomeAndExpenditureRegistInfo(response.getIncomeAndExpenditureRegistInfo());
+		/* 画面表示情報返却 */
+		// 画面表示情報にログインユーザ名を設定
+		return response.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+		// レスポンスからModelAndViewを生成
+		.build();
 	}
 }

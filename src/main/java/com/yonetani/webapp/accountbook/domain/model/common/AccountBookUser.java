@@ -17,6 +17,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.UserName;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -30,6 +31,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
 public class AccountBookUser {
 	// ユーザID
 	private final UserId userId;
@@ -60,22 +62,5 @@ public class AccountBookUser {
 			TargetYear.from(nowTargetYear),
 			TargetMonth.from(nowTargetMonth),
 			UserName.from(userName));
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		StringBuilder buff = new StringBuilder(130);
-		buff.append("userId:")
-		.append(userId)
-		.append(",nowTargetYear:")
-		.append(nowTargetYear)
-		.append(",nowTargetMonth:")
-		.append(nowTargetMonth)
-		.append(",userName:")
-		.append(userName);
-		return buff.toString();
 	}
 }

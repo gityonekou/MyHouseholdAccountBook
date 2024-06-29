@@ -15,6 +15,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.CodeValue;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -28,6 +29,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
 public class CodeAndValuePair {
 	// コード
 	private final Code code;
@@ -45,18 +47,5 @@ public class CodeAndValuePair {
 	 */
 	public static CodeAndValuePair from(String code, String codeValue) {
 		return new CodeAndValuePair(Code.from(code), CodeValue.from(codeValue));
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		StringBuilder buff = new StringBuilder(40);
-		buff.append("code:")
-		.append(code)
-		.append(",codeValue:")
-		.append(codeValue);
-		return buff.toString();
 	}
 }

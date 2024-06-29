@@ -18,6 +18,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -31,6 +32,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
 public class Shop {
 	// ユーザID
 	private final UserId userId;
@@ -62,24 +64,5 @@ public class Shop {
 				ShopKubunCode.from(shopKubunCode),
 				ShopName.from(shopName),
 				ShopSort.from(shopSort));
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		StringBuilder buff = new StringBuilder(130);
-		buff.append("userId:")
-		.append(userId)
-		.append(",shopCode:")
-		.append(shopCode)
-		.append(",shopKubunCode:")
-		.append(shopKubunCode)
-		.append(",shopName:")
-		.append(shopName)
-		.append(",shopSort:")
-		.append(shopSort);
-		return buff.toString();
 	}
 }
