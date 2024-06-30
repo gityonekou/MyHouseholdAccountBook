@@ -12,8 +12,10 @@ package com.yonetani.webapp.accountbook.presentation.session;
 import java.io.Serializable;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -27,6 +29,8 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
+@EqualsAndHashCode
 public class LoginUserInfo implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -46,18 +50,5 @@ public class LoginUserInfo implements Serializable {
 	 */
 	public static LoginUserInfo from(String userId, String userName) {
 		return new LoginUserInfo(userId, userName);
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		StringBuilder buff = new StringBuilder(40);
-		buff.append("userId:")
-		.append(userId)
-		.append(",userName:")
-		.append(userName);
-		return buff.toString();
 	}
 }

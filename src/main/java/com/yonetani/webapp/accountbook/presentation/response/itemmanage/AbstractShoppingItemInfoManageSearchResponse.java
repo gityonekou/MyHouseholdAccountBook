@@ -23,6 +23,7 @@ import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse
 import com.yonetani.webapp.accountbook.presentation.session.ShoppingItemSearchInfo;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -55,6 +56,7 @@ public abstract class AbstractShoppingItemInfoManageSearchResponse extends Abstr
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@Getter
+	@EqualsAndHashCode
 	public static class ShoppingItemListItem {
 		// 商品コード
 		private final String shoppingItemCode;

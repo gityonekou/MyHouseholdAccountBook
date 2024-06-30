@@ -19,6 +19,7 @@ import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse
 import com.yonetani.webapp.accountbook.presentation.session.IncomeAndExpenditureRegistInfo;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -49,6 +50,7 @@ public class IncomeAndExpenditureRegistResponse extends AbstractResponse {
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@Getter
+	@EqualsAndHashCode
 	public static class IncomeListItem {
 		// 収入区分名
 		private final String incomeKubunName;
@@ -71,6 +73,7 @@ public class IncomeAndExpenditureRegistResponse extends AbstractResponse {
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@Getter
+	@EqualsAndHashCode
 	public static class ExpenditureListItem {
 		// 支出項目名
 		private final String sisyutuItemName;

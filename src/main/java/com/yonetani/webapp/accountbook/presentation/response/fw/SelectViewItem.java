@@ -15,6 +15,7 @@ import java.util.List;
 import org.springframework.util.CollectionUtils;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -44,6 +45,7 @@ public class SelectViewItem {
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@Getter
+	@EqualsAndHashCode
 	public static class OptionItem {
 		// value属性の値
 		private final String value;

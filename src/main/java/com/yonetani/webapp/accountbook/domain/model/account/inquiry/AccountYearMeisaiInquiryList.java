@@ -29,6 +29,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -60,6 +61,7 @@ public class AccountYearMeisaiInquiryList {
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@Getter
 	@ToString
+	@EqualsAndHashCode
 	public static class MeisaiInquiryListItem {
 		// 対象月
 		private final TargetMonth month;

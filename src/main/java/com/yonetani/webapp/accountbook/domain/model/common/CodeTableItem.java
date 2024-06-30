@@ -17,6 +17,7 @@ import org.springframework.util.CollectionUtils;
 import com.yonetani.webapp.accountbook.domain.type.common.CodeKubun;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -34,6 +35,7 @@ import lombok.ToString;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @ToString
+@EqualsAndHashCode
 public class CodeTableItem {
 	// コード区分
 	private final CodeKubun kubun;

@@ -13,6 +13,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -30,6 +31,7 @@ import lombok.ToString;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @ToString
+@EqualsAndHashCode
 public class ShopBase {
 	// 店舗コード
 	private final ShopCode shopCode;

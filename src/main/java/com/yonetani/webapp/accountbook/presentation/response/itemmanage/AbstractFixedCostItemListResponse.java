@@ -22,6 +22,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -57,6 +58,7 @@ public abstract class AbstractFixedCostItemListResponse extends AbstractExpendit
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@Getter
+	@EqualsAndHashCode
 	public static class FixedCostItem {
 		// 固定費コード
 		private final String fixedCostCode;

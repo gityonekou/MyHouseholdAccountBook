@@ -26,6 +26,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.Shopping
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemStandardPrice;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -57,6 +58,7 @@ public class ShoppingItemInquiryList {
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@Getter
 	@ToString
+	@EqualsAndHashCode
 	public static class ShoppingItemInquiryItem {
 		// 商品コード
 		private final ShoppingItemCode shoppingItemCode;

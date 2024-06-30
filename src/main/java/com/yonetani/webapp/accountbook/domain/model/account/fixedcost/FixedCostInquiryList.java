@@ -28,6 +28,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemNa
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -59,6 +60,7 @@ public class FixedCostInquiryList {
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@Getter
 	@ToString
+	@EqualsAndHashCode
 	public static class FixedCostInquiryItem {
 		// 固定費コード
 		private final FixedCostCode fixedCostCode;

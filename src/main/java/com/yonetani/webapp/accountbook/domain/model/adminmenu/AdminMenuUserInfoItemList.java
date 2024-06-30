@@ -21,6 +21,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.type.common.UserName;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -52,6 +53,7 @@ public class AdminMenuUserInfoItemList {
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@Getter
 	@ToString
+	@EqualsAndHashCode
 	public static class UserInfoItem {
 		// ユーザID
 		private final UserId userId;

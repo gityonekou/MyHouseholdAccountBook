@@ -42,8 +42,8 @@ spring:
         - classpath:sql/initsql/schema_test.sql
         - classpath:org/springframework/security/core/userdetails/jdbc/users.ddl
       # 各テストケースに依存しない初期登録データ
-      data-locations:
-        - classpath:sql/initsql/data_test.sql
+      # data-locations:
+      #   - classpath:sql/initsql/data_test.sql
       # (DB初期化用SQL↑実行を)常に行う.EMBEDDED=h2dbのとき、の意味. ALWAYSは無条件
       mode: embedded
 

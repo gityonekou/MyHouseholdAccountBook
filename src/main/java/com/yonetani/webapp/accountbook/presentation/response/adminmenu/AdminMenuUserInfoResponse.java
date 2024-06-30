@@ -21,6 +21,7 @@ import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -50,6 +51,7 @@ public class AdminMenuUserInfoResponse extends AbstractResponse {
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@Getter
+	@EqualsAndHashCode
 	public static class UserInfoListItem {
 		// ユーザID
 		private final String userId;

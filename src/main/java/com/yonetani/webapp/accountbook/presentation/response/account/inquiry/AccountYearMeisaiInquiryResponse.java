@@ -18,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -47,6 +48,7 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@Getter
+	@EqualsAndHashCode
 	public static class MeisaiInquiryListItem {
 		// 対象月
 		private final String month;

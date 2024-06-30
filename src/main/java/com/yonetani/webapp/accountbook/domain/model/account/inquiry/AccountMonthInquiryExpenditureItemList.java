@@ -25,6 +25,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingak
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuB;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -56,6 +57,7 @@ public class AccountMonthInquiryExpenditureItemList {
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@Getter
 	@ToString
+	@EqualsAndHashCode
 	public static class ExpenditureItem {
 		// 支出項目コード
 		private final SisyutuItemCode sisyutuItemCode;

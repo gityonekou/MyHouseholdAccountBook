@@ -20,6 +20,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuusiKingaku
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -37,6 +38,7 @@ import lombok.ToString;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @ToString
+@EqualsAndHashCode
 public class IncomeAndExpenseInquiryItem {
 	// 対象月
 	private final TargetMonth month;

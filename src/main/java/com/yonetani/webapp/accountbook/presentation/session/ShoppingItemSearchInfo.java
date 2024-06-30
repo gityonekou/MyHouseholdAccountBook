@@ -12,8 +12,10 @@ package com.yonetani.webapp.accountbook.presentation.session;
 import java.io.Serializable;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -27,6 +29,8 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
+@EqualsAndHashCode
 public class ShoppingItemSearchInfo implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -51,22 +55,5 @@ public class ShoppingItemSearchInfo implements Serializable {
 	 */
 	public static ShoppingItemSearchInfo from(String searchActType, String searchTargetKubun, String searchValue, String sisyutuItemCode) {
 		return new ShoppingItemSearchInfo(searchActType, searchTargetKubun, searchValue, sisyutuItemCode);
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		StringBuilder buff = new StringBuilder(40);
-		buff.append("searchActType:")
-		.append(searchActType)
-		.append(",searchTargetKubun:")
-		.append(searchTargetKubun)
-		.append(",searchValue:")
-		.append(searchValue)
-		.append(",sisyutuItemCode:")
-		.append(sisyutuItemCode);
-		return buff.toString();
 	}
 }

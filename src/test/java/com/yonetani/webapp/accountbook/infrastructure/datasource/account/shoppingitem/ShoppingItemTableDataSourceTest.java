@@ -12,6 +12,7 @@ package com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppi
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +28,10 @@ import org.springframework.test.context.jdbc.Sql;
 
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItem;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItemInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItemInquiryList.ShoppingItemInquiryItem;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemJanCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.shoppingitem.ShoppingItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
@@ -264,18 +268,13 @@ class ShoppingItemTableDataSourceTest {
 		assertEquals(expectedData.getStandardPrice(), actualData.getStandardPrice(), "基準価格が等しいこと");
 		
 		// toStringチェック
-		System.out.println(actualData);
-		assertEquals(getShoppingItemToStringStr(1), actualData.toString(), "toStringチェック");
+		assertEquals(getToStringStr(1), actualData.toString(), "toStringチェック");
 		
 		/* 対象データなしの場合、nullとなること(商品コード) */
-		ShoppingItem expectedNotFoundDataA = getTestShoppingItemData(4);
-		assertNull(repository.findByIdAndShoppingItemCode(
-				SearchQueryUserIdAndShoppingItemCode.from(expectedNotFoundDataA.getUserId().toString(), expectedNotFoundDataA.getShoppingItemCode().toString())),
+		assertNull(repository.findByIdAndShoppingItemCode(SearchQueryUserIdAndShoppingItemCode.from("TEST-USER-ID", "00004")),
 				"対象データなしの場合nullとなること(商品コード)");
 		/* 対象データなしの場合、nullとなること(ユーザID) */
-		ShoppingItem expectedNotFoundDataB = getTestShoppingItemData(6);
-		assertNull(repository.findByIdAndShoppingItemCode(
-				SearchQueryUserIdAndShoppingItemCode.from(expectedNotFoundDataB.getUserId().toString(), expectedNotFoundDataB.getShoppingItemCode().toString())),
+		assertNull(repository.findByIdAndShoppingItemCode(SearchQueryUserIdAndShoppingItemCode.from("TEST-USER-ID_NOT_FOUND", "00001")),
 				"対象データなしの場合nullとなること(ユーザID)");
 		/* null項目の取得チェック */
 		// 期待値
@@ -304,45 +303,80 @@ class ShoppingItemTableDataSourceTest {
 	@Sql("ShoppingItemTableDataSourceFindByIdAndSisyutuItemCodeTest.sql")
 	void testFindByIdAndSisyutuItemCode() {
 		/* 対象データなしの場合、0件となること(支出項目コード) */
-		ShoppingItem expectedNotFoundDataA = getTestShoppingItemData(4);
-		ShoppingItemInquiryList actualNotFound = repository.findByIdAndSisyutuItemCode(
-				SearchQueryUserIdAndSisyutuItemCode.from(expectedNotFoundDataA.getUserId().toString(), expectedNotFoundDataA.getSisyutuItemCode().toString()));
+		ShoppingItemInquiryList actualNotFound = repository.findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode.from("TEST-USER-ID", "0040"));
 		assertTrue(actualNotFound.isEmpty(), "対象データなしの場合0件となること(支出項目コード)");
 		assertEquals(0, actualNotFound.getValues().size(), "対象データなしの場合0件となること(支出項目コード)");
 		assertEquals("商品検索結果:0件", actualNotFound.toString(), "対象データなし(toStringチェック)");
 		/* 対象データなしの場合、0件となること(ユーザID) */
-		ShoppingItem expectedNotFoundDataB = getTestShoppingItemData(6);
-		assertTrue(repository.findByIdAndSisyutuItemCode(
-				SearchQueryUserIdAndSisyutuItemCode.from(expectedNotFoundDataB.getUserId().toString(), expectedNotFoundDataB.getSisyutuItemCode().toString())).isEmpty(),
+		assertTrue(repository.findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode.from("TEST-USER-ID_NOT_FOUND", "0010")).isEmpty(),
 				"対象データなしの場合0件となること(ユーザID)");
 		/* 対象データなしの場合、0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:ユーザID)) */
-		ShoppingItem expectedNotFoundDataC = getTestShoppingItemData(7);
-		assertTrue(repository.findByIdAndSisyutuItemCode(
-				SearchQueryUserIdAndSisyutuItemCode.from(expectedNotFoundDataC.getUserId().toString(), expectedNotFoundDataC.getSisyutuItemCode().toString())).isEmpty(),
+		assertTrue(repository.findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode.from("TEST-USER-ID2", "0010")).isEmpty(),
 				"対象データなしの場合0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:ユーザID))");
 		/* 対象データなしの場合、0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:支出項目コード)) */
-		ShoppingItem expectedNotFoundDataD = getTestShoppingItemData(3);
-		assertTrue(repository.findByIdAndSisyutuItemCode(
-				SearchQueryUserIdAndSisyutuItemCode.from(expectedNotFoundDataD.getUserId().toString(), expectedNotFoundDataD.getSisyutuItemCode().toString())).isEmpty(),
+		assertTrue(repository.findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode.from("TEST-USER-ID", "0030")).isEmpty(),
 				"対象データなしの場合0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:支出項目コード))");
 		/* 対象データ1件(店舗コードに対応する店舗名なし) */
-		ShoppingItem expected1 = getTestShoppingItemData(8);
-		ShoppingItemInquiryList actual1 = repository.findByIdAndSisyutuItemCode(
-				SearchQueryUserIdAndSisyutuItemCode.from(expected1.getUserId().toString(), expected1.getSisyutuItemCode().toString()));
+		ShoppingItemInquiryList actual1 = repository.findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode.from("TEST-USER-ID", "0011"));
 		assertEquals(1, actual1.getValues().size(), "対象データ1件(店舗コードに対応する店舗名なし)");
-		
+		assertIterableEquals(getTestShoppingItemInquiryItemListData(1), actual1.getValues(), "検索結果が正しいこと:対象データ1件(店舗コードに対応する店舗名なし)");
 		/* 対象データ1件(NULL値項目) */
+		ShoppingItemInquiryList actual2 = repository.findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode.from("TEST-USER-ID", "0020"));
+		assertEquals(1, actual2.getValues().size(), "対象データ1件(NULL値項目)");
+		assertIterableEquals(getTestShoppingItemInquiryItemListData(2), actual2.getValues(), "検索結果が正しいこと:対象データ1件(NULL値項目)");
 		/* 対象データ1件(全項目) */
-		/* 対象データ2件(店舗コードに対応する店舗名なし(1件)、全項目1件) */
-		/* 対象データ2件(全項目2件) */
+		ShoppingItemInquiryList actual3 = repository.findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode.from("TEST-USER-ID", "0017"));
+		assertEquals(1, actual3.getValues().size(), "対象データ1件(全項目)");
+		assertIterableEquals(getTestShoppingItemInquiryItemListData(3), actual3.getValues(), "検索結果が正しいこと:対象データ1件(全項目)");
+		assertEquals(getToStringStr(2), actual3.toString(), "対象データ1件(全項目)");
+		/* 対象データ2件(店舗コードに対応する店舗名なし(店舗名なし商品コード:00001、全項目商品コード:00005) 商品コードの降順で表示 */
+		ShoppingItemInquiryList actual4 = repository.findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode.from("TEST-USER-ID", "0010"));
+		assertEquals(2, actual4.getValues().size(), "対象データ2件(店舗コードに対応する店舗名なし(1件)、全項目1件)");
+		assertIterableEquals(getTestShoppingItemInquiryItemListData(4), actual4.getValues(), "検索結果とソート結果が正しいこと:対象データ2件(店舗コードに対応する店舗名なし(1件)、全項目1件)");
+		/* 対象データ2件(全項目2件) 商品コードの降順で表示 */
+		ShoppingItemInquiryList actual5 = repository.findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode.from("TEST-USER-ID", "0023"));
+		assertEquals(2, actual5.getValues().size(), "対象データ2件(全項目2件)");
+		assertIterableEquals(getTestShoppingItemInquiryItemListData(5), actual5.getValues(), "検索結果とソート結果が正しいこと:対象データ2件(全項目2件)");
 	}
 
 	/**
 	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingitem.ShoppingItemTableDataSource#findByIdAndShoppingItemJanCode(com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemJanCode)} のためのテスト・メソッド。
 	 */
 	@Test
+	@Sql("ShoppingItemTableDataSourceFindByIdAndShoppingItemJanCodeTest.sql")
 	void testFindByIdAndShoppingItemJanCode() {
-		fail("まだ実装されていません");
+		/* 対象データなしの場合、0件となること(商品JANコード) */
+		assertTrue(repository.findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "9999999999999")).isEmpty(),
+				"対象データなしの場合0件となること(商品JANコード)");
+		/* 対象データなしの場合、0件となること(ユーザID) */
+		assertTrue(repository.findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID_NOT_FOUND", "1234567890100")).isEmpty(),
+				"対象データなしの場合0件となること(ユーザID)");
+		/* 対象データなしの場合、0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:ユーザID)) */
+		assertTrue(repository.findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID2", "1234567890100")).isEmpty(),
+				"対象データなしの場合0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:ユーザID))");
+		/* 対象データなしの場合、0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:支出項目コード)) */
+		assertTrue(repository.findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "0030")).isEmpty(),
+				"対象データなしの場合0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:支出項目コード))");
+		/* 対象データ1件(店舗コードに対応する店舗名なし) */
+		ShoppingItemInquiryList actual1 = repository.findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "1234567890400"));
+		assertEquals(1, actual1.getValues().size(), "対象データ1件(店舗コードに対応する店舗名なし)");
+		assertIterableEquals(getTestShoppingItemInquiryItemListData(101), actual1.getValues(), "検索結果が正しいこと:対象データ1件(店舗コードに対応する店舗名なし)");
+		/* 対象データ1件(NULL値項目) */
+		ShoppingItemInquiryList actual2 = repository.findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "1234567890600"));
+		assertEquals(1, actual2.getValues().size(), "対象データ1件(NULL値項目)");
+		assertIterableEquals(getTestShoppingItemInquiryItemListData(102), actual2.getValues(), "検索結果が正しいこと:対象データ1件(NULL値項目)");
+		/* 対象データ1件(全項目) */
+		ShoppingItemInquiryList actual3 = repository.findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "1234567890700"));
+		assertEquals(1, actual3.getValues().size(), "対象データ1件(全項目)");
+		assertIterableEquals(getTestShoppingItemInquiryItemListData(103), actual3.getValues(), "検索結果が正しいこと:対象データ1件(全項目)");
+		/* 対象データ2件(店舗コードに対応する店舗名なし(店舗名なし商品コード:00008、全項目商品コード:00009)) 商品コードの降順で表示 */
+		ShoppingItemInquiryList actual4 = repository.findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "1234567890800"));
+		assertEquals(2, actual4.getValues().size(), "対象データ2件(店舗コードに対応する店舗名なし(1件)、全項目1件)");
+		assertIterableEquals(getTestShoppingItemInquiryItemListData(104), actual4.getValues(), "検索結果とソート結果が正しいこと:対象データ2件(店舗コードに対応する店舗名なし(1件)、全項目1件)");
+		/* 対象データ2件(全項目2件) 商品コードの降順で表示 */
+		ShoppingItemInquiryList actual5 = repository.findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "1234567890100"));
+		assertEquals(2, actual5.getValues().size(), "対象データ2件(全項目2件)");
+		assertIterableEquals(getTestShoppingItemInquiryItemListData(105), actual5.getValues(), "検索結果とソート結果が正しいこと:対象データ2件(全項目2件)");
 	}
 
 	/**
@@ -357,16 +391,28 @@ class ShoppingItemTableDataSourceTest {
 	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingitem.ShoppingItemTableDataSource#countById(com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId)} のためのテスト・メソッド。
 	 */
 	@Test
+	@Sql("ShoppingItemTableDataSourceCountByIdTest.sql")
 	void testCountById() {
-		fail("まだ実装されていません");
+		/* 対象データなしの場合、0件となること */
+		assertEquals(0, repository.countById(SearchQueryUserId.from("TEST-USER-ID_NOT_FOUND")), "対象データなしの場合、0件となること");
+		/* 登録済みデータ2件の場合、2件となること */
+		assertEquals(2, repository.countById(SearchQueryUserId.from("TEST-USER-ID")), "登録済みデータ2件の場合、2件となること");
 	}
 
 	/**
 	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingitem.ShoppingItemTableDataSource#countByIdAndShoppingItemJanCode(com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemJanCode)} のためのテスト・メソッド。
 	 */
 	@Test
+	@Sql("ShoppingItemTableDataSourceCountByIdAndShoppingItemJanCodeTest.sql")
 	void testCountByIdAndShoppingItemJanCode() {
-		fail("まだ実装されていません");
+		/* 対象データなしの場合、0件となること(ユーザID) */
+		assertEquals(0, repository.countByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID_NOT_FOUND", "1234567890100")), "対象データなしの場合、0件となること(ユーザID)");
+		/* 対象データなしの場合、0件となること(商品JANコード) */
+		assertEquals(0, repository.countByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "9999999999999")), "対象データなしの場合、0件となること(商品JANコード)");
+		/* 登録済みデータ3件で対象データ1件の場合、1件となること */
+		assertEquals(1, repository.countByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "1234567890100")), "登録済みデータ3件で対象データ1件の場合、1件となること");
+		/* 登録済みデータ3件で対象データ2件の場合、2件となること */
+		assertEquals(2, repository.countByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "1234567890600")), "登録済みデータ3件で対象データ2件の場合、2件となること");
 	}
 	
 	/**
@@ -401,18 +447,6 @@ class ShoppingItemTableDataSourceTest {
 				// 新規登録用null可データ
 				data = ShoppingItem.from("TEST-USER-ID", "00005", "商品区分名NULL", "商品名NULL", null, "1234567890500", "0050", "会社名NULL", null, null);
 				break;
-			case 6:
-				// ユーザIDなし
-				data = ShoppingItem.from("TEST-USER-ID_NOT_FOUND", "00001", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertBigDecimal(1180, 2));
-				break;
-			case 7:
-				// ユーザIDなし
-				data = ShoppingItem.from("TEST-USER-ID2", "00004", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertBigDecimal(1180, 2));
-				break;
-			case 8:
-				// 任意データ1
-				data = ShoppingItem.from("TEST-USER-ID", "00006", "商品区分名６", "商品名６", "商品詳細６", "1334567890101", "0011", "会社名６", "099", DomainCommonUtils.convertBigDecimal(1183, 2));
-				break;
 			case 101:
 				// 2のデータをnull可データに更新用
 				data = ShoppingItem.from("TEST-USER-ID", "00002", "商品区分名２NULL", "商品名２NULL", null, "1234567890600", "0060", "会社名２NULL", null, null);
@@ -445,18 +479,80 @@ class ShoppingItemTableDataSourceTest {
 	
 	/**
 	 *<pre>
+	 * ShoppingItemInquiryListのテストデータ(ShoppingItemInquiryItemのリスト)を返します。
+	 *</pre>
+	 * @param type
+	 * @return
+	 *
+	 */
+	private List<ShoppingItemInquiryItem> getTestShoppingItemInquiryItemListData(int type) {
+		// TODO:本来は、リソースに設定したデータファイルからデータを取得してドメインを作成したいところ。時間みながら、共通のUtilを作って値を取得するように修正する
+		List<ShoppingItemInquiryItem> dataList = new ArrayList<>();
+		switch(type) {
+			case 1:
+				dataList.add(ShoppingItemInquiryItem.from("00006", "商品区分名６", "商品名６", "商品詳細６", "1334567890101", "税金支払い", "会社名６", null, DomainCommonUtils.convertBigDecimal(1183, 2)));
+				break;
+			case 2:
+				dataList.add(ShoppingItemInquiryItem.from("00002", "商品区分名２NULL", "商品名２NULL", null, "1234567890200", "飲食日用品", "会社名２NULL", null, null));
+				break;
+			case 3:
+				dataList.add(ShoppingItemInquiryItem.from("00007", "商品区分名７", "商品名７", "商品詳細７", "1234567890700", "イデコ", "会社名７", "テスト店舗２", DomainCommonUtils.convertBigDecimal(2470, 2)));
+				break;
+			case 4:
+				// 商品コードの降順で表示
+				dataList.add(ShoppingItemInquiryItem.from("00005", "商品区分名１", "商品名１－２", "商品詳細１－２", "2234567890100", "その他", "会社名１", "テスト店舗１０", DomainCommonUtils.convertBigDecimal(1182, 2)));
+				dataList.add(ShoppingItemInquiryItem.from("00001", "商品区分名１", "商品名１－１", "商品詳細１－１", "1234567890100", "その他", "会社名１", null, DomainCommonUtils.convertBigDecimal(1180, 2)));
+				break;
+			case 5:
+				// 商品コードの降順で表示
+				dataList.add(ShoppingItemInquiryItem.from("00009", "商品区分名９", "商品名９", "商品詳細９", "1234567891900", "食費", "会社名９", "テスト店舗３０", DomainCommonUtils.convertBigDecimal(3090, 2)));
+				dataList.add(ShoppingItemInquiryItem.from("00008", "商品区分名８", "商品名８", "商品詳細８", "1234567891800", "食費", "会社名８", "テスト店舗２", DomainCommonUtils.convertBigDecimal(3080, 2)));
+				break;
+			case 101:
+				dataList.add(ShoppingItemInquiryItem.from("00004", "商品区分名４", "商品名４", "商品詳細４", "1234567890400", "税金支払い", "会社名４", null, DomainCommonUtils.convertBigDecimal(1480, 2)));
+				break;
+			case 102:
+				dataList.add(ShoppingItemInquiryItem.from("00006", "商品区分名６NULL", "商品名６NULL", null, "1234567890600", "飲食日用品", "会社名６NULL", null, null));
+				break;
+			case 103:
+				dataList.add(ShoppingItemInquiryItem.from("00007", "商品区分名７", "商品名７", "商品詳細７", "1234567890700", "イデコ", "会社名７", "テスト店舗２", DomainCommonUtils.convertBigDecimal(1780, 2)));
+				break;
+			case 104:
+				// 商品コードの降順で表示
+				dataList.add(ShoppingItemInquiryItem.from("00009", "商品区分名９", "商品名９", "商品詳細９", "1234567890800", "税金支払い", "会社名９", "テスト店舗３０", DomainCommonUtils.convertBigDecimal(1990, 2)));
+				dataList.add(ShoppingItemInquiryItem.from("00008", "商品区分名８", "商品名８", "商品詳細８", "1234567890800", "食費", "会社名８", null, DomainCommonUtils.convertBigDecimal(1880, 2)));
+				break;
+			case 105:
+				// 商品コードの降順で表示
+				dataList.add(ShoppingItemInquiryItem.from("00005", "商品区分名１", "商品名１－２", "商品詳細１－２", "1234567890100", "その他", "会社名１", "テスト店舗１０", DomainCommonUtils.convertBigDecimal(1580, 2)));
+				dataList.add(ShoppingItemInquiryItem.from("00001", "商品区分名１", "商品名１－１", "商品詳細１－１", "1234567890100", "その他", "会社名１", "テスト店舗２", DomainCommonUtils.convertBigDecimal(1180, 2)));
+				break;
+			default:
+		}
+		
+		return dataList;
+	}
+	
+	/**
+	 *<pre>
 	 * ShoppingItemのtoStringメソッドで返される文字列を固定文字列として返します。
 	 *</pre>
 	 * @return ShoppingItemの文字列の値
 	 *
 	 */
-	private String getShoppingItemToStringStr(int type) {
-		// TODO:本来は期待値はテキストファイルのデータを取得したいところだが、固定でも別にいいような気もするし、どうするか、
-		return "ShoppingItem(userId=TEST-USER-ID, shoppingItemCode=00001, shoppingItemKubunName=商品区分名１, shoppingItemName=商品名１, shoppingItemDetailContext=商品詳細１, shoppingItemJanCode=1234567890100, sisyutuItemCode=0010, companyName=会社名１, shopCode=010, standardPrice=1,180円)";
-	}
-	
-	private List<String> getShoppingItemInquiryListToStringStr(int type) {
-		// TODO:本来は期待値はテキストファイルのデータを取得したいところだが、固定でも別にいいような気もするし、どうするか、
-		return null;
+	private String getToStringStr(int type) {
+		// TODO:本来は期待値はテキストファイルのデータを取得したいところだが、固定でも別にいいような気もするし、どうするか
+		String str = null;
+		switch(type) {
+			case 1:
+				str = "ShoppingItem(userId=TEST-USER-ID, shoppingItemCode=00001, shoppingItemKubunName=商品区分名１, shoppingItemName=商品名１, shoppingItemDetailContext=商品詳細１, shoppingItemJanCode=1234567890100, sisyutuItemCode=0010, companyName=会社名１, shopCode=010, standardPrice=1,180円)";
+				break;
+			case 2:
+				str = "商品検索結果:1件:[[0][ShoppingItemInquiryList.ShoppingItemInquiryItem(shoppingItemCode=00007, shoppingItemKubunName=商品区分名７, shoppingItemName=商品名７, shoppingItemDetailContext=商品詳細７, shoppingItemJanCode=1234567890700, sisyutuItemName=イデコ, companyName=会社名７, standardShopName=テスト店舗２, standardPrice=2,470円)]]";
+				break;
+			default:
+		}
+		
+		return str;
 	}
 }
