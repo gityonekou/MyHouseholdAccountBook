@@ -37,13 +37,21 @@
 package com.yonetani.webapp.accountbook.presentation.controller.account.regist;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.regist.IncomeAndExpenditureRegistUseCase;
+import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
+import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.IncomeItemForm;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.IncomeAndExpenditureRegistResponse;
+import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
 import com.yonetani.webapp.accountbook.presentation.session.IncomeAndExpenditureRegistSession;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
@@ -78,8 +86,8 @@ import lombok.extern.log4j.Log4j2;
  * ・収支登録画面：支出を削除(POST)→収支登録画面(収入と支出の一覧表示)
  * ・収支登録画面：内容確認ボタン押下(POST)→収支登録内容確認画面
  * ・収支登録画面：キャンセルボタン押下(POST)→各月の収支画面に戻る(収支登録画面遷移前の表示月の値で再表示する)
- * ・収支登録画面：登録ボタン押下(POST)→登録・更新成功時→リダイレクト(GET)：登録した月の収支画面
- * ・収支登録画面：前に戻るボタン押下(POST)→収支登録画面(収入と支出の一覧表示)
+ * ・収支登録内容確認画面：登録ボタン押下(POST)→登録・更新成功時→リダイレクト(GET)：登録した月の収支画面
+ * ・収支登録内容確認画面：前に戻るボタン押下(POST)→収支登録画面(収入と支出の一覧表示)
  *
  *</pre>
  *
@@ -116,17 +124,18 @@ public class IncomeAndExpenditureRegistController {
 			@RequestParam("targetYearMonth") String targetYearMonth,
 			@RequestParam("returnYearMonth") String returnYearMonth) {
 		log.debug("getInitLoad:targetYearMonth="+ targetYearMonth + ",returnYearMonth=" + returnYearMonth);
+		
 		// 収支登録セッション情報をクリア
 		registListSession.clearData();
 		// 画面表示データ読込
-		IncomeAndExpenditureRegistResponse response = this.usecase.readInitInfo(loginUserSession.getLoginUserInfo(), targetYearMonth, returnYearMonth);
-		// 新しい収支登録情報をセッションに設定
-		registListSession.setIncomeAndExpenditureRegistInfo(response.getIncomeAndExpenditureRegistInfo());
+		IncomeAndExpenditureRegistResponse response = usecase.readInitInfo(loginUserSession.getLoginUserInfo(), targetYearMonth, returnYearMonth);
+		// 新しい支出登録情報をセッションに設定
+		registListSession.setExpenditureRegistItemList(response.getExpenditureRegistItemList());
 		/* 画面表示情報返却 */
 		// 画面表示情報にログインユーザ名を設定
 		return response.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
-		// レスポンスからModelAndViewを生成
-		.build();
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 	
 	/**
@@ -143,16 +152,215 @@ public class IncomeAndExpenditureRegistController {
 	@PostMapping("/updateload/")
 	public ModelAndView getUpdateLoad(@RequestParam("targetYearMonth") String targetYearMonth) {
 		log.debug("getUpdateLoad:targetYearMonth="+ targetYearMonth);
+		
 		// 収支登録セッション情報をクリア
 		registListSession.clearData();
 		// 画面表示データ読込
-		IncomeAndExpenditureRegistResponse response = this.usecase.readUpdateInfo(loginUserSession.getLoginUserInfo(), targetYearMonth);
-		// 新しい収支登録情報をセッションに設定
-		registListSession.setIncomeAndExpenditureRegistInfo(response.getIncomeAndExpenditureRegistInfo());
+		IncomeAndExpenditureRegistResponse response = usecase.readUpdateInfo(loginUserSession.getLoginUserInfo(), targetYearMonth);
+		// 収入登録情報をセッションに設定
+		registListSession.setIncomeRegistItemList(response.getIncomeRegistItemList());
+		// 支出登録情報をセッションに設定
+		registListSession.setExpenditureRegistItemList(response.getExpenditureRegistItemList());
 		/* 画面表示情報返却 */
 		// 画面表示情報にログインユーザ名を設定
 		return response.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
-		// レスポンスからModelAndViewを生成
-		.build();
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+	
+	/**
+	 *<pre>
+	 * 収支登録画面で収入情報の新規登録ボタン押下時のGET要求時マッピングです。
+	 * 収支登録画面の各収支一覧と新規の収入情報登録フォームを表示します。
+	 *</pre>
+	 * @return 収支登録画面
+	 *
+	 */
+	@GetMapping("/incomeaddselect/")
+	public ModelAndView getIncomeAddSelect() {
+		log.debug("getIncomeAddSelect:");
+		// 画面表示情報を取得
+		return this.usecase.readIncomeAddSelect(
+					// ログインユーザ情報
+					loginUserSession.getLoginUserInfo(),
+					// セッションに設定されている収支情報のリスト
+					registListSession.getIncomeRegistItemList(),
+					// セッションに設定されている支出情報のリスト
+					registListSession.getExpenditureRegistItemList())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+	
+	/**
+	 *<pre>
+	 * 収支登録画面で更新対象の収入情報選択時のGET要求時マッピングです。
+	 * 収支登録画面の各収支一覧と更新対象の収入情報を反映した収入情報登録フォームを表示します。
+	 *</pre>
+	 * @param incomeCode 選択した収入コード
+	 * @return 収支登録画面
+	 *
+	 */
+	@GetMapping("/incomeupdateselect")
+	public ModelAndView getIncomeUpdateSelect(@RequestParam("incomeCode") String incomeCode) {
+		log.debug("getIncomeUpdateSelect:incomeCode=" + incomeCode);
+		// 画面表示情報を取得
+		return this.usecase.readIncomeUpdateSelect(
+					// ログインユーザ情報
+					loginUserSession.getLoginUserInfo(),
+					// 収入コード
+					incomeCode,
+					// セッションに設定されている収支情報のリスト
+					registListSession.getIncomeRegistItemList(),
+					// セッションに設定されている支出情報のリスト
+					registListSession.getExpenditureRegistItemList())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+	
+	/**
+	 *<pre>
+	 * 収入情報の登録・更新時のPOST要求時マッピングです。
+	 * 以下画面遷移に対応します。
+	 * ・収入を新規登録(POST)→収支登録画面(収入と支出の一覧表示)
+	 * ・収入を訂正(POST)→収支登録画面(収入と支出の一覧表示)
+	 *</pre>
+	 * @param inputForm 入情報入力フォームデータ
+	 * @param bindingResult フォームのバリデーションチェック結果
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
+	 * @return 収支登録画面情報
+	 *
+	 */
+	@PostMapping(value="/incomeupdate/", params = "actionUpdate")
+	public ModelAndView postIncomeUpdate(@ModelAttribute @Validated IncomeItemForm inputForm, BindingResult bindingResult,
+			RedirectAttributes redirectAttributes) {
+		log.debug("postIncomeUpdate:input=" + inputForm);
+		/* 入力フィールドのバリデーションチェック結果を判定 */
+		// チェック結果エラーの場合
+		if(bindingResult.hasErrors()) {
+			// 初期表示情報を取得し、入力チェックエラーを設定
+			return this.usecase.readIncomeUpdateBindingErrorSetInfo(
+						loginUserSession.getLoginUserInfo(),
+						inputForm,
+						registListSession.getIncomeRegistItemList(),
+						registListSession.getExpenditureRegistItemList())
+					// レスポンスにログインユーザ名を設定
+					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					// レスポンスからModelAndViewを生成
+					.build();
+			
+		// チェック結果OKの場合
+		} else {
+			// actionに従い、処理を実行
+			IncomeAndExpenditureRegistResponse response = this.usecase.execIncomeAction(
+					loginUserSession.getLoginUserInfo(),
+					inputForm,
+					registListSession.getIncomeRegistItemList());
+			// 収入一覧をセッションに設定
+			registListSession.setIncomeRegistItemList(response.getIncomeRegistItemList());
+			// 収入支出一覧表示にリダイレクト
+			return response.buildRedirect(redirectAttributes);
+		}
+	}
+	
+	/**
+	 *<pre>
+	 * 収入情報の削除のPOST要求時マッピングです。
+	 * 以下画面遷移に対応します。
+	 * ・収入を削除(POST)→収支登録画面(収入と支出の一覧表示)
+	 *</pre>
+	 * @param inputForm 入情報入力フォームデータ
+	 * @param bindingResult フォームのバリデーションチェック結果
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
+	 * @return 収支登録画面情報
+	 *
+	 */
+	@PostMapping(value="/incomeupdate/", params = "actionDelete")
+	public ModelAndView postIncomeDelete(@ModelAttribute @Validated IncomeItemForm inputForm, BindingResult bindingResult,
+			RedirectAttributes redirectAttributes) {
+		log.debug("postIncomeDelete:input=" + inputForm);
+		/* 入力フィールドのバリデーションチェック結果を判定 */
+		// チェック結果エラーの場合
+		if(bindingResult.hasErrors()) {
+			// 初期表示情報を取得し、入力チェックエラーを設定
+			return this.usecase.readIncomeUpdateBindingErrorSetInfo(
+						loginUserSession.getLoginUserInfo(),
+						inputForm,
+						registListSession.getIncomeRegistItemList(),
+						registListSession.getExpenditureRegistItemList())
+					// レスポンスにログインユーザ名を設定
+					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					// レスポンスからModelAndViewを生成
+					.build();
+			
+		// チェック結果OKの場合
+		} else {
+			// アクションに削除を設定
+			inputForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_DELETE);
+			// actionに従い、処理を実行
+			IncomeAndExpenditureRegistResponse response = this.usecase.execIncomeAction(
+					loginUserSession.getLoginUserInfo(),
+					inputForm,
+					registListSession.getIncomeRegistItemList());
+			// 収入一覧をセッションに設定
+			registListSession.setIncomeRegistItemList(response.getIncomeRegistItemList());
+			// 収入支出一覧表示にリダイレクト
+			return response.buildRedirect(redirectAttributes);
+		}
+	}
+	
+	/**
+	 *<pre>
+	 * 収支登録画面で収入情報、および、支出情報登録後後のリダイレクト(Get要求時)のマッピングです。
+	 * 収支登録画面の各収支一覧を表示します。
+	 *</pre>
+	 * @param redirectMessages リダイレクト元から引き継いだメッセージ
+	 * @return 収支登録画面
+	 *
+	 */
+	@GetMapping("/updateComplete/")
+	public ModelAndView updateComplete(@ModelAttribute CompleteRedirectMessages redirectMessages) {
+		log.debug("updateComplete:input=" + redirectMessages);
+		// 画面表示情報を取得
+		return this.usecase.readIncomeAndExpenditureInfoList(
+					// ログインユーザ情報
+					loginUserSession.getLoginUserInfo(),
+					// セッションに設定されている収支情報のリスト
+					registListSession.getIncomeRegistItemList(),
+					// セッションに設定されている支出情報のリスト
+					registListSession.getExpenditureRegistItemList())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.buildComplete(redirectMessages);
+	}
+	
+	/**
+	 *<pre>
+	 * 収支登録内容確認画面で登録完了後のリダイレクト(Get要求時)のマッピングです。
+	 * 登録した月の収支画面を表示します。
+	 *</pre>
+	 * @param redirectMessages リダイレクト元から引き継いだメッセージ
+	 * @return 収支登録画面
+	 *
+	 */
+	@GetMapping("/registComplete/")
+	public ModelAndView registComplete(@ModelAttribute CompleteRedirectMessages redirectMessages) {
+		log.debug("registComplete:input=" + redirectMessages);
+		// 画面表示情報を取得
+		return this.usecase.readIncomeAndExpenditureInfoList(
+				// ログインユーザ情報
+				loginUserSession.getLoginUserInfo(),
+				// セッションに設定されている収支情報のリスト
+				registListSession.getIncomeRegistItemList(),
+				// セッションに設定されている支出情報のリスト
+				registListSession.getExpenditureRegistItemList())
+			// レスポンスにログインユーザ名を設定
+			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+			// レスポンスからModelAndViewを生成
+			.buildComplete(redirectMessages);
 	}
 }

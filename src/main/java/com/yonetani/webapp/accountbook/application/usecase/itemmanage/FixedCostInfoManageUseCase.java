@@ -514,10 +514,10 @@ public class FixedCostInfoManageUseCase {
 				inputForm,
 				// 支払月選択ボックスの表示情報リストはデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定
 				shiharaiTukiList.stream().map(pair ->
-				OptionItem.from(pair.getCode().toString(), pair.getCodeValue().toString())).collect(Collectors.toList()),
+					OptionItem.from(pair.getCode().toString(), pair.getCodeValue().toString())).collect(Collectors.toList()),
 				// 支払日選択ボックスの表示情報リストはデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定
 				shiharaiDayList.stream().map(pair ->
-				OptionItem.from(pair.getCode().toString(), pair.getCodeValue().toString())).collect(Collectors.toList()));
+					OptionItem.from(pair.getCode().toString(), pair.getCodeValue().toString())).collect(Collectors.toList()));
 		
 		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
 		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, inputForm.getSisyutuItemCode()));

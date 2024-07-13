@@ -66,7 +66,7 @@ public class FixedCostInfoUpdateForm {
 	private Integer shiharaiKingaku;
 	
 	/**
-	 * 相関チェック(支払月でその他任意を選択した場合、支払月任意詳細は必須
+	 * 相関チェック(支払月でその他任意を選択した場合、支払月任意詳細は必須)
 	 * 
 	 * @return その他任意を選択した場合で支払月任意詳細の設定ありならtrue、空ならfalse
 	 */

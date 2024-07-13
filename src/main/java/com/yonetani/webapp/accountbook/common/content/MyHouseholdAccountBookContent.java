@@ -20,10 +20,16 @@ package com.yonetani.webapp.accountbook.common.content;
  *
  */
 public class MyHouseholdAccountBookContent {
-	// アクション(登録)
+	// アクション(新規登録)
 	public static final String ACTION_TYPE_ADD = "add";
 	// アクション(更新)
 	public static final String ACTION_TYPE_UPDATE = "update";
+	// アクション(更新)
+	public static final String ACTION_TYPE_DELETE = "delete";
+	// データタイプ(新規)
+	public static final String DATA_TYPE_NEW = "new";
+	// データタイプ(DBロード)
+	public static final String DATA_TYPE_LOAD = "load";
 	
 	// ユーザステータス(view：有効)
 	public static final String USER_STATUS_ENABLED_VIEW = "有効";
@@ -50,6 +56,9 @@ public class MyHouseholdAccountBookContent {
 	
 	// コード定義区分(ショップ区分:001)
 	public static final String CODE_DEFINES_SHOP_KUBUN = "001";
+	// 商品登録画面で基準店舗選択ボックスに表示する店舗の店舗区分コード
+	// 飲食日用品(901)、ホームセンター(902)、薬局/薬局複合店(905)、複合店舗(907)
+	public static final String[] STANDARD_SHOPSLIST_KUBUN_CODE = {"901","902","905","907"};
 	// コード定義区分(固定費支払月:002)
 	public static final String CODE_DEFINES_FIXED_COST_SHIHARAI_TUKI = "002";
 	// コード定義:固定費支払月で毎月(00)を選択時
@@ -62,6 +71,10 @@ public class MyHouseholdAccountBookContent {
 	public static final String SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE = "40";
 	// コード定義区分(固定費支払日:003)
 	public static final String CODE_DEFINES_FIXED_COST_SHIHARAI_DAY = "003";
+	// コード定義区分(収入区分:004)
+	public static final String CODE_DEFINES_INCOME_KUBUN = "004";
+	// コード定義:収入区分でその他任意(9)を選択時
+	public static final String INCOME_KUBUN_OPTIONAL_SELECTED_VALUE = "9";
 	
 	// 支出項目コード仮登録データ:9999
 	public static final String SISYUTU_ITEM_CODE_TEMPORARY_VALUE = "9999";
@@ -71,10 +84,6 @@ public class MyHouseholdAccountBookContent {
 	public static final String SISYUTU_ITEM_NITIYOU_SYOUMOUHIN_SORT_VALUE = "0502000000";
 	// 支出項目(食費)の支出項目表示順最大値
 	public static final String SISYUTU_ITEM_INSYOKU_SORT_MAX_VALUE = "0503999999";
-	
-	// 商品登録画面で基準店舗選択ボックスに表示する店舗の店舗区分コード
-	// 飲食日用品(901)、ホームセンター(902)、薬局/薬局複合店(905)、複合店舗(907)
-	public static final String[] STANDARD_SHOPSLIST_KUBUN_CODE = {"901","902","905","907"};
 	
 	// 商品情報を検索条件に商品を検索(セッション格納値)
 	public static final String ACT_SEARCH_SHOPPING_ITEM = "ActSearchShoppingItem";

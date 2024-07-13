@@ -68,7 +68,7 @@ public class ShoppingItemInfoUpdateForm {
 	private Integer standardPrice;
 	
 	/**
-	 * 相関チェック(基準店舗コードを選択した場合、基準価格は必須
+	 * 相関チェック(基準店舗コードを選択した場合、基準価格は必須)
 	 * 
 	 * @return 基準店舗を選択した場合で基準価格の設定ありならtrue、空ならfalse
 	 */

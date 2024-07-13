@@ -30,53 +30,69 @@
 						<p class="h6">■収入登録エリア■</p>
 						<table class="table table-sm table-bordered">
 							<tbody>
-								<tr class="table-info">
-									<td class="w10">給料</td>
-									<td class="w10" align="right">418,000円</td>
-									<td class="w5" align="center"><a class="btn text-bg-success btn-sm" href="./MonthEndClosingProcess_3.html">訂正</a></td>
-									<td>給料詳細あればここに表示</td>
-								</tr>
-								<tr>
-									<td class="w10">積立からの取崩し</td>
-									<td class="w10" align="right">113,400円</td>
-									<td class="w5" align="center"><a class="btn text-bg-success btn-sm" href="./MonthEndClosingProcess_3.html">訂正</a></td>
-									<td>税金支払いのため税金積立から切り崩し</td>
-								</tr>
+								<th:block th:each="item, itemStat : ${incomeListInfo}">
+									<th:block th:if="${itemStat.odd}"><tr class="table-info"></th:block>
+									<th:block th:if="${itemStat.even}"><tr></th:block>
+										<td class="w10" th:text="${item.incomeKubunName}">収入区分名</td>
+										<td class="w10" th:text="${item.incomeKingaku}" align="right">収入金額</td>
+										<td class="w5" align="center"><a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/accountregist/incomeandexpenditure/incomeupdateselect(incomeCode=${item.incomeCode})}">訂正</a></td>
+										<td th:text="${item.incomeDetailContext}">収入詳細</td>
+									</tr>
+								</th:block>
+								<th:block th:if="${#lists.size(incomeListInfo)} > 0">
 								<tr class="table-success">
 									<td class="w10">収入合計</td>
-									<td class="w10" align="right">531,400円</td>
+									<td class="w10" th:text="${incomeSumKingaku}" align="right">収入金額合計</td>
 									<td colspan="2"></td>
 								</tr>
+								</th:block>
 								<tr class="table-info">
-									<td class="w10">&emsp;<a class="btn text-bg-success btn-sm" href="./MonthEndClosingProcess_4.html">新規追加</a></td>
+									<td class="w10">&emsp;<a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/accountregist/incomeandexpenditure/incomeaddselect/}">新規追加</a></td>
 									<td colspan="3"></td>
 								</tr>
 							</tbody>
 						</table>
-						<ul class="list-group">
+						
+						<!-- 収入登録フォーム -->
+						<th:block th:if="${incomeItemForm} != null">
+						<ul class="list-group" >
 							<li class="list-group-item border border-primary">
-								<form action="./MonthEndClosingProcess_2.html">
-									<span>【新規追加】<span>
-									<div class="input-group w30">収入区分：<select class="form-select" id="shopGroup">
-											<option value="" selected="selected">収入区分を選択してください</option>
-											<option value="00">給料</option>
-											<option value="91">副業</option>
-											<option value="92">積立からの取崩し</option>
-											<option value="94">その他任意</option>
-										</select>
-									</div>
-									<div class="input-group">
-										　詳細　：<input type="text" class="form-control" id="otherdetail" placeholder="収入区分でその他任意選択の場合、詳細は必須入力" value="" >
-									</div>
-									<div class="input-group w15">
-										収入金額：<input type="text" class="form-control" id="syuunyuukingaku" value="413,000">円
-									</div>
-									<div class="input-group w15">
-										<button class="btn btn-primary" type="submit" id="new-add">新規追加</button>
-									</div>
-								</form>
+							<form name="IncomeItemInfo" method="post" th:action="@{/myhacbook/accountregist/incomeandexpenditure/incomeupdate/}" th:object="${incomeItemForm}">
+								<span th:text="*{incomeKubunName}">収入区分名</span>
+								<div class="input-group w30">収入区分：
+									<select class="form-select w30" th:errorclass="is-invalid" th:field="*{incomeKubun}" required>
+										<option th:each="item : ${incomeKubunSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+									</select>
+				 					<p class="invalid-feedback" th:errors="*{incomeKubun}"></p>
+				 					<!--/* 必須チェックの結果を出力 */-->
+									<p class="invalid-feedback" th:errors="*{needCheckIncomeDetailContext}" style="display: block;"></p>
+								</div>
+								<div class="input-group">
+									　詳細　：<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{incomeDetailContext}" placeholder="収入区分でその他任意選択の場合、詳細は必須入力">
+				 					<p class="invalid-feedback" th:errors="*{incomeDetailContext}"></p>
+				 					<!--/* 必須チェックの結果を出力 */-->
+									<p class="invalid-feedback" th:errors="*{needCheckIncomeDetailContext}" style="display: block;"></p>
+								</div>
+								<div class="input-group w15">
+									収入金額：<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{incomeKingaku}" required>円
+									<p class="invalid-feedback" th:errors="*{incomeKingaku}"></p>
+								</div>
+								<div class="mb-3 w15">
+									<span>&emsp;</span><button class="btn btn-primary" type="submit" name="actionUpdate">登録</button>
+									<th:block th:if="*{#strings.equals(action, 'update')}">
+										<span>&emsp;</span>
+										<span>&emsp;</span>
+										<span>&emsp;</span>
+										<button class="btn btn-primary" type="submit" name="actionDelete">削除</button>
+									</th:block>
+									<input type="hidden" th:field="*{action}" />
+									<input type="hidden" th:field="*{incomeCode}" />
+									<input type="hidden" th:field="*{incomeKubunName}" />
+								</div>
+							</form>
 							</li>
 						</ul>
+						</th:block>
 					</div>
 				</div>
 			</div>
@@ -127,6 +143,8 @@
 								</tr>
 							</tbody>
 						</table>
+						<!-- 支出登録フォーム -->
+						<th:block th:if="${expenditureItemForm} != null">
 						<ul class="list-group">
 							<li class="list-group-item border border-primary">
 								<form action="./MonthEndClosingProcess_2.html">
@@ -149,6 +167,7 @@
 								</form>
 							</li>
 						</ul>
+						</th:block>
 					</div>
 				</div>
 			</div>
