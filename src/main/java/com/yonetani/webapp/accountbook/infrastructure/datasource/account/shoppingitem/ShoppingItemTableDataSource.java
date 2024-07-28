@@ -199,7 +199,14 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 				// 基準店舗コード
 				data.getShopCode().toString(),
 				// 基準価格
-				data.getStandardPrice().getValue());
+				data.getStandardPrice().getValue(),
+				// 内容量
+				data.getShoppingItemCapacity().getValue(),
+				// 内容量単位
+				data.getShoppingItemCapacityUnit().toString(),
+				// カロリー
+				data.getShoppingItemCalories().getValue()
+				);
 	}
 	
 	/**
@@ -231,7 +238,14 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 				// 基準店舗コード
 				dto.getStandardShopCode(),
 				// 基準価格
-				dto.getStandardPrice());
+				dto.getStandardPrice(),
+				// 内容量
+				dto.getCapacity(),
+				// 内容量単位
+				dto.getCapacityUnit(),
+				// カロリー
+				dto.getCalories()
+				);
 	}
 	
 	/**
@@ -261,6 +275,13 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 				// 基準店舗名
 				dto.getStandardShopName(),
 				// 基準価格
-				dto.getStandardPrice());
+				dto.getStandardPrice(),
+				// 内容量
+				dto.getCapacity(),
+				// 内容量単位
+				dto.getCapacityUnit(),
+				// カロリー
+				dto.getCalories()
+				);
 	}
 }

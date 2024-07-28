@@ -27,12 +27,14 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yonetani.webapp.accountbook.common.component.CodeTableItemComponent;
 import com.yonetani.webapp.accountbook.common.component.SisyutuItemComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.shop.ShopInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItem;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItemInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.common.CodeAndValuePair;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryShoppingItemInfoSearchCondition;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopKubunCodeList;
@@ -93,6 +95,9 @@ public class ShoppingItemInfoManageUseCase {
 	
 	// 商品テーブル:SHOPPING_ITEM_TABLEリポジトリー
 	private final ShoppingItemTableRepository shoppingItemRepository;
+	
+	// コードテーブル
+	private final CodeTableItemComponent codeTableItem;
 	
 	/**
 	 *<pre>
@@ -377,6 +382,12 @@ public class ShoppingItemInfoManageUseCase {
 		updateItemForm.setStandardShopCode(searchResult.getShopCode().toString());
 		// 基準価格
 		updateItemForm.setStandardPrice(DomainCommonUtils.convertInteger(searchResult.getStandardPrice().getValue()));
+		// 商品内容量
+		updateItemForm.setShoppingItemCapacity(searchResult.getShoppingItemCapacity().getValue());
+		// 商品内容量単位
+		updateItemForm.setShoppingItemCapacityUnit(searchResult.getShoppingItemCapacityUnit().toString());
+		// カロリー
+		updateItemForm.setShoppingItemCalories(searchResult.getShoppingItemCalories().getValue());
 		
 		// 基準店舗選択ボックス表示情報を設定したレスポンスを生成
 		ShoppingItemInfoManageUpdateResponse response = createShoppingItemInfoManageUpdateResponse(user.getUserId(), updateItemForm);
@@ -423,7 +434,7 @@ public class ShoppingItemInfoManageUseCase {
 			inputForm.setShoppingItemCode(String.format("%05d", count));
 			
 			// 商品情報を作成
-			ShoppingItem addData = createSisyutuItem(user.getUserId().toString(), inputForm);
+			ShoppingItem addData = createShoppingItem(user.getUserId().toString(), inputForm);
 			
 			// 商品テーブルに登録
 			int addCount = shoppingItemRepository.add(addData);
@@ -456,7 +467,7 @@ public class ShoppingItemInfoManageUseCase {
 			
 			/* 商品更新 */
 			// 商品情報を作成
-			ShoppingItem updateData = createSisyutuItem(user.getUserId().toString(), inputForm);
+			ShoppingItem updateData = createShoppingItem(user.getUserId().toString(), inputForm);
 			
 			// 商品テーブルに登録(支出項目コードは更新対象外項目なので注意)
 			int updateCount = shoppingItemRepository.update(updateData);
@@ -502,7 +513,7 @@ public class ShoppingItemInfoManageUseCase {
 	
 	/**
 	 *<pre>
-	 * 基準店舗選択ボックスの表示情報を取得し、情報管理(商品)更新画面レスポンス情報を生成して返します。
+	 * 基準店舗選択ボックス・内容量単位選択ボックスの表示情報を取得し、情報管理(商品)更新画面レスポンス情報を生成して返します。
 	 *</pre>
 	 * @param userId 表示対象のユーザID
 	 * @param inputForm 商品情報入力フォームの入力値
@@ -510,6 +521,17 @@ public class ShoppingItemInfoManageUseCase {
 	 *
 	 */
 	private ShoppingItemInfoManageUpdateResponse createShoppingItemInfoManageUpdateResponse(String userId, ShoppingItemInfoUpdateForm inputForm) {
+		
+		// コードテーブル情報から内容量単位選択ボックスの表示情報を取得し、リストに設定
+		List<CodeAndValuePair> codeValuePairList = codeTableItem.getCodeValues(MyHouseholdAccountBookContent.SHOPPING_ITEM_CAPACITY_UNIT);
+		// 内容量単位選択ボックス表示情報が未設定の場合、エラー
+		if(codeValuePairList == null) {
+			throw new MyHouseholdAccountBookRuntimeException("コード定義ファイルに「商品内容量単位情報："
+					+ MyHouseholdAccountBookContent.SHOPPING_ITEM_CAPACITY_UNIT + "」が登録されていません。管理者に問い合わせてください");
+		}
+		// 内容量単位選択ボックスの表示情報リストはデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定
+		List<OptionItem> capacityUnitList = codeValuePairList.stream().map(pair ->
+			OptionItem.from(pair.getCode().toString(), pair.getCodeValue().toString())).collect(Collectors.toList());
 		
 		// レスポンス
 		ShoppingItemInfoManageUpdateResponse response = null;
@@ -526,7 +548,7 @@ public class ShoppingItemInfoManageUseCase {
 						standardShopsList.stream().map(item -> ShopKubunCode.from(item)).collect(Collectors.toUnmodifiableList())));
 		if(shopSearchResult.isEmpty()) {
 			// 店舗情報が0件の場合、メッセージを設定
-			response = ShoppingItemInfoManageUpdateResponse.getInstance(inputForm, null);
+			response = ShoppingItemInfoManageUpdateResponse.getInstance(inputForm, null, capacityUnitList);
 			response.addMessage("店舗情報取得結果が0件です。");
 		} else {
 			// 店舗情報をレスポンスに設定
@@ -540,7 +562,9 @@ public class ShoppingItemInfoManageUseCase {
 								domain.getShopCode().toString(),
 								// 店舗名
 								domain.getShopName().toString()
-						)).collect(Collectors.toUnmodifiableList())
+						)).collect(Collectors.toUnmodifiableList()),
+					// 内容量単位選択ボックスの表示情報リスト
+					capacityUnitList
 					);
 		}
 		
@@ -556,7 +580,7 @@ public class ShoppingItemInfoManageUseCase {
 	 * @return 商品情報(ドメイン)
 	 *
 	 */
-	private ShoppingItem createSisyutuItem(String userId, ShoppingItemInfoUpdateForm inputForm) {
+	private ShoppingItem createShoppingItem(String userId, ShoppingItemInfoUpdateForm inputForm) {
 		return ShoppingItem.from(
 				// ユーザID
 				userId,
@@ -577,7 +601,14 @@ public class ShoppingItemInfoManageUseCase {
 				// 基準店舗コード
 				inputForm.getStandardShopCode(),
 				// 基準価格
-				DomainCommonUtils.convertBigDecimal(inputForm.getStandardPrice(), 0));
+				DomainCommonUtils.convertBigDecimal(inputForm.getStandardPrice(), 0),
+				// 内容量
+				inputForm.getShoppingItemCapacity(),
+				// 内容量単位
+				inputForm.getShoppingItemCapacityUnit(),
+				// カロリー
+				inputForm.getShoppingItemCalories()
+				);
 	}
 	
 	/**
@@ -590,14 +621,50 @@ public class ShoppingItemInfoManageUseCase {
 	 *
 	 */
 	private List<AbstractShoppingItemInfoManageSearchResponse.ShoppingItemListItem> createShoppingItemList(ShoppingItemInquiryList searchResult) {
-		return searchResult.getValues().stream().map(domain -> 
-			AbstractShoppingItemInfoManageSearchResponse.ShoppingItemListItem.from(
+		
+		return searchResult.getValues().stream().map(domain -> {
+			// 内容量とカロリーが設定されている場合、商品名の値に連結(内容量／カロリー)
+			StringBuilder nameTextBuff = new StringBuilder();
+			// 商品内容量の値が設定されている場合、値を設定
+			if(domain.getShoppingItemCapacity().getValue() != null) {
+				// 開始文字列
+				nameTextBuff.append("（");
+				// 商品内容量
+				nameTextBuff.append(domain.getShoppingItemCapacity().toString());
+				// 商品内容量単位
+				nameTextBuff.append(codeTableItem.getCodeValue(
+						// コード区分：商品内容量単位
+						MyHouseholdAccountBookContent.SHOPPING_ITEM_CAPACITY_UNIT,
+						// 商品内容量単位
+						domain.getShoppingItemCapacityUnit().toString()));
+			}
+			// 商品のカロリー量の値が設定されている場合、値を設定
+			if(domain.getShoppingItemCalories().getValue() != null) {
+				// 商品内容量が未設定の場合、「（」を出力、設定ありの場合は「/」を出力
+				if(nameTextBuff.length() == 0) {
+					// 開始文字列を出力
+					nameTextBuff.append("（");
+				} else {
+					// 区切り文字列を出力
+					nameTextBuff.append("/");
+				}
+				nameTextBuff.append(domain.getShoppingItemCalories().toString());
+			}
+			// 値が設定されている場合、最後の「）」の値を出力
+			if(nameTextBuff.length() > 0) {
+				// 終了文字列を出力
+				nameTextBuff.append("）");
+			}
+			String shoppingItemNameText = domain.getShoppingItemName().toString() + nameTextBuff.toString();
+			
+			// 商品一覧情報の明細データを返却
+			return AbstractShoppingItemInfoManageSearchResponse.ShoppingItemListItem.from(
 				// 商品コード
 				domain.getShoppingItemCode().toString(),
 				// 商品区分名
 				domain.getShoppingItemKubunName().toString(),
-				// 商品名
-				domain.getShoppingItemName().toString(),
+				// 商品名(内容量／カロリー)
+				shoppingItemNameText,
 				// 商品詳細
 				domain.getShoppingItemDetailContext().toString(),
 				// 商品JANコード
@@ -609,8 +676,8 @@ public class ShoppingItemInfoManageUseCase {
 				// 基準店舗名
 				domain.getStandardShopName().toString(),
 				// 基準価格
-				domain.getStandardPrice().toString())
-		).collect(Collectors.toUnmodifiableList());
+				domain.getStandardPrice().toString());
+		}).collect(Collectors.toUnmodifiableList());
 	}
 	
 	/**

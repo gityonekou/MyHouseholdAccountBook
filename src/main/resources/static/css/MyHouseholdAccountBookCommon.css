@@ -21,6 +21,11 @@
 .w50{
   width:50%;
 }
+p.validated-error{
+  font-size: 90%;
+  color: #dc3545;
+}
 tr[data-href]{
   cursor: pointer;
 }
+

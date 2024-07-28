@@ -75,6 +75,8 @@ public class MyHouseholdAccountBookContent {
 	public static final String CODE_DEFINES_INCOME_KUBUN = "004";
 	// コード定義:収入区分でその他任意(9)を選択時
 	public static final String INCOME_KUBUN_OPTIONAL_SELECTED_VALUE = "9";
+	// コード定義区分(商品内容量単位:005)
+	public static final String SHOPPING_ITEM_CAPACITY_UNIT = "005";
 	
 	// 支出項目コード仮登録データ:9999
 	public static final String SISYUTU_ITEM_CODE_TEMPORARY_VALUE = "9999";

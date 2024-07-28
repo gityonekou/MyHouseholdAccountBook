@@ -114,6 +114,9 @@ class ShoppingItemTableDataSourceTest {
 		assertEquals(expectedData.getCompanyName().toString(), actualDataMap.get("COMPANY_NAME"), "登録データの会社名(COMPANY_NAME)が正しいこと");
 		assertEquals(expectedData.getShopCode().toString(), actualDataMap.get("STANDARD_SHOP_CODE"), "登録データの基準店舗コード(STANDARD_SHOP_CODE)が正しいこと");
 		assertEquals(expectedData.getStandardPrice().getValue(), actualDataMap.get("STANDARD_PRICE"), "登録データの基準価格(STANDARD_PRICE)が正しいこと");
+		assertEquals(expectedData.getShoppingItemCapacity().getValue(), actualDataMap.get("CAPACITY"), "登録データの内容量(CAPACITY)が正しいこと");
+		assertEquals(expectedData.getShoppingItemCapacityUnit().toString(), actualDataMap.get("CAPACITY_UNIT"), "登録データの内容量単位(CAPACITY_UNIT)が正しいこと");
+		assertEquals(expectedData.getShoppingItemCalories().getValue(), actualDataMap.get("CALORIES"), "登録データのカロリー(CALORIES)が正しいこと");
 		
 		/* 同じデータを登録した場合、一意制約違反となること */
 		assertThrows(DuplicateKeyException.class, () -> repository.add(expectedData), "同じデータを登録した場合、一意制約違反となること");
@@ -142,6 +145,9 @@ class ShoppingItemTableDataSourceTest {
 		assertEquals(expectedNullData.getCompanyName().toString(), actualNullDataMap.get("COMPANY_NAME"), "登録データの会社名(COMPANY_NAME)が正しいこと");
 		assertNull(actualNullDataMap.get("STANDARD_SHOP_CODE"), "登録データの基準店舗コード(STANDARD_SHOP_CODE)がNULLであること");
 		assertNull(actualNullDataMap.get("STANDARD_PRICE"), "登録データの基準価格(STANDARD_PRICE)がNULLであること");
+		assertNull(actualNullDataMap.get("CAPACITY"), "登録データの内容量(CAPACITY)がNULLであること");
+		assertNull(actualNullDataMap.get("CAPACITY_UNIT"), "登録データの内容量単位(CAPACITY_UNIT)がNULLであること");
+		assertNull(actualNullDataMap.get("CALORIES"), "登録データのカロリー(CALORIES)がNULLであること");
 		
 		/* null不可項目の登録チェック */
 		assertThrows(DataIntegrityViolationException.class, () -> repository.add(getTestShoppingItemData(102)), "「商品区分名」項目のnull登録不可");
@@ -202,7 +208,15 @@ class ShoppingItemTableDataSourceTest {
 		assertEquals(expectedData.getShopCode().toString(), actualDataMap.get("STANDARD_SHOP_CODE"), "基準店舗コード(STANDARD_SHOP_CODE)の更新後の値が正しいこと");
 		// 更新データと等しいこと：基準価格
 		assertEquals(expectedData.getStandardPrice().getValue(), actualDataMap.get("STANDARD_PRICE"), "基準価格(STANDARD_PRICE)の更新後の値が正しいこと");
+		// 更新データと等しいこと：内容量
+		assertEquals(expectedData.getShoppingItemCapacity().getValue(), actualDataMap.get("CAPACITY"), "内容量(CAPACITY)の更新後の値が正しいこと");
+		// 更新データと等しいこと：内容量単位
+		assertEquals(expectedData.getShoppingItemCapacityUnit().toString(), actualDataMap.get("CAPACITY_UNIT"), "内容量単位(CAPACITY_UNIT)の更新後の値が正しいこと");
+		// 更新データと等しいこと：カロリー
+		assertEquals(expectedData.getShoppingItemCalories().getValue(), actualDataMap.get("CALORIES"), "カロリー(CALORIES)の更新後の値が正しいこと");
 		
+		// 更新データと等しいこと：内容量単位
+		// 更新データと等しいこと：カロリー
 		/* データ更新(対象データなし) */
 		assertEquals(0, repository.update(getTestShoppingItemData(4)), "更新データが0件(対象なし)であること");
 		
@@ -239,7 +253,12 @@ class ShoppingItemTableDataSourceTest {
 		assertNull(actualNullDataMap.get("STANDARD_SHOP_CODE"), "基準店舗コード(STANDARD_SHOP_CODE)の更新後の値がnullであること");
 		// 基準価格の値がnullであること
 		assertNull(actualNullDataMap.get("STANDARD_PRICE"), "基準価格(STANDARD_PRICE)の更新後の値がnullであること");
-		
+		// 内容量の値がnullであること
+		assertNull(actualNullDataMap.get("CAPACITY"), "内容量(CAPACITY)の更新後の値がnullであること");
+		// 内容量単位の値がnullであること
+		assertNull(actualNullDataMap.get("CAPACITY_UNIT"), "内容量単位(CAPACITY_UNIT)の更新後の値がnullであること");
+		// カロリーの値がnullであること
+		assertNull(actualNullDataMap.get("CALORIES"), "カロリー(CALORIES)の更新後の値がnullであること");
 	}
 	
 	/**
@@ -266,6 +285,9 @@ class ShoppingItemTableDataSourceTest {
 		assertEquals(expectedData.getCompanyName(), actualData.getCompanyName(), "会社名が等しいこと");
 		assertEquals(expectedData.getShopCode(), actualData.getShopCode(), "基準店舗コードが等しいこと");
 		assertEquals(expectedData.getStandardPrice(), actualData.getStandardPrice(), "基準価格が等しいこと");
+		assertEquals(expectedData.getShoppingItemCapacity(), actualData.getShoppingItemCapacity(), "内容量が等しいこと");
+		assertEquals(expectedData.getShoppingItemCapacityUnit(), actualData.getShoppingItemCapacityUnit(), "内容量単位が等しいこと");
+		assertEquals(expectedData.getShoppingItemCalories(), actualData.getShoppingItemCalories(), "カロリーが等しいこと");
 		
 		// toStringチェック
 		assertEquals(getToStringStr(1), actualData.toString(), "toStringチェック");
@@ -294,6 +316,10 @@ class ShoppingItemTableDataSourceTest {
 		assertEquals(expectedNullData.getCompanyName(), actualNullData.getCompanyName(), "会社名が等しいこと");
 		assertNull(actualNullData.getShopCode().toString(), "基準店舗コードの値がnullであること");
 		assertNull(actualNullData.getStandardPrice().getValue(), "基準価格の値がnullであること");
+		assertNull(actualNullData.getShoppingItemCapacity().getValue(), "内容量の値がnullであること");
+		assertNull(actualNullData.getShoppingItemCapacityUnit().toString(), "内容量単位の値がnullであること");
+		assertNull(actualNullData.getShoppingItemCalories().getValue(), "カロリーの値がnullであること");
+		
 	}
 
 	/**
@@ -429,47 +455,47 @@ class ShoppingItemTableDataSourceTest {
 		switch (type) {
 			case 1:
 				// 基準価格(BigDecimal)はDBの該当項目の小数点以下桁数のスケールに合わせる
-				data = ShoppingItem.from("TEST-USER-ID", "00001", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertBigDecimal(1180, 2));
+				data = ShoppingItem.from("TEST-USER-ID", "00001", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertBigDecimal(1180, 2), 110, "01", 1100);
 				break;
 			case 2:
 				// 基準価格(BigDecimal)はDBの該当項目の小数点以下桁数のスケールに合わせる
-				data = ShoppingItem.from("TEST-USER-ID", "00002", "商品区分名２", "商品名２", "商品詳細２", "1234567890200", "0020", "会社名２", "020", DomainCommonUtils.convertBigDecimal(1280, 2));
+				data = ShoppingItem.from("TEST-USER-ID", "00002", "商品区分名２", "商品名２", "商品詳細２", "1234567890200", "0020", "会社名２", "020", DomainCommonUtils.convertBigDecimal(1280, 2), 120, "02", 1200);
 				break;
 			case 3:
 				// 基準価格(BigDecimal)はDBの該当項目の小数点以下桁数のスケールに合わせる
-				data = ShoppingItem.from("TEST-USER-ID", "00003", "商品区分名３", "商品名３", "商品詳細３", "1234567890300", "0030", "会社名３", "030", DomainCommonUtils.convertBigDecimal(1380, 2));
+				data = ShoppingItem.from("TEST-USER-ID", "00003", "商品区分名３", "商品名３", "商品詳細３", "1234567890300", "0030", "会社名３", "030", DomainCommonUtils.convertBigDecimal(1380, 2), 130, "03", 1300);
 				break;
 			case 4:
 				// 基準価格(BigDecimal)はDBの該当項目の小数点以下桁数のスケールに合わせる
-				data = ShoppingItem.from("TEST-USER-ID", "00004", "商品区分名４", "商品名４", "商品詳細４", "1234567890400", "0040", "会社名４", "040", DomainCommonUtils.convertBigDecimal(1480, 2));
+				data = ShoppingItem.from("TEST-USER-ID", "00004", "商品区分名４", "商品名４", "商品詳細４", "1234567890400", "0040", "会社名４", "040", DomainCommonUtils.convertBigDecimal(1480, 2), 140, "04", 1400);
 				break;
 			case 5:
 				// 新規登録用null可データ
-				data = ShoppingItem.from("TEST-USER-ID", "00005", "商品区分名NULL", "商品名NULL", null, "1234567890500", "0050", "会社名NULL", null, null);
+				data = ShoppingItem.from("TEST-USER-ID", "00005", "商品区分名NULL", "商品名NULL", null, "1234567890500", "0050", "会社名NULL", null, null, null, null, null);
 				break;
 			case 101:
 				// 2のデータをnull可データに更新用
-				data = ShoppingItem.from("TEST-USER-ID", "00002", "商品区分名２NULL", "商品名２NULL", null, "1234567890600", "0060", "会社名２NULL", null, null);
+				data = ShoppingItem.from("TEST-USER-ID", "00002", "商品区分名２NULL", "商品名２NULL", null, "1234567890600", "0060", "会社名２NULL", null, null, null, null, null);
 				break;
 			case 102:
 				// null不可データ(商品区分名)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", null, "商品名１", "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertBigDecimal(1180, 2));
+				data = ShoppingItem.from("TEST-USER-ID", "00999", null, "商品名１", "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertBigDecimal(1180, 2), 110, "01", 1100);
 				break;
 			case 103:
 				// null不可データ(商品名)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", null, "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertBigDecimal(1180, 2));
+				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", null, "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertBigDecimal(1180, 2), 110, "01", 1100);
 				break;
 			case 104:
 				// null不可データ(商品JANコード)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", null, "0010", "会社名１", "010", DomainCommonUtils.convertBigDecimal(1180, 2));
+				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", null, "0010", "会社名１", "010", DomainCommonUtils.convertBigDecimal(1180, 2), 110, "01", 1100);
 				break;
 			case 105:
 				// null不可データ(支出項目コード)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", null, "会社名１", "010", DomainCommonUtils.convertBigDecimal(1180, 2));
+				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", null, "会社名１", "010", DomainCommonUtils.convertBigDecimal(1180, 2), 110, "01", 1100);
 				break;
 			case 106:
 				// null不可データ(会社名)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", "0010", null, "010", DomainCommonUtils.convertBigDecimal(1180, 2));
+				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", "0010", null, "010", DomainCommonUtils.convertBigDecimal(1180, 2), 110, "01", 1100);
 				break;
 			default:
 		}
@@ -490,42 +516,42 @@ class ShoppingItemTableDataSourceTest {
 		List<ShoppingItemInquiryItem> dataList = new ArrayList<>();
 		switch(type) {
 			case 1:
-				dataList.add(ShoppingItemInquiryItem.from("00006", "商品区分名６", "商品名６", "商品詳細６", "1334567890101", "税金支払い", "会社名６", null, DomainCommonUtils.convertBigDecimal(1183, 2)));
+				dataList.add(ShoppingItemInquiryItem.from("00006", "商品区分名６", "商品名６", "商品詳細６", "1334567890101", "税金支払い", "会社名６", null, DomainCommonUtils.convertBigDecimal(1183, 2), 660, "06", 6600));
 				break;
 			case 2:
-				dataList.add(ShoppingItemInquiryItem.from("00002", "商品区分名２NULL", "商品名２NULL", null, "1234567890200", "飲食日用品", "会社名２NULL", null, null));
+				dataList.add(ShoppingItemInquiryItem.from("00002", "商品区分名２NULL", "商品名２NULL", null, "1234567890200", "飲食日用品", "会社名２NULL", null, null, null, null, null));
 				break;
 			case 3:
-				dataList.add(ShoppingItemInquiryItem.from("00007", "商品区分名７", "商品名７", "商品詳細７", "1234567890700", "イデコ", "会社名７", "テスト店舗２", DomainCommonUtils.convertBigDecimal(2470, 2)));
+				dataList.add(ShoppingItemInquiryItem.from("00007", "商品区分名７", "商品名７", "商品詳細７", "1234567890700", "イデコ", "会社名７", "テスト店舗２", DomainCommonUtils.convertBigDecimal(2470, 2), 770, "07", 7700));
 				break;
 			case 4:
 				// 商品コードの降順で表示
-				dataList.add(ShoppingItemInquiryItem.from("00005", "商品区分名１", "商品名１－２", "商品詳細１－２", "2234567890100", "その他", "会社名１", "テスト店舗１０", DomainCommonUtils.convertBigDecimal(1182, 2)));
-				dataList.add(ShoppingItemInquiryItem.from("00001", "商品区分名１", "商品名１－１", "商品詳細１－１", "1234567890100", "その他", "会社名１", null, DomainCommonUtils.convertBigDecimal(1180, 2)));
+				dataList.add(ShoppingItemInquiryItem.from("00005", "商品区分名１", "商品名１－２", "商品詳細１－２", "2234567890100", "その他", "会社名１", "テスト店舗１０", DomainCommonUtils.convertBigDecimal(1182, 2), 111, "05", 1110));
+				dataList.add(ShoppingItemInquiryItem.from("00001", "商品区分名１", "商品名１－１", "商品詳細１－１", "1234567890100", "その他", "会社名１", null, DomainCommonUtils.convertBigDecimal(1180, 2), 110, "01", 1100));
 				break;
 			case 5:
 				// 商品コードの降順で表示
-				dataList.add(ShoppingItemInquiryItem.from("00009", "商品区分名９", "商品名９", "商品詳細９", "1234567891900", "食費", "会社名９", "テスト店舗３０", DomainCommonUtils.convertBigDecimal(3090, 2)));
-				dataList.add(ShoppingItemInquiryItem.from("00008", "商品区分名８", "商品名８", "商品詳細８", "1234567891800", "食費", "会社名８", "テスト店舗２", DomainCommonUtils.convertBigDecimal(3080, 2)));
+				dataList.add(ShoppingItemInquiryItem.from("00009", "商品区分名９", "商品名９", "商品詳細９", "1234567891900", "食費", "会社名９", "テスト店舗３０", DomainCommonUtils.convertBigDecimal(3090, 2), 990, "99", 9900));
+				dataList.add(ShoppingItemInquiryItem.from("00008", "商品区分名８", "商品名８", "商品詳細８", "1234567891800", "食費", "会社名８", "テスト店舗２", DomainCommonUtils.convertBigDecimal(3080, 2), 880, "08", 8800));
 				break;
 			case 101:
-				dataList.add(ShoppingItemInquiryItem.from("00004", "商品区分名４", "商品名４", "商品詳細４", "1234567890400", "税金支払い", "会社名４", null, DomainCommonUtils.convertBigDecimal(1480, 2)));
+				dataList.add(ShoppingItemInquiryItem.from("00004", "商品区分名４", "商品名４", "商品詳細４", "1234567890400", "税金支払い", "会社名４", null, DomainCommonUtils.convertBigDecimal(1480, 2), 140, "04", 1400));
 				break;
 			case 102:
-				dataList.add(ShoppingItemInquiryItem.from("00006", "商品区分名６NULL", "商品名６NULL", null, "1234567890600", "飲食日用品", "会社名６NULL", null, null));
+				dataList.add(ShoppingItemInquiryItem.from("00006", "商品区分名６NULL", "商品名６NULL", null, "1234567890600", "飲食日用品", "会社名６NULL", null, null, null, null, null));
 				break;
 			case 103:
-				dataList.add(ShoppingItemInquiryItem.from("00007", "商品区分名７", "商品名７", "商品詳細７", "1234567890700", "イデコ", "会社名７", "テスト店舗２", DomainCommonUtils.convertBigDecimal(1780, 2)));
+				dataList.add(ShoppingItemInquiryItem.from("00007", "商品区分名７", "商品名７", "商品詳細７", "1234567890700", "イデコ", "会社名７", "テスト店舗２", DomainCommonUtils.convertBigDecimal(1780, 2), 170, "07", 1700));
 				break;
 			case 104:
 				// 商品コードの降順で表示
-				dataList.add(ShoppingItemInquiryItem.from("00009", "商品区分名９", "商品名９", "商品詳細９", "1234567890800", "税金支払い", "会社名９", "テスト店舗３０", DomainCommonUtils.convertBigDecimal(1990, 2)));
-				dataList.add(ShoppingItemInquiryItem.from("00008", "商品区分名８", "商品名８", "商品詳細８", "1234567890800", "食費", "会社名８", null, DomainCommonUtils.convertBigDecimal(1880, 2)));
+				dataList.add(ShoppingItemInquiryItem.from("00009", "商品区分名９", "商品名９", "商品詳細９", "1234567890800", "税金支払い", "会社名９", "テスト店舗３０", DomainCommonUtils.convertBigDecimal(1990, 2), 190, "99", 1900));
+				dataList.add(ShoppingItemInquiryItem.from("00008", "商品区分名８", "商品名８", "商品詳細８", "1234567890800", "食費", "会社名８", null, DomainCommonUtils.convertBigDecimal(1880, 2), 180, "08", 1800));
 				break;
 			case 105:
 				// 商品コードの降順で表示
-				dataList.add(ShoppingItemInquiryItem.from("00005", "商品区分名１", "商品名１－２", "商品詳細１－２", "1234567890100", "その他", "会社名１", "テスト店舗１０", DomainCommonUtils.convertBigDecimal(1580, 2)));
-				dataList.add(ShoppingItemInquiryItem.from("00001", "商品区分名１", "商品名１－１", "商品詳細１－１", "1234567890100", "その他", "会社名１", "テスト店舗２", DomainCommonUtils.convertBigDecimal(1180, 2)));
+				dataList.add(ShoppingItemInquiryItem.from("00005", "商品区分名１", "商品名１－２", "商品詳細１－２", "1234567890100", "その他", "会社名１", "テスト店舗１０", DomainCommonUtils.convertBigDecimal(1580, 2), 115, "05", 1155));
+				dataList.add(ShoppingItemInquiryItem.from("00001", "商品区分名１", "商品名１－１", "商品詳細１－１", "1234567890100", "その他", "会社名１", "テスト店舗２", DomainCommonUtils.convertBigDecimal(1180, 2), 112, "02", 1122));
 				break;
 			default:
 		}
@@ -545,10 +571,10 @@ class ShoppingItemTableDataSourceTest {
 		String str = null;
 		switch(type) {
 			case 1:
-				str = "ShoppingItem(userId=TEST-USER-ID, shoppingItemCode=00001, shoppingItemKubunName=商品区分名１, shoppingItemName=商品名１, shoppingItemDetailContext=商品詳細１, shoppingItemJanCode=1234567890100, sisyutuItemCode=0010, companyName=会社名１, shopCode=010, standardPrice=1,180円)";
+				str = "ShoppingItem(userId=TEST-USER-ID, shoppingItemCode=00001, shoppingItemKubunName=商品区分名１, shoppingItemName=商品名１, shoppingItemDetailContext=商品詳細１, shoppingItemJanCode=1234567890100, sisyutuItemCode=0010, companyName=会社名１, shopCode=010, standardPrice=1,180円, shoppingItemCapacity=110, shoppingItemCapacityUnit=01, shoppingItemCalories=1100)";
 				break;
 			case 2:
-				str = "商品検索結果:1件:[[0][ShoppingItemInquiryList.ShoppingItemInquiryItem(shoppingItemCode=00007, shoppingItemKubunName=商品区分名７, shoppingItemName=商品名７, shoppingItemDetailContext=商品詳細７, shoppingItemJanCode=1234567890700, sisyutuItemName=イデコ, companyName=会社名７, standardShopName=テスト店舗２, standardPrice=2,470円)]]";
+				str = "商品検索結果:1件:[[0][ShoppingItemInquiryList.ShoppingItemInquiryItem(shoppingItemCode=00007, shoppingItemKubunName=商品区分名７, shoppingItemName=商品名７, shoppingItemDetailContext=商品詳細７, shoppingItemJanCode=1234567890700, sisyutuItemName=イデコ, companyName=会社名７, standardShopName=テスト店舗２, standardPrice=2,470円, shoppingItemCapacity=770, shoppingItemCapacityUnit=07, shoppingItemCalories=7700)]]";
 				break;
 			default:
 		}

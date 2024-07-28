@@ -48,6 +48,12 @@ public class ShoppingItemReadWriteDto {
 	private final String standardShopCode;
 	// 基準価格
 	private final BigDecimal standardPrice;
+	// 内容量
+	private final Integer capacity;
+	// 内容量単位
+	private final String capacityUnit;
+	// カロリー
+	private final Integer calories;
 	
 	/**
 	 *<pre>
@@ -63,6 +69,9 @@ public class ShoppingItemReadWriteDto {
 	 * @param companyName 会社名
 	 * @param standardShopCode 基準店舗コード
 	 * @param standardPrice 基準価格
+	 * @param capacity 内容量
+	 * @param capacityUnit 内容量単位
+	 * @param calories カロリー
 	 * @return 商品テーブル:SHOPPING_ITEM_TABLE出力情報
 	 *
 	 */
@@ -76,7 +85,11 @@ public class ShoppingItemReadWriteDto {
 			String sisyutuItemCode,
 			String companyName,
 			String standardShopCode,
-			BigDecimal standardPrice) {
+			BigDecimal standardPrice,
+			Integer capacity,
+			String capacityUnit,
+			Integer calories
+			) {
 		return new ShoppingItemReadWriteDto(
 				userId,
 				shoppingItemCode,
@@ -87,6 +100,9 @@ public class ShoppingItemReadWriteDto {
 				sisyutuItemCode,
 				companyName,
 				standardShopCode,
-				standardPrice);
+				standardPrice,
+				capacity,
+				capacityUnit,
+				calories);
 	}
 }

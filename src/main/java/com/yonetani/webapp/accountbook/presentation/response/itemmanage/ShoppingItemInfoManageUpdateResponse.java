@@ -41,6 +41,8 @@ public class ShoppingItemInfoManageUpdateResponse extends AbstractResponse {
 	private final ShoppingItemInfoUpdateForm shoppingItemInfoUpdateForm;
 	// 店舗グループ
 	private final SelectViewItem standardShopsList;
+	// 商品内容量単位
+	private final SelectViewItem shoppingItemCapacityUnitList;
 	
 	// 支出項目名
 	@Setter
@@ -52,23 +54,37 @@ public class ShoppingItemInfoManageUpdateResponse extends AbstractResponse {
 	 *</pre>
 	 * @param inputForm  更新商品情報入力フォーム
 	 * @param addList 基準店舗選択ボックスの表示情報リスト
+	 * @param capacityUnitList 商品内容量単位選択ボックスの表示情報リスト
 	 * @return 情報管理(商品)更新情報入力画面情報
 	 *
 	 */
-	public static ShoppingItemInfoManageUpdateResponse getInstance(ShoppingItemInfoUpdateForm inputForm, List<OptionItem> addList) {
+	public static ShoppingItemInfoManageUpdateResponse getInstance(ShoppingItemInfoUpdateForm inputForm, List<OptionItem> addList,
+			List<OptionItem> capacityUnitList) {
 		// 更新商品情報入力フォームがnullなら空データを設定
 		if(inputForm == null) {
 			inputForm = new ShoppingItemInfoUpdateForm();
 		}
 		// 基準店舗選択ボックスの表示情報リストを生成
-		List<OptionItem> optionList = new ArrayList<>();
-		optionList.add(OptionItem.from("", "選択なし"));
+		List<OptionItem> standardShopsOptionList = new ArrayList<>();
+		standardShopsOptionList.add(OptionItem.from("", "選択なし"));
 		if(!CollectionUtils.isEmpty(addList)) {
-			optionList.addAll(addList);
+			standardShopsOptionList.addAll(addList);
+		}
+		// 商品内容量単位選択ボックスの表示情報リストを生成
+		List<OptionItem> capacityUnitOptionList = new ArrayList<>();
+		capacityUnitOptionList.add(OptionItem.from("", "選択なし"));
+		if(!CollectionUtils.isEmpty(capacityUnitList)) {
+			capacityUnitOptionList.addAll(capacityUnitList);
 		}
 		
 		// 入力フォームと基準店舗選択ボックスの表示情報リストを元に情報管理(商品)更新情報入力画面情報を生成
-		return new ShoppingItemInfoManageUpdateResponse(inputForm, SelectViewItem.from(optionList));
+		return new ShoppingItemInfoManageUpdateResponse(
+				// 更新商品情報入力フォーム
+				inputForm,
+				// 店舗グループ選択ボックス
+				SelectViewItem.from(standardShopsOptionList),
+				// 商品内容量単位選択ボックス
+				SelectViewItem.from(capacityUnitOptionList));
 	}
 	
 	/**
@@ -84,6 +100,8 @@ public class ShoppingItemInfoManageUpdateResponse extends AbstractResponse {
 		modelAndView.addObject("sisyutuItemName", sisyutuItemName);
 		// 基準店舗選択ボックス
 		modelAndView.addObject("standardShopsList", standardShopsList);
+		// 商品内容量単位選択ボックス
+		modelAndView.addObject("shoppingItemCapacityUnitList", shoppingItemCapacityUnitList);
 		
 		return modelAndView;
 	}

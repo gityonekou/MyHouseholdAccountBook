@@ -46,4 +46,10 @@ public class ShoppingItemInquiryReadDto {
 	private final String standardShopName;
 	// 基準価格
 	private final BigDecimal standardPrice;
+	// 内容量
+	private final Integer capacity;
+	// 内容量単位
+	private final String capacityUnit;
+	// カロリー
+	private final Integer calories;
 }

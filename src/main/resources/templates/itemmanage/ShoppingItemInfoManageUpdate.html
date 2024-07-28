@@ -73,6 +73,25 @@
 					<p class="invalid-feedback" th:errors="*{needCheckStandardPrice}" style="display: block;"></p>
 				</div>
 				<div class="mb-3">
+					<label for="shoppingItemCapacity" class="form-label">内容量</label>
+					<div class="input-group w20">
+	 					<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{shoppingItemCapacity}">
+						<select class="form-select" th:errorclass="is-invalid" th:field="*{shoppingItemCapacityUnit}">
+							<option th:each="item : ${shoppingItemCapacityUnitList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+						</select>
+						<!--/* 必須チェックの結果を出力 */-->
+						<p class="invalid-feedback" th:errors="*{shoppingItemCapacity}"></p>
+ 					</div>
+ 					<p class="validated-error" th:errors="*{needCheckShoppingItemCapacity}"></p>
+				</div>
+				<div class="mb-3">
+					<label for="shoppingItemCalories" class="form-label">カロリー</label>
+					<div class="input-group w10">
+ 						<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{shoppingItemCalories}">Kcal
+ 						<p class="invalid-feedback" th:errors="*{shoppingItemCalories}"></p>
+ 					</div>
+				</div>
+				<div class="mb-3">
 					<button class="btn btn-primary" type="submit">登録</button>
 					<input type="hidden" th:field="*{action}" />
 					<input type="hidden" th:field="*{shoppingItemCode}" />

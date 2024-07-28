@@ -84,7 +84,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		IncomeAndExpenditureRegistResponse response = createIncomeItemFormResponse(incomeItemForm);
 		
 		// TODO:固定費テーブルに登録されている固定費情報から対象年月に合致する固定費一覧を取得
-		
+		//★ここから
 		// TODO:固定費一覧から画面表示する支出一覧とセッション保存の支出一覧を設定
 		
 		return response;

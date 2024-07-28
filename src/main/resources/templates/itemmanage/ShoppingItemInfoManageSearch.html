@@ -60,7 +60,7 @@
 					<thead>
 						<tr class="table-secondary">
 							<th scope="col" class="w15">商品区分名</th>
-							<th scope="col" class="w25">商品名</th>
+							<th scope="col" class="w25">商品名(内容量/カロリー)</th>
 							<th scope="col" class="w15">支出項目名</th>
 							<th scope="col" class="w10">JANコード</th>
 							<th scope="col" class="w15">会社名</th>
@@ -73,7 +73,7 @@
 						<th:block th:if="${itemStat.odd}"><tr th:data-href="@{/myhacbook/managebaseinfo/shoppingiteminfo/select(shoppingItemCode=${item.shoppingItemCode})}"></th:block>
 						<th:block th:if="${itemStat.even}"><tr class="table-warning" th:data-href="@{/myhacbook/managebaseinfo/shoppingiteminfo/select(shoppingItemCode=${item.shoppingItemCode})}"></th:block>
 							<td th:text="${item.shoppingItemKubunName}">商品区分名</td>
-							<td th:text="${item.shoppingItemName}">商品名</td>
+							<td th:text="${item.shoppingItemNameText}">商品名(内容量/カロリー)</td>
 							<td th:text="${item.sisyutuItemName}">支出項目名</td>
 							<td th:text="${item.shoppingItemJanCode}">JANコード</td>
 							<td th:text="${item.companyName}">会社名</td>

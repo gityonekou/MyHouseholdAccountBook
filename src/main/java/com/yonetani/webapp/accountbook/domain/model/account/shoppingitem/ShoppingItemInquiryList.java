@@ -17,6 +17,9 @@ import org.springframework.util.CollectionUtils;
 
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemName;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCalories;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCapacity;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCapacityUnit;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCompanyName;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemDetailContext;
@@ -78,6 +81,12 @@ public class ShoppingItemInquiryList {
 		private final ShopName standardShopName;
 		// 基準価格
 		private final ShoppingItemStandardPrice standardPrice;
+		// 内容量
+		private final ShoppingItemCapacity shoppingItemCapacity;
+		// 内容量単位
+		private final ShoppingItemCapacityUnit shoppingItemCapacityUnit;
+		// カロリー
+		private final ShoppingItemCalories shoppingItemCalories;
 		
 		/**
 		 *<pre>
@@ -92,6 +101,9 @@ public class ShoppingItemInquiryList {
 		 * @param companyName 会社名
 		 * @param standardShopName 基準店舗名
 		 * @param standardPrice 基準価格
+		 * @param shoppingItemCapacity 内容量
+		 * @param shoppingItemCapacityUnit 内容量単位
+		 * @param shoppingItemCalories カロリー
 		 * @return 商品検索結果明細情報を表すドメインモデル
 		 *
 		 */
@@ -104,7 +116,10 @@ public class ShoppingItemInquiryList {
 				String sisyutuItemName,
 				String companyName,
 				String standardShopName,
-				BigDecimal standardPrice
+				BigDecimal standardPrice,
+				Integer shoppingItemCapacity,
+				String shoppingItemCapacityUnit,
+				Integer shoppingItemCalories
 				) {
 			return new ShoppingItemInquiryItem(
 					ShoppingItemCode.from(shoppingItemCode),
@@ -115,7 +130,10 @@ public class ShoppingItemInquiryList {
 					SisyutuItemName.from(sisyutuItemName),
 					ShoppingItemCompanyName.from(companyName),
 					ShopName.from(standardShopName),
-					ShoppingItemStandardPrice.from(standardPrice));
+					ShoppingItemStandardPrice.from(standardPrice),
+					ShoppingItemCapacity.from(shoppingItemCapacity),
+					ShoppingItemCapacityUnit.from(shoppingItemCapacityUnit),
+					ShoppingItemCalories.from(shoppingItemCalories));
 		}
 	}
 	
@@ -144,7 +162,7 @@ public class ShoppingItemInquiryList {
 	@Override
 	public String toString() {
 		if(values.size() > 0) {
-			StringBuilder buff = new StringBuilder((values.size() + 1) * 370);
+			StringBuilder buff = new StringBuilder((values.size() + 1) * 470);
 			buff.append("商品検索結果:")
 			.append(values.size())
 			.append("件:");

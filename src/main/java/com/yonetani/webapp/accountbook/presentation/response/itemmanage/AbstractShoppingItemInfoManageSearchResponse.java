@@ -62,8 +62,8 @@ public abstract class AbstractShoppingItemInfoManageSearchResponse extends Abstr
 		private final String shoppingItemCode;
 		// 商品区分名
 		private final String shoppingItemKubunName;
-		// 商品名
-		private final String shoppingItemName;
+		// 商品名(内容量/カロリー)
+		private final String shoppingItemNameText;
 		// 商品詳細
 		private final String shoppingItemDetailContext;
 		// 商品JANコード
@@ -83,7 +83,7 @@ public abstract class AbstractShoppingItemInfoManageSearchResponse extends Abstr
 		 *</pre>
 		 * @param shoppingItemCode 商品コード
 		 * @param shoppingItemKubunName 商品区分名
-		 * @param shoppingItemName 商品名
+		 * @param shoppingItemNameText 商品名(内容量/カロリー)
 		 * @param shoppingItemDetailContext 商品詳細
 		 * @param shoppingItemJanCode 商品JANコード
 		 * @param sisyutuItemName 支出項目名
@@ -93,10 +93,10 @@ public abstract class AbstractShoppingItemInfoManageSearchResponse extends Abstr
 		 * @return 店舗一覧情報の明細データ
 		 *
 		 */
-		public static ShoppingItemListItem from(String shoppingItemCode, String shoppingItemKubunName, String shoppingItemName,
+		public static ShoppingItemListItem from(String shoppingItemCode, String shoppingItemKubunName, String shoppingItemNameText,
 				String shoppingItemDetailContext, String shoppingItemJanCode, String sisyutuItemName, 
 				String companyName, String standardShopName, String standardPrice) {
-			return new ShoppingItemListItem(shoppingItemCode, shoppingItemKubunName, shoppingItemName,
+			return new ShoppingItemListItem(shoppingItemCode, shoppingItemKubunName, shoppingItemNameText,
 					shoppingItemDetailContext, shoppingItemJanCode, sisyutuItemName,
 					companyName, standardShopName, standardPrice);
 		}

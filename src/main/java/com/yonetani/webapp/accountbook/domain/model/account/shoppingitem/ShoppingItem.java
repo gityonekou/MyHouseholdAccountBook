@@ -12,6 +12,9 @@ package com.yonetani.webapp.accountbook.domain.model.account.shoppingitem;
 import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCalories;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCapacity;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCapacityUnit;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCompanyName;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemDetailContext;
@@ -63,6 +66,12 @@ public class ShoppingItem {
 	private final ShoppingItemStandardShopCode shopCode;
 	// 基準価格
 	private final ShoppingItemStandardPrice standardPrice;
+	// 内容量
+	private final ShoppingItemCapacity shoppingItemCapacity;
+	// 内容量単位
+	private final ShoppingItemCapacityUnit shoppingItemCapacityUnit;
+	// カロリー
+	private final ShoppingItemCalories shoppingItemCalories;
 	
 	/**
 	 *<pre>
@@ -78,6 +87,9 @@ public class ShoppingItem {
 	 * @param companyName 会社名
 	 * @param shopCode 基準店舗コード
 	 * @param standardPrice 基準価格
+	 * @param shoppingItemCapacity 内容量
+	 * @param shoppingItemCapacityUnit 内容量単位
+	 * @param shoppingItemCalories カロリー
 	 * @return 商品テーブル情報を表すドメインモデル
 	 *
 	 */
@@ -91,7 +103,10 @@ public class ShoppingItem {
 			String sisyutuItemCode,
 			String companyName,
 			String shopCode,
-			BigDecimal standardPrice
+			BigDecimal standardPrice,
+			Integer shoppingItemCapacity,
+			String shoppingItemCapacityUnit,
+			Integer shoppingItemCalories
 			) {
 		return new ShoppingItem(
 				UserId.from(userId),
@@ -103,6 +118,9 @@ public class ShoppingItem {
 				SisyutuItemCode.from(sisyutuItemCode),
 				ShoppingItemCompanyName.from(companyName),
 				ShoppingItemStandardShopCode.from(shopCode),
-				ShoppingItemStandardPrice.from(standardPrice));
+				ShoppingItemStandardPrice.from(standardPrice),
+				ShoppingItemCapacity.from(shoppingItemCapacity),
+				ShoppingItemCapacityUnit.from(shoppingItemCapacityUnit),
+				ShoppingItemCalories.from(shoppingItemCalories));
 	}
 }
