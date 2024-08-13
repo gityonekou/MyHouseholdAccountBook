@@ -77,6 +77,14 @@ public class MyHouseholdAccountBookContent {
 	public static final String INCOME_KUBUN_OPTIONAL_SELECTED_VALUE = "9";
 	// コード定義区分(商品内容量単位:005)
 	public static final String SHOPPING_ITEM_CAPACITY_UNIT = "005";
+	// コード定義区分(支出区分:006)
+	public static final String CODE_DEFINES_EXPENDITURE_KUBUN = "006";
+	// コード定義:支出区分で無駄遣いなし(1)を選択時
+	public static final String EXPENDITURE_KUBUN_NON_WASTED_SELECTED_VALUE = "1";
+	// コード定義:支出区分で無駄遣いB(2)を選択時
+	public static final String EXPENDITURE_KUBUN_WASTED_B_SELECTED_VALUE = "2";
+	// コード定義:支出区分で無駄遣いC(3)を選択時
+	public static final String EXPENDITURE_KUBUN_WASTED_C_SELECTED_VALUE = "3";
 	
 	// 支出項目コード仮登録データ:9999
 	public static final String SISYUTU_ITEM_CODE_TEMPORARY_VALUE = "9999";

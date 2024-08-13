@@ -5,7 +5,10 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
 		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
 		crossorigin="anonymous">
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"
+		rel="stylesheet" >
 <link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<link th:href="@{/css/MyHouseholdAccountBookDatepicker.css}" rel="stylesheet" type="text/css">
 <title>月度収支登録</title>
 </head>
 <body>
@@ -60,7 +63,7 @@
 							<form name="IncomeItemInfo" method="post" th:action="@{/myhacbook/accountregist/incomeandexpenditure/incomeupdate/}" th:object="${incomeItemForm}">
 								<span th:text="*{incomeKubunName}">収入区分名</span>
 								<div class="input-group w30">収入区分：
-									<select class="form-select w30" th:errorclass="is-invalid" th:field="*{incomeKubun}" required>
+									<select class="form-select" th:errorclass="is-invalid" th:field="*{incomeKubun}" required>
 										<option th:each="item : ${incomeKubunSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
 									</select>
 				 					<p class="invalid-feedback" th:errors="*{incomeKubun}"></p>
@@ -104,41 +107,25 @@
 						<p class="h6">■支出登録エリア■</p>
 						<table class="table table-sm table-bordered">
 							<tbody>
-								<tr class="table-warning">
-									<td class="w20">＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠</td>
-									<td class="w10" align="right">999,999円</td>
-									<td class="w5" align="center"><a class="btn text-bg-success btn-sm" href="./MonthEndClosingProcess_3.html">訂正</a></td>
-									<td class="w10">支払日：27日</td>
-									<td>支払い詳細あればここに表示</td>
-								</tr>
-								<tr>
-									<td class="w20">国民年金</td>
-									<td class="w10" align="right">16,800円</td>
-									<td class="w5" align="center"><a class="btn text-bg-success btn-sm" href="./MonthEndClosingProcess_3.html">訂正</a></td>
-									<td class="w10">支払日：27日</td>
-									<td>支払い詳細あればここに表示</td>
-								</tr>
-								<tr class="table-warning">
-									<td class="w20">健康保険</td>
-									<td class="w10" align="right">47,650円</td>
-									<td class="w5" align="center"><a class="btn text-bg-success btn-sm" href="./MonthEndClosingProcess_3.html">訂正</a></td>
-									<td class="w10">支払日：27日</td>
-									<td>支払い詳細あればここに表示</td>
-								</tr>
-								<tr>
-									<td class="w20">宿賃</td>
-									<td class="w10" align="right">30,000円</td>
-									<td class="w5" align="center"><a class="btn text-bg-success btn-sm" href="./MonthEndClosingProcess_3.html">訂正</a></td>
-									<td class="w10">支払日：25日</td>
-									<td>支払い詳細あればここに表示</td>
-								</tr>
+								<th:block th:each="item, itemStat : ${expenditureListInfo}">
+									<th:block th:if="${itemStat.odd}"><tr class="table-warning"></th:block>
+									<th:block th:if="${itemStat.even}"><tr></th:block>
+										<td class="w20" th:text="${item.expenditureName}">支出名と支出区分</td>
+										<td class="w10" th:text="${item.shiharaiKingaku}" align="right">支出金額</td>
+										<td class="w5" align="center"><a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/accountregist/incomeandexpenditure/expenditureupdateselect(expenditureCode=${item.expenditureCode})}">訂正</a></td>
+										<td class="w10">支払：<span th:text="${item.siharaiDate}">支払日</span></td>
+										<td th:text="${item.expenditureDetailContext}">支出詳細</td>
+									</tr>
+								</th:block>
+								<th:block th:if="${#lists.size(expenditureListInfo)} > 0">
 								<tr class="table-success">
 									<td class="w20">支出合計</td>
-									<td class="w10" align="right">79,450円</td>
+									<td class="w10" th:text="${expenditureSumKingaku}" align="right">支出金額合計</td>
 									<td colspan="3"></td>
 								</tr>
+								</th:block>
 								<tr class="table-info">
-									<td class="w20">&emsp;<a class="btn text-bg-success btn-sm" href="./ExpenditureItemSelectInit.html">新規追加</a></td>
+									<td class="w20">&emsp;<a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/accountregist/incomeandexpenditure/expenditureaddselect/}">新規追加</a></td>
 									<td colspan="5"></td>
 								</tr>
 							</tbody>
@@ -147,22 +134,43 @@
 						<th:block th:if="${expenditureItemForm} != null">
 						<ul class="list-group">
 							<li class="list-group-item border border-primary">
-								<form action="./MonthEndClosingProcess_2.html">
-									<span>支出項目名：飲食日用品＞日用消耗品＞キッチン用品</span><br>
+								<form name="ExpenditureItemInfo" method="post" th:action="@{/myhacbook/accountregist/incomeandexpenditure/expenditureupdate/}" th:object="${expenditureItemForm}">
+									<span>支出項目名：</span><span th:text="*{sisyutuItemName}">支出項目名</span>&emsp;<a class="btn text-bg-success btn-sm" href="./ExpenditureItemSelectInit.html">支出項目変更</a><br>
 									<div class="input-group w30">
-										　名称　：<input type="text" class="form-control" id="otherdetail" value="健康保険支払い">
+										　名称　：<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{expenditureName}" required>
+										<p class="invalid-feedback" th:errors="*{expenditureName}"></p>
+									</div>
+									<div class="input-group w30">支出区分：
+										<select class="form-select" th:errorclass="is-invalid" th:field="*{expenditureKubun}" required>
+											<option th:each="item : ${expenditureKubunSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+										</select>
+					 					<p class="invalid-feedback" th:errors="*{expenditureKubun}"></p>
 									</div>
 									<div class="input-group">
-										　詳細　：<input type="text" class="form-control" id="otherdetail" value="★名称★固定支払の場合は名称変更不可とおもったけど、あくまで固定費からはコピーになるので名称変更は自由か。★" >
-									</div>
-									<div class="input-group w10">
-										支払日　：<input type="text" class="form-control" id="syuunyuukingaku" value="31">日
+										　詳細　：<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{expenditureDetailContext}">
+										<p class="invalid-feedback" th:errors="*{expenditureDetailContext}"></p>
 									</div>
 									<div class="input-group w15">
-										支払金額：<input type="text" class="form-control" id="syuunyuukingaku" value="413,000">円
+										支払日　：<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{siharaiDate}">
+										<p class="invalid-feedback" th:errors="*{siharaiDate}"></p>
+										<p class="invalid-feedback" th:errors="*{needCheckSiharaiDate}" style="display: block;"></p>
 									</div>
 									<div class="input-group w15">
-										<button class="btn btn-primary" type="submit">新規追加</button>
+										支払金額：<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{expenditureKingaku}" required>円
+										<p class="invalid-feedback" th:errors="*{expenditureKingaku}"></p>
+									</div>
+									<div class="mb-3 w15">
+										<span>&emsp;</span><button class="btn btn-primary" type="submit" name="actionUpdate">登録</button>
+										<th:block th:if="*{#strings.equals(action, 'update')}">
+											<span>&emsp;</span>
+											<span>&emsp;</span>
+											<span>&emsp;</span>
+											<button class="btn btn-primary" type="submit" name="actionDelete">削除</button>
+										</th:block>
+										<input type="hidden" th:field="*{action}" />
+										<input type="hidden" th:field="*{expenditureCode}" />
+										<input type="hidden" th:field="*{sisyutuItemCode}" />
+										<input type="hidden" th:field="*{eventCode}" />
 									</div>
 								</form>
 							</li>
@@ -197,7 +205,17 @@
 	<!--/* フッター共通jsのインクルード) */-->
 	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
 	<!--/* 収支登録で使用するJavaScript */-->
-	<script type="text/javascript" th:src="@{/js/account/regist/IncomeAndExpenditureRegist.js}"></script>
+<!--/*	<script type="text/javascript" th:src="@{/js/account/regist/IncomeAndExpenditureRegist.js}"></script> */-->
+	
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.1/jquery-ui.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+<script>
+	$(function() {
+		$.datepicker.setDefaults($.datepicker.regional["ja"]);
+		$("#siharaiDate").datepicker();
+	});
+</script>
 	
 </body>
 </html>

@@ -49,6 +49,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.regist.IncomeAndExpenditureRegistUseCase;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
+import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.ExpenditureItemForm;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.IncomeItemForm;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.IncomeAndExpenditureRegistResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
@@ -228,7 +229,7 @@ public class IncomeAndExpenditureRegistController {
 	 * ・収入を新規登録(POST)→収支登録画面(収入と支出の一覧表示)
 	 * ・収入を訂正(POST)→収支登録画面(収入と支出の一覧表示)
 	 *</pre>
-	 * @param inputForm 入情報入力フォームデータ
+	 * @param inputForm 収入情報入力フォームデータ
 	 * @param bindingResult フォームのバリデーションチェック結果
 	 * @param redirectAttributes リダイレクト先引き継ぎ領域
 	 * @return 収支登録画面情報
@@ -272,7 +273,7 @@ public class IncomeAndExpenditureRegistController {
 	 * 以下画面遷移に対応します。
 	 * ・収入を削除(POST)→収支登録画面(収入と支出の一覧表示)
 	 *</pre>
-	 * @param inputForm 入情報入力フォームデータ
+	 * @param inputForm 収入情報入力フォームデータ
 	 * @param bindingResult フォームのバリデーションチェック結果
 	 * @param redirectAttributes リダイレクト先引き継ぎ領域
 	 * @return 収支登録画面情報
@@ -314,7 +315,145 @@ public class IncomeAndExpenditureRegistController {
 	
 	/**
 	 *<pre>
-	 * 収支登録画面で収入情報、および、支出情報登録後後のリダイレクト(Get要求時)のマッピングです。
+	 * 収支登録画面で支出情報の新規登録ボタン押下時のGET要求時マッピングです。
+	 * 支出項目選択画面を表示します。
+	 *</pre>
+	 * @return 支出項目選択画面
+	 *
+	 */
+	@GetMapping("/expenditureaddselect/")
+	public ModelAndView getExpenditureAddSelect() {
+		log.debug("getExpenditureAddSelect:");
+		// 画面表示情報を取得
+		return this.usecase.readExpenditureAddSelect(loginUserSession.getLoginUserInfo())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+	
+	/**
+	 *<pre>
+	 * 収支登録画面で更新対象の支出情報選択時のGET要求時マッピングです。
+	 * 収支登録画面の各収支一覧と更新対象の支出情報を反映した支出情報登録フォームを表示します。
+	 *</pre>
+	 * @param expenditureCode 選択した支出コード
+	 * @return 収支登録画面
+	 *
+	 */
+	@GetMapping("/expenditureupdateselect")
+	public ModelAndView getExpenditureUpdateSelect(@RequestParam("expenditureCode") String expenditureCode) {
+		log.debug("getExpenditureUpdateSelect:expenditureCode=" + expenditureCode);
+		// 画面表示情報を取得
+		return this.usecase.readExpenditureUpdateSelect(
+					// ログインユーザ情報
+					loginUserSession.getLoginUserInfo(),
+					// 支出コード
+					expenditureCode,
+					// セッションに設定されている収支情報のリスト
+					registListSession.getIncomeRegistItemList(),
+					// セッションに設定されている支出情報のリスト
+					registListSession.getExpenditureRegistItemList())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+	
+	/**
+	 *<pre>
+	 * 支出情報の登録・更新時のPOST要求時マッピングです。
+	 * 以下画面遷移に対応します。
+	 * ・支出を新規登録(POST)→収支登録画面(収入と支出の一覧表示)
+	 * ・支出を訂正(POST)→収支登録画面(収入と支出の一覧表示)
+	 *</pre>
+	 * @param inputForm 支出情報入力フォームデータ
+	 * @param bindingResult フォームのバリデーションチェック結果
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
+	 * @return 収支登録画面情報
+	 *
+	 */
+	@PostMapping(value="/expenditureupdate/", params = "actionUpdate")
+	public ModelAndView postExpenditureUpdate(@ModelAttribute @Validated ExpenditureItemForm inputForm, BindingResult bindingResult,
+			RedirectAttributes redirectAttributes) {
+		log.debug("postExpenditureUpdate:input=" + inputForm);
+		/* 入力フィールドのバリデーションチェック結果を判定 */
+		// チェック結果エラーの場合
+		if(bindingResult.hasErrors()) {
+			// 初期表示情報を取得し、入力チェックエラーを設定
+			return this.usecase.readExpenditureUpdateBindingErrorSetInfo(
+						loginUserSession.getLoginUserInfo(),
+						inputForm,
+						registListSession.getIncomeRegistItemList(),
+						registListSession.getExpenditureRegistItemList())
+					// レスポンスにログインユーザ名を設定
+					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					// レスポンスからModelAndViewを生成
+					.build();
+			
+		// チェック結果OKの場合
+		} else {
+			// actionに従い、処理を実行
+			IncomeAndExpenditureRegistResponse response = this.usecase.execExpenditureAction(
+					loginUserSession.getLoginUserInfo(),
+					inputForm,
+					registListSession.getExpenditureRegistItemList());
+			// 支出一覧をセッションに設定
+			registListSession.setExpenditureRegistItemList(response.getExpenditureRegistItemList());
+			// 収入支出一覧表示にリダイレクト
+			return response.buildRedirect(redirectAttributes);
+		}
+	}
+	
+	/**
+	 *<pre>
+	 * 支出情報の削除のPOST要求時マッピングです。
+	 * 以下画面遷移に対応します。
+	 * ・支出を削除(POST)→収支登録画面(収入と支出の一覧表示)
+	 *</pre>
+	 * @param inputForm 支出情報入力フォームデータ
+	 * @param bindingResult フォームのバリデーションチェック結果
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
+	 * @return 収支登録画面情報
+	 *
+	 */
+	@PostMapping(value="/expenditureupdate/", params = "actionDelete")
+	public ModelAndView postExpenditureDelete(@ModelAttribute @Validated ExpenditureItemForm inputForm, BindingResult bindingResult,
+			RedirectAttributes redirectAttributes) {
+		log.debug("postExpenditureDelete:input=" + inputForm);
+		/* 入力フィールドのバリデーションチェック結果を判定 */
+		// チェック結果エラーの場合
+		if(bindingResult.hasErrors()) {
+			// 初期表示情報を取得し、入力チェックエラーを設定
+			return this.usecase.readExpenditureUpdateBindingErrorSetInfo(
+						loginUserSession.getLoginUserInfo(),
+						inputForm,
+						registListSession.getIncomeRegistItemList(),
+						registListSession.getExpenditureRegistItemList())
+					// レスポンスにログインユーザ名を設定
+					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					// レスポンスからModelAndViewを生成
+					.build();
+			
+		// チェック結果OKの場合
+		} else {
+			// アクションに削除を設定
+			inputForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_DELETE);
+			// actionに従い、処理を実行
+			IncomeAndExpenditureRegistResponse response = this.usecase.execExpenditureAction(
+					loginUserSession.getLoginUserInfo(),
+					inputForm,
+					registListSession.getExpenditureRegistItemList());
+			// 支出一覧をセッションに設定
+			registListSession.setExpenditureRegistItemList(response.getExpenditureRegistItemList());
+			// 収入支出一覧表示にリダイレクト
+			return response.buildRedirect(redirectAttributes);
+		}
+	}
+	
+	/**
+	 *<pre>
+	 * 収支登録画面で収入情報、および、支出情報登録後のリダイレクト(Get要求時)のマッピングです。
 	 * 収支登録画面の各収支一覧を表示します。
 	 *</pre>
 	 * @param redirectMessages リダイレクト元から引き継いだメッセージ

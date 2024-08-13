@@ -103,9 +103,7 @@ public class IncomeAndExpenditureRegistResponse extends AbstractResponse {
 	public static class ExpenditureListItem {
 		// 支出コード(仮登録用支出コード)
 		private final String expenditureCode;
-		// 支出項目名
-		private final String sisyutuItemName;
-		// 支出名
+		// 支出名と支出区分
 		private final String expenditureName;
 		// 支出詳細
 		private final String expenditureDetailContext;
@@ -119,8 +117,7 @@ public class IncomeAndExpenditureRegistResponse extends AbstractResponse {
 		 * 引数の値から支出一覧情報を生成して返します。
 		 *</pre>
 		 * @param expenditureCode 支出コード(仮登録用支出コード)
-		 * @param sisyutuItemName 支出項目名
-		 * @param expenditureName 支出名
+		 * @param expenditureName 支出名と支出区分
 		 * @param expenditureDetailContext 支出詳細
 		 * @param siharaiDate 支払日
 		 * @param shiharaiKingaku 支払金額
@@ -129,12 +126,11 @@ public class IncomeAndExpenditureRegistResponse extends AbstractResponse {
 		 */
 		public static ExpenditureListItem from(
 				String expenditureCode,
-				String sisyutuItemName,
 				String expenditureName,
 				String expenditureDetailContext,
 				String siharaiDate,
 				String shiharaiKingaku) {
-			return new ExpenditureListItem(expenditureCode, sisyutuItemName, expenditureName, expenditureDetailContext,
+			return new ExpenditureListItem(expenditureCode, expenditureName, expenditureDetailContext,
 					siharaiDate, shiharaiKingaku);
 			
 		}
@@ -152,8 +148,13 @@ public class IncomeAndExpenditureRegistResponse extends AbstractResponse {
 	
 	// 支出情報
 	private List<ExpenditureListItem> expenditureListInfo = new ArrayList<>();
+	// 支出金額合計
+	@Setter
+	private String expenditureSumKingaku;
 	// 支出情報入力フォーム
 	private final ExpenditureItemForm expenditureItemForm;
+	// 支出区分選択ボックス
+	private final SelectViewItem expenditureKubunSelectList;
 	
 	// セッション管理する収入登録情報のリストです。
 	@Setter
@@ -211,8 +212,8 @@ public class IncomeAndExpenditureRegistResponse extends AbstractResponse {
 	 *
 	 */
 	public static IncomeAndExpenditureRegistResponse getInstance() {
-		// 収入入力フォーム、収入区分選択ボックス、支出入力フォームなしで画面を表示
-		return new IncomeAndExpenditureRegistResponse(null, null, null);
+		// 収入入力フォーム、収入区分選択ボックス、支出入力フォーム、支出区分選択ボックスなしで画面を表示
+		return new IncomeAndExpenditureRegistResponse(null, null, null, null);
 	}
 	
 	/**
@@ -237,7 +238,33 @@ public class IncomeAndExpenditureRegistResponse extends AbstractResponse {
 			incomeKubunList.addAll(addIncomeKubunList);
 		}
 		// 収入入力フォームの表示データを設定して画面を表示
-		return new IncomeAndExpenditureRegistResponse(incomeItemForm, SelectViewItem.from(incomeKubunList), null);
+		return new IncomeAndExpenditureRegistResponse(incomeItemForm, SelectViewItem.from(incomeKubunList), null, null);
+	}
+	
+	/**
+	 *<pre>
+	 * 支出入力フォームをもとにレスポンス情報を生成して返します。
+	 * 収入入力フォームにはnullが設定されます。
+	 *</pre>
+	 * @param expenditureItemForm 支出情報が格納されたフォームデータ
+	 * @param addExpenditureKubunList 支出区分選択ボックスの表示情報リスト
+	 * @return 収支登録画面表示情報
+	 *
+	 */
+	public static IncomeAndExpenditureRegistResponse getInstance(
+			ExpenditureItemForm expenditureItemForm, List<OptionItem> addExpenditureKubunList) {
+		// 支出情報フォームデータがnullなら空データを設定(アクションなしで処理継続となるので、後の登録ではエラーになる：継続処理可能)
+		if(expenditureItemForm == null) {
+			expenditureItemForm = new ExpenditureItemForm();
+		}
+		// 支出区分選択ボックスの表示情報リストを生成
+		List<OptionItem> expenditureKubunList = new ArrayList<>();
+		expenditureKubunList.add(OptionItem.from("", "支出区分を選択してください"));
+		if(!CollectionUtils.isEmpty(addExpenditureKubunList)) {
+			expenditureKubunList.addAll(addExpenditureKubunList);
+		}
+		// 支出入力フォームの表示データを設定して画面を表示
+		return new IncomeAndExpenditureRegistResponse(null, null, expenditureItemForm, SelectViewItem.from(expenditureKubunList));
 	}
 	
 	/**
@@ -257,8 +284,12 @@ public class IncomeAndExpenditureRegistResponse extends AbstractResponse {
 		modelAndView.addObject("incomeKubunSelectList", incomeKubunSelectList);
 		// 支出一覧情報
 		modelAndView.addObject("expenditureListInfo", expenditureListInfo);
+		// 支出金額合計
+		modelAndView.addObject("expenditureSumKingaku", expenditureSumKingaku);
 		// 支出登録フォーム
 		modelAndView.addObject("expenditureItemForm", expenditureItemForm);
+		// 支出区分選択ボックス
+		modelAndView.addObject("expenditureKubunSelectList", expenditureKubunSelectList);
 		
 		return modelAndView;
 	}

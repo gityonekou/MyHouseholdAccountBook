@@ -38,7 +38,7 @@ import lombok.Data;
 public class IncomeItemForm {
 	// アクション
 	private String action;
-	// 収入コード(仮登録用収入コード)
+	// 収入コード(新規の場合、仮登録用収入コード:yyyyMMddHHmmssSSS)
 	private String incomeCode;
 	// 収入区分名
 	private String incomeKubunName;

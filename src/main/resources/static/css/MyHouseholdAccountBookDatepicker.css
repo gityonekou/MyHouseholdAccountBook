@@ -1,0 +1,11 @@
+@charset "UTF-8";
+
+/* 土曜日の色設定 */
+td.ui-datepicker-week-end:last-child a.ui-state-default{
+  color: #00f!important;       /* 文字色：青 */
+}
+/* 日曜日の色設定 */
+td.ui-datepicker-week-end:first-child a.ui-state-default{
+  color: #f00!important;       /* 文字色：赤 */
+}
+

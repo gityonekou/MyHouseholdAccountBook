@@ -20,6 +20,7 @@ import org.apache.ibatis.annotations.Update;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostInquiryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndFixedCostCodeSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndFixedCostShiharaiTukiListSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndSisyutuItemCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSearchQueryDto;
 
@@ -103,6 +104,17 @@ public interface FixedCostTableMapper {
 	 */
 	@Select("sql/account/fixedcost/FixedCostInquirySelectSql02.sql")
 	List<FixedCostInquiryReadDto> findByIdAndSisyutuItemCode(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
+	
+	/**
+	 *<pre>
+	 * 指定のユーザID、固定費支払月を条件に固定費テーブル:FIXED_COST_TABLEを参照します。
+	 *</pre>
+	 * @param search 検索条件:ユーザID、固定費支払月のリスト(in条件に指定する固定費支払月)
+	 * @return 固定費情報参照結果のリスト
+	 *
+	 */
+	@Select("sql/account/fixedcost/FixedCostTableListSelectSql01.sql")
+	List<FixedCostReadWriteDto> findByIdAndFixedCostShiharaiTukiList(@Param("dto") UserIdAndFixedCostShiharaiTukiListSearchQueryDto search);
 	
 	/**
 	 *<pre>

@@ -12,8 +12,10 @@ package com.yonetani.webapp.accountbook.domain.repository.account.fixedcost;
 
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCost;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostShiharaiTukiList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 
 /**
@@ -88,6 +90,16 @@ public interface FixedCostTableRepository {
 	 *
 	 */
 	FixedCostInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search);
+	
+	/**
+	 *<pre>
+	 * ユーザIDと指定の固定費支払月(リスト値)に対応する固定費情報を取得します。
+	 *</pre>
+	 * @param search 検索対象のユーザIDと固定費支払月(リスト値)
+	 * @return る固定費情報のリスト
+	 *
+	 */
+	FixedCostList findByIdAndFixedCostShiharaiTukiList(SearchQueryUserIdAndFixedCostShiharaiTukiList search);
 	
 	/**
 	 *<pre>

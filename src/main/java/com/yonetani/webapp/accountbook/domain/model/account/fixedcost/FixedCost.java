@@ -11,6 +11,8 @@ package com.yonetani.webapp.accountbook.domain.model.account.fixedcost;
 
 import java.math.BigDecimal;
 
+import org.springframework.util.StringUtils;
+
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostName;
@@ -97,5 +99,32 @@ public class FixedCost {
 				FixedCostShiharaiTukiOptionalContext.from(fixedCostShiharaiTukiOptionalContext),
 				FixedCostShiharaiDay.from(fixedCostShiharaiDay),
 				ShiharaiKingaku.from(shiharaiKingaku));
+	}
+	
+	/**
+	 *<pre>
+	 * 「固定費内容詳細(支払内容詳細)」項目と「固定費支払月任意詳細」項目の値から支出詳細の表示値を作成して返します。
+	 * 
+	 * 固定費内容詳細(支払内容詳細)項目、固定費支払月任意詳細のどちらかに値が設定されている場合、その値を返します。
+	 * 固定費内容詳細(支払内容詳細)項目と固定費支払月任意詳細両方に値が設定されている場合、各値を「/」で連結した値を返します。
+	 *</pre>
+	 * @return 支出詳細の表示値
+	 *
+	 */
+	public String getExpenditureDetailContext() {
+		StringBuilder buff = new StringBuilder();
+		// 固定費内容詳細(支払内容詳細)の値が設定されている場合、支出詳細の表示値に追加
+		if(StringUtils.hasLength(fixedCostDetailContext.toString())) {
+			buff.append(fixedCostDetailContext.toString());
+		}
+		// 固定費支払月任意詳細の値が設定されている場合、支出詳細の表示値に追加
+		if(StringUtils.hasLength(fixedCostShiharaiTukiOptionalContext.toString())) {
+			// 固定費内容詳細(支払内容詳細)の値が設定済みの場合、区切り文字(/)を追加
+			if(buff.length() > 0) {
+				buff.append('/');
+			}
+			buff.append(fixedCostShiharaiTukiOptionalContext.toString());
+		}
+		return buff.toString();
 	}
 }

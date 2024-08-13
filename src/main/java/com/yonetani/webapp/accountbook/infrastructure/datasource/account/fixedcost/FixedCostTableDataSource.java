@@ -16,13 +16,16 @@ import org.springframework.stereotype.Repository;
 
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCost;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostShiharaiTukiList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostInquiryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndFixedCostCodeSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndFixedCostShiharaiTukiListSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndSisyutuItemCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.fixedcost.FixedCostTableMapper;
@@ -126,6 +129,30 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 		} else {
 			// 検索結果ありの場合、ドメインに変換して返却
 			return FixedCostInquiryList.from(searchResult.stream().map(dto -> createFixedCostInquiryItem(dto))
+						.collect(Collectors.toUnmodifiableList()));
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public FixedCostList findByIdAndFixedCostShiharaiTukiList(SearchQueryUserIdAndFixedCostShiharaiTukiList search) {
+		// 検索結果を取得
+		List<FixedCostReadWriteDto> searchResult = mapper.findByIdAndFixedCostShiharaiTukiList(
+				UserIdAndFixedCostShiharaiTukiListSearchQueryDto.from(
+						// ユーザID
+						search.getUserId().toString(),
+						// 固定費支払月のリスト
+						search.getFixedCostShiharaiTukiList().stream().map(
+								model -> model.toString()).collect(Collectors.toUnmodifiableList())));
+		
+		if(searchResult == null) {
+			// 検索結果なしの場合、0件データを返却
+			return FixedCostList.from(null);
+		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
+			return FixedCostList.from(searchResult.stream().map(dto -> createFixedCost(dto))
 						.collect(Collectors.toUnmodifiableList()));
 		}
 	}
