@@ -62,10 +62,11 @@ public class FileRequiredValidator implements ConstraintValidator<FileRequired, 
 		}
 		// ファイルの指定あり、かつ、ファイルサイズが0出ない場合
 		if(value != null && !value.getOriginalFilename().isEmpty()) {
-			// ファイルの拡張子が指定のもの以外の場合
+			// ファイルの拡張子が指定のものの場合
 			String[] splitNames = value.getOriginalFilename().split("\\.");
 			if(splitNames[splitNames.length - 1].equals(extension)) {
 				return true;
+			// ファイルの拡張子が指定のもの以外の場合
 			} else {
 				// エラーメッセージを設定
 				setErrorMessage(context, "指定ファイルの拡張子が不正です。正しい拡張子[" + extension + "]のファイルを選択してください。");

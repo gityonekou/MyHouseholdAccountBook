@@ -11,6 +11,7 @@
 package com.yonetani.webapp.accountbook.application.usecase.account.regist;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -79,13 +80,11 @@ public class IncomeAndExpenditureRegistUseCase {
 	 *</pre>
 	 * @param user ログインユーザ情報
 	 * @param targetYearMonth 収支を新規登録する対象年月の値
-	 * @param returnYearMonth 月度収支画面に戻るときに表示する対象年月の値
 	 * @return 収支登録画面の表示情報
 	 *
 	 */
-	public IncomeAndExpenditureRegistResponse readInitInfo(
-			LoginUserInfo user, String targetYearMonth, String returnYearMonth) {
-		log.debug("readInitInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",returnYearMonth=" + returnYearMonth);
+	public IncomeAndExpenditureRegistResponse readInitInfo(LoginUserInfo user, String targetYearMonth) {
+		log.debug("readInitInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
 		
 		/* 空の収入情報入力フォームをもとにレスポンスを生成 */
 		// 新規収入情報入力フォームを生成
@@ -96,7 +95,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		incomeItemForm.setIncomeKubunName("【新規追加】");
 		
 		// レスポンスを生成
-		IncomeAndExpenditureRegistResponse response = createIncomeItemFormResponse(incomeItemForm);
+		IncomeAndExpenditureRegistResponse response = createIncomeItemFormResponse(targetYearMonth, incomeItemForm);
 		
 		/* 固定費テーブルに登録されている固定費情報から対象年月に合致する固定費一覧を取得 */
 		// 対象の月の値を取得
@@ -186,7 +185,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		
 		// TODO 自動生成されたメソッド・スタブ
 		
-		return IncomeAndExpenditureRegistResponse.getInstance();
+		return IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
 	}
 	
 	/**
@@ -194,16 +193,17 @@ public class IncomeAndExpenditureRegistUseCase {
 	 * セッション情報の各収支一覧情報を画面表示情報に設定します。
 	 *</pre>
 	 * @param user ログインユーザ情報
+	 * @param targetYearMonth 収支の対象年月の値
 	 * @param incomeRegistItemList セッションに設定されている収支情報のリスト
 	 * @param expenditureRegistItemList セッションに設定されている支出情報のリスト
 	 * @return 収支登録画面の表示情報
 	 *
 	 */
-	public IncomeAndExpenditureRegistResponse readIncomeAndExpenditureInfoList(LoginUserInfo user,
+	public IncomeAndExpenditureRegistResponse readIncomeAndExpenditureInfoList(LoginUserInfo user, String targetYearMonth,
 			List<IncomeRegistItem> incomeRegistItemList, List<ExpenditureRegistItem> expenditureRegistItemList) {
-		log.debug("readIncomeAndExpenditureInfoList:userid=" + user.getUserId());
+		log.debug("readIncomeAndExpenditureInfoList:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
 		// レスポンスを生成
-		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance();
+		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
 		// セッション情報の各収支一覧情報を画面表示情報に設定
 		setIncomeAndExpenditureInfoList(incomeRegistItemList, expenditureRegistItemList, response);
 		
@@ -215,14 +215,15 @@ public class IncomeAndExpenditureRegistUseCase {
 	 * セッション情報の各収支一覧情報を画面表示情報に設定し、新規追加モードで収入情報登録フォームを設定します
 	 *</pre>
 	 * @param user ログインユーザ情報
+	 * @param targetYearMonth 収支の対象年月の値
 	 * @param incomeRegistItemList セッションに設定されている収支情報のリスト
 	 * @param expenditureRegistItemList セッションに設定されている支出情報のリスト
 	 * @return 収支登録画面の表示情報
 	 *
 	 */
-	public IncomeAndExpenditureRegistResponse readIncomeAddSelect(LoginUserInfo user,
+	public IncomeAndExpenditureRegistResponse readIncomeAddSelect(LoginUserInfo user, String targetYearMonth,
 			List<IncomeRegistItem> incomeRegistItemList, List<ExpenditureRegistItem> expenditureRegistItemList) {
-		log.debug("readIncomeAddSelect:userid=" + user.getUserId());
+		log.debug("readIncomeAddSelect:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
 		
 		// 新規収入情報入力フォームを生成
 		IncomeItemForm incomeItemForm = new IncomeItemForm();
@@ -232,7 +233,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		incomeItemForm.setIncomeKubunName("【新規追加】");
 		
 		// レスポンスを生成
-		IncomeAndExpenditureRegistResponse response = createIncomeItemFormResponse(incomeItemForm);
+		IncomeAndExpenditureRegistResponse response = createIncomeItemFormResponse(targetYearMonth, incomeItemForm);
 		
 		// セッション情報の各収支一覧情報を画面表示情報に設定
 		setIncomeAndExpenditureInfoList(incomeRegistItemList, expenditureRegistItemList, response);
@@ -245,15 +246,16 @@ public class IncomeAndExpenditureRegistUseCase {
 	 * セッション情報の各収支一覧情報を画面表示情報に設定し、選択した収入情報の値を収入情報入力フォームに設定します
 	 *</pre>
 	 * @param user ログインユーザ情報
+	 * @param targetYearMonth 収支の対象年月の値
 	 * @param incomeCode 収入情報入力フォームに表示する収入情報の収入コード
 	 * @param incomeRegistItemList セッションに設定されている収支情報のリスト
 	 * @param expenditureRegistItemList セッションに設定されている支出情報のリスト
 	 * @return 収支登録画面の表示情報
 	 *
 	 */
-	public IncomeAndExpenditureRegistResponse readIncomeUpdateSelect(LoginUserInfo user, String incomeCode,
+	public IncomeAndExpenditureRegistResponse readIncomeUpdateSelect(LoginUserInfo user, String targetYearMonth, String incomeCode,
 			List<IncomeRegistItem> incomeRegistItemList, List<ExpenditureRegistItem> expenditureRegistItemList) {
-		log.debug("readIncomeUpdateSelect:userid=" + user.getUserId() + ",incomeCode=" + incomeCode);
+		log.debug("readIncomeUpdateSelect:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",incomeCode=" + incomeCode);
 		
 		// 新規収入情報入力フォームを生成
 		IncomeItemForm incomeItemForm = null;
@@ -292,7 +294,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		}
 		
 		// レスポンスを生成
-		IncomeAndExpenditureRegistResponse response = createIncomeItemFormResponse(incomeItemForm);
+		IncomeAndExpenditureRegistResponse response = createIncomeItemFormResponse(targetYearMonth, incomeItemForm);
 		
 		// セッション情報の各収支一覧情報を画面表示情報に設定
 		setIncomeAndExpenditureInfoList(incomeRegistItemList, expenditureRegistItemList, response);
@@ -305,18 +307,20 @@ public class IncomeAndExpenditureRegistUseCase {
 	 * 収入情報フォーム登録ボタン押下時の入力チェックエラーの場合の画面表示情報取得
 	 *</pre>
 	 * @param user ログインユーザ情報
+	 * @param targetYearMonth 収支の対象年月の値
 	 * @param inputForm 収入情報入力フォームデータ
 	 * @param incomeRegistItemList セッションに設定されている収支情報のリスト
 	 * @param expenditureRegistItemList セッションに設定されている支出情報のリスト
 	 * @return 収支登録画面の表示情報
 	 *
 	 */
-	public IncomeAndExpenditureRegistResponse readIncomeUpdateBindingErrorSetInfo(LoginUserInfo user, IncomeItemForm inputForm,
-			List<IncomeRegistItem> incomeRegistItemList, List<ExpenditureRegistItem> expenditureRegistItemList) {
-		log.debug("readIncomeUpdateBindingErrorSetInfo:userid=" + user.getUserId() + ",inputForm=" + inputForm);
+	public IncomeAndExpenditureRegistResponse readIncomeUpdateBindingErrorSetInfo(LoginUserInfo user,
+			String targetYearMonth, IncomeItemForm inputForm, List<IncomeRegistItem> incomeRegistItemList,
+			List<ExpenditureRegistItem> expenditureRegistItemList) {
+		log.debug("readIncomeUpdateBindingErrorSetInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",inputForm=" + inputForm);
 		
 		// レスポンスを生成
-		IncomeAndExpenditureRegistResponse response = createIncomeItemFormResponse(inputForm);
+		IncomeAndExpenditureRegistResponse response = createIncomeItemFormResponse(targetYearMonth, inputForm);
 		
 		// セッション情報の各収支一覧情報を画面表示情報に設定
 		setIncomeAndExpenditureInfoList(incomeRegistItemList, expenditureRegistItemList, response);
@@ -331,16 +335,17 @@ public class IncomeAndExpenditureRegistUseCase {
 	 * 収入情報入力フォームの入力値に従い、アクション(登録 or 更新 or 削除)を実行します
 	 *</pre>
 	 * @param user ログインユーザ情報
+	 * @param targetYearMonth 収支の対象年月の値
 	 * @param inputForm 収入情報入力フォームデータ
 	 * @param incomeRegistItemList セッションに設定されている収支情報のリスト
 	 * @return 収支登録画面の表示情報
 	 *
 	 */
-	public IncomeAndExpenditureRegistResponse execIncomeAction(LoginUserInfo user, IncomeItemForm inputForm,
-			List<IncomeRegistItem> incomeRegistItemList) {
-		log.debug("execIncomeAction:userid=" + user.getUserId() + ",inputForm=" + inputForm);
+	public IncomeAndExpenditureRegistResponse execIncomeAction(LoginUserInfo user, String targetYearMonth,
+			IncomeItemForm inputForm, List<IncomeRegistItem> incomeRegistItemList) {
+		log.debug("execIncomeAction:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",inputForm=" + inputForm);
 		
-		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance();
+		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
 		
 		// 収入金額をbigdecimalに変換
 		BigDecimal incomeKingaku = DomainCommonUtils.convertBigDecimal(inputForm.getIncomeKingaku(), 0);
@@ -498,15 +503,17 @@ public class IncomeAndExpenditureRegistUseCase {
 	 * セッション情報の各収支一覧情報を画面表示情報に設定し、選択した支出情報の値を支出情報入力フォームに設定します
 	 *</pre>
 	 * @param user ログインユーザ情報
+	 * @param targetYearMonth 収支の対象年月
 	 * @param expenditureCode 支出情報入力フォームに表示する支出情報の支出コード
 	 * @param incomeRegistItemList セッションに設定されている収支情報のリスト
 	 * @param expenditureRegistItemList セッションに設定されている支出情報のリスト
 	 * @return 収支登録画面の表示情報
 	 *
 	 */
-	public IncomeAndExpenditureRegistResponse readExpenditureUpdateSelect(LoginUserInfo user, String expenditureCode,
+	public IncomeAndExpenditureRegistResponse readExpenditureUpdateSelect(
+			LoginUserInfo user, String targetYearMonth, String expenditureCode,
 			List<IncomeRegistItem> incomeRegistItemList, List<ExpenditureRegistItem> expenditureRegistItemList) {
-		log.debug("readExpenditureUpdateSelect:userid=" + user.getUserId() + ",expenditureCode=" + expenditureCode);
+		log.debug("readExpenditureUpdateSelect:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",expenditureCode=" + expenditureCode);
 		
 		// 新規支出情報入力フォームを生成
 		ExpenditureItemForm expenditureItemForm = null;
@@ -542,7 +549,8 @@ public class IncomeAndExpenditureRegistUseCase {
 				// 支出詳細
 				expenditureItemForm.setExpenditureDetailContext(session.getExpenditureDetailContext());
 				// 支払日
-				expenditureItemForm.setSiharaiDate(session.getSiharaiDate());
+				expenditureItemForm.setSiharaiDate(LocalDate.parse(targetYearMonth + session.getSiharaiDate(),
+						DateTimeFormatter.ofPattern("yyyyMMdd")));
 				// 支出金額
 				expenditureItemForm.setExpenditureKingaku(DomainCommonUtils.convertInteger(session.getExpenditureKingaku()));
 				
@@ -556,7 +564,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		}
 		
 		// レスポンスを生成
-		IncomeAndExpenditureRegistResponse response = createExpenditureItemFormResponse(expenditureItemForm);
+		IncomeAndExpenditureRegistResponse response = createExpenditureItemFormResponse(targetYearMonth, expenditureItemForm);
 		
 		// セッション情報の各収支一覧情報を画面表示情報に設定
 		setIncomeAndExpenditureInfoList(incomeRegistItemList, expenditureRegistItemList, response);
@@ -569,18 +577,20 @@ public class IncomeAndExpenditureRegistUseCase {
 	 * 支出情報フォーム登録ボタン押下時の入力チェックエラーの場合の画面表示情報取得
 	 *</pre>
 	 * @param user ログインユーザ情報
+	 * @param targetYearMonth 収支の対象年月
 	 * @param inputForm 支出情報入力フォームデータ
 	 * @param incomeRegistItemList セッションに設定されている収支情報のリスト
 	 * @param expenditureRegistItemList セッションに設定されている支出情報のリスト
 	 * @return 収支登録画面の表示情報
 	 *
 	 */
-	public IncomeAndExpenditureRegistResponse readExpenditureUpdateBindingErrorSetInfo(LoginUserInfo user, ExpenditureItemForm inputForm,
+	public IncomeAndExpenditureRegistResponse readExpenditureUpdateBindingErrorSetInfo(LoginUserInfo user,
+			String targetYearMonth, ExpenditureItemForm inputForm,
 			List<IncomeRegistItem> incomeRegistItemList, List<ExpenditureRegistItem> expenditureRegistItemList) {
-		log.debug("readExpenditureUpdateBindingErrorSetInfo:userid=" + user.getUserId() + ",inputForm=" + inputForm);
+		log.debug("readExpenditureUpdateBindingErrorSetInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",inputForm=" + inputForm);
 		
 		// レスポンスを生成
-		IncomeAndExpenditureRegistResponse response = createExpenditureItemFormResponse(inputForm);
+		IncomeAndExpenditureRegistResponse response = createExpenditureItemFormResponse(targetYearMonth, inputForm);
 		
 		// セッション情報の各収支一覧情報を画面表示情報に設定
 		setIncomeAndExpenditureInfoList(incomeRegistItemList, expenditureRegistItemList, response);
@@ -595,16 +605,17 @@ public class IncomeAndExpenditureRegistUseCase {
 	 * 支出情報入力フォームの入力値に従い、アクション(登録 or 更新 or 削除)を実行します
 	 *</pre>
 	 * @param user ログインユーザ情報
+	 * @param targetYearMonth 収支の対象年月
 	 * @param inputForm 支出情報入力フォームデータ
 	 * @param expenditureRegistItemList セッションに設定されている支出情報のリスト
 	 * @return 収支登録画面の表示情報
 	 *
 	 */
-	public IncomeAndExpenditureRegistResponse execExpenditureAction(LoginUserInfo user, ExpenditureItemForm inputForm,
-			List<ExpenditureRegistItem> expenditureRegistItemList) {
-		log.debug("execExpenditureAction:userid=" + user.getUserId() + ",inputForm=" + inputForm);
+	public IncomeAndExpenditureRegistResponse execExpenditureAction(LoginUserInfo user, String targetYearMonth,
+			ExpenditureItemForm inputForm, List<ExpenditureRegistItem> expenditureRegistItemList) {
+		log.debug("execExpenditureAction:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",inputForm=" + inputForm);
 		
-		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance();
+		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
 		
 		// 支出金額をbigdecimalに変換
 		BigDecimal expenditureKingaku = DomainCommonUtils.convertBigDecimal(inputForm.getExpenditureKingaku(), 0);
@@ -734,11 +745,12 @@ public class IncomeAndExpenditureRegistUseCase {
 	 *<pre>
 	 * 収入情報入力フォームを指定して収支登録画面の表示情報を生成します。
 	 *</pre>
+	 * @param targetYearMonth 収支を新規登録する対象年月の値
 	 * @param incomeItemForm 収入情報入力フォームデータ
 	 * @return 収支登録画面の表示情報
 	 *
 	 */
-	private IncomeAndExpenditureRegistResponse createIncomeItemFormResponse(IncomeItemForm incomeItemForm) {
+	private IncomeAndExpenditureRegistResponse createIncomeItemFormResponse(String targetYearMonth, IncomeItemForm incomeItemForm) {
 		
 		// コードテーブル情報から収入区分選択ボックスの表示情報を取得し、リストに設定
 		List<CodeAndValuePair> incomeKubunList = codeTableItem.getCodeValues(MyHouseholdAccountBookContent.CODE_DEFINES_INCOME_KUBUN);
@@ -749,6 +761,8 @@ public class IncomeAndExpenditureRegistUseCase {
 		}
 		// レスポンスを生成
 		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(
+				// 収支対象の年月(YYYMM)
+				targetYearMonth,
 				// 収入情報入力フォーム
 				incomeItemForm,
 				// 収入区分選択ボックスの表示情報リストはデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定
@@ -762,11 +776,12 @@ public class IncomeAndExpenditureRegistUseCase {
 	 *<pre>
 	 * 支出情報入力フォームを指定して収支登録画面の表示情報を生成します。
 	 *</pre>
+	 * @param targetYearMonth 収支を新規登録する対象年月の値
 	 * @param expenditureItemForm 支出情報入力フォームデータ
 	 * @return 収支登録画面の表示情報
 	 *
 	 */
-	private IncomeAndExpenditureRegistResponse createExpenditureItemFormResponse(ExpenditureItemForm expenditureItemForm) {
+	private IncomeAndExpenditureRegistResponse createExpenditureItemFormResponse(String targetYearMonth, ExpenditureItemForm expenditureItemForm) {
 		
 		// コードテーブル情報から支出区分選択ボックスの表示情報を取得し、リストに設定
 		List<CodeAndValuePair> expenditureKubunList = codeTableItem.getCodeValues(MyHouseholdAccountBookContent.CODE_DEFINES_EXPENDITURE_KUBUN);
@@ -777,6 +792,8 @@ public class IncomeAndExpenditureRegistUseCase {
 		}
 		// レスポンスを生成
 		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(
+				// 収支対象の年月(YYYMM)
+				targetYearMonth,
 				// 支出情報入力フォーム
 				expenditureItemForm,
 				// 収入区分選択ボックスの表示情報リストはデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定
@@ -902,9 +919,6 @@ public class IncomeAndExpenditureRegistUseCase {
 	 *
 	 */
 	private IncomeRegistItem createIncomeRegistItem(String dataTypeNew, IncomeItemForm inputForm) {
-		
-		// 収入金額をbigdecimalに変換
-		BigDecimal incomeKingaku = DomainCommonUtils.convertBigDecimal(inputForm.getIncomeKingaku(), 0);
 		// セッションに設定する収支登録情報を作成し返却
 		return IncomeRegistItem.from(
 				// データタイプ：新規
@@ -918,7 +932,7 @@ public class IncomeAndExpenditureRegistUseCase {
 				// 収入詳細
 				inputForm.getIncomeDetailContext(),
 				// 収入金額
-				incomeKingaku);
+				DomainCommonUtils.convertBigDecimal(inputForm.getIncomeKingaku(), 0));
 	}
 	
 	/**
@@ -931,10 +945,6 @@ public class IncomeAndExpenditureRegistUseCase {
 	 *
 	 */
 	private ExpenditureRegistItem createExpenditureRegistItem(String dataTypeNew, ExpenditureItemForm inputForm) {
-		
-		// 支出金額をbigdecimalに変換
-		BigDecimal expenditureKingaku = DomainCommonUtils.convertBigDecimal(inputForm.getExpenditureKingaku(), 0);
-		
 		// セッションに設定する支出登録情報を作成し返却
 		return ExpenditureRegistItem.from(
 				// データタイプ
@@ -954,8 +964,8 @@ public class IncomeAndExpenditureRegistUseCase {
 				// 支出詳細
 				inputForm.getExpenditureDetailContext(),
 				// 支払日
-				inputForm.getSiharaiDate(),
+				DomainCommonUtils.getDateStr(inputForm.getSiharaiDate()),
 				// 支払金額
-				expenditureKingaku);
+				DomainCommonUtils.convertBigDecimal(inputForm.getExpenditureKingaku(), 0));
 	}
 }

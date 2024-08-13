@@ -20,7 +20,7 @@
 	<div class="col">
 		<div class="card">
 			<div class="card-body">
-				<h5 class="card-title">2023年06月度収支登録</h5>
+				<h5 class="card-title"><span th:text="${viewYear}"></span>年<span th:text="${viewMonth}"></span>月度収支登録</h5>
 				<th:block th:each="message : ${messages}">
 					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
 				</th:block>
@@ -153,7 +153,6 @@
 									<div class="input-group w15">
 										支払日　：<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{siharaiDate}">
 										<p class="invalid-feedback" th:errors="*{siharaiDate}"></p>
-										<p class="invalid-feedback" th:errors="*{needCheckSiharaiDate}" style="display: block;"></p>
 									</div>
 									<div class="input-group w15">
 										支払金額：<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{expenditureKingaku}" required>円
@@ -205,17 +204,15 @@
 	<!--/* フッター共通jsのインクルード) */-->
 	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
 	<!--/* 収支登録で使用するJavaScript */-->
-<!--/*	<script type="text/javascript" th:src="@{/js/account/regist/IncomeAndExpenditureRegist.js}"></script> */-->
-	
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.1/jquery-ui.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
-<script>
-	$(function() {
-		$.datepicker.setDefaults($.datepicker.regional["ja"]);
-		$("#siharaiDate").datepicker();
-	});
-</script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.1/jquery-ui.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+	<script>
+		$(function() {
+			$.datepicker.setDefaults($.datepicker.regional["ja"]);
+			$("#siharaiDate").datepicker();
+		});
+	</script>
 	
 </body>
 </html>

@@ -10,9 +10,10 @@
  */
 package com.yonetani.webapp.accountbook.presentation.request.account.inquiry;
 
-import org.springframework.util.StringUtils;
+import java.time.LocalDate;
 
-import jakarta.validation.constraints.AssertTrue;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -54,32 +55,11 @@ public class ExpenditureItemForm {
 	@Size(max = 300)
 	private String expenditureDetailContext;
 	// 支払日
-	//@Pattern(regexp = "^[0-9]{2}", message = "支払日はDD形式で指定してください。")
-	private String siharaiDate;
+	@DateTimeFormat(pattern = "yyyy/MM/dd")
+	private LocalDate siharaiDate;
 	// 支払金額
 	@NotNull
 	@Min(1)
 	private Integer expenditureKingaku;
 	
-	/**
-	 * 支払日チェック(支払日が設定されている場合、日付内であること)
-	 * 
-	 * @return その他任意を選択した場合で収入詳細の設定ありならtrue、空ならfalse
-	 */
-	@AssertTrue(message = "支払日はDD形式で指定してください。")
-	public boolean isNeedCheckSiharaiDate() {
-		// 支払日が設定されている場合、日付内であること
-		if(StringUtils.hasLength(siharaiDate)) {
-			try {
-				int val = Integer.parseInt(siharaiDate);
-				if(val < 1 || val > 31) {
-					return false;
-				}
-			} catch (NumberFormatException ex) {
-				return false;
-			}
-		}
-		// 上記以外はチェック結果OK:trueを返却
-		return true;
-	}
 }

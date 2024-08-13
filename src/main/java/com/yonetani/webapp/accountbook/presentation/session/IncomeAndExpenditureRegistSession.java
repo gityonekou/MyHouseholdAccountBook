@@ -34,6 +34,10 @@ import lombok.Data;
 public class IncomeAndExpenditureRegistSession implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
+	// 収支の対象年月
+	private String targetYearMonth;
+	// 月度収支画面に戻るときに表示する対象年月
+	private String returnYearMonth;
 	// セッション管理する収入登録情報のリストです。
 	private List<IncomeRegistItem> incomeRegistItemList = new ArrayList<IncomeRegistItem>();
 	
@@ -42,14 +46,18 @@ public class IncomeAndExpenditureRegistSession implements Serializable {
 	
 	/**
 	 *<pre>
-	 * セッション管理している商品検索条件情報をクリアします。
+	 * セッション管理している収支登録情報をクリアします。
 	 *</pre>
+	 * @param targetYearMonth 新規に設定する対象年月
+	 * @param returnYearMonth 新規に設定する月度収支画面に戻るときに表示する対象年月
 	 *
 	 */
-	public void clearData() {
-		incomeRegistItemList = null;
-		incomeRegistItemList = new ArrayList<IncomeRegistItem>();
-		expenditureRegistItemList = null;
-		expenditureRegistItemList = new ArrayList<ExpenditureRegistItem>();
+	public void clearData(String targetYearMonth, String returnYearMonth) {
+		this.targetYearMonth = targetYearMonth;
+		this.returnYearMonth = returnYearMonth;
+		this.incomeRegistItemList = null;
+		this.incomeRegistItemList = new ArrayList<IncomeRegistItem>();
+		this.expenditureRegistItemList = null;
+		this.expenditureRegistItemList = new ArrayList<ExpenditureRegistItem>();
 	}
 }

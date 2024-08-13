@@ -71,9 +71,25 @@ public class DomainCommonUtils {
 	 * @return フォーマット編集した日付の値
 	 *
 	 */
-	public static synchronized String formatyyyySPMMSPdd(LocalDate date) {
+	public static String formatyyyySPMMSPdd(LocalDate date) {
 		// 値がnullの場合は空文字列を返却、null以外の場合はYYYY/MM/DD形式に変換した値を返却
 		return (date == null) ? "" : date.format(yyyySPMMSPddformat);
+	}
+	
+	/**
+	 *<pre>
+	 * 指定されたLocalDateの日付の値を0パディングした文字列で返します。
+	 *</pre>
+	 * @param date 取得対象の日付
+	 * @return 0パディング編集した日付の値。nullの場合は空文字列
+	 *
+	 */
+	public static String getDateStr(LocalDate date) {
+		if(date == null) {
+			return "";
+		} else {
+			return String.format("%02d", date.getDayOfMonth());
+		}
 	}
 	
 	/**

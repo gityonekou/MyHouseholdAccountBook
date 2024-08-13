@@ -127,12 +127,11 @@ public class IncomeAndExpenditureRegistController {
 		log.debug("getInitLoad:targetYearMonth="+ targetYearMonth + ",returnYearMonth=" + returnYearMonth);
 		
 		// 収支登録セッション情報をクリア
-		registListSession.clearData();
+		registListSession.clearData(targetYearMonth, returnYearMonth);
 		// 画面表示データ読込
-		IncomeAndExpenditureRegistResponse response = usecase.readInitInfo(loginUserSession.getLoginUserInfo(), targetYearMonth, returnYearMonth);
+		IncomeAndExpenditureRegistResponse response = usecase.readInitInfo(loginUserSession.getLoginUserInfo(), targetYearMonth);
 		// 新しい支出登録情報をセッションに設定
 		registListSession.setExpenditureRegistItemList(response.getExpenditureRegistItemList());
-		/* 画面表示情報返却 */
 		// 画面表示情報にログインユーザ名を設定
 		return response.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
@@ -155,7 +154,7 @@ public class IncomeAndExpenditureRegistController {
 		log.debug("getUpdateLoad:targetYearMonth="+ targetYearMonth);
 		
 		// 収支登録セッション情報をクリア
-		registListSession.clearData();
+		registListSession.clearData(targetYearMonth, targetYearMonth);
 		// 画面表示データ読込
 		IncomeAndExpenditureRegistResponse response = usecase.readUpdateInfo(loginUserSession.getLoginUserInfo(), targetYearMonth);
 		// 収入登録情報をセッションに設定
@@ -184,6 +183,8 @@ public class IncomeAndExpenditureRegistController {
 		return this.usecase.readIncomeAddSelect(
 					// ログインユーザ情報
 					loginUserSession.getLoginUserInfo(),
+					// 収支の対象年月
+					registListSession.getTargetYearMonth(),
 					// セッションに設定されている収支情報のリスト
 					registListSession.getIncomeRegistItemList(),
 					// セッションに設定されている支出情報のリスト
@@ -210,6 +211,8 @@ public class IncomeAndExpenditureRegistController {
 		return this.usecase.readIncomeUpdateSelect(
 					// ログインユーザ情報
 					loginUserSession.getLoginUserInfo(),
+					// 収支の対象年月
+					registListSession.getTargetYearMonth(),
 					// 収入コード
 					incomeCode,
 					// セッションに設定されている収支情報のリスト
@@ -245,6 +248,7 @@ public class IncomeAndExpenditureRegistController {
 			// 初期表示情報を取得し、入力チェックエラーを設定
 			return this.usecase.readIncomeUpdateBindingErrorSetInfo(
 						loginUserSession.getLoginUserInfo(),
+						registListSession.getTargetYearMonth(),
 						inputForm,
 						registListSession.getIncomeRegistItemList(),
 						registListSession.getExpenditureRegistItemList())
@@ -258,6 +262,7 @@ public class IncomeAndExpenditureRegistController {
 			// actionに従い、処理を実行
 			IncomeAndExpenditureRegistResponse response = this.usecase.execIncomeAction(
 					loginUserSession.getLoginUserInfo(),
+					registListSession.getTargetYearMonth(),
 					inputForm,
 					registListSession.getIncomeRegistItemList());
 			// 収入一覧をセッションに設定
@@ -289,6 +294,7 @@ public class IncomeAndExpenditureRegistController {
 			// 初期表示情報を取得し、入力チェックエラーを設定
 			return this.usecase.readIncomeUpdateBindingErrorSetInfo(
 						loginUserSession.getLoginUserInfo(),
+						registListSession.getTargetYearMonth(),
 						inputForm,
 						registListSession.getIncomeRegistItemList(),
 						registListSession.getExpenditureRegistItemList())
@@ -304,6 +310,7 @@ public class IncomeAndExpenditureRegistController {
 			// actionに従い、処理を実行
 			IncomeAndExpenditureRegistResponse response = this.usecase.execIncomeAction(
 					loginUserSession.getLoginUserInfo(),
+					registListSession.getTargetYearMonth(),
 					inputForm,
 					registListSession.getIncomeRegistItemList());
 			// 収入一覧をセッションに設定
@@ -348,6 +355,8 @@ public class IncomeAndExpenditureRegistController {
 		return this.usecase.readExpenditureUpdateSelect(
 					// ログインユーザ情報
 					loginUserSession.getLoginUserInfo(),
+					// 収支の対象年月
+					registListSession.getTargetYearMonth(),
 					// 支出コード
 					expenditureCode,
 					// セッションに設定されている収支情報のリスト
@@ -383,6 +392,7 @@ public class IncomeAndExpenditureRegistController {
 			// 初期表示情報を取得し、入力チェックエラーを設定
 			return this.usecase.readExpenditureUpdateBindingErrorSetInfo(
 						loginUserSession.getLoginUserInfo(),
+						registListSession.getTargetYearMonth(),
 						inputForm,
 						registListSession.getIncomeRegistItemList(),
 						registListSession.getExpenditureRegistItemList())
@@ -396,6 +406,7 @@ public class IncomeAndExpenditureRegistController {
 			// actionに従い、処理を実行
 			IncomeAndExpenditureRegistResponse response = this.usecase.execExpenditureAction(
 					loginUserSession.getLoginUserInfo(),
+					registListSession.getTargetYearMonth(),
 					inputForm,
 					registListSession.getExpenditureRegistItemList());
 			// 支出一覧をセッションに設定
@@ -427,6 +438,7 @@ public class IncomeAndExpenditureRegistController {
 			// 初期表示情報を取得し、入力チェックエラーを設定
 			return this.usecase.readExpenditureUpdateBindingErrorSetInfo(
 						loginUserSession.getLoginUserInfo(),
+						registListSession.getTargetYearMonth(),
 						inputForm,
 						registListSession.getIncomeRegistItemList(),
 						registListSession.getExpenditureRegistItemList())
@@ -442,6 +454,7 @@ public class IncomeAndExpenditureRegistController {
 			// actionに従い、処理を実行
 			IncomeAndExpenditureRegistResponse response = this.usecase.execExpenditureAction(
 					loginUserSession.getLoginUserInfo(),
+					registListSession.getTargetYearMonth(),
 					inputForm,
 					registListSession.getExpenditureRegistItemList());
 			// 支出一覧をセッションに設定
@@ -467,6 +480,8 @@ public class IncomeAndExpenditureRegistController {
 		return this.usecase.readIncomeAndExpenditureInfoList(
 					// ログインユーザ情報
 					loginUserSession.getLoginUserInfo(),
+					// 収支の対象年月
+					registListSession.getTargetYearMonth(),
 					// セッションに設定されている収支情報のリスト
 					registListSession.getIncomeRegistItemList(),
 					// セッションに設定されている支出情報のリスト
@@ -493,6 +508,8 @@ public class IncomeAndExpenditureRegistController {
 		return this.usecase.readIncomeAndExpenditureInfoList(
 				// ログインユーザ情報
 				loginUserSession.getLoginUserInfo(),
+				// 収支の対象年月
+				registListSession.getTargetYearMonth(),
 				// セッションに設定されている収支情報のリスト
 				registListSession.getIncomeRegistItemList(),
 				// セッションに設定されている支出情報のリスト
