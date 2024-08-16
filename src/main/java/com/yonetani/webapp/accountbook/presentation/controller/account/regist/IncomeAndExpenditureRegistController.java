@@ -466,6 +466,30 @@ public class IncomeAndExpenditureRegistController {
 	
 	/**
 	 *<pre>
+	 * 支出項目選択画面で対象の支出項目選択時のGET要求時マッピングです。
+	 * 選択した支出項目の詳細情報を表示し、次のアクションのためのボタンを表示します。
+	 *</pre>
+	 * @param sisyutuItemCode 選択した支出項目コード
+	 * @return 支出項目選択画面
+	 *
+	 */
+	@GetMapping("/expenditureitemactselect")
+	public ModelAndView getExpenditureItemActSelect(@RequestParam("sisyutuItemCode") String sisyutuItemCode) {
+		log.debug("getExpenditureItemActSelect:sisyutuItemCode=" + sisyutuItemCode);
+		// 画面表示情報を取得
+		return this.usecase.readExpenditureItemActSelect(
+					// ログインユーザ情報
+					loginUserSession.getLoginUserInfo(),
+					// 支出項目コード
+					sisyutuItemCode)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+	
+	/**
+	 *<pre>
 	 * 収支登録画面で収入情報、および、支出情報登録後のリダイレクト(Get要求時)のマッピングです。
 	 * 収支登録画面の各収支一覧を表示します。
 	 *</pre>

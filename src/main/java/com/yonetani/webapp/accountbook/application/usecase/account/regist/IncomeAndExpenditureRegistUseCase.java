@@ -35,11 +35,12 @@ import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.Fixed
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiTuki;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.ExpenditureItemForm;
+import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.ExpenditureSelectItemForm;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.IncomeItemForm;
+import com.yonetani.webapp.accountbook.presentation.response.account.regist.ExpenditureItemSelectResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.IncomeAndExpenditureRegistResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.IncomeAndExpenditureRegistResponse.ExpenditureListItem;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.IncomeAndExpenditureRegistResponse.IncomeListItem;
-import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.session.ExpenditureRegistItem;
 import com.yonetani.webapp.accountbook.presentation.session.IncomeRegistItem;
@@ -484,19 +485,6 @@ public class IncomeAndExpenditureRegistUseCase {
 		
 		return response;
 	}
-
-	/**
-	 *<pre>
-	 * 支出項目選択画面表示情報を取得します。
-	 *</pre>
-	 * @param user ログインユーザ情報
-	 * @return 支出項目選択画面の表示情報
-	 *
-	 */
-	public AbstractResponse readExpenditureAddSelect(LoginUserInfo loginUserInfo) {
-		// TODO 自動生成されたメソッド・スタブ
-		return null;
-	}
 	
 	/**
 	 *<pre>
@@ -740,7 +728,57 @@ public class IncomeAndExpenditureRegistUseCase {
 		
 		return response;
 	}
+	
+	/**
+	 *<pre>
+	 * 支出項目選択画面表示情報を取得します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @return 支出項目選択画面の表示情報
+	 *
+	 */
+	public ExpenditureItemSelectResponse readExpenditureAddSelect(LoginUserInfo user) {
+		log.debug("readExpenditureAddSelect:userid=" + user.getUserId());
 		
+		// レスポンス
+		ExpenditureItemSelectResponse response = ExpenditureItemSelectResponse.getInstance();
+		// 支出項目一覧をすべて取得
+		sisyutuItemComponent.setSisyutuItemList(user, response);
+		
+		return response;
+	}
+	
+	/**
+	 *<pre>
+	 * 指定の支出項目コードに対応する支出項目情報と支出項目一覧情報を取得し支出項目選択画面の表示情報に設定します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param sisyutuItemCode 支出項目コード
+	 * @return 支出項目選択画面の表示情報
+	 *
+	 */
+	public ExpenditureItemSelectResponse readExpenditureItemActSelect(LoginUserInfo user, String sisyutuItemCode) {
+		log.debug("readExpenditureItemActSelect:userid=" + user.getUserId() + ", sisyutuItemCode=" + sisyutuItemCode);
+		// レスポンス
+		ExpenditureItemSelectResponse response = ExpenditureItemSelectResponse.getInstance();
+		// 支出項目一覧をすべて取得
+		sisyutuItemComponent.setSisyutuItemList(user, response);
+		// 支出項目詳細内容を設定
+		response.setSisyutuItemDetailContext(
+				sisyutuItemComponent.getSisyutuItem(user, sisyutuItemCode).getSisyutuItemDetailContext().toString());
+		// 選択した支出項目・イベント情報のフォームデータを設定
+		ExpenditureSelectItemForm selectForm = new ExpenditureSelectItemForm();
+		selectForm.setSisyutuItemCode(sisyutuItemCode);
+		response.setExpenditureSelectItemForm(selectForm);
+		// 支出項目コードに対応する支出項目名(＞で区切った値)を設定
+		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, sisyutuItemCode));		
+		
+		// イベント支出項目でイベントが登録されている場合、対応するイベント一覧を取得
+		// TODO:
+		
+		return response;
+	}
+	
 	/**
 	 *<pre>
 	 * 収入情報入力フォームを指定して収支登録画面の表示情報を生成します。

@@ -48,6 +48,48 @@ public class SisyutuItemComponent {
 	
 	/**
 	 *<pre>
+	 * 指定した支出項目コードに対応する支出項目テーブル情報(ドメイン)を返します。
+	 *</pre>
+	 * @param user 支出項目情報を取得するユーザ情報
+	 * @param sisyutuItemCode 取得対象の支出項目コード
+	 * @return 支出項目テーブル情報(ドメイン)
+	 *
+	 */
+	public SisyutuItem getSisyutuItem(LoginUserInfo user, String sisyutuItemCode) {
+		// 支出項目コードに対応する支出項目情報を取得
+		SisyutuItem sisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
+				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
+		if(sisyutuItem == null) {
+			// 選択した支出項目コードに対応する支出項目情報が存在しない場合エラーに遷移
+			throw new MyHouseholdAccountBookRuntimeException("対象の支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" + sisyutuItemCode);
+			
+		}
+		return sisyutuItem;
+	}
+	
+	/**
+	 *<pre>
+	 * 指定した支出項目コードが支出項目テーブルに存在するかを確認します。
+	 *</pre>
+	 * @param user 支出項目情報を取得するユーザ情報
+	 * @param sisyutuItemCode 取得対象の支出項目コード
+	 * @return 支出項目テーブルに存在する場合true、存在しない場合false
+	 *
+	 */
+	public boolean hasSisyutuItem(LoginUserInfo user, String sisyutuItemCode) {
+		// 支出項目コードに対応する支出項目情報を取得
+		SisyutuItem sisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
+				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
+		if(sisyutuItem == null) {
+			return false;
+			
+		} else {
+			return true;
+		}
+	}
+	
+	/**
+	 *<pre>
 	 * 支出項目の名称を＞区切りで連結した値で返します。
 	 *</pre>
 	 * @param user 支出項目一覧を取得するユーザ情報
