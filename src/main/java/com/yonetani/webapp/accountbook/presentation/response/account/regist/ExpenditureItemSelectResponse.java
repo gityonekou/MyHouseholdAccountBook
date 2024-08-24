@@ -14,6 +14,8 @@ import org.springframework.web.servlet.ModelAndView;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.ExpenditureSelectItemForm;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractExpenditureItemInfoManageResponse;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -26,6 +28,7 @@ import lombok.Setter;
  * @since 家計簿アプリ(1.00.A)
  *
  */
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExpenditureItemSelectResponse extends AbstractExpenditureItemInfoManageResponse {
 
 	// 選択した支出項目・イベント情報のフォームデータ

@@ -31,6 +31,8 @@ public class DomainCommonUtils {
 	private static final DecimalFormat kingakuDecimalFormat = new DecimalFormat("#,###");
 	// 日付フォーマット(YYYY/MM/DD)
 	private static final DateTimeFormatter yyyySPMMSPddformat = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+	// 日付フォーマット(YYYY年MM月DD日)
+	private static final DateTimeFormatter yyyyNenMMGatuddNitiformat = DateTimeFormatter.ofPattern("yyyy年MM月dd日");
 	// 円
 	private static final String YEN = "円";
 	
@@ -74,6 +76,20 @@ public class DomainCommonUtils {
 	public static String formatyyyySPMMSPdd(LocalDate date) {
 		// 値がnullの場合は空文字列を返却、null以外の場合はYYYY/MM/DD形式に変換した値を返却
 		return (date == null) ? "" : date.format(yyyySPMMSPddformat);
+	}
+	
+	/**
+	 *<pre>
+	 * 日付の値を「yyyy年MM月dd日」フォーマット編集した文字列の値を返却します。
+	 * nullの場合は空文字列が返却されます。
+	 *</pre>
+	 * @param date フォーマット編集する日付の値
+	 * @return フォーマット編集した日付の値
+	 *
+	 */
+	public static String formatyyyyNenMMGatuddNiti(LocalDate date) {
+		// 値がnullの場合は空文字列を返却、null以外の場合はYYYY/MM/DD形式に変換した値を返却
+		return (date == null) ? "" : date.format(yyyyNenMMGatuddNitiformat);
 	}
 	
 	/**

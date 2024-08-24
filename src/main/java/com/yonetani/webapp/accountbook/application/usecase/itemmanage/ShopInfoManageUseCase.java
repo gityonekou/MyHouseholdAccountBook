@@ -116,7 +116,7 @@ public class ShopInfoManageUseCase {
 		log.debug("readShopInfo:userid=" + user.getUserId() + ",shopCode=" + shopCode);
 		
 		// 入力チェック:店舗コード未設定の場合、エラー
-		if(StringUtils.hasLength(shopCode)) {
+		if(!StringUtils.hasLength(shopCode)) {
 			throw new MyHouseholdAccountBookRuntimeException("予期しないエラーが発生しました。管理者に問い合わせてください。shopCode:" + shopCode);
 		}
 		// 店舗一覧情報を取得

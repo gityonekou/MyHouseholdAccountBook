@@ -50,7 +50,7 @@ public class SisyutuItemComponent {
 	 *<pre>
 	 * 指定した支出項目コードに対応する支出項目テーブル情報(ドメイン)を返します。
 	 *</pre>
-	 * @param user 支出項目情報を取得するユーザ情報
+	 * @param user 支出項目情報を取得するユーザ情報(ログインユーザ情報)
 	 * @param sisyutuItemCode 取得対象の支出項目コード
 	 * @return 支出項目テーブル情報(ドメイン)
 	 *
@@ -71,7 +71,7 @@ public class SisyutuItemComponent {
 	 *<pre>
 	 * 指定した支出項目コードが支出項目テーブルに存在するかを確認します。
 	 *</pre>
-	 * @param user 支出項目情報を取得するユーザ情報
+	 * @param user 支出項目情報を取得するユーザ情報(ログインユーザ情報)
 	 * @param sisyutuItemCode 取得対象の支出項目コード
 	 * @return 支出項目テーブルに存在する場合true、存在しない場合false
 	 *
@@ -92,7 +92,7 @@ public class SisyutuItemComponent {
 	 *<pre>
 	 * 支出項目の名称を＞区切りで連結した値で返します。
 	 *</pre>
-	 * @param user 支出項目一覧を取得するユーザ情報
+	 * @param user 支出項目一覧を取得するユーザ情報(ログインユーザ情報)
 	 * @param sisyutuItemCode 取得対象の支出項目コード
 	 * @return 支出項目の名称を＞区切りで連結した値 名称取得に失敗した場合はnullを返却
 	 *
@@ -156,7 +156,7 @@ public class SisyutuItemComponent {
 	 *<pre>
 	 * 支出項目一覧を取得し、画面情報に設定します。
 	 *</pre>
-	 * @param user 支出項目一覧を取得するユーザ情報
+	 * @param user 支出項目一覧を取得するユーザ情報(ログインユーザ情報)
 	 * @param response 支出項目一覧を設定する画面情報
 	 *
 	 */
@@ -188,9 +188,9 @@ public class SisyutuItemComponent {
 	 *<pre>
 	 * 検索条件(支出項目表示順A～支出項目表示順B)までの支出項目一覧を取得し、画面情報に設定します。
 	 *</pre>
-	 * @param user 支出項目一覧を取得するユーザ情報
-	 * @param betweenA 支出項目表示順A
-	 * @param betweenB 支出項目表示順B
+	 * @param user 支出項目一覧を取得するユーザ情報(ログインユーザ情報)
+	 * @param betweenA 検索条件:支出項目表示順A(BETWEEN A AND BのAの値(下限値))
+	 * @param betweenB 検索条件:支出項目表示順B(BETWEEN A AND BのBの値(上限値))
 	 * @param response 支出項目一覧を設定する画面情報
 	 *
 	 */

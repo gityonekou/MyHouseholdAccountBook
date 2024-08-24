@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"
+		rel="stylesheet" >
+<link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<link th:href="@{/css/MyHouseholdAccountBookDatepicker.css}" rel="stylesheet" type="text/css">
+<title>情報管理(イベント)</title>
+</head>
+<body>
+
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">情報管理(イベント)</h5>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
+			</div>
+			
+			
+			<!-- イベント一覧表示エリア -->
+			<div class="card-body">
+				<div class="card">
+					<div class="card-body">
+						<p class="h6">■登録済みイベント一覧■</p>
+						<!--/* イベント一覧の検索結果ありの場合、テーブルヘッダ部を表示 */-->
+						<th:block th:if="${#lists.size(eventList)} > 0">
+						<p class="card-text">更新対象のイベントを選択してください。</p>
+						<table class="table table-sm table-bordered table-hover">
+							<thead>
+								<tr class="table-secondary">
+								<th scope="col" class="w20">支出項目名</th>
+								<th scope="col" class="w5"></th>
+								<th scope="col" class="w25">イベント名</th>
+								<th scope="col" class="w20">イベント期間</th>
+								<th scope="col">任意入力</th>
+								</tr>
+							</thead>
+							<tbody>
+								<th:block th:each="item, itemStat : ${eventList}">
+									<th:block th:if="${itemStat.odd}"><tr class="table-warning"></th:block>
+									<th:block th:if="${itemStat.even}"><tr></th:block>
+										<td th:text="${item.sisyutuItemName}">支出項目名</td>
+										<td align="center"><a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/managebaseinfo/eventinfo/updateload(eventCode=${item.eventCode})}">訂正</a></td>
+										<td th:text="${item.eventName}">イベント名</td>
+										<td><span th:text="${item.eventStartDate}">イベント開始日</span>～<span th:text="${item.eventEndDate}">イベント終了日</span></td>
+										<td th:text="${item.eventDetailContext}">イベント内容詳細(任意入力)</td>
+									</tr>
+								</th:block>
+							</tbody>
+						</table>
+						</th:block>
+						
+						<!-- イベント情報登録フォーム -->
+						<th:block th:if="${eventInfoForm} != null">
+						<ul class="list-group">
+							<li class="list-group-item border border-primary">
+								<form name="EventInfoUpdate" method="post" th:action="@{/myhacbook/managebaseinfo/eventinfo/update/}" th:object="${eventInfoForm}">
+									<span>支出項目名：</span><span th:text="*{sisyutuItemName}">支出項目名</span>
+									<div class="input-group w30">
+										　名称　：<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{eventName}" required>
+										<p class="invalid-feedback" th:errors="*{eventName}"></p>
+									</div>
+									<div class="input-group">
+										　任意　：<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{eventDetailContext}">
+										<p class="invalid-feedback" th:errors="*{eventDetailContext}"></p>
+									</div>
+									<div class="input-group w20">
+										開始日　：<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{eventStartDate}">
+										<p class="invalid-feedback" th:errors="*{eventStartDate}"></p>
+										<!--/* 開始日<終了日チェックの結果を出力 */-->
+										<p class="invalid-feedback" th:errors="*{checkStartEndDate}" style="display: block;"></p>
+									</div>
+									<div class="input-group w20">
+										終了日　：<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{eventEndDate}">
+										<p class="invalid-feedback" th:errors="*{eventEndDate}"></p>
+										<!--/* 開始日<終了日チェックの結果を出力 */-->
+										<p class="invalid-feedback" th:errors="*{checkStartEndDate}" style="display: block;"></p>
+									</div>
+									<div class="mb-3">
+										<br>
+										<span>&emsp;</span><button class="btn btn-primary" type="submit" name="actionUpdate">登録</button>
+										<th:block th:if="*{#strings.equals(action, 'update')}">
+											<span>&emsp;</span>
+											<span>&emsp;</span>
+											<span>&emsp;</span>
+											<button class="btn btn-primary" type="button" name="actionDelete" id="event-info-action-delete-btn" >イベント終了</button>
+										</th:block>
+										<input type="hidden" th:field="*{action}" />
+										<input type="hidden" th:field="*{eventCode}" />
+										<input type="hidden" th:field="*{sisyutuItemCode}" />
+									</div>
+								</form>
+								<!--/*イベント終了実行時に送信するフォーム */-->
+								<form name="EventInfoDelete" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/eventinfo/delete/}" th:object="${eventInfoForm}">
+									<input type="hidden" th:field="*{eventCode}" />
+								</form>
+							</li>
+						</ul>
+						</th:block>
+					</div>
+				</div>
+			</div>
+			
+			<!-- 支出項目一覧表示エリア -->
+			<div class="card-body">
+				<div class="card">
+					<div class="card-body">
+						<p class="h6">★イベント支出項目一覧★</p>
+						<p class="card-text">イベントを新規追加する場合、対象の支出項目を選択してください。</p>
+						
+						<ul class="list-unstyled">
+							<li class="mt-1 border border-dark">
+								<div class="bg-info">▼<span>趣味娯楽</span></div>
+								<ul class="list-unstyled ps-3">
+									
+									<!--/* 支出項目レベル２のデータ：支出項目(イベント)を繰り返すリストブロックー */-->
+									<li class="mt-1 border border-primary" th:each="item : ${expenditureItemList}">
+									<th:block th:if="${#lists.size(item.childItemList)}==0">
+										<div class="bg-warning">
+										<button class="btn d-inline-flex align-items-center collapsed border-0">■<span th:text="${item.sisyutuItemName}"></span></button>
+										：<span th:text="${item.sisyutuItemDetailContext}"></span>
+										</div>
+									</th:block>
+									<th:block th:if="${#lists.size(item.childItemList)}>0">
+										<div class="bg-warning">
+										<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+											aria-expanded="false" th:data-bs-target="'#area_'+${item.sisyutuItemCode}" th:aria-controls="'area_'+${item.sisyutuItemCode}">▼<span th:text="${item.sisyutuItemName}"></span></button>
+											：<span th:text="${item.sisyutuItemDetailContext}"></span>
+										</div>
+										<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${item.sisyutuItemCode}">
+
+											<!--/* 支出項目レベル３のデータを繰り返すリストブロックー */-->
+											<li class="mt-1 border border-primary" th:each="nest3ChildItem : ${item.childItemList}">
+											<th:block th:if="${#lists.size(nest3ChildItem.childItemList)}==0">
+												<button class="btn d-inline-flex align-items-center collapsed border-0">■<span th:text="${nest3ChildItem.sisyutuItemName}"></span></button>
+												：<a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/managebaseinfo/eventinfo/addload(sisyutuItemCode=${nest3ChildItem.sisyutuItemCode})}">イベントを登録</a>
+												：<span th:text="${nest3ChildItem.sisyutuItemDetailContext}"></span>
+											</th:block>
+											<th:block th:if="${#lists.size(nest3ChildItem.childItemList)}>0">
+												<div class="bg-warning">
+												<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+													aria-expanded="false" th:data-bs-target="'#area_'+${nest3ChildItem.sisyutuItemCode}" th:aria-controls="'area_'+${nest3ChildItem.sisyutuItemCode}">▼<span th:text="${nest3ChildItem.sisyutuItemName}"></span></button>
+													：<span th:text="${nest3ChildItem.sisyutuItemDetailContext}"></span>
+												</div>
+												<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${nest3ChildItem.sisyutuItemCode}">
+												
+													<!--/* 支出項目レベル４のデータを繰り返すリストブロックー */-->
+													<li class="mt-1 border border-primary" th:each="nest4ChildItem : ${nest3ChildItem.childItemList}">
+													<th:block th:if="${#lists.size(nest4ChildItem.childItemList)}==0">
+														<button class="btn d-inline-flex align-items-center collapsed border-0">■<span th:text="${nest4ChildItem.sisyutuItemName}"></span></button>
+														：<a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/managebaseinfo/eventinfo/addload(sisyutuItemCode=${nest4ChildItem.sisyutuItemCode})}">イベントを登録</a>
+														：<span th:text="${nest4ChildItem.sisyutuItemDetailContext}"></span>
+													</th:block>
+													<th:block th:if="${#lists.size(nest4ChildItem.childItemList)}>0">
+														<div class="bg-warning">
+														<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+															aria-expanded="false" th:data-bs-target="'#area_'+${nest4ChildItem.sisyutuItemCode}" th:aria-controls="'area_'+${nest4ChildItem.sisyutuItemCode}">▼<span th:text="${nest4ChildItem.sisyutuItemName}"></span></button>
+															：<span th:text="${nest4ChildItem.sisyutuItemDetailContext}"></span>
+														</div>
+														<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${nest4ChildItem.sisyutuItemCode}">
+														
+															<!--/* 支出項目レベル５のデータを繰り返すリストブロックー */-->
+															<li th:each="nest5ChildItem : ${nest4ChildItem.childItemList}">
+															<th:block th:if="${#lists.size(nest5ChildItem.childItemList)}==0">
+																<button class="btn d-inline-flex align-items-center collapsed border-0">■<span th:text="${nest5ChildItem.sisyutuItemName}"></span></button>
+																：<a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/managebaseinfo/eventinfo/addload(sisyutuItemCode=${nest5ChildItem.sisyutuItemCode})}">イベントを登録</a>
+																：<span th:text="${nest5ChildItem.sisyutuItemDetailContext}"></span>
+															</th:block>
+															<th:block th:if="${#lists.size(nest5ChildItem.childItemList)}>0">
+																<button class="btn d-inline-flex align-items-center collapsed border-0" data-bs-toggle="collapse"
+																	aria-expanded="false" th:data-bs-target="'#area_'+${nest5ChildItem.sisyutuItemCode}" th:aria-controls="'area_'+${nest5ChildItem.sisyutuItemCode}">▼<span th:text="${nest5ChildItem.sisyutuItemName}"></span></button>
+																	：<p class="btn btn-outline-info btn-sm">ここが表示される場合はエラーです</p>
+																	：<span th:text="${nest5ChildItem.sisyutuItemDetailContext}"></span>
+																<ul class="list-unstyled ps-3 collapse" th:id="'area_'+${nest5ChildItem.sisyutuItemCode}">
+																
+																	<!--/* 支出項目レベル６のデータを繰り返すリストブロックー＝仕様範囲外なので、エラーとなる */-->
+																	<li>仕様範囲外データ表示中１：エラーです。管理者に問い合わせてください</li>
+																	<li>仕様範囲外データ表示中２：エラーです。管理者に問い合わせてください</li>
+																	<li>仕様範囲外データ表示中３：エラーです。管理者に問い合わせてください</li>
+																</ul>
+															</th:block>
+															</li>
+														</ul>
+													</th:block>
+													</li>
+												</ul>
+											</th:block>
+											</li>
+										</ul>
+									</th:block>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	<!--/* イベント登録で使用するJavaScript */-->
+	<script type="text/javascript" th:src="@{/js/itemmanage/ManageEventInfo.js}"></script>
+	<!--/* 情報管理(イベント)画面で使用するJavaScript カレンダーのjquery部品を使用 */-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.1/jquery-ui.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+	<script>
+		$(function() {
+			$.datepicker.setDefaults($.datepicker.regional["ja"]);
+			$("#eventStartDate").datepicker();
+			$("#eventEndDate").datepicker();
+		});
+	</script>
+</body>
+</html>

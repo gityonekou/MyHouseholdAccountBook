@@ -81,6 +81,7 @@
 									<p class="invalid-feedback" th:errors="*{incomeKingaku}"></p>
 								</div>
 								<div class="mb-3 w15">
+									<br>
 									<span>&emsp;</span><button class="btn btn-primary" type="submit" name="actionUpdate">登録</button>
 									<th:block th:if="*{#strings.equals(action, 'update')}">
 										<span>&emsp;</span>
@@ -150,7 +151,7 @@
 										　詳細　：<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{expenditureDetailContext}">
 										<p class="invalid-feedback" th:errors="*{expenditureDetailContext}"></p>
 									</div>
-									<div class="input-group w15">
+									<div class="input-group w20">
 										支払日　：<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{siharaiDate}">
 										<p class="invalid-feedback" th:errors="*{siharaiDate}"></p>
 									</div>
@@ -159,6 +160,7 @@
 										<p class="invalid-feedback" th:errors="*{expenditureKingaku}"></p>
 									</div>
 									<div class="mb-3 w15">
+										<br>
 										<span>&emsp;</span><button class="btn btn-primary" type="submit" name="actionUpdate">登録</button>
 										<th:block th:if="*{#strings.equals(action, 'update')}">
 											<span>&emsp;</span>

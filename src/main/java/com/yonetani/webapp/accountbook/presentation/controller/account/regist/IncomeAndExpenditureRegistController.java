@@ -50,6 +50,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.yonetani.webapp.accountbook.application.usecase.account.regist.IncomeAndExpenditureRegistUseCase;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.ExpenditureItemForm;
+import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.ExpenditureSelectItemForm;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.IncomeItemForm;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.IncomeAndExpenditureRegistResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
@@ -486,6 +487,64 @@ public class IncomeAndExpenditureRegistController {
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
 				.build();
+	}
+	
+	/**
+	 *<pre>
+	 * 支出項目選択画面で対象の支出項目・イベント選択確定のPOST要求時マッピングです。
+	 * 選択した支出項目・イベント情報から新規の支出登録フォームを設定します。
+	 *</pre>
+	 * @param inputForm 選択した支出項目・イベント情報のフォームデータ
+	 * @return 収支登録画面情報
+	 *
+	 */
+	@PostMapping(value= "/expenditureselect/", params = "actionSelect")
+	public ModelAndView postExpenditureItemActSelect(@ModelAttribute ExpenditureSelectItemForm inputForm) {
+		log.debug("postExpenditureItemActSelect:input=" + inputForm);
+		// 画面表示情報を取得
+		return this.usecase.readNewExpenditureItem(
+					// ログインユーザ情報
+					loginUserSession.getLoginUserInfo(),
+					// 収支の対象年月
+					registListSession.getTargetYearMonth(),
+					// 選択した支出項目・イベント情報のフォームデータ
+					inputForm,
+					// セッションに設定されている収支情報のリスト
+					registListSession.getIncomeRegistItemList(),
+					// セッションに設定されている支出情報のリスト
+					registListSession.getExpenditureRegistItemList())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+	
+	/**
+	 *<pre>
+	 * 支出項目選択画面でキャンセルボタン押下時のPOST要求時マッピングです。
+	 * 収支登録画面の各収支一覧を表示します。
+	 *</pre>
+	 * @param inputForm 選択した支出項目・イベント情報のフォームデータ
+	 * @return 収支登録画面情報
+	 *
+	 */
+	@PostMapping(value= "/expenditureselect/", params = "actionCancel")
+	public ModelAndView postExpenditureItemActCancel() {
+		log.debug("postExpenditureItemActCancel:" );
+		// 画面表示情報を取得
+		return this.usecase.readIncomeAndExpenditureInfoList(
+				// ログインユーザ情報
+				loginUserSession.getLoginUserInfo(),
+				// 収支の対象年月
+				registListSession.getTargetYearMonth(),
+				// セッションに設定されている収支情報のリスト
+				registListSession.getIncomeRegistItemList(),
+				// セッションに設定されている支出情報のリスト
+				registListSession.getExpenditureRegistItemList())
+			// レスポンスにログインユーザ名を設定
+			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+			// レスポンスからModelAndViewを生成
+			.build();
 	}
 	
 	/**

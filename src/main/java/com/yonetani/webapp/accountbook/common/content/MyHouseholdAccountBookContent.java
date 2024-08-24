@@ -94,6 +94,10 @@ public class MyHouseholdAccountBookContent {
 	public static final String SISYUTU_ITEM_NITIYOU_SYOUMOUHIN_SORT_VALUE = "0502000000";
 	// 支出項目(食費)の支出項目表示順最大値
 	public static final String SISYUTU_ITEM_INSYOKU_SORT_MAX_VALUE = "0503999999";
+	// 支出項目(イベント)の支出項目表示順の値
+	public static final String SISYUTU_ITEM_EVENT_SORT_VALUE = "0603000000";
+	// 支出項目(イベント)に属する支出項目表示順の最大値
+	public static final String SISYUTU_ITEM_EVENT_SORT_MAX_VALUE = "0603999999";
 	
 	// 商品情報を検索条件に商品を検索(セッション格納値)
 	public static final String ACT_SEARCH_SHOPPING_ITEM = "ActSearchShoppingItem";

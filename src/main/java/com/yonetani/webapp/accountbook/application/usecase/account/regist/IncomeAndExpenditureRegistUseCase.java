@@ -29,6 +29,7 @@ import com.yonetani.webapp.accountbook.common.component.SisyutuItemComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostList;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
 import com.yonetani.webapp.accountbook.domain.model.common.CodeAndValuePair;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostShiharaiTukiList;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
@@ -508,16 +509,6 @@ public class IncomeAndExpenditureRegistUseCase {
 		for(ExpenditureRegistItem session : expenditureRegistItemList) {
 			if(Objects.equals(expenditureCode, session.getExpenditureCode())) {
 				
-				// 支出項目名を取得(＞で区切った値)
-				StringBuilder sisyutuItemNameBuff = new StringBuilder();
-				sisyutuItemNameBuff.append(sisyutuItemComponent.getSisyutuItemName(user, session.getSisyutuItemCode()));
-				if(StringUtils.hasLength(session.getEventCode())) {
-					// イベントコードが指定されている場合、イベント名を設定
-					sisyutuItemNameBuff.append("【");
-					sisyutuItemNameBuff.append("イベントコードに対応するイベント名を取得して表示");
-					sisyutuItemNameBuff.append("】");
-				}
-				
 				// 支出入力フォームに更新対象の支出情報を設定
 				expenditureItemForm = new ExpenditureItemForm();
 				// アクション：更新
@@ -527,7 +518,7 @@ public class IncomeAndExpenditureRegistUseCase {
 				// 支出項目コード
 				expenditureItemForm.setSisyutuItemCode(session.getSisyutuItemCode());
 				// 支出項目名＋イベント名
-				expenditureItemForm.setSisyutuItemName(sisyutuItemNameBuff.toString());
+				expenditureItemForm.setSisyutuItemName(getSisyutuItemNameStr(user, session.getSisyutuItemCode(), session.getEventCode()));
 				// イベントコード
 				expenditureItemForm.setEventCode(session.getEventCode());
 				// 支出名
@@ -766,15 +757,62 @@ public class IncomeAndExpenditureRegistUseCase {
 		// 支出項目詳細内容を設定
 		response.setSisyutuItemDetailContext(
 				sisyutuItemComponent.getSisyutuItem(user, sisyutuItemCode).getSisyutuItemDetailContext().toString());
-		// 選択した支出項目・イベント情報のフォームデータを設定
-		ExpenditureSelectItemForm selectForm = new ExpenditureSelectItemForm();
-		selectForm.setSisyutuItemCode(sisyutuItemCode);
-		response.setExpenditureSelectItemForm(selectForm);
 		// 支出項目コードに対応する支出項目名(＞で区切った値)を設定
-		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, sisyutuItemCode));		
+		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, sisyutuItemCode));	
 		
 		// イベント支出項目でイベントが登録されている場合、対応するイベント一覧を取得
 		// TODO:
+		
+		// 選択した支出項目・イベント情報のフォームデータを設定
+		ExpenditureSelectItemForm selectForm = new ExpenditureSelectItemForm();
+		selectForm.setSisyutuItemCode(sisyutuItemCode);
+		// TODO:
+		selectForm.setEventCode("TODO_eventCode");
+		response.setExpenditureSelectItemForm(selectForm);
+		
+		return response;
+	}
+	
+	/**
+	 *<pre>
+	 * 選択した支出項目コード・イベント情報をもとに新規の支出情報登録フォームを設定します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param targetYearMonth 収支の対象年月
+	 * @param inputForm 選択した支出項目・イベント情報フォームデータ
+	 * @param incomeRegistItemList セッションに設定されている収支情報のリスト
+	 * @param expenditureRegistItemList セッションに設定されている支出情報のリスト
+	 * @return 収支登録画面の表示情報
+	 *
+	 */
+	public IncomeAndExpenditureRegistResponse readNewExpenditureItem(LoginUserInfo user, String targetYearMonth,
+			ExpenditureSelectItemForm inputForm,
+			List<IncomeRegistItem> incomeRegistItemList, List<ExpenditureRegistItem> expenditureRegistItemList) {
+		log.debug("readNewExpenditureItem:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",inputForm=" + inputForm);
+		
+		// 選択した支出項目コードに対応する支出項目情報を取得
+		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(user, inputForm.getSisyutuItemCode());
+		
+		// 新規支出情報入力フォームを生成
+		ExpenditureItemForm expenditureItemForm = new ExpenditureItemForm();
+		// アクション：新規登録
+		expenditureItemForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_ADD);
+		// 支出項目コード
+		expenditureItemForm.setSisyutuItemCode(inputForm.getSisyutuItemCode());
+		// 支出項目名＋イベント名
+		expenditureItemForm.setSisyutuItemName(getSisyutuItemNameStr(user, inputForm.getSisyutuItemCode(), inputForm.getEventCode()));
+		// イベントコード
+		expenditureItemForm.setEventCode(inputForm.getEventCode());
+		// 支出名
+		expenditureItemForm.setExpenditureName(sisyutuItem.getSisyutuItemName().toString());
+		// 支出詳細
+		expenditureItemForm.setExpenditureDetailContext(sisyutuItem.getSisyutuItemDetailContext().toString());
+		
+		// レスポンスを生成
+		IncomeAndExpenditureRegistResponse response = createExpenditureItemFormResponse(targetYearMonth, expenditureItemForm);
+		
+		// セッション情報の各収支一覧情報を画面表示情報に設定
+		setIncomeAndExpenditureInfoList(incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
 	}
@@ -1005,5 +1043,29 @@ public class IncomeAndExpenditureRegistUseCase {
 				DomainCommonUtils.getDateStr(inputForm.getSiharaiDate()),
 				// 支払金額
 				DomainCommonUtils.convertBigDecimal(inputForm.getExpenditureKingaku(), 0));
+	}
+	
+	/**
+	 *<pre>
+	 * 画面表示する支出項目名(支出項目名(＞で区切った値)＋イベント名)の値を取得します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param sisyutuItemCode 支出項目コード
+	 * @param eventCode イベントコード
+	 * @return 支出項目名(支出項目名＋イベント名)
+	 *
+	 */
+	private String getSisyutuItemNameStr(LoginUserInfo user, String sisyutuItemCode, String eventCode) {
+		// 支出項目名を取得(＞で区切った値)
+		StringBuilder sisyutuItemNameBuff = new StringBuilder();
+		sisyutuItemNameBuff.append(sisyutuItemComponent.getSisyutuItemName(user, sisyutuItemCode));
+		if(StringUtils.hasLength(eventCode)) {
+			// イベントコードが指定されている場合、イベント名を設定
+			sisyutuItemNameBuff.append("【");
+			// TODO:
+			sisyutuItemNameBuff.append("イベントコードに対応するイベント名を取得して表示");
+			sisyutuItemNameBuff.append("】");
+		}
+		return sisyutuItemNameBuff.toString();
 	}
 }

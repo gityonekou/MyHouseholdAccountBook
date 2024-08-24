@@ -332,7 +332,7 @@ public class FixedCostInfoManageUseCase {
 		int deleteCount = fixedCostRepository.delete(deleteData);
 		// 追加件数が1件以上の場合、業務エラー
 		if(deleteCount != 1) {
-			throw new MyHouseholdAccountBookRuntimeException("固定費テーブル:FIXED_COST_TABLEへの削除件数が不正でした。[件数=" + deleteCount + "][add data:" + deleteData + "]");
+			throw new MyHouseholdAccountBookRuntimeException("固定費テーブル:FIXED_COST_TABLEへの削除件数が不正でした。[件数=" + deleteCount + "][delete data:" + deleteData + "]");
 		}
 		// レスポンスを生成(エラー時はエラー画面に遷移するので固定費情報は使用しない:nullを指定)
 		FixedCostInfoManageActSelectResponse response = FixedCostInfoManageActSelectResponse.getInstance(null);
