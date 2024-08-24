@@ -18,7 +18,9 @@
 		<div class="card">
 			<div class="card-body">
 				<h5 class="card-title">支出項目選択</h5>
-				<p class="card-text">何かのメッセージがある場合はここに表示</p>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
 			</div>
 			
 			<!-- 選択支出情報表示エリア -->
@@ -35,6 +37,15 @@
 						<div class="mb-3">
 							<label for="name" class="form-label">支出項目詳細内容：<span th:text="${sisyutuItemDetailContext}">支出項目詳細内容</span></label>
 						</div>
+						<!--/* イベント情報選択ボックス表示ありの場合 */-->
+						<th:block th:if="${eventSelectList} != null">
+						<div class="mb-3">
+							<label for="eventCode" class="form-label">イベント：▼対象のイベントを選択してください▼</label>
+							<select class="form-select" th:errorclass="is-invalid" th:field="*{eventCode}" required>
+								<option th:each="item : ${eventSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+							</select>
+						</div>
+						</th:block>
 						<div class="mb-3">
 							<button class="btn btn-primary" name="actionSelect" type="submit">確定</button>
 							<span>&emsp;</span>
@@ -42,6 +53,7 @@
 							<span>&emsp;</span>
 							<button class="btn btn-primary" name="actionCancel" type="submit">キャンセル</button>
 							<input type="hidden" th:field="*{sisyutuItemCode}" />
+							<input type="hidden" th:field="*{eventCodeRequired}" />
 						</div>
 					</div>
 					</form>

@@ -14,6 +14,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.event.EventItem;
 import com.yonetani.webapp.accountbook.domain.model.account.event.EventItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndEventCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 
 /**
  *<pre>
@@ -73,9 +74,19 @@ public interface EventItemTableRepository {
 	
 	/**
 	 *<pre>
+	 * ユーザID、支出項目コードに対応するイベント情報を取得します。
+	 *</pre>
+	 * @param search 検索対象のユーザID、支出項目コード
+	 * @return イベント情報のリスト
+	 *
+	 */
+	EventItemInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search);
+	
+	/**
+	 *<pre>
 	 * ユーザID、イベントコードに対応するイベント情報を取得します。
 	 *</pre>
-	 * @param search ユーザID、イベントコードの検索条件
+	 * @param search 検索対象のユーザID、イベントコード
 	 * @return イベント情報
 	 *
 	 */

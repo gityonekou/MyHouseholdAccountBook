@@ -108,7 +108,7 @@ public interface ShopTableRepository {
 	 *<pre>
 	 * ユーザID、店舗コードに対応する店舗情報を取得します。
 	 *</pre>
-	 * @param search ユーザID、店舗コードの検索条件
+	 * @param search 検索対象のユーザIDと店舗コード
 	 * @return 店舗情報
 	 *
 	 */

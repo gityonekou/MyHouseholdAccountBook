@@ -19,10 +19,12 @@ import com.yonetani.webapp.accountbook.domain.model.account.event.EventItemInqui
 import com.yonetani.webapp.accountbook.domain.model.account.event.EventItemInquiryList.EventInquiryItem;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndEventCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.event.EventItemTableRepository;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.event.EventItemInquiryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.event.EventItemReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndEventCodeSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndSisyutuItemCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.event.EventItemTableMapper;
 
@@ -79,6 +81,28 @@ public class EventItemTableDataSource implements EventItemTableRepository {
 	public EventItemInquiryList findById(SearchQueryUserId userId) {
 		// 検索結果を取得
 		List<EventItemInquiryReadDto> searchResult = mapper.findById(UserIdSearchQueryDto.from(userId.getUserId().toString()));
+		if(searchResult == null) {
+			// 検索結果なしの場合、0件データを返却
+			return EventItemInquiryList.from(null);
+		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
+			return EventItemInquiryList.from(searchResult.stream().map(dto -> createEventItemInquiryItem(dto))
+					.collect(Collectors.toUnmodifiableList()));
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public EventItemInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search) {
+		// 検索結果を取得
+		List<EventItemInquiryReadDto> searchResult = mapper.findByIdAndSisyutuItemCode(
+				UserIdAndSisyutuItemCodeSearchQueryDto.from(
+						// ユーザID
+						search.getUserId().toString(),
+						// 支出項目コード
+						search.getSisyutuItemCode().toString()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return EventItemInquiryList.from(null);

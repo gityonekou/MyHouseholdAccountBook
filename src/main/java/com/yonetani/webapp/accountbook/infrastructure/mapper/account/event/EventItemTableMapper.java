@@ -20,6 +20,7 @@ import org.apache.ibatis.annotations.Update;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.event.EventItemInquiryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.event.EventItemReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndEventCodeSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndSisyutuItemCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSearchQueryDto;
 
 /**
@@ -96,6 +97,18 @@ public interface EventItemTableMapper {
 	
 	/**
 	 *<pre>
+	 * イベントテーブル:EVENT_ITEM_TABLE、支出項目テーブル:SISYUTU_ITEM_TABLEから指定のユーザID、支出項目コードを条件に
+	 * イベント情報を参照します。
+	 *</pre>
+	 * @param search 検索条件:ユーザID、支出項目コード
+	 * @return イベント情報参照結果のリスト
+	 *
+	 */
+	@Select("sql/account/event/EventItemInquirySelectSql02.sql")
+	public List<EventItemInquiryReadDto> findByIdAndSisyutuItemCode(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
+	
+	/**
+	 *<pre>
 	 * 指定のユーザIDに対応するイベント情報が何件あるかを取得します。
 	 *</pre>
 	 * @param userId 検索条件:ユーザID
@@ -104,4 +117,5 @@ public interface EventItemTableMapper {
 	 */
 	@Select("sql/account/event/EventItemTableCountSql01.sql")
 	public int countById(@Param("dto") UserIdSearchQueryDto userId);
+	
 }

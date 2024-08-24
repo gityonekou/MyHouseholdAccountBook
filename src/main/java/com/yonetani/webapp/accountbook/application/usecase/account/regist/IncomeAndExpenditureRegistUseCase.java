@@ -28,10 +28,15 @@ import com.yonetani.webapp.accountbook.common.component.CodeTableItemComponent;
 import com.yonetani.webapp.accountbook.common.component.SisyutuItemComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.model.account.event.EventItem;
+import com.yonetani.webapp.accountbook.domain.model.account.event.EventItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostList;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
 import com.yonetani.webapp.accountbook.domain.model.common.CodeAndValuePair;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndEventCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostShiharaiTukiList;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.repository.account.event.EventItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiTuki;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
@@ -72,6 +77,8 @@ public class IncomeAndExpenditureRegistUseCase {
 	private final SisyutuItemComponent sisyutuItemComponent;
 	// 固定費テーブル:FIXED_COST_TABLEリポジトリー
 	private final FixedCostTableRepository fixedCostRepository;
+	// イベントテーブル:EVENT_ITEM_TABLEリポジトリー
+	private final EventItemTableRepository eventRepository;
 	
 	/**
 	 *<pre>
@@ -601,7 +608,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		
 		// 新規登録の場合
 		if(Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
-
+			
 			// 支出情報入力フォームに支出コードを設定：(仮登録用支出コード):yyyyMMddHHmmssSSS
 			inputForm.setExpenditureCode(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS").format(LocalDateTime.now()));
 			
@@ -760,14 +767,38 @@ public class IncomeAndExpenditureRegistUseCase {
 		// 支出項目コードに対応する支出項目名(＞で区切った値)を設定
 		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, sisyutuItemCode));	
 		
-		// イベント支出項目でイベントが登録されている場合、対応するイベント一覧を取得
-		// TODO:
-		
-		// 選択した支出項目・イベント情報のフォームデータを設定
+		// 選択した支出項目のフォームデータを作成
 		ExpenditureSelectItemForm selectForm = new ExpenditureSelectItemForm();
 		selectForm.setSisyutuItemCode(sisyutuItemCode);
-		// TODO:
-		selectForm.setEventCode("TODO_eventCode");
+		
+		// イベント支出項目でイベントが登録されている場合、対応するイベント一覧を取得し選択プルダウンリストとしてレスポンスに設定
+		EventItemInquiryList inquiryList = eventRepository.findByIdAndSisyutuItemCode(
+				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
+		if(!inquiryList.isEmpty()) {
+			// 検索結果ありの場合、イベント情報選択のプルダウンリストをレスポンスに設定
+			response.addEventSelectList(inquiryList.getValues().stream().map(domain -> {
+				// 表示テキストを作成(任意入力が入力されている場合、追加表示
+				StringBuilder textWk = new StringBuilder(domain.getEventName().toString());
+				if(StringUtils.hasLength(domain.getEventDetailContext().toString())) {
+					textWk.append("【");
+					textWk.append(domain.getEventDetailContext().toString());
+					textWk.append("】");
+				}
+				// OptionItemを返却
+				return OptionItem.from(
+					// プルダウン選択値:イベントコード
+					domain.getEventCode().toString(),
+					// プルダウン表示テキスト:イベントイベント名(任意入力)
+					textWk.toString());
+			}).collect(Collectors.toList()));
+			
+			// イベント情報選択ボックスありフラグを設定
+			selectForm.setEventCodeRequired(true);
+			// 先頭のイベント情報を選択
+			selectForm.setEventCode(inquiryList.getValues().get(0).getEventCode().toString());
+		}
+		
+		// 支出項目のフォームデータをレスポンスに設定
 		response.setExpenditureSelectItemForm(selectForm);
 		
 		return response;
@@ -790,6 +821,12 @@ public class IncomeAndExpenditureRegistUseCase {
 			List<IncomeRegistItem> incomeRegistItemList, List<ExpenditureRegistItem> expenditureRegistItemList) {
 		log.debug("readNewExpenditureItem:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",inputForm=" + inputForm);
 		
+		// イベント情報必須の場合、イベントコードが未設定の場合はここで予期しないエラーとして判定する
+		if(inputForm.isEventCodeRequired() && !StringUtils.hasLength(inputForm.getEventCode())) {
+			throw new MyHouseholdAccountBookRuntimeException(
+					"イベント情報を必須選択になっていますが、対象のイベントコードが空です。管理者に問い合わせてください。[eventCode="
+							+ inputForm.getEventCode() + "]");
+		}
 		// 選択した支出項目コードに対応する支出項目情報を取得
 		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(user, inputForm.getSisyutuItemCode());
 		
@@ -1059,11 +1096,18 @@ public class IncomeAndExpenditureRegistUseCase {
 		// 支出項目名を取得(＞で区切った値)
 		StringBuilder sisyutuItemNameBuff = new StringBuilder();
 		sisyutuItemNameBuff.append(sisyutuItemComponent.getSisyutuItemName(user, sisyutuItemCode));
+		
+		// イベントコードが指定されている場合、イベント名を設定
 		if(StringUtils.hasLength(eventCode)) {
-			// イベントコードが指定されている場合、イベント名を設定
+			
+			// イベントコードに対応するイベント情報を取得
+			EventItem eventItem = eventRepository.findByIdAndEventCode(SearchQueryUserIdAndEventCode.from(user.getUserId(), eventCode));
+			// イベントコードに対応するイベント情報がない場合、エラー
+			if(eventItem == null) {
+				throw new MyHouseholdAccountBookRuntimeException("対象のイベント情報が存在しません。管理者に問い合わせてください。eventCode:" + eventCode);
+			}
 			sisyutuItemNameBuff.append("【");
-			// TODO:
-			sisyutuItemNameBuff.append("イベントコードに対応するイベント名を取得して表示");
+			sisyutuItemNameBuff.append(eventItem.getEventName().toString());
 			sisyutuItemNameBuff.append("】");
 		}
 		return sisyutuItemNameBuff.toString();

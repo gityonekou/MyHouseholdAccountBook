@@ -95,7 +95,7 @@ public interface FixedCostTableMapper {
 	
 	/**
 	 *<pre>
-	 * 固定費テーブル:FIXED_COST_TABLE、支出項目テーブル:SISYUTU_ITEM_TABLEから指定のユーザID、固定費コードを条件に
+	 * 固定費テーブル:FIXED_COST_TABLE、支出項目テーブル:SISYUTU_ITEM_TABLEから指定のユーザID、支出項目コードを条件に
 	 * 固定費情報を参照します。
 	 *</pre>
 	 * @param search 検索条件:ユーザID、支出項目コード

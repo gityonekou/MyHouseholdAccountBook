@@ -136,7 +136,7 @@
 						<ul class="list-group">
 							<li class="list-group-item border border-primary">
 								<form name="ExpenditureItemInfo" method="post" th:action="@{/myhacbook/accountregist/incomeandexpenditure/expenditureupdate/}" th:object="${expenditureItemForm}">
-									<span>支出項目名：</span><span th:text="*{sisyutuItemName}">支出項目名</span>&emsp;<a class="btn text-bg-success btn-sm" href="./ExpenditureItemSelectInit.html">支出項目変更</a><br>
+									<span>支出項目名：</span><span th:text="*{sisyutuItemName}">支出項目名</span>
 									<div class="input-group w30">
 										　名称　：<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{expenditureName}" required>
 										<p class="invalid-feedback" th:errors="*{expenditureName}"></p>

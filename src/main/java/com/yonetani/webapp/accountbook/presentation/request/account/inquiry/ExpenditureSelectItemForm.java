@@ -27,4 +27,6 @@ public class ExpenditureSelectItemForm {
 	private String sisyutuItemCode;
 	// イベントコード
 	private String eventCode;
+	// イベントコードが必須かどうか
+	private boolean eventCodeRequired;
 }
