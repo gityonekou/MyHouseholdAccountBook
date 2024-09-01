@@ -51,7 +51,7 @@ public class IncomeItemForm {
 	private String incomeDetailContext;
 	// 収入金額
 	@NotNull
-	@Min(1)
+	@Min(0)
 	private Integer incomeKingaku;
 	
 	/**

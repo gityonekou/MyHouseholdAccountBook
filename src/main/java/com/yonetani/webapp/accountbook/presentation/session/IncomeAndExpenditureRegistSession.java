@@ -60,4 +60,17 @@ public class IncomeAndExpenditureRegistSession implements Serializable {
 		this.expenditureRegistItemList = null;
 		this.expenditureRegistItemList = new ArrayList<ExpenditureRegistItem>();
 	}
+	
+	/**
+	 *<pre>
+	 * セッション管理している収支登録情報をnullクリアします。
+	 *</pre>
+	 *
+	 */
+	public void clearData() {
+		this.targetYearMonth = null;
+		this.returnYearMonth = null;
+		this.incomeRegistItemList = null;
+		this.expenditureRegistItemList = null;
+	}
 }

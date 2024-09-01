@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm;
@@ -183,7 +184,7 @@ public class ShopInfoManageResponse extends AbstractResponse {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String getRedirectUrl() {
+	protected String buildRedirectUrl(RedirectAttributes redirectAttributes) {
 		// お店情報登録完了後、リダイレクトするURL
 		return "redirect:/myhacbook/managebaseinfo/shopinfo/updateComplete/";
 	}

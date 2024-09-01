@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.EventInfoForm;
 
@@ -120,7 +121,7 @@ public class EventInfoManageResponse extends AbstractExpenditureItemInfoManageRe
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String getRedirectUrl() {
+	protected String buildRedirectUrl(RedirectAttributes redirectAttributes) {
 		// イベント情報登録完了後、リダイレクトするURL
 		return "redirect:/myhacbook/managebaseinfo/eventinfo/updateComplete/";
 	}

@@ -14,20 +14,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.ExpenditureItemForm;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.IncomeItemForm;
-import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.session.ExpenditureRegistItem;
 import com.yonetani.webapp.accountbook.presentation.session.IncomeRegistItem;
 
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -44,120 +41,13 @@ import lombok.Setter;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class IncomeAndExpenditureRegistResponse extends AbstractResponse {
+public class IncomeAndExpenditureRegistResponse extends AbstractIncomeAndExpenditureRegistResponse {
 	
-	/**
-	 *<pre>
-	 * 収支登録画面に表示する収入一覧情報です
-	 *
-	 *</pre>
-	 *
-	 * @author ：Kouki Yonetani
-	 * @since 家計簿アプリ(1.00.A)
-	 *
-	 */
-	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-	@Getter
-	@EqualsAndHashCode
-	public static class IncomeListItem {
-		// 収入コード(仮登録用収入コード)
-		private final String incomeCode;
-		// 収入区分名
-		private final String incomeKubunName;
-		// 収入詳細
-		private final String incomeDetailContext;
-		// 収入金額
-		private final String incomeKingaku;
-		
-		/**
-		 *<pre>
-		 * 引数の値から収入一覧情報を生成して返します。
-		 *</pre>
-		 * @param incomeCode 収入コード(仮登録用収入コード)
-		 * @param incomeKubunName 収入区分名
-		 * @param incomeDetailContext 収入詳細
-		 * @param incomeKingaku 収入金額
-		 * @return 収入一覧情報
-		 *
-		 */
-		public static IncomeListItem from(
-				String incomeCode,
-				String incomeKubunName,
-				String incomeDetailContext,
-				String incomeKingaku) {
-			return new IncomeListItem(incomeCode, incomeKubunName, incomeDetailContext, incomeKingaku);
-		}
-	}
-	
-	/**
-	 *<pre>
-	 * 収支登録画面に表示する支出一覧情報です
-	 *
-	 *</pre>
-	 *
-	 * @author ：Kouki Yonetani
-	 * @since 家計簿アプリ(1.00.A)
-	 *
-	 */
-	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-	@Getter
-	@EqualsAndHashCode
-	public static class ExpenditureListItem {
-		// 支出コード(仮登録用支出コード)
-		private final String expenditureCode;
-		// 支出名と支出区分
-		private final String expenditureName;
-		// 支出詳細
-		private final String expenditureDetailContext;
-		// 支払日
-		private final String siharaiDate;
-		// 支払金額
-		private final String shiharaiKingaku;
-		
-		/**
-		 *<pre>
-		 * 引数の値から支出一覧情報を生成して返します。
-		 *</pre>
-		 * @param expenditureCode 支出コード(仮登録用支出コード)
-		 * @param expenditureName 支出名と支出区分
-		 * @param expenditureDetailContext 支出詳細
-		 * @param siharaiDate 支払日
-		 * @param shiharaiKingaku 支払金額
-		 * @return 支出一覧情報
-		 *
-		 */
-		public static ExpenditureListItem from(
-				String expenditureCode,
-				String expenditureName,
-				String expenditureDetailContext,
-				String siharaiDate,
-				String shiharaiKingaku) {
-			return new ExpenditureListItem(expenditureCode, expenditureName, expenditureDetailContext,
-					siharaiDate, shiharaiKingaku);
-			
-		}
-	}
-	
-	// 「yyyy年MM月度」の年の値
-	private final String viewYear;
-	// 「yyyy年MM月度」の月の値
-	private final String viewMonth;
-	
-	// 収入情報
-	private List<IncomeListItem> incomeListInfo = new ArrayList<>();
-	// 収入金額合計
-	@Setter
-	private String incomeSumKingaku;
 	// 収入情報入力フォーム
 	private final IncomeItemForm incomeItemForm;
 	// 収入区分選択ボックス
 	private final SelectViewItem incomeKubunSelectList;
 	
-	// 支出情報
-	private List<ExpenditureListItem> expenditureListInfo = new ArrayList<>();
-	// 支出金額合計
-	@Setter
-	private String expenditureSumKingaku;
 	// 支出情報入力フォーム
 	private final ExpenditureItemForm expenditureItemForm;
 	// 支出区分選択ボックス
@@ -174,45 +64,6 @@ public class IncomeAndExpenditureRegistResponse extends AbstractResponse {
 	
 	/**
 	 *<pre>
-	 * 収入一覧を追加します。
-	 *</pre>
-	 * @param addList 追加する収入一覧
-	 *
-	 */
-	public void addIncomeListInfo(List<IncomeListItem> addList) {
-		if(!CollectionUtils.isEmpty(addList)) {
-			incomeListInfo.addAll(addList);
-		}
-	}
-	
-	/**
-	 *<pre>
-	 * 収入情報を収入一覧に追加します。
-	 *</pre>
-	 * @param addList 追加する収入情報
-	 *
-	 */
-	public void addIncomeListItem(IncomeListItem addItem) {
-		if(addItem != null) {
-			incomeListInfo.add(addItem);
-		}
-	}
-	
-	/**
-	 *<pre>
-	 * 支出一覧を追加します。
-	 *</pre>
-	 * @param addList 追加する支出一覧
-	 *
-	 */
-	public void addExpenditureListInfo(List<ExpenditureListItem> addList) {
-		if(!CollectionUtils.isEmpty(addList)) {
-			expenditureListInfo.addAll(addList);
-		}
-	}
-	
-	/**
-	 *<pre>
 	 * デフォルト値からレスポンス情報を生成して返します。
 	 *</pre>
 	 * @param targetYearMonth 収支対象の年月(YYYMM)
@@ -220,10 +71,10 @@ public class IncomeAndExpenditureRegistResponse extends AbstractResponse {
 	 *
 	 */
 	public static IncomeAndExpenditureRegistResponse getInstance(String targetYearMonth) {
-		// 対象年月を年・月に分割
-		String[] yearMonth = getYearMonth(targetYearMonth);
 		// 収入入力フォーム、収入区分選択ボックス、支出入力フォーム、支出区分選択ボックスなしで画面を表示
-		return new IncomeAndExpenditureRegistResponse(yearMonth[0], yearMonth[1], null, null, null, null);
+		IncomeAndExpenditureRegistResponse response = new IncomeAndExpenditureRegistResponse(null, null, null, null);
+		response.setYearMonth(targetYearMonth);
+		return response;
 	}
 	
 	/**
@@ -240,8 +91,6 @@ public class IncomeAndExpenditureRegistResponse extends AbstractResponse {
 	public static IncomeAndExpenditureRegistResponse getInstance(String targetYearMonth,
 			IncomeItemForm incomeItemForm, List<OptionItem> addIncomeKubunList) {
 		
-		// 対象年月を年・月に分割
-		String[] yearMonth = getYearMonth(targetYearMonth);
 		// 収入情報フォームデータがnullなら空データを設定(アクションなしで処理継続となるので、後の登録ではエラーになる：継続処理可能)
 		if(incomeItemForm == null) {
 			incomeItemForm = new IncomeItemForm();
@@ -253,8 +102,10 @@ public class IncomeAndExpenditureRegistResponse extends AbstractResponse {
 			incomeKubunList.addAll(addIncomeKubunList);
 		}
 		// 収入入力フォームの表示データを設定して画面を表示
-		return new IncomeAndExpenditureRegistResponse(yearMonth[0], yearMonth[1],
-				incomeItemForm, SelectViewItem.from(incomeKubunList), null, null);
+		IncomeAndExpenditureRegistResponse response = new IncomeAndExpenditureRegistResponse(incomeItemForm,
+				SelectViewItem.from(incomeKubunList), null, null);
+		response.setYearMonth(targetYearMonth);
+		return response;
 	}
 	
 	/**
@@ -271,8 +122,6 @@ public class IncomeAndExpenditureRegistResponse extends AbstractResponse {
 	public static IncomeAndExpenditureRegistResponse getInstance(String targetYearMonth, 
 			ExpenditureItemForm expenditureItemForm, List<OptionItem> addExpenditureKubunList) {
 		
-		// 対象年月を年・月に分割
-		String[] yearMonth = getYearMonth(targetYearMonth);
 		// 支出情報フォームデータがnullなら空データを設定(アクションなしで処理継続となるので、後の登録ではエラーになる：継続処理可能)
 		if(expenditureItemForm == null) {
 			expenditureItemForm = new ExpenditureItemForm();
@@ -284,29 +133,9 @@ public class IncomeAndExpenditureRegistResponse extends AbstractResponse {
 			expenditureKubunList.addAll(addExpenditureKubunList);
 		}
 		// 支出入力フォームの表示データを設定して画面を表示
-		return new IncomeAndExpenditureRegistResponse(yearMonth[0], yearMonth[1], null, null,
-				expenditureItemForm, SelectViewItem.from(expenditureKubunList));
-	}
-	
-	/**
-	 *<pre>
-	 * 対象年月(yyyyMM)の値を年と月に分割して配列として返します。
-	 * 配列の1要素目に年、2要素目に月の値が格納されます。
-	 *</pre>
-	 * @param targetYearMonth 対象年月(yyyyMM)
-	 * @return 配列の1要素目に年、2要素目に月
-	 *
-	 */
-	private static String[] getYearMonth(String targetYearMonth) {
-		if(!StringUtils.hasLength(targetYearMonth) || targetYearMonth.length() != 6) {
-			throw new MyHouseholdAccountBookRuntimeException("対象年月の値が不正です。管理者に問い合わせてください。[targetYearMonth=" + targetYearMonth + "]");
-		}
-		String[] yearMonth = new String[2];
-		// yyyyMMのyyyyの値を設定(年の値を設定)
-		yearMonth[0] = targetYearMonth.substring(0, 4);
-		// yyyyMMのMMの値を設定(月の値を設定)
-		yearMonth[1] = targetYearMonth.substring(4);
-		return yearMonth;
+		IncomeAndExpenditureRegistResponse response = new IncomeAndExpenditureRegistResponse(null, null,expenditureItemForm, SelectViewItem.from(expenditureKubunList));
+		response.setYearMonth(targetYearMonth);
+		return response;
 	}
 	
 	/**
@@ -316,22 +145,10 @@ public class IncomeAndExpenditureRegistResponse extends AbstractResponse {
 	public ModelAndView build() {
 		// 画面表示のModelとViewを生成
 		ModelAndView modelAndView = createModelAndView("account/regist/IncomeAndExpenditureRegist");
-		// 「yyyy年MM月度」の年の値
-		modelAndView.addObject("viewYear", viewYear);
-		// 「yyyy年MM月度」の月の値
-		modelAndView.addObject("viewMonth", viewMonth);
-		// 収入一覧情報
-		modelAndView.addObject("incomeListInfo", incomeListInfo);
-		// 収入金額合計
-		modelAndView.addObject("incomeSumKingaku", incomeSumKingaku);
 		// 収入登録フォーム
 		modelAndView.addObject("incomeItemForm", incomeItemForm);
 		// 収入区分選択ボックス
 		modelAndView.addObject("incomeKubunSelectList", incomeKubunSelectList);
-		// 支出一覧情報
-		modelAndView.addObject("expenditureListInfo", expenditureListInfo);
-		// 支出金額合計
-		modelAndView.addObject("expenditureSumKingaku", expenditureSumKingaku);
 		// 支出登録フォーム
 		modelAndView.addObject("expenditureItemForm", expenditureItemForm);
 		// 支出区分選択ボックス
@@ -344,7 +161,7 @@ public class IncomeAndExpenditureRegistResponse extends AbstractResponse {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String getRedirectUrl() {
+	protected String buildRedirectUrl(RedirectAttributes redirectAttributes) {
 		// 登録完了後、リダイレクトするURL(一覧画面)
 		return "redirect:/myhacbook/accountregist/incomeandexpenditure/updateComplete/";
 	}

@@ -185,17 +185,15 @@
 			<div class="card-body">
 				<div class="card">
 					<div class="card-body">
+						<form name="RegistCheckInfo" method="post" th:action="@{/myhacbook/accountregist/incomeandexpenditure/registcheck/}">
 							<div class="mb-3">
-								<button class="btn btn-primary" type="button" id="check">内容確認</button>
+								<button class="btn btn-primary" type="submit" name="actionCheck">内容確認</button>
 								<span>&emsp;</span>
 								<span>&emsp;</span>
 								<span>&emsp;</span>
-								<button class="btn btn-primary" type="button" id="cancel">キャンセル</button>
+								<button class="btn btn-primary" type="submit" name="actionCancel">キャンセル</button>
 							</div>
-							<form name="CheckProcess" action="./MonthEndClosingCheck.html">
-							</form>
-							<form name="Cancel" action="./AccountBookMonth.html">
-							</form>
+						</form>
 					</div>
 				</div>
 			</div>

@@ -11,6 +11,7 @@
 package com.yonetani.webapp.accountbook.presentation.response.itemmanage;
 
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -112,7 +113,7 @@ public class FixedCostInfoManageActSelectResponse extends AbstractFixedCostItemL
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String getRedirectUrl() {
+	protected String buildRedirectUrl(RedirectAttributes redirectAttributes) {
 		// 固定費削除完了後、リダイレクトするURL
 		return "redirect:/myhacbook/managebaseinfo/fixedcostinfo/updateComplete/";
 	}

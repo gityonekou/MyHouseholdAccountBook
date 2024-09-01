@@ -14,12 +14,14 @@ package com.yonetani.webapp.accountbook.presentation.controller.account.inquiry;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.inquiry.AccountMonthInquiryUseCase;
+import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
 import lombok.RequiredArgsConstructor;
@@ -134,5 +136,28 @@ public class AccountMonthInquiryController {
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
 				.build();
+	}
+	
+	/**
+	 *<pre>
+	 * 各種登録処理で、各月の収支画面にリダイレクト(Get要求時)のマッピングです。
+	 * 対象月の収支画面を表示します。
+	 *</pre>
+	 * @param targetYearMonth 表示対象の年月
+	 * @param redirectMessages リダイレクト元から引き継いだメッセージ
+	 * @return マイ家計簿(各月の収支)画面
+	 *
+	 */
+	@GetMapping("/registComplete/")
+	public ModelAndView registComplete(
+			@RequestParam("targetYearMonth") String targetYearMonth, @ModelAttribute CompleteRedirectMessages redirectMessages) {
+		log.debug("registComplete:targetYearMonth="+ targetYearMonth + ",input=" + redirectMessages);
+		
+		// 画面表示情報を取得
+		return this.usecase.read(loginUserSession.getLoginUserInfo(), targetYearMonth)
+			// レスポンスにログインユーザ名を設定
+			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+			// レスポンスからModelAndViewを生成
+			.buildComplete(redirectMessages);
 	}
 }

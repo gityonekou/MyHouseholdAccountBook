@@ -10,6 +10,7 @@
 package com.yonetani.webapp.accountbook.presentation.response.adminmenu;
 
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.presentation.request.adminmenu.AdminMenuUploadBaseInfoFileForm;
@@ -84,7 +85,7 @@ public class AdminMenuBaseInfoResponse extends AbstractResponse {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String getRedirectUrl() {
+	protected String buildRedirectUrl(RedirectAttributes redirectAttributes) {
 		// ベース情報登録完了後、リダイレクトするURL
 		return "redirect:/myhacbook/admin/completeUploadBaseInfo/";
 	}

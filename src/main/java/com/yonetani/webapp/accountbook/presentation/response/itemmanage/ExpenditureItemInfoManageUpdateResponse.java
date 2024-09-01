@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ExpenditureItemInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
@@ -99,7 +100,7 @@ public class ExpenditureItemInfoManageUpdateResponse extends AbstractExpenditure
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String getRedirectUrl() {
+	protected String buildRedirectUrl(RedirectAttributes redirectAttributes) {
 		// 支出項目情報登録完了後、リダイレクトするURL
 		return "redirect:/myhacbook/managebaseinfo/expenditeminfo/updateComplete/";
 	}

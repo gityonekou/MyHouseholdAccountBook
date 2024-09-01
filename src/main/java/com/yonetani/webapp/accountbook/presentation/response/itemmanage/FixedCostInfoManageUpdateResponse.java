@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
@@ -101,7 +102,7 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String getRedirectUrl() {
+	protected String buildRedirectUrl(RedirectAttributes redirectAttributes) {
 		// 固定費登録完了後、リダイレクトするURL
 		return "redirect:/myhacbook/managebaseinfo/fixedcostinfo/updateComplete/";
 	}

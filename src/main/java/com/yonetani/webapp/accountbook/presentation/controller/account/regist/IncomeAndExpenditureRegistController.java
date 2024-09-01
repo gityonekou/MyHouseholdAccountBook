@@ -186,9 +186,9 @@ public class IncomeAndExpenditureRegistController {
 					loginUserSession.getLoginUserInfo(),
 					// 収支の対象年月
 					registListSession.getTargetYearMonth(),
-					// セッションに設定されている収支情報のリスト
+					// セッションに設定されている収入登録情報のリスト
 					registListSession.getIncomeRegistItemList(),
-					// セッションに設定されている支出情報のリスト
+					// セッションに設定されている支出登録情報のリスト
 					registListSession.getExpenditureRegistItemList())
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
@@ -216,9 +216,9 @@ public class IncomeAndExpenditureRegistController {
 					registListSession.getTargetYearMonth(),
 					// 収入コード
 					incomeCode,
-					// セッションに設定されている収支情報のリスト
+					// セッションに設定されている収入登録情報のリスト
 					registListSession.getIncomeRegistItemList(),
-					// セッションに設定されている支出情報のリスト
+					// セッションに設定されている支出登録情報のリスト
 					registListSession.getExpenditureRegistItemList())
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
@@ -360,9 +360,9 @@ public class IncomeAndExpenditureRegistController {
 					registListSession.getTargetYearMonth(),
 					// 支出コード
 					expenditureCode,
-					// セッションに設定されている収支情報のリスト
+					// セッションに設定されている収入登録情報のリスト
 					registListSession.getIncomeRegistItemList(),
-					// セッションに設定されている支出情報のリスト
+					// セッションに設定されている支出登録情報のリスト
 					registListSession.getExpenditureRegistItemList())
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
@@ -509,9 +509,9 @@ public class IncomeAndExpenditureRegistController {
 					registListSession.getTargetYearMonth(),
 					// 選択した支出項目・イベント情報のフォームデータ
 					inputForm,
-					// セッションに設定されている収支情報のリスト
+					// セッションに設定されている収入登録情報のリスト
 					registListSession.getIncomeRegistItemList(),
-					// セッションに設定されている支出情報のリスト
+					// セッションに設定されている支出登録情報のリスト
 					registListSession.getExpenditureRegistItemList())
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
@@ -537,9 +537,9 @@ public class IncomeAndExpenditureRegistController {
 				loginUserSession.getLoginUserInfo(),
 				// 収支の対象年月
 				registListSession.getTargetYearMonth(),
-				// セッションに設定されている収支情報のリスト
+				// セッションに設定されている収入登録情報のリスト
 				registListSession.getIncomeRegistItemList(),
-				// セッションに設定されている支出情報のリスト
+				// セッションに設定されている支出登録情報のリスト
 				registListSession.getExpenditureRegistItemList())
 			// レスポンスにログインユーザ名を設定
 			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
@@ -565,9 +565,9 @@ public class IncomeAndExpenditureRegistController {
 					loginUserSession.getLoginUserInfo(),
 					// 収支の対象年月
 					registListSession.getTargetYearMonth(),
-					// セッションに設定されている収支情報のリスト
+					// セッションに設定されている収入登録情報のリスト
 					registListSession.getIncomeRegistItemList(),
-					// セッションに設定されている支出情報のリスト
+					// セッションに設定されている支出登録情報のリスト
 					registListSession.getExpenditureRegistItemList())
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
@@ -577,29 +577,138 @@ public class IncomeAndExpenditureRegistController {
 	
 	/**
 	 *<pre>
-	 * 収支登録内容確認画面で登録完了後のリダイレクト(Get要求時)のマッピングです。
-	 * 登録した月の収支画面を表示します。
+	 * 収支登録画面で内容確認ボタン押下時のPOST要求時マッピングです。
+	 * 収入一覧・支出一覧をもとに、収支登録内容確認画面に遷移します。
+	 * 収入一覧の登録件数が0件の場合、エラーとします。(もし、未収入でも0円で収入を登録する必要あり)
 	 *</pre>
-	 * @param redirectMessages リダイレクト元から引き継いだメッセージ
-	 * @return 収支登録画面
+	 * @return 収支登録内容確認画面
 	 *
 	 */
-	@GetMapping("/registComplete/")
-	public ModelAndView registComplete(@ModelAttribute CompleteRedirectMessages redirectMessages) {
-		log.debug("registComplete:input=" + redirectMessages);
+	@PostMapping(value = "/registcheck/", params = "actionCheck")
+	public ModelAndView getRegistCheckLoad() {
+		log.debug("getRegistCheckLoad:");
+		
+		// 収入登録情報の件数で遷移先を判定
+		if(registListSession.getIncomeRegistItemList().size() == 0) {
+			// 収入登録情報が未登録の場合、収支登録画面にエラーメッセージを表示(メッセージは収支登録ユースケースで設定)
+			return this.usecase.readRegistCheckErrorSetInfo(
+					// ログインユーザ情報
+					loginUserSession.getLoginUserInfo(),
+					// 収支の対象年月
+					registListSession.getTargetYearMonth(),
+					// セッションに設定されている収入登録情報のリスト
+					registListSession.getIncomeRegistItemList(),
+					// セッションに設定されている支出登録情報のリスト
+					registListSession.getExpenditureRegistItemList())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+			
+		} else {
+			// 収入登録情報の登録ありの場合、収支登録内容確認画面に遷移
+			return this.usecase.readRegistCheckInfo(
+					// ログインユーザ情報
+					loginUserSession.getLoginUserInfo(),
+					// 収支の対象年月
+					registListSession.getTargetYearMonth(),
+					// セッションに設定されている収入登録情報のリスト
+					registListSession.getIncomeRegistItemList(),
+					// セッションに設定されている支出登録情報のリスト
+					registListSession.getExpenditureRegistItemList())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+		}
+
+	}
+	
+	/**
+	 *<pre>
+	 * 収支登録画面でキャンセルボタン押下時のPOST要求時マッピングです。
+	 * 入力内容をキャンセルし、各月の収支参照画面に戻ります。
+	 * (新規登録の場合、登録対象月ではなく遷移元の月(一つ前に表示していた月)が遷移対象となります。
+	 *</pre>
+	 *
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
+	 * @return 各月の収支参照画面
+	 *
+	 */
+	@PostMapping(value = "/registcheck/", params = "actionCancel")
+	public ModelAndView getRegistCancelLoad(RedirectAttributes redirectAttributes) {
+		log.debug("getRegistCancelLoad:");
+		
+		// セッションの収支の対象年月、月度収支画面に戻るときに表示する対象年月の値を取得
+		String targetYearMonth = registListSession.getTargetYearMonth();
+		String returnYearMonth = registListSession.getReturnYearMonth();
+		
+		// セッション情報をクリア
+		registListSession.clearData();
+		
 		// 画面表示情報を取得
-		return this.usecase.readIncomeAndExpenditureInfoList(
+		return this.usecase.readRegistCancelInfo(loginUserSession.getLoginUserInfo(), targetYearMonth, returnYearMonth)
+			// レスポンスにログインユーザ名を設定
+			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+			// 各月の収支参照画面にリダイレクト
+			.buildRedirect(redirectAttributes);
+	}
+	
+	/**
+	 *<pre>
+	 * 収支登録内容確認画面で登録ボタン押下時のPOST要求マッピングです。
+	 * セッションに登録されている収入一覧情報、支出一覧情報をもとに収支を登録します。
+	 * 
+	 *</pre>
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
+	 * @return 各月の収支参照画面
+	 *
+	 */
+	@PostMapping(value = "/regist/", params = "actionUpdate")
+	public ModelAndView postRegist(RedirectAttributes redirectAttributes) {
+		log.debug("postRegist:");
+		
+		// actionに従い、処理を実行
+		return this.usecase.execRegistAction(
 				// ログインユーザ情報
 				loginUserSession.getLoginUserInfo(),
 				// 収支の対象年月
 				registListSession.getTargetYearMonth(),
-				// セッションに設定されている収支情報のリスト
+				// セッションに設定されている収入登録情報のリスト
 				registListSession.getIncomeRegistItemList(),
-				// セッションに設定されている支出情報のリスト
+				// セッションに設定されている支出登録情報のリスト
 				registListSession.getExpenditureRegistItemList())
 			// レスポンスにログインユーザ名を設定
 			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
-			// レスポンスからModelAndViewを生成
-			.buildComplete(redirectMessages);
+			// 各月の収支参照画面にリダイレクト
+			.buildRedirect(redirectAttributes);
+	}
+	
+	/**
+	 *<pre>
+	 * 収支登録内容確認画面で前に戻るボタン押下時のPOST要求マッピングです。
+	 * 収支登録画面の各収支一覧を表示します。
+	 *</pre>
+	 * @return 収支登録画面
+	 *
+	 */
+	@PostMapping(value = "/regist/", params = "actionReturnBack")
+	public ModelAndView postRegistReturnBack() {
+		log.debug("postRegistReturnBack:");
+		
+		// 画面表示情報を取得
+		return this.usecase.readIncomeAndExpenditureInfoList(
+					// ログインユーザ情報
+					loginUserSession.getLoginUserInfo(),
+					// 収支の対象年月
+					registListSession.getTargetYearMonth(),
+					// セッションに設定されている収入登録情報のリスト
+					registListSession.getIncomeRegistItemList(),
+					// セッションに設定されている支出登録情報のリスト
+					registListSession.getExpenditureRegistItemList())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
 	}
 }

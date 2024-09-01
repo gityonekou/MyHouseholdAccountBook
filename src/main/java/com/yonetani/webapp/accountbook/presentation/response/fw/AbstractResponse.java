@@ -164,19 +164,22 @@ public abstract class AbstractResponse {
 	 * デフォルトはトップ画面(トップメニュー画面)です。
 	 * 遷移先を変更する場合はこのメソッドをオーバーライドして実装してください。
 	 *</pre>
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
 	 * @return トランザクションリが完了した場合にリダイレクトするURL
 	 *
 	 */
-	protected String getRedirectUrl() {
+	protected String buildRedirectUrl(RedirectAttributes redirectAttributes) {
 		return "redirect:/myhacbook/topmenu/";
 	}
 	
 	/**
 	 *<pre>
 	 * リダイレクト処理です。
+	 * トランザクションリが完了した場合、getRedirectUrl()の呼び出し結果からModelAndViewを生成し、遷移先にリダイレクトします。
+	 * トランザクション処理化完了しなかった場合、build()を呼び出して対応する画面表示処理を呼び出します。
+	 * 
 	 *</pre>
-	 * @param redirectViewName トランザクションリが完了した場合にリダイレクトするURL
-	 * @param errorViewName トランザクション処理化完了しなかった場合に遷移するURL
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
 	 * @return 画面返却データのModelAndView
 	 *
 	 */
@@ -188,7 +191,7 @@ public abstract class AbstractResponse {
 			redirectAttributes.addFlashAttribute(redirectMessages);
 			
 			// リダイレクト
-			return new ModelAndView(getRedirectUrl());
+			return new ModelAndView(buildRedirectUrl(redirectAttributes));
 			
 		} else {
 			return build();
