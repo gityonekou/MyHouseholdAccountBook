@@ -67,14 +67,12 @@
 											<tr class="table-success border border-success" th:if="${item.sisyutuItemLevel == 1}">
 												<td th:if="${#strings.isEmpty(item.percentage)}">■<span th:text="${item.sisyutuItemName}"></span>：<span th:text="${item.sisyutuKingaku}"></span></td>
 												<td th:if="!${#strings.isEmpty(item.percentage)}">■<span th:text="${item.sisyutuItemName}"></span>：<span th:text="${item.sisyutuKingaku}"></span>&emsp;<code>(B:<span th:text="${item.sisyutuKingakuB}"></span>：<span th:text="${item.percentage}"></span>%)</code></td>
-												<td th:if="${item.closingFlg}"><span th:text="${item.siharaiDate}"></span></td>
-												<td th:if="!${item.closingFlg}"><code th:text="${item.siharaiDate}"></code></td>
+												<td th:text="${item.siharaiDate}">支払日</td>
 											</tr>
 											<tr th:if="${item.sisyutuItemLevel == 2}">
 												<td th:if="${#strings.isEmpty(item.percentage)}">&emsp;・<span th:text="${item.sisyutuItemName}"></span>：<span th:text="${item.sisyutuKingaku}"></span></td>
 												<td th:if="!${#strings.isEmpty(item.percentage)}">&emsp;・<span th:text="${item.sisyutuItemName}"></span>：<span th:text="${item.sisyutuKingaku}"></span>&emsp;<code>(B:<span th:text="${item.sisyutuKingakuB}"></span>：<span th:text="${item.percentage}"></span>%)</code></td>
-												<td th:if="${item.closingFlg}"><span th:text="${item.siharaiDate}"></span></td>
-												<td th:if="!${item.closingFlg}"><code th:text="${item.siharaiDate}"></code></td>
+												<td th:text="${item.siharaiDate}">支払日</td>
 											</tr>
 										</th:block>
 									</tbody>

@@ -132,7 +132,7 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@Getter
 	@EqualsAndHashCode
-	public static class ExpenditureItem {
+	public static class ExpenditureListItem {
 		// 支出項目レベル(1～5)
 		private final int sisyutuItemLevel;
 		// 支出項目名
@@ -145,8 +145,6 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 		private final String percentage;
 		// 支払日
 		private final String siharaiDate;
-		// 支払い済みフラグ
-		private final boolean closingFlg;
 		
 		/**
 		 *<pre>
@@ -158,33 +156,30 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 		 * @param sisyutuKingakuB 支出金額b
 		 * @praam percentage 支出金額B割合
 		 * @param siharaiDate 支払日
-		 * @param closingFlg 支払い済みフラグ
 		 * @return 月毎の支出金額情報明細
 		 *
 		 */
-		public static ExpenditureItem form(
+		public static ExpenditureListItem form(
 				int sisyutuItemLevel,
 				String sisyutuItemName,
 				String sisyutuKingaku,
 				String sisyutuKingakuB,
 				String percentage,
-				String siharaiDate,
-				boolean closingFlg) {
-			return new ExpenditureItem(
+				String siharaiDate) {
+			return new ExpenditureListItem(
 					sisyutuItemLevel,
 					sisyutuItemName,
 					sisyutuKingaku,
 					sisyutuKingakuB,
 					percentage,
-					siharaiDate,
-					closingFlg);
+					siharaiDate);
 		}
 	}
 	
 	// 表示する月の対象年月情報
 	private final TargetYearMonthInfo targetYearMonthInfo;
 	// 月毎の支出金額情報明細のリストです。
-	private List<ExpenditureItem> expenditureItemList = new ArrayList<>();
+	private List<ExpenditureListItem> expenditureItemList = new ArrayList<>();
 	
 	// 指定月の収支情報
 	// 表示する月の収支情報が登録済みかどうかのフラグ(デフォルトはデータあり)
@@ -222,7 +217,7 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 	 * @param addList 追加する月毎の支出項目明細のリスト
 	 *
 	 */
-	public void addExpenditureItemList(List<ExpenditureItem> addList) {
+	public void addExpenditureItemList(List<ExpenditureListItem> addList) {
 		if(!CollectionUtils.isEmpty(addList)) {
 			expenditureItemList.addAll(addList);
 		}

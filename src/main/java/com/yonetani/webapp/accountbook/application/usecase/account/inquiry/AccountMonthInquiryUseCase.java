@@ -25,7 +25,7 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.AccountMonthInquiryRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureInquiryRepository;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse;
-import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse.ExpenditureItem;
+import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse.ExpenditureListItem;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse.TargetYearMonthInfo;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
@@ -193,17 +193,16 @@ public class AccountMonthInquiryUseCase {
 	 * @return 支出項目のリスト(レスポンス)
 	 *
 	 */
-	private List<ExpenditureItem> convertExpenditureItemList(AccountMonthInquiryExpenditureItemList resultList) {
+	private List<ExpenditureListItem> convertExpenditureItemList(AccountMonthInquiryExpenditureItemList resultList) {
 		// 返却するリストを不変オブジェクトに変換する
 		return resultList.getValues().stream().map(domain ->
-		AccountMonthInquiryResponse.ExpenditureItem.form(
+		AccountMonthInquiryResponse.ExpenditureListItem.form(
 				domain.getSisyutuItemLevel().getValue(),
 				domain.getSisyutuItemName().toString(),
 				domain.getSisyutuKingaku().toString(),
 				domain.getSisyutuKingakuB().toSisyutuKingakuBString(),
 				domain.getSisyutuKingakuB().toPercentageString(),
-				domain.getShiharaiDate().toString(),
-				domain.getClosingFlg().getValue())).collect(Collectors.toUnmodifiableList());
+				domain.getShiharaiDate().toString())).collect(Collectors.toUnmodifiableList());
 	}
 	
 }

@@ -47,6 +47,4 @@ public class SisyutuKingakuAndSisyutuItemReadDto {
 	private final BigDecimal sisyutuKingakuB;
 	// 支払日
 	private final LocalDate siharaiDate;
-	// 支払い済みフラグ
-	private final boolean closingFlg;
 }

@@ -63,14 +63,13 @@ public class AccountMonthInquiryDataSource implements AccountMonthInquiryReposit
 	 */
 	private AccountMonthInquiryExpenditureItemList convertExpenditureItemList(List<SisyutuKingakuAndSisyutuItemReadDto> resultDto) {
 		return AccountMonthInquiryExpenditureItemList.from(resultDto.stream().map(dto -> 
-		AccountMonthInquiryExpenditureItemList.ExpenditureItem.from(
+		AccountMonthInquiryExpenditureItemList.ExpenditureListItem.from(
 					dto.getSisyutuItemCode(),
 					dto.getSisyutuItemName(),
 					dto.getSisyutuItemLevel(),
 					dto.getSisyutuKingaku(),
 					dto.getSisyutuKingakuB(),
-					dto.getSiharaiDate(),
-					dto.isClosingFlg())).collect(Collectors.toUnmodifiableList()));
+					dto.getSiharaiDate())).collect(Collectors.toUnmodifiableList()));
 	}
 
 }

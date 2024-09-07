@@ -16,7 +16,6 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ClosingFlg;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ShiharaiDate;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemLevel;
@@ -58,7 +57,7 @@ public class AccountMonthInquiryExpenditureItemList {
 	@Getter
 	@ToString
 	@EqualsAndHashCode
-	public static class ExpenditureItem {
+	public static class ExpenditureListItem {
 		// 支出項目コード
 		private final SisyutuItemCode sisyutuItemCode;
 		// 支出項目名
@@ -71,8 +70,6 @@ public class AccountMonthInquiryExpenditureItemList {
 		private final SisyutuKingakuB sisyutuKingakuB;
 		// 支払日
 		private final ShiharaiDate shiharaiDate;
-		// 支払い済みフラグ
-		private final ClosingFlg closingFlg;
 		
 		/**
 		 *<pre>
@@ -84,32 +81,29 @@ public class AccountMonthInquiryExpenditureItemList {
 		 * @param sisyutuKingaku 支出金額
 		 * @param sisyutuKingakuB 支出金額b
 		 * @param siharaiDate 支払日
-		 * @param closingFlg 支払い済みフラグ
 		 * @return 月毎の支出項目明細
 		 *
 		 */
-		public static ExpenditureItem from(
+		public static ExpenditureListItem from(
 					String sisyutuItemCode,
 					String sisyutuItemName,
 					String sisyutuItemLevel,
 					BigDecimal sisyutuKingaku,
 					BigDecimal sisyutuKingakuB,
-					LocalDate siharaiDate,
-					boolean closingFlg
+					LocalDate siharaiDate
 				) {
-			return new ExpenditureItem(
+			return new ExpenditureListItem(
 					SisyutuItemCode.from(sisyutuItemCode),
 					SisyutuItemName.from(sisyutuItemName),
 					SisyutuItemLevel.from(sisyutuItemLevel),
 					SisyutuKingaku.from(sisyutuKingaku),
 					SisyutuKingakuB.from(sisyutuKingaku, sisyutuKingakuB),
-					ShiharaiDate.from(siharaiDate),
-					ClosingFlg.from(closingFlg));
+					ShiharaiDate.from(siharaiDate));
 		}
 	}
 	
 	// 月毎の支出項目明細のリスト
-	private final List<ExpenditureItem> values;
+	private final List<ExpenditureListItem> values;
 	
 	/**
 	 *<pre>
@@ -119,7 +113,7 @@ public class AccountMonthInquiryExpenditureItemList {
 	 * @return AccountMonthInquiryExpenditureItemListのドメインモデル
 	 *
 	 */
-	public static AccountMonthInquiryExpenditureItemList from(List<ExpenditureItem> values) {
+	public static AccountMonthInquiryExpenditureItemList from(List<ExpenditureListItem> values) {
 		if(CollectionUtils.isEmpty(values)) {
 			return new AccountMonthInquiryExpenditureItemList(Collections.emptyList());
 		} else {
