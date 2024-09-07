@@ -39,15 +39,15 @@ import lombok.ToString;
 @Getter
 @ToString
 @EqualsAndHashCode
-public class IncomeAndExpenseInquiryItem {
+public class IncomeAndExpenditureInquiryItem {
 	// 対象月
 	private final TargetMonth month;
 	// 収入金額
 	private final SyuunyuuKingaku syuunyuuKingaku;
-	// 支出金額
-	private final SisyutuKingaku sisyutuKingaku;
 	// 支出予定金額
 	private final SisyutuYoteiKingaku sisyutuYoteiKingaku;
+	// 支出金額
+	private final SisyutuKingaku sisyutuKingaku;
 	// 収支
 	private final SyuusiKingaku syuusiKingaku;
 	
@@ -57,23 +57,23 @@ public class IncomeAndExpenseInquiryItem {
 	 *</pre>
 	 * @param month 対象月(TARGET_MONTH)
 	 * @param syuunyuuKingaku 収入金額(INCOME_KINGAKU)
-	 * @param sisyutuKingaku 支出金額(EXPENSE_KINGAKU)
-	 * @param sisyutuYoteiKingaku 支出予定金額(EXPENSE_YOTEI_KINGAKU)
-	 * @param syuusiKingaku 収支(SYUUSI_KINGAKU)
+	 * @param sisyutuYoteiKingaku 支出予定金額(EXPENDITURE_ESTIMATE_KINGAKU)
+	 * @param sisyutuKingaku 支出金額(EXPENDITURE_KINGAKU)
+	 * @param syuusiKingaku 収支(INCOME_AND_EXPENDITURE_KINGAKU)
 	 * @return 収支情報のドメインモデル
 	 *
 	 */
-	public static IncomeAndExpenseInquiryItem from(
+	public static IncomeAndExpenditureInquiryItem from(
 			String month,
 			BigDecimal syuunyuuKingaku,
-			BigDecimal sisyutuKingaku,
 			BigDecimal sisyutuYoteiKingaku,
+			BigDecimal sisyutuKingaku,
 			BigDecimal syuusiKingaku) {
-		return new IncomeAndExpenseInquiryItem(
+		return new IncomeAndExpenditureInquiryItem(
 				TargetMonth.from(month),
 				SyuunyuuKingaku.from(syuunyuuKingaku),
-				SisyutuKingaku.from(sisyutuKingaku),
 				SisyutuYoteiKingaku.from(sisyutuYoteiKingaku),
+				SisyutuKingaku.from(sisyutuKingaku),
 				SyuusiKingaku.from(syuusiKingaku));
 	}
 	
@@ -84,8 +84,8 @@ public class IncomeAndExpenseInquiryItem {
 	 * @return
 	 *
 	 */
-	public static IncomeAndExpenseInquiryItem fromEmpty() {
-		return new IncomeAndExpenseInquiryItem(null, null, null, null, null);
+	public static IncomeAndExpenditureInquiryItem fromEmpty() {
+		return new IncomeAndExpenditureInquiryItem(null, null, null, null, null);
 	}
 	
 	/**

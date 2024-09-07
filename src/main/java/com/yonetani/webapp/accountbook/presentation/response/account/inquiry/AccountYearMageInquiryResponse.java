@@ -54,10 +54,10 @@ public class AccountYearMageInquiryResponse extends AbstractResponse {
 		private final String month;
 		// 収入金額
 		private final String syuunyuuKingaku;
-		// 支出金額
-		private final String sisyutuKingaku;
 		// 支出予定金額
 		private final String sisyutuYoteiKingaku ;
+		// 支出金額
+		private final String sisyutuKingaku;
 		// 収支
 		private final String syuusiKingaku;
 		/**
@@ -66,23 +66,23 @@ public class AccountYearMageInquiryResponse extends AbstractResponse {
 		 *</pre>
 		 * @param month 対象月(TARGET_MONTH)
 		 * @param syuunyuuKingaku 収入金額(INCOME_KINGAKU)
-		 * @param sisyutuKingaku 支出金額(EXPENSE_KINGAKU)
-		 * @param sisyutuYoteiKingaku 支出予定金額(EXPENSE_YOTEI_KINGAKU)
-		 * @param syuusiKingaku 収支(SYUUSI_KINGAKU)
+		 * @param sisyutuYoteiKingaku 支出予定金額(EXPENDITURE_ESTIMATE_KINGAKU)
+		 * @param sisyutuKingaku 支出金額(EXPENDITURE_KINGAKU)
+		 * @param syuusiKingaku 収支(INCOME_AND_EXPENDITURE_KINGAKU)
 		 * @return 年間収支(マージ)情報の明細データ
 		 *
 		 */
 		public static MageInquiryListItem from(
 				String month,
 				String syuunyuuKingaku,
-				String sisyutuKingaku,
 				String sisyutuYoteiKingaku,
+				String sisyutuKingaku,
 				String syuusiKingaku) {
 			return new MageInquiryListItem(
 					month,
 					syuunyuuKingaku,
-					sisyutuKingaku,
 					sisyutuYoteiKingaku,
+					sisyutuKingaku,
 					syuusiKingaku) {
 			};
 		}
@@ -95,12 +95,12 @@ public class AccountYearMageInquiryResponse extends AbstractResponse {
 	// 収入金額合計
 	@Setter
 	private String syuunyuuKingakuGoukei;
-	// 支出金額合計
-	@Setter
-	private String sisyutuKingakuGoukei;
 	// 支出予定金額合計
 	@Setter
 	private String sisyutuYoteiKingakuGoukei;
+	// 支出金額合計
+	@Setter
+	private String sisyutuKingakuGoukei;
 	// 収支合計
 	@Setter
 	private String syuusiKingakuGoukei;
@@ -148,10 +148,10 @@ public class AccountYearMageInquiryResponse extends AbstractResponse {
 		modelAndView.addObject("mageInquiryList", mageInquiryList);
 		// 収入金額合計
 		modelAndView.addObject("syuunyuuKingakuGoukei", syuunyuuKingakuGoukei);
-		// 支出金額合計
-		modelAndView.addObject("sisyutuKingakuGoukei", sisyutuKingakuGoukei);
 		// 支出予定金額合計
 		modelAndView.addObject("sisyutuYoteiKingakuGoukei", sisyutuYoteiKingakuGoukei);
+		// 支出金額合計
+		modelAndView.addObject("sisyutuKingakuGoukei", sisyutuKingakuGoukei);
 		// 収支合計
 		modelAndView.addObject("syuusiKingakuGoukei", syuusiKingakuGoukei);
 		

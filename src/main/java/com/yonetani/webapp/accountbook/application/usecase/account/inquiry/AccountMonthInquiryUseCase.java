@@ -19,11 +19,11 @@ import org.springframework.stereotype.Service;
 import com.yonetani.webapp.accountbook.common.component.AccountBookUserInquiryUseCase;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureItemList;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenseInquiryItem;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureInquiryItem;
 import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.AccountMonthInquiryRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenseInquiryRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureInquiryRepository;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse.ExpenditureItem;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse.TargetYearMonthInfo;
@@ -53,7 +53,7 @@ public class AccountMonthInquiryUseCase {
 	// 指定月の支出項目リスト取得リポジトリー
 	private final AccountMonthInquiryRepository repository;
 	// 指定月の収支取得リポジトリー
-	private final IncomeAndExpenseInquiryRepository syuusiRepository;
+	private final IncomeAndExpenditureInquiryRepository syuusiRepository;
 	
 	/**
 	 *<pre>
@@ -160,7 +160,7 @@ public class AccountMonthInquiryUseCase {
 			response.addExpenditureItemList(convertExpenditureItemList(resultList));
 		}
 		// ユーザID,現在の対象年月を条件に該当月の収支金額を取得
-		IncomeAndExpenseInquiryItem sisyutuResult = syuusiRepository.select(inquiryModel);
+		IncomeAndExpenditureInquiryItem sisyutuResult = syuusiRepository.select(inquiryModel);
 		if(sisyutuResult.isEmpty()) {
 			// 該当月の収支データ登録なしの場合で支出金額情報が登録済みの場合、不正データ登録のため予期しないエラーとする
 			// DBデータのメンテナンスが必要(どのタイミングで登録されたかを調査し、該当ユーザの該当月の出金額情報は削除）

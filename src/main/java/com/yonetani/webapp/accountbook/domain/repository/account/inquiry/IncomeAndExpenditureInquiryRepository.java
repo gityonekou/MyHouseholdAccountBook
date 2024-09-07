@@ -12,8 +12,8 @@
  */
 package com.yonetani.webapp.accountbook.domain.repository.account.inquiry;
 
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenseInquiryItem;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenseInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureInquiryItem;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 
@@ -29,7 +29,7 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
  * @since 家計簿アプリ(1.00.A)
  *
  */
-public interface IncomeAndExpenseInquiryRepository {
+public interface IncomeAndExpenditureInquiryRepository {
 	
 	/**
 	 *<pre>
@@ -39,7 +39,7 @@ public interface IncomeAndExpenseInquiryRepository {
 	 * @return 指定年度の収支(マージ)のリスト結果
 	 *
 	 */
-	IncomeAndExpenseInquiryList select(SearchQueryUserIdAndYear searchQuery);
+	IncomeAndExpenditureInquiryList select(SearchQueryUserIdAndYear searchQuery);
 	
 	/**
 	 *<pre>
@@ -49,6 +49,6 @@ public interface IncomeAndExpenseInquiryRepository {
 	 * @return 収支情報
 	 *
 	 */
-	IncomeAndExpenseInquiryItem select(SearchQueryUserIdAndYearMonth searchQuery);
+	IncomeAndExpenditureInquiryItem select(SearchQueryUserIdAndYearMonth searchQuery);
 	
 }

@@ -1,5 +1,5 @@
 /**
- * 収支テーブル:INCOME_AND_EXPENSE_TABLEテーブルの各項目のDTOです。
+ * 収支テーブル:INCOME_AND_EXPENDITURE_TABLEテーブルの各項目のDTOです。
  *
  *------------------------------------------------
  * 更新履歴
@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  *<pre>
- * 収支テーブル:INCOME_AND_EXPENSE_TABLEテーブルの各項目のDTOです。
+ * 収支テーブル:INCOME_AND_EXPENDITURE_TABLEテーブルの各項目のDTOです。
  *
  *</pre>
  *
@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class IncomeAndExpenseReadDto {
+public class IncomeAndExpenditureReadDto {
 	// ユーザID
 	private final String userId;
 	// 対象年
@@ -36,17 +36,11 @@ public class IncomeAndExpenseReadDto {
 	private final String targetMonth;
 	// 収入金額
 	private final BigDecimal incomeKingaku;
-	// 支出金額
-	private final BigDecimal expenseKingaku;
 	// 支出予定金額
-	private final BigDecimal expenseYoteiKingaku ;
+	private final BigDecimal expenditureEstimateKingaku ;
+	// 支出金額
+	private final BigDecimal expenditureKingaku;
 	// 収支
-	private final BigDecimal syuusiKingaku;
-	// 衣類住居設備予定金額
-	private final BigDecimal iruiJyuukyoYoteiKingaku;
-	// 飲食日用品予定金額
-	private final BigDecimal insyokuNitiyouhinYoteiKingaku;
-	// 趣味娯楽予定金額
-	private final BigDecimal syumiGotakuYoteiKingaku;
+	private final BigDecimal incomeAndExpenditureKingaku;
 	
 }

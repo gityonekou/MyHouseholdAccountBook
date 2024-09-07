@@ -17,7 +17,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
-import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.IncomeAndExpenseReadDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.IncomeAndExpenditureReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearSearchQueryDto;
 
@@ -34,7 +34,7 @@ import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndY
  *
  */
 @Mapper
-public interface IncomeAndExpenseInquiryMapper {
+public interface IncomeAndExpenditureInquiryMapper {
 	
 	/**
 	 *<pre>
@@ -44,8 +44,8 @@ public interface IncomeAndExpenseInquiryMapper {
 	 * @return 収支テーブル検索結果
 	 *
 	 */
-	@Select("sql/account/inquiry/IncomeAndExpenseInquirySelectSql01.sql")
-	List<IncomeAndExpenseReadDto> selectUserIdAndYear(@Param("dto") UserIdAndYearSearchQueryDto dto);
+	@Select("sql/account/inquiry/IncomeAndExpenditureInquirySelectSql01.sql")
+	List<IncomeAndExpenditureReadDto> selectUserIdAndYear(@Param("dto") UserIdAndYearSearchQueryDto dto);
 	
 	/**
 	 *<pre>
@@ -55,6 +55,6 @@ public interface IncomeAndExpenseInquiryMapper {
 	 * @return 収支テーブル検索結果
 	 *
 	 */
-	@Select("sql/account/inquiry/IncomeAndExpenseInquirySelectSql02.sql")
-	IncomeAndExpenseReadDto selectUserIdAndYearMonth(@Param("dto") UserIdAndYearMonthSearchQueryDto dto);
+	@Select("sql/account/inquiry/IncomeAndExpenditureInquirySelectSql02.sql")
+	IncomeAndExpenditureReadDto selectUserIdAndYearMonth(@Param("dto") UserIdAndYearMonthSearchQueryDto dto);
 }

@@ -39,17 +39,17 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class IncomeAndExpenseInquiryList {
+public class IncomeAndExpenditureInquiryList {
 	
 	// 年間収支(マージ)情報のリスト
-	private final List<IncomeAndExpenseInquiryItem> values;
+	private final List<IncomeAndExpenditureInquiryItem> values;
 	
 	// 収入金額合計
 	private final SyuunyuuKingaku syuunyuuKingakuGoukei;
-	// 支出金額合計
-	private final SisyutuKingaku sisyutuKingakuGoukei;
 	// 支出予定金額合計
 	private final SisyutuYoteiKingaku sisyutuYoteiKingakuGoukei;
+	// 支出金額合計
+	private final SisyutuKingaku sisyutuKingakuGoukei;
 	// 収支合計
 	private final SyuusiKingaku syuusiKingakuGoukei;
 	
@@ -61,31 +61,31 @@ public class IncomeAndExpenseInquiryList {
 	 * @return 明細リストの値を表すドメインモデル
 	 *
 	 */
-	public static IncomeAndExpenseInquiryList from(List<IncomeAndExpenseInquiryItem> values) {
+	public static IncomeAndExpenditureInquiryList from(List<IncomeAndExpenditureInquiryItem> values) {
 		if(CollectionUtils.isEmpty(values)) {
-			return new IncomeAndExpenseInquiryList(
+			return new IncomeAndExpenditureInquiryList(
 					Collections.emptyList(),
 					SyuunyuuKingaku.from(BigDecimal.ZERO),
-					SisyutuKingaku.from(BigDecimal.ZERO),
 					SisyutuYoteiKingaku.from(BigDecimal.ZERO),
+					SisyutuKingaku.from(BigDecimal.ZERO),
 					SyuusiKingaku.from(BigDecimal.ZERO));
 		} else {
 			// 各種合計値を計算
 			BigDecimal syuunyuuKingakuGoukeiWk = BigDecimal.ZERO;
-			BigDecimal sisyutuKingakuGoukeiWk = BigDecimal.ZERO;
 			BigDecimal sisyutuYoteiKingakuGoukeiWk = BigDecimal.ZERO;
+			BigDecimal sisyutuKingakuGoukeiWk = BigDecimal.ZERO;
 			BigDecimal syuusiKingakuGoukeiWk = BigDecimal.ZERO;
-			for(IncomeAndExpenseInquiryItem item : values) {
+			for(IncomeAndExpenditureInquiryItem item : values) {
 				syuunyuuKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(syuunyuuKingakuGoukeiWk, item.getSyuunyuuKingaku().getValue());
-				sisyutuKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(sisyutuKingakuGoukeiWk, item.getSisyutuKingaku().getValue());
 				sisyutuYoteiKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(sisyutuYoteiKingakuGoukeiWk, item.getSisyutuYoteiKingaku().getValue());
+				sisyutuKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(sisyutuKingakuGoukeiWk, item.getSisyutuKingaku().getValue());
 				syuusiKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(syuusiKingakuGoukeiWk, item.getSyuusiKingaku().getValue());
 			}
-			return new IncomeAndExpenseInquiryList(
+			return new IncomeAndExpenditureInquiryList(
 					values,
 					SyuunyuuKingaku.from(syuunyuuKingakuGoukeiWk),
-					SisyutuKingaku.from(sisyutuKingakuGoukeiWk),
 					SisyutuYoteiKingaku.from(sisyutuYoteiKingakuGoukeiWk),
+					SisyutuKingaku.from(sisyutuKingakuGoukeiWk),
 					SyuusiKingaku.from(syuusiKingakuGoukeiWk));
 		}
 	}
@@ -108,10 +108,10 @@ public class IncomeAndExpenseInquiryList {
 			}
 			buff.append("[[合計][syuunyuuKingakuGoukei:")
 			.append(syuunyuuKingakuGoukei)
-			.append(",sisyutuKingakuGoukei:")
-			.append(sisyutuKingakuGoukei)
 			.append(",sisyutuYoteiKingakuGoukei:")
 			.append(sisyutuYoteiKingakuGoukei)
+			.append(",sisyutuKingakuGoukei:")
+			.append(sisyutuKingakuGoukei)
 			.append(",syuusiKingakuGoukei:")
 			.append(syuusiKingakuGoukei)
 			.append("]]");

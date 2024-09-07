@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	
 	let btnItems = [
 			// 新規で追加ボタン
-			{id: 'incomeAndExpenseRegistBtn', formname : 'IncomeAndExpenseRegistForm'},
+			{id: 'incomeAndExpenditureRegistBtn', formname : 'IncomeAndExpenditureRegistForm'},
 			// キャンセルボタン
 			{id: 'cancelBtn', formname : 'CancelForm'}
 		];

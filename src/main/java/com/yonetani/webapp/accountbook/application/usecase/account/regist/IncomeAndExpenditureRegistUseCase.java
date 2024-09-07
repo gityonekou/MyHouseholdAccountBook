@@ -949,6 +949,8 @@ public class IncomeAndExpenditureRegistUseCase {
 		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(targetYearMonth);
 		
 		// TODO：収支の登録処理から
+		//ここから作成
+		
 		response.addMessage(String.format("%s年%s月度の収支情報を登録しました。", targetYearMonth.substring(0, 4), targetYearMonth.substring(4)));
 		response.setTransactionSuccessFull();
 		

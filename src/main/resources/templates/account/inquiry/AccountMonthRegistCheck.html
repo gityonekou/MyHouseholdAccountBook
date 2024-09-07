@@ -28,10 +28,10 @@
 						<p class="card-text"><span th:text="*{viewYear}"></span>年<span th:text="*{viewMonth}"></span>月度の収支が登録されていません。新規で登録しますか？</p>
 						
 							<div class="mb-3">
-								<button class="btn btn-primary" type="button" id="incomeAndExpenseRegistBtn">新規登録</button>
+								<button class="btn btn-primary" type="button" id="incomeAndExpenditureRegistBtn">新規登録</button>
 								<button class="btn btn-primary" type="button" id="cancelBtn">キャンセル</button>
 							</div>
-							<form name="IncomeAndExpenseRegistForm" class="d-flex" method="post" th:action="@{/myhacbook/accountregist/incomeandexpenditure/initload/}">
+							<form name="IncomeAndExpenditureRegistForm" class="d-flex" method="post" th:action="@{/myhacbook/accountregist/incomeandexpenditure/initload/}">
 								<input type="hidden" th:field="*{targetYearMonth}" />
 								<input type="hidden" th:field="*{returnYearMonth}" />
 							</form>

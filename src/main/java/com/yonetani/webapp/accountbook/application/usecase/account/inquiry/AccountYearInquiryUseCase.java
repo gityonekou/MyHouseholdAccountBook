@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountYearMeisaiInquiryList;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenseInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.AccountYearMeisaiInquiryRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenseInquiryRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureInquiryRepository;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearInquiryTargetYearInfo;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearMageInquiryResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearMageInquiryResponse.MageInquiryListItem;
@@ -48,7 +48,7 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class AccountYearInquiryUseCase {
 	// 指定年度の収支(マージ)結果取得リポジトリー
-	private final IncomeAndExpenseInquiryRepository repositoryMage;
+	private final IncomeAndExpenditureInquiryRepository repositoryMage;
 	
 	// 指定年度の収支(明細)結果取得リポジトリー
 	private final AccountYearMeisaiInquiryRepository repositoryMeisai;
@@ -76,7 +76,7 @@ public class AccountYearInquiryUseCase {
 				user.getUserId(), targetYear);
 		
 		// ユーザID、対象年度を条件に年間収支(マージ)のリスト(ドメインモデル)を取得
-		IncomeAndExpenseInquiryList resultList = repositoryMage.select(inquiryModel);
+		IncomeAndExpenditureInquiryList resultList = repositoryMage.select(inquiryModel);
 		// 年間収支(マージ)のリスト(ドメインモデル)をレスポンスに設定
 		if(resultList.isEmpty()) {
 			// 件数が0件の場合、メッセージを設定
@@ -87,10 +87,10 @@ public class AccountYearInquiryUseCase {
 			/* 合計値を設定 */
 			// 収入金額合計
 			response.setSyuunyuuKingakuGoukei(resultList.getSyuunyuuKingakuGoukei().toString());
-			// 支出金額合計
-			response.setSisyutuKingakuGoukei(resultList.getSisyutuKingakuGoukei().toString());
 			// 支出予定金額合計
 			response.setSisyutuYoteiKingakuGoukei(resultList.getSisyutuYoteiKingakuGoukei().toString());
+			// 支出金額合計
+			response.setSisyutuKingakuGoukei(resultList.getSisyutuKingakuGoukei().toString());
 			// 収支合計
 			response.setSyuusiKingakuGoukei(resultList.getSyuusiKingakuGoukei().toString());
 		}
@@ -106,13 +106,13 @@ public class AccountYearInquiryUseCase {
 	 * @return 年間収支(マージ)(レスポンス)
 	 *
 	 */
-	private List<MageInquiryListItem> convertMageList(IncomeAndExpenseInquiryList resultList) {
+	private List<MageInquiryListItem> convertMageList(IncomeAndExpenditureInquiryList resultList) {
 		return resultList.getValues().stream().map(domain ->
 			AccountYearMageInquiryResponse.MageInquiryListItem.from(
 					domain.getMonth().toString(),
 					domain.getSyuunyuuKingaku().toString(),
-					domain.getSisyutuKingaku().toString(),
 					domain.getSisyutuYoteiKingaku().toString(),
+					domain.getSisyutuKingaku().toString(),
 					domain.getSyuusiKingaku().toString())
 		).collect(Collectors.toUnmodifiableList());
 	}
