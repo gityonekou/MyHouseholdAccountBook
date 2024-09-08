@@ -32,6 +32,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItemI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuItemTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ExpenditureItemInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractExpenditureItemInfoManageResponse;
@@ -336,7 +337,7 @@ public class ExpenditureItemInfoManageUseCase {
 			}
 			
 			// +1した値を4桁で0パディングして支出項目コードに設定
-			inputForm.setSisyutuItemCode(String.format("%04d", count));
+			inputForm.setSisyutuItemCode(SisyutuItemCode.getNewCode(count));
 			
 			/* 支出項目情報を新規追加する */ 
 			// 新規追加する支出項目情報(ドメイン)を生成

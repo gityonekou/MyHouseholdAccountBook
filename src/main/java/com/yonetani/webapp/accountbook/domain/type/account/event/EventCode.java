@@ -42,6 +42,30 @@ public class EventCode {
 	}
 	
 	/**
+	 *<pre>
+	 * 新規発番するイベントコードの値(数値)をもとに、「イベントコード」項目の値を表すドメインタイプを生成します。
+	 *</pre>
+	 * @param count 新規発番するイベントコードの値(数値)
+	 * @return 「イベントコード」項目ドメインタイプ
+	 *
+	 */
+	public static EventCode from(int count) {
+		return new EventCode(String.format("%04d", count));
+	}
+	
+	/**
+	 *<pre>
+	 * 新規発番するイベントコードの値を取得します。
+	 *</pre>
+	 * @param count 新規発番するイベントコードの値(数値)
+	 * @return イベントコードの値
+	 *
+	 */
+	public static String getNewCode(int count) {
+		return EventCode.from(count).toString();
+	}
+	
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

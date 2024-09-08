@@ -32,6 +32,7 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSort;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSortBetweenAB;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShopInfoManageResponse;
@@ -194,7 +195,7 @@ public class ShopInfoManageUseCase {
 			// 新規の店舗コードを設定し、店舗情報入力フォームの値をドメインに変換
 			Shop shop = Shop.from(
 					user.getUserId(),
-					String.format("%03d", count),
+					ShopCode.getNewCode(count),
 					shopForm.getShopKubun(),
 					shopForm.getShopName(), 
 					String.format("%03d", shopForm.getShopSort()));

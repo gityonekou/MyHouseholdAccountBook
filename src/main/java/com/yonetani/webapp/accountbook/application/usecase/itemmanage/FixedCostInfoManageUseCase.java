@@ -36,6 +36,7 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
@@ -397,7 +398,7 @@ public class FixedCostInfoManageUseCase {
 			}
 			
 			// 固定費コードを入力フォームに設定
-			inputForm.setFixedCostCode(String.format("%04d", count));
+			inputForm.setFixedCostCode(FixedCostCode.getNewCode(count));
 			
 			// 追加する固定費情報
 			FixedCost addData = createFixedCost(user.getUserId(), inputForm);

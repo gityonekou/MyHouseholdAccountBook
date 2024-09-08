@@ -9,6 +9,12 @@
  */
 package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
 
+import java.math.BigDecimal;
+
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuCode;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKubun;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
@@ -42,7 +48,44 @@ public class IncomeItem {
 	// 対象月
 	private final TargetMonth targetMonth;
 	// 収入コード
+	private final SyuunyuuCode syuunyuuCode;
 	// 収入区分
+	private final SyuunyuuKubun syuunyuuKubun;
 	// 収入詳細
+	private final SyuunyuuDetailContext syuunyuuDetailContext;
 	// 収入金額
+	private final SyuunyuuKingaku syuunyuuKingaku;
+	
+	/**
+	 *<pre>
+	 * 引数の値から収入テーブル情報を表すドメインモデルを生成して返します。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param targetYear 対象年
+	 * @param targetMonth 対象月
+	 * @param syuunyuuCode 収入コード
+	 * @param syuunyuuKubun 収入区分
+	 * @param syuunyuuDetailContext 収入詳細
+	 * @param syuunyuuKingaku 収入金額
+	 * @return 収入テーブル情報を表すドメインモデル
+	 *
+	 */
+	public static IncomeItem from(
+			String userId,
+			String targetYear,
+			String targetMonth,
+			String syuunyuuCode,
+			String syuunyuuKubun,
+			String syuunyuuDetailContext,
+			BigDecimal syuunyuuKingaku) {
+		return new IncomeItem(
+				UserId.from(userId),
+				TargetYear.from(targetYear),
+				TargetMonth.from(targetMonth),
+				SyuunyuuCode.from(syuunyuuCode),
+				SyuunyuuKubun.from(syuunyuuKubun),
+				SyuunyuuDetailContext.from(syuunyuuDetailContext),
+				SyuunyuuKingaku.from(syuunyuuKingaku));
+		
+	}
 }

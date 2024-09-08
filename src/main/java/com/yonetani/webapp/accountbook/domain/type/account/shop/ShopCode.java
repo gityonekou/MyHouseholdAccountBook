@@ -42,6 +42,30 @@ public class ShopCode {
 	}
 	
 	/**
+	 *<pre>
+	 * 新規発番する店舗コードの値(数値)をもとに、「店舗コード」項目の値を表すドメインタイプを生成します。
+	 *</pre>
+	 * @param count 新規発番する店舗コードの値(数値)
+	 * @return 「店舗コード」項目ドメインタイプ
+	 *
+	 */
+	public static ShopCode from(int count) {
+		return new ShopCode(String.format("%03d", count));
+	}
+	
+	/**
+	 *<pre>
+	 * 新規発番する店舗コードの値を取得します。
+	 *</pre>
+	 * @param count 新規発番する店舗コードの値(数値)
+	 * @return 店舗コードの値
+	 *
+	 */
+	public static String getNewCode(int count) {
+		return ShopCode.from(count).toString();
+	}
+	
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

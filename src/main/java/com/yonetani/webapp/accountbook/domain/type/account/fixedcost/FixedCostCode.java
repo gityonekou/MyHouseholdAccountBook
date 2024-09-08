@@ -40,7 +40,31 @@ public class FixedCostCode {
 	public static FixedCostCode from(String fixedCostCode) {
 		return new FixedCostCode(fixedCostCode);
 	}
-
+	
+	/**
+	 *<pre>
+	 * 新規発番する固定費コードの値(数値)をもとに、「固定費コード」項目の値を表すドメインタイプを生成します。
+	 *</pre>
+	 * @param count 新規発番する固定費コードの値(数値)
+	 * @return 「固定費コード」項目ドメインタイプ
+	 *
+	 */
+	public static FixedCostCode from(int count) {
+		return new FixedCostCode(String.format("%04d", count));
+	}
+	
+	/**
+	 *<pre>
+	 * 新規発番する固定費コードの値を取得します。
+	 *</pre>
+	 * @param count 新規発番する固定費コードの値(数値)
+	 * @return 固定費コードの値
+	 *
+	 */
+	public static String getNewCode(int count) {
+		return FixedCostCode.from(count).toString();
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

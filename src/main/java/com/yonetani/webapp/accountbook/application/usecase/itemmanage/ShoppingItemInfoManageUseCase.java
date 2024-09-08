@@ -44,6 +44,7 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.shoppingitem.ShoppingItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemJanCode;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShoppingItemInfoSearchForm;
@@ -431,7 +432,7 @@ public class ShoppingItemInfoManageUseCase {
 			}
 			
 			// 商品コードを入力フォームに設定
-			inputForm.setShoppingItemCode(String.format("%05d", count));
+			inputForm.setShoppingItemCode(ShoppingItemCode.getNewCode(count));
 			
 			// 商品情報を作成
 			ShoppingItem addData = createShoppingItem(user.getUserId().toString(), inputForm);

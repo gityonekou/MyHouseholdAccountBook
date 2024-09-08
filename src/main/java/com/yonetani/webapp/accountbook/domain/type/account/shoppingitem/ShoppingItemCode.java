@@ -42,6 +42,30 @@ public class ShoppingItemCode {
 	}
 	
 	/**
+	 *<pre>
+	 * 新規発番する商品コードの値(数値)をもとに、「商品コード」項目の値を表すドメインタイプを生成します。
+	 *</pre>
+	 * @param count 新規発番する商品コードの値(数値)
+	 * @return 「商品コード」項目ドメインタイプ
+	 *
+	 */
+	public static ShoppingItemCode from(int count) {
+		return new ShoppingItemCode(String.format("%05d", count));
+	}
+	
+	/**
+	 *<pre>
+	 * 新規発番する商品コードの値を取得します。
+	 *</pre>
+	 * @param count 新規発番する商品コードの値(数値)
+	 * @return 商品コードの値
+	 *
+	 */
+	public static String getNewCode(int count) {
+		return ShoppingItemCode.from(count).toString();
+	}
+	
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

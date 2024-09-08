@@ -28,6 +28,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndEventCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.event.EventItemTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.EventInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.EventInfoManageResponse;
@@ -188,7 +189,7 @@ public class EventInfoManageUseCase {
 			}
 			
 			// 固定費コードを入力フォームに設定
-			inputForm.setEventCode(String.format("%04d", count));
+			inputForm.setEventCode(EventCode.getNewCode(count));
 			
 			// 追加する固定費情報
 			EventItem addData = createEventItem(user.getUserId(), inputForm);

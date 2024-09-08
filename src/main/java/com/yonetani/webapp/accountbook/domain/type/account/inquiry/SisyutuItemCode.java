@@ -41,7 +41,31 @@ public class SisyutuItemCode {
 	public static SisyutuItemCode from(String sisyutuItemCode) {
 		return new SisyutuItemCode(sisyutuItemCode);
 	}
-
+	
+	/**
+	 *<pre>
+	 * 新規発番する支出項目コードの値(数値)をもとに、「支出項目コード」項目の値を表すドメインタイプを生成します。
+	 *</pre>
+	 * @param count 新規発番する支出項目コードの値(数値)
+	 * @return 「支出項目コード」項目ドメインタイプ
+	 *
+	 */
+	public static SisyutuItemCode from(int count) {
+		return new SisyutuItemCode(String.format("%04d", count));
+	}
+	
+	/**
+	 *<pre>
+	 * 新規発番する支出項目コードの値を取得します。
+	 *</pre>
+	 * @param count 新規発番する支出項目コードの値(数値)
+	 * @return 支出項目コードの値
+	 *
+	 */
+	public static String getNewCode(int count) {
+		return SisyutuItemCode.from(count).toString();
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
