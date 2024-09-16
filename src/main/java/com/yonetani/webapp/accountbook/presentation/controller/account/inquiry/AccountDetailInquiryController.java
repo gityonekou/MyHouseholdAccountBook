@@ -13,6 +13,7 @@
 package com.yonetani.webapp.accountbook.presentation.controller.account.inquiry;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -35,6 +36,20 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @RequestMapping("/myhacbook/accountinquiry/accountdetail/")
 public class AccountDetailInquiryController {
+	
+	
+	/**
+	 *<pre>
+	 * 指定月の収支詳細画面表示のGET要求時マッピングです。
+	 *</pre>
+	 * @return
+	 *
+	 */
+	@GetMapping("/month/")
+	public String getAccountMonthDetail() {
+		log.debug("getAccountMonthDetail:");
+		return "account/inquiry/AccountMonthDetail";
+	}
 	
 	/**
 	 *<pre>

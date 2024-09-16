@@ -31,13 +31,18 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
 import com.yonetani.webapp.accountbook.domain.model.account.event.EventItem;
 import com.yonetani.webapp.accountbook.domain.model.account.event.EventItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostList;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItemInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
 import com.yonetani.webapp.accountbook.domain.model.common.CodeAndValuePair;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndEventCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostShiharaiTukiList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.event.EventItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiTuki;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.ExpenditureItemForm;
@@ -81,6 +86,10 @@ public class IncomeAndExpenditureRegistUseCase {
 	private final FixedCostTableRepository fixedCostRepository;
 	// イベントテーブル:EVENT_ITEM_TABLEリポジトリー
 	private final EventItemTableRepository eventRepository;
+	// 収入テーブル:INCOME_TABLEリポジトリー
+	private final IncomeTableRepository incomeRepository;
+	// 支出テーブル:EXPENDITURE_TABLEリポジトリー
+	private final ExpenditureTableRepository expenditureRepository;
 	
 	/**
 	 *<pre>
@@ -146,6 +155,9 @@ public class IncomeAndExpenditureRegistUseCase {
 			/* 作成するセッションデータのリストは登録・更新・削除で変更される可能性があるので変更可のリストを指定して作成します */
 			// 仮登録用支出コードの末尾3桁(999)のインクリメント用
 			AtomicInteger count = new AtomicInteger(1);
+			// 仮登録用支出コードの固定値部分(yyyyMMddHHmmss)
+			String nowTimeStr = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(LocalDateTime.now());
+			
 			List<ExpenditureRegistItem> expenditureRegistItemList = searchResult.getValues().stream().map(
 					domain -> ExpenditureRegistItem.from(
 							// データタイプ(新規)
@@ -153,7 +165,7 @@ public class IncomeAndExpenditureRegistUseCase {
 							// アクション(新規追加)
 							MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 							// 支出コード(仮登録用支出コード:yyyyMMddHHmmss999)
-							String.format("%s%03d", DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(LocalDateTime.now()), count.getAndIncrement()),
+							String.format("%s%03d", nowTimeStr, count.getAndIncrement()),
 							// 支出項目コード
 							domain.getSisyutuItemCode().toString(),
 							// イベントコード:固定費からは登録不可:値設定が必要な場合は収支登録画面で設定する
@@ -194,9 +206,73 @@ public class IncomeAndExpenditureRegistUseCase {
 	public IncomeAndExpenditureRegistResponse readUpdateInfo(LoginUserInfo user, String targetYearMonth) {
 		log.debug("readUpdateInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
 		
-		// TODO 自動生成されたメソッド・スタブ
+		// レスポンスを生成
+		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
 		
-		return IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
+		// 対象年月検索条件
+		SearchQueryUserIdAndYearMonth search = SearchQueryUserIdAndYearMonth.from(user.getUserId(), targetYearMonth);
+		// 収入テーブルから対象年月の収入情報を取得
+		IncomeItemInquiryList incomeList = incomeRepository.findById(search);
+		// 収入情報が未登録の場合、予期しないエラー(登録必須のためエラーとする必要あり)
+		if(incomeList.isEmpty()) {
+			throw new MyHouseholdAccountBookRuntimeException("更新対象の収入情報が収入テーブルに存在しません。管理者に問い合わせてください。[search=" + search + "]");
+		}
+		// 収支テーブルから取得した収支情報をセッションの収支情報リストに設定
+		// 注意：セッション情報のリストは編集可とする必要があるので、可変リストで作成する必要あり
+		List<IncomeRegistItem> incomeRegistItemList = incomeList.getValues().stream().map(
+				domain -> IncomeRegistItem.from(
+						// データタイプ(DBロード)
+						MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
+						// アクション(更新)
+						MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE,
+						// 収入コード
+						domain.getSyuunyuuCode().toString(),
+						// 収入区分
+						domain.getSyuunyuuKubun().toString(),
+						// 収入詳細
+						domain.getSyuunyuuDetailContext().toString(),
+						// 収入金額
+						domain.getSyuunyuuKingaku().getValue())
+				).collect(Collectors.toList());
+		
+		// 支出テーブルから対象年月の支出情報を取得(未登録の場合ありのため、0件チェックは不要)
+		ExpenditureItemInquiryList expenditureList = expenditureRepository.findById(search);
+		// 支出テーブルから取得した支出情報をセッションの支出情報リストに設定
+		// 注意：セッション情報のリストは編集可とする必要があるので、可変リストで作成する必要あり
+		List<ExpenditureRegistItem> expenditureRegistItemList = expenditureList.getValues().stream().map(
+				domain -> ExpenditureRegistItem.from(
+						// データタイプ(DBロード)
+						MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
+						// アクション(更新)
+						MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE,
+						// 支出コード
+						domain.getSisyutuCode().toString(),
+						// 支出項目コード
+						domain.getSisyutuItemCode().toString(),
+						// イベントコード
+						domain.getEventCode().toString(),
+						// 支出名
+						domain.getSisyutuName().toString(),
+						// 支出区分
+						domain.getSisyutuKubun().toString(),
+						// 支出詳細
+						domain.getSisyutuDetailContext().toString(),
+						// 支払日(日付からDDの値を取得して設定):DBはnull可
+						(domain.getShiharaiDate().getValue() != null) ?
+								// 値ありの場合、日付から日にちの値を取得(文字列で値を設定)
+								String.format("%02d", domain.getShiharaiDate().getValue().getDayOfMonth()) :
+								// 値なしの場合、nullを設定
+								null,
+						// 支払金額
+						domain.getSisyutuKingaku().getValue())
+				).collect(Collectors.toList());
+		// レスポンスにセッションの支出情報を設定
+		response.setExpenditureRegistItemList(expenditureRegistItemList);
+		
+		// 固定費一覧から画面表示する支出一覧とセッション保存の支出一覧を設定
+		setIncomeAndExpenditureInfoList(user, incomeRegistItemList, expenditureRegistItemList, response);
+		
+		return response;
 	}
 	
 	/**

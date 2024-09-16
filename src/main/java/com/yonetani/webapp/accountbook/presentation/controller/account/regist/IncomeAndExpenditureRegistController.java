@@ -150,7 +150,7 @@ public class IncomeAndExpenditureRegistController {
 	 * @return 収支登録画面情報
 	 *
 	 */
-	@PostMapping("/updateload/")
+	@GetMapping("/updateload/")
 	public ModelAndView getUpdateLoad(@RequestParam("targetYearMonth") String targetYearMonth) {
 		log.debug("getUpdateLoad:targetYearMonth="+ targetYearMonth);
 		

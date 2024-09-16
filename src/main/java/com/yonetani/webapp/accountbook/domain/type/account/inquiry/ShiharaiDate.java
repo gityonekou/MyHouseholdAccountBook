@@ -15,6 +15,7 @@ import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -29,6 +30,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @EqualsAndHashCode
+@Getter
 public class ShiharaiDate {
 	// 支払日
 	private final LocalDate value;
@@ -52,6 +54,5 @@ public class ShiharaiDate {
 	public String toString() {
 		// YYYY/MM/DD形式で返却
 		return DomainCommonUtils.formatyyyySPMMSPdd(value);
-		
 	}	
 }

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.inquiry.AccountMonthInquiryUseCase;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
@@ -136,6 +137,72 @@ public class AccountMonthInquiryController {
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
 				.build();
+	}
+	
+	/**
+	 *<pre>
+	 * 買い物登録ボタン押下時のPOST要求時マッピングです。買い物登録画面にリダイレクトします。
+	 *</pre>
+	 * @param targetYearMonth 表示対象の年月
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
+	 * @return 買い物登録画面へリダイレクト
+	 *
+	 */
+	@PostMapping(value = "/dispatchaction/", params = "shoppinAdd")
+	public ModelAndView getShoppinAddRedirectLoad(
+			@RequestParam("targetYearMonth") String targetYearMonth, RedirectAttributes redirectAttributes) {
+		log.debug("getShoppinAddRedirectLoad:targetYearMonth=" + targetYearMonth);
+		
+		// 画面表示情報を取得
+		return this.usecase.readShoppinAddRedirectInfo(loginUserSession.getLoginUserInfo(), targetYearMonth)
+			// レスポンスにログインユーザ名を設定
+			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+			// 買い物登録画面へリダイレクト
+			.buildRedirect(redirectAttributes);
+	}
+	
+	/**
+	 *<pre>
+	 * 詳細表示ボタン押下時のPOST要求時マッピングです。各月の収支詳細表示画面にリダイレクトします。
+	 *</pre>
+	 * @param targetYearMonth 表示対象の年月
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
+	 * @return 各月の収支詳細表示画面へリダイレクト
+	 *
+	 */
+	@PostMapping(value = "/dispatchaction/", params = "accountMonthDetail")
+	public ModelAndView getAccountMonthDetailRedirectLoad(
+			@RequestParam("targetYearMonth") String targetYearMonth, RedirectAttributes redirectAttributes) {
+		log.debug("getAccountMonthDetailRedirectLoad:targetYearMonth=" + targetYearMonth);
+		
+		// 画面表示情報を取得
+		return this.usecase.readAccountMonthDetailRedirectInfo(loginUserSession.getLoginUserInfo(), targetYearMonth)
+			// レスポンスにログインユーザ名を設定
+			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+			// 各月の収支詳細表示画面へリダイレクト
+			.buildRedirect(redirectAttributes);
+	}
+	
+	/**
+	 *<pre>
+	 * 更新ボタン押下時のPOST要求時マッピングです。収支登録画面(更新)にリダイレクトします。
+	 *</pre>
+	 * @param targetYearMonth 表示対象の年月
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
+	 * @return 収支登録画面(更新)へリダイレクト
+	 *
+	 */
+	@PostMapping(value = "/dispatchaction/", params = "accountMonthUpdate")
+	public ModelAndView getAccountMonthUpdateRedirectLoad(
+			@RequestParam("targetYearMonth") String targetYearMonth, RedirectAttributes redirectAttributes) {
+		log.debug("getAccountMonthUpdateRedirectLoad:targetYearMonth=" + targetYearMonth);
+		
+		// 画面表示情報を取得
+		return this.usecase.readAccountMonthUpdateRedirectInfo(loginUserSession.getLoginUserInfo(), targetYearMonth)
+			// レスポンスにログインユーザ名を設定
+			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+			// 収支登録画面(更新)へリダイレクト
+			.buildRedirect(redirectAttributes);
 	}
 	
 	/**

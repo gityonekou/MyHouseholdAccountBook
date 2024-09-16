@@ -11,7 +11,7 @@ package com.yonetani.webapp.accountbook.domain.repository.account.inquiry;
 
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeItemInquiryList;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 
 /**
  *<pre>
@@ -60,23 +60,23 @@ public interface IncomeTableRepository {
 	
 	/**
 	 *<pre>
-	 * ユーザIDに対応する収入情報を取得します。
+	 * ユーザID、対象年月に対応する収入情報を取得します。
 	 *</pre>
-	 * @param userId 検索対象のユーザID
+	 * @param searchQuery 検索条件(ユーザID, 対象年月(yyyyMM))
 	 * @return 収入情報のリスト
 	 *
 	 */
-	IncomeItemInquiryList findById(SearchQueryUserId userId);
+	IncomeItemInquiryList findById(SearchQueryUserIdAndYearMonth searchQuery);
 	
 	/**
 	 *<pre>
-	 * 新規の収入コード発番用にユーザIDに対応する収入情報が何件あるかを取得します。
+	 * 新規の収入コード発番用にユーザID、対象年月に対応する収入情報が何件あるかを取得します。
 	 *</pre>
-	 * @param userId 検索対象のユーザID
+	 * @param searchQuery 検索条件(ユーザID, 対象年月(yyyyMM))
 	 * @return 指定条件に該当するデータの件数
 	 *
 	 */
-	int countById(SearchQueryUserId userId);
+	int countById(SearchQueryUserIdAndYearMonth searchQuery);
 	
 	
 }

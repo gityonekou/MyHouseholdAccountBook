@@ -21,6 +21,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingak
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKubun;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuName;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.DeleteFlg;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
@@ -71,6 +72,8 @@ public class ExpenditureItem {
 	private final SisyutuYoteiKingaku sisyutuYoteiKingaku;
 	// 支出金額
 	private final SisyutuKingaku sisyutuKingaku;
+	// 削除フラグ
+	private final DeleteFlg deleteFlg;
 	
 	/**
 	 *<pre>
@@ -88,6 +91,7 @@ public class ExpenditureItem {
 	 * @param shiharaiDate 支払日
 	 * @param sisyutuYoteiKingaku 支出予定金額
 	 * @param sisyutuKingaku 支出金額
+	 * @param deleteFlg 削除フラグ
 	 * @return 支出テーブル情報を表すドメインモデル
 	 *
 	 */
@@ -103,7 +107,8 @@ public class ExpenditureItem {
 			String sisyutuDetailContext,
 			LocalDate shiharaiDate,
 			BigDecimal sisyutuYoteiKingaku,
-			BigDecimal sisyutuKingaku) {
+			BigDecimal sisyutuKingaku,
+			boolean deleteFlg) {
 		return new ExpenditureItem(
 				UserId.from(userId),
 				TargetYear.from(targetYear),
@@ -116,7 +121,8 @@ public class ExpenditureItem {
 				SisyutuDetailContext.from(sisyutuDetailContext),
 				ShiharaiDate.from(shiharaiDate),
 				SisyutuYoteiKingaku.from(sisyutuYoteiKingaku),
-				SisyutuKingaku.from(sisyutuKingaku));
+				SisyutuKingaku.from(sisyutuKingaku),
+				DeleteFlg.from(deleteFlg));
 		
 	}
 }

@@ -52,7 +52,7 @@ public class ExpenditureRegistItem implements Serializable {
 	private final String expenditureKubun;
 	// 支出詳細
 	private final String expenditureDetailContext;
-	// 支払日
+	// 支払日(DD)
 	private final String siharaiDate;
 	// 支払金額
 	private final BigDecimal expenditureKingaku;
@@ -69,7 +69,7 @@ public class ExpenditureRegistItem implements Serializable {
 	 * @param expenditureName 支出名
 	 * @param expenditureKubun 支出区分
 	 * @param expenditureDetailContext 支出詳細
-	 * @param siharaiDate 支払日
+	 * @param siharaiDate 支払日(DD)
 	 * @param expenditureKingaku 支払金額
 	 * @return　支出登録情報
 	 *

@@ -11,7 +11,7 @@ package com.yonetani.webapp.accountbook.domain.repository.account.inquiry;
 
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItemInquiryList;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 
 /**
  *<pre>
@@ -60,22 +60,22 @@ public interface ExpenditureTableRepository {
 	
 	/**
 	 *<pre>
-	 * ユーザIDに対応する支出情報を取得します。
+	 * ユーザID、対象年月に対応する支出情報を取得します。
 	 *</pre>
-	 * @param userId 検索対象のユーザID
+	 * @param searchQuery 検索条件(ユーザID, 対象年月(yyyyMM))
 	 * @return 支出情報のリスト
 	 *
 	 */
-	ExpenditureItemInquiryList findById(SearchQueryUserId userId);
+	ExpenditureItemInquiryList findById(SearchQueryUserIdAndYearMonth searchQuery);
 	
 	/**
 	 *<pre>
-	 * 新規の支出コード発番用にユーザIDに対応する支出情報が何件あるかを取得します。
+	 * 新規の支出コード発番用にユーザID、対象年月に対応する支出情報が何件あるかを取得します。
 	 *</pre>
-	 * @param userId 検索対象のユーザID
+	 * @param searchQuery 検索条件(ユーザID, 対象年月(yyyyMM))
 	 * @return 指定条件に該当するデータの件数
 	 *
 	 */
-	int countById(SearchQueryUserId userId);
+	int countById(SearchQueryUserIdAndYearMonth searchQuery);
 	
 }

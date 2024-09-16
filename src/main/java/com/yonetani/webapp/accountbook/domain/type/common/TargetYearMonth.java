@@ -9,6 +9,10 @@
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
 
+import org.springframework.util.StringUtils;
+
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +43,9 @@ public class TargetYearMonth {
 	 *
 	 */
 	public static TargetYearMonth from(String yearMonth){
+		if(!StringUtils.hasLength(yearMonth) || yearMonth.length() != 6) {
+			throw new MyHouseholdAccountBookRuntimeException("「年月」項目の値が不正です。管理者に問い合わせてください。[yearMonth=" + yearMonth + "]");
+		}
 		return new TargetYearMonth(yearMonth);
 	}
 	

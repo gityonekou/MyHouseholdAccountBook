@@ -24,9 +24,11 @@ import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.AccountMonthInquiryRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureInquiryRepository;
+import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryRedirectResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse.ExpenditureListItem;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse.TargetYearMonthInfo;
+import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.RequiredArgsConstructor;
@@ -135,6 +137,54 @@ public class AccountMonthInquiryUseCase {
 	
 	/**
 	 *<pre>
+	 * 買い物登録画面にリダイレクトするための情報を設定します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param targetYearMonth 収支の対象年月
+	 * @return 買い物登録画面リダイレクト情報
+	 *
+	 */
+	public AbstractResponse readShoppinAddRedirectInfo(LoginUserInfo user, String targetYearMonth) {
+		log.debug("readShoppinAddRedirectInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+		AccountMonthInquiryRedirectResponse response
+			= AccountMonthInquiryRedirectResponse.getShoppinAddRedirectInstance(targetYearMonth);
+		return response;
+	}
+	
+	/**
+	 *<pre>
+	 * 各月の収支詳細表示画面にリダイレクトするための情報を設定します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param targetYearMonth 収支の対象年月
+	 * @return 各月の収支詳細表示画面リダイレクト情報
+	 *
+	 */
+	public AbstractResponse readAccountMonthDetailRedirectInfo(LoginUserInfo user, String targetYearMonth) {
+		log.debug("readAccountMonthDetailRedirectInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+		AccountMonthInquiryRedirectResponse response
+			= AccountMonthInquiryRedirectResponse.getAccountMonthDetailRedirectInstance(targetYearMonth);
+		return response;
+	}
+	
+	/**
+	 *<pre>
+	 * 収支登録画面(更新)にリダイレクトするための情報を設定します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param targetYearMonth 収支の対象年月
+	 * @return 収支登録画面(更新)リダイレクト情報
+	 *
+	 */
+	public AbstractResponse readAccountMonthUpdateRedirectInfo(LoginUserInfo user, String targetYearMonth) {
+		log.debug("readAccountMonthUpdateRedirectInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+		AccountMonthInquiryRedirectResponse response
+			= AccountMonthInquiryRedirectResponse.getAccountMonthUpdateRedirectInstance(targetYearMonth);
+		return response;
+	}
+	
+	/**
+	 *<pre>
 	 * 支出項目のリストと収支金額を取得します。
 	 *</pre>
 	 * @param user ユーザ情報
@@ -203,6 +253,5 @@ public class AccountMonthInquiryUseCase {
 				domain.getSisyutuKingakuB().toSisyutuKingakuBString(),
 				domain.getSisyutuKingakuB().toPercentageString(),
 				domain.getShiharaiDate().toString())).collect(Collectors.toUnmodifiableList());
-	}
-	
+	}	
 }

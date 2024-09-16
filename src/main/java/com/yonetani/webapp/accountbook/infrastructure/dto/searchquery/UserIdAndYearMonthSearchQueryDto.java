@@ -12,6 +12,8 @@
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.searchquery;
 
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -51,5 +53,23 @@ public class UserIdAndYearMonthSearchQueryDto {
 	 */
 	public static UserIdAndYearMonthSearchQueryDto from(String userId, String year, String month) {
 		return new UserIdAndYearMonthSearchQueryDto(userId, year, month);
+	}
+	
+	/**
+	 *<pre>
+	 * 検索条件：ユーザID、対象年月のドメインタイプをもとにUserIdAndYearMonthSearchQueryDtoを生成して返します。
+	 *</pre>
+	 * @param searchQuery 検索条件：ユーザID、対象年月のドメインタイプ
+	 * @return テーブルの検索条件：ユーザID、対象年、対象月
+	 *
+	 */
+	public static UserIdAndYearMonthSearchQueryDto from(SearchQueryUserIdAndYearMonth searchQuery) {
+		return UserIdAndYearMonthSearchQueryDto.from(
+				// 検索条件:ユーザID
+				searchQuery.getUserId().toString(),
+				// 検索条件:対象年
+				searchQuery.getYearMonth().getYear(),
+				// 検索条件:対象月
+				searchQuery.getYearMonth().getMonth());
 	}
 }

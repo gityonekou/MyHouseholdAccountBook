@@ -15,6 +15,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKubun;
+import com.yonetani.webapp.accountbook.domain.type.common.DeleteFlg;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
@@ -55,6 +56,8 @@ public class IncomeItem {
 	private final SyuunyuuDetailContext syuunyuuDetailContext;
 	// 収入金額
 	private final SyuunyuuKingaku syuunyuuKingaku;
+	// 削除フラグ
+	private final DeleteFlg deleteFlg;
 	
 	/**
 	 *<pre>
@@ -67,6 +70,7 @@ public class IncomeItem {
 	 * @param syuunyuuKubun 収入区分
 	 * @param syuunyuuDetailContext 収入詳細
 	 * @param syuunyuuKingaku 収入金額
+	 * @param deleteFlg 削除フラグ
 	 * @return 収入テーブル情報を表すドメインモデル
 	 *
 	 */
@@ -77,7 +81,8 @@ public class IncomeItem {
 			String syuunyuuCode,
 			String syuunyuuKubun,
 			String syuunyuuDetailContext,
-			BigDecimal syuunyuuKingaku) {
+			BigDecimal syuunyuuKingaku,
+			boolean deleteFlg) {
 		return new IncomeItem(
 				UserId.from(userId),
 				TargetYear.from(targetYear),
@@ -85,7 +90,8 @@ public class IncomeItem {
 				SyuunyuuCode.from(syuunyuuCode),
 				SyuunyuuKubun.from(syuunyuuKubun),
 				SyuunyuuDetailContext.from(syuunyuuDetailContext),
-				SyuunyuuKingaku.from(syuunyuuKingaku));
+				SyuunyuuKingaku.from(syuunyuuKingaku),
+				DeleteFlg.from(deleteFlg));
 		
 	}
 }
