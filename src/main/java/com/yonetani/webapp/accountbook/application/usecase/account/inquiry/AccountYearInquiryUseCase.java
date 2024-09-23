@@ -20,7 +20,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountYearM
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.AccountYearMeisaiInquiryRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureInquiryRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearInquiryTargetYearInfo;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearMageInquiryResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearMageInquiryResponse.MageInquiryListItem;
@@ -47,9 +47,9 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @RequiredArgsConstructor
 public class AccountYearInquiryUseCase {
-	// 指定年度の収支(マージ)結果取得リポジトリー
-	private final IncomeAndExpenditureInquiryRepository repositoryMage;
 	
+	// 収支テーブル:INCOME_AND_EXPENDITURE_TABLEリポジトリー：指定年度の収支(マージ)結果取得
+	private final IncomeAndExpenditureTableRepository repositoryMage;
 	// 指定年度の収支(明細)結果取得リポジトリー
 	private final AccountYearMeisaiInquiryRepository repositoryMeisai;
 	
@@ -109,7 +109,7 @@ public class AccountYearInquiryUseCase {
 	private List<MageInquiryListItem> convertMageList(IncomeAndExpenditureInquiryList resultList) {
 		return resultList.getValues().stream().map(domain ->
 			AccountYearMageInquiryResponse.MageInquiryListItem.from(
-					domain.getMonth().toString(),
+					domain.getTargetMonth().toString(),
 					domain.getSyuunyuuKingaku().toString(),
 					domain.getSisyutuYoteiKingaku().toString(),
 					domain.getSisyutuKingaku().toString(),

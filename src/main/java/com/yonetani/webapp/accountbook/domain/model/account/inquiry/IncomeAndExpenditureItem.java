@@ -1,5 +1,5 @@
 /**
- * 収支情報の値を表すドメインモデルです
+ * 収支テーブル情報の値を表すドメインモデルです
  *
  *------------------------------------------------
  * 更新履歴
@@ -11,13 +11,13 @@ package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
 
 import java.math.BigDecimal;
 
-import org.springframework.util.StringUtils;
-
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuusiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -27,7 +27,7 @@ import lombok.ToString;
 
 /**
  *<pre>
- * 収支情報の値を表すドメインモデルです
+ * 収支テーブル情報の値を表すドメインモデルです
  *
  *</pre>
  *
@@ -39,38 +39,49 @@ import lombok.ToString;
 @Getter
 @ToString
 @EqualsAndHashCode
-public class IncomeAndExpenditureInquiryItem {
+public class IncomeAndExpenditureItem {
+	
+	// ユーザID
+	private final UserId userId;
+	// 対象年
+	private final TargetYear targetYear;
 	// 対象月
-	private final TargetMonth month;
+	private final TargetMonth targetMonth;
 	// 収入金額
 	private final SyuunyuuKingaku syuunyuuKingaku;
 	// 支出予定金額
 	private final SisyutuYoteiKingaku sisyutuYoteiKingaku;
 	// 支出金額
 	private final SisyutuKingaku sisyutuKingaku;
-	// 収支
+	// 収支金額
 	private final SyuusiKingaku syuusiKingaku;
 	
 	/**
 	 *<pre>
-	 * 引数の値から収支情報のドメインモデルを生成して返します。
+	 * 引数の値から収支テーブル情報のドメインモデルを生成して返します。
 	 *</pre>
-	 * @param month 対象月(TARGET_MONTH)
-	 * @param syuunyuuKingaku 収入金額(INCOME_KINGAKU)
-	 * @param sisyutuYoteiKingaku 支出予定金額(EXPENDITURE_ESTIMATE_KINGAKU)
-	 * @param sisyutuKingaku 支出金額(EXPENDITURE_KINGAKU)
-	 * @param syuusiKingaku 収支(INCOME_AND_EXPENDITURE_KINGAKU)
-	 * @return 収支情報のドメインモデル
+	 * @param userId ユーザID
+	 * @param targetYear 対象年
+	 * @param targetMonth 対象月
+	 * @param syuunyuuKingaku 収入金額
+	 * @param sisyutuYoteiKingaku 支出予定金額
+	 * @param sisyutuKingaku 支出金額
+	 * @param syuusiKingaku 収支金額
+	 * @return 収支テーブル情報を表すドメインモデル
 	 *
 	 */
-	public static IncomeAndExpenditureInquiryItem from(
-			String month,
+	public static IncomeAndExpenditureItem from(
+			String userId,
+			String targetYear,
+			String targetMonth,
 			BigDecimal syuunyuuKingaku,
 			BigDecimal sisyutuYoteiKingaku,
 			BigDecimal sisyutuKingaku,
 			BigDecimal syuusiKingaku) {
-		return new IncomeAndExpenditureInquiryItem(
-				TargetMonth.from(month),
+		return new IncomeAndExpenditureItem(
+				UserId.from(userId),
+				TargetYear.from(targetYear),
+				TargetMonth.from(targetMonth),
 				SyuunyuuKingaku.from(syuunyuuKingaku),
 				SisyutuYoteiKingaku.from(sisyutuYoteiKingaku),
 				SisyutuKingaku.from(sisyutuKingaku),
@@ -84,8 +95,8 @@ public class IncomeAndExpenditureInquiryItem {
 	 * @return
 	 *
 	 */
-	public static IncomeAndExpenditureInquiryItem fromEmpty() {
-		return new IncomeAndExpenditureInquiryItem(null, null, null, null, null);
+	public static IncomeAndExpenditureItem fromEmpty() {
+		return new IncomeAndExpenditureItem(null, null, null, null, null, null, null);
 	}
 	
 	/**
@@ -96,7 +107,7 @@ public class IncomeAndExpenditureInquiryItem {
 	 *
 	 */
 	public boolean isEmpty() {
-		if(month == null || !StringUtils.hasLength(month.toString())) {
+		if(userId == null) {
 			return true;
 		} else {
 			return false;

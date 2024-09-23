@@ -86,6 +86,6 @@ public class ExpenditureRegistItem implements Serializable {
 			String siharaiDate,
 			BigDecimal expenditureKingaku) {
 		return new ExpenditureRegistItem(dataType, action, expenditureCode, sisyutuItemCode, eventCode, expenditureName, 
-				expenditureKubun, expenditureDetailContext, siharaiDate, expenditureKingaku);
+				expenditureKubun, expenditureDetailContext, siharaiDate, expenditureKingaku.setScale(2));
 	}
 }

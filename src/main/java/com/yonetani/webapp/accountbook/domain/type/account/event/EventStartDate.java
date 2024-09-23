@@ -44,6 +44,7 @@ public class EventStartDate {
 	 *
 	 */
 	public static EventStartDate from(LocalDate date) {
+		
 		return new EventStartDate(date);
 	}
 	

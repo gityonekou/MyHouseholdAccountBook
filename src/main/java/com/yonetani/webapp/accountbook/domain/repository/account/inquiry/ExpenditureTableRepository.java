@@ -12,6 +12,7 @@ package com.yonetani.webapp.accountbook.domain.repository.account.inquiry;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
 
 /**
  *<pre>
@@ -78,4 +79,13 @@ public interface ExpenditureTableRepository {
 	 */
 	int countById(SearchQueryUserIdAndYearMonth searchQuery);
 	
+	/**
+	 *<pre>
+	 * ユーザID、対象年月に対応する支出金額の合計値を取得します。
+	 *</pre>
+	 * @param searchQuery 検索条件(ユーザID, 対象年月(yyyyMM))
+	 * @return 検索条件に一致する支出金額の合計値
+	 *
+	 */
+	SisyutuKingakuTotalAmount sumExpenditureKingaku(SearchQueryUserIdAndYearMonth searchQuery);
 }

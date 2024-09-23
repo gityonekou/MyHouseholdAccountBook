@@ -18,6 +18,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.IncomeReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry.IncomeTableMapper;
@@ -92,6 +93,15 @@ public class IncomeTableDataSource implements IncomeTableRepository {
 	public int countById(SearchQueryUserIdAndYearMonth searchQuery) {
 		// ユーザID、対象年月に対応する収入情報の件数を返します。
 		return mapper.countById(UserIdAndYearMonthSearchQueryDto.from(searchQuery));
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public SyuunyuuKingakuTotalAmount sumIncomeKingaku(SearchQueryUserIdAndYearMonth searchQuery) {
+		// ユーザID、対象年月に対応する収入金額合計値を取得し合計金額(ドメイン)に変換して返します。
+		return SyuunyuuKingakuTotalAmount.from(mapper.sumIncomeKingaku(UserIdAndYearMonthSearchQueryDto.from(searchQuery)));
 	}
 	
 	/**

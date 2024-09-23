@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -31,7 +32,10 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
 import com.yonetani.webapp.accountbook.domain.model.account.event.EventItem;
 import com.yonetani.webapp.accountbook.domain.model.account.event.EventItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostList;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItemInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
 import com.yonetani.webapp.accountbook.domain.model.common.CodeAndValuePair;
@@ -42,8 +46,16 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.repository.account.event.EventItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiTuki;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ShiharaiDate;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.ExpenditureItemForm;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.ExpenditureSelectItemForm;
@@ -90,6 +102,8 @@ public class IncomeAndExpenditureRegistUseCase {
 	private final IncomeTableRepository incomeRepository;
 	// 支出テーブル:EXPENDITURE_TABLEリポジトリー
 	private final ExpenditureTableRepository expenditureRepository;
+	// 収支テーブル:INCOME_AND_EXPENDITURE_TABLEリポジトリー
+	private final IncomeAndExpenditureTableRepository incomeAndExpenditureRepository;
 	
 	/**
 	 *<pre>
@@ -223,8 +237,8 @@ public class IncomeAndExpenditureRegistUseCase {
 				domain -> IncomeRegistItem.from(
 						// データタイプ(DBロード)
 						MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
-						// アクション(更新)
-						MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE,
+						// アクション(データ更新なし)
+						MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 						// 収入コード
 						domain.getSyuunyuuCode().toString(),
 						// 収入区分
@@ -234,6 +248,8 @@ public class IncomeAndExpenditureRegistUseCase {
 						// 収入金額
 						domain.getSyuunyuuKingaku().getValue())
 				).collect(Collectors.toList());
+		// レスポンスにセッションの収入情報を設定
+		response.setIncomeRegistItemList(incomeRegistItemList);
 		
 		// 支出テーブルから対象年月の支出情報を取得(未登録の場合ありのため、0件チェックは不要)
 		ExpenditureItemInquiryList expenditureList = expenditureRepository.findById(search);
@@ -243,8 +259,8 @@ public class IncomeAndExpenditureRegistUseCase {
 				domain -> ExpenditureRegistItem.from(
 						// データタイプ(DBロード)
 						MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
-						// アクション(更新)
-						MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE,
+						// アクション(データ更新なし)
+						MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 						// 支出コード
 						domain.getSisyutuCode().toString(),
 						// 支出項目コード
@@ -1017,17 +1033,221 @@ public class IncomeAndExpenditureRegistUseCase {
 	 * @return 収支登録内容確認画面の表示情報(各月の収支参照画面にリダイレクトを設定)
 	 *
 	 */
+	@Transactional
 	public IncomeAndExpenditureRegistCheckResponse execRegistAction(LoginUserInfo user, String targetYearMonth,
 			List<IncomeRegistItem> incomeRegistItemList, List<ExpenditureRegistItem> expenditureRegistItemList) {
 		log.debug("execRegistAction:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
 		
+		// 対象年月ドメインタイプ
+		TargetYearMonth yearMonthDomain = TargetYearMonth.from(targetYearMonth);
 		// レスポンスを生成
-		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(targetYearMonth);
+		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(yearMonthDomain.getTargetYearMonth());
 		
-		// TODO：収支の登録処理から
-		//ここから作成
+		// セッションに登録されている収入情報のリストがない場合、予期しないエラー
+		if(CollectionUtils.isEmpty(incomeRegistItemList)) {
+			throw new MyHouseholdAccountBookRuntimeException("セッションの収入情報がnullか空です。管理者に問い合わせてください。[targetYearMonth="
+					+ yearMonthDomain.getTargetYearMonth() + "]");
+		}
+		// 検索条件(ユーザID、年月度(YYYYMM))
+		SearchQueryUserIdAndYearMonth search = SearchQueryUserIdAndYearMonth.from(user.getUserId(), yearMonthDomain.getTargetYearMonth());
+		// 現在の収入テーブル情報登録件数を取得
+		int incomeDataCount = incomeRepository.countById(search);
+		// 初期登録確認のフラグ(初期の場合は必ず収入テーブル情報登録件数が0件となるので、0件の場合は初期登録と判断)
+		boolean initFlg = (incomeDataCount == 0) ? true : false;
 		
-		response.addMessage(String.format("%s年%s月度の収支情報を登録しました。", targetYearMonth.substring(0, 4), targetYearMonth.substring(4)));
+		// 現在の支出テーブル情報登録件数を取得
+		int expenditureDataCount = expenditureRepository.countById(search);
+		
+		// 収入情報更新ありの場合、収入テーブルを更新
+		boolean incomeUpdateFlg = false;
+		SyuunyuuKingakuTotalAmount incomeKingakuTotalAmount = SyuunyuuKingakuTotalAmount.ZERO;
+		// 収入情報の件数分繰り返す
+		for(IncomeRegistItem incomeRegistData : incomeRegistItemList) {
+			
+			// アクションが変更なしの場合、収入金額合計を加算するのみ(DBデータ変更なし)
+			if(Objects.equals(incomeRegistData.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE)) {
+				
+				// 収入金額合計を加算
+				incomeKingakuTotalAmount = incomeKingakuTotalAmount.add(SyuunyuuKingaku.from(incomeRegistData.getIncomeKingaku()));
+				
+			// データタイプが新規追加の場合、収入テーブルに対象データを追加
+			} else if (Objects.equals(incomeRegistData.getDataType(), MyHouseholdAccountBookContent.DATA_TYPE_NEW)) {
+				
+				// 収入コードを発番
+				String incomeCode = String.format("%02d", ++incomeDataCount);
+				
+				// セッションの収支登録情報から収入テーブル情報(ドメイン)を生成
+				IncomeItem addIncomeData = createIncomeItem(user.getUserId(), yearMonthDomain, incomeCode, incomeRegistData);
+				// 収入テーブルに登録
+				int addCount = incomeRepository.add(addIncomeData);
+				// 追加件数が1件以上の場合、業務エラー
+				if(addCount != 1) {
+					throw new MyHouseholdAccountBookRuntimeException("収入テーブル:INCOME_TABLEへの追加件数が不正でした。[件数=" + addCount + "][add data:" + addIncomeData + "]");
+				}
+				// 収入金額合計を加算
+				incomeKingakuTotalAmount = incomeKingakuTotalAmount.add(addIncomeData.getSyuunyuuKingaku());
+				// 収入情報更新あり
+				incomeUpdateFlg = true;
+				
+			// データタイプがDBロードの場合
+			} else if (Objects.equals(incomeRegistData.getDataType(), MyHouseholdAccountBookContent.DATA_TYPE_LOAD)) {
+				
+				// アクションが更新の場合
+				if (Objects.equals(incomeRegistData.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
+					
+					// セッションの収支登録情報から収入テーブル情報(ドメイン)を生成
+					IncomeItem updIncomeData = createIncomeItem(user.getUserId(), yearMonthDomain, incomeRegistData.getIncomeCode(), incomeRegistData);
+					// 収入テーブルを更新
+					int updCount = incomeRepository.update(updIncomeData);
+					// 更新件数が1件以上の場合、業務エラー
+					if(updCount != 1) {
+						throw new MyHouseholdAccountBookRuntimeException("収入テーブル:INCOME_TABLEへの更新件数が不正でした。[件数=" + updCount + "][update data:" + updIncomeData + "]");
+					}
+					// 収入金額合計を加算
+					incomeKingakuTotalAmount = incomeKingakuTotalAmount.add(updIncomeData.getSyuunyuuKingaku());
+					// 収入情報更新あり
+					incomeUpdateFlg = true;
+					
+				// アクションが削除の場合
+				} else if (Objects.equals(incomeRegistData.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_DELETE)) {
+					
+					// セッションの収支登録情報から収入テーブル情報(ドメイン)を生成
+					IncomeItem delIncomeData = createIncomeItem(user.getUserId(), yearMonthDomain, incomeRegistData.getIncomeCode(), incomeRegistData);
+					// 収入テーブルの対象データを論理削除
+					int delCount = incomeRepository.delete(delIncomeData);
+					// 削除件数が1件以上の場合、業務エラー
+					if(delCount != 1) {
+						throw new MyHouseholdAccountBookRuntimeException("収入テーブル:INCOME_TABLEへの削除件数が不正でした。[件数=" + delCount + "][delete data:" + delIncomeData + "]");
+					}
+					// 収入情報更新あり
+					incomeUpdateFlg = true;
+				} else {
+					throw new MyHouseholdAccountBookRuntimeException("未定義のアクションが設定されています。管理者に問い合わせてください。"
+							+ "dataType=" + incomeRegistData.getDataType() + "action=" + incomeRegistData.getAction());
+				}
+			} else {
+				throw new MyHouseholdAccountBookRuntimeException("未定義のアクションが設定されています。管理者に問い合わせてください。"
+						+ "dataType=" + incomeRegistData.getDataType() + "action=" + incomeRegistData.getAction());
+			}
+		}
+		
+		// 支出情報更新ありの場合、支出テーブルを更新
+		boolean expenditureUpdateFlg = false;
+		SisyutuKingakuTotalAmount expenditureKingakuTotalAmount = SisyutuKingakuTotalAmount.ZERO;
+		// 支出情報の件数分繰り返す
+		for(ExpenditureRegistItem expenditureRegistData : expenditureRegistItemList) {
+			
+			// アクションが変更なしの場合、支出金額合計を加算するのみ(DBデータ変更なし)
+			if(Objects.equals(expenditureRegistData.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE)) {
+				
+				// 支出金額合計を加算
+				expenditureKingakuTotalAmount = expenditureKingakuTotalAmount.add(SisyutuKingaku.from(expenditureRegistData.getExpenditureKingaku()));
+				
+			// データタイプが新規追加の場合、支出テーブルに対象データを追加
+			} else if (Objects.equals(expenditureRegistData.getDataType(), MyHouseholdAccountBookContent.DATA_TYPE_NEW)) {
+				
+				// 支出コードを発番
+				String expenditureCode = String.format("%03d", ++expenditureDataCount);
+				
+				// セッションの支出登録情報から支出テーブル情報(ドメイン)を生成
+				ExpenditureItem addExpenditureData = createExpenditureItem(initFlg, user.getUserId(), yearMonthDomain, expenditureCode, expenditureRegistData);
+				// 支出テーブルに登録
+				int addCount = expenditureRepository.add(addExpenditureData);
+				// 追加件数が1件以上の場合、業務エラー
+				if(addCount != 1) {
+					throw new MyHouseholdAccountBookRuntimeException("支出テーブル：EXPENDITURE_TABLEへの追加件数が不正でした。[件数=" + addCount + "][add data:" + addExpenditureData + "]");
+				}
+				// 支出金額合計を加算
+				expenditureKingakuTotalAmount = expenditureKingakuTotalAmount.add(addExpenditureData.getSisyutuKingaku());
+				// 支出情報更新あり
+				expenditureUpdateFlg = true;
+				
+			// データタイプがDBロードの場合
+			} else if (Objects.equals(expenditureRegistData.getDataType(), MyHouseholdAccountBookContent.DATA_TYPE_LOAD)) {
+				
+				// アクションが更新の場合
+				if (Objects.equals(expenditureRegistData.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
+					
+					// セッションの支出登録情報から支出テーブル情報(ドメイン)を生成
+					ExpenditureItem updExpenditureData = createExpenditureItem(initFlg, user.getUserId(), yearMonthDomain, expenditureRegistData.getExpenditureCode(), expenditureRegistData);
+					// 支出テーブルを更新
+					int updCount = expenditureRepository.update(updExpenditureData);
+					// 更新件数が1件以上の場合、業務エラー
+					if(updCount != 1) {
+						throw new MyHouseholdAccountBookRuntimeException("支出テーブル：EXPENDITURE_TABLEへの更新件数が不正でした。[件数=" + updCount + "][update data:" + updExpenditureData + "]");
+					}
+					// 支出金額合計を加算
+					expenditureKingakuTotalAmount = expenditureKingakuTotalAmount.add(updExpenditureData.getSisyutuKingaku());
+					// 支出情報更新あり
+					expenditureUpdateFlg = true;
+					
+				// アクションが削除の場合
+				} else if (Objects.equals(expenditureRegistData.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_DELETE)) {
+					
+					// セッションの支出登録情報から支出テーブル情報(ドメイン)を生成
+					ExpenditureItem delExpenditureData = createExpenditureItem(initFlg, user.getUserId(), yearMonthDomain, expenditureRegistData.getExpenditureCode(), expenditureRegistData);
+					// 支出テーブルの対象データを論理削除
+					int delCount = expenditureRepository.delete(delExpenditureData);
+					// 削除件数が1件以上の場合、業務エラー
+					if(delCount != 1) {
+						throw new MyHouseholdAccountBookRuntimeException("支出テーブル：EXPENDITURE_TABLEへの削除件数が不正でした。[件数=" + delCount + "][delete data:" + delExpenditureData + "]");
+					}
+					// 支出情報更新あり
+					expenditureUpdateFlg = true;
+					
+				} else {
+					throw new MyHouseholdAccountBookRuntimeException("未定義のアクションが設定されています。管理者に問い合わせてください。"
+							+ "dataType=" + expenditureRegistData.getDataType() + "action=" + expenditureRegistData.getAction());
+				}
+				
+			} else {
+				throw new MyHouseholdAccountBookRuntimeException("未定義のアクションが設定されています。管理者に問い合わせてください。"
+						+ "dataType=" + expenditureRegistData.getDataType() + "action=" + expenditureRegistData.getAction());
+			}
+		}
+		
+		// 支出情報更新ありの場合、支出金額テーブルを更新
+		if(expenditureUpdateFlg) {
+			// TODO：支出金額テーブルの登録処理から
+		}
+		
+		// 収入情報、支出情報更新ありの場合、収支テーブルを更新
+		if(incomeUpdateFlg || expenditureUpdateFlg) {
+			
+			// 初期登録:収支登録確認画面からの遷移の場合、対象年月の収支テーブル情報を追加
+			if(initFlg) {
+				
+				// 収支テーブル情報を作成
+				IncomeAndExpenditureItem addSyuusiData = createIncomeAndExpenditureItem(
+						initFlg, user.getUserId(), yearMonthDomain, incomeKingakuTotalAmount, expenditureKingakuTotalAmount);
+				// 収支テーブルに登録
+				int addCount = incomeAndExpenditureRepository.add(addSyuusiData);
+				// 追加件数が1件以上の場合、業務エラー
+				if(addCount != 1) {
+					throw new MyHouseholdAccountBookRuntimeException("収支テーブル:INCOME_AND_EXPENDITURE_TABLEへの追加件数が不正でした。[件数=" + addCount + "][add data:" + addSyuusiData + "]");
+				}
+				
+			// 収支更新:各月の収支画面の更新ボタン押下からの遷移の場合、収支テーブルを更新
+			} else {
+				
+				// 収支テーブル情報を作成
+				IncomeAndExpenditureItem updSyuusiData = createIncomeAndExpenditureItem(
+						initFlg, user.getUserId(), yearMonthDomain, incomeKingakuTotalAmount, expenditureKingakuTotalAmount);
+				// 収支テーブルを更新
+				int updCount = incomeAndExpenditureRepository.update(updSyuusiData);
+				// 更新件数が1件以上の場合、業務エラー
+				if(updCount != 1) {
+					throw new MyHouseholdAccountBookRuntimeException("収支テーブル:INCOME_AND_EXPENDITURE_TABLEへの更新件数が不正でした。[件数=" + updCount + "][update data:" + updSyuusiData + "]");
+				}
+			}
+			
+			response.addMessage(String.format("%s年%s月度の収支情報を登録しました。", yearMonthDomain.getYear(), yearMonthDomain.getMonth()));
+		
+		// 収支テーブル更新なしの場合、メッセージを設定
+		} else {
+			response.addMessage(String.format("【注意】%s年%s月度の収支情報の変更箇所がありませんでした。", yearMonthDomain.getYear(), yearMonthDomain.getMonth()));
+		}
+		
 		response.setTransactionSuccessFull();
 		
 		return response;
@@ -1110,6 +1330,7 @@ public class IncomeAndExpenditureRegistUseCase {
 			List<IncomeRegistItem> incomeRegistItemList,
 			List<ExpenditureRegistItem> expenditureRegistItemList,
 			AbstractIncomeAndExpenditureRegistResponse response) {
+		
 		// セッションに登録されている収入情報のリストがある場合
 		if(!CollectionUtils.isEmpty(incomeRegistItemList)) {
 			/* セッションに登録されている収入情報のリストを画面表示情報の収入一覧情報に変換し合計金額を設定 */
@@ -1283,6 +1504,7 @@ public class IncomeAndExpenditureRegistUseCase {
 	 *
 	 */
 	private String getSisyutuItemNameStr(LoginUserInfo user, String sisyutuItemCode, String eventCode) {
+		
 		// 支出項目名を取得(＞で区切った値)
 		StringBuilder sisyutuItemNameBuff = new StringBuilder();
 		sisyutuItemNameBuff.append(sisyutuItemComponent.getSisyutuItemName(user, sisyutuItemCode));
@@ -1303,4 +1525,121 @@ public class IncomeAndExpenditureRegistUseCase {
 		return sisyutuItemNameBuff.toString();
 	}
 	
+	/**
+	 *<pre>
+	 * 引数の収支登録情報(セッション)から収入テーブル情報(ドメイン)を生成して返します。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param yearMonthDomain 対象年月(ドメイン)
+	 * @param incomeCode 収入コード
+	 * @param incomeData 収支登録情報(セッション)
+	 * @return 収入テーブル情報(ドメイン)
+	 *
+	 */
+	private IncomeItem createIncomeItem(String userId, TargetYearMonth yearMonthDomain, String incomeCode, IncomeRegistItem incomeData) {
+		return IncomeItem.from(
+				// ユーザID
+				userId,
+				// 対象年
+				yearMonthDomain.getYear(),
+				// 対象月
+				yearMonthDomain.getMonth(),
+				// 収入コード
+				incomeCode,
+				// 収入区分
+				incomeData.getIncomeKubun(),
+				// 収入詳細
+				incomeData.getIncomeDetailContext(),
+				// 収入金額
+				incomeData.getIncomeKingaku(),
+				// 削除フラグ
+				false);
+	}
+	
+	/**
+	 *<pre>
+	 * 引数の支出登録情報(セッション)から支出テーブル情報(ドメイン)を生成して返します。
+	 *</pre>
+	 * @param initFlg 初期登録かどうかのフラグ　(収支登録確認画面からの遷移:true／各月の収支画面の更新ボタン押下からの遷移：false)
+	 * @param userId ユーザID
+	 * @param yearMonthDomain 対象年月(ドメイン)
+	 * @param expenditureCode 支出コード
+	 * @param expenditureData 支出登録情報(セッション)
+	 * @return 支出テーブル情報(ドメイン)
+	 *
+	 */
+	private ExpenditureItem createExpenditureItem(boolean initFlg, String userId, TargetYearMonth yearMonthDomain,
+			String expenditureCode, ExpenditureRegistItem expenditureData) {
+		
+		// 支出予定金額
+		BigDecimal sisyutuYoteiKingaku = (initFlg) ? expenditureData.getExpenditureKingaku() : SisyutuYoteiKingaku.ZERO.getValue();
+		
+		// 支出テーブル情報(ドメイン)を生成して返却
+		return ExpenditureItem.from(
+				// ユーザID
+				userId,
+				//対象年
+				yearMonthDomain.getYear(),
+				// 対象月
+				yearMonthDomain.getMonth(),
+				// 支出コード
+				expenditureCode,
+				// 支出項目コード
+				expenditureData.getSisyutuItemCode(),
+				// イベントコード
+				expenditureData.getEventCode(),
+				// 支出名称
+				expenditureData.getExpenditureName(),
+				// 支出区分
+				expenditureData.getExpenditureKubun(),
+				// 支出詳細
+				expenditureData.getExpenditureDetailContext(),
+				// 支払日
+				ShiharaiDate.from(yearMonthDomain.getTargetYearMonth(), expenditureData.getSiharaiDate()).getValue(),
+				// 支出予定金額
+				sisyutuYoteiKingaku,
+				// 支出金額
+				expenditureData.getExpenditureKingaku(),
+				// 削除フラグ
+				false);
+	}
+	
+	/**
+	 *<pre>
+	 * 引数の情報から収支テーブル情報(ドメイン)を生成して返します。
+	 *</pre>
+	 * @param initFlg 初期登録かどうかのフラグ　(収支登録確認画面からの遷移:true／各月の収支画面の更新ボタン押下からの遷移：false)
+	 * @param userId ユーザID
+	 * @param yearMonthDomain 対象年月(ドメイン)
+	 * @param incomeKingakuTotalAmount 対象月の収入金額合計
+	 * @param expenditureKingakuTotalAmount 対象月の支出金額合計
+	 * @return 収支テーブル情報(ドメイン)
+	 *
+	 */
+	private IncomeAndExpenditureItem createIncomeAndExpenditureItem(boolean initFlg, String userId, TargetYearMonth yearMonthDomain,
+			SyuunyuuKingakuTotalAmount incomeKingakuTotalAmount, SisyutuKingakuTotalAmount expenditureKingakuTotalAmount) {
+		
+		// 支出予定金額
+		BigDecimal sisyutuYoteiKingaku = (initFlg) ? expenditureKingakuTotalAmount.getValue() : SisyutuYoteiKingaku.ZERO.getValue();
+		
+		// 収支金額(収入金額合計 - 支出金額合計)
+		BigDecimal syuusiKingaku = incomeKingakuTotalAmount.getValue().subtract(expenditureKingakuTotalAmount.getValue());
+		
+		// 支出テーブル情報(ドメイン)を生成して返却
+		return IncomeAndExpenditureItem.from(
+				// ユーザID
+				userId,
+				//対象年
+				yearMonthDomain.getYear(),
+				// 対象月
+				yearMonthDomain.getMonth(),
+				// 収入金額
+				incomeKingakuTotalAmount.getValue(),
+				// 支出予定金額
+				sisyutuYoteiKingaku,
+				// 支出金額
+				expenditureKingakuTotalAmount.getValue(),
+				// 収支金額
+				syuusiKingaku);
+	}
 }

@@ -19,11 +19,15 @@ import org.springframework.stereotype.Service;
 import com.yonetani.webapp.accountbook.common.component.AccountBookUserInquiryUseCase;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureItemList;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureInquiryItem;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.AccountMonthInquiryRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureInquiryRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryRedirectResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse.ExpenditureListItem;
@@ -50,12 +54,17 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @RequiredArgsConstructor
 public class AccountMonthInquiryUseCase {
+	
 	// ユーザ情報照会ユースケース
 	private final AccountBookUserInquiryUseCase userInquiry;
 	// 指定月の支出項目リスト取得リポジトリー
 	private final AccountMonthInquiryRepository repository;
-	// 指定月の収支取得リポジトリー
-	private final IncomeAndExpenditureInquiryRepository syuusiRepository;
+	// 収支テーブル:INCOME_AND_EXPENDITURE_TABLEリポジトリー
+	private final IncomeAndExpenditureTableRepository syuusiRepository;
+	// 収入テーブル:INCOME_TABLEリポジトリー
+	private final IncomeTableRepository incomeRepository;
+	// 支出テーブル:EXPENDITURE_TABLEリポジトリー
+	private final ExpenditureTableRepository expenditureRepository;
 	
 	/**
 	 *<pre>
@@ -197,7 +206,6 @@ public class AccountMonthInquiryUseCase {
 		
 		// 検索条件(ユーザID、年月(YYYYMM))をドメインオブジェクトに変換
 		SearchQueryUserIdAndYearMonth inquiryModel = SearchQueryUserIdAndYearMonth.from(user.getUserId(), targetYearMonth);
-		
 		// ユーザID,対象年月を検索条件に支出金額情報のリストを取得
 		AccountMonthInquiryExpenditureItemList resultList = repository.selectExpenditureItem(inquiryModel);
 
@@ -209,8 +217,9 @@ public class AccountMonthInquiryUseCase {
 			// 支出金額情報のリストをレスポンスに設定(ドメインモデルからレスポンスへの変換)
 			response.addExpenditureItemList(convertExpenditureItemList(resultList));
 		}
+
 		// ユーザID,現在の対象年月を条件に該当月の収支金額を取得
-		IncomeAndExpenditureInquiryItem sisyutuResult = syuusiRepository.select(inquiryModel);
+		IncomeAndExpenditureItem sisyutuResult = syuusiRepository.select(inquiryModel);
 		if(sisyutuResult.isEmpty()) {
 			// 該当月の収支データ登録なしの場合で支出金額情報が登録済みの場合、不正データ登録のため予期しないエラーとする
 			// DBデータのメンテナンスが必要(どのタイミングで登録されたかを調査し、該当ユーザの該当月の出金額情報は削除）
@@ -223,6 +232,22 @@ public class AccountMonthInquiryUseCase {
 			response.setSyuusiDataFlg(false);
 			
 		} else {
+			// 収入テーブルから対象月の収入金額合計値を取得
+			SyuunyuuKingakuTotalAmount incomeKingakuTotalAmount = incomeRepository.sumIncomeKingaku(inquiryModel);
+			// 収支テーブルの収入金額の値と対象月の収入テーブルの収入金額合計値が一致するかを確認
+			SyuunyuuKingakuTotalAmount chkIncomeKingaku = SyuunyuuKingakuTotalAmount.from(sisyutuResult.getSyuunyuuKingaku().getValue());
+			if(!chkIncomeKingaku.equals(incomeKingakuTotalAmount)) {
+				throw new MyHouseholdAccountBookRuntimeException("該当月の収入情報が一致しません。管理者に問い合わせてください。[yearMonth=" + inquiryModel.getYearMonth() + "]");
+			}
+			
+			// 支出テーブルから対象月の支出金額合計値を取得
+			SisyutuKingakuTotalAmount expenditureKingakuTotalAmount = expenditureRepository.sumExpenditureKingaku(inquiryModel);
+			// 収支テーブルの支出金額の値と対象月の支出テーブルの支出金額合計値が一致するかを確認
+			SisyutuKingakuTotalAmount chkExpenditureKingaku = SisyutuKingakuTotalAmount.from(sisyutuResult.getSisyutuKingaku().getValue());
+			if(!chkExpenditureKingaku.equals(expenditureKingakuTotalAmount)) {
+				throw new MyHouseholdAccountBookRuntimeException("該当月の支出情報が一致しません。管理者に問い合わせてください。[yearMonth=" + inquiryModel.getYearMonth() + "]");
+			}
+			
 			// 収支情報(ドメインモデル)から収支情報(レスポンス)への変換
 			// 収入金額
 			response.setSyuunyuuKingaku(sisyutuResult.getSyuunyuuKingaku().toString());

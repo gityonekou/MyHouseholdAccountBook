@@ -1,7 +1,5 @@
 /**
- * マイ家計簿 収支情報取得を行うリポジトリーです。
- * 以下IFを提供します。
- * ・指定年度の年間収支(マージ)情報取得
+ * 収支テーブル：INCOME_AND_EXPENDITURE_TABLEのデータを登録・更新・参照するリポジトリーです
  * 
  *
  *------------------------------------------------
@@ -12,16 +10,14 @@
  */
 package com.yonetani.webapp.accountbook.domain.repository.account.inquiry;
 
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureInquiryItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 
 /**
  *<pre>
- * マイ家計簿 収支情報取得を行うリポジトリーです。
- * 以下IFを提供します。
- * ・指定年度の年間収支(マージ)情報取得
+ * 収支テーブル：INCOME_AND_EXPENDITURE_TABLEのデータを登録・更新・参照するリポジトリーです
  *
  *</pre>
  *
@@ -29,7 +25,27 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
  * @since 家計簿アプリ(1.00.A)
  *
  */
-public interface IncomeAndExpenditureInquiryRepository {
+public interface IncomeAndExpenditureTableRepository {
+	
+	/**
+	 *<pre>
+	 * 収支テーブル情報を新規登録します。
+	 *</pre>
+	 * @param data 新規追加データ
+	 * @return 登録されたデータの件数
+	 *
+	 */
+	int add(IncomeAndExpenditureItem data);
+	
+	/**
+	 *<pre>
+	 * 収支テーブル情報を更新します。
+	 *</pre>
+	 * @param data 更新データ
+	 * @return 更新されたデータの件数
+	 *
+	 */
+	int update(IncomeAndExpenditureItem data);
 	
 	/**
 	 *<pre>
@@ -49,6 +65,6 @@ public interface IncomeAndExpenditureInquiryRepository {
 	 * @return 収支情報
 	 *
 	 */
-	IncomeAndExpenditureInquiryItem select(SearchQueryUserIdAndYearMonth searchQuery);
+	IncomeAndExpenditureItem select(SearchQueryUserIdAndYearMonth searchQuery);
 	
 }

@@ -69,6 +69,6 @@ public class IncomeRegistItem implements Serializable {
 			String incomeKubun,
 			String incomeDetailContext,
 			BigDecimal incomeKingaku) {
-		return new IncomeRegistItem(dataType, action, incomeCode, incomeKubun, incomeDetailContext, incomeKingaku);
+		return new IncomeRegistItem(dataType, action, incomeCode, incomeKubun, incomeDetailContext, incomeKingaku.setScale(2));
 	}
 }

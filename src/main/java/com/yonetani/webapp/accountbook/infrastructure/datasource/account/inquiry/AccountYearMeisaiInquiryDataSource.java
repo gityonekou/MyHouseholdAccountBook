@@ -19,11 +19,11 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountYearM
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.AccountYearMeisaiInquiryRepository;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.AccountYearMeisaiInquiryReadDto;
-import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.IncomeAndExpenditureReadDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.IncomeAndExpenditureReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry.AccountYearMeisaiInquiryMapper;
-import com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry.IncomeAndExpenditureInquiryMapper;
+import com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry.IncomeAndExpenditureTableMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -42,7 +42,7 @@ import lombok.RequiredArgsConstructor;
 public class AccountYearMeisaiInquiryDataSource implements AccountYearMeisaiInquiryRepository {
 
 	// マッパー
-	private final IncomeAndExpenditureInquiryMapper incomeAndExpenditureMapper;
+	private final IncomeAndExpenditureTableMapper incomeAndExpenditureMapper;
 	// マッパー
 	private final AccountYearMeisaiInquiryMapper accountYearMeisaiMapper;
 	
@@ -53,13 +53,13 @@ public class AccountYearMeisaiInquiryDataSource implements AccountYearMeisaiInqu
 	public AccountYearMeisaiInquiryList select(SearchQueryUserIdAndYear searchQuery) {
 		/* 対象の収支情報の年月の値を取得 */
 		// 対象の年月の収支情報を取得
-		List<IncomeAndExpenditureReadDto> targetYearMonthList = incomeAndExpenditureMapper.selectUserIdAndYear(
+		List<IncomeAndExpenditureReadWriteDto> targetYearMonthList = incomeAndExpenditureMapper.selectUserIdAndYear(
 				UserIdAndYearSearchQueryDto.from(
 						searchQuery.getUserId().toString(),
 						searchQuery.getYear().toString()));
 		// 検索結果を取得
 		List<AccountYearMeisaiInquiryReadDto> result = new ArrayList<>(targetYearMonthList.size());
-		for(IncomeAndExpenditureReadDto targetYearMonth : targetYearMonthList) {
+		for(IncomeAndExpenditureReadWriteDto targetYearMonth : targetYearMonthList) {
 			AccountYearMeisaiInquiryReadDto resultDto = accountYearMeisaiMapper.select(UserIdAndYearMonthSearchQueryDto.from(
 					searchQuery.getUserId().toString(),
 					searchQuery.getYear().toString(),

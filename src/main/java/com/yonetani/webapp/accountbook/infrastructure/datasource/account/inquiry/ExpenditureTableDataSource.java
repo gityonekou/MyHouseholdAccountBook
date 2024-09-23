@@ -9,6 +9,7 @@
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.inquiry;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,6 +19,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureI
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.ExpenditureReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry.ExpenditureTableMapper;
@@ -92,6 +94,21 @@ public class ExpenditureTableDataSource implements ExpenditureTableRepository {
 	public int countById(SearchQueryUserIdAndYearMonth searchQuery) {
 		// ユーザID、対象年月に対応する収入情報の件数を返します。
 		return mapper.countById(UserIdAndYearMonthSearchQueryDto.from(searchQuery));
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public SisyutuKingakuTotalAmount sumExpenditureKingaku(SearchQueryUserIdAndYearMonth searchQuery) {
+		// ユーザID、対象年月に対応する支出金額合計値を取得し合計金額(ドメイン)に変換して返します。
+		// 値がnull(対象月の支出情報なし)の場合、0の値を返します。
+		BigDecimal totalAmount = mapper.sumExpenditureKingaku(UserIdAndYearMonthSearchQueryDto.from(searchQuery));
+		if(totalAmount == null) {
+			return SisyutuKingakuTotalAmount.ZERO;
+		} else {
+			return SisyutuKingakuTotalAmount.from(totalAmount);
+		}
 	}
 	
 	/**

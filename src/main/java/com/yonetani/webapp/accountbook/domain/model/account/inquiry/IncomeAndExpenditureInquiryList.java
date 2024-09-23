@@ -42,7 +42,7 @@ import lombok.RequiredArgsConstructor;
 public class IncomeAndExpenditureInquiryList {
 	
 	// 年間収支(マージ)情報のリスト
-	private final List<IncomeAndExpenditureInquiryItem> values;
+	private final List<IncomeAndExpenditureItem> values;
 	
 	// 収入金額合計
 	private final SyuunyuuKingaku syuunyuuKingakuGoukei;
@@ -61,7 +61,7 @@ public class IncomeAndExpenditureInquiryList {
 	 * @return 明細リストの値を表すドメインモデル
 	 *
 	 */
-	public static IncomeAndExpenditureInquiryList from(List<IncomeAndExpenditureInquiryItem> values) {
+	public static IncomeAndExpenditureInquiryList from(List<IncomeAndExpenditureItem> values) {
 		if(CollectionUtils.isEmpty(values)) {
 			return new IncomeAndExpenditureInquiryList(
 					Collections.emptyList(),
@@ -75,7 +75,7 @@ public class IncomeAndExpenditureInquiryList {
 			BigDecimal sisyutuYoteiKingakuGoukeiWk = BigDecimal.ZERO;
 			BigDecimal sisyutuKingakuGoukeiWk = BigDecimal.ZERO;
 			BigDecimal syuusiKingakuGoukeiWk = BigDecimal.ZERO;
-			for(IncomeAndExpenditureInquiryItem item : values) {
+			for(IncomeAndExpenditureItem item : values) {
 				syuunyuuKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(syuunyuuKingakuGoukeiWk, item.getSyuunyuuKingaku().getValue());
 				sisyutuYoteiKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(sisyutuYoteiKingakuGoukeiWk, item.getSisyutuYoteiKingaku().getValue());
 				sisyutuKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(sisyutuKingakuGoukeiWk, item.getSisyutuKingaku().getValue());

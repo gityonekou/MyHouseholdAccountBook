@@ -9,6 +9,7 @@
  */
 package com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Insert;
@@ -76,7 +77,7 @@ public interface IncomeTableMapper {
 	 */
 	@Select("sql/account/inquiry/IncomeTableSelectSql01.sql")
 	public List<IncomeReadWriteDto> findById(@Param("dto") UserIdAndYearMonthSearchQueryDto search);
-
+	
 	/**
 	 *<pre>
 	 * 指定のユーザID、対象年月に対応する収入情報が何件あるかを取得します。
@@ -87,5 +88,16 @@ public interface IncomeTableMapper {
 	 */
 	@Select("sql/account/inquiry/IncomeTableCountSql01.sql")
 	public int countById(@Param("dto") UserIdAndYearMonthSearchQueryDto search);
+	
+	/**
+	 *<pre>
+	 * 指定のユーザID、対象年月に対応する収入金額合計値を取得します。
+	 *</pre>
+	 * @param search 検索条件:ユーザID、対象年月
+	 * @return 収入金額合計値
+	 *
+	 */
+	@Select("sql/account/inquiry/IncomeTableSumSql01.sql")
+	public BigDecimal sumIncomeKingaku(@Param("dto") UserIdAndYearMonthSearchQueryDto search);
 	
 }

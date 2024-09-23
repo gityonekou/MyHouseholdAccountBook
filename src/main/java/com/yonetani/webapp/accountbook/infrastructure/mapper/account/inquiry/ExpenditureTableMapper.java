@@ -9,6 +9,7 @@
  */
 package com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Insert;
@@ -76,7 +77,7 @@ public interface ExpenditureTableMapper {
 	 */
 	@Select("sql/account/inquiry/ExpenditureTableSelectSql01.sql")
 	public List<ExpenditureReadWriteDto> findById(@Param("dto") UserIdAndYearMonthSearchQueryDto search);
-
+	
 	/**
 	 *<pre>
 	 * 指定のユーザID、対象年月に対応する支出情報が何件あるかを取得します。
@@ -87,5 +88,16 @@ public interface ExpenditureTableMapper {
 	 */
 	@Select("sql/account/inquiry/ExpenditureTableCountSql01.sql")
 	public int countById(@Param("dto") UserIdAndYearMonthSearchQueryDto search);
+	
+	/**
+	 *<pre>
+	 * 指定のユーザID、対象年月に対応する支出金額合計値を取得します。
+	 *</pre>
+	 * @param search 検索条件:ユーザID、対象年月
+	 * @return 支出金額合計値
+	 *
+	 */
+	@Select("sql/account/inquiry/ExpenditureTableSumSql01.sql")
+	public BigDecimal sumExpenditureKingaku(@Param("dto") UserIdAndYearMonthSearchQueryDto search);
 	
 }

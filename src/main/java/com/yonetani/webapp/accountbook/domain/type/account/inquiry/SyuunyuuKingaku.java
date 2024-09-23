@@ -1,5 +1,5 @@
 /**
- *  「収入金額」項目の値を表すドメインタイプです
+ * 「収入金額」項目の値を表すドメインタイプです
  *
  *------------------------------------------------
  * 更新履歴
@@ -11,6 +11,7 @@ package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
 
 import java.math.BigDecimal;
 
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 
 import lombok.AccessLevel;
@@ -38,12 +39,31 @@ public class SyuunyuuKingaku {
 	/**
 	 *<pre>
 	 * 「収入金額」項目の値を表すドメインタイプを生成します
+	 * 
+	 * [ガード節]
+	 * ・null値
+	 * ・マイナス値
+	 * ・スケール値が2以外
 	 *</pre>
 	 * @param syuunyuuKingaku 収入金額
 	 * @return 「収入金額」項目ドメインタイプ
 	 *
 	 */
 	public static SyuunyuuKingaku from(BigDecimal syuunyuuKingaku) {
+		// ガード節(null)
+		if(syuunyuuKingaku == null) {
+			throw new MyHouseholdAccountBookRuntimeException("「収入金額」項目の設定値がnullです。管理者に問い合わせてください。");
+		}
+		// ガード節(マイナス値)
+		if(BigDecimal.ZERO.compareTo(syuunyuuKingaku) > 0) {
+			throw new MyHouseholdAccountBookRuntimeException("「収入金額」項目の設定値がマイナスです。管理者に問い合わせてください。[value=" + syuunyuuKingaku.intValue() + "]");
+		}
+		// ガード節(スケール値が2以外)
+		if(syuunyuuKingaku.scale() != 2) {
+			throw new MyHouseholdAccountBookRuntimeException("「収入金額」項目のスケール値が不正です。管理者に問い合わせてください。[scale=" + syuunyuuKingaku.scale() + "]");
+		}
+		
+		// 「収入金額」項目の値を生成して返却
 		return new SyuunyuuKingaku(syuunyuuKingaku);
 	}
 	
