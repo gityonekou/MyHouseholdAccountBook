@@ -11,8 +11,6 @@ package com.yonetani.webapp.accountbook.domain.model.adminmenu;
 
 import java.util.List;
 
-import org.springframework.util.StringUtils;
-
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookException;
 import com.yonetani.webapp.accountbook.domain.type.adminmenu.UserPassword;
 import com.yonetani.webapp.accountbook.domain.type.adminmenu.UserRoles;
@@ -113,31 +111,5 @@ public class AdminMenuUserInfo {
 				UserRoles.fromString(userRoles),
 				UserPassword.from(userPassword),
 				TargetYearMonth.from(targetYearMonth));
-	}
-	
-	/**
-	 *<pre>
-	 * 値が空となるドメインモデルを生成して返します。
-	 *</pre>
-	 * @return
-	 *
-	 */
-	public static AdminMenuUserInfo fromEmpty() {
-		return new AdminMenuUserInfo(null, null, null, null, null, null);
-	}
-	
-	/**
-	 *<pre>
-	 * 検索結果が設定されているかどうかを判定します。
-	 *</pre>
-	 * @return 空の場合はtrue、値が設定されている場合はfalse
-	 *
-	 */
-	public boolean isEmpty() {
-		if(userId == null || !StringUtils.hasLength(userId.toString())) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 }

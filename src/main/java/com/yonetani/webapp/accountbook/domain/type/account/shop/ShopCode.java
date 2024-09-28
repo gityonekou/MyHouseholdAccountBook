@@ -11,6 +11,7 @@ package com.yonetani.webapp.accountbook.domain.type.account.shop;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 @EqualsAndHashCode
 public class ShopCode {
 	// 店舗コード
@@ -62,7 +64,7 @@ public class ShopCode {
 	 *
 	 */
 	public static String getNewCode(int count) {
-		return ShopCode.from(count).toString();
+		return ShopCode.from(count).getValue();
 	}
 	
 	/**

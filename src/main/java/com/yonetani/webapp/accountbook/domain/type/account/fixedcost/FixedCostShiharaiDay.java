@@ -14,12 +14,14 @@
 package com.yonetani.webapp.accountbook.domain.type.account.fixedcost;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Objects;
 
+import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
+
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -37,6 +39,7 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 @EqualsAndHashCode
 public class FixedCostShiharaiDay {
 	// 固定費支払日(支払日)
@@ -84,7 +87,7 @@ public class FixedCostShiharaiDay {
 			shiharaiDayValue = value;
 		}
 		// 指定年月の月初めの日にちカレンダーを取得
-		LocalDate firstDayOfMonth = LocalDate.parse(yearMonth + "01", DateTimeFormatter.ofPattern("yyyyMMdd"));
+		LocalDate firstDayOfMonth = LocalDate.parse(yearMonth + "01", MyHouseholdAccountBookContent.DATE_TIME_FORMATTER);
 		// 対象月の最終日を取得
 		String lastDayStr =String.format("%02d", firstDayOfMonth.with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth());
 		

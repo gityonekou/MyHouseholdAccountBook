@@ -29,8 +29,8 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@EqualsAndHashCode
 @Getter
+@EqualsAndHashCode
 public class SyumiGotakuKingaku {
 	// 趣味娯楽金額
 	private final BigDecimal value;

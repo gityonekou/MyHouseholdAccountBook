@@ -29,8 +29,8 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@EqualsAndHashCode
 @Getter
+@EqualsAndHashCode
 public class IruiJyuukyoSetubiKingaku {
 	// 衣類住居設備金額
 	private final BigDecimal value;

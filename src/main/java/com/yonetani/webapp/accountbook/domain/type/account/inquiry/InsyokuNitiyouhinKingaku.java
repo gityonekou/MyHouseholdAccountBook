@@ -29,8 +29,8 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@EqualsAndHashCode
 @Getter
+@EqualsAndHashCode
 public class InsyokuNitiyouhinKingaku {
 	// 飲食日用品金額
 	private final BigDecimal value;

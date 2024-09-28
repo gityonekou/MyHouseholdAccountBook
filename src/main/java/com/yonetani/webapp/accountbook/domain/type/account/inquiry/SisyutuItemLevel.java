@@ -27,8 +27,8 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@EqualsAndHashCode
 @Getter
+@EqualsAndHashCode
 public class SisyutuItemLevel {
 	
 	// 支出項目レベル(1～5)

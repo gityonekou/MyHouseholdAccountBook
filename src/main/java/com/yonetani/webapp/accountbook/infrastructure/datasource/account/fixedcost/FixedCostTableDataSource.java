@@ -83,7 +83,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	public FixedCost findByIdAndFixedCostCode(SearchQueryUserIdAndFixedCostCode search) {
 		// 検索結果を取得
 		FixedCostReadWriteDto searchResult = mapper.findByIdAndFixedCostCode(UserIdAndFixedCostCodeSearchQueryDto.from(
-				search.getUserId().toString(), search.getFixedCostCode().toString()));
+				search.getUserId().getValue(), search.getFixedCostCode().getValue()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、nullを返却
 			return null;
@@ -100,7 +100,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	public FixedCostInquiryList findById(SearchQueryUserId userId) {
 		// 検索結果を取得
 		List<FixedCostInquiryReadDto> searchResult = mapper.findById(
-				UserIdSearchQueryDto.from(userId.getUserId().toString()));
+				UserIdSearchQueryDto.from(userId.getUserId().getValue()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return FixedCostInquiryList.from(null);
@@ -120,9 +120,9 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 		List<FixedCostInquiryReadDto> searchResult = mapper.findByIdAndSisyutuItemCode(
 				UserIdAndSisyutuItemCodeSearchQueryDto.from(
 						// ユーザID
-						search.getUserId().toString(),
+						search.getUserId().getValue(),
 						// 支出項目コード
-						search.getSisyutuItemCode().toString()));
+						search.getSisyutuItemCode().getValue()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return FixedCostInquiryList.from(null);
@@ -142,10 +142,10 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 		List<FixedCostReadWriteDto> searchResult = mapper.findByIdAndFixedCostShiharaiTukiList(
 				UserIdAndFixedCostShiharaiTukiListSearchQueryDto.from(
 						// ユーザID
-						search.getUserId().toString(),
+						search.getUserId().getValue(),
 						// 固定費支払月のリスト
 						search.getFixedCostShiharaiTukiList().stream().map(
-								model -> model.toString()).collect(Collectors.toUnmodifiableList())));
+								model -> model.getValue()).collect(Collectors.toUnmodifiableList())));
 		
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
@@ -163,7 +163,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	@Override
 	public int countById(SearchQueryUserId userId) {
 		// ユーザIDで検索し、登録されている固定費情報の件数を返す
-		return mapper.countById(UserIdSearchQueryDto.from(userId.getUserId().toString()));
+		return mapper.countById(UserIdSearchQueryDto.from(userId.getUserId().getValue()));
 	}
 	
 	/**
@@ -174,9 +174,9 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 		// ユーザID、支出項目コードで検索し、登録されている固定費情報の件数を返す
 		return mapper.countBySisyutuItemCode(UserIdAndSisyutuItemCodeSearchQueryDto.from(
 				// ユーザID
-				search.getUserId().toString(),
+				search.getUserId().getValue(),
 				// 支出項目コード
-				search.getSisyutuItemCode().toString()));
+				search.getSisyutuItemCode().getValue()));
 	}
 	
 	/**
@@ -199,6 +199,8 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 				dto.getFixedCostDetailContext(),
 				// 支出項目コード
 				dto.getSisyutuItemCode(),
+				// 固定費区分
+				dto.getFixedCostKubun(),
 				// 固定費支払月(支払月)
 				dto.getFixedCostShiharaiTuki(),
 				// 固定費支払月任意詳細
@@ -220,21 +222,23 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	private FixedCostReadWriteDto createFixedCostReadWriteDto(FixedCost data) {
 		return FixedCostReadWriteDto.from(
 				// ユーザID
-				data.getUserId().toString(),
+				data.getUserId().getValue(),
 				// 固定費コード
-				data.getFixedCostCode().toString(),
+				data.getFixedCostCode().getValue(),
 				// 固定費名(支払名)
-				data.getFixedCostName().toString(),
+				data.getFixedCostName().getValue(),
 				// 固定費内容詳細(支払内容詳細)
-				data.getFixedCostDetailContext().toString(),
+				data.getFixedCostDetailContext().getValue(),
 				// 支出項目コード
-				data.getSisyutuItemCode().toString(),
+				data.getSisyutuItemCode().getValue(),
+				// 固定費区分
+				data.getFixedCostKubun().getValue(),
 				// 固定費支払月(支払月)
-				data.getFixedCostShiharaiTuki().toString(),
+				data.getFixedCostShiharaiTuki().getValue(),
 				// 固定費支払月任意詳細
-				data.getFixedCostShiharaiTukiOptionalContext().toString(),
+				data.getFixedCostShiharaiTukiOptionalContext().getValue(),
 				// 固定費支払日(支払日)
-				data.getFixedCostShiharaiDay().toString(),
+				data.getFixedCostShiharaiDay().getValue(),
 				// 支払金額
 				data.getShiharaiKingaku().getValue());
 	}

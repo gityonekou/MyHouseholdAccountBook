@@ -40,6 +40,8 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 	
 	// 固定費情報が格納されたフォームデータです。
 	private final FixedCostInfoUpdateForm fixedCostInfoUpdateForm;
+	// 固定費区分選択ボックス
+	private final SelectViewItem fixedCostKubunSelectList;
 	// 支払月選択ボックス
 	private final SelectViewItem shiharaiTukiSelectList;
 	// 支払日選択ボックス
@@ -53,13 +55,14 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 	 * デフォルト値からレスポンス情報を生成して返します。
 	 *</pre>
 	 * @param inputForm 固定費情報が格納されたフォームデータ
+	 * @param addKubunList 固定費区分選択ボックスの表示情報リスト
 	 * @param addTukiList 支払月選択ボックスの表示情報リスト
 	 * @param addDayList 支払日選択ボックスの表示情報リスト
 	 * @return 情報管理(固定費)更新画面表示情報
 	 *
 	 */
-	public static FixedCostInfoManageUpdateResponse getInstance(FixedCostInfoUpdateForm inputForm, List<OptionItem> addTukiList,
-			List<OptionItem> addDayList) {
+	public static FixedCostInfoManageUpdateResponse getInstance(FixedCostInfoUpdateForm inputForm,
+			List<OptionItem> addKubunList, List<OptionItem> addTukiList, List<OptionItem> addDayList) {
 		if(inputForm == null) {
 			inputForm = new FixedCostInfoUpdateForm();
 		}
@@ -75,8 +78,16 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 		if(!CollectionUtils.isEmpty(addDayList)) {
 			optionDayList.addAll(addDayList);
 		}
-		// 入力フォームと支払月選択ボックス・支払日選択ボックスの表示情報リストを元に情報管理(固定費)更新画面表示情報を生成
-		return new FixedCostInfoManageUpdateResponse(inputForm, SelectViewItem.from(optionTukiList), SelectViewItem.from(optionDayList));
+		// 入力フォームと各種瀬卓ボックスの表示情報リストを元に情報管理(固定費)更新画面表示情報を生成
+		return new FixedCostInfoManageUpdateResponse(
+				// 固定費情報入力フォーム
+				inputForm,
+				// 固定費区分選択ボックス表示情報
+				SelectViewItem.from(addKubunList),
+				// 支払月選択ボックス表示情報
+				SelectViewItem.from(optionTukiList),
+				// 支払日選択ボックス表示情報
+				SelectViewItem.from(optionDayList));
 	}
 	
 	/**
@@ -88,6 +99,8 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 		ModelAndView modelAndView = createModelAndView("itemmanage/FixedCostInfoManageUpdate");
 		// 更新商品情報入力フォーム
 		modelAndView.addObject("fixedCostInfoUpdateForm", fixedCostInfoUpdateForm);
+		// 固定費区分選択ボックス
+		modelAndView.addObject("fixedCostKubunSelectList", fixedCostKubunSelectList);
 		// 支払月選択ボックス
 		modelAndView.addObject("shiharaiTukiSelectList", shiharaiTukiSelectList);
 		// 支払日選択ボックス

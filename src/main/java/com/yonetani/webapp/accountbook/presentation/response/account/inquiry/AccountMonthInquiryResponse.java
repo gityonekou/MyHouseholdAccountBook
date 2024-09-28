@@ -18,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
@@ -84,7 +85,7 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 				throw new MyHouseholdAccountBookRuntimeException("対象年月の値が不正です。管理者に問い合わせてください。[targetYearMonth=" + targetYearMonth + "]");
 			}
 			// 現在の対象年月からカレンダーを生成(前月・翌月の値取得用)
-			LocalDate yearMonthCalendar = LocalDate.parse(targetYearMonth + "01", DateTimeFormatter.ofPattern("yyyyMMdd"));
+			LocalDate yearMonthCalendar = LocalDate.parse(targetYearMonth + "01", MyHouseholdAccountBookContent.DATE_TIME_FORMATTER);
 			DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMM");
 			
 			return new TargetYearMonthInfo(

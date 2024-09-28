@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 @EqualsAndHashCode
 public class ShiharaiKingaku {
 	// 支払金額

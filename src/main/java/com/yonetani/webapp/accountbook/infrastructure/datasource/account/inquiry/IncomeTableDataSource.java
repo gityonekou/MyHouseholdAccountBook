@@ -143,17 +143,17 @@ public class IncomeTableDataSource implements IncomeTableRepository {
 	private IncomeReadWriteDto createIncomeReadWriteDto(IncomeItem domain) {
 		return IncomeReadWriteDto.from(
 				// ユーザID
-				domain.getUserId().toString(),
+				domain.getUserId().getValue(),
 				// 対象年
-				domain.getTargetYear().toString(),
+				domain.getTargetYear().getValue(),
 				// 対象月
-				domain.getTargetMonth().toString(),
+				domain.getTargetMonth().getValue(),
 				// 収入コード
-				domain.getSyuunyuuCode().toString(),
+				domain.getSyuunyuuCode().getValue(),
 				// 収入区分
-				domain.getSyuunyuuKubun().toString(),
+				domain.getSyuunyuuKubun().getValue(),
 				// 収入詳細
-				domain.getSyuunyuuDetailContext().toString(),
+				domain.getSyuunyuuDetailContext().getValue(),
 				// 収入金額
 				domain.getSyuunyuuKingaku().getValue(),
 				// 削除フラグ

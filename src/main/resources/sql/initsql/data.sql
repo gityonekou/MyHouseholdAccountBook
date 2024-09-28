@@ -148,14 +148,14 @@ INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SOR
 
 
 -- 固定費テストデータ
-INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, SISYUTU_ITEM_CODE, FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT, FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU, DELETE_FLG) 
+INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, SISYUTU_ITEM_CODE, FIXED_COST_KUBUN, FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT, FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU, DELETE_FLG) 
 	VALUES
- ('kouki', '0001', 'コミケ C014', '【内容詳細】2024年夏コミ', '0028', '06', null, '15', 49800.00, false),
- ('kouki', '0002', '国民年金保険', null, '0015', '00',null, '00', 16980.00, false),
- ('kouki', '0003', '散髪(奇数月)', '【内容詳細】奇数月に散髪', '0021', '20',null, '03', 16980.00, false),
- ('kouki', '0004', '消費税支払(偶数月)', '【内容詳細】偶数月に消費税支払い', '0012', '30',null, '19', 3260.00, false),
- ('kouki', '0005', 'その他任意で不定期の支払１', '【内容詳細】その他任意で不定期の支払１詳細内容', '0009', '40','【支払月任意詳細】その他任意月１', '40', 36380.00, false),
- ('kouki', '0006', 'その他任意で不定期の支払２', null, '0009', '40','【支払月任意詳細】その他任意月２', '40', 22910.00, false);
+ ('kouki', '0001', 'コミケ C014', '【内容詳細】2024年夏コミ', '0028', '2', '06', null, '15', 49800.00, false),
+ ('kouki', '0002', '国民年金保険', null, '0015', '1', '00',null, '00', 16980.00, false),
+ ('kouki', '0003', '散髪(奇数月)', '【内容詳細】奇数月に散髪', '0021', '1', '20',null, '03', 16980.00, false),
+ ('kouki', '0004', '消費税支払(偶数月)', '【内容詳細】偶数月に消費税支払い', '0012', '1', '30',null, '19', 3260.00, false),
+ ('kouki', '0005', 'その他任意で不定期の支払１', '【内容詳細】その他任意で不定期の支払１詳細内容', '0009', '1', '40','【支払月任意詳細】その他任意月１', '40', 36380.00, false),
+ ('kouki', '0006', 'その他任意で不定期の支払２', null, '0009', '1', '40','【支払月任意詳細】その他任意月２', '40', 22910.00, false);
 
 -- 収支テーブル：INCOME_AND_EXPENDITURE_TABLE
 INSERT INTO INCOME_AND_EXPENDITURE_TABLE (USER_ID, TARGET_YEAR, TARGET_MONTH, INCOME_KINGAKU, EXPENDITURE_ESTIMATE_KINGAKU, EXPENDITURE_KINGAKU, INCOME_AND_EXPENDITURE_KINGAKU)

@@ -13,6 +13,8 @@ package com.yonetani.webapp.accountbook.presentation.response.account.inquiry;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +56,7 @@ public class AccountYearInquiryTargetYearInfo {
 	public static AccountYearInquiryTargetYearInfo from(String targetYear, String targetYearMonth) {
 		
 		// 現在の対象年月からカレンダーを生成(前年・翌年の値取得用)
-		LocalDate yearCalendar = LocalDate.parse(targetYear + "0101", DateTimeFormatter.ofPattern("yyyyMMdd"));
+		LocalDate yearCalendar = LocalDate.parse(targetYear + "0101", MyHouseholdAccountBookContent.DATE_TIME_FORMATTER);
 		DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy");
 		
 		return new AccountYearInquiryTargetYearInfo(

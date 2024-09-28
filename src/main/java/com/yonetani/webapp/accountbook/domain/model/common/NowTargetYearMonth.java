@@ -10,8 +10,6 @@
 package com.yonetani.webapp.accountbook.domain.model.common;
 
 
-import org.springframework.util.StringUtils;
-
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 
 import lombok.AccessLevel;
@@ -45,27 +43,9 @@ public class NowTargetYearMonth {
 	 * @param year 年
 	 * @param month 月
 	 * @return 現在の対象年・月の値を表すドメインモデル
-	 *  引数で指定した年、または月の値がnullまたは空文字列の場合はnullを返します。
 	 *
 	 */
 	public static NowTargetYearMonth from(String year, String month) {
-		if(!StringUtils.hasLength(year) || !StringUtils.hasLength(month)) {
-			return new NowTargetYearMonth(null);
-		} else {
-			return new NowTargetYearMonth(TargetYearMonth.from(year + month));
-		}
-	}
-	
-	/**
-	 *<pre>
-	 * 対象年・月の値の検索結果が検索できなかったかどうかを判定します。
-	 *</pre>
-	 * @return
-	 * 検索できなかった場合:true、検索出来た場合:false
-	 *
-	 */
-	public boolean isEmpty() {
-		// 値がnullの場合trueを返却、null以外の場合falseを返却
-		return (yearMonth == null) ? true : false;
+		return new NowTargetYearMonth(TargetYearMonth.from(year + month));
 	}
 }

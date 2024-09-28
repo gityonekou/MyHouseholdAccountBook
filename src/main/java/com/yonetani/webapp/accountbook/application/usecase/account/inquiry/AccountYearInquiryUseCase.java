@@ -109,7 +109,7 @@ public class AccountYearInquiryUseCase {
 	private List<MageInquiryListItem> convertMageList(IncomeAndExpenditureInquiryList resultList) {
 		return resultList.getValues().stream().map(domain ->
 			AccountYearMageInquiryResponse.MageInquiryListItem.from(
-					domain.getTargetMonth().toString(),
+					domain.getTargetMonth().getValue(),
 					domain.getSyuunyuuKingaku().toString(),
 					domain.getSisyutuYoteiKingaku().toString(),
 					domain.getSisyutuKingaku().toString(),
@@ -181,7 +181,7 @@ public class AccountYearInquiryUseCase {
 	private List<MeisaiInquiryListItem> convertMeisaiList(AccountYearMeisaiInquiryList resultList) {
 		return resultList.getValues().stream().map(domain ->
 			AccountYearMeisaiInquiryResponse.MeisaiInquiryListItem.from(
-					domain.getMonth().toString(),
+					domain.getMonth().getValue(),
 					domain.getJigyouKeihiKingaku().toString(),
 					domain.getKoteiHikazeiKingaku().toString(),
 					domain.getKoteiKazeiKingaku().toString(),

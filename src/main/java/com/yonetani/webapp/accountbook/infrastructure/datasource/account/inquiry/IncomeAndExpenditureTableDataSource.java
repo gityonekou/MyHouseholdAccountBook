@@ -68,8 +68,8 @@ public class IncomeAndExpenditureTableDataSource implements IncomeAndExpenditure
 	public IncomeAndExpenditureInquiryList select(SearchQueryUserIdAndYear searchQuery) {
 		// 検索結果を取得
 		List<IncomeAndExpenditureReadWriteDto> result = mapper.selectUserIdAndYear(UserIdAndYearSearchQueryDto.from(
-				searchQuery.getUserId().toString(),
-				searchQuery.getYear().toString()));
+				searchQuery.getUserId().getValue(),
+				searchQuery.getYear().getValue()));
 		// 検索結果をドメインモデルに変換して返却
 		return IncomeAndExpenditureInquiryList.from(result.stream().map(dto ->	 createIncomeAndExpenditureItem(dto))
 					.collect(Collectors.toUnmodifiableList()));
@@ -82,7 +82,7 @@ public class IncomeAndExpenditureTableDataSource implements IncomeAndExpenditure
 	public IncomeAndExpenditureItem select(SearchQueryUserIdAndYearMonth searchQuery) {
 		// 検索結果を取得
 		IncomeAndExpenditureReadWriteDto result = mapper.selectUserIdAndYearMonth(UserIdAndYearMonthSearchQueryDto.from(
-				searchQuery.getUserId().toString(),
+				searchQuery.getUserId().getValue(),
 				searchQuery.getYearMonth().getYear(),
 				searchQuery.getYearMonth().getMonth()
 				));
@@ -131,11 +131,11 @@ public class IncomeAndExpenditureTableDataSource implements IncomeAndExpenditure
 	private IncomeAndExpenditureReadWriteDto createIncomeAndExpenditureReadWriteDto(IncomeAndExpenditureItem domain) {
 		return IncomeAndExpenditureReadWriteDto.from(
 				// ユーザID
-				domain.getUserId().toString(),
+				domain.getUserId().getValue(),
 				// 対象年
-				domain.getTargetYear().toString(),
+				domain.getTargetYear().getValue(),
 				// 対象月
-				domain.getTargetMonth().toString(),
+				domain.getTargetMonth().getValue(),
 				// 収入金額
 				domain.getSyuunyuuKingaku().getValue(),
 				// 支出予定金額

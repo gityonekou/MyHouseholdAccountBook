@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 @EqualsAndHashCode
 public class ShoppingItemCapacity {
 	// 商品内容量

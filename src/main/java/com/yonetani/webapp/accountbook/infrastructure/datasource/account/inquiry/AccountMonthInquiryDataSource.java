@@ -47,7 +47,7 @@ public class AccountMonthInquiryDataSource implements AccountMonthInquiryReposit
 	public AccountMonthInquiryExpenditureItemList selectExpenditureItem(SearchQueryUserIdAndYearMonth searchQuery) {
 		// 検索結果を取得
 		return convertExpenditureItemList(mapper.selectExpenditureItem(UserIdAndYearMonthSearchQueryDto.from(
-				searchQuery.getUserId().toString(),
+				searchQuery.getUserId().getValue(),
 				searchQuery.getYearMonth().getYear(),
 				searchQuery.getYearMonth().getMonth()
 				)));

@@ -82,10 +82,10 @@ public class AccountMonthInquiryUseCase {
 		
 		// レスポンスを生成
 		AccountMonthInquiryResponse response = AccountMonthInquiryResponse.getInstance(
-				TargetYearMonthInfo.from(yearMonth.getYearMonth().toString()));
+				TargetYearMonthInfo.from(yearMonth.getYearMonth().getValue()));
 		
 		// ユーザID,現在の対象年月を条件に支出項目のリストと収支金額を取得
-		execRead(user, yearMonth.getYearMonth().toString(), response);
+		execRead(user, yearMonth.getYearMonth().getValue(), response);
 		
 		return response;
 	}
@@ -273,7 +273,7 @@ public class AccountMonthInquiryUseCase {
 		return resultList.getValues().stream().map(domain ->
 		AccountMonthInquiryResponse.ExpenditureListItem.form(
 				domain.getSisyutuItemLevel().getValue(),
-				domain.getSisyutuItemName().toString(),
+				domain.getSisyutuItemName().getValue(),
 				domain.getSisyutuKingaku().toString(),
 				domain.getSisyutuKingakuB().toSisyutuKingakuBString(),
 				domain.getSisyutuKingakuB().toPercentageString(),

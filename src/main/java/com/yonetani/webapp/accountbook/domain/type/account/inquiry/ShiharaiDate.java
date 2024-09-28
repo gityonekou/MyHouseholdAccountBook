@@ -13,11 +13,11 @@
 package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 import org.springframework.util.StringUtils;
 
+import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 
@@ -40,8 +40,8 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@EqualsAndHashCode
 @Getter
+@EqualsAndHashCode
 public class ShiharaiDate {
 	// 支払日
 	private final LocalDate value;
@@ -96,7 +96,7 @@ public class ShiharaiDate {
 		// 引数で指定した対象年月、日付の値をもとにLocalDateに変換し、「支払日」項目ドメインタイプを生成
 		String dateText = yearMonth + day;
 		try {
-			return new ShiharaiDate(LocalDate.parse(dateText, DateTimeFormatter.ofPattern("yyyyMMdd")));
+			return new ShiharaiDate(LocalDate.parse(dateText, MyHouseholdAccountBookContent.DATE_TIME_FORMATTER));
 		} catch (DateTimeParseException ex) {
 			throw new MyHouseholdAccountBookRuntimeException("「支払日」項目の設定値が不正です。管理者に問い合わせてください。[date=" + dateText + "]");
 		}

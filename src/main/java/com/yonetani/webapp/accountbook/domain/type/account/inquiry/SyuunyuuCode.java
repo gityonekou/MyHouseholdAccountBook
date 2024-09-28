@@ -11,6 +11,7 @@ package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 @EqualsAndHashCode
 public class SyuunyuuCode {
 	
@@ -63,7 +65,7 @@ public class SyuunyuuCode {
 	 *
 	 */
 	public static String getNewCode(int count) {
-		return SyuunyuuCode.from(count).toString();
+		return SyuunyuuCode.from(count).getValue();
 	}
 	
 	/**

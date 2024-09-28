@@ -43,6 +43,8 @@ public class ExpenditureItemForm {
 	private String sisyutuItemName;
 	// イベントコード
 	private String eventCode;
+	// 支払金額の0円開始設定フラグ
+	private boolean clearStartFlg;
 	
 	// 支出名
 	@NotBlank

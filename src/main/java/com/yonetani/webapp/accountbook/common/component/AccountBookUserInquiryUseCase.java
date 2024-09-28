@@ -54,7 +54,7 @@ public class AccountBookUserInquiryUseCase {
 		// 指定したユーザIDに対応する現在の対象年・月の値を取得
 		NowTargetYearMonth yearMonth = userInfoSearchRepository.getNowTargetYearMonth(SearchQueryUserId.from(userId));
 		log.debug("現在の対象年月:" + yearMonth);
-		if(yearMonth.isEmpty()) {
+		if(yearMonth == null) {
 			throw new MyHouseholdAccountBookRuntimeException("指定ユーザIDに対応する現在の対象年・月の値が取得できませんでした。管理者に問い合わせてください。[userId=" + userId + "]");
 		}
 		return yearMonth;

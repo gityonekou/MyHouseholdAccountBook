@@ -109,10 +109,10 @@ public class SisyutuItemComponent {
 		
 		List<String> sisyutuItemNameList = new ArrayList<String>();
 		// 自分自身の支出項目名を設定
-		sisyutuItemNameList.add(sisyutuItem.getSisyutuItemName().toString());
+		sisyutuItemNameList.add(sisyutuItem.getSisyutuItemName().getValue());
 		
 		// 親の支出項目コード
-		String parentSisyutuItemCode = sisyutuItem.getParentSisyutuItemCode().toString();
+		String parentSisyutuItemCode = sisyutuItem.getParentSisyutuItemCode().getValue();
 		// 親の支出項目レベル
 		int sisyutuItemLevel = sisyutuItem.getSisyutuItemLevel().getValue();
 		
@@ -127,10 +127,10 @@ public class SisyutuItemComponent {
 				throw new MyHouseholdAccountBookRuntimeException("支出項目情報が属する親の支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" 
 						+ sisyutuItemCode + ", [sisyutuItemCodeの値からさかのぼって調査必要です]:[存在しない親コード=parentSisyutuItemCode:" + parentSisyutuItemCode + "]");
 			} else {
-				sisyutuItemNameList.add(parentSisyutuItem.getSisyutuItemName().toString());
+				sisyutuItemNameList.add(parentSisyutuItem.getSisyutuItemName().getValue());
 			}
 			// 取得対象の親の支出項目コードを再設定
-			parentSisyutuItemCode = parentSisyutuItem.getParentSisyutuItemCode().toString();
+			parentSisyutuItemCode = parentSisyutuItem.getParentSisyutuItemCode().getValue();
 			// 親の支出項目レベルを設定
 			sisyutuItemLevel = parentSisyutuItem.getSisyutuItemLevel().getValue();
 			
@@ -174,10 +174,10 @@ public class SisyutuItemComponent {
 			// ここでは単純なリストを設定し、画面表示のための親子関係への再設定はプレゼン層で行う
 			response.addSisyutuItemResponseList(sisyutuItemSearchResult.getValues().stream().map(domain -> 
 			AbstractExpenditureItemInfoManageResponse.SisyutuItemInfo.from(
-					domain.getSisyutuItemCode().toString(),
-					domain.getSisyutuItemName().toString(),
-					domain.getSisyutuItemDetailContext().toString(),
-					domain.getParentSisyutuItemCode().toString(),
+					domain.getSisyutuItemCode().getValue(),
+					domain.getSisyutuItemName().getValue(),
+					domain.getSisyutuItemDetailContext().getValue(),
+					domain.getParentSisyutuItemCode().getValue(),
 					domain.getSisyutuItemLevel().toString(),
 					domain.getEnableUpdateFlg().getValue())
 			).collect(Collectors.toUnmodifiableList()));
@@ -216,10 +216,10 @@ public class SisyutuItemComponent {
 			// ここでは単純なリストを設定し、画面表示のための親子関係への再設定はプレゼン層で行う
 			response.addSisyutuItemResponseList(sisyutuItemSearchResult.getValues().stream().map(domain -> 
 			AbstractExpenditureItemInfoManageResponse.SisyutuItemInfo.from(
-					domain.getSisyutuItemCode().toString(),
-					domain.getSisyutuItemName().toString(),
-					domain.getSisyutuItemDetailContext().toString(),
-					domain.getParentSisyutuItemCode().toString(),
+					domain.getSisyutuItemCode().getValue(),
+					domain.getSisyutuItemName().getValue(),
+					domain.getSisyutuItemDetailContext().getValue(),
+					domain.getParentSisyutuItemCode().getValue(),
 					domain.getSisyutuItemLevel().toString(),
 					domain.getEnableUpdateFlg().getValue())
 			).collect(Collectors.toUnmodifiableList()));

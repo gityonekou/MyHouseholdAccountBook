@@ -38,6 +38,8 @@ public class FixedCostReadWriteDto {
 	private final String fixedCostDetailContext;
 	// 支出項目コード
 	private final String sisyutuItemCode;
+	// 固定費区分
+	private final String fixedCostKubun;
 	// 固定費支払月(支払月)
 	private final String fixedCostShiharaiTuki;
 	// 固定費支払月任意詳細
@@ -59,6 +61,7 @@ public class FixedCostReadWriteDto {
 	 * @param fixedCostName 固定費名(支払名)
 	 * @param fixedCostDetailContext 固定費内容詳細(支払内容詳細)
 	 * @param sisyutuItemCode 支出項目コード
+	 * @param fixedCostKubun 固定費区分
 	 * @param fixedCostShiharaiTuki 固定費支払月(支払月)
 	 * @param fixedCostShiharaiTukiOptionalContext 固定費支払月任意詳細
 	 * @param fixedCostShiharaiDay 固定費支払日(支払日)
@@ -72,6 +75,7 @@ public class FixedCostReadWriteDto {
 			String fixedCostName,
 			String fixedCostDetailContext,
 			String sisyutuItemCode,
+			String fixedCostKubun,
 			String fixedCostShiharaiTuki,
 			String fixedCostShiharaiTukiOptionalContext,
 			String fixedCostShiharaiDay,
@@ -82,6 +86,7 @@ public class FixedCostReadWriteDto {
 				fixedCostName,
 				fixedCostDetailContext, 
 				sisyutuItemCode,
+				fixedCostKubun,
 				fixedCostShiharaiTuki,
 				fixedCostShiharaiTukiOptionalContext,
 				fixedCostShiharaiDay,

@@ -62,8 +62,8 @@ public class CodeTableItemComponent {
 		result.getValues().forEach(codeTableItem -> {
 			Map<String, String> codeValuePairMap = new LinkedHashMap<>();
 			codeTableItem.getKeyValueList().forEach(keyValuePair -> codeValuePairMap.put(
-					keyValuePair.getCode().toString(), keyValuePair.getCodeValue().toString()));
-			codeMapTable.put(codeTableItem.getKubun().toString(), codeValuePairMap);
+					keyValuePair.getCode().getValue(), keyValuePair.getCodeValue().getValue()));
+			codeMapTable.put(codeTableItem.getKubun().getValue(), codeValuePairMap);
 			
 		});
 		log.debug("CodeTableItemComponent constractor end:");

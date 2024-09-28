@@ -12,11 +12,15 @@ package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
 import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuusiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
 import lombok.AccessLevel;
@@ -97,6 +101,84 @@ public class IncomeAndExpenditureItem {
 	 */
 	public static IncomeAndExpenditureItem fromEmpty() {
 		return new IncomeAndExpenditureItem(null, null, null, null, null, null, null);
+	}
+	
+	/**
+	 *<pre>
+	 * 引数の情報から対象月の収支テーブル情報を新規追加する場合の収支テーブル情報(ドメイン)を生成して返します。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param yearMonthDomain 対象年月(ドメイン)
+	 * @param incomeKingakuTotalAmount 対象月の収入金額合計
+	 * @param sisyutuYoteiKingakuTotalAmount 対象月の支出予定金額合計
+	 * @param sisyutuKingakuTotalAmount 対象月の支出金額合計
+	 * @return 収支テーブル情報(ドメイン)
+	 *
+	 */
+	public static IncomeAndExpenditureItem createAddTypeIncomeAndExpenditureItem(
+			UserId userId,
+			TargetYearMonth yearMonthDomain,
+			SyuunyuuKingakuTotalAmount incomeKingakuTotalAmount,
+			SisyutuYoteiKingakuTotalAmount sisyutuYoteiKingakuTotalAmount,
+			SisyutuKingakuTotalAmount sisyutuKingakuTotalAmount) {
+		
+		// 収支金額(収入金額合計 - 支出金額合計)
+		BigDecimal syuusiKingaku = incomeKingakuTotalAmount.getValue().subtract(sisyutuKingakuTotalAmount.getValue());
+		
+		// 支出テーブル情報(ドメイン)を生成して返却
+		return IncomeAndExpenditureItem.from(
+				// ユーザID
+				userId.getValue(),
+				//対象年
+				yearMonthDomain.getYear(),
+				// 対象月
+				yearMonthDomain.getMonth(),
+				// 収入金額
+				incomeKingakuTotalAmount.getValue(),
+				// 支出予定金額
+				sisyutuYoteiKingakuTotalAmount.getValue(),
+				// 支出金額
+				sisyutuKingakuTotalAmount.getValue(),
+				// 収支金額
+				syuusiKingaku);
+	}
+	
+	/**
+	 *<pre>
+	 * 引数の情報から収支テーブルを更新する場合の収支テーブル情報(ドメイン)を生成して返します。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param yearMonthDomain 対象年月(ドメイン)
+	 * @param incomeKingakuTotalAmount 対象月の収入金額合計
+	 * @param expenditureKingakuTotalAmount 対象月の支出金額合計
+	 * @return 収支テーブル情報(ドメイン)
+	 *
+	 */
+	public static IncomeAndExpenditureItem createUpdTypeIncomeAndExpenditureItem(
+			UserId userId,
+			TargetYearMonth yearMonthDomain,
+			SyuunyuuKingakuTotalAmount incomeKingakuTotalAmount,
+			SisyutuKingakuTotalAmount expenditureKingakuTotalAmount) {
+		
+		// 収支金額(収入金額合計 - 支出金額合計)
+		BigDecimal syuusiKingaku = incomeKingakuTotalAmount.getValue().subtract(expenditureKingakuTotalAmount.getValue());
+		
+		// 支出テーブル情報(ドメイン)を生成して返却
+		return IncomeAndExpenditureItem.from(
+				// ユーザID
+				userId.getValue(),
+				//対象年
+				yearMonthDomain.getYear(),
+				// 対象月
+				yearMonthDomain.getMonth(),
+				// 収入金額
+				incomeKingakuTotalAmount.getValue(),
+				// 支出予定金額
+				SisyutuYoteiKingakuTotalAmount.ZERO.getValue(),
+				// 支出金額
+				expenditureKingakuTotalAmount.getValue(),
+				// 収支金額
+				syuusiKingaku);
 	}
 	
 	/**

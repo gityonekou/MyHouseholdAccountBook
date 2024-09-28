@@ -83,7 +83,7 @@ public class ShopTableDataSource implements ShopTableRepository {
 	@Override
 	public ShopInquiryList findById(SearchQueryUserId userId) {
 		// 検索結果を取得
-		List<ShopReadWriteDto> searchResult = mapper.findById(UserIdSearchQueryDto.from(userId.getUserId().toString()));
+		List<ShopReadWriteDto> searchResult = mapper.findById(UserIdSearchQueryDto.from(userId.getUserId().getValue()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return ShopInquiryList.from(null);
@@ -101,7 +101,7 @@ public class ShopTableDataSource implements ShopTableRepository {
 	public Shop findByIdAndShopCode(SearchQueryUserIdAndShopCode search) {
 		// 指定条件で店舗情報を取得
 		ShopReadWriteDto result = mapper.findByIdAndShopCode(UserIdAndShopCodeSearchQueryDto.from(
-				search.getUserId().toString(), search.getShopCode().toString()));
+				search.getUserId().getValue(), search.getShopCode().getValue()));
 		if(result == null) {
 			// 対象データなしの場合、nullを返却
 			return null;
@@ -117,7 +117,7 @@ public class ShopTableDataSource implements ShopTableRepository {
 	@Override
 	public int countByIdAndLessThanNineHundred(SearchQueryUserId userId) {
 		// ユーザIDで検索し、店舗コードが900より小さいものの件数を返す
-		return mapper.countByIdAndLessThanNineHundred(UserIdSearchQueryDto.from(userId.getUserId().toString()));
+		return mapper.countByIdAndLessThanNineHundred(UserIdSearchQueryDto.from(userId.getUserId().getValue()));
 	}
 
 	/**
@@ -127,7 +127,7 @@ public class ShopTableDataSource implements ShopTableRepository {
 	public ShopInquiryList findByIdAndShopSort(SearchQueryUserIdAndShopSort search) {
 		// 検索結果を取得
 		List<ShopReadWriteDto> searchResult = mapper.findByIdAndShopSort(
-				UserIdAndShopSortSearchQueryDto.from(search.getUserId().toString(), search.getShopSort().toString()));
+				UserIdAndShopSortSearchQueryDto.from(search.getUserId().getValue(), search.getShopSort().getValue()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return ShopInquiryList.from(null);
@@ -145,9 +145,9 @@ public class ShopTableDataSource implements ShopTableRepository {
 		// 検索結果を取得
 		List<ShopReadWriteDto> searchResult = mapper.findByIdAndShopSortBetween(
 				UserIdAndShopSortBetweenABSearchQueryDto.from(
-						search.getUserId().toString(),
-						search.getShopSortA().toString(),
-						search.getShopSortB().toString()));
+						search.getUserId().getValue(),
+						search.getShopSortA().getValue(),
+						search.getShopSortB().getValue()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return ShopInquiryList.from(null);
@@ -165,8 +165,8 @@ public class ShopTableDataSource implements ShopTableRepository {
 		// 検索結果を取得
 		List<ShopReadWriteDto> searchResult = mapper.findByIdAndShopKubunCodeList(
 				UserIdAndShopKubunCodeListSearchQueryDto.from(
-						search.getUserId().toString(),
-						search.getShopKubunCodeList().stream().map(model -> model.toString()).collect(Collectors.toUnmodifiableList())));
+						search.getUserId().getValue(),
+						search.getShopKubunCodeList().stream().map(model -> model.getValue()).collect(Collectors.toUnmodifiableList())));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return ShopInquiryList.from(null);
@@ -209,14 +209,14 @@ public class ShopTableDataSource implements ShopTableRepository {
 	private ShopReadWriteDto createShopReadWriteDto(Shop data) {
 		return ShopReadWriteDto.from(
 				// ユーザID
-				data.getUserId().toString(),
+				data.getUserId().getValue(),
 				// 店舗コード
-				data.getShopCode().toString(),
+				data.getShopCode().getValue(),
 				// 店舗区分コード
-				data.getShopKubunCode().toString(),
+				data.getShopKubunCode().getValue(),
 				// 店舗名
-				data.getShopName().toString(),
+				data.getShopName().getValue(),
 				// 店舗表示順
-				data.getShopSort().toString());
+				data.getShopSort().getValue());
 	}
 }

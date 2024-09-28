@@ -45,12 +45,12 @@ public class SisyutuItemBaseTableDataSource implements SisyutuItemBaseTableRepos
 	public int add(SisyutuItemBase data) {
 		// 支出項目テーブル(BASE):SISYUTU_ITEM_BASE_TABLEにデータを追加
 		return sisyutuItemBaseTableMapper.insert(SisyutuItemBaseTableReadWriteDto.from(
-				data.getSisyutuItemCode().toString(),
-				data.getSisyutuItemName().toString(),
-				data.getSisyutuItemDetailContext().toString(),
-				data.getParentSisyutuItemCode().toString(),
+				data.getSisyutuItemCode().getValue(),
+				data.getSisyutuItemName().getValue(),
+				data.getSisyutuItemDetailContext().getValue(),
+				data.getParentSisyutuItemCode().getValue(),
 				data.getSisyutuItemLevel().toString(),
-				data.getSisyutuItemSort().toString()
+				data.getSisyutuItemSort().getValue()
 				));
 	}
 

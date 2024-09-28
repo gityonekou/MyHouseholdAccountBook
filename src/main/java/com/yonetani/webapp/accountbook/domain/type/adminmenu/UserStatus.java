@@ -30,8 +30,8 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@EqualsAndHashCode
 @Getter
+@EqualsAndHashCode
 public class UserStatus {
 	
 	// ユーザステータス(true:有効、false:無効)

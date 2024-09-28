@@ -18,7 +18,9 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKubun
 import com.yonetani.webapp.accountbook.domain.type.common.DeleteFlg;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
+import com.yonetani.webapp.accountbook.presentation.session.IncomeRegistItem;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -93,5 +95,36 @@ public class IncomeItem {
 				SyuunyuuKingaku.from(syuunyuuKingaku),
 				DeleteFlg.from(deleteFlg));
 		
+	}
+	
+	/**
+	 *<pre>
+	 * 引数の収支登録情報(セッション)から収入テーブル情報(ドメイン)を生成して返します。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param yearMonthDomain 対象年月(ドメイン)
+	 * @param incomeCode 収入コード
+	 * @param incomeData 収支登録情報(セッション)
+	 * @return 収入テーブル情報(ドメイン)
+	 *
+	 */
+	public static IncomeItem createIncomeItem(UserId userId, TargetYearMonth yearMonthDomain, String incomeCode, IncomeRegistItem incomeData) {
+		return IncomeItem.from(
+				// ユーザID
+				userId.getValue(),
+				// 対象年
+				yearMonthDomain.getYear(),
+				// 対象月
+				yearMonthDomain.getMonth(),
+				// 収入コード
+				incomeCode,
+				// 収入区分
+				incomeData.getIncomeKubun(),
+				// 収入詳細
+				incomeData.getIncomeDetailContext(),
+				// 収入金額
+				incomeData.getIncomeKingaku(),
+				// 削除フラグ
+				false);
 	}
 }

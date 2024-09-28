@@ -9,8 +9,13 @@
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
 
+import org.springframework.util.StringUtils;
+
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -24,6 +29,7 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 @EqualsAndHashCode
 public class UserId {
 	// ユーザID
@@ -31,13 +37,20 @@ public class UserId {
 	
 	/**
 	 *<pre>
-	 * 「ユーザID」項目の値を表すドメインタイプを生成します。
+	 *「ユーザID」項目の値を表すドメインタイプを生成します。
+	 * 
+	 * [ガード節]
+	 * ・空文字列
 	 *</pre>
 	 * @param userId ユーザID
 	 * @return 「ユーザID」項目ドメインタイプ
 	 *
 	 */
 	public static UserId from(String userId) {
+		// ガード節(空文字列)
+		if(!StringUtils.hasLength(userId)) {
+			throw new MyHouseholdAccountBookRuntimeException("「ユーザID」項目の設定値が空文字列です。管理者に問い合わせてください。");
+		}
 		return new UserId(userId);
 	}
 	

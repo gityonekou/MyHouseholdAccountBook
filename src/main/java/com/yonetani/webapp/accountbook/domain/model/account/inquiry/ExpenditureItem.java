@@ -24,7 +24,9 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiK
 import com.yonetani.webapp.accountbook.domain.type.common.DeleteFlg;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
+import com.yonetani.webapp.accountbook.presentation.session.ExpenditureRegistItem;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -124,5 +126,55 @@ public class ExpenditureItem {
 				SisyutuKingaku.from(sisyutuKingaku),
 				DeleteFlg.from(deleteFlg));
 		
+	}
+	
+	/**
+	 *<pre>
+	 * 引数の支出登録情報(セッション)から支出テーブル情報(ドメイン)を生成して返します。
+	 *</pre>
+	 * @param initFlg 初期登録かどうかのフラグ　(収支登録確認画面からの遷移:true／各月の収支画面の更新ボタン押下からの遷移：false)
+	 * @param userId ユーザID
+	 * @param yearMonthDomain 対象年月(ドメイン)
+	 * @param expenditureCode 支出コード
+	 * @param expenditureData 支出登録情報(セッション)
+	 * @return 支出テーブル情報(ドメイン)
+	 *
+	 */
+	public static ExpenditureItem createExpenditureItem(boolean initFlg, UserId userId, TargetYearMonth yearMonthDomain,
+			String expenditureCode, ExpenditureRegistItem expenditureData) {
+		
+		// 支出予定金額：対象月の新規登録時のみ、支出金額の設定値を支出予定金額として設定。対象月の更新時は新規追加時を含めすべて0を設定
+		BigDecimal sisyutuYoteiKingaku = (initFlg) ? expenditureData.getExpenditureKingaku() : SisyutuYoteiKingaku.ZERO.getValue();
+		// 支出金額：固定費の対象データが初期値0フラグが設定していある場合は支出金額は0を設定、それ以外は設定されている支出金額を設定
+		BigDecimal sisyutuKingaku = (expenditureData.isClearStartFlg()) ? SisyutuYoteiKingaku.ZERO.getValue() : expenditureData.getExpenditureKingaku();
+		
+		// 支出テーブル情報(ドメイン)を生成して返却
+		return ExpenditureItem.from(
+				// ユーザID
+				userId.getValue(),
+				//対象年
+				yearMonthDomain.getYear(),
+				// 対象月
+				yearMonthDomain.getMonth(),
+				// 支出コード
+				expenditureCode,
+				// 支出項目コード
+				expenditureData.getSisyutuItemCode(),
+				// イベントコード
+				expenditureData.getEventCode(),
+				// 支出名称
+				expenditureData.getExpenditureName(),
+				// 支出区分
+				expenditureData.getExpenditureKubun(),
+				// 支出詳細
+				expenditureData.getExpenditureDetailContext(),
+				// 支払日
+				ShiharaiDate.from(yearMonthDomain.getValue(), expenditureData.getSiharaiDate()).getValue(),
+				// 支出予定金額
+				sisyutuYoteiKingaku,
+				// 支出金額
+				sisyutuKingaku,
+				// 削除フラグ
+				false);
 	}
 }

@@ -187,19 +187,19 @@ public class ShoppingItemInfoManageUseCase {
 		ShoppingItemInfoManageActSelectResponse response = ShoppingItemInfoManageActSelectResponse.getInstance(
 				SelectShoppingItemInfo.from(
 						// 商品コード
-						searchResult.getShoppingItemCode().toString(),
+						searchResult.getShoppingItemCode().getValue(),
 						// 商品区分名
-						searchResult.getShoppingItemKubunName().toString(),
+						searchResult.getShoppingItemKubunName().getValue(),
 						// 商品名
-						searchResult.getShoppingItemName().toString(),
+						searchResult.getShoppingItemName().getValue(),
 						// 商品詳細
-						searchResult.getShoppingItemDetailContext().toString(),
+						searchResult.getShoppingItemDetailContext().getValue(),
 						// 商品JANコード
-						searchResult.getShoppingItemJanCode().toString(),
+						searchResult.getShoppingItemJanCode().getValue(),
 						// 支出項目名(＞で区切った値)
-						sisyutuItemComponent.getSisyutuItemName(user, searchResult.getSisyutuItemCode().toString()),
+						sisyutuItemComponent.getSisyutuItemName(user, searchResult.getSisyutuItemCode().getValue()),
 						// 会社名
-						searchResult.getCompanyName().toString()));
+						searchResult.getCompanyName().getValue()));
 		
 		/* 指定した検索条件に一致する商品一覧を取得 */
 		// 検索条件が支出項目コードで商品を検索の場合
@@ -319,20 +319,20 @@ public class ShoppingItemInfoManageUseCase {
 		// アクション：新規登録
 		addItemForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_ADD);
 		// 属する支出項目コード
-		addItemForm.setSisyutuItemCode(searchResult.getSisyutuItemCode().toString());
+		addItemForm.setSisyutuItemCode(searchResult.getSisyutuItemCode().getValue());
 		// 商品区分名
-		addItemForm.setShoppingItemKubunName(searchResult.getShoppingItemKubunName().toString());
+		addItemForm.setShoppingItemKubunName(searchResult.getShoppingItemKubunName().getValue());
 		// 商品名
-		addItemForm.setShoppingItemName("★新規★" + searchResult.getShoppingItemName().toString());
+		addItemForm.setShoppingItemName("★新規★" + searchResult.getShoppingItemName().getValue());
 		// 商品詳細
-		addItemForm.setShoppingItemDetailContext(searchResult.getShoppingItemDetailContext().toString());
+		addItemForm.setShoppingItemDetailContext(searchResult.getShoppingItemDetailContext().getValue());
 		// 会社名
-		addItemForm.setCompanyName(searchResult.getCompanyName().toString());
+		addItemForm.setCompanyName(searchResult.getCompanyName().getValue());
 		
 		// 基準店舗選択ボックス表示情報を設定したレスポンスを生成
 		ShoppingItemInfoManageUpdateResponse response = createShoppingItemInfoManageUpdateResponse(user.getUserId(), addItemForm);
 		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
-		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, searchResult.getSisyutuItemCode().toString()));
+		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, searchResult.getSisyutuItemCode().getValue()));
 		
 		// コピーした情報を新規登録する旨をメッセージ表示
 		response.addMessage("「コピーして商品を新規追加」が選択されています。");
@@ -366,34 +366,34 @@ public class ShoppingItemInfoManageUseCase {
 		// アクション：更新
 		updateItemForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE);
 		// 商品コード
-		updateItemForm.setShoppingItemCode(searchResult.getShoppingItemCode().toString());
+		updateItemForm.setShoppingItemCode(searchResult.getShoppingItemCode().getValue());
 		// 属する支出項目コード
-		updateItemForm.setSisyutuItemCode(searchResult.getSisyutuItemCode().toString());
+		updateItemForm.setSisyutuItemCode(searchResult.getSisyutuItemCode().getValue());
 		// 商品区分名
-		updateItemForm.setShoppingItemKubunName(searchResult.getShoppingItemKubunName().toString());
+		updateItemForm.setShoppingItemKubunName(searchResult.getShoppingItemKubunName().getValue());
 		// 商品名
-		updateItemForm.setShoppingItemName(searchResult.getShoppingItemName().toString());
+		updateItemForm.setShoppingItemName(searchResult.getShoppingItemName().getValue());
 		// 商品詳細
-		updateItemForm.setShoppingItemDetailContext(searchResult.getShoppingItemDetailContext().toString());
+		updateItemForm.setShoppingItemDetailContext(searchResult.getShoppingItemDetailContext().getValue());
 		// 商品JANコード
-		updateItemForm.setShoppingItemJanCode(searchResult.getShoppingItemJanCode().toString());
+		updateItemForm.setShoppingItemJanCode(searchResult.getShoppingItemJanCode().getValue());
 		// 会社名
-		updateItemForm.setCompanyName(searchResult.getCompanyName().toString());
+		updateItemForm.setCompanyName(searchResult.getCompanyName().getValue());
 		// 基準店舗コード
-		updateItemForm.setStandardShopCode(searchResult.getShopCode().toString());
+		updateItemForm.setStandardShopCode(searchResult.getShopCode().getValue());
 		// 基準価格
 		updateItemForm.setStandardPrice(DomainCommonUtils.convertInteger(searchResult.getStandardPrice().getValue()));
 		// 商品内容量
 		updateItemForm.setShoppingItemCapacity(searchResult.getShoppingItemCapacity().getValue());
 		// 商品内容量単位
-		updateItemForm.setShoppingItemCapacityUnit(searchResult.getShoppingItemCapacityUnit().toString());
+		updateItemForm.setShoppingItemCapacityUnit(searchResult.getShoppingItemCapacityUnit().getValue());
 		// カロリー
 		updateItemForm.setShoppingItemCalories(searchResult.getShoppingItemCalories().getValue());
 		
 		// 基準店舗選択ボックス表示情報を設定したレスポンスを生成
 		ShoppingItemInfoManageUpdateResponse response = createShoppingItemInfoManageUpdateResponse(user.getUserId(), updateItemForm);
 		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
-		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, searchResult.getSisyutuItemCode().toString()));
+		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, searchResult.getSisyutuItemCode().getValue()));
 		
 		return response;
 	}
@@ -435,7 +435,7 @@ public class ShoppingItemInfoManageUseCase {
 			inputForm.setShoppingItemCode(ShoppingItemCode.getNewCode(count));
 			
 			// 商品情報を作成
-			ShoppingItem addData = createShoppingItem(user.getUserId().toString(), inputForm);
+			ShoppingItem addData = createShoppingItem(user.getUserId(), inputForm);
 			
 			// 商品テーブルに登録
 			int addCount = shoppingItemRepository.add(addData);
@@ -468,7 +468,7 @@ public class ShoppingItemInfoManageUseCase {
 			
 			/* 商品更新 */
 			// 商品情報を作成
-			ShoppingItem updateData = createShoppingItem(user.getUserId().toString(), inputForm);
+			ShoppingItem updateData = createShoppingItem(user.getUserId(), inputForm);
 			
 			// 商品テーブルに登録(支出項目コードは更新対象外項目なので注意)
 			int updateCount = shoppingItemRepository.update(updateData);
@@ -532,7 +532,7 @@ public class ShoppingItemInfoManageUseCase {
 		}
 		// 内容量単位選択ボックスの表示情報リストはデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定
 		List<OptionItem> capacityUnitList = codeValuePairList.stream().map(pair ->
-			OptionItem.from(pair.getCode().toString(), pair.getCodeValue().toString())).collect(Collectors.toList());
+			OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList());
 		
 		// レスポンス
 		ShoppingItemInfoManageUpdateResponse response = null;
@@ -560,9 +560,9 @@ public class ShoppingItemInfoManageUseCase {
 					shopSearchResult.getValues().stream().map(domain ->
 						OptionItem.from(
 								// 店舗コード
-								domain.getShopCode().toString(),
+								domain.getShopCode().getValue(),
 								// 店舗名
-								domain.getShopName().toString()
+								domain.getShopName().getValue()
 						)).collect(Collectors.toUnmodifiableList()),
 					// 内容量単位選択ボックスの表示情報リスト
 					capacityUnitList
@@ -637,7 +637,7 @@ public class ShoppingItemInfoManageUseCase {
 						// コード区分：商品内容量単位
 						MyHouseholdAccountBookContent.SHOPPING_ITEM_CAPACITY_UNIT,
 						// 商品内容量単位
-						domain.getShoppingItemCapacityUnit().toString()));
+						domain.getShoppingItemCapacityUnit().getValue()));
 			}
 			// 商品のカロリー量の値が設定されている場合、値を設定
 			if(domain.getShoppingItemCalories().getValue() != null) {
@@ -656,26 +656,26 @@ public class ShoppingItemInfoManageUseCase {
 				// 終了文字列を出力
 				nameTextBuff.append("）");
 			}
-			String shoppingItemNameText = domain.getShoppingItemName().toString() + nameTextBuff.toString();
+			String shoppingItemNameText = domain.getShoppingItemName().getValue() + nameTextBuff.toString();
 			
 			// 商品一覧情報の明細データを返却
 			return AbstractShoppingItemInfoManageSearchResponse.ShoppingItemListItem.from(
 				// 商品コード
-				domain.getShoppingItemCode().toString(),
+				domain.getShoppingItemCode().getValue(),
 				// 商品区分名
-				domain.getShoppingItemKubunName().toString(),
+				domain.getShoppingItemKubunName().getValue(),
 				// 商品名(内容量／カロリー)
 				shoppingItemNameText,
 				// 商品詳細
-				domain.getShoppingItemDetailContext().toString(),
+				domain.getShoppingItemDetailContext().getValue(),
 				// 商品JANコード
-				domain.getShoppingItemJanCode().toString(),
+				domain.getShoppingItemJanCode().getValue(),
 				// 支出項目名
-				domain.getSisyutuItemName().toString(),
+				domain.getSisyutuItemName().getValue(),
 				// 会社名
-				domain.getCompanyName().toString(),
+				domain.getCompanyName().getValue(),
 				// 基準店舗名
-				domain.getStandardShopName().toString(),
+				domain.getStandardShopName().getValue(),
 				// 基準価格
 				domain.getStandardPrice().toString());
 		}).collect(Collectors.toUnmodifiableList());

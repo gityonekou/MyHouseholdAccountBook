@@ -151,20 +151,20 @@ public class FixedCostInquiryList {
 			for(FixedCostInquiryItem item : values) {
 				
 				// 支払月が毎月、またはその他任意の場合、奇数・偶数をそれぞれ加算
-				if(Objects.equals(item.getFixedCostShiharaiTuki().toString(),
+				if(Objects.equals(item.getFixedCostShiharaiTuki().getValue(),
 						MyHouseholdAccountBookContent.SHIHARAI_TUKI_EVERY_SELECTED_VALUE)
-					|| Objects.equals(item.getFixedCostShiharaiTuki().toString(),
+					|| Objects.equals(item.getFixedCostShiharaiTuki().getValue(),
 							MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE)) {
 					oddMonthGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(oddMonthGoukeiWk, item.getShiharaiKingaku().getValue());
 					anEvenMonthGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(anEvenMonthGoukeiWk, item.getShiharaiKingaku().getValue());
 					
 				// 支払月が奇数月の場合、奇数月を加算
-				} else if(Objects.equals(item.getFixedCostShiharaiTuki().toString(),
+				} else if(Objects.equals(item.getFixedCostShiharaiTuki().getValue(),
 						MyHouseholdAccountBookContent.SHIHARAI_TUKI_ODD_SELECTED_VALUE)) {
 					oddMonthGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(oddMonthGoukeiWk, item.getShiharaiKingaku().getValue());
 					
 				// 支払月が偶数月の場合、偶数月を加算
-				} else if(Objects.equals(item.getFixedCostShiharaiTuki().toString(),
+				} else if(Objects.equals(item.getFixedCostShiharaiTuki().getValue(),
 						MyHouseholdAccountBookContent.SHIHARAI_TUKI_AN_EVEN_SELECTED_VALUE)) {
 					anEvenMonthGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(anEvenMonthGoukeiWk, item.getShiharaiKingaku().getValue());
 				}

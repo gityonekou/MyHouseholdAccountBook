@@ -110,7 +110,7 @@ public class AdminMenuUserInfoUseCase {
 		
 		// ユーザIDでユーザ情報を検索し、レスポンスに設定
 		AdminMenuUserInfo userInfo = adminUserInfoRepository.getUserInfo(SearchQueryUserId.from(userId));
-		if(userInfo.isEmpty()) {
+		if(userInfo == null) {
 			// 検索結果なしの場合
 			throw new MyHouseholdAccountBookRuntimeException("選択したユーザIDに対応するユーザ情報がありません。管理者に問い合わせてください。[userid:"
 					+ userId + "]");
@@ -118,11 +118,11 @@ public class AdminMenuUserInfoUseCase {
 			// 取得したユーザ情報をもとにFormデータを作成し、レスポンスに設定
 			AdminMenuUserInfoForm userInfoForm = new AdminMenuUserInfoForm();
 			userInfoForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE);
-			userInfoForm.setUserId(userInfo.getUserId().toString());
-			userInfoForm.setUserName(userInfo.getUserName().toString());
+			userInfoForm.setUserId(userInfo.getUserId().getValue());
+			userInfoForm.setUserName(userInfo.getUserName().getValue());
 			userInfoForm.setUserStatus(userInfo.getUserStatus().toValueString());
 			userInfoForm.setUserRole(userInfo.getUserRole().toValueStringList());
-			userInfoForm.setTargetYearMonth(userInfo.getTargetYearMonth().getTargetYearMonth());
+			userInfoForm.setTargetYearMonth(userInfo.getTargetYearMonth().getValue());
 			response.setAdminMenuUserInfoForm(userInfoForm);
 		}
 		
@@ -155,7 +155,7 @@ public class AdminMenuUserInfoUseCase {
 					userInfoForm.getUserStatus(),
 					userInfoForm.getUserRole(),
 					userInfoForm.getUserPassword(),
-					domainTypeYearMonth.getTargetYearMonth());
+					domainTypeYearMonth.getValue());
 			
 			// 家計簿利用ユーザ情報
 			AccountBookUser accountBookUser = AccountBookUser.from(
@@ -181,13 +181,13 @@ public class AdminMenuUserInfoUseCase {
 				sisyutuItemBaseList.getValues().forEach(baseData -> {
 						// 登録する支出項目テーブル情報を生成(更新不可フラグはデフォルトで不可:falseを設定)
 						SisyutuItem addData = SisyutuItem.from(
-							accountBookUser.getUserId().toString(),
-							baseData.getSisyutuItemCode().toString(),
-							baseData.getSisyutuItemName().toString(), 
-							baseData.getSisyutuItemDetailContext().toString(),
-							baseData.getParentSisyutuItemCode().toString(),
+							accountBookUser.getUserId().getValue(),
+							baseData.getSisyutuItemCode().getValue(),
+							baseData.getSisyutuItemName().getValue(), 
+							baseData.getSisyutuItemDetailContext().getValue(),
+							baseData.getParentSisyutuItemCode().getValue(),
 							baseData.getSisyutuItemLevel().toString(),
-							baseData.getSisyutuItemSort().toString(),
+							baseData.getSisyutuItemSort().getValue(),
 							false);
 						// データを登録
 						int addCount = sisyutuItemTableRepository.add(addData);
@@ -203,11 +203,11 @@ public class AdminMenuUserInfoUseCase {
 				shopBaseList.getValues().forEach(baseData -> {
 						// 登録する店舗テーブル情報を生成
 						Shop addData = Shop.from(
-								accountBookUser.getUserId().toString(),
-								baseData.getShopCode().toString(),
-								baseData.getShopCode().toString(),
-								baseData.getShopName().toString(),
-								baseData.getShopCode().toString());
+								accountBookUser.getUserId().getValue(),
+								baseData.getShopCode().getValue(),
+								baseData.getShopCode().getValue(),
+								baseData.getShopName().getValue(),
+								baseData.getShopCode().getValue());
 						// データを登録
 						int addCount = shopTableRepository.add(addData);
 						// 追加件数が1件以上の場合、業務エラー
@@ -268,12 +268,12 @@ public class AdminMenuUserInfoUseCase {
 				// 登録する支出項目テーブル情報を生成(更新不可フラグはデフォルトで不可:falseを設定)
 				SisyutuItem addData = SisyutuItem.from(
 					"koukiyonetani",
-					baseData.getSisyutuItemCode().toString(),
-					baseData.getSisyutuItemName().toString(), 
-					baseData.getSisyutuItemDetailContext().toString(),
-					baseData.getParentSisyutuItemCode().toString(),
+					baseData.getSisyutuItemCode().getValue(),
+					baseData.getSisyutuItemName().getValue(), 
+					baseData.getSisyutuItemDetailContext().getValue(),
+					baseData.getParentSisyutuItemCode().getValue(),
 					baseData.getSisyutuItemLevel().toString(),
-					baseData.getSisyutuItemSort().toString(),
+					baseData.getSisyutuItemSort().getValue(),
 					false);
 				// データを登録
 				int addCount = sisyutuItemTableRepository.add(addData);
@@ -310,11 +310,11 @@ public class AdminMenuUserInfoUseCase {
 		} else {
 			response.addUserInfoListItems(userInfoList.getValues().stream().map(domain ->
 			AdminMenuUserInfoResponse.UserInfoListItem.from(
-					domain.getUserId().toString(),
-					domain.getUserName().toString(),
+					domain.getUserId().getValue(),
+					domain.getUserName().getValue(),
 					domain.getUserStatus().toString(),
 					domain.getUserRole().toViewStringList(),
-					domain.getTargetYearMonth().toString()
+					domain.getTargetYearMonth().getValue()
 			)).collect(Collectors.toUnmodifiableList()));
 		}
 		return response;

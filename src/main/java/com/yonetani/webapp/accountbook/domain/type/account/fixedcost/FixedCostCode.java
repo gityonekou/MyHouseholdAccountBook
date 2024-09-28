@@ -11,6 +11,7 @@ package com.yonetani.webapp.accountbook.domain.type.account.fixedcost;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 @EqualsAndHashCode
 public class FixedCostCode {
 	// 固定費コード
@@ -62,7 +64,7 @@ public class FixedCostCode {
 	 *
 	 */
 	public static String getNewCode(int count) {
-		return FixedCostCode.from(count).toString();
+		return FixedCostCode.from(count).getValue();
 	}
 	
 	/**

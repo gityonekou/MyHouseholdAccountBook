@@ -51,6 +51,9 @@ public class FixedCostInfoUpdateForm {
 	// 固定費内容詳細(支払内容詳細)
 	@Size(max = 300)
 	private String fixedCostDetailContext;
+	// 固定費区分
+	@NotBlank
+	private String fixedCostKubun;
 	// 支払月
 	@NotBlank
 	private String shiharaiTuki;

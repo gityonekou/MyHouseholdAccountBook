@@ -9,6 +9,9 @@
  */
 package com.yonetani.webapp.accountbook.common.content;
 
+import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
+
 /**
  *<pre>
  * 画面表示値、値の定数クラスです。
@@ -87,6 +90,12 @@ public class MyHouseholdAccountBookContent {
 	public static final String EXPENDITURE_KUBUN_WASTED_B_SELECTED_VALUE = "2";
 	/** コード定義:支出区分で無駄遣いC(3)を選択時 */
 	public static final String EXPENDITURE_KUBUN_WASTED_C_SELECTED_VALUE = "3";
+	/** コード定義区分(固定費区分:007) */
+	public static final String CODE_DEFINES_FIXED_COST_KUBUN = "007";
+	/** コード定義:固定費区分で支払い金額確定を選択時 */
+	public static final String FIXED_COST_FIX_SELECTED_VALUE = "1";
+	/** コード定義:固定費区分で予定支払い金額を選択時 */
+	public static final String FIXED_COST_ESTIMATE_SELECTED_VALUE = "2";
 	
 	/** 支出項目コード仮登録データ:9999 */
 	public static final String SISYUTU_ITEM_CODE_TEMPORARY_VALUE = "9999";
@@ -113,5 +122,14 @@ public class MyHouseholdAccountBookContent {
 	public static final String SEARCH_TARGET_COMPANY_NAME = "companyName";
 	/** 商品JANコードを検索条件に商品を検索 */
 	public static final String SEARCH_TARGET_SHOPPING_ITEM_JAN_CODE = "janCode";
+	
+	
+	/** 日付チェック用のフォーマットです(うるう年でない年で29日を指定した場合、28日のLocalDateとして判断します */
+	public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+	/** 日付の厳密チェック用の日付フォーマットです */
+	// うるう年の厳密なチェックを行う場合のフォーマッターです
+	// (デフォルトだと、うるう年でない年の日付の値に2月29日を指定してparseを行っても2月28日のLocalDateとしてparse結果が返されるため)
+	// 厳密なチェックを行う場合、年のフォーマットはyyyyではなくuuuuを指定する必要があるので注意
+	public static final DateTimeFormatter STRICT_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("uuuuMMdd").withResolverStyle(ResolverStyle.STRICT);
 	
 }

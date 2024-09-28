@@ -30,8 +30,8 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@EqualsAndHashCode
 @Getter
+@EqualsAndHashCode
 public class SyuunyuuKingaku {
 	// 収入金額
 	private final BigDecimal value;

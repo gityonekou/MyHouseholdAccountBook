@@ -83,7 +83,7 @@ public class ShopInfoManageUseCase {
 		}
 		// 店舗グループの選択ボックスは入力先でデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定
 		ShopInfoManageResponse response = ShopInfoManageResponse.getInstance(shopGroupList.stream().map(pair ->
-		OptionItem.from(pair.getCode().toString(), pair.getCodeValue().toString())).collect(Collectors.toList()));
+		OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList()));
 		
 		// ログインユーザの店舗情報を取得
 		ShopInquiryList shopSearchResult = shopRepository.findById(SearchQueryUserId.from(user.getUserId()));
@@ -94,10 +94,10 @@ public class ShopInfoManageUseCase {
 			// 店舗情報をレスポンスに設定
 			response.addShopList(shopSearchResult.getValues().stream().map(domain ->
 				ShopInfoManageResponse.ShopListItem.from(
-						domain.getShopCode().toString(),
-						domain.getShopName().toString(),
-						codeTableItem.getCodeValue(MyHouseholdAccountBookContent.CODE_DEFINES_SHOP_KUBUN, domain.getShopKubunCode().toString()),
-						domain.getShopSort().toString())
+						domain.getShopCode().getValue(),
+						domain.getShopName().getValue(),
+						codeTableItem.getCodeValue(MyHouseholdAccountBookContent.CODE_DEFINES_SHOP_KUBUN, domain.getShopKubunCode().getValue()),
+						domain.getShopSort().getValue())
 			).collect(Collectors.toUnmodifiableList()));
 		}
 		
@@ -132,15 +132,15 @@ public class ShopInfoManageUseCase {
 			// アクション
 			form.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE);
 			// 店舗コード
-			form.setShopCode(shop.getShopCode().toString());
+			form.setShopCode(shop.getShopCode().getValue());
 			// 店舗区分
-			form.setShopKubun(shop.getShopKubunCode().toString());
+			form.setShopKubun(shop.getShopKubunCode().getValue());
 			// 店舗名
-			form.setShopName(shop.getShopName().toString());
+			form.setShopName(shop.getShopName().getValue());
 			// 表示順
-			form.setShopSort(Integer.parseInt(shop.getShopSort().toString()));
+			form.setShopSort(Integer.parseInt(shop.getShopSort().getValue()));
 			// 表示順(更新比較用)
-			form.setShopSortBefore(shop.getShopSort().toString());
+			form.setShopSortBefore(shop.getShopSort().getValue());
 			
 			response.setShopInfoForm(form);
 		}
@@ -303,11 +303,11 @@ public class ShopInfoManageUseCase {
 	 */
 	private Shop createChopData(Shop data, int add) {
 		return Shop.from(
-				data.getUserId().toString(),
-				data.getShopCode().toString(),
-				data.getShopKubunCode().toString(),
-				data.getShopName().toString(),
-				String.format("%03d", Integer.parseInt(data.getShopSort().toString()) + add)
+				data.getUserId().getValue(),
+				data.getShopCode().getValue(),
+				data.getShopKubunCode().getValue(),
+				data.getShopName().getValue(),
+				String.format("%03d", Integer.parseInt(data.getShopSort().getValue()) + add)
 				);
 	}
 }

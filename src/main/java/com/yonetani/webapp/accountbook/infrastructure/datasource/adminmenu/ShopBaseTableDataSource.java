@@ -46,8 +46,8 @@ public class ShopBaseTableDataSource implements ShopBaseTableRepository {
 	public int add(ShopBase data) {
 		// 店舗テーブル(BASE):SHOP_BASE_TABLEにデータを追加
 		return shopBaseTableMapper.insert(ShopBaseTableReadWriteDto.from(
-				data.getShopCode().toString(),
-				data.getShopName().toString()
+				data.getShopCode().getValue(),
+				data.getShopName().getValue()
 				));
 	}
 

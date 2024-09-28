@@ -80,7 +80,7 @@ public class EventItemTableDataSource implements EventItemTableRepository {
 	@Override
 	public EventItemInquiryList findById(SearchQueryUserId userId) {
 		// 検索結果を取得
-		List<EventItemInquiryReadDto> searchResult = mapper.findById(UserIdSearchQueryDto.from(userId.getUserId().toString()));
+		List<EventItemInquiryReadDto> searchResult = mapper.findById(UserIdSearchQueryDto.from(userId.getUserId().getValue()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return EventItemInquiryList.from(null);
@@ -100,9 +100,9 @@ public class EventItemTableDataSource implements EventItemTableRepository {
 		List<EventItemInquiryReadDto> searchResult = mapper.findByIdAndSisyutuItemCode(
 				UserIdAndSisyutuItemCodeSearchQueryDto.from(
 						// ユーザID
-						search.getUserId().toString(),
+						search.getUserId().getValue(),
 						// 支出項目コード
-						search.getSisyutuItemCode().toString()));
+						search.getSisyutuItemCode().getValue()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return EventItemInquiryList.from(null);
@@ -120,7 +120,7 @@ public class EventItemTableDataSource implements EventItemTableRepository {
 	public EventItem findByIdAndEventCode(SearchQueryUserIdAndEventCode search) {
 		// 指定条件でイベント情報を取得
 		EventItemReadWriteDto result = mapper.findByIdAndEventCode(UserIdAndEventCodeSearchQueryDto.from(
-				search.getUserId().toString(), search.getEventCode().toString()));
+				search.getUserId().getValue(), search.getEventCode().getValue()));
 		if(result == null) {
 			// 対象データなしの場合、nullを返却
 			return null;
@@ -136,7 +136,7 @@ public class EventItemTableDataSource implements EventItemTableRepository {
 	@Override
 	public int countById(SearchQueryUserId userId) {
 		// ユーザIDに対応するイベント情報の件数を返します。
-		return mapper.countById(UserIdSearchQueryDto.from(userId.getUserId().toString()));
+		return mapper.countById(UserIdSearchQueryDto.from(userId.getUserId().getValue()));
 	}
 	
 	/**
@@ -202,15 +202,15 @@ public class EventItemTableDataSource implements EventItemTableRepository {
 	private EventItemReadWriteDto createEventItemReadWriteDto(EventItem domain) {
 		return EventItemReadWriteDto.from(
 				// ユーザID
-				domain.getUserId().toString(),
+				domain.getUserId().getValue(),
 				// イベントコード
-				domain.getEventCode().toString(),
+				domain.getEventCode().getValue(),
 				// 支出項目コード
-				domain.getSisyutuItemCode().toString(),
+				domain.getSisyutuItemCode().getValue(),
 				// イベント名
-				domain.getEventName().toString(),
+				domain.getEventName().getValue(),
 				// イベント内容詳細
-				domain.getEventDetailContext().toString(),
+				domain.getEventDetailContext().getValue(),
 				// イベント開始日
 				domain.getEventStartDate().getValue(),
 				// ベント終了日

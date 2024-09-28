@@ -98,9 +98,9 @@ public class EventInfoManageUseCase {
 		// 支出項目コードに対応する支出項目名(＞で区切った値)を設定
 		inputForm.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, sisyutuItemCode));
 		// イベント名:支出項目名を仮設定
-		inputForm.setEventName(sisyutuItem.getSisyutuItemName().toString());
+		inputForm.setEventName(sisyutuItem.getSisyutuItemName().getValue());
 		// イベント内容詳細(任意入力項目):支出項目詳細内容を仮設定
-		inputForm.setEventDetailContext(sisyutuItem.getSisyutuItemDetailContext().toString());
+		inputForm.setEventDetailContext(sisyutuItem.getSisyutuItemDetailContext().getValue());
 		
 		// 画面表示情報を生成して返却
 		return createEventInfoManageResponse(user, inputForm);
@@ -130,15 +130,15 @@ public class EventInfoManageUseCase {
 		// アクション：更新
 		inputForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE);
 		// イベントコード
-		inputForm.setEventCode(eventItem.getEventCode().toString());
+		inputForm.setEventCode(eventItem.getEventCode().getValue());
 		// 支出項目コード
-		inputForm.setSisyutuItemCode(eventItem.getSisyutuItemCode().toString());
+		inputForm.setSisyutuItemCode(eventItem.getSisyutuItemCode().getValue());
 		// 支出項目名(＞で区切った値)
-		inputForm.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, eventItem.getSisyutuItemCode().toString()));
+		inputForm.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, eventItem.getSisyutuItemCode().getValue()));
 		// イベント名
-		inputForm.setEventName(eventItem.getEventName().toString());
+		inputForm.setEventName(eventItem.getEventName().getValue());
 		// イベント内容詳細(任意入力項目)
-		inputForm.setEventDetailContext(eventItem.getEventDetailContext().toString());
+		inputForm.setEventDetailContext(eventItem.getEventDetailContext().getValue());
 		// 開始日
 		inputForm.setEventStartDate(eventItem.getEventStartDate().getValue());
 		// 終了日
@@ -304,13 +304,13 @@ public class EventInfoManageUseCase {
 			List<EventListItem> eventList = inquiryList.getValues().stream().map(domain ->
 					EventListItem.from(
 							// イベントコード
-							domain.getEventCode().toString(),
+							domain.getEventCode().getValue(),
 							// 支出項目名
-							domain.getSisyutuItemName().toString(),
+							domain.getSisyutuItemName().getValue(),
 							// イベント名
-							domain.getEventName().toString(),
+							domain.getEventName().getValue(),
 							// イベント内容詳細(任意入力)
-							domain.getEventDetailContext().toString(),
+							domain.getEventDetailContext().getValue(),
 							// イベント開始日
 							DomainCommonUtils.formatyyyyNenMMGatuddNiti(domain.getEventStartDate().getValue()),
 							// イベント終了日

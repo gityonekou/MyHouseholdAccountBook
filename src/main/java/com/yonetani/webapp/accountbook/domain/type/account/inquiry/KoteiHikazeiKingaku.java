@@ -29,8 +29,8 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@EqualsAndHashCode
 @Getter
+@EqualsAndHashCode
 public class KoteiHikazeiKingaku {
 	// 固定(非課税)金額
 	private final BigDecimal value;

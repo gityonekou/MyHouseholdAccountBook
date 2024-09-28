@@ -40,6 +40,12 @@
  					<p class="invalid-feedback" th:errors="*{fixedCostDetailContext}"></p>
 				</div>
 				<div class="mb-3">
+					<label for="fixedCostKubun" class="form-label">■固定費区分</label>
+					<select class="form-select w30" th:errorclass="is-invalid" th:field="*{fixedCostKubun}" required>
+						<option th:each="item : ${fixedCostKubunSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+					</select>
+				</div>
+				<div class="mb-3">
 					<label for="shiharaiTuki" class="form-label">■支払月</label>
 					<select class="form-select w20" th:errorclass="is-invalid" th:field="*{shiharaiTuki}" required>
 						<option th:each="item : ${shiharaiTukiSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>

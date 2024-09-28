@@ -160,23 +160,23 @@ public class ExpenditureTableDataSource implements ExpenditureTableRepository {
 	private ExpenditureReadWriteDto createExpenditureReadWriteDto(ExpenditureItem domain) {
 		return ExpenditureReadWriteDto.from(
 				// ユーザID
-				domain.getUserId().toString(),
+				domain.getUserId().getValue(),
 				// 対象年
-				domain.getTargetYear().toString(),
+				domain.getTargetYear().getValue(),
 				// 対象月
-				domain.getTargetMonth().toString(),
+				domain.getTargetMonth().getValue(),
 				// 支出コード
-				domain.getSisyutuCode().toString(),
+				domain.getSisyutuCode().getValue(),
 				// 支出項目コード
-				domain.getSisyutuItemCode().toString(),
+				domain.getSisyutuItemCode().getValue(),
 				// イベントコード
-				domain.getEventCode().toString(),
+				domain.getEventCode().getValue(),
 				// 支出名称
-				domain.getSisyutuName().toString(),
+				domain.getSisyutuName().getValue(),
 				// 支出区分
-				domain.getSisyutuKubun().toString(),
+				domain.getSisyutuKubun().getValue(),
 				// 支出詳細
-				domain.getSisyutuDetailContext().toString(),
+				domain.getSisyutuDetailContext().getValue(),
 				// 支払日
 				domain.getShiharaiDate().getValue(),
 				// 支出予定金額

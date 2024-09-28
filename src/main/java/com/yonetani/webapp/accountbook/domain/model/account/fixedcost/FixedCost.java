@@ -15,6 +15,7 @@ import org.springframework.util.StringUtils;
 
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostKubun;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostName;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiDay;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiTuki;
@@ -54,6 +55,8 @@ public class FixedCost {
 	private final FixedCostDetailContext fixedCostDetailContext;
 	// 支出項目コード
 	private final SisyutuItemCode sisyutuItemCode;
+	// 固定費区分
+	private final FixedCostKubun fixedCostKubun;
 	// 固定費支払月(支払月)
 	private final FixedCostShiharaiTuki fixedCostShiharaiTuki;
 	// 固定費支払月任意詳細
@@ -72,6 +75,7 @@ public class FixedCost {
 	 * @param fixedCostName 固定費名(支払名)
 	 * @param fixedCostDetailContext 固定費内容詳細(支払内容詳細)
 	 * @param sisyutuItemCode 支出項目コード
+	 * @param fixedCostKubun 固定費区分
 	 * @param fixedCostShiharaiTuki 固定費支払月(支払月)
 	 * @param fixedCostShiharaiTukiOptionalContext 固定費支払月任意詳細
 	 * @param fixedCostShiharaiDay 固定費支払日(支払日)
@@ -85,6 +89,7 @@ public class FixedCost {
 			String fixedCostName,
 			String fixedCostDetailContext,
 			String sisyutuItemCode,
+			String fixedCostKubun,
 			String fixedCostShiharaiTuki,
 			String fixedCostShiharaiTukiOptionalContext,
 			String fixedCostShiharaiDay,
@@ -95,6 +100,7 @@ public class FixedCost {
 				FixedCostName.from(fixedCostName),
 				FixedCostDetailContext.from(fixedCostDetailContext),
 				SisyutuItemCode.from(sisyutuItemCode),
+				FixedCostKubun.from(fixedCostKubun),
 				FixedCostShiharaiTuki.from(fixedCostShiharaiTuki),
 				FixedCostShiharaiTukiOptionalContext.from(fixedCostShiharaiTukiOptionalContext),
 				FixedCostShiharaiDay.from(fixedCostShiharaiDay),
@@ -114,16 +120,16 @@ public class FixedCost {
 	public String getExpenditureDetailContext() {
 		StringBuilder buff = new StringBuilder();
 		// 固定費内容詳細(支払内容詳細)の値が設定されている場合、支出詳細の表示値に追加
-		if(StringUtils.hasLength(fixedCostDetailContext.toString())) {
-			buff.append(fixedCostDetailContext.toString());
+		if(StringUtils.hasLength(fixedCostDetailContext.getValue())) {
+			buff.append(fixedCostDetailContext.getValue());
 		}
 		// 固定費支払月任意詳細の値が設定されている場合、支出詳細の表示値に追加
-		if(StringUtils.hasLength(fixedCostShiharaiTukiOptionalContext.toString())) {
+		if(StringUtils.hasLength(fixedCostShiharaiTukiOptionalContext.getValue())) {
 			// 固定費内容詳細(支払内容詳細)の値が設定済みの場合、区切り文字(/)を追加
 			if(buff.length() > 0) {
 				buff.append('/');
 			}
-			buff.append(fixedCostShiharaiTukiOptionalContext.toString());
+			buff.append(fixedCostShiharaiTukiOptionalContext.getValue());
 		}
 		return buff.toString();
 	}

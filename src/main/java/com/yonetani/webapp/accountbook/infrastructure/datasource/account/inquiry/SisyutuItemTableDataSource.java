@@ -87,7 +87,7 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 	@Override
 	public SisyutuItemInquiryList findById(SearchQueryUserId userId) {
 		// 検索結果を取得
-		List<SisyutuItemReadWriteDto> searchResult = mapper.findById(UserIdSearchQueryDto.from(userId.getUserId().toString()));
+		List<SisyutuItemReadWriteDto> searchResult = mapper.findById(UserIdSearchQueryDto.from(userId.getUserId().getValue()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return SisyutuItemInquiryList.from(null);
@@ -105,7 +105,7 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 	public SisyutuItemInquiryList findByIdAndSisyutuItemSortBetween(SearchQueryUserIdAndSisyutuItemSortBetweenAB search) {
 		// 検索結果を取得
 		List<SisyutuItemReadWriteDto> searchResult = mapper.findByIdAndSisyutuItemSortBetween(UserIdAndSisyutuItemSortBetweenABSearchQueryDto.from(
-				search.getUserId().toString(), search.getSisyutuItemSortA().toString(), search.getSisyutuItemSortB().toString()));
+				search.getUserId().getValue(), search.getSisyutuItemSortA().getValue(), search.getSisyutuItemSortB().getValue()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return SisyutuItemInquiryList.from(null);
@@ -124,7 +124,7 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 		// 検索結果を取得
 		SisyutuItemReadWriteDto searchResult = mapper.findByIdAndSisyutuItemCode(
 				UserIdAndSisyutuItemCodeSearchQueryDto.from(
-						search.getUserId().toString(), search.getSisyutuItemCode().toString()));
+						search.getUserId().getValue(), search.getSisyutuItemCode().getValue()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、nullを返却
 			return null;
@@ -142,7 +142,7 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 		// 検索結果を取得
 		List<SisyutuItemReadWriteDto> searchResult = mapper.searchParentSisyutuItemMemberNameList(
 				UserIdAndSisyutuItemCodeSearchQueryDto.from(
-						search.getUserId().toString(), search.getSisyutuItemCode().toString()));
+						search.getUserId().getValue(), search.getSisyutuItemCode().getValue()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return SisyutuItemInquiryList.from(null);
@@ -159,7 +159,7 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 	@Override
 	public int countById(SearchQueryUserId userId) {
 		// ユーザIDで検索し、登録されている支出項目の件数を返す
-		return mapper.countById(UserIdSearchQueryDto.from(userId.getUserId().toString()));
+		return mapper.countById(UserIdSearchQueryDto.from(userId.getUserId().getValue()));
 	}
 	
 	/**
@@ -201,19 +201,19 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 	private SisyutuItemReadWriteDto createSisyutuItemReadWriteDto(SisyutuItem data) {
 		return SisyutuItemReadWriteDto.from(
 				// ユーザID
-				data.getUserId().toString(),
+				data.getUserId().getValue(),
 				// 支出項目コード
-				data.getSisyutuItemCode().toString(),
+				data.getSisyutuItemCode().getValue(),
 				// 支出項目名
-				data.getSisyutuItemName().toString(),
+				data.getSisyutuItemName().getValue(),
 				// 支出項目詳細内容
-				data.getSisyutuItemDetailContext().toString(),
+				data.getSisyutuItemDetailContext().getValue(),
 				// 親支出項目コード
-				data.getParentSisyutuItemCode().toString(),
+				data.getParentSisyutuItemCode().getValue(),
 				// 支出項目レベル(1～5)
 				data.getSisyutuItemLevel().toString(),
 				// 支出項目表示順
-				data.getSisyutuItemSort().toString(),
+				data.getSisyutuItemSort().getValue(),
 				// 更新可否フラグ
 				data.getEnableUpdateFlg().getValue());
 	}

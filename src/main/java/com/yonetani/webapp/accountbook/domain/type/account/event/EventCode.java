@@ -11,6 +11,7 @@ package com.yonetani.webapp.accountbook.domain.type.account.event;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 @EqualsAndHashCode
 public class EventCode {
 	// イベントコード
@@ -62,7 +64,7 @@ public class EventCode {
 	 *
 	 */
 	public static String getNewCode(int count) {
-		return EventCode.from(count).toString();
+		return EventCode.from(count).getValue();
 	}
 	
 	/**

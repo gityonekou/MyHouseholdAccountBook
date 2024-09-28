@@ -55,14 +55,14 @@ public class AccountYearMeisaiInquiryDataSource implements AccountYearMeisaiInqu
 		// 対象の年月の収支情報を取得
 		List<IncomeAndExpenditureReadWriteDto> targetYearMonthList = incomeAndExpenditureMapper.selectUserIdAndYear(
 				UserIdAndYearSearchQueryDto.from(
-						searchQuery.getUserId().toString(),
-						searchQuery.getYear().toString()));
+						searchQuery.getUserId().getValue(),
+						searchQuery.getYear().getValue()));
 		// 検索結果を取得
 		List<AccountYearMeisaiInquiryReadDto> result = new ArrayList<>(targetYearMonthList.size());
 		for(IncomeAndExpenditureReadWriteDto targetYearMonth : targetYearMonthList) {
 			AccountYearMeisaiInquiryReadDto resultDto = accountYearMeisaiMapper.select(UserIdAndYearMonthSearchQueryDto.from(
-					searchQuery.getUserId().toString(),
-					searchQuery.getYear().toString(),
+					searchQuery.getUserId().getValue(),
+					searchQuery.getYear().getValue(),
 					targetYearMonth.getTargetMonth()));
 			result.add(resultDto);
 		}

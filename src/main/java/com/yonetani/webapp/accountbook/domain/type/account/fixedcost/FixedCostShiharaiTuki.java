@@ -11,6 +11,7 @@ package com.yonetani.webapp.accountbook.domain.type.account.fixedcost;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 @EqualsAndHashCode
 public class FixedCostShiharaiTuki {
 	// 固定費支払月(支払月)

@@ -87,9 +87,9 @@ public class AdminMenuUserInfoDataSource implements AdminMenuUserInfoRepository 
 	@Override
 	public AdminMenuUserInfo getUserInfo(SearchQueryUserId userId) {
 		// 指定ユーザIDに対応するユーザ情報を取得
-		AdminMenuUserInfoDto dto = userInfoListMapper.selectUserInfo(UserIdSearchQueryDto.from(userId.getUserId().toString()));
+		AdminMenuUserInfoDto dto = userInfoListMapper.selectUserInfo(UserIdSearchQueryDto.from(userId.getUserId().getValue()));
 		if(dto == null) {
-			return AdminMenuUserInfo.fromEmpty();
+			return null;
 		} else {
 			return AdminMenuUserInfo.from(
 					dto.getUserId(),
@@ -117,8 +117,8 @@ public class AdminMenuUserInfoDataSource implements AdminMenuUserInfoRepository 
 		
 		// ユーザ情報を追加
 		User user = new User(
-				userInfo.getUserId().toString(),
-				passwordEncoder.encode(userInfo.getUserPassword().toString()),
+				userInfo.getUserId().getValue(),
+				passwordEncoder.encode(userInfo.getUserPassword().getValue()),
 				userInfo.getUserStatus().isValue(),
 				true,
 				true,
@@ -140,8 +140,8 @@ public class AdminMenuUserInfoDataSource implements AdminMenuUserInfoRepository 
 		
 		// ユーザ情報を更新
 		User user = new User(
-				userInfo.getUserId().toString(),
-				passwordEncoder.encode(userInfo.getUserPassword().toString()),
+				userInfo.getUserId().getValue(),
+				passwordEncoder.encode(userInfo.getUserPassword().getValue()),
 				userInfo.getUserStatus().isValue(),
 				true,
 				true,

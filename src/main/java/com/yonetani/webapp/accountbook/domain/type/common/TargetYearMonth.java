@@ -9,12 +9,17 @@
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
 import org.springframework.util.StringUtils;
 
+import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -28,36 +33,48 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 @EqualsAndHashCode
 public class TargetYearMonth {
 	
 	// 年月(yyyyMM)
 	private final String value;
+	// 「年」項目の値
+	private final TargetYear year;
+	// 「月」項目の値
+	private final TargetMonth month;
 	
 	/**
 	 *<pre>
 	 * 「年月」項目の値を表すドメインタイプを生成します。
+	 * 
+	 * [ガード節]
+	 * ・空文字列
+	 * ・長さが6桁以外
+	 * ・年項目、月項目に変換できない
+	 * 
 	 *</pre>
 	 * @param yearMonth 年月
 	 * @return 「年月」項目ドメインタイプ
 	 *
 	 */
 	public static TargetYearMonth from(String yearMonth){
+		// ガード節(空文字列 or 長さが6桁以外)
 		if(!StringUtils.hasLength(yearMonth) || yearMonth.length() != 6) {
 			throw new MyHouseholdAccountBookRuntimeException("「年月」項目の値が不正です。管理者に問い合わせてください。[yearMonth=" + yearMonth + "]");
 		}
-		return new TargetYearMonth(yearMonth);
-	}
-	
-	/**
-	 *<pre>
-	 * パッケージしている年月(YYYYMM)の値を文字列で返します。
-	 *</pre>
-	 * @return 年月(YYYYMM)の値
-	 *
-	 */
-	public String getTargetYearMonth() {
-		return value;
+		// 年項目
+		TargetYear yearIns = TargetYear.from(yearMonth);
+		// 月項目
+		TargetMonth monthIns = TargetMonth.from(yearMonth);
+		// カレンダーの日付として有効かどうか
+		try {
+			LocalDate.parse(yearMonth + "01", MyHouseholdAccountBookContent.STRICT_DATE_TIME_FORMATTER);
+		} catch (DateTimeParseException ex) {
+			throw new MyHouseholdAccountBookRuntimeException("「年月」項目の設定値が不正です。管理者に問い合わせてください。[yearMonth=" + yearMonth + "]");
+		}
+		// 「年月」項目ドメインタイプを返却
+		return new TargetYearMonth(yearMonth, yearIns, monthIns);
 	}
 	
 	/**
@@ -68,7 +85,7 @@ public class TargetYearMonth {
 	 *
 	 */
 	public String getYear() {
-		return value.substring(0, 4);
+		return year.getValue();
 	}
 	
 	/**
@@ -79,7 +96,7 @@ public class TargetYearMonth {
 	 *
 	 */
 	public String getMonth() {
-		return value.substring(4);
+		return month.getValue();
 	}
 	
 	@Override

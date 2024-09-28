@@ -76,7 +76,7 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 		// 検索結果を取得
 		ShoppingItemReadWriteDto searchResult = mapper.findByIdAndShoppingItemCode(
 				UserIdAndShoppingItemCodeSearchQueryDto.from(
-						search.getUserId().toString(), search.getShoppingItemCode().toString()));
+						search.getUserId().getValue(), search.getShoppingItemCode().getValue()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、nullを返却
 			return null;
@@ -93,7 +93,7 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 	public ShoppingItemInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search) {
 		// 検索結果を取得
 		List<ShoppingItemInquiryReadDto> searchResult = mapper.findByIdAndSisyutuItemCode(UserIdAndSisyutuItemCodeSearchQueryDto.from(
-				search.getUserId().toString(), search.getSisyutuItemCode().toString()));
+				search.getUserId().getValue(), search.getSisyutuItemCode().getValue()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return ShoppingItemInquiryList.from(null);
@@ -111,7 +111,7 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 	public ShoppingItemInquiryList findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode search) {
 		// 検索結果を取得
 		List<ShoppingItemInquiryReadDto> searchResult = mapper.findByIdAndShoppingItemJanCode(UserIdAndShoppingItemJanCodeSearchQueryDto.from(
-				search.getUserId().toString(), search.getShoppingItemJanCode().toString()));
+				search.getUserId().getValue(), search.getShoppingItemJanCode().getValue()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return ShoppingItemInquiryList.from(null);
@@ -132,15 +132,15 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 		List<ShoppingItemInquiryReadDto> searchResult = mapper.selectShoppingItemInfoSearchCondition(
 				ShoppingItemInfoSearchConditionSearchQueryDto.from(
 						// ユーザID
-						search.getUserId().toString(),
+						search.getUserId().getValue(),
 						// 商品区分名
-						search.getShoppingItemKubunName().toString(),
+						search.getShoppingItemKubunName().getValue(),
 						// 商品名
-						search.getShoppingItemName().toString(),
+						search.getShoppingItemName().getValue(),
 						// 会社名
-						search.getCompanyName().toString(),
+						search.getCompanyName().getValue(),
 						// 商品JANコード
-						search.getShoppingItemJanCode().toString()));
+						search.getShoppingItemJanCode().getValue()));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return ShoppingItemInquiryList.from(null);
@@ -157,7 +157,7 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 	@Override
 	public int countById(SearchQueryUserId userId) {
 		// ユーザIDで検索し、登録されている商品の件数を返す
-		return mapper.countById(UserIdSearchQueryDto.from(userId.getUserId().toString()));
+		return mapper.countById(UserIdSearchQueryDto.from(userId.getUserId().getValue()));
 	}
 	
 	/**
@@ -167,7 +167,7 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 	public int countByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode search) {
 		// ユーザID、商品JANコードで検索し、登録されている商品の件数を返す
 		return mapper.countByIdAndShoppingItemJanCode(UserIdAndShoppingItemJanCodeSearchQueryDto.from(
-				search.getUserId().toString(), search.getShoppingItemJanCode().toString()));
+				search.getUserId().getValue(), search.getShoppingItemJanCode().getValue()));
 	}
 	
 	/**
@@ -181,29 +181,29 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 	private ShoppingItemReadWriteDto createShoppingItemReadWriteDto(ShoppingItem data) {
 		return ShoppingItemReadWriteDto.from(
 				// ユーザID
-				data.getUserId().toString(),
+				data.getUserId().getValue(),
 				// 商品コード
-				data.getShoppingItemCode().toString(),
+				data.getShoppingItemCode().getValue(),
 				// 商品区分名
-				data.getShoppingItemKubunName().toString(),
+				data.getShoppingItemKubunName().getValue(),
 				// 商品名
-				data.getShoppingItemName().toString(),
+				data.getShoppingItemName().getValue(),
 				// 商品詳細
-				data.getShoppingItemDetailContext().toString(),
+				data.getShoppingItemDetailContext().getValue(),
 				// 商品JANコード
-				data.getShoppingItemJanCode().toString(),
+				data.getShoppingItemJanCode().getValue(),
 				// 支出項目コード
-				data.getSisyutuItemCode().toString(),
+				data.getSisyutuItemCode().getValue(),
 				// 会社名
-				data.getCompanyName().toString(),
+				data.getCompanyName().getValue(),
 				// 基準店舗コード
-				data.getShopCode().toString(),
+				data.getShopCode().getValue(),
 				// 基準価格
 				data.getStandardPrice().getValue(),
 				// 内容量
 				data.getShoppingItemCapacity().getValue(),
 				// 内容量単位
-				data.getShoppingItemCapacityUnit().toString(),
+				data.getShoppingItemCapacityUnit().getValue(),
 				// カロリー
 				data.getShoppingItemCalories().getValue()
 				);

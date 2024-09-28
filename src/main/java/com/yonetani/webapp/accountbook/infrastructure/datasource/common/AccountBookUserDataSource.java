@@ -47,9 +47,9 @@ public class AccountBookUserDataSource implements AccountBookUserRepository {
 	 */
 	@Override
 	public NowTargetYearMonth getNowTargetYearMonth(SearchQueryUserId searchQuery) {
-		AccountBookUserDto result = mapper.selectUser(UserIdSearchQueryDto.from(searchQuery.getUserId().toString()));
+		AccountBookUserDto result = mapper.selectUser(UserIdSearchQueryDto.from(searchQuery.getUserId().getValue()));
 		if(result == null) {
-			return NowTargetYearMonth.from(null, null);
+			return null;
 		} else {
 			return NowTargetYearMonth.from(result.getNowTargetYear(), result.getNowTargetMonth());
 		}
@@ -60,7 +60,7 @@ public class AccountBookUserDataSource implements AccountBookUserRepository {
 	 */
 	@Override
 	public AccountBookUser getUserInfo(SearchQueryUserId searchQuery) {
-		AccountBookUserDto result = mapper.selectUser(UserIdSearchQueryDto.from(searchQuery.getUserId().toString()));
+		AccountBookUserDto result = mapper.selectUser(UserIdSearchQueryDto.from(searchQuery.getUserId().getValue()));
 		return result != null ? createAccountBookUser(result) : null;
 	}
 	
@@ -103,13 +103,13 @@ public class AccountBookUserDataSource implements AccountBookUserRepository {
 	private AccountBookUserWriteDto createAccountBookUserWriteDto(AccountBookUser userInfo) {
 		return AccountBookUserWriteDto.from(
 				// ユーザID
-				userInfo.getUserId().toString(),
+				userInfo.getUserId().getValue(),
 				// 現在の対象年
-				userInfo.getNowTargetYear().toString(),
+				userInfo.getNowTargetYear().getValue(),
 				// 現在の対象月
-				userInfo.getNowTargetMonth().toString(),
+				userInfo.getNowTargetMonth().getValue(),
 				// ユーザ名
-				userInfo.getUserName().toString());
+				userInfo.getUserName().getValue());
 	}
 	
 	/**
