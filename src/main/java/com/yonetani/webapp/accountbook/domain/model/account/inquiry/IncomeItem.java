@@ -108,7 +108,7 @@ public class IncomeItem {
 	 * @return 収入テーブル情報(ドメイン)
 	 *
 	 */
-	public static IncomeItem createIncomeItem(UserId userId, TargetYearMonth yearMonthDomain, String incomeCode, IncomeRegistItem incomeData) {
+	public static IncomeItem createIncomeItem(UserId userId, TargetYearMonth yearMonthDomain, SyuunyuuCode incomeCode, IncomeRegistItem incomeData) {
 		return IncomeItem.from(
 				// ユーザID
 				userId.getValue(),
@@ -117,7 +117,7 @@ public class IncomeItem {
 				// 対象月
 				yearMonthDomain.getMonth(),
 				// 収入コード
-				incomeCode,
+				incomeCode.getValue(),
 				// 収入区分
 				incomeData.getIncomeKubun(),
 				// 収入詳細

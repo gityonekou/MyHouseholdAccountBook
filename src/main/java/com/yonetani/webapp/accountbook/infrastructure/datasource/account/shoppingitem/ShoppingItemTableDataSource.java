@@ -56,7 +56,7 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 	@Override
 	public int add(ShoppingItem data) {
 		// 商品テーブル:SHOPPING_ITEM_TABLEにデータを追加します。
-		return mapper.insert(createShoppingItemReadWriteDto(data));
+		return mapper.insert(ShoppingItemReadWriteDto.from(data));
 	}
 	
 	/**
@@ -65,7 +65,7 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 	@Override
 	public int update(ShoppingItem data) {
 		// 商品テーブル:SHOPPING_ITEM_TABLEの情報を指定の商品情報で更新します。
-		return mapper.update(createShoppingItemReadWriteDto(data));
+		return mapper.update(ShoppingItemReadWriteDto.from(data));
 	}
 	
 	/**
@@ -130,17 +130,7 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 			SearchQueryShoppingItemInfoSearchCondition search) {
 		// 検索結果を取得
 		List<ShoppingItemInquiryReadDto> searchResult = mapper.selectShoppingItemInfoSearchCondition(
-				ShoppingItemInfoSearchConditionSearchQueryDto.from(
-						// ユーザID
-						search.getUserId().getValue(),
-						// 商品区分名
-						search.getShoppingItemKubunName().getValue(),
-						// 商品名
-						search.getShoppingItemName().getValue(),
-						// 会社名
-						search.getCompanyName().getValue(),
-						// 商品JANコード
-						search.getShoppingItemJanCode().getValue()));
+				ShoppingItemInfoSearchConditionSearchQueryDto.from(search));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return ShoppingItemInquiryList.from(null);
@@ -168,45 +158,6 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 		// ユーザID、商品JANコードで検索し、登録されている商品の件数を返す
 		return mapper.countByIdAndShoppingItemJanCode(UserIdAndShoppingItemJanCodeSearchQueryDto.from(
 				search.getUserId().getValue(), search.getShoppingItemJanCode().getValue()));
-	}
-	
-	/**
-	 *<pre>
-	 * 引数で指定した商品テーブル情報ドメインモデルからDTOを生成して返します。
-	 *</pre>
-	 * @param data 商品テーブル情報ドメインモデル
-	 * @return 商品テーブル:SHOPPING_ITEM_TABLE読込・出力情報
-	 *
-	 */
-	private ShoppingItemReadWriteDto createShoppingItemReadWriteDto(ShoppingItem data) {
-		return ShoppingItemReadWriteDto.from(
-				// ユーザID
-				data.getUserId().getValue(),
-				// 商品コード
-				data.getShoppingItemCode().getValue(),
-				// 商品区分名
-				data.getShoppingItemKubunName().getValue(),
-				// 商品名
-				data.getShoppingItemName().getValue(),
-				// 商品詳細
-				data.getShoppingItemDetailContext().getValue(),
-				// 商品JANコード
-				data.getShoppingItemJanCode().getValue(),
-				// 支出項目コード
-				data.getSisyutuItemCode().getValue(),
-				// 会社名
-				data.getCompanyName().getValue(),
-				// 基準店舗コード
-				data.getShopCode().getValue(),
-				// 基準価格
-				data.getStandardPrice().getValue(),
-				// 内容量
-				data.getShoppingItemCapacity().getValue(),
-				// 内容量単位
-				data.getShoppingItemCapacityUnit().getValue(),
-				// カロリー
-				data.getShoppingItemCalories().getValue()
-				);
 	}
 	
 	/**

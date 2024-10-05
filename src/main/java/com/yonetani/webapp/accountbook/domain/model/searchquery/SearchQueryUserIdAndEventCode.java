@@ -51,7 +51,7 @@ public class SearchQueryUserIdAndEventCode {
 	 * @return 検索条件(ユーザID, イベントコード)
 	 *
 	 */
-	public static SearchQueryUserIdAndEventCode from(String userId, String eventCode) {
-		return new SearchQueryUserIdAndEventCode(UserId.from(userId), EventCode.from(eventCode));
+	public static SearchQueryUserIdAndEventCode from(UserId userId, EventCode eventCode) {
+		return new SearchQueryUserIdAndEventCode(userId, eventCode);
 	}
 }

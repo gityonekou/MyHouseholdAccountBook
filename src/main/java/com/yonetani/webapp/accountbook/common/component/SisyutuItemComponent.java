@@ -22,8 +22,10 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemSortBetweenAB;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuItemTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemSort;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractExpenditureItemInfoManageResponse;
-import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -50,15 +52,17 @@ public class SisyutuItemComponent {
 	 *<pre>
 	 * 指定した支出項目コードに対応する支出項目テーブル情報(ドメイン)を返します。
 	 *</pre>
-	 * @param user 支出項目情報を取得するユーザ情報(ログインユーザ情報)
+	 * @param userId ユーザID
 	 * @param sisyutuItemCode 取得対象の支出項目コード
 	 * @return 支出項目テーブル情報(ドメイン)
 	 *
 	 */
-	public SisyutuItem getSisyutuItem(LoginUserInfo user, String sisyutuItemCode) {
+	public SisyutuItem getSisyutuItem(UserId userId, SisyutuItemCode sisyutuItemCode) {
+		log.debug("getSisyutuItem:userid="+ userId + ",sisyutuItemCode=" + sisyutuItemCode);
+		
 		// 支出項目コードに対応する支出項目情報を取得
 		SisyutuItem sisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
-				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
+				SearchQueryUserIdAndSisyutuItemCode.from(userId, sisyutuItemCode));
 		if(sisyutuItem == null) {
 			// 選択した支出項目コードに対応する支出項目情報が存在しない場合エラーに遷移
 			throw new MyHouseholdAccountBookRuntimeException("対象の支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" + sisyutuItemCode);
@@ -71,15 +75,17 @@ public class SisyutuItemComponent {
 	 *<pre>
 	 * 指定した支出項目コードが支出項目テーブルに存在するかを確認します。
 	 *</pre>
-	 * @param user 支出項目情報を取得するユーザ情報(ログインユーザ情報)
+	 * @param userId ユーザID
 	 * @param sisyutuItemCode 取得対象の支出項目コード
 	 * @return 支出項目テーブルに存在する場合true、存在しない場合false
 	 *
 	 */
-	public boolean hasSisyutuItem(LoginUserInfo user, String sisyutuItemCode) {
+	public boolean hasSisyutuItem(UserId userId, SisyutuItemCode sisyutuItemCode) {
+		log.debug("hasSisyutuItem:userid="+ userId + ",sisyutuItemCode=" + sisyutuItemCode);
+		
 		// 支出項目コードに対応する支出項目情報を取得
 		SisyutuItem sisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
-				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
+				SearchQueryUserIdAndSisyutuItemCode.from(userId, sisyutuItemCode));
 		if(sisyutuItem == null) {
 			return false;
 			
@@ -92,17 +98,17 @@ public class SisyutuItemComponent {
 	 *<pre>
 	 * 支出項目の名称を＞区切りで連結した値で返します。
 	 *</pre>
-	 * @param user 支出項目一覧を取得するユーザ情報(ログインユーザ情報)
+	 * @param userId ユーザID
 	 * @param sisyutuItemCode 取得対象の支出項目コード
 	 * @return 支出項目の名称を＞区切りで連結した値 名称取得に失敗した場合はnullを返却
 	 *
 	 */
-	public String getSisyutuItemName(LoginUserInfo user, String sisyutuItemCode) {
-		log.debug("getSisyutuItemName:userid="+ user.getUserId() + ",sisyutuItemCode=" + sisyutuItemCode);
+	public String getSisyutuItemName(UserId userId, SisyutuItemCode sisyutuItemCode) {
+		log.debug("getSisyutuItemName:userid="+ userId + ",sisyutuItemCode=" + sisyutuItemCode);
 		
 		// 指定した支出項目の存在チェック
 		SisyutuItem sisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
-				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
+				SearchQueryUserIdAndSisyutuItemCode.from(userId, sisyutuItemCode));
 		if(sisyutuItem == null) {
 			throw new MyHouseholdAccountBookRuntimeException("支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" + sisyutuItemCode);
 		}
@@ -122,7 +128,7 @@ public class SisyutuItemComponent {
 		while(sisyutuItemLevel > 1 && sisyutuItemNameList.size() < 6) {
 			// 親支出項目コードに対応する支出項目情報を取得
 			SisyutuItem parentSisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
-					SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), parentSisyutuItemCode));
+					SearchQueryUserIdAndSisyutuItemCode.from(userId, SisyutuItemCode.from(parentSisyutuItemCode)));
 			if(parentSisyutuItem == null) {
 				throw new MyHouseholdAccountBookRuntimeException("支出項目情報が属する親の支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" 
 						+ sisyutuItemCode + ", [sisyutuItemCodeの値からさかのぼって調査必要です]:[存在しない親コード=parentSisyutuItemCode:" + parentSisyutuItemCode + "]");
@@ -156,15 +162,15 @@ public class SisyutuItemComponent {
 	 *<pre>
 	 * 支出項目一覧を取得し、画面情報に設定します。
 	 *</pre>
-	 * @param user 支出項目一覧を取得するユーザ情報(ログインユーザ情報)
+	 * @param userId ユーザID
 	 * @param response 支出項目一覧を設定する画面情報
 	 *
 	 */
-	public void setSisyutuItemList(LoginUserInfo user, AbstractExpenditureItemInfoManageResponse response) {
-		log.debug("setSisyutuItemList:userid="+ user.getUserId());
+	public void setSisyutuItemList(UserId userId, AbstractExpenditureItemInfoManageResponse response) {
+		log.debug("setSisyutuItemList:userid="+ userId);
 		
 		// 支出項目を取得
-		SisyutuItemInquiryList sisyutuItemSearchResult = sisyutuItemRepository.findById(SearchQueryUserId.from(user.getUserId()));
+		SisyutuItemInquiryList sisyutuItemSearchResult = sisyutuItemRepository.findById(SearchQueryUserId.from(userId));
 		if(sisyutuItemSearchResult.isEmpty()) {
 			// 支出項目情報が0件の場合、メッセージを設定
 			response.addMessage("支出項目情報取得結果が0件です。");
@@ -188,20 +194,20 @@ public class SisyutuItemComponent {
 	 *<pre>
 	 * 検索条件(支出項目表示順A～支出項目表示順B)までの支出項目一覧を取得し、画面情報に設定します。
 	 *</pre>
-	 * @param user 支出項目一覧を取得するユーザ情報(ログインユーザ情報)
+	 * @param userId ユーザID
 	 * @param betweenA 検索条件:支出項目表示順A(BETWEEN A AND BのAの値(下限値))
 	 * @param betweenB 検索条件:支出項目表示順B(BETWEEN A AND BのBの値(上限値))
 	 * @param response 支出項目一覧を設定する画面情報
 	 *
 	 */
-	public void setSisyutuItemList(LoginUserInfo user, String betweenA, String betweenB, AbstractExpenditureItemInfoManageResponse response) {
-		log.debug("setSisyutuItemList:userid="+ user.getUserId() + ",betweenA=" + betweenA + ",betweenB=" + betweenB);
+	public void setSisyutuItemList(UserId userId, SisyutuItemSort betweenA, SisyutuItemSort betweenB, AbstractExpenditureItemInfoManageResponse response) {
+		log.debug("setSisyutuItemList:userid="+ userId + ",betweenA=" + betweenA + ",betweenB=" + betweenB);
 		
 		// 支出項目：飲食日用品から、日用消耗品と飲食の項目をすべて取得(表示順から取得する)
 		SisyutuItemInquiryList sisyutuItemSearchResult = sisyutuItemRepository.findByIdAndSisyutuItemSortBetween(
 				SearchQueryUserIdAndSisyutuItemSortBetweenAB.from(
 						// 検索条件:ユーザID
-						user.getUserId(),
+						userId,
 						// 検索条件:支出項目表示順A
 						betweenA,
 						// 検索条件:支出項目表示順B

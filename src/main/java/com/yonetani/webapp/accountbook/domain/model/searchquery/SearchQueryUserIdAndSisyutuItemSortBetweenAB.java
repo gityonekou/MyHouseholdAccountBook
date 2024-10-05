@@ -58,8 +58,8 @@ public class SearchQueryUserIdAndSisyutuItemSortBetweenAB {
 	 * @return 検索条件(ユーザID, 支出項目表示順A, 支出項目表示順B)
 	 *
 	 */
-	public static SearchQueryUserIdAndSisyutuItemSortBetweenAB from(String userId, String sisyutuItemSortA, String sisyutuItemSortB) {
-		return new SearchQueryUserIdAndSisyutuItemSortBetweenAB(
-				UserId.from(userId), SisyutuItemSort.from(sisyutuItemSortA), SisyutuItemSort.from(sisyutuItemSortB));
+	public static SearchQueryUserIdAndSisyutuItemSortBetweenAB from(
+			UserId userId, SisyutuItemSort sisyutuItemSortA, SisyutuItemSort sisyutuItemSortB) {
+		return new SearchQueryUserIdAndSisyutuItemSortBetweenAB(userId, sisyutuItemSortA, sisyutuItemSortB);
 	}
 }

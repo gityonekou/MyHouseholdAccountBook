@@ -29,6 +29,9 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndEventCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.event.EventItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemSort;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.EventInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.EventInfoManageResponse;
@@ -70,7 +73,7 @@ public class EventInfoManageUseCase {
 	 */
 	public EventInfoManageResponse readEventInfo(LoginUserInfo user) {
 		log.debug("readEventInfo:userid=" + user.getUserId());
-		return createEventInfoManageResponse(user, null);
+		return createEventInfoManageResponse(UserId.from(user.getUserId()), null);
 	}
 
 	/**
@@ -79,31 +82,36 @@ public class EventInfoManageUseCase {
 	 * 新規追加するイベントが属する支出項目コードをもとに、新規のイベント情報を入力フォーム設定値を取得します。
 	 *</pre>
 	 * @param user 表示対象のユーザID
-	 * @param sisyutuItemCode 新規追加するイベントが属する支出項目コード(イベント関連の支出項目コード)
+	 * @param sisyutuItemCodeStr 新規追加するイベントが属する支出項目コード(イベント関連の支出項目コード)
 	 * @return 情報管理(イベント)画面の表示情報
 	 *
 	 */
-	public EventInfoManageResponse readAddEventInfo(LoginUserInfo user, String sisyutuItemCode) {
-		log.debug("readAddEventInfo:userid=" + user.getUserId() + ",sisyutuItemCode=" + sisyutuItemCode);
+	public EventInfoManageResponse readAddEventInfo(LoginUserInfo user, String sisyutuItemCodeStr) {
+		log.debug("readAddEventInfo:userid=" + user.getUserId() + ",sisyutuItemCode=" + sisyutuItemCodeStr);
+		
+		// ドメインタイプ:ユーザID
+		UserId userId = UserId.from(user.getUserId());
+		// ドメインタイプ:支出項目コード
+		SisyutuItemCode sisyutuItemCode = SisyutuItemCode.from(sisyutuItemCodeStr);
 		
 		// 選択した支出項目コードに対応する支出項目情報を取得
-		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(user, sisyutuItemCode);
+		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(userId, sisyutuItemCode);
 			
 		// イベント情報入力フォームを生成
 		EventInfoForm inputForm = new EventInfoForm();
 		// アクション：新規登録
 		inputForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_ADD);
 		// 支出項目コード
-		inputForm.setSisyutuItemCode(sisyutuItemCode);
+		inputForm.setSisyutuItemCode(sisyutuItemCode.getValue());
 		// 支出項目コードに対応する支出項目名(＞で区切った値)を設定
-		inputForm.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, sisyutuItemCode));
+		inputForm.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(userId, sisyutuItemCode));
 		// イベント名:支出項目名を仮設定
 		inputForm.setEventName(sisyutuItem.getSisyutuItemName().getValue());
 		// イベント内容詳細(任意入力項目):支出項目詳細内容を仮設定
 		inputForm.setEventDetailContext(sisyutuItem.getSisyutuItemDetailContext().getValue());
 		
 		// 画面表示情報を生成して返却
-		return createEventInfoManageResponse(user, inputForm);
+		return createEventInfoManageResponse(userId, inputForm);
 	}
 	
 	/**
@@ -112,15 +120,20 @@ public class EventInfoManageUseCase {
 	 * 選択したイベントコードに応じたイベント情報をイベント情報を入力フォームに設定します。
 	 *</pre>
 	 * @param user 表示対象のユーザID
-	 * @param eventCode 表示対象のイベントコード
+	 * @param eventCodeStr 表示対象のイベントコード
 	 * @return 情報管理(イベント)画面の表示情報
 	 *
 	 */
-	public EventInfoManageResponse readUpdateEventInfo(LoginUserInfo user, String eventCode) {
-		log.debug("readUpdateEventInfo:userid=" + user.getUserId() + ",eventCode=" + eventCode);
+	public EventInfoManageResponse readUpdateEventInfo(LoginUserInfo user, String eventCodeStr) {
+		log.debug("readUpdateEventInfo:userid=" + user.getUserId() + ",eventCode=" + eventCodeStr);
+		
+		// ドメインタイプ:ユーザID
+		UserId userId = UserId.from(user.getUserId());
+		// ドメインタイプ:支出項目コード
+		EventCode eventCode = EventCode.from(eventCodeStr);
 		
 		// イベントコードに対応するイベント情報を取得
-		EventItem eventItem = eventRepository.findByIdAndEventCode(SearchQueryUserIdAndEventCode.from(user.getUserId(), eventCode));
+		EventItem eventItem = eventRepository.findByIdAndEventCode(SearchQueryUserIdAndEventCode.from(userId, eventCode));
 		// イベントコードに対応するイベント情報がない場合、エラー
 		if(eventItem == null) {
 			throw new MyHouseholdAccountBookRuntimeException("更新対象のイベント情報が存在しません。管理者に問い合わせてください。eventCode:" + eventCode);
@@ -134,7 +147,7 @@ public class EventInfoManageUseCase {
 		// 支出項目コード
 		inputForm.setSisyutuItemCode(eventItem.getSisyutuItemCode().getValue());
 		// 支出項目名(＞で区切った値)
-		inputForm.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, eventItem.getSisyutuItemCode().getValue()));
+		inputForm.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(userId, eventItem.getSisyutuItemCode()));
 		// イベント名
 		inputForm.setEventName(eventItem.getEventName().getValue());
 		// イベント内容詳細(任意入力項目)
@@ -145,7 +158,7 @@ public class EventInfoManageUseCase {
 		inputForm.setEventEndDate(eventItem.getEventEndDate().getValue());
 		
 		// 画面表示情報を生成して返却
-		return createEventInfoManageResponse(user, inputForm);
+		return createEventInfoManageResponse(userId, inputForm);
 	}
 
 	/**
@@ -159,7 +172,7 @@ public class EventInfoManageUseCase {
 	 */
 	public EventInfoManageResponse readBindingErrorSetInfo(LoginUserInfo user, EventInfoForm inputForm) {
 		log.debug("readBindingErrorSetInfo:userid=" + user.getUserId() + ",inputForm=" + inputForm);
-		return createEventInfoManageResponse(user, inputForm);
+		return createEventInfoManageResponse(UserId.from(user.getUserId()), inputForm);
 	}
 
 	/**
@@ -175,13 +188,15 @@ public class EventInfoManageUseCase {
 	public EventInfoManageResponse execAction(LoginUserInfo user, EventInfoForm inputForm) {
 		log.debug("execAction:userid=" + user.getUserId() + ",inputForm=" + inputForm);
 		
+		// ドメインタイプ:ユーザID
+		UserId userId = UserId.from(user.getUserId());
 		// レスポンスを生成
-		EventInfoManageResponse response = createEventInfoManageResponse(user, inputForm, false);
+		EventInfoManageResponse response = createEventInfoManageResponse(userId, inputForm, false);
 		
 		// 新規登録の場合
 		if(Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
 			// 新規採番するイベントコードの値を取得
-			int count = eventRepository.countById(SearchQueryUserId.from(user.getUserId()));
+			int count = eventRepository.countById(SearchQueryUserId.from(userId));
 			count++;
 			if(count > 9999) {
 				response.addErrorMessage("イベント情報は9999件以上登録できません。管理者に問い合わせてください。");
@@ -234,16 +249,21 @@ public class EventInfoManageUseCase {
 	 * 指定したイベント情報のイベント終了処理(論理削除処理)
 	 *</pre>
 	 * @param user 表示対象のユーザID
-	 * @param eventCode イベント終了対象のイベントコード
+	 * @param eventCodeStr イベント終了対象のイベントコード
 	 * @return 情報管理(イベント)画面の表示情報
 	 *
 	 */
 	@Transactional
-	public EventInfoManageResponse execDelete(LoginUserInfo user, String eventCode) {
-		log.debug("execDelete:userid=" + user.getUserId() + ",eventCode=" + eventCode);
+	public EventInfoManageResponse execDelete(LoginUserInfo user, String eventCodeStr) {
+		log.debug("execDelete:userid=" + user.getUserId() + ",eventCode=" + eventCodeStr);
+		
+		// ドメインタイプ:ユーザID
+		UserId userId = UserId.from(user.getUserId());
+		// ドメインタイプ:イベントコード
+		EventCode eventCode = EventCode.from(eventCodeStr);
 		
 		// イベントコードに対応するイベント情報を取得
-		EventItem deleteData = eventRepository.findByIdAndEventCode(SearchQueryUserIdAndEventCode.from(user.getUserId(), eventCode));
+		EventItem deleteData = eventRepository.findByIdAndEventCode(SearchQueryUserIdAndEventCode.from(userId, eventCode));
 		if(deleteData == null) {
 			throw new MyHouseholdAccountBookRuntimeException("削除対象のイベント情報がイベントテーブル:EVENT_ITEM_TABLEに存在しません。管理者に問い合わせてください。[eventCode=" + eventCode + "]");
 		}
@@ -255,7 +275,7 @@ public class EventInfoManageUseCase {
 			throw new MyHouseholdAccountBookRuntimeException("イベントテーブル:EVENT_ITEM_TABLEへの削除件数が不正でした。[件数=" + deleteCount + "][delete data:" + deleteData + "]");
 		}
 		// レスポンスを生成(エラー時はエラー画面に遷移するのでイベント情報は使用しない:nullを指定)
-		EventInfoManageResponse response = createEventInfoManageResponse(user, null, false);
+		EventInfoManageResponse response = createEventInfoManageResponse(userId, null, false);
 		
 		// トランザクション完了
 		response.setTransactionSuccessFull();
@@ -270,31 +290,31 @@ public class EventInfoManageUseCase {
 	 *<pre>
 	 * イベント情報入力フォームを指定して情報管理(イベント)画面の表示情報を生成します。
 	 *</pre>
-	 * @param user 表示対象のユーザID
+	 * @param userId 表示対象のユーザID
 	 * @param inputForm イベント情報入力フォーム
 	 * @return 情報管理(イベント)画面の表示情報
 	 *
 	 */
-	private EventInfoManageResponse createEventInfoManageResponse(LoginUserInfo user, EventInfoForm inputForm) {
-		return createEventInfoManageResponse(user, inputForm, true);
+	private EventInfoManageResponse createEventInfoManageResponse(UserId userId, EventInfoForm inputForm) {
+		return createEventInfoManageResponse(userId, inputForm, true);
 	}
 	
 	/**
 	 *<pre>
 	 * イベント情報入力フォームを指定して情報管理(イベント)画面の表示情報を生成します。
 	 *</pre>
-	 * @param user 表示対象のユーザID
+	 * @param userId 表示対象のユーザID
 	 * @param inputForm イベント情報入力フォーム
 	 * @param msgFlg ベント一覧の表示件数が0件の場合にメッセージを表示するかどうか
 	 * @return 情報管理(イベント)画面の表示情報
 	 *
 	 */
-	private EventInfoManageResponse createEventInfoManageResponse(LoginUserInfo user, EventInfoForm inputForm, boolean msgFlg) {
+	private EventInfoManageResponse createEventInfoManageResponse(UserId userId, EventInfoForm inputForm, boolean msgFlg) {
 		// レスポンス
 		EventInfoManageResponse response = null;
 
 		// 現在有効な(開催終了ステータスとなっていない)イベントの一覧を取得
-		EventItemInquiryList inquiryList = eventRepository.findById(SearchQueryUserId.from(user.getUserId()));
+		EventItemInquiryList inquiryList = eventRepository.findById(SearchQueryUserId.from(userId));
 		if(inquiryList.isEmpty()) {
 			response = EventInfoManageResponse.getInstance(null, inputForm);
 			if(msgFlg) {
@@ -322,11 +342,11 @@ public class EventInfoManageUseCase {
 		// イベント費(0059)に属する支出項目一覧をすべて取得
 		sisyutuItemComponent.setSisyutuItemList(
 				// ログインユーザ情報
-				user,
+				userId,
 				// 検索条件:支出項目表示順A：支出項目(イベント)の表示順:0603000000
-				MyHouseholdAccountBookContent.SISYUTU_ITEM_EVENT_SORT_VALUE,
+				SisyutuItemSort.from(MyHouseholdAccountBookContent.SISYUTU_ITEM_EVENT_SORT_VALUE),
 				// 検索条件:支出項目表示順B：ベントに属する支出項目の最大値:0603999999
-				MyHouseholdAccountBookContent.SISYUTU_ITEM_EVENT_SORT_MAX_VALUE,
+				SisyutuItemSort.from(MyHouseholdAccountBookContent.SISYUTU_ITEM_EVENT_SORT_MAX_VALUE),
 				// 画面表示情報
 				response);
 		

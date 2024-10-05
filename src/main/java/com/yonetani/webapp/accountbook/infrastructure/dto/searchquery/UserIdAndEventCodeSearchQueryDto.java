@@ -11,6 +11,8 @@
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.searchquery;
 
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndEventCode;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -39,12 +41,15 @@ public class UserIdAndEventCodeSearchQueryDto {
 	 *<pre>
 	 * 引数のパラメータ値をもとにUserIdAndEventCodeSearchQueryDtoを生成して返します。
 	 *</pre>
-	 * @param userId ユーザID
-	 * @param eventCode イベントコード
+	 * @param search 検索条件(ユーザID、イベントコード)
 	 * @return テーブルの検索条件：ユーザID、イベントコード
 	 *
 	 */
-	public static UserIdAndEventCodeSearchQueryDto from(String userId, String eventCode) {
-		return new UserIdAndEventCodeSearchQueryDto(userId, eventCode);
+	public static UserIdAndEventCodeSearchQueryDto from(SearchQueryUserIdAndEventCode search) {
+		return new UserIdAndEventCodeSearchQueryDto(
+				// ユーザID
+				search.getUserId().getValue(),
+				// イベントコード
+				search.getEventCode().getValue());
 	}
 }

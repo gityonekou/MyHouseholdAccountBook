@@ -19,6 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.yonetani.webapp.accountbook.common.component.AccountBookUserInquiryUseCase;
 import com.yonetani.webapp.accountbook.domain.model.common.AccountBookUser;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.response.top.TopPageResponse;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
@@ -64,7 +65,7 @@ public class TopPageController {
 		String loginUserId = SecurityContextHolder.getContext().getAuthentication().getName();
 		
 		// ログインユーザのユーザ情報を取得
-		AccountBookUser loginUserInfo = userInquiry.getUserInfo(loginUserId);
+		AccountBookUser loginUserInfo = userInquiry.getUserInfo(UserId.from(loginUserId));
 		
 		// ユーザ情報をセッションに設定
 		loginUserSession.setLoginUserInfo(LoginUserInfo.from(

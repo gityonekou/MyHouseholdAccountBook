@@ -51,7 +51,7 @@ public class SearchQueryUserIdAndFixedCostCode {
 	 * @return 検索条件(ユーザID, 固定費コード)
 	 *
 	 */
-	public static SearchQueryUserIdAndFixedCostCode from(String userId, String fixedCostCode) {
-		return new SearchQueryUserIdAndFixedCostCode(UserId.from(userId), FixedCostCode.from(fixedCostCode));
+	public static SearchQueryUserIdAndFixedCostCode from(UserId userId, FixedCostCode fixedCostCode) {
+		return new SearchQueryUserIdAndFixedCostCode(userId, fixedCostCode);
 	}
 }

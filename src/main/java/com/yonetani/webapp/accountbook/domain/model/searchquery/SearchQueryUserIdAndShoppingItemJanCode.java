@@ -51,7 +51,7 @@ public class SearchQueryUserIdAndShoppingItemJanCode {
 	 * @return 検索条件(ユーザID, 商品JANコード)
 	 *
 	 */
-	public static SearchQueryUserIdAndShoppingItemJanCode from(String userId, String shoppingItemJanCode) {
-		return new SearchQueryUserIdAndShoppingItemJanCode(UserId.from(userId), ShoppingItemJanCode.from(shoppingItemJanCode));
+	public static SearchQueryUserIdAndShoppingItemJanCode from(UserId userId, ShoppingItemJanCode shoppingItemJanCode) {
+		return new SearchQueryUserIdAndShoppingItemJanCode(userId, shoppingItemJanCode);
 	}
 }

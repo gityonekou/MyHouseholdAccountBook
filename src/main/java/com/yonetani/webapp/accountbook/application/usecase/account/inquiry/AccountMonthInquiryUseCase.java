@@ -28,6 +28,8 @@ import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeA
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryRedirectResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse.ExpenditureListItem;
@@ -78,7 +80,7 @@ public class AccountMonthInquiryUseCase {
 		log.debug("read:userid=" + user.getUserId());
 		
 		// ユーザIDに対応する現在の対象年月の値を取得
-		NowTargetYearMonth yearMonth = userInquiry.getNowTargetYearMonth(user.getUserId());
+		NowTargetYearMonth yearMonth = userInquiry.getNowTargetYearMonth(UserId.from(user.getUserId()));
 		
 		// レスポンスを生成
 		AccountMonthInquiryResponse response = AccountMonthInquiryResponse.getInstance(
@@ -205,7 +207,8 @@ public class AccountMonthInquiryUseCase {
 		log.debug("execRead:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
 		
 		// 検索条件(ユーザID、年月(YYYYMM))をドメインオブジェクトに変換
-		SearchQueryUserIdAndYearMonth inquiryModel = SearchQueryUserIdAndYearMonth.from(user.getUserId(), targetYearMonth);
+		SearchQueryUserIdAndYearMonth inquiryModel = SearchQueryUserIdAndYearMonth.from(
+				UserId.from(user.getUserId()), TargetYearMonth.from(targetYearMonth));
 		// ユーザID,対象年月を検索条件に支出金額情報のリストを取得
 		AccountMonthInquiryExpenditureItemList resultList = repository.selectExpenditureItem(inquiryModel);
 

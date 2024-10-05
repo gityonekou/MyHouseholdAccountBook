@@ -141,7 +141,7 @@ public class ExpenditureItem {
 	 *
 	 */
 	public static ExpenditureItem createExpenditureItem(boolean initFlg, UserId userId, TargetYearMonth yearMonthDomain,
-			String expenditureCode, ExpenditureRegistItem expenditureData) {
+			SisyutuCode expenditureCode, ExpenditureRegistItem expenditureData) {
 		
 		// 支出予定金額：対象月の新規登録時のみ、支出金額の設定値を支出予定金額として設定。対象月の更新時は新規追加時を含めすべて0を設定
 		BigDecimal sisyutuYoteiKingaku = (initFlg) ? expenditureData.getExpenditureKingaku() : SisyutuYoteiKingaku.ZERO.getValue();
@@ -157,7 +157,7 @@ public class ExpenditureItem {
 				// 対象月
 				yearMonthDomain.getMonth(),
 				// 支出コード
-				expenditureCode,
+				expenditureCode.getValue(),
 				// 支出項目コード
 				expenditureData.getSisyutuItemCode(),
 				// イベントコード

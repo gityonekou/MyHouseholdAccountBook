@@ -56,7 +56,7 @@ public class SearchQueryUserIdAndShopSortBetweenAB {
 	 * @return 検索条件(ユーザID, 店舗表示順A, 店舗表示順B)
 	 *
 	 */
-	public static SearchQueryUserIdAndShopSortBetweenAB from(String userId, String shopSortA, String shopSortB) {
-		return new SearchQueryUserIdAndShopSortBetweenAB(UserId.from(userId), ShopSort.from(shopSortA), ShopSort.from(shopSortB));
+	public static SearchQueryUserIdAndShopSortBetweenAB from(UserId userId, ShopSort shopSortA, ShopSort shopSortB) {
+		return new SearchQueryUserIdAndShopSortBetweenAB(userId, shopSortA, shopSortB);
 	}
 }

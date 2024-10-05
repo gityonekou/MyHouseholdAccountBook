@@ -56,12 +56,12 @@ public class SearchQueryUserIdAndShopKubunCodeList {
 	 * @return 検索条件(ユーザID, 店舗区分コードのリスト(IN条件に指定する値)
 	 *
 	 */
-	public static SearchQueryUserIdAndShopKubunCodeList from(String userId, List<ShopKubunCode> shopKubunCodeList) {
+	public static SearchQueryUserIdAndShopKubunCodeList from(UserId userId, List<ShopKubunCode> shopKubunCodeList) {
 		if(CollectionUtils.isEmpty(shopKubunCodeList)) {
 			// 店舗区分コードのリストは必須
 			throw new MyHouseholdAccountBookRuntimeException("店舗区分コードのリストが未設定です");
 		} else {
-			return new SearchQueryUserIdAndShopKubunCodeList(UserId.from(userId), shopKubunCodeList);
+			return new SearchQueryUserIdAndShopKubunCodeList(userId, shopKubunCodeList);
 		}
 	}
 }

@@ -56,12 +56,12 @@ public class SearchQueryUserIdAndFixedCostShiharaiTukiList {
 	 * @return 検索条件(ユーザID, 固定費支払月のリスト(IN条件に指定する値)
 	 *
 	 */
-	public static SearchQueryUserIdAndFixedCostShiharaiTukiList from(String userId, List<FixedCostShiharaiTuki> fixedCostShiharaiTukiList) {
+	public static SearchQueryUserIdAndFixedCostShiharaiTukiList from(UserId userId, List<FixedCostShiharaiTuki> fixedCostShiharaiTukiList) {
 		if(CollectionUtils.isEmpty(fixedCostShiharaiTukiList)) {
 			// 固定費支払月のリストは必須
 			throw new MyHouseholdAccountBookRuntimeException("固定費支払月のリストが未設定です");
 		} else {
-			return new SearchQueryUserIdAndFixedCostShiharaiTukiList(UserId.from(userId), fixedCostShiharaiTukiList);
+			return new SearchQueryUserIdAndFixedCostShiharaiTukiList(userId, fixedCostShiharaiTukiList);
 		}
 	}
 }

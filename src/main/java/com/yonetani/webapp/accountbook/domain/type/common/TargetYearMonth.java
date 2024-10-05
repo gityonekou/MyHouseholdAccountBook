@@ -64,9 +64,9 @@ public class TargetYearMonth {
 			throw new MyHouseholdAccountBookRuntimeException("「年月」項目の値が不正です。管理者に問い合わせてください。[yearMonth=" + yearMonth + "]");
 		}
 		// 年項目
-		TargetYear yearIns = TargetYear.from(yearMonth);
+		TargetYear yearIns = TargetYear.from(yearMonth.substring(0, 4));
 		// 月項目
-		TargetMonth monthIns = TargetMonth.from(yearMonth);
+		TargetMonth monthIns = TargetMonth.from(yearMonth.substring(4));
 		// カレンダーの日付として有効かどうか
 		try {
 			LocalDate.parse(yearMonth + "01", MyHouseholdAccountBookContent.STRICT_DATE_TIME_FORMATTER);

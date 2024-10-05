@@ -53,7 +53,7 @@ public class EventItemTableDataSource implements EventItemTableRepository {
 	@Override
 	public int add(EventItem data) {
 		// イベント情報をイベントテーブルに出力
-		return mapper.insert(createEventItemReadWriteDto(data));
+		return mapper.insert(EventItemReadWriteDto.from(data));
 	}
 	
 	/**
@@ -62,7 +62,7 @@ public class EventItemTableDataSource implements EventItemTableRepository {
 	@Override
 	public int update(EventItem data) {
 		// イベントテーブル:EVENT_ITEM_TABLEを更新
-		return mapper.update(createEventItemReadWriteDto(data));
+		return mapper.update(EventItemReadWriteDto.from(data));
 	}
 	
 	/**
@@ -71,7 +71,7 @@ public class EventItemTableDataSource implements EventItemTableRepository {
 	@Override
 	public int delete(EventItem data) {
 		// イベントテーブル:EVENT_ITEM_TABLEから指定のイベント情報を論理削除
-		return mapper.delete(createEventItemReadWriteDto(data));
+		return mapper.delete(EventItemReadWriteDto.from(data));
 	}
 	
 	/**
@@ -119,8 +119,7 @@ public class EventItemTableDataSource implements EventItemTableRepository {
 	@Override
 	public EventItem findByIdAndEventCode(SearchQueryUserIdAndEventCode search) {
 		// 指定条件でイベント情報を取得
-		EventItemReadWriteDto result = mapper.findByIdAndEventCode(UserIdAndEventCodeSearchQueryDto.from(
-				search.getUserId().getValue(), search.getEventCode().getValue()));
+		EventItemReadWriteDto result = mapper.findByIdAndEventCode(UserIdAndEventCodeSearchQueryDto.from(search));
 		if(result == null) {
 			// 対象データなしの場合、nullを返却
 			return null;
@@ -189,33 +188,5 @@ public class EventItemTableDataSource implements EventItemTableRepository {
 				dto.getEventStartDate(),
 				// ベント終了日
 				dto.getEventEndDate());
-	}
-	
-	/**
-	 *<pre>
-	 * 引数で指定したイベントテーブル情報ドメインモデルからベントテーブル:EVENT_ITEM_TABLE読込・出力情報を生成して返します。
-	 *</pre>
-	 * @param dto イベントテーブル情報ドメインモデル
-	 * @return ベントテーブル:EVENT_ITEM_TABLE読込・出力情報
-	 *
-	 */
-	private EventItemReadWriteDto createEventItemReadWriteDto(EventItem domain) {
-		return EventItemReadWriteDto.from(
-				// ユーザID
-				domain.getUserId().getValue(),
-				// イベントコード
-				domain.getEventCode().getValue(),
-				// 支出項目コード
-				domain.getSisyutuItemCode().getValue(),
-				// イベント名
-				domain.getEventName().getValue(),
-				// イベント内容詳細
-				domain.getEventDetailContext().getValue(),
-				// イベント開始日
-				domain.getEventStartDate().getValue(),
-				// ベント終了日
-				domain.getEventEndDate().getValue(),
-				// イベント終了フラグ
-				domain.getEventExitFlg().getValue());
 	}
 }

@@ -58,6 +58,18 @@ public class SisyutuItemCode {
 	
 	/**
 	 *<pre>
+	 * 「親の支出項目コード」項目の値をもとに、「支出項目コード」項目の値を表すドメインタイプを生成します。
+	 *</pre>
+	 * @param parentSisyutuItemCode 「親の支出項目コード」項目ドメインタイプ
+	 * @return 「支出項目コード」項目ドメインタイプ
+	 *
+	 */
+	public static SisyutuItemCode from(ParentSisyutuItemCode parentSisyutuItemCode) {
+		return new SisyutuItemCode(parentSisyutuItemCode.getValue());
+	}
+	
+	/**
+	 *<pre>
 	 * 新規発番する支出項目コードの値を取得します。
 	 *</pre>
 	 * @param count 新規発番する支出項目コードの値(数値)

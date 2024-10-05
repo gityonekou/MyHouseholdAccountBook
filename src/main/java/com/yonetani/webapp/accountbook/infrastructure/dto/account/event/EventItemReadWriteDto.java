@@ -11,6 +11,8 @@ package com.yonetani.webapp.accountbook.infrastructure.dto.account.event;
 
 import java.time.LocalDate;
 
+import com.yonetani.webapp.accountbook.domain.model.account.event.EventItem;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -47,22 +49,29 @@ public class EventItemReadWriteDto {
 	
 	/**
 	 *<pre>
-	 * 引数のパラメータ値をもとにEventItemReadWriteDtoを生成して返します。
+	 * 引数で指定したイベントテーブル情報ドメインモデルからベントテーブル:EVENT_ITEM_TABLE読込・出力情報を生成して返します。
 	 *</pre>
-	 * @param userId ユーザID
-	 * @param eventCode イベントコード
-	 * @param sisyutuItemCode 支出項目コード
-	 * @param eventName イベント名
-	 * @param eventDetailContext イベント内容詳細
-	 * @param eventStartDate イベント開始日
-	 * @param eventEndDate イベント終了日
-	 * @param eventExitFlg イベント終了フラグ
-	 * @return イベントテーブル:EVENT_ITEM_TABLE読込・出力情報
+	 * @param dto イベントテーブル情報ドメインモデル
+	 * @return ベントテーブル:EVENT_ITEM_TABLE読込・出力情報
 	 *
 	 */
-	public static EventItemReadWriteDto from(String userId, String eventCode, String sisyutuItemCode, String eventName,
-			String eventDetailContext, LocalDate eventStartDate, LocalDate eventEndDate, boolean eventExitFlg) {
-		return new EventItemReadWriteDto(userId, eventCode, sisyutuItemCode, eventName, eventDetailContext,
-				eventStartDate, eventEndDate, eventExitFlg);
+	public static EventItemReadWriteDto from(EventItem domain) {
+		return new EventItemReadWriteDto(
+				// ユーザID
+				domain.getUserId().getValue(),
+				// イベントコード
+				domain.getEventCode().getValue(),
+				// 支出項目コード
+				domain.getSisyutuItemCode().getValue(),
+				// イベント名
+				domain.getEventName().getValue(),
+				// イベント内容詳細
+				domain.getEventDetailContext().getValue(),
+				// イベント開始日
+				domain.getEventStartDate().getValue(),
+				// ベント終了日
+				domain.getEventEndDate().getValue(),
+				// イベント終了フラグ
+				domain.getEventExitFlg().getValue());
 	}
 }

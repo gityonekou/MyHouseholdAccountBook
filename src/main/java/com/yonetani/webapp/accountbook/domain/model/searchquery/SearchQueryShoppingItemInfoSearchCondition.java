@@ -73,18 +73,18 @@ public class SearchQueryShoppingItemInfoSearchCondition {
 	 * @return 検索条件(ユーザID, 商品区分名, 商品名, 会社名, 商品JANコード)
 	 *
 	 */
-	public static SearchQueryShoppingItemInfoSearchCondition from(String userId, String shoppingItemKubunName, 
-			String shoppingItemName, String companyName, String shoppingItemJanCode) {
+	public static SearchQueryShoppingItemInfoSearchCondition from(UserId userId, ShoppingItemKubunName shoppingItemKubunName, 
+			ShoppingItemName shoppingItemName, ShoppingItemCompanyName companyName, ShoppingItemJanCode shoppingItemJanCode) {
 		return new SearchQueryShoppingItemInfoSearchCondition(
 						// ユーザID
-						UserId.from(userId),
+						userId,
 						// 商品区分名
-						ShoppingItemKubunName.from(shoppingItemKubunName),
+						shoppingItemKubunName,
 						// 商品名
-						ShoppingItemName.from(shoppingItemName),
+						shoppingItemName,
 						// 会社名
-						ShoppingItemCompanyName.from(companyName),
+						companyName,
 						// 商品JANコード
-						ShoppingItemJanCode.from(shoppingItemJanCode));
+						shoppingItemJanCode);
 	}
 }

@@ -52,9 +52,7 @@ public class SearchQueryUserIdAndYearMonth {
 	 * @return 検索条件(ユーザID, 年月度(YYYYMM))
 	 *
 	 */
-	public static SearchQueryUserIdAndYearMonth from(String userId, String yearMonth) {
-		return new SearchQueryUserIdAndYearMonth(
-				UserId.from(userId),
-				TargetYearMonth.from(yearMonth));
+	public static SearchQueryUserIdAndYearMonth from(UserId userId, TargetYearMonth yearMonth) {
+		return new SearchQueryUserIdAndYearMonth(userId, yearMonth);
 	}
 }

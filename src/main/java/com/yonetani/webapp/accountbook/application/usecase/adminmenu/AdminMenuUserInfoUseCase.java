@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookException;
@@ -37,6 +36,7 @@ import com.yonetani.webapp.accountbook.domain.repository.adminmenu.ShopBaseTable
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.SisyutuItemBaseTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.common.AccountBookUserRepository;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.request.adminmenu.AdminMenuUserInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.adminmenu.AdminMenuUserInfoResponse;
 
@@ -94,17 +94,15 @@ public class AdminMenuUserInfoUseCase {
 	 * ・有効なユーザのユーザ一覧を取得し、画面情報に設定します。
 	 * ・指定されたユーザIDの情報を取得し、入力フォームに値を設定します。
 	 *</pre>
-	 * @param userId 入力フォームに設定するユーザのユーザID
+	 * @param userIdStr 入力フォームに設定するユーザのユーザID
 	 * @return　ユーザ情報管理画面の表示情報(レスポンス)
 	 *
 	 */
-	public AdminMenuUserInfoResponse read(String userId) {
-		log.debug("read: userId=" + userId);
+	public AdminMenuUserInfoResponse read(String userIdStr) {
+		log.debug("read: userId=" + userIdStr);
 		
-		// 入力チェック:ユーザID未設定の場合エラー
-		if(!StringUtils.hasLength(userId)) {
-			throw new MyHouseholdAccountBookRuntimeException("予期しないエラーが発生しました。管理者に問い合わせてください。[userid:" + userId + "]");
-		}
+		// ドメインタイプ:ユーザID
+		UserId userId = UserId.from(userIdStr);
 		// ユーザ情報の一覧をレスポンスに設定
 		AdminMenuUserInfoResponse response = applyUserInfoList(AdminMenuUserInfoResponse.getInstance());
 		

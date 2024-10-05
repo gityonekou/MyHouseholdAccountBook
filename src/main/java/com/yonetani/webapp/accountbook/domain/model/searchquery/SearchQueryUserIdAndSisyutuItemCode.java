@@ -51,7 +51,7 @@ public class SearchQueryUserIdAndSisyutuItemCode {
 	 * @return 検索条件(ユーザID, 支出項目コード)
 	 *
 	 */
-	public static SearchQueryUserIdAndSisyutuItemCode from (String userId, String sisyutuItemCode) {
-		return new SearchQueryUserIdAndSisyutuItemCode(UserId.from(userId), SisyutuItemCode.from(sisyutuItemCode));
+	public static SearchQueryUserIdAndSisyutuItemCode from (UserId userId, SisyutuItemCode sisyutuItemCode) {
+		return new SearchQueryUserIdAndSisyutuItemCode(userId, sisyutuItemCode);
 	}
 }

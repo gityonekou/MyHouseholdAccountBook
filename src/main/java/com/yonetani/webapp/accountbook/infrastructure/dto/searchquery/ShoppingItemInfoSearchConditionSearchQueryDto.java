@@ -13,6 +13,8 @@
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.searchquery;
 
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryShoppingItemInfoSearchCondition;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -47,19 +49,23 @@ public class ShoppingItemInfoSearchConditionSearchQueryDto {
 	
 	/**
 	 *<pre>
-	 * 引数のパラメータ値をもとにShoppingItemInfoSearchConditionSearchQueryDtoを生成して返します。
+	 * 検索条件のドメイン情報をもとにShoppingItemInfoSearchConditionSearchQueryDtoを生成して返します。
 	 *</pre>
-	 * @param userId ユーザID
-	 * @param shoppingItemKubunName 商品区分名
-	 * @param shoppingItemName 商品名
-	 * @param companyName 会社名
-	 * @param shoppingItemJanCode 商品JANコード
+	 * @param search 商品情報検索条件
 	 * @return テーブルの検索条件：ユーザID、商品区分名、商品名、会社名、商品JANコード
 	 *
 	 */
-	public static ShoppingItemInfoSearchConditionSearchQueryDto from(String userId, String shoppingItemKubunName, 
-			String shoppingItemName, String companyName, String shoppingItemJanCode) {
-		return new ShoppingItemInfoSearchConditionSearchQueryDto(userId, shoppingItemKubunName, 
-				shoppingItemName, companyName, shoppingItemJanCode);
+	public static ShoppingItemInfoSearchConditionSearchQueryDto from(SearchQueryShoppingItemInfoSearchCondition search) {
+		return new ShoppingItemInfoSearchConditionSearchQueryDto(
+				// ユーザID
+				search.getUserId().getValue(),
+				// 商品区分名
+				(search.getShoppingItemKubunName() != null) ? search.getShoppingItemKubunName().getValue() : null,
+				// 商品名
+				(search.getShoppingItemName() != null) ? search.getShoppingItemName().getValue() : null,
+				// 会社名
+				(search.getCompanyName() != null) ? search.getCompanyName().getValue() : null,
+				// 商品JANコード
+				(search.getShoppingItemJanCode() != null) ? search.getShoppingItemJanCode().getValue() : null);
 	}
 }

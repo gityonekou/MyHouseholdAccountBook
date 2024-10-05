@@ -18,6 +18,7 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.Objects;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -63,11 +64,11 @@ public class FixedCostShiharaiDay {
 	 * 「固定費支払日(支払日)」項目の値にコード値(月初営業日)、コード値(月初営業日)が設定されている場合、
 	 * 指定年月に対応する支払日の値を返却します。
 	 *</pre>
-	 * @param yearMonth 指定年月
+	 * @param targetYearMonth 指定年月
 	 * @return 指定年月に対応する支払日(DD)
 	 *
 	 */
-	public String getShiharaiDayValue(String yearMonth) {
+	public String getShiharaiDayValue(TargetYearMonth targetYearMonth) {
 		// 支払日の値がnullの場合、空文字列を返却
 		if(Objects.isNull(value)) {
 			return "";
@@ -87,7 +88,7 @@ public class FixedCostShiharaiDay {
 			shiharaiDayValue = value;
 		}
 		// 指定年月の月初めの日にちカレンダーを取得
-		LocalDate firstDayOfMonth = LocalDate.parse(yearMonth + "01", MyHouseholdAccountBookContent.DATE_TIME_FORMATTER);
+		LocalDate firstDayOfMonth = LocalDate.parse(targetYearMonth.getValue() + "01", MyHouseholdAccountBookContent.DATE_TIME_FORMATTER);
 		// 対象月の最終日を取得
 		String lastDayStr =String.format("%02d", firstDayOfMonth.with(TemporalAdjusters.lastDayOfMonth()).getDayOfMonth());
 		

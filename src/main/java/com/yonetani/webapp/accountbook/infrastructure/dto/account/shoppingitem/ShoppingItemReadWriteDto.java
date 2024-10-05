@@ -11,6 +11,8 @@ package com.yonetani.webapp.accountbook.infrastructure.dto.account.shoppingitem;
 
 import java.math.BigDecimal;
 
+import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItem;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -57,52 +59,40 @@ public class ShoppingItemReadWriteDto {
 	
 	/**
 	 *<pre>
-	 * 引数のパラメータ値をもとにShoppingItemReadWriteDtoを生成して返します。
+	 * 商品テーブル情報ドメインモデルからShoppingItemReadWriteDtoを生成して返します。
 	 *</pre>
-	 * @param userId   ユーザID
-	 * @param shoppingItemCode 商品コード
-	 * @param shoppingItemKubunName 商品区分名
-	 * @param shoppingItemName 商品名
-	 * @param shoppingItemDetailContext 商品詳細
-	 * @param shoppingItemJanCode 商品JANコード
-	 * @param sisyutuItemCode 支出項目コード
-	 * @param companyName 会社名
-	 * @param standardShopCode 基準店舗コード
-	 * @param standardPrice 基準価格
-	 * @param capacity 内容量
-	 * @param capacityUnit 内容量単位
-	 * @param calories カロリー
-	 * @return 商品テーブル:SHOPPING_ITEM_TABLE出力情報
+	 * @param data 商品テーブル情報ドメインモデル
+	 * @return 商品テーブル:SHOPPING_ITEM_TABLE読込・出力情報
 	 *
 	 */
-	public static ShoppingItemReadWriteDto from(
-			String userId,
-			String shoppingItemCode,
-			String shoppingItemKubunName,
-			String shoppingItemName,
-			String shoppingItemDetailContext,
-			String shoppingItemJanCode,
-			String sisyutuItemCode,
-			String companyName,
-			String standardShopCode,
-			BigDecimal standardPrice,
-			Integer capacity,
-			String capacityUnit,
-			Integer calories
-			) {
+	public static ShoppingItemReadWriteDto from(ShoppingItem data) {
 		return new ShoppingItemReadWriteDto(
-				userId,
-				shoppingItemCode,
-				shoppingItemKubunName,
-				shoppingItemName, 
-				shoppingItemDetailContext,
-				shoppingItemJanCode,
-				sisyutuItemCode,
-				companyName,
-				standardShopCode,
-				standardPrice,
-				capacity,
-				capacityUnit,
-				calories);
+				// ユーザID
+				data.getUserId().getValue(),
+				// 商品コード
+				data.getShoppingItemCode().getValue(),
+				// 商品区分名
+				data.getShoppingItemKubunName().getValue(),
+				// 商品名
+				data.getShoppingItemName().getValue(),
+				// 商品詳細
+				data.getShoppingItemDetailContext().getValue(),
+				// 商品JANコード
+				data.getShoppingItemJanCode().getValue(),
+				// 支出項目コード
+				data.getSisyutuItemCode().getValue(),
+				// 会社名
+				data.getCompanyName().getValue(),
+				// 基準店舗コード
+				data.getShopCode().getValue(),
+				// 基準価格
+				data.getStandardPrice().getValue(),
+				// 内容量
+				data.getShoppingItemCapacity().getValue(),
+				// 内容量単位
+				data.getShoppingItemCapacityUnit().getValue(),
+				// カロリー
+				data.getShoppingItemCalories().getValue()
+			);
 	}
 }

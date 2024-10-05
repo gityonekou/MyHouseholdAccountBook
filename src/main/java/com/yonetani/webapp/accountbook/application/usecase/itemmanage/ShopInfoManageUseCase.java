@@ -33,6 +33,8 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSortBetweenAB;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopSort;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShopInfoManageResponse;
@@ -86,7 +88,7 @@ public class ShopInfoManageUseCase {
 		OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList()));
 		
 		// ログインユーザの店舗情報を取得
-		ShopInquiryList shopSearchResult = shopRepository.findById(SearchQueryUserId.from(user.getUserId()));
+		ShopInquiryList shopSearchResult = shopRepository.findById(SearchQueryUserId.from(UserId.from(user.getUserId())));
 		if(shopSearchResult.isEmpty()) {
 			// 店舗情報が0件の場合、メッセージを設定
 			response.addMessage("店舗情報取得結果が0件です。");
@@ -109,21 +111,22 @@ public class ShopInfoManageUseCase {
 	 * 指定したユーザIDと店舗に応じた情報管理(お店)画面の表示情報を取得します。
 	 *</pre>
 	 * @param user　表示対象のユーザID
-	 * @param shopCode　表示対象の店舗コード
+	 * @param shopCodeStr　表示対象の店舗コード
 	 * @return 情報管理(お店)画面の表示情報
 	 *
 	 */
-	public ShopInfoManageResponse readShopInfo(LoginUserInfo user, String shopCode) {
-		log.debug("readShopInfo:userid=" + user.getUserId() + ",shopCode=" + shopCode);
+	public ShopInfoManageResponse readShopInfo(LoginUserInfo user, String shopCodeStr) {
+		log.debug("readShopInfo:userid=" + user.getUserId() + ",shopCode=" + shopCodeStr);
 		
-		// 入力チェック:店舗コード未設定の場合、エラー
-		if(!StringUtils.hasLength(shopCode)) {
-			throw new MyHouseholdAccountBookRuntimeException("予期しないエラーが発生しました。管理者に問い合わせてください。shopCode:" + shopCode);
-		}
+		// ドメインタイプ:ユーザID
+		UserId userId = UserId.from(user.getUserId());
+		// ドメインタイプ:店舗コード
+		ShopCode shopCode = ShopCode.from(shopCodeStr);
+		
 		// 店舗一覧情報を取得
 		ShopInfoManageResponse response = readShopInfo(user);
 		// 店舗IDに対応する店舗情報を取得
-		Shop shop = shopRepository.findByIdAndShopCode(SearchQueryUserIdAndShopCode.from(user.getUserId(), shopCode));
+		Shop shop = shopRepository.findByIdAndShopCode(SearchQueryUserIdAndShopCode.from(userId, shopCode));
 		if(shop == null) {
 			throw new MyHouseholdAccountBookRuntimeException("更新対象の店舗情報が存在しません。管理者に問い合わせてください。shopCode:" + shopCode);
 		} else {
@@ -161,8 +164,11 @@ public class ShopInfoManageUseCase {
 		log.debug("execAction:userid=" + user.getUserId() + ",shopForm=" + shopForm);
 		ShopInfoManageResponse response = ShopInfoManageResponse.getInstance(null);
 		
+		// ドメインタイプ:ユーザID
+		UserId userId = UserId.from(user.getUserId());
+		
 		// 現在の900番未満のデータ件数を取得
-		int count = shopRepository.countByIdAndLessThanNineHundred(SearchQueryUserId.from(user.getUserId()));
+		int count = shopRepository.countByIdAndLessThanNineHundred(SearchQueryUserId.from(userId));
 		
 		// 既存データの表示順更新データ
 		List<Shop> sortValueUpdateList = new ArrayList<>();
@@ -186,7 +192,7 @@ public class ShopInfoManageUseCase {
 			} else if(shopForm.getShopSort() < count){
 				// 指定した表示順より大きい表示順の値の店舗情報を取得
 				ShopInquiryList sortList = shopRepository.findByIdAndShopSort(SearchQueryUserIdAndShopSort.from(
-						user.getUserId(), String.format("%03d", shopForm.getShopSort())));
+						userId, ShopSort.from(shopForm.getShopSort())));
 				if(!sortList.isEmpty()) {
 					sortList.getValues().forEach(data -> sortValueUpdateList.add(createChopData(data, 1)));
 				}
@@ -194,7 +200,7 @@ public class ShopInfoManageUseCase {
 			
 			// 新規の店舗コードを設定し、店舗情報入力フォームの値をドメインに変換
 			Shop shop = Shop.from(
-					user.getUserId(),
+					userId.getValue(),
 					ShopCode.getNewCode(count),
 					shopForm.getShopKubun(),
 					shopForm.getShopName(), 
@@ -223,19 +229,19 @@ public class ShopInfoManageUseCase {
 				shopForm.setShopSort(count);
 			}
 			// 表示順が更新されている場合、既存データの新しい表示順の値を設定
-			String newShopSortValue = String.format("%03d", shopForm.getShopSort());
+			ShopSort newShopSortValue = ShopSort.from(shopForm.getShopSort());
 			if(!newShopSortValue.equals(shopForm.getShopSortBefore())) {
 				log.debug(" 既存データの表示順調整ありshopSort Before:" + shopForm.getShopSortBefore() + ",New=" + newShopSortValue);
 				
 				/* 新旧の表示順を比較し、既存データの表示順を変更するデータを取得 */
 				// 旧表示順＞新表示順の場合
-				if(shopForm.getShopSortBefore().compareTo(newShopSortValue) > 0) {
+				if(shopForm.getShopSortBefore().compareTo(newShopSortValue.getValue()) > 0) {
 					/* 旧表示順＞新表示順の場合、新表示順～旧表示順 -1間のデータを取得し、表示順を＋１する */
 					// 検索条件(between a and b)のbの値を設定　＝　旧表示順 - 1の値
 					int searchBIntVal = Integer.parseInt(shopForm.getShopSortBefore()) - 1;
 					// 新表示順～旧表示順 -1間のデータを取得
 					ShopInquiryList sortList = shopRepository.findByIdAndShopSortBetween(SearchQueryUserIdAndShopSortBetweenAB.from(
-							user.getUserId(), newShopSortValue, String.format("%03d", searchBIntVal)));
+							userId, newShopSortValue, ShopSort.from(searchBIntVal)));
 					if(!sortList.isEmpty()) {
 						// 既存データの表示順= 表示順 + 1
 						sortList.getValues().forEach(updShopData -> sortValueUpdateList.add(createChopData(updShopData, 1)));
@@ -247,7 +253,7 @@ public class ShopInfoManageUseCase {
 					int searchAIntVal = Integer.parseInt(shopForm.getShopSortBefore()) + 1;
 					// 旧表示順+1 ～新表示順間のデータを取得
 					ShopInquiryList sortList = shopRepository.findByIdAndShopSortBetween(SearchQueryUserIdAndShopSortBetweenAB.from(
-							user.getUserId(), String.format("%03d", searchAIntVal), newShopSortValue));
+							userId, ShopSort.from(searchAIntVal), newShopSortValue));
 					if(!sortList.isEmpty()) {
 						// 既存データの表示順= 表示順 - 1
 						sortList.getValues().forEach(updShopData -> sortValueUpdateList.add(createChopData(updShopData, -1)));
@@ -257,11 +263,11 @@ public class ShopInfoManageUseCase {
 			}
 			// 店舗情報入力フォームの値をドメインに変換
 			Shop shop = Shop.from(
-					user.getUserId(),
+					userId.getValue(),
 					shopForm.getShopCode(),
 					shopForm.getShopKubun(),
 					shopForm.getShopName(), 
-					newShopSortValue);
+					newShopSortValue.getValue());
 			int updateCount = shopRepository.update(shop);
 			// 更新件数が1件以上の場合、業務エラー
 			if(updateCount != 1) {

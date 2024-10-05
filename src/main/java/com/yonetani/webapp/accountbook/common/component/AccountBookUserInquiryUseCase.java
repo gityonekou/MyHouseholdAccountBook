@@ -17,6 +17,7 @@ import com.yonetani.webapp.accountbook.domain.model.common.AccountBookUser;
 import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.repository.common.AccountBookUserRepository;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -48,7 +49,7 @@ public class AccountBookUserInquiryUseCase {
 	 * @return 現在の対象年・月の値(ドメインモデル)
 	 *
 	 */
-	public NowTargetYearMonth getNowTargetYearMonth(String userId) {
+	public NowTargetYearMonth getNowTargetYearMonth(UserId userId) {
 		log.debug("getNowTargetYearMonth: userId=" + userId);
 		
 		// 指定したユーザIDに対応する現在の対象年・月の値を取得
@@ -68,7 +69,7 @@ public class AccountBookUserInquiryUseCase {
 	 * @return 家計簿利用ユーザ情報
 	 *
 	 */
-	public AccountBookUser getUserInfo(String userId) {
+	public AccountBookUser getUserInfo(UserId userId) {
 		log.debug("getUserInfo: userId=" + userId);
 		
 		// 指定したユーザIDに対応する家計簿利用ユーザ情報を取得

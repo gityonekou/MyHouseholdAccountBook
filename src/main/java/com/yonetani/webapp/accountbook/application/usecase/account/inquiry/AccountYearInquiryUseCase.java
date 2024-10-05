@@ -21,6 +21,8 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExp
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.AccountYearMeisaiInquiryRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearInquiryTargetYearInfo;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearMageInquiryResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearMageInquiryResponse.MageInquiryListItem;
@@ -58,22 +60,26 @@ public class AccountYearInquiryUseCase {
 	 * 指定年の年間収支(マージ)の値を取得します。
 	 *</pre>
 	 * @param user ユーザ情報
-	 * @param targetYear 表示対象の年度
-	 * @param returnYearMonth 各月の収支画面に戻る場合に表示する年月の値
+	 * @param targetYearStr 表示対象の年度
+	 * @param returnYearMonthStr 各月の収支画面に戻る場合に表示する年月の値
 	 * @return 年間収支(マージ)情報
 	 *
 	 */
-	public AccountYearMageInquiryResponse readMage(LoginUserInfo user, String targetYear, String returnYearMonth) {
-		log.debug("read:userid=" + user.getUserId() + ",targetYear=" + targetYear);
+	public AccountYearMageInquiryResponse readMage(LoginUserInfo user, String targetYearStr, String returnYearMonthStr) {
+		log.debug("read:userid=" + user.getUserId() + ",targetYear=" + targetYearStr);
+		
+		// ドメインタイプ:ユーザID
+		UserId userId = UserId.from(user.getUserId());
+		// ドメインタイプ:年
+		TargetYear targetYear = TargetYear.from(targetYearStr);
 		
 		// レスポンスを生成
 		AccountYearMageInquiryResponse response = AccountYearMageInquiryResponse.getInstance(
-				AccountYearInquiryTargetYearInfo.from(targetYear, returnYearMonth));
+				AccountYearInquiryTargetYearInfo.from(targetYearStr, returnYearMonthStr));
 		
 		/* ユーザID,入力された対象年度を条件に年間収支(マージ)のリストを取得 */
 		// フォームオブジェクトからドメインオブジェクトに変換
-		SearchQueryUserIdAndYear inquiryModel = SearchQueryUserIdAndYear.from(
-				user.getUserId(), targetYear);
+		SearchQueryUserIdAndYear inquiryModel = SearchQueryUserIdAndYear.from(userId, targetYear);
 		
 		// ユーザID、対象年度を条件に年間収支(マージ)のリスト(ドメインモデル)を取得
 		IncomeAndExpenditureInquiryList resultList = repositoryMage.select(inquiryModel);
@@ -122,22 +128,26 @@ public class AccountYearInquiryUseCase {
 	 * 指定年の年間収支(明細)の値を取得します。
 	 *</pre>
 	 * @param user ユーザ情報
-	 * @param targetYear 表示対象の年度
-	 * @param returnYearMonth 各月の収支画面に戻る場合に表示する年月の値
+	 * @param targetYearStr 表示対象の年度
+	 * @param returnYearMonthStr 各月の収支画面に戻る場合に表示する年月の値
 	 * @return 年間収支(明細)情報
 	 *
 	 */
-	public AccountYearMeisaiInquiryResponse readMeisai(LoginUserInfo user, String targetYear, String returnYearMonth) {
-		log.debug("read:userid=" + user.getUserId() + ",targetYear=" + targetYear);
+	public AccountYearMeisaiInquiryResponse readMeisai(LoginUserInfo user, String targetYearStr, String returnYearMonthStr) {
+		log.debug("read:userid=" + user.getUserId() + ",targetYear=" + targetYearStr);
+		
+		// ドメインタイプ:ユーザID
+		UserId userId = UserId.from(user.getUserId());
+		// ドメインタイプ:年
+		TargetYear targetYear = TargetYear.from(targetYearStr);
 		
 		// レスポンスを生成
 		AccountYearMeisaiInquiryResponse response = AccountYearMeisaiInquiryResponse.getInstance(
-				AccountYearInquiryTargetYearInfo.from(targetYear, returnYearMonth));
+				AccountYearInquiryTargetYearInfo.from(targetYearStr, returnYearMonthStr));
 		
 		/* ユーザID,入力された対象年度を条件に年間収支(明細)のリストを取得 */
 		// フォームオブジェクトからドメインオブジェクトに変換
-		SearchQueryUserIdAndYear inquiryModel = SearchQueryUserIdAndYear.from(
-				user.getUserId(), targetYear);
+		SearchQueryUserIdAndYear inquiryModel = SearchQueryUserIdAndYear.from(userId, targetYear);
 		// ユーザID、対象年度を条件に年間収支(明細)のリスト(ドメインモデル)を取得
 		AccountYearMeisaiInquiryList resultList = repositoryMeisai.select(inquiryModel);
 		// 年間収支(明細)のリスト(ドメインモデル)をレスポンスに設定

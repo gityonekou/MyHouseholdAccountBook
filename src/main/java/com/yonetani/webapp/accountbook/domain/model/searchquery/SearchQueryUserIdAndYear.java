@@ -51,7 +51,7 @@ public class SearchQueryUserIdAndYear {
 	 * @return 検索条件(ユーザID, 年度(YYYY))
 	 *
 	 */
-	public static SearchQueryUserIdAndYear from(String userId, String year) {
-		return new SearchQueryUserIdAndYear(UserId.from(userId), TargetYear.from(year));
+	public static SearchQueryUserIdAndYear from(UserId userId, TargetYear year) {
+		return new SearchQueryUserIdAndYear(userId, year);
 	}
 }

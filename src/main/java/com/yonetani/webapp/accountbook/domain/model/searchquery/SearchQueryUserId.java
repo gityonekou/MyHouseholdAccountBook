@@ -44,7 +44,7 @@ public class SearchQueryUserId {
 	 * @return 検索条件(ユーザID)
 	 *
 	 */
-	public static SearchQueryUserId from(String userId) {
-		return new SearchQueryUserId(UserId.from(userId));
+	public static SearchQueryUserId from(UserId userId) {
+		return new SearchQueryUserId(userId);
 	}
 }

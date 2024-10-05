@@ -44,6 +44,18 @@ public class ShopSort {
 	}
 	
 	/**
+	 *<pre>
+	 * 指定の表示順(数値)に対応する、「店舗表示順」項目の値を表すドメインタイプを生成します。
+	 *</pre>
+	 * @param count 表示順の値(数値)
+	 * @return 「店舗表示順」項目ドメインタイプ
+	 *
+	 */
+	public static ShopSort from(int sort) {
+		return new ShopSort(String.format("%03d", sort));
+	}
+	
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

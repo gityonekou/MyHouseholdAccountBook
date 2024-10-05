@@ -48,10 +48,14 @@ import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.Fixed
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiTuki;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuCode;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingakuTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
@@ -113,12 +117,17 @@ public class IncomeAndExpenditureRegistUseCase {
 	 * 
 	 *</pre>
 	 * @param user ログインユーザ情報
-	 * @param targetYearMonth 収支を新規登録する対象年月の値
+	 * @param targetYearMonthStr 収支を新規登録する対象年月の値
 	 * @return 収支登録画面の表示情報
 	 *
 	 */
-	public IncomeAndExpenditureRegistResponse readInitInfo(LoginUserInfo user, String targetYearMonth) {
-		log.debug("readInitInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+	public IncomeAndExpenditureRegistResponse readInitInfo(LoginUserInfo user, String targetYearMonthStr) {
+		log.debug("readInitInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonthStr);
+		
+		// ドメインタイプ:ユーザID
+		UserId userId = UserId.from(user.getUserId());
+		// ドメインタイプ:対象年月
+		TargetYearMonth targetYearMonth = TargetYearMonth.from(targetYearMonthStr);
 		
 		/* 空の収入情報入力フォームをもとにレスポンスを生成 */
 		// 新規収入情報入力フォームを生成
@@ -129,11 +138,11 @@ public class IncomeAndExpenditureRegistUseCase {
 		incomeItemForm.setIncomeKubunName("【新規追加】");
 		
 		// レスポンスを生成
-		IncomeAndExpenditureRegistResponse response = createIncomeItemFormResponse(targetYearMonth, incomeItemForm);
+		IncomeAndExpenditureRegistResponse response = createIncomeItemFormResponse(targetYearMonth.getValue(), incomeItemForm);
 		
 		/* 固定費テーブルに登録されている固定費情報から対象年月に合致する固定費一覧を取得 */
 		// 対象の月の値を取得
-		String month = targetYearMonth.substring(4);
+		String month = targetYearMonth.getMonth();
 		// 対象月が奇数月(20) or 偶数月(30)かを取得
 		String oddEven = Integer.parseInt(month) % 2 == 1 
 				? MyHouseholdAccountBookContent.SHIHARAI_TUKI_ODD_SELECTED_VALUE
@@ -152,7 +161,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		FixedCostList searchResult = fixedCostRepository.findByIdAndFixedCostShiharaiTukiList(
 				SearchQueryUserIdAndFixedCostShiharaiTukiList.from(
 						// ユーザID
-						user.getUserId(),
+						userId,
 						// 固定費支払月(リスト値)
 						shiharaiTukiList.stream().map(item -> FixedCostShiharaiTuki.from(item)).collect(Collectors.toUnmodifiableList())));
 		
@@ -201,7 +210,7 @@ public class IncomeAndExpenditureRegistUseCase {
 			response.setExpenditureRegistItemList(expenditureRegistItemList);
 			
 			// 固定費一覧から画面表示する支出一覧とセッション保存の支出一覧を設定
-			setIncomeAndExpenditureInfoList(user, null, expenditureRegistItemList, response);
+			setIncomeAndExpenditureInfoList(userId, null, expenditureRegistItemList, response);
 		}
 		return response;
 	}
@@ -214,18 +223,22 @@ public class IncomeAndExpenditureRegistUseCase {
 	 * 
 	 *</pre>
 	 * @param user ログインユーザ情報
-	 * @param targetYearMonth 収支更新対象の対象年月の値
+	 * @param targetYearMonthStr 収支更新対象の対象年月の値
 	 * @return 収支登録画面の表示情報
 	 *
 	 */
-	public IncomeAndExpenditureRegistResponse readUpdateInfo(LoginUserInfo user, String targetYearMonth) {
-		log.debug("readUpdateInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+	public IncomeAndExpenditureRegistResponse readUpdateInfo(LoginUserInfo user, String targetYearMonthStr) {
+		log.debug("readUpdateInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonthStr);
 		
+		// ドメインタイプ:ユーザID
+		UserId userId = UserId.from(user.getUserId());
+		// ドメインタイプ:対象年月
+		TargetYearMonth targetYearMonth = TargetYearMonth.from(targetYearMonthStr);
 		// レスポンスを生成
-		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
-		
+		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth.getValue());
+
 		// 対象年月検索条件
-		SearchQueryUserIdAndYearMonth search = SearchQueryUserIdAndYearMonth.from(user.getUserId(), targetYearMonth);
+		SearchQueryUserIdAndYearMonth search = SearchQueryUserIdAndYearMonth.from(userId, targetYearMonth);
 		// 収入テーブルから対象年月の収入情報を取得
 		IncomeItemInquiryList incomeList = incomeRepository.findById(search);
 		// 収入情報が未登録の場合、予期しないエラー(登録必須のためエラーとする必要あり)
@@ -289,7 +302,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		response.setExpenditureRegistItemList(expenditureRegistItemList);
 		
 		// 固定費一覧から画面表示する支出一覧とセッション保存の支出一覧を設定
-		setIncomeAndExpenditureInfoList(user, incomeRegistItemList, expenditureRegistItemList, response);
+		setIncomeAndExpenditureInfoList(userId, incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
 	}
@@ -311,7 +324,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		// レスポンスを生成
 		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
 		// セッション情報の各収支一覧情報を画面表示情報に設定
-		setIncomeAndExpenditureInfoList(user, incomeRegistItemList, expenditureRegistItemList, response);
+		setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
 	}
@@ -342,7 +355,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		IncomeAndExpenditureRegistResponse response = createIncomeItemFormResponse(targetYearMonth, incomeItemForm);
 		
 		// セッション情報の各収支一覧情報を画面表示情報に設定
-		setIncomeAndExpenditureInfoList(user, incomeRegistItemList, expenditureRegistItemList, response);
+		setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
 	}
@@ -403,7 +416,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		IncomeAndExpenditureRegistResponse response = createIncomeItemFormResponse(targetYearMonth, incomeItemForm);
 		
 		// セッション情報の各収支一覧情報を画面表示情報に設定
-		setIncomeAndExpenditureInfoList(user, incomeRegistItemList, expenditureRegistItemList, response);
+		setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
 	}
@@ -429,7 +442,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		IncomeAndExpenditureRegistResponse response = createIncomeItemFormResponse(targetYearMonth, inputForm);
 		
 		// セッション情報の各収支一覧情報を画面表示情報に設定
-		setIncomeAndExpenditureInfoList(user, incomeRegistItemList, expenditureRegistItemList, response);
+		setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
 	}
@@ -608,6 +621,8 @@ public class IncomeAndExpenditureRegistUseCase {
 			List<IncomeRegistItem> incomeRegistItemList, List<ExpenditureRegistItem> expenditureRegistItemList) {
 		log.debug("readExpenditureUpdateSelect:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",expenditureCode=" + expenditureCode);
 		
+		// ユーザID
+		UserId userId = UserId.from(user.getUserId());
 		// 新規支出情報入力フォームを生成
 		ExpenditureItemForm expenditureItemForm = null;
 		for(ExpenditureRegistItem session : expenditureRegistItemList) {
@@ -622,7 +637,10 @@ public class IncomeAndExpenditureRegistUseCase {
 				// 支出項目コード
 				expenditureItemForm.setSisyutuItemCode(session.getSisyutuItemCode());
 				// 支出項目名＋イベント名
-				expenditureItemForm.setSisyutuItemName(getSisyutuItemNameStr(user, session.getSisyutuItemCode(), session.getEventCode()));
+				expenditureItemForm.setSisyutuItemName(getSisyutuItemNameStr(
+						userId,
+						SisyutuItemCode.from(session.getSisyutuItemCode()),
+						StringUtils.hasLength(session.getEventCode()) ? EventCode.from(session.getEventCode()) :  null));
 				// イベントコード
 				expenditureItemForm.setEventCode(session.getEventCode());
 				// 支出名
@@ -651,7 +669,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		IncomeAndExpenditureRegistResponse response = createExpenditureItemFormResponse(targetYearMonth, expenditureItemForm);
 		
 		// セッション情報の各収支一覧情報を画面表示情報に設定
-		setIncomeAndExpenditureInfoList(user, incomeRegistItemList, expenditureRegistItemList, response);
+		setIncomeAndExpenditureInfoList(userId, incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
 	}
@@ -677,7 +695,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		IncomeAndExpenditureRegistResponse response = createExpenditureItemFormResponse(targetYearMonth, inputForm);
 		
 		// セッション情報の各収支一覧情報を画面表示情報に設定
-		setIncomeAndExpenditureInfoList(user, incomeRegistItemList, expenditureRegistItemList, response);
+		setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
 	}
@@ -841,7 +859,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		// レスポンス
 		ExpenditureItemSelectResponse response = ExpenditureItemSelectResponse.getInstance();
 		// 支出項目一覧をすべて取得
-		sisyutuItemComponent.setSisyutuItemList(user, response);
+		sisyutuItemComponent.setSisyutuItemList(UserId.from(user.getUserId()), response);
 		
 		return response;
 	}
@@ -851,29 +869,35 @@ public class IncomeAndExpenditureRegistUseCase {
 	 * 指定の支出項目コードに対応する支出項目情報と支出項目一覧情報を取得し支出項目選択画面の表示情報に設定します。
 	 *</pre>
 	 * @param user ログインユーザ情報
-	 * @param sisyutuItemCode 支出項目コード
+	 * @param sisyutuItemCodeStr 支出項目コード
 	 * @return 支出項目選択画面の表示情報
 	 *
 	 */
-	public ExpenditureItemSelectResponse readExpenditureItemActSelect(LoginUserInfo user, String sisyutuItemCode) {
-		log.debug("readExpenditureItemActSelect:userid=" + user.getUserId() + ", sisyutuItemCode=" + sisyutuItemCode);
+	public ExpenditureItemSelectResponse readExpenditureItemActSelect(LoginUserInfo user, String sisyutuItemCodeStr) {
+		log.debug("readExpenditureItemActSelect:userid=" + user.getUserId() + ", sisyutuItemCode=" + sisyutuItemCodeStr);
+		
+		// ドメインタイプ:ユーザID
+		UserId userId = UserId.from(user.getUserId());
+		// ドメインタイプ:支出項目コード
+		SisyutuItemCode sisyutuItemCode = SisyutuItemCode.from(sisyutuItemCodeStr);
+		
 		// レスポンス
 		ExpenditureItemSelectResponse response = ExpenditureItemSelectResponse.getInstance();
 		// 支出項目一覧をすべて取得
-		sisyutuItemComponent.setSisyutuItemList(user, response);
+		sisyutuItemComponent.setSisyutuItemList(userId, response);
 		// 支出項目詳細内容を設定(支出項目選択画面からの支出項目選択なので、対象の支出項目がない場合:null)チェックは不要とする
 		response.setSisyutuItemDetailContext(
-				sisyutuItemComponent.getSisyutuItem(user, sisyutuItemCode).getSisyutuItemDetailContext().getValue());
+				sisyutuItemComponent.getSisyutuItem(userId, sisyutuItemCode).getSisyutuItemDetailContext().getValue());
 		// 支出項目コードに対応する支出項目名(＞で区切った値)を設定
-		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(user, sisyutuItemCode));	
+		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(userId, sisyutuItemCode));	
 		
 		// 選択した支出項目のフォームデータを作成
 		ExpenditureSelectItemForm selectForm = new ExpenditureSelectItemForm();
-		selectForm.setSisyutuItemCode(sisyutuItemCode);
+		selectForm.setSisyutuItemCode(sisyutuItemCode.getValue());
 		
 		// イベント支出項目でイベントが登録されている場合、対応するイベント一覧を取得し選択プルダウンリストとしてレスポンスに設定
 		EventItemInquiryList inquiryList = eventRepository.findByIdAndSisyutuItemCode(
-				SearchQueryUserIdAndSisyutuItemCode.from(user.getUserId(), sisyutuItemCode));
+				SearchQueryUserIdAndSisyutuItemCode.from(userId, sisyutuItemCode));
 		if(!inquiryList.isEmpty()) {
 			// 検索結果ありの場合、イベント情報選択のプルダウンリストをレスポンスに設定
 			response.addEventSelectList(inquiryList.getValues().stream().map(domain -> {
@@ -921,6 +945,8 @@ public class IncomeAndExpenditureRegistUseCase {
 			List<IncomeRegistItem> incomeRegistItemList, List<ExpenditureRegistItem> expenditureRegistItemList) {
 		log.debug("readNewExpenditureItem:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",inputForm=" + inputForm);
 		
+		// ユーザID
+		UserId userId = UserId.from(user.getUserId());
 		// イベント情報必須の場合、イベントコードが未設定の場合はここで予期しないエラーとして判定する
 		if(inputForm.isEventCodeRequired() && !StringUtils.hasLength(inputForm.getEventCode())) {
 			throw new MyHouseholdAccountBookRuntimeException(
@@ -928,7 +954,7 @@ public class IncomeAndExpenditureRegistUseCase {
 							+ inputForm.getEventCode() + "]");
 		}
 		// 選択した支出項目コードに対応する支出項目情報を取得(支出項目選択画面からの遷移の場合、nullチェックは不要とする)
-		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(user, inputForm.getSisyutuItemCode());
+		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(userId, SisyutuItemCode.from(inputForm.getSisyutuItemCode()));
 		
 		// 新規支出情報入力フォームを生成
 		ExpenditureItemForm expenditureItemForm = new ExpenditureItemForm();
@@ -937,7 +963,10 @@ public class IncomeAndExpenditureRegistUseCase {
 		// 支出項目コード
 		expenditureItemForm.setSisyutuItemCode(inputForm.getSisyutuItemCode());
 		// 支出項目名＋イベント名
-		expenditureItemForm.setSisyutuItemName(getSisyutuItemNameStr(user, inputForm.getSisyutuItemCode(), inputForm.getEventCode()));
+		expenditureItemForm.setSisyutuItemName(getSisyutuItemNameStr(
+				userId,
+				SisyutuItemCode.from(inputForm.getSisyutuItemCode()),
+				StringUtils.hasLength(inputForm.getEventCode()) ? EventCode.from(inputForm.getEventCode()) :  null));
 		// イベントコード
 		expenditureItemForm.setEventCode(inputForm.getEventCode());
 		// 支出名
@@ -951,7 +980,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		IncomeAndExpenditureRegistResponse response = createExpenditureItemFormResponse(targetYearMonth, expenditureItemForm);
 		
 		// セッション情報の各収支一覧情報を画面表示情報に設定
-		setIncomeAndExpenditureInfoList(user, incomeRegistItemList, expenditureRegistItemList, response);
+		setIncomeAndExpenditureInfoList(userId, incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
 	}
@@ -974,7 +1003,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		// レスポンスを生成
 		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(targetYearMonth);
 		// セッション情報の各収支一覧情報を画面表示情報に設定
-		setIncomeAndExpenditureInfoList(user, incomeRegistItemList, expenditureRegistItemList, response);
+		setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
 	}
@@ -997,7 +1026,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		// レスポンスを生成
 		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
 		// セッション情報の各収支一覧情報を画面表示情報に設定
-		setIncomeAndExpenditureInfoList(user, incomeRegistItemList, expenditureRegistItemList, response);
+		setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
 		// メッセージを設定
 		response.addMessage("収入情報が未登録です。");
 		
@@ -1018,9 +1047,8 @@ public class IncomeAndExpenditureRegistUseCase {
 			String returnYearMonth) {
 		log.debug("readRegistCancelInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",returnYearMonth=" + returnYearMonth);
 		
-		if(!StringUtils.hasLength(targetYearMonth) || targetYearMonth.length() != 6) {
-			throw new MyHouseholdAccountBookRuntimeException("対象年月の値が不正です。管理者に問い合わせてください。[targetYearMonth=" + targetYearMonth + "]");
-		}
+		// 戻り対象の対象年月の設定値をチェック
+		TargetYearMonth.from(returnYearMonth);
 		
 		// レスポンスを生成
 		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(returnYearMonth);
@@ -1035,31 +1063,31 @@ public class IncomeAndExpenditureRegistUseCase {
 	 * 収支情報のリスト、支出情報のリストをもとに収支を登録します。
 	 *</pre>
 	 * @param user ログインユーザ情報
-	 * @param targetYearMonth 収支の対象年月の値
+	 * @param targetYearMonthStr 収支の対象年月の値
 	 * @param incomeRegistItemList セッションに設定されている収支情報のリスト
 	 * @param expenditureRegistItemList セッションに設定されている支出情報のリスト
 	 * @return 収支登録内容確認画面の表示情報(各月の収支参照画面にリダイレクトを設定)
 	 *
 	 */
 	@Transactional
-	public IncomeAndExpenditureRegistCheckResponse execRegistAction(LoginUserInfo user, String targetYearMonth,
+	public IncomeAndExpenditureRegistCheckResponse execRegistAction(LoginUserInfo user, String targetYearMonthStr,
 			List<IncomeRegistItem> incomeRegistItemList, List<ExpenditureRegistItem> expenditureRegistItemList) {
-		log.debug("execRegistAction:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+		log.debug("execRegistAction:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonthStr);
 		
 		// ユーザID
 		UserId userId = UserId.from(user.getUserId());
 		// 対象年月ドメインタイプ
-		TargetYearMonth yearMonthDomain = TargetYearMonth.from(targetYearMonth);
+		TargetYearMonth targetYearMonth = TargetYearMonth.from(targetYearMonthStr);
 		// レスポンスを生成
-		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(yearMonthDomain.getValue());
+		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(targetYearMonth.getValue());
 		
 		// セッションに登録されている収入情報のリストがない場合、予期しないエラー
 		if(CollectionUtils.isEmpty(incomeRegistItemList)) {
 			throw new MyHouseholdAccountBookRuntimeException("セッションの収入情報がnullか空です。管理者に問い合わせてください。[targetYearMonth="
-					+ yearMonthDomain.getValue() + "]");
+					+ targetYearMonth + "]");
 		}
 		// 検索条件(ユーザID、年月度(YYYYMM))
-		SearchQueryUserIdAndYearMonth search = SearchQueryUserIdAndYearMonth.from(user.getUserId(), yearMonthDomain.getValue());
+		SearchQueryUserIdAndYearMonth search = SearchQueryUserIdAndYearMonth.from(userId, targetYearMonth);
 		// 現在の収入テーブル情報登録件数を取得
 		int incomeDataCount = incomeRepository.countById(search);
 		// 初期登録かどうかのフラグ　(収支登録確認画面からの遷移:true／各月の収支画面の更新ボタン押下からの遷移：false)
@@ -1084,16 +1112,14 @@ public class IncomeAndExpenditureRegistUseCase {
 			// データタイプが新規追加の場合、収入テーブルに対象データを追加
 			} else if (Objects.equals(incomeRegistData.getDataType(), MyHouseholdAccountBookContent.DATA_TYPE_NEW)) {
 				
-				// 収入コードを発番
-				String incomeCode = String.format("%02d", ++incomeDataCount);
 				// セッションの収支登録情報と発番した収入コードをもとに収入テーブル情報(ドメイン)を生成
 				IncomeItem addIncomeData = IncomeItem.createIncomeItem(
 						// ユーザID
 						userId,
 						// 対象年月
-						yearMonthDomain,
+						targetYearMonth,
 						// 収入コード(新規発番)
-						incomeCode,
+						SyuunyuuCode.from(++incomeDataCount),
 						// 収支登録情報(セッション)
 						incomeRegistData);
 				// 収入テーブルに登録
@@ -1118,9 +1144,9 @@ public class IncomeAndExpenditureRegistUseCase {
 							// ユーザID
 							userId,
 							// 対象年月
-							yearMonthDomain,
+							targetYearMonth,
 							// 収入コード(セッション)
-							incomeRegistData.getIncomeCode(),
+							SyuunyuuCode.from(incomeRegistData.getIncomeCode()),
 							// 収支登録情報(セッション)
 							incomeRegistData);
 					// 収入テーブルを更新
@@ -1142,9 +1168,9 @@ public class IncomeAndExpenditureRegistUseCase {
 							// ユーザID
 							userId,
 							// 対象年月
-							yearMonthDomain,
+							targetYearMonth,
 							// 収入コード(セッション)
-							incomeRegistData.getIncomeCode(),
+							SyuunyuuCode.from(incomeRegistData.getIncomeCode()),
 							// 収支登録情報(セッション)
 							incomeRegistData);
 					// 収入テーブルの対象データを論理削除
@@ -1183,9 +1209,6 @@ public class IncomeAndExpenditureRegistUseCase {
 			// データタイプが新規追加の場合、支出テーブルに対象データを追加
 			} else if (Objects.equals(expenditureRegistData.getDataType(), MyHouseholdAccountBookContent.DATA_TYPE_NEW)) {
 				
-				// 支出コードを発番
-				String expenditureCode = String.format("%03d", ++expenditureDataCount);
-				
 				// セッションの支出登録情報と新規発番した支出コードをもとに支出テーブル情報(ドメイン)を生成
 				ExpenditureItem addExpenditureData = ExpenditureItem.createExpenditureItem(
 						// 初期登録かどうかのフラグ
@@ -1193,9 +1216,9 @@ public class IncomeAndExpenditureRegistUseCase {
 						// ユーザID
 						userId,
 						// 対象年月
-						yearMonthDomain,
+						targetYearMonth,
 						// 支出コード(新規発番)
-						expenditureCode,
+						SisyutuCode.from(++expenditureDataCount),
 						// 支出登録情報(セッション)
 						expenditureRegistData);
 				// 支出テーブルに登録
@@ -1225,9 +1248,9 @@ public class IncomeAndExpenditureRegistUseCase {
 							// ユーザID
 							userId,
 							// 対象年月
-							yearMonthDomain,
+							targetYearMonth,
 							// 支出コード(セッション)
-							expenditureRegistData.getExpenditureCode(),
+							SisyutuCode.from(expenditureRegistData.getExpenditureCode()),
 							// 支出登録情報(セッション)
 							expenditureRegistData);
 					// 支出テーブルを更新
@@ -1251,9 +1274,9 @@ public class IncomeAndExpenditureRegistUseCase {
 							// ユーザID
 							userId,
 							// 対象年月
-							yearMonthDomain,
+							targetYearMonth,
 							// 支出コード(セッション)
-							expenditureRegistData.getExpenditureCode(),
+							SisyutuCode.from(expenditureRegistData.getExpenditureCode()),
 							// 支出登録情報(セッション)
 							expenditureRegistData);
 					// 支出テーブルの対象データを論理削除
@@ -1279,6 +1302,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		// 支出情報更新ありの場合、支出金額テーブルを更新
 		if(expenditureUpdateFlg) {
 			// TODO：支出金額テーブルの登録処理から
+			//ここから
 		}
 		
 		// 収入情報、支出情報更新ありの場合、収支テーブルを更新
@@ -1292,7 +1316,7 @@ public class IncomeAndExpenditureRegistUseCase {
 						// ユーザID
 						userId,
 						// 対象年月
-						yearMonthDomain,
+						targetYearMonth,
 						// 対象月の収入金額合計
 						incomeKingakuTotalAmount,
 						// 対象月の支出予定金額合計
@@ -1314,7 +1338,7 @@ public class IncomeAndExpenditureRegistUseCase {
 						// ユーザID
 						userId,
 						// 対象年月
-						yearMonthDomain,
+						targetYearMonth,
 						// 対象月の収入金額合計
 						incomeKingakuTotalAmount,
 						// 対象月の支出金額合計
@@ -1327,11 +1351,11 @@ public class IncomeAndExpenditureRegistUseCase {
 				}
 			}
 			
-			response.addMessage(String.format("%s年%s月度の収支情報を登録しました。", yearMonthDomain.getYear(), yearMonthDomain.getMonth()));
+			response.addMessage(String.format("%s年%s月度の収支情報を登録しました。", targetYearMonth.getYear(), targetYearMonth.getMonth()));
 		
 		// 収支テーブル更新なしの場合、メッセージを設定
 		} else {
-			response.addMessage(String.format("【注意】%s年%s月度の収支情報の変更箇所がありませんでした。", yearMonthDomain.getYear(), yearMonthDomain.getMonth()));
+			response.addMessage(String.format("【注意】%s年%s月度の収支情報の変更箇所がありませんでした。", targetYearMonth.getYear(), targetYearMonth.getMonth()));
 		}
 		
 		response.setTransactionSuccessFull();
@@ -1405,14 +1429,14 @@ public class IncomeAndExpenditureRegistUseCase {
 	 *<pre>
 	 * セッションの収入情報、支出情報の各一覧情報を画面情報に設定します。
 	 *</pre>
-	 * @param user ログインユーザ情報
+	 * @param userId ログインユーザID
 	 * @param incomeRegistItemList セッションに設定されている収支情報のリスト
 	 * @param expenditureRegistItemList セッションに設定されている支出情報のリスト
 	 * @param response 収入一覧、支出一覧レスポンス情報
 	 *
 	 */
 	private void setIncomeAndExpenditureInfoList(
-			LoginUserInfo user, 
+			UserId userId, 
 			List<IncomeRegistItem> incomeRegistItemList,
 			List<ExpenditureRegistItem> expenditureRegistItemList,
 			AbstractIncomeAndExpenditureRegistResponse response) {
@@ -1488,7 +1512,7 @@ public class IncomeAndExpenditureRegistUseCase {
 				expenditureNameBuff.append(session.getExpenditureName());
 				
 				// 支出項目コードに対応する支出項目情報を取得
-				SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(user, session.getSisyutuItemCode());
+				SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(userId, SisyutuItemCode.from(session.getSisyutuItemCode()));
 				if(sisyutuItem == null) {
 					new MyHouseholdAccountBookRuntimeException(
 							"支出項目コードに対応する支出項目情報が存在しません。管理者に問い合わせてください。[sisyutuItemCode=" + session.getSisyutuItemCode() + "]");
@@ -1593,17 +1617,17 @@ public class IncomeAndExpenditureRegistUseCase {
 	 * @return 支出項目名(支出項目名＋イベント名)
 	 *
 	 */
-	private String getSisyutuItemNameStr(LoginUserInfo user, String sisyutuItemCode, String eventCode) {
+	private String getSisyutuItemNameStr(UserId userId, SisyutuItemCode sisyutuItemCode, EventCode eventCode) {
 		
 		// 支出項目名を取得(＞で区切った値)
 		StringBuilder sisyutuItemNameBuff = new StringBuilder();
-		sisyutuItemNameBuff.append(sisyutuItemComponent.getSisyutuItemName(user, sisyutuItemCode));
+		sisyutuItemNameBuff.append(sisyutuItemComponent.getSisyutuItemName(userId, sisyutuItemCode));
 		
 		// イベントコードが指定されている場合、イベント名を設定
-		if(StringUtils.hasLength(eventCode)) {
-			
+		if(eventCode != null) {
 			// イベントコードに対応するイベント情報を取得
-			EventItem eventItem = eventRepository.findByIdAndEventCode(SearchQueryUserIdAndEventCode.from(user.getUserId(), eventCode));
+			EventItem eventItem = eventRepository.findByIdAndEventCode(SearchQueryUserIdAndEventCode.from(
+					userId, eventCode));
 			// イベントコードに対応するイベント情報がない場合、エラー
 			if(eventItem == null) {
 				throw new MyHouseholdAccountBookRuntimeException("対象のイベント情報が存在しません。管理者に問い合わせてください。eventCode:" + eventCode);
