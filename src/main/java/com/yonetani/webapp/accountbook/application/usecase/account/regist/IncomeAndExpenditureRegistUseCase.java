@@ -467,7 +467,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
 		
 		// 収入金額をbigdecimalに変換
-		BigDecimal incomeKingaku = DomainCommonUtils.convertBigDecimal(inputForm.getIncomeKingaku(), 0);
+		BigDecimal incomeKingaku = DomainCommonUtils.convertKingakuBigDecimal(inputForm.getIncomeKingaku());
 		
 		// 新規登録の場合
 		if(Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
@@ -720,7 +720,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
 		
 		// 支出金額をbigdecimalに変換
-		BigDecimal expenditureKingaku = DomainCommonUtils.convertBigDecimal(inputForm.getExpenditureKingaku(), 0);
+		BigDecimal expenditureKingaku = DomainCommonUtils.convertKingakuBigDecimal(inputForm.getExpenditureKingaku());
 		
 		// 新規登録の場合
 		if(Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
@@ -1568,7 +1568,7 @@ public class IncomeAndExpenditureRegistUseCase {
 				// 収入詳細
 				inputForm.getIncomeDetailContext(),
 				// 収入金額
-				DomainCommonUtils.convertBigDecimal(inputForm.getIncomeKingaku(), 0));
+				DomainCommonUtils.convertKingakuBigDecimal(inputForm.getIncomeKingaku()));
 	}
 	
 	/**
@@ -1602,7 +1602,7 @@ public class IncomeAndExpenditureRegistUseCase {
 				// 支払日
 				DomainCommonUtils.getDateStr(inputForm.getSiharaiDate()),
 				// 支払金額
-				DomainCommonUtils.convertBigDecimal(inputForm.getExpenditureKingaku(), 0),
+				DomainCommonUtils.convertKingakuBigDecimal(inputForm.getExpenditureKingaku()),
 				// 支払金額の0円開始設定フラグ
 				inputForm.isClearStartFlg());
 	}

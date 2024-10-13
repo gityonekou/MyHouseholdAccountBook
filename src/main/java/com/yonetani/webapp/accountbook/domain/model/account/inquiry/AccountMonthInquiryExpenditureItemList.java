@@ -92,12 +92,15 @@ public class AccountMonthInquiryExpenditureItemList {
 					BigDecimal sisyutuKingakuB,
 					LocalDate siharaiDate
 				) {
+			// 支出金額のドメインタイプを生成
+			SisyutuKingaku sisyutuKingakuVal = SisyutuKingaku.from(sisyutuKingaku);
+			
 			return new ExpenditureListItem(
 					SisyutuItemCode.from(sisyutuItemCode),
 					SisyutuItemName.from(sisyutuItemName),
 					SisyutuItemLevel.from(sisyutuItemLevel),
-					SisyutuKingaku.from(sisyutuKingaku),
-					SisyutuKingakuB.from(sisyutuKingaku, sisyutuKingakuB),
+					sisyutuKingakuVal,
+					SisyutuKingakuB.from(sisyutuKingakuB, sisyutuKingakuVal),
 					ShiharaiDate.from(siharaiDate));
 		}
 	}

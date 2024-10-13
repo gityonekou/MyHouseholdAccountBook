@@ -57,15 +57,15 @@ public class ShoppingItemInfoSearchConditionSearchQueryDto {
 	 */
 	public static ShoppingItemInfoSearchConditionSearchQueryDto from(SearchQueryShoppingItemInfoSearchCondition search) {
 		return new ShoppingItemInfoSearchConditionSearchQueryDto(
-				// ユーザID
+				// 検索条件:ユーザID
 				search.getUserId().getValue(),
-				// 商品区分名
+				// 検索条件:商品区分名
 				(search.getShoppingItemKubunName() != null) ? search.getShoppingItemKubunName().getValue() : null,
-				// 商品名
+				// 検索条件:商品名
 				(search.getShoppingItemName() != null) ? search.getShoppingItemName().getValue() : null,
-				// 会社名
+				// 検索条件:会社名
 				(search.getCompanyName() != null) ? search.getCompanyName().getValue() : null,
-				// 商品JANコード
+				// 検索条件:商品JANコード
 				(search.getShoppingItemJanCode() != null) ? search.getShoppingItemJanCode().getValue() : null);
 	}
 }

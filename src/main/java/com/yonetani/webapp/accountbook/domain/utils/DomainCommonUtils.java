@@ -27,6 +27,9 @@ import java.time.format.DateTimeFormatter;
  */
 public class DomainCommonUtils {
 	
+	/** BigDecimalの値(100) スケール2 */
+	public static final BigDecimal ONE_HUNDRED_BIGDECIMAL = new BigDecimal("100").setScale(2);
+	
 	// 金額のカンマ区切りフォーマッター
 	private static final DecimalFormat kingakuDecimalFormat = new DecimalFormat("#,###");
 	// 日付フォーマット(YYYY/MM/DD)
@@ -125,6 +128,31 @@ public class DomainCommonUtils {
 		} else {
 			return target.add(augend);
 		}
+	}
+	
+	/**
+	 *<pre>
+	 * 引数で指定した金額(整数)の値をBigDecimalに変換して返します。値がnullの場合、nullを返却します。
+	 * BigDecimalのスケール値は金額関連のDB項目のデフォルト値(2)が設定されます。
+	 *</pre>
+	 * @param kingaku BigDecimalに変換する金額の値(整数値)
+	 * @return 引数の値をBigDecimalに変換した値
+	 *
+	 */
+	public static BigDecimal convertKingakuBigDecimal(Integer kingaku) {
+		// 値がnullの場合、nullを返します。
+		if(kingaku == null) {
+			return null;
+		}
+		// 整数の値に指定したスケール分0を追加
+		String numStr = kingaku.toString() + ".00";
+		
+		// 整数の値を文字列変換
+		BigDecimal bigVal = new BigDecimal(numStr.toString());
+		// スケールを設定(小数点以下切り上げ)
+		bigVal.setScale(2, RoundingMode.HALF_UP);
+		
+		return bigVal;
 	}
 	
 	/**

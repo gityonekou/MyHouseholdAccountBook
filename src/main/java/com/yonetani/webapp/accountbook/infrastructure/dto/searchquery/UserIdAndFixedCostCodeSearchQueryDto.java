@@ -11,6 +11,8 @@
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.searchquery;
 
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostCode;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -37,14 +39,17 @@ public class UserIdAndFixedCostCodeSearchQueryDto {
 	
 	/**
 	 *<pre>
-	 * 引数のパラメータ値をもとにUserIdAndFixedCostCodeSearchQueryDtoを生成して返します。
+	 * 検索条件のドメイン情報をもとにUserIdAndFixedCostCodeSearchQueryDtoを生成して返します。
 	 *</pre>
-	 * @param userId ユーザID
-	 * @param fixedCostCode 固定費コード
+	 * @param search 検索条件(ユーザID、固定費コード)
 	 * @return テーブルの検索条件：ユーザID、固定費コード
 	 *
 	 */
-	public static UserIdAndFixedCostCodeSearchQueryDto from(String userId, String fixedCostCode) {
-		return new UserIdAndFixedCostCodeSearchQueryDto(userId, fixedCostCode);
+	public static UserIdAndFixedCostCodeSearchQueryDto from(SearchQueryUserIdAndFixedCostCode search) {
+		return new UserIdAndFixedCostCodeSearchQueryDto(
+				// 検索条件:ユーザID
+				search.getUserId().getValue(),
+				// 検索条件:固定費コード
+				search.getFixedCostCode().getValue());
 	}
 }

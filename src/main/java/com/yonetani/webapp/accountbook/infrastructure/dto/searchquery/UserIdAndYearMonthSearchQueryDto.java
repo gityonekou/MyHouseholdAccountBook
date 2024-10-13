@@ -51,25 +51,25 @@ public class UserIdAndYearMonthSearchQueryDto {
 	 * @return テーブルの検索条件：ユーザID、対象年、対象月
 	 *
 	 */
-	public static UserIdAndYearMonthSearchQueryDto from(String userId, String year, String month) {
+	public static UserIdAndYearMonthSearchQueryDto fromString(String userId, String year, String month) {
 		return new UserIdAndYearMonthSearchQueryDto(userId, year, month);
 	}
 	
 	/**
 	 *<pre>
-	 * 検索条件：ユーザID、対象年月のドメインタイプをもとにUserIdAndYearMonthSearchQueryDtoを生成して返します。
+	 * 検索条件のドメイン情報をもとにUserIdAndYearMonthSearchQueryDtoを生成して返します。
 	 *</pre>
-	 * @param searchQuery 検索条件：ユーザID、対象年月のドメインタイプ
+	 * @param search 検索条件(ユーザID、対象年月)
 	 * @return テーブルの検索条件：ユーザID、対象年、対象月
 	 *
 	 */
-	public static UserIdAndYearMonthSearchQueryDto from(SearchQueryUserIdAndYearMonth searchQuery) {
-		return UserIdAndYearMonthSearchQueryDto.from(
+	public static UserIdAndYearMonthSearchQueryDto from(SearchQueryUserIdAndYearMonth search) {
+		return new UserIdAndYearMonthSearchQueryDto(
 				// 検索条件:ユーザID
-				searchQuery.getUserId().toString(),
+				search.getUserId().toString(),
 				// 検索条件:対象年
-				searchQuery.getYearMonth().getYear(),
+				search.getYearMonth().getYear(),
 				// 検索条件:対象月
-				searchQuery.getYearMonth().getMonth());
+				search.getYearMonth().getMonth());
 	}
 }

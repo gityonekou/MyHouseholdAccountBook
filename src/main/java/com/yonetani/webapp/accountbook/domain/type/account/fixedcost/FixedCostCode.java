@@ -9,6 +9,10 @@
  */
 package com.yonetani.webapp.accountbook.domain.type.account.fixedcost;
 
+import org.springframework.util.StringUtils;
+
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -34,12 +38,32 @@ public class FixedCostCode {
 	/**
 	 *<pre>
 	 * 「固定費コード」項目の値を表すドメインタイプを生成します。
+	 * 
+	 * [ガード節]
+	 * ・空文字列
+	 * ・長さが4桁でない
+	 * ・数値に変換できない(数値4桁:0パディング)
 	 *</pre>
 	 * @param fixedCostCode 固定費コード
 	 * @return 「固定費コード」項目ドメインタイプ
 	 *
 	 */
 	public static FixedCostCode from(String fixedCostCode) {
+		// ガード節(空文字列)
+		if(!StringUtils.hasLength(fixedCostCode)) {
+			throw new MyHouseholdAccountBookRuntimeException("「固定費コード」項目の設定値が空文字列です。管理者に問い合わせてください。");
+		}
+		// ガード節(長さが4桁でない)
+		if(fixedCostCode.length() != 4) {
+			throw new MyHouseholdAccountBookRuntimeException("「固定費コード」項目の設定値が不正です。管理者に問い合わせてください。[fixedCostCode=" + fixedCostCode + "]");
+		}
+		// ガード節(数値に変換できない(数値4桁:0パディング))
+		try {
+			Integer.parseInt(fixedCostCode);
+		} catch(NumberFormatException ex) {
+			throw new MyHouseholdAccountBookRuntimeException("「固定費コード」項目の設定値が不正です。管理者に問い合わせてください。[fixedCostCode=" + fixedCostCode + "]");
+		}
+		
 		return new FixedCostCode(fixedCostCode);
 	}
 	

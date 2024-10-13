@@ -12,6 +12,9 @@
 package com.yonetani.webapp.accountbook.infrastructure.dto.searchquery;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostShiharaiTukiList;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -39,14 +42,18 @@ public class UserIdAndFixedCostShiharaiTukiListSearchQueryDto {
 	
 	/**
 	 *<pre>
-	 * 引数のパラメータ値をもとにUserIdAndFixedCostShiharaiTukiListSearchQueryDtoを生成して返します。
+	 * 検索条件のドメイン情報をもとにUserIdAndFixedCostShiharaiTukiListSearchQueryDtoを生成して返します。
 	 *</pre>
-	 * @param userId ユーザID
-	 * @param fixedCostShiharaiTukiList 固定費支払月のリスト
+	 * @param search 検索条件(ユーザID、固定費支払月のリスト)
 	 * @return テーブルの検索条件：ユーザID、固定費支払月のリスト
 	 *
 	 */
-	public static UserIdAndFixedCostShiharaiTukiListSearchQueryDto from(String userId, List<String> fixedCostShiharaiTukiList) {
-		return new UserIdAndFixedCostShiharaiTukiListSearchQueryDto(userId, fixedCostShiharaiTukiList);
+	public static UserIdAndFixedCostShiharaiTukiListSearchQueryDto from(SearchQueryUserIdAndFixedCostShiharaiTukiList search) {
+		return new UserIdAndFixedCostShiharaiTukiListSearchQueryDto(
+				// 検索条件:ユーザID
+				search.getUserId().getValue(),
+				// 検索条件:固定費支払月のリスト
+				search.getFixedCostShiharaiTukiList().stream().map(
+						model -> model.getValue()).collect(Collectors.toUnmodifiableList()));
 	}
 }

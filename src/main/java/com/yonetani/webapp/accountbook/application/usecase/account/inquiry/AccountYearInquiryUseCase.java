@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountYearMeisaiInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.AccountYearMeisaiInquiryRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearInquiryTargetYearInfo;
@@ -53,7 +53,7 @@ public class AccountYearInquiryUseCase {
 	// 収支テーブル:INCOME_AND_EXPENDITURE_TABLEリポジトリー：指定年度の収支(マージ)結果取得
 	private final IncomeAndExpenditureTableRepository repositoryMage;
 	// 指定年度の収支(明細)結果取得リポジトリー
-	private final AccountYearMeisaiInquiryRepository repositoryMeisai;
+	private final SisyutuKingakuTableRepository repositoryMeisai;
 	
 	/**
 	 *<pre>

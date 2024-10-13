@@ -47,7 +47,7 @@ public class AccountBookUserDataSource implements AccountBookUserRepository {
 	 */
 	@Override
 	public NowTargetYearMonth getNowTargetYearMonth(SearchQueryUserId searchQuery) {
-		AccountBookUserDto result = mapper.selectUser(UserIdSearchQueryDto.from(searchQuery.getUserId().getValue()));
+		AccountBookUserDto result = mapper.selectUser(UserIdSearchQueryDto.from(searchQuery));
 		if(result == null) {
 			return null;
 		} else {
@@ -60,7 +60,7 @@ public class AccountBookUserDataSource implements AccountBookUserRepository {
 	 */
 	@Override
 	public AccountBookUser getUserInfo(SearchQueryUserId searchQuery) {
-		AccountBookUserDto result = mapper.selectUser(UserIdSearchQueryDto.from(searchQuery.getUserId().getValue()));
+		AccountBookUserDto result = mapper.selectUser(UserIdSearchQueryDto.from(searchQuery));
 		return result != null ? createAccountBookUser(result) : null;
 	}
 	

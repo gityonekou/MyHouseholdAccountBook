@@ -604,7 +604,7 @@ public class FixedCostInfoManageUseCase {
 				// 固定費支払日(支払日)
 				inputForm.getShiharaiDay(),
 				// 支払金額
-				DomainCommonUtils.convertBigDecimal(inputForm.getShiharaiKingaku(), 0));
+				DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShiharaiKingaku()));
 	}
 	
 	/**

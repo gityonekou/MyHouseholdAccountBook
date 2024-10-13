@@ -36,6 +36,9 @@ public class SyuusiKingaku {
 	// 収支金額
 	private final BigDecimal value;
 	
+	// 値が0の「収支金額」項目の値
+	public static final SyuusiKingaku ZERO = SyuusiKingaku.from(BigDecimal.ZERO.setScale(2));
+	
 	/**
 	 *<pre>
 	 * 「収支金額」項目の値を表すドメインタイプを生成します

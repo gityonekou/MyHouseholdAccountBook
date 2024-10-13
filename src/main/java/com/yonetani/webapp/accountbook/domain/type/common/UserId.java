@@ -41,6 +41,7 @@ public class UserId {
 	 * 
 	 * [ガード節]
 	 * ・空文字列
+	 * ・長さ50文字以内
 	 *</pre>
 	 * @param userId ユーザID
 	 * @return 「ユーザID」項目ドメインタイプ
@@ -50,6 +51,10 @@ public class UserId {
 		// ガード節(空文字列)
 		if(!StringUtils.hasLength(userId)) {
 			throw new MyHouseholdAccountBookRuntimeException("「ユーザID」項目の設定値が空文字列です。管理者に問い合わせてください。");
+		}
+		// ガード節(長さ50文字以内)
+		if(userId.length() > 50) {
+			throw new MyHouseholdAccountBookRuntimeException("「ユーザID」項目の設定値が不正です。管理者に問い合わせてください。[userId=" + userId + "]");
 		}
 		return new UserId(userId);
 	}

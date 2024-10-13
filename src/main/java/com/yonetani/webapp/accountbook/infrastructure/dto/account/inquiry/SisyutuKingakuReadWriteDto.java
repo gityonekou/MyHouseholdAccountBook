@@ -1,11 +1,10 @@
 /**
- * 支出金額テーブルと支出アイテムテーブルと結合し、
- * 支出項目ごとに対応する金額を表した結果を格納するDTOです。
+ * 支出金額テーブル：SISYUTU_KINGAKU_TABLE読込・出力情報です。
  *
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  コメントなど
- * 2023/09/30 : 1.00.00  新規作成
+ * 2024/10/13 : 1.00.00  新規作成
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry;
@@ -19,8 +18,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  *<pre>
- * 支出金額テーブルと支出アイテムテーブルと結合し、
- * 支出項目ごとに対応する金額を表した結果を格納するDTOです。
+ * 支出金額テーブル：SISYUTU_KINGAKU_TABLE読込・出力情報です。
  *
  *</pre>
  *
@@ -30,17 +28,19 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class SisyutuKingakuAndSisyutuItemReadDto {
+public class SisyutuKingakuReadWriteDto {
+	// ユーザID
+	private final String userId;
 	// 対象年
 	private final String targetYear;
 	// 対象月
 	private final String targetMonth;
 	// 支出項目コード
 	private final String sisyutuItemCode;
-	// 支出項目名
-	private final String sisyutuItemName;
-	// 支出項目レベル(1～5):
-	private final String sisyutuItemLevel;
+	// 親支出項目コード
+	private final String parentSisyutuItemCode;
+	// 支出予定金額
+	private final BigDecimal sisyutuYoteiKingaku;
 	// 支出金額
 	private final BigDecimal sisyutuKingaku;
 	// 支出金額B
@@ -49,4 +49,5 @@ public class SisyutuKingakuAndSisyutuItemReadDto {
 	private final BigDecimal sisyutuKingakuC;
 	// 支出支払日
 	private final LocalDate sisyutuSiharaiDate;
+	
 }

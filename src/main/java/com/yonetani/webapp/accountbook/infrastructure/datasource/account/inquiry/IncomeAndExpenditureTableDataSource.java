@@ -67,9 +67,8 @@ public class IncomeAndExpenditureTableDataSource implements IncomeAndExpenditure
 	@Override
 	public IncomeAndExpenditureInquiryList select(SearchQueryUserIdAndYear searchQuery) {
 		// 検索結果を取得
-		List<IncomeAndExpenditureReadWriteDto> result = mapper.selectUserIdAndYear(UserIdAndYearSearchQueryDto.from(
-				searchQuery.getUserId().getValue(),
-				searchQuery.getYear().getValue()));
+		List<IncomeAndExpenditureReadWriteDto> result = mapper.selectUserIdAndYear(
+				UserIdAndYearSearchQueryDto.from(searchQuery));
 		// 検索結果をドメインモデルに変換して返却
 		return IncomeAndExpenditureInquiryList.from(result.stream().map(dto ->	 createIncomeAndExpenditureItem(dto))
 					.collect(Collectors.toUnmodifiableList()));
@@ -81,11 +80,8 @@ public class IncomeAndExpenditureTableDataSource implements IncomeAndExpenditure
 	@Override
 	public IncomeAndExpenditureItem select(SearchQueryUserIdAndYearMonth searchQuery) {
 		// 検索結果を取得
-		IncomeAndExpenditureReadWriteDto result = mapper.selectUserIdAndYearMonth(UserIdAndYearMonthSearchQueryDto.from(
-				searchQuery.getUserId().getValue(),
-				searchQuery.getYearMonth().getYear(),
-				searchQuery.getYearMonth().getMonth()
-				));
+		IncomeAndExpenditureReadWriteDto result = mapper.selectUserIdAndYearMonth(
+				UserIdAndYearMonthSearchQueryDto.from(searchQuery));
 		// 検索結果をドメインモデルに変換して返却
 		if(result != null) {
 			return createIncomeAndExpenditureItem(result);

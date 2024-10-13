@@ -75,8 +75,7 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 	public ShoppingItem findByIdAndShoppingItemCode(SearchQueryUserIdAndShoppingItemCode search) {
 		// 検索結果を取得
 		ShoppingItemReadWriteDto searchResult = mapper.findByIdAndShoppingItemCode(
-				UserIdAndShoppingItemCodeSearchQueryDto.from(
-						search.getUserId().getValue(), search.getShoppingItemCode().getValue()));
+				UserIdAndShoppingItemCodeSearchQueryDto.from(search));
 		if(searchResult == null) {
 			// 検索結果なしの場合、nullを返却
 			return null;
@@ -92,8 +91,8 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 	@Override
 	public ShoppingItemInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search) {
 		// 検索結果を取得
-		List<ShoppingItemInquiryReadDto> searchResult = mapper.findByIdAndSisyutuItemCode(UserIdAndSisyutuItemCodeSearchQueryDto.from(
-				search.getUserId().getValue(), search.getSisyutuItemCode().getValue()));
+		List<ShoppingItemInquiryReadDto> searchResult = mapper.findByIdAndSisyutuItemCode(
+				UserIdAndSisyutuItemCodeSearchQueryDto.from(search));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return ShoppingItemInquiryList.from(null);
@@ -110,8 +109,8 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 	@Override
 	public ShoppingItemInquiryList findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode search) {
 		// 検索結果を取得
-		List<ShoppingItemInquiryReadDto> searchResult = mapper.findByIdAndShoppingItemJanCode(UserIdAndShoppingItemJanCodeSearchQueryDto.from(
-				search.getUserId().getValue(), search.getShoppingItemJanCode().getValue()));
+		List<ShoppingItemInquiryReadDto> searchResult = mapper.findByIdAndShoppingItemJanCode(
+				UserIdAndShoppingItemJanCodeSearchQueryDto.from(search));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return ShoppingItemInquiryList.from(null);
@@ -147,7 +146,7 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 	@Override
 	public int countById(SearchQueryUserId userId) {
 		// ユーザIDで検索し、登録されている商品の件数を返す
-		return mapper.countById(UserIdSearchQueryDto.from(userId.getUserId().getValue()));
+		return mapper.countById(UserIdSearchQueryDto.from(userId));
 	}
 	
 	/**
@@ -156,8 +155,7 @@ public class ShoppingItemTableDataSource implements ShoppingItemTableRepository 
 	@Override
 	public int countByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode search) {
 		// ユーザID、商品JANコードで検索し、登録されている商品の件数を返す
-		return mapper.countByIdAndShoppingItemJanCode(UserIdAndShoppingItemJanCodeSearchQueryDto.from(
-				search.getUserId().getValue(), search.getShoppingItemJanCode().getValue()));
+		return mapper.countByIdAndShoppingItemJanCode(UserIdAndShoppingItemJanCodeSearchQueryDto.from(search));
 	}
 	
 	/**

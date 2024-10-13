@@ -11,6 +11,8 @@
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.searchquery;
 
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -37,15 +39,18 @@ public class UserIdAndYearSearchQueryDto {
 	
 	/**
 	 *<pre>
-	 * 引数のパラメータ値をもとにUserIdAndYearSearchQueryDtoを生成して返します。
+	 * 検索条件のドメイン情報をもとにUserIdAndYearSearchQueryDtoを生成して返します。
 	 *</pre>
-	 * @param userId 検索条件:ユーザID
-	 * @param targetYear 検索条件:対象年
+	 * @param search 検索条件(ユーザID、対象年)
 	 * @return テーブルの検索条件：ユーザID、対象年
 	 *
 	 */
-	public static UserIdAndYearSearchQueryDto from(String userId, String targetYear) {
-		return new UserIdAndYearSearchQueryDto(userId, targetYear);
+	public static UserIdAndYearSearchQueryDto from(SearchQueryUserIdAndYear search) {
+		return new UserIdAndYearSearchQueryDto(
+				// 検索条件:ユーザID
+				search.getUserId().getValue(),
+				// 検索条件:対象年
+				search.getYear().getValue());
 	}
 	
 }

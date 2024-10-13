@@ -39,7 +39,7 @@ public class UserIdAndEventCodeSearchQueryDto {
 	
 	/**
 	 *<pre>
-	 * 引数のパラメータ値をもとにUserIdAndEventCodeSearchQueryDtoを生成して返します。
+	 * 検索条件のドメイン情報をもとにUserIdAndEventCodeSearchQueryDtoを生成して返します。
 	 *</pre>
 	 * @param search 検索条件(ユーザID、イベントコード)
 	 * @return テーブルの検索条件：ユーザID、イベントコード
@@ -47,9 +47,9 @@ public class UserIdAndEventCodeSearchQueryDto {
 	 */
 	public static UserIdAndEventCodeSearchQueryDto from(SearchQueryUserIdAndEventCode search) {
 		return new UserIdAndEventCodeSearchQueryDto(
-				// ユーザID
+				// 検索条件:ユーザID
 				search.getUserId().getValue(),
-				// イベントコード
+				// 検索条件:イベントコード
 				search.getEventCode().getValue());
 	}
 }

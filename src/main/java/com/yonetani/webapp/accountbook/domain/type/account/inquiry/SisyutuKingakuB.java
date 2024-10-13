@@ -12,6 +12,7 @@ package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 
 import lombok.AccessLevel;
@@ -41,28 +42,43 @@ public class SisyutuKingakuB {
 	/**
 	 *<pre>
 	 * 「支出金額B」項目の値を表すドメインタイプを生成します
+	 * 
+	 * [非ガード節]
+	 * ・支出金額Bがnull値
+	 * [ガード節]
+	 * ・支出金額がnull値
+	 * ・支出金額Bがマイナス値
+	 * ・支出金額Bがスケール値が2以外
+	 * 
 	 *</pre>
-	 *@param sisyutuKingaku 支出金額
-	 * @param sisyutuKingakuB 支出金額B
+	 * @param kingakub 支出金額B
+	 * @param sisyutuKingaku 支出金額
 	 * @return 「支出金額B」項目(支出金額B, 割合)ドメインタイプ
 	 *
 	 */
-	public static SisyutuKingakuB from(BigDecimal kingaku, BigDecimal kingakub) {
-		// null値判定
-		if(kingaku == null || kingakub == null) {
+	public static SisyutuKingakuB from(BigDecimal kingakub, SisyutuKingaku sisyutuKingaku) {
+		
+		// ガード節(支出金額がnull値)
+		if(sisyutuKingaku == null) {
+			throw new MyHouseholdAccountBookRuntimeException("「支出金額B」項目の設定値が不正です。管理者に問い合わせてください。[sisyutuKingaku=null]");
+		}
+		// 非ガード(支出金額Bがnull値の場合、値nullの「支出金額B」項目ドメインタイプを生成
+		if (kingakub == null) {
 			return new SisyutuKingakuB(null, null);
-		// 支払金額Bの値から「支出金額B」項目を作成する
-		} else if(kingaku.compareTo(BigDecimal.ZERO) > 0 && kingakub.compareTo(BigDecimal.ZERO) > 0) {
-			// 支払金額Bの値が0以上の場合は支払金額項目Bの値から割合の値を設定
-			// 支払金額Bの割合=支出金額B/支出金額 * 100(四捨五入)
-			BigDecimal pt = kingakub.divide(kingaku, 2, RoundingMode.HALF_UP).multiply(new BigDecimal("100"));
-			return new SisyutuKingakuB(kingakub, pt);
-
-		} else {
-			// 支払金額Bの値が0以下の場合は支払金額項目Bの値はnullで設定
-			return new SisyutuKingakuB(kingakub, null);
+		}
+		// ガード節(支出金額Bがマイナス値)
+		if (BigDecimal.ZERO.compareTo(kingakub) > 0) {
+			throw new MyHouseholdAccountBookRuntimeException("「支出金額B」項目の設定値が不正です。管理者に問い合わせてください。[value=" + kingakub.intValue() + "]");
+		}
+		// ガード節(支出金額Bのスケール値が2以外)
+		if (kingakub.scale() != 2) {
+			throw new MyHouseholdAccountBookRuntimeException("「支出金額B」項目の設定値が不正です。管理者に問い合わせてください。[value=" + kingakub.scale() + "]");
 		}
 		
+		// 設定値OKの場合、支出金額Bの値と支出金額をもとに支出金額B項目ドメインタイプを生成
+		// 支出金額Bの割合=支出金額B/支出金額 * 100(四捨五入)
+		BigDecimal pt = kingakub.divide(sisyutuKingaku.getValue(), 2, RoundingMode.HALF_UP).multiply(DomainCommonUtils.ONE_HUNDRED_BIGDECIMAL);
+		return new SisyutuKingakuB(kingakub, pt);
 		
 	}
 	

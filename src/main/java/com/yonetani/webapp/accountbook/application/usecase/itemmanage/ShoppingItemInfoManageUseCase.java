@@ -636,7 +636,7 @@ public class ShoppingItemInfoManageUseCase {
 				// 基準店舗コード
 				inputForm.getStandardShopCode(),
 				// 基準価格
-				DomainCommonUtils.convertBigDecimal(inputForm.getStandardPrice(), 0),
+				DomainCommonUtils.convertKingakuBigDecimal(inputForm.getStandardPrice()),
 				// 内容量
 				inputForm.getShoppingItemCapacity(),
 				// 内容量単位

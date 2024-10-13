@@ -74,7 +74,7 @@ public class AdminMenuUserInfoDataSource implements AdminMenuUserInfoRepository 
 					dto.getUserName(),
 					dto.isEnabled(),
 					toUserRoleDomainList(userInfoListAuthoritiesMapper.selectAuthority(
-							UserIdSearchQueryDto.from(dto.getUserId()))),
+							UserIdSearchQueryDto.fromString(dto.getUserId()))),
 					dto.getNowTargetYear(),
 					dto.getNowTargetMonth())
 		).collect(Collectors.toUnmodifiableList()));
@@ -87,7 +87,7 @@ public class AdminMenuUserInfoDataSource implements AdminMenuUserInfoRepository 
 	@Override
 	public AdminMenuUserInfo getUserInfo(SearchQueryUserId userId) {
 		// 指定ユーザIDに対応するユーザ情報を取得
-		AdminMenuUserInfoDto dto = userInfoListMapper.selectUserInfo(UserIdSearchQueryDto.from(userId.getUserId().getValue()));
+		AdminMenuUserInfoDto dto = userInfoListMapper.selectUserInfo(UserIdSearchQueryDto.from(userId));
 		if(dto == null) {
 			return null;
 		} else {
@@ -96,7 +96,7 @@ public class AdminMenuUserInfoDataSource implements AdminMenuUserInfoRepository 
 					dto.getUserName(),
 					dto.isEnabled(),
 					toUserRoleDomainList(userInfoListAuthoritiesMapper.selectAuthority(
-							UserIdSearchQueryDto.from(dto.getUserId()))),
+							UserIdSearchQueryDto.fromString(dto.getUserId()))),
 					// パスワードは取得しないので空文字列を設定
 					"", 
 					dto.getNowTargetYear(),

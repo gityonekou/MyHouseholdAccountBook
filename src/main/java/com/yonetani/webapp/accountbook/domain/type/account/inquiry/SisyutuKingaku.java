@@ -35,7 +35,10 @@ import lombok.RequiredArgsConstructor;
 public class SisyutuKingaku {
 	// 支出金額
 	private final BigDecimal value;
-
+	
+	// 値が0の「支出金額」項目の値
+	public static final SisyutuKingaku ZERO = SisyutuKingaku.from(BigDecimal.ZERO.setScale(2));
+	
 	/**
 	 *<pre>
 	 * 「支出金額」項目の値を表すドメインタイプを生成します

@@ -11,6 +11,8 @@
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.searchquery;
 
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemJanCode;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -37,14 +39,17 @@ public class UserIdAndShoppingItemJanCodeSearchQueryDto {
 	
 	/**
 	 *<pre>
-	 * 引数のパラメータ値をもとにUserIdAndShoppingItemJanCodeSearchQueryDtoを生成して返します。
+	 * 検索条件のドメイン情報をもとにUserIdAndShoppingItemJanCodeSearchQueryDtoを生成して返します。
 	 *</pre>
-	 * @param userId ユーザID
-	 * @param shoppingItemJanCode 商品JANコード
+	 * @param search 検索条件(ユーザID、商品JANコード)
 	 * @return テーブルの検索条件：ユーザID、商品JANコード
 	 *
 	 */
-	public static UserIdAndShoppingItemJanCodeSearchQueryDto from(String userId, String shoppingItemJanCode) {
-		return new UserIdAndShoppingItemJanCodeSearchQueryDto(userId, shoppingItemJanCode);
+	public static UserIdAndShoppingItemJanCodeSearchQueryDto from(SearchQueryUserIdAndShoppingItemJanCode search) {
+		return new UserIdAndShoppingItemJanCodeSearchQueryDto(
+				// 検索条件:ユーザID
+				search.getUserId().getValue(),
+				// 検索条件:商品JANコード
+				search.getShoppingItemJanCode().getValue());
 	}
 }

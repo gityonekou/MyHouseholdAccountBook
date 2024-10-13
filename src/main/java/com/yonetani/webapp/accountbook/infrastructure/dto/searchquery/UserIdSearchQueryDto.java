@@ -10,6 +10,8 @@
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.searchquery;
 
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -33,13 +35,25 @@ public class UserIdSearchQueryDto {
 	
 	/**
 	 *<pre>
-	 * ユーザIDの文字列を元にUserIdSearchQueryDtoを生成して返します。
+	 * 引数の値をもとにUserIdSearchQueryDtoを生成して返します。
 	 *</pre>
-	 * @param search 検索条件(String):ユーザID
+	 * @param userId 検索条件:ユーザID
 	 * @return テーブルの検索条件：ユーザID
 	 *
 	 */
-	public static UserIdSearchQueryDto from(String search) {
-		return new UserIdSearchQueryDto(search);
+	public static UserIdSearchQueryDto fromString(String userId) {
+		return new UserIdSearchQueryDto(userId);
+	}
+	
+	/**
+	 *<pre>
+	 * 検索条件のドメイン情報をもとにUserIdSearchQueryDtoを生成して返します。
+	 *</pre>
+	 * @param search 検索条件(ユーザID)
+	 * @return テーブルの検索条件：ユーザID
+	 *
+	 */
+	public static UserIdSearchQueryDto from(SearchQueryUserId search) {
+		return new UserIdSearchQueryDto(search.getUserId().getValue());
 	}
 }

@@ -82,8 +82,8 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	@Override
 	public FixedCost findByIdAndFixedCostCode(SearchQueryUserIdAndFixedCostCode search) {
 		// 検索結果を取得
-		FixedCostReadWriteDto searchResult = mapper.findByIdAndFixedCostCode(UserIdAndFixedCostCodeSearchQueryDto.from(
-				search.getUserId().getValue(), search.getFixedCostCode().getValue()));
+		FixedCostReadWriteDto searchResult = mapper.findByIdAndFixedCostCode(
+				UserIdAndFixedCostCodeSearchQueryDto.from(search));
 		if(searchResult == null) {
 			// 検索結果なしの場合、nullを返却
 			return null;
@@ -100,7 +100,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	public FixedCostInquiryList findById(SearchQueryUserId userId) {
 		// 検索結果を取得
 		List<FixedCostInquiryReadDto> searchResult = mapper.findById(
-				UserIdSearchQueryDto.from(userId.getUserId().getValue()));
+				UserIdSearchQueryDto.from(userId));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return FixedCostInquiryList.from(null);
@@ -118,11 +118,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	public FixedCostInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search) {
 		// 検索結果を取得
 		List<FixedCostInquiryReadDto> searchResult = mapper.findByIdAndSisyutuItemCode(
-				UserIdAndSisyutuItemCodeSearchQueryDto.from(
-						// ユーザID
-						search.getUserId().getValue(),
-						// 支出項目コード
-						search.getSisyutuItemCode().getValue()));
+				UserIdAndSisyutuItemCodeSearchQueryDto.from(search));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return FixedCostInquiryList.from(null);
@@ -140,12 +136,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	public FixedCostList findByIdAndFixedCostShiharaiTukiList(SearchQueryUserIdAndFixedCostShiharaiTukiList search) {
 		// 検索結果を取得
 		List<FixedCostReadWriteDto> searchResult = mapper.findByIdAndFixedCostShiharaiTukiList(
-				UserIdAndFixedCostShiharaiTukiListSearchQueryDto.from(
-						// ユーザID
-						search.getUserId().getValue(),
-						// 固定費支払月のリスト
-						search.getFixedCostShiharaiTukiList().stream().map(
-								model -> model.getValue()).collect(Collectors.toUnmodifiableList())));
+				UserIdAndFixedCostShiharaiTukiListSearchQueryDto.from(search));
 		
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
@@ -163,7 +154,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	@Override
 	public int countById(SearchQueryUserId userId) {
 		// ユーザIDで検索し、登録されている固定費情報の件数を返す
-		return mapper.countById(UserIdSearchQueryDto.from(userId.getUserId().getValue()));
+		return mapper.countById(UserIdSearchQueryDto.from(userId));
 	}
 	
 	/**
@@ -172,11 +163,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	@Override
 	public int countBySisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search) {
 		// ユーザID、支出項目コードで検索し、登録されている固定費情報の件数を返す
-		return mapper.countBySisyutuItemCode(UserIdAndSisyutuItemCodeSearchQueryDto.from(
-				// ユーザID
-				search.getUserId().getValue(),
-				// 支出項目コード
-				search.getSisyutuItemCode().getValue()));
+		return mapper.countBySisyutuItemCode(UserIdAndSisyutuItemCodeSearchQueryDto.from(search));
 	}
 	
 	/**

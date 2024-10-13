@@ -11,6 +11,7 @@ package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
 
 import java.math.BigDecimal;
 
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 
 import lombok.AccessLevel;
@@ -39,12 +40,32 @@ public class ShiharaiKingaku {
 	/**
 	 *<pre>
 	 * 「支払金額」項目の値を表すドメインタイプを生成します。
+	 * 
+	 * [ガード節]
+	 * ・null値
+	 * ・マイナス値
+	 * ・スケール値が2以外
+	 * 
 	 *</pre>
 	 * @param kingaku 支払金額
 	 * @return 「支払金額」項目ドメインタイプ
 	 *
 	 */
 	public static ShiharaiKingaku from(BigDecimal kingaku) {
+		
+		// ガード節(null)
+		if(kingaku == null) {
+			throw new MyHouseholdAccountBookRuntimeException("「支払金額」項目の設定値がnullです。管理者に問い合わせてください。");
+		}
+		// ガード節(マイナス値)
+		if(BigDecimal.ZERO.compareTo(kingaku) > 0) {
+			throw new MyHouseholdAccountBookRuntimeException("「支払金額」項目の設定値がマイナスです。管理者に問い合わせてください。[value=" + kingaku.intValue() + "]");
+		}
+		// ガード節(スケール値が2以外)
+		if(kingaku.scale() != 2) {
+			throw new MyHouseholdAccountBookRuntimeException("「支払金額」項目のスケール値が不正です。管理者に問い合わせてください。[scale=" + kingaku.scale() + "]");
+		}
+		
 		return new ShiharaiKingaku(kingaku);
 	}
 	

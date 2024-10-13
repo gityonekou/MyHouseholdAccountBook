@@ -80,7 +80,7 @@ public class EventItemTableDataSource implements EventItemTableRepository {
 	@Override
 	public EventItemInquiryList findById(SearchQueryUserId userId) {
 		// 検索結果を取得
-		List<EventItemInquiryReadDto> searchResult = mapper.findById(UserIdSearchQueryDto.from(userId.getUserId().getValue()));
+		List<EventItemInquiryReadDto> searchResult = mapper.findById(UserIdSearchQueryDto.from(userId));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return EventItemInquiryList.from(null);
@@ -98,11 +98,7 @@ public class EventItemTableDataSource implements EventItemTableRepository {
 	public EventItemInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search) {
 		// 検索結果を取得
 		List<EventItemInquiryReadDto> searchResult = mapper.findByIdAndSisyutuItemCode(
-				UserIdAndSisyutuItemCodeSearchQueryDto.from(
-						// ユーザID
-						search.getUserId().getValue(),
-						// 支出項目コード
-						search.getSisyutuItemCode().getValue()));
+				UserIdAndSisyutuItemCodeSearchQueryDto.from(search));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return EventItemInquiryList.from(null);
@@ -135,7 +131,7 @@ public class EventItemTableDataSource implements EventItemTableRepository {
 	@Override
 	public int countById(SearchQueryUserId userId) {
 		// ユーザIDに対応するイベント情報の件数を返します。
-		return mapper.countById(UserIdSearchQueryDto.from(userId.getUserId().getValue()));
+		return mapper.countById(UserIdSearchQueryDto.from(userId));
 	}
 	
 	/**

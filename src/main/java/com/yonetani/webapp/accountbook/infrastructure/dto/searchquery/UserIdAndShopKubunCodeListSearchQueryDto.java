@@ -12,6 +12,9 @@
 package com.yonetani.webapp.accountbook.infrastructure.dto.searchquery;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopKubunCodeList;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -39,14 +42,17 @@ public class UserIdAndShopKubunCodeListSearchQueryDto {
 	
 	/**
 	 *<pre>
-	 * 引数のパラメータ値をもとにUserIdAndShopKubunCodeListSearchQueryDtoを生成して返します。
+	 * 検索条件のドメイン情報をもとにUserIdAndShopKubunCodeListSearchQueryDtoを生成して返します。
 	 *</pre>
-	 * @param userId ユーザID
-	 * @param shopKubunCodeList 店舗区分コードのリスト
+	 * @param search 検索条件(ユーザID、店舗区分コードのリスト)
 	 * @return テーブルの検索条件：ユーザID、店舗区分コードのリスト
 	 *
 	 */
-	public static UserIdAndShopKubunCodeListSearchQueryDto from(String userId, List<String> shopKubunCodeList) {
-		return new UserIdAndShopKubunCodeListSearchQueryDto(userId, shopKubunCodeList);
+	public static UserIdAndShopKubunCodeListSearchQueryDto from(SearchQueryUserIdAndShopKubunCodeList search) {
+		return new UserIdAndShopKubunCodeListSearchQueryDto(
+				// 検索条件:ユーザID
+				search.getUserId().getValue(),
+				// 検索条件:固定費支払月のリスト
+				search.getShopKubunCodeList().stream().map(model -> model.getValue()).collect(Collectors.toUnmodifiableList()));
 	}
 }

@@ -22,10 +22,10 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonth
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.AccountMonthInquiryRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
@@ -60,7 +60,7 @@ public class AccountMonthInquiryUseCase {
 	// ユーザ情報照会ユースケース
 	private final AccountBookUserInquiryUseCase userInquiry;
 	// 指定月の支出項目リスト取得リポジトリー
-	private final AccountMonthInquiryRepository repository;
+	private final SisyutuKingakuTableRepository repository;
 	// 収支テーブル:INCOME_AND_EXPENDITURE_TABLEリポジトリー
 	private final IncomeAndExpenditureTableRepository syuusiRepository;
 	// 収入テーブル:INCOME_TABLEリポジトリー
@@ -210,7 +210,7 @@ public class AccountMonthInquiryUseCase {
 		SearchQueryUserIdAndYearMonth inquiryModel = SearchQueryUserIdAndYearMonth.from(
 				UserId.from(user.getUserId()), TargetYearMonth.from(targetYearMonth));
 		// ユーザID,対象年月を検索条件に支出金額情報のリストを取得
-		AccountMonthInquiryExpenditureItemList resultList = repository.selectExpenditureItem(inquiryModel);
+		AccountMonthInquiryExpenditureItemList resultList = repository.select(inquiryModel);
 
 		// 支出金額情報のリスト(ドメインモデル)をレスポンスに設定
 		if(resultList.isEmpty()) {

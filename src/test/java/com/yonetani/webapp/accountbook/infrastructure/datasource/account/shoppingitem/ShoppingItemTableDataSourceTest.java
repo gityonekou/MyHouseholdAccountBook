@@ -34,6 +34,10 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemJanCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.shoppingitem.ShoppingItemTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemJanCode;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.shoppingitem.ShoppingItemTableMapper;
 
@@ -272,7 +276,7 @@ class ShoppingItemTableDataSourceTest {
 		ShoppingItem expectedData = getTestShoppingItemData(1);
 		// データ取得
 		ShoppingItem actualData = repository.findByIdAndShoppingItemCode(
-				SearchQueryUserIdAndShoppingItemCode.from(expectedData.getUserId().toString(), expectedData.getShoppingItemCode().toString()));
+				SearchQueryUserIdAndShoppingItemCode.from(expectedData.getUserId(), expectedData.getShoppingItemCode()));
 		
 		// 取得したデータが期待通りであること(全項目)
 		assertEquals(expectedData.getUserId(), actualData.getUserId(), "ユーザIDが等しいこと");
@@ -293,17 +297,17 @@ class ShoppingItemTableDataSourceTest {
 		assertEquals(getToStringStr(1), actualData.toString(), "toStringチェック");
 		
 		/* 対象データなしの場合、nullとなること(商品コード) */
-		assertNull(repository.findByIdAndShoppingItemCode(SearchQueryUserIdAndShoppingItemCode.from("TEST-USER-ID", "00004")),
+		assertNull(repository.findByIdAndShoppingItemCode(createSearchQueryUserIdAndShoppingItemCode("TEST-USER-ID", "00004")),
 				"対象データなしの場合nullとなること(商品コード)");
 		/* 対象データなしの場合、nullとなること(ユーザID) */
-		assertNull(repository.findByIdAndShoppingItemCode(SearchQueryUserIdAndShoppingItemCode.from("TEST-USER-ID_NOT_FOUND", "00001")),
+		assertNull(repository.findByIdAndShoppingItemCode(createSearchQueryUserIdAndShoppingItemCode("TEST-USER-ID_NOT_FOUND", "00001")),
 				"対象データなしの場合nullとなること(ユーザID)");
 		/* null項目の取得チェック */
 		// 期待値
 		ShoppingItem expectedNullData = getTestShoppingItemData(101);
 		// データ取得
 		ShoppingItem actualNullData = repository.findByIdAndShoppingItemCode(
-				SearchQueryUserIdAndShoppingItemCode.from(expectedNullData.getUserId().toString(), expectedNullData.getShoppingItemCode().toString()));
+				SearchQueryUserIdAndShoppingItemCode.from(expectedNullData.getUserId(), expectedNullData.getShoppingItemCode()));
 		
 		// 取得したデータが期待通りであること(Null値項目あり)
 		assertEquals(expectedNullData.getUserId(), actualNullData.getUserId(), "ユーザIDが等しいこと");
@@ -329,38 +333,38 @@ class ShoppingItemTableDataSourceTest {
 	@Sql("ShoppingItemTableDataSourceFindByIdAndSisyutuItemCodeTest.sql")
 	void testFindByIdAndSisyutuItemCode() {
 		/* 対象データなしの場合、0件となること(支出項目コード) */
-		ShoppingItemInquiryList actualNotFound = repository.findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode.from("TEST-USER-ID", "0040"));
+		ShoppingItemInquiryList actualNotFound = repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID", "0040"));
 		assertTrue(actualNotFound.isEmpty(), "対象データなしの場合0件となること(支出項目コード)");
 		assertEquals(0, actualNotFound.getValues().size(), "対象データなしの場合0件となること(支出項目コード)");
 		assertEquals("商品検索結果:0件", actualNotFound.toString(), "対象データなし(toStringチェック)");
 		/* 対象データなしの場合、0件となること(ユーザID) */
-		assertTrue(repository.findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode.from("TEST-USER-ID_NOT_FOUND", "0010")).isEmpty(),
+		assertTrue(repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID_NOT_FOUND", "0010")).isEmpty(),
 				"対象データなしの場合0件となること(ユーザID)");
 		/* 対象データなしの場合、0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:ユーザID)) */
-		assertTrue(repository.findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode.from("TEST-USER-ID2", "0010")).isEmpty(),
+		assertTrue(repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID2", "0010")).isEmpty(),
 				"対象データなしの場合0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:ユーザID))");
 		/* 対象データなしの場合、0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:支出項目コード)) */
-		assertTrue(repository.findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode.from("TEST-USER-ID", "0030")).isEmpty(),
+		assertTrue(repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID", "0030")).isEmpty(),
 				"対象データなしの場合0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:支出項目コード))");
 		/* 対象データ1件(店舗コードに対応する店舗名なし) */
-		ShoppingItemInquiryList actual1 = repository.findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode.from("TEST-USER-ID", "0011"));
+		ShoppingItemInquiryList actual1 = repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID", "0011"));
 		assertEquals(1, actual1.getValues().size(), "対象データ1件(店舗コードに対応する店舗名なし)");
 		assertIterableEquals(getTestShoppingItemInquiryItemListData(1), actual1.getValues(), "検索結果が正しいこと:対象データ1件(店舗コードに対応する店舗名なし)");
 		/* 対象データ1件(NULL値項目) */
-		ShoppingItemInquiryList actual2 = repository.findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode.from("TEST-USER-ID", "0020"));
+		ShoppingItemInquiryList actual2 = repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID", "0020"));
 		assertEquals(1, actual2.getValues().size(), "対象データ1件(NULL値項目)");
 		assertIterableEquals(getTestShoppingItemInquiryItemListData(2), actual2.getValues(), "検索結果が正しいこと:対象データ1件(NULL値項目)");
 		/* 対象データ1件(全項目) */
-		ShoppingItemInquiryList actual3 = repository.findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode.from("TEST-USER-ID", "0017"));
+		ShoppingItemInquiryList actual3 = repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID", "0017"));
 		assertEquals(1, actual3.getValues().size(), "対象データ1件(全項目)");
 		assertIterableEquals(getTestShoppingItemInquiryItemListData(3), actual3.getValues(), "検索結果が正しいこと:対象データ1件(全項目)");
 		assertEquals(getToStringStr(2), actual3.toString(), "対象データ1件(全項目)");
 		/* 対象データ2件(店舗コードに対応する店舗名なし(店舗名なし商品コード:00001、全項目商品コード:00005) 商品コードの降順で表示 */
-		ShoppingItemInquiryList actual4 = repository.findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode.from("TEST-USER-ID", "0010"));
+		ShoppingItemInquiryList actual4 = repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID", "0010"));
 		assertEquals(2, actual4.getValues().size(), "対象データ2件(店舗コードに対応する店舗名なし(1件)、全項目1件)");
 		assertIterableEquals(getTestShoppingItemInquiryItemListData(4), actual4.getValues(), "検索結果とソート結果が正しいこと:対象データ2件(店舗コードに対応する店舗名なし(1件)、全項目1件)");
 		/* 対象データ2件(全項目2件) 商品コードの降順で表示 */
-		ShoppingItemInquiryList actual5 = repository.findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode.from("TEST-USER-ID", "0023"));
+		ShoppingItemInquiryList actual5 = repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID", "0023"));
 		assertEquals(2, actual5.getValues().size(), "対象データ2件(全項目2件)");
 		assertIterableEquals(getTestShoppingItemInquiryItemListData(5), actual5.getValues(), "検索結果とソート結果が正しいこと:対象データ2件(全項目2件)");
 	}
@@ -372,35 +376,35 @@ class ShoppingItemTableDataSourceTest {
 	@Sql("ShoppingItemTableDataSourceFindByIdAndShoppingItemJanCodeTest.sql")
 	void testFindByIdAndShoppingItemJanCode() {
 		/* 対象データなしの場合、0件となること(商品JANコード) */
-		assertTrue(repository.findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "9999999999999")).isEmpty(),
+		assertTrue(repository.findByIdAndShoppingItemJanCode(createSearchQueryUserIdAndShoppingItemJanCode("TEST-USER-ID", "9999999999999")).isEmpty(),
 				"対象データなしの場合0件となること(商品JANコード)");
 		/* 対象データなしの場合、0件となること(ユーザID) */
-		assertTrue(repository.findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID_NOT_FOUND", "1234567890100")).isEmpty(),
+		assertTrue(repository.findByIdAndShoppingItemJanCode(createSearchQueryUserIdAndShoppingItemJanCode("TEST-USER-ID_NOT_FOUND", "1234567890100")).isEmpty(),
 				"対象データなしの場合0件となること(ユーザID)");
 		/* 対象データなしの場合、0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:ユーザID)) */
-		assertTrue(repository.findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID2", "1234567890100")).isEmpty(),
+		assertTrue(repository.findByIdAndShoppingItemJanCode(createSearchQueryUserIdAndShoppingItemJanCode("TEST-USER-ID2", "1234567890100")).isEmpty(),
 				"対象データなしの場合0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:ユーザID))");
 		/* 対象データなしの場合、0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:支出項目コード)) */
-		assertTrue(repository.findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "0030")).isEmpty(),
+		assertTrue(repository.findByIdAndShoppingItemJanCode(createSearchQueryUserIdAndShoppingItemJanCode("TEST-USER-ID", "0030")).isEmpty(),
 				"対象データなしの場合0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:支出項目コード))");
 		/* 対象データ1件(店舗コードに対応する店舗名なし) */
-		ShoppingItemInquiryList actual1 = repository.findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "1234567890400"));
+		ShoppingItemInquiryList actual1 = repository.findByIdAndShoppingItemJanCode(createSearchQueryUserIdAndShoppingItemJanCode("TEST-USER-ID", "1234567890400"));
 		assertEquals(1, actual1.getValues().size(), "対象データ1件(店舗コードに対応する店舗名なし)");
 		assertIterableEquals(getTestShoppingItemInquiryItemListData(101), actual1.getValues(), "検索結果が正しいこと:対象データ1件(店舗コードに対応する店舗名なし)");
 		/* 対象データ1件(NULL値項目) */
-		ShoppingItemInquiryList actual2 = repository.findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "1234567890600"));
+		ShoppingItemInquiryList actual2 = repository.findByIdAndShoppingItemJanCode(createSearchQueryUserIdAndShoppingItemJanCode("TEST-USER-ID", "1234567890600"));
 		assertEquals(1, actual2.getValues().size(), "対象データ1件(NULL値項目)");
 		assertIterableEquals(getTestShoppingItemInquiryItemListData(102), actual2.getValues(), "検索結果が正しいこと:対象データ1件(NULL値項目)");
 		/* 対象データ1件(全項目) */
-		ShoppingItemInquiryList actual3 = repository.findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "1234567890700"));
+		ShoppingItemInquiryList actual3 = repository.findByIdAndShoppingItemJanCode(createSearchQueryUserIdAndShoppingItemJanCode("TEST-USER-ID", "1234567890700"));
 		assertEquals(1, actual3.getValues().size(), "対象データ1件(全項目)");
 		assertIterableEquals(getTestShoppingItemInquiryItemListData(103), actual3.getValues(), "検索結果が正しいこと:対象データ1件(全項目)");
 		/* 対象データ2件(店舗コードに対応する店舗名なし(店舗名なし商品コード:00008、全項目商品コード:00009)) 商品コードの降順で表示 */
-		ShoppingItemInquiryList actual4 = repository.findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "1234567890800"));
+		ShoppingItemInquiryList actual4 = repository.findByIdAndShoppingItemJanCode(createSearchQueryUserIdAndShoppingItemJanCode("TEST-USER-ID", "1234567890800"));
 		assertEquals(2, actual4.getValues().size(), "対象データ2件(店舗コードに対応する店舗名なし(1件)、全項目1件)");
 		assertIterableEquals(getTestShoppingItemInquiryItemListData(104), actual4.getValues(), "検索結果とソート結果が正しいこと:対象データ2件(店舗コードに対応する店舗名なし(1件)、全項目1件)");
 		/* 対象データ2件(全項目2件) 商品コードの降順で表示 */
-		ShoppingItemInquiryList actual5 = repository.findByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "1234567890100"));
+		ShoppingItemInquiryList actual5 = repository.findByIdAndShoppingItemJanCode(createSearchQueryUserIdAndShoppingItemJanCode("TEST-USER-ID", "1234567890100"));
 		assertEquals(2, actual5.getValues().size(), "対象データ2件(全項目2件)");
 		assertIterableEquals(getTestShoppingItemInquiryItemListData(105), actual5.getValues(), "検索結果とソート結果が正しいこと:対象データ2件(全項目2件)");
 	}
@@ -420,9 +424,9 @@ class ShoppingItemTableDataSourceTest {
 	@Sql("ShoppingItemTableDataSourceCountByIdTest.sql")
 	void testCountById() {
 		/* 対象データなしの場合、0件となること */
-		assertEquals(0, repository.countById(SearchQueryUserId.from("TEST-USER-ID_NOT_FOUND")), "対象データなしの場合、0件となること");
+		assertEquals(0, repository.countById(createSearchQueryUserId("TEST-USER-ID_NOT_FOUND")), "対象データなしの場合、0件となること");
 		/* 登録済みデータ2件の場合、2件となること */
-		assertEquals(2, repository.countById(SearchQueryUserId.from("TEST-USER-ID")), "登録済みデータ2件の場合、2件となること");
+		assertEquals(2, repository.countById(createSearchQueryUserId("TEST-USER-ID")), "登録済みデータ2件の場合、2件となること");
 	}
 
 	/**
@@ -432,13 +436,13 @@ class ShoppingItemTableDataSourceTest {
 	@Sql("ShoppingItemTableDataSourceCountByIdAndShoppingItemJanCodeTest.sql")
 	void testCountByIdAndShoppingItemJanCode() {
 		/* 対象データなしの場合、0件となること(ユーザID) */
-		assertEquals(0, repository.countByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID_NOT_FOUND", "1234567890100")), "対象データなしの場合、0件となること(ユーザID)");
+		assertEquals(0, repository.countByIdAndShoppingItemJanCode(createSearchQueryUserIdAndShoppingItemJanCode("TEST-USER-ID_NOT_FOUND", "1234567890100")), "対象データなしの場合、0件となること(ユーザID)");
 		/* 対象データなしの場合、0件となること(商品JANコード) */
-		assertEquals(0, repository.countByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "9999999999999")), "対象データなしの場合、0件となること(商品JANコード)");
+		assertEquals(0, repository.countByIdAndShoppingItemJanCode(createSearchQueryUserIdAndShoppingItemJanCode("TEST-USER-ID", "9999999999999")), "対象データなしの場合、0件となること(商品JANコード)");
 		/* 登録済みデータ3件で対象データ1件の場合、1件となること */
-		assertEquals(1, repository.countByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "1234567890100")), "登録済みデータ3件で対象データ1件の場合、1件となること");
+		assertEquals(1, repository.countByIdAndShoppingItemJanCode(createSearchQueryUserIdAndShoppingItemJanCode("TEST-USER-ID", "1234567890100")), "登録済みデータ3件で対象データ1件の場合、1件となること");
 		/* 登録済みデータ3件で対象データ2件の場合、2件となること */
-		assertEquals(2, repository.countByIdAndShoppingItemJanCode(SearchQueryUserIdAndShoppingItemJanCode.from("TEST-USER-ID", "1234567890600")), "登録済みデータ3件で対象データ2件の場合、2件となること");
+		assertEquals(2, repository.countByIdAndShoppingItemJanCode(createSearchQueryUserIdAndShoppingItemJanCode("TEST-USER-ID", "1234567890600")), "登録済みデータ3件で対象データ2件の場合、2件となること");
 	}
 	
 	/**
@@ -455,19 +459,19 @@ class ShoppingItemTableDataSourceTest {
 		switch (type) {
 			case 1:
 				// 基準価格(BigDecimal)はDBの該当項目の小数点以下桁数のスケールに合わせる
-				data = ShoppingItem.from("TEST-USER-ID", "00001", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertBigDecimal(1180, 2), 110, "01", 1100);
+				data = ShoppingItem.from("TEST-USER-ID", "00001", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100);
 				break;
 			case 2:
 				// 基準価格(BigDecimal)はDBの該当項目の小数点以下桁数のスケールに合わせる
-				data = ShoppingItem.from("TEST-USER-ID", "00002", "商品区分名２", "商品名２", "商品詳細２", "1234567890200", "0020", "会社名２", "020", DomainCommonUtils.convertBigDecimal(1280, 2), 120, "02", 1200);
+				data = ShoppingItem.from("TEST-USER-ID", "00002", "商品区分名２", "商品名２", "商品詳細２", "1234567890200", "0020", "会社名２", "020", DomainCommonUtils.convertKingakuBigDecimal(1280), 120, "02", 1200);
 				break;
 			case 3:
 				// 基準価格(BigDecimal)はDBの該当項目の小数点以下桁数のスケールに合わせる
-				data = ShoppingItem.from("TEST-USER-ID", "00003", "商品区分名３", "商品名３", "商品詳細３", "1234567890300", "0030", "会社名３", "030", DomainCommonUtils.convertBigDecimal(1380, 2), 130, "03", 1300);
+				data = ShoppingItem.from("TEST-USER-ID", "00003", "商品区分名３", "商品名３", "商品詳細３", "1234567890300", "0030", "会社名３", "030", DomainCommonUtils.convertKingakuBigDecimal(1380), 130, "03", 1300);
 				break;
 			case 4:
 				// 基準価格(BigDecimal)はDBの該当項目の小数点以下桁数のスケールに合わせる
-				data = ShoppingItem.from("TEST-USER-ID", "00004", "商品区分名４", "商品名４", "商品詳細４", "1234567890400", "0040", "会社名４", "040", DomainCommonUtils.convertBigDecimal(1480, 2), 140, "04", 1400);
+				data = ShoppingItem.from("TEST-USER-ID", "00004", "商品区分名４", "商品名４", "商品詳細４", "1234567890400", "0040", "会社名４", "040", DomainCommonUtils.convertKingakuBigDecimal(1480), 140, "04", 1400);
 				break;
 			case 5:
 				// 新規登録用null可データ
@@ -479,23 +483,23 @@ class ShoppingItemTableDataSourceTest {
 				break;
 			case 102:
 				// null不可データ(商品区分名)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", null, "商品名１", "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertBigDecimal(1180, 2), 110, "01", 1100);
+				data = ShoppingItem.from("TEST-USER-ID", "00999", null, "商品名１", "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100);
 				break;
 			case 103:
 				// null不可データ(商品名)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", null, "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertBigDecimal(1180, 2), 110, "01", 1100);
+				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", null, "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100);
 				break;
 			case 104:
 				// null不可データ(商品JANコード)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", null, "0010", "会社名１", "010", DomainCommonUtils.convertBigDecimal(1180, 2), 110, "01", 1100);
+				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", null, "0010", "会社名１", "010", DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100);
 				break;
 			case 105:
 				// null不可データ(支出項目コード)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", null, "会社名１", "010", DomainCommonUtils.convertBigDecimal(1180, 2), 110, "01", 1100);
+				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", null, "会社名１", "010", DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100);
 				break;
 			case 106:
 				// null不可データ(会社名)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", "0010", null, "010", DomainCommonUtils.convertBigDecimal(1180, 2), 110, "01", 1100);
+				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", "0010", null, "010", DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100);
 				break;
 			default:
 		}
@@ -516,42 +520,42 @@ class ShoppingItemTableDataSourceTest {
 		List<ShoppingItemInquiryItem> dataList = new ArrayList<>();
 		switch(type) {
 			case 1:
-				dataList.add(ShoppingItemInquiryItem.from("00006", "商品区分名６", "商品名６", "商品詳細６", "1334567890101", "税金支払い", "会社名６", null, DomainCommonUtils.convertBigDecimal(1183, 2), 660, "06", 6600));
+				dataList.add(ShoppingItemInquiryItem.from("00006", "商品区分名６", "商品名６", "商品詳細６", "1334567890101", "税金支払い", "会社名６", null, DomainCommonUtils.convertKingakuBigDecimal(1183), 660, "06", 6600));
 				break;
 			case 2:
 				dataList.add(ShoppingItemInquiryItem.from("00002", "商品区分名２NULL", "商品名２NULL", null, "1234567890200", "飲食日用品", "会社名２NULL", null, null, null, null, null));
 				break;
 			case 3:
-				dataList.add(ShoppingItemInquiryItem.from("00007", "商品区分名７", "商品名７", "商品詳細７", "1234567890700", "イデコ", "会社名７", "テスト店舗２", DomainCommonUtils.convertBigDecimal(2470, 2), 770, "07", 7700));
+				dataList.add(ShoppingItemInquiryItem.from("00007", "商品区分名７", "商品名７", "商品詳細７", "1234567890700", "イデコ", "会社名７", "テスト店舗２", DomainCommonUtils.convertKingakuBigDecimal(2470), 770, "07", 7700));
 				break;
 			case 4:
 				// 商品コードの降順で表示
-				dataList.add(ShoppingItemInquiryItem.from("00005", "商品区分名１", "商品名１－２", "商品詳細１－２", "2234567890100", "その他", "会社名１", "テスト店舗１０", DomainCommonUtils.convertBigDecimal(1182, 2), 111, "05", 1110));
-				dataList.add(ShoppingItemInquiryItem.from("00001", "商品区分名１", "商品名１－１", "商品詳細１－１", "1234567890100", "その他", "会社名１", null, DomainCommonUtils.convertBigDecimal(1180, 2), 110, "01", 1100));
+				dataList.add(ShoppingItemInquiryItem.from("00005", "商品区分名１", "商品名１－２", "商品詳細１－２", "2234567890100", "その他", "会社名１", "テスト店舗１０", DomainCommonUtils.convertKingakuBigDecimal(1182), 111, "05", 1110));
+				dataList.add(ShoppingItemInquiryItem.from("00001", "商品区分名１", "商品名１－１", "商品詳細１－１", "1234567890100", "その他", "会社名１", null, DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100));
 				break;
 			case 5:
 				// 商品コードの降順で表示
-				dataList.add(ShoppingItemInquiryItem.from("00009", "商品区分名９", "商品名９", "商品詳細９", "1234567891900", "食費", "会社名９", "テスト店舗３０", DomainCommonUtils.convertBigDecimal(3090, 2), 990, "99", 9900));
-				dataList.add(ShoppingItemInquiryItem.from("00008", "商品区分名８", "商品名８", "商品詳細８", "1234567891800", "食費", "会社名８", "テスト店舗２", DomainCommonUtils.convertBigDecimal(3080, 2), 880, "08", 8800));
+				dataList.add(ShoppingItemInquiryItem.from("00009", "商品区分名９", "商品名９", "商品詳細９", "1234567891900", "食費", "会社名９", "テスト店舗３０", DomainCommonUtils.convertKingakuBigDecimal(3090), 990, "99", 9900));
+				dataList.add(ShoppingItemInquiryItem.from("00008", "商品区分名８", "商品名８", "商品詳細８", "1234567891800", "食費", "会社名８", "テスト店舗２", DomainCommonUtils.convertKingakuBigDecimal(3080), 880, "08", 8800));
 				break;
 			case 101:
-				dataList.add(ShoppingItemInquiryItem.from("00004", "商品区分名４", "商品名４", "商品詳細４", "1234567890400", "税金支払い", "会社名４", null, DomainCommonUtils.convertBigDecimal(1480, 2), 140, "04", 1400));
+				dataList.add(ShoppingItemInquiryItem.from("00004", "商品区分名４", "商品名４", "商品詳細４", "1234567890400", "税金支払い", "会社名４", null, DomainCommonUtils.convertKingakuBigDecimal(1480), 140, "04", 1400));
 				break;
 			case 102:
 				dataList.add(ShoppingItemInquiryItem.from("00006", "商品区分名６NULL", "商品名６NULL", null, "1234567890600", "飲食日用品", "会社名６NULL", null, null, null, null, null));
 				break;
 			case 103:
-				dataList.add(ShoppingItemInquiryItem.from("00007", "商品区分名７", "商品名７", "商品詳細７", "1234567890700", "イデコ", "会社名７", "テスト店舗２", DomainCommonUtils.convertBigDecimal(1780, 2), 170, "07", 1700));
+				dataList.add(ShoppingItemInquiryItem.from("00007", "商品区分名７", "商品名７", "商品詳細７", "1234567890700", "イデコ", "会社名７", "テスト店舗２", DomainCommonUtils.convertKingakuBigDecimal(1780), 170, "07", 1700));
 				break;
 			case 104:
 				// 商品コードの降順で表示
-				dataList.add(ShoppingItemInquiryItem.from("00009", "商品区分名９", "商品名９", "商品詳細９", "1234567890800", "税金支払い", "会社名９", "テスト店舗３０", DomainCommonUtils.convertBigDecimal(1990, 2), 190, "99", 1900));
-				dataList.add(ShoppingItemInquiryItem.from("00008", "商品区分名８", "商品名８", "商品詳細８", "1234567890800", "食費", "会社名８", null, DomainCommonUtils.convertBigDecimal(1880, 2), 180, "08", 1800));
+				dataList.add(ShoppingItemInquiryItem.from("00009", "商品区分名９", "商品名９", "商品詳細９", "1234567890800", "税金支払い", "会社名９", "テスト店舗３０", DomainCommonUtils.convertKingakuBigDecimal(1990), 190, "99", 1900));
+				dataList.add(ShoppingItemInquiryItem.from("00008", "商品区分名８", "商品名８", "商品詳細８", "1234567890800", "食費", "会社名８", null, DomainCommonUtils.convertKingakuBigDecimal(1880), 180, "08", 1800));
 				break;
 			case 105:
 				// 商品コードの降順で表示
-				dataList.add(ShoppingItemInquiryItem.from("00005", "商品区分名１", "商品名１－２", "商品詳細１－２", "1234567890100", "その他", "会社名１", "テスト店舗１０", DomainCommonUtils.convertBigDecimal(1580, 2), 115, "05", 1155));
-				dataList.add(ShoppingItemInquiryItem.from("00001", "商品区分名１", "商品名１－１", "商品詳細１－１", "1234567890100", "その他", "会社名１", "テスト店舗２", DomainCommonUtils.convertBigDecimal(1180, 2), 112, "02", 1122));
+				dataList.add(ShoppingItemInquiryItem.from("00005", "商品区分名１", "商品名１－２", "商品詳細１－２", "1234567890100", "その他", "会社名１", "テスト店舗１０", DomainCommonUtils.convertKingakuBigDecimal(1580), 115, "05", 1155));
+				dataList.add(ShoppingItemInquiryItem.from("00001", "商品区分名１", "商品名１－１", "商品詳細１－１", "1234567890100", "その他", "会社名１", "テスト店舗２", DomainCommonUtils.convertKingakuBigDecimal(1180), 112, "02", 1122));
 				break;
 			default:
 		}
@@ -580,5 +584,56 @@ class ShoppingItemTableDataSourceTest {
 		}
 		
 		return str;
+	}
+	
+	/**
+	 *<pre>
+	 * 引数の値からSearchQueryUserIdを生成して返します。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @return 検索条件ドメイン(SearchQueryUserId)
+	 *
+	 */
+	private SearchQueryUserId createSearchQueryUserId(String userId) {
+		return SearchQueryUserId.from(UserId.from(userId));
+	}
+	
+	/**
+	 *<pre>
+	 * 引数の値からSearchQueryUserIdAndSisyutuItemCodeを生成して返します。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param sisyutuItemCode 支出項目コード
+	 * @return 検索条件ドメイン(SearchQueryUserIdAndSisyutuItemCode)
+	 *
+	 */
+	private SearchQueryUserIdAndSisyutuItemCode createSearchQueryUserIdAndSisyutuItemCode(String userId, String sisyutuItemCode) {
+		return SearchQueryUserIdAndSisyutuItemCode.from(UserId.from(userId), SisyutuItemCode.from(sisyutuItemCode));
+	}
+	
+	/**
+	 *<pre>
+	 * 引数の値からSearchQueryUserIdAndShoppingItemCodeを生成して返します。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param shoppingItemCode 商品コード
+	 * @return 検索条件ドメイン(SearchQueryUserIdAndShoppingItemCode)
+	 *
+	 */
+	private SearchQueryUserIdAndShoppingItemCode createSearchQueryUserIdAndShoppingItemCode(String userId, String shoppingItemCode) {
+		return SearchQueryUserIdAndShoppingItemCode.from(UserId.from(userId), ShoppingItemCode.from(shoppingItemCode));
+	}
+	
+	/**
+	 *<pre>
+	 * 引数の値からSearchQueryUserIdAndShoppingItemJanCodeを生成して返します。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param shoppingItemJanCode 商品JANコード
+	 * @return 検索条件ドメイン(SearchQueryUserIdAndShoppingItemJanCode)
+	 *
+	 */
+	private SearchQueryUserIdAndShoppingItemJanCode createSearchQueryUserIdAndShoppingItemJanCode(String userId, String shoppingItemJanCode) {
+		return SearchQueryUserIdAndShoppingItemJanCode.from(UserId.from(userId), ShoppingItemJanCode.from(shoppingItemJanCode));
 	}
 }
