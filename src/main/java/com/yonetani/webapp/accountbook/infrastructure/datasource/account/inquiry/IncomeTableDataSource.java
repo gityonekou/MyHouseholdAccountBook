@@ -48,7 +48,7 @@ public class IncomeTableDataSource implements IncomeTableRepository {
 	@Override
 	public int add(IncomeItem data) {
 		// 収入情報を収入テーブルに出力
-		return mapper.insert(createIncomeReadWriteDto(data));
+		return mapper.insert(IncomeReadWriteDto.from(data));
 	}
 	
 	/**
@@ -57,7 +57,7 @@ public class IncomeTableDataSource implements IncomeTableRepository {
 	@Override
 	public int update(IncomeItem data) {
 		// 収入テーブル:INCOME_TABLEを更新
-		return mapper.update(createIncomeReadWriteDto(data));
+		return mapper.update(IncomeReadWriteDto.from(data));
 	}
 	
 	/**
@@ -66,7 +66,7 @@ public class IncomeTableDataSource implements IncomeTableRepository {
 	@Override
 	public int delete(IncomeItem data) {
 		// 収入テーブル:INCOME_TABLEから指定の収入情報を論理削除
-		return mapper.delete(createIncomeReadWriteDto(data));
+		return mapper.delete(IncomeReadWriteDto.from(data));
 	}
 	
 	/**
@@ -130,33 +130,5 @@ public class IncomeTableDataSource implements IncomeTableRepository {
 				dto.getSyuunyuuKingaku(),
 				// 削除フラグ
 				dto.isDeleteFlg());
-	}
-	
-	/**
-	 *<pre>
-	 * 引数で指定した収入テーブル情報ドメインモデルから収入テーブル:INCOME_TABLE読込・出力情報を生成して返します。
-	 *</pre>
-	 * @param domain 収入テーブル情報ドメインモデル
-	 * @return 収入テーブル:INCOME_TABLE読込・出力情報
-	 *
-	 */
-	private IncomeReadWriteDto createIncomeReadWriteDto(IncomeItem domain) {
-		return IncomeReadWriteDto.from(
-				// ユーザID
-				domain.getUserId().getValue(),
-				// 対象年
-				domain.getTargetYear().getValue(),
-				// 対象月
-				domain.getTargetMonth().getValue(),
-				// 収入コード
-				domain.getSyuunyuuCode().getValue(),
-				// 収入区分
-				domain.getSyuunyuuKubun().getValue(),
-				// 収入詳細
-				domain.getSyuunyuuDetailContext().getValue(),
-				// 収入金額
-				domain.getSyuunyuuKingaku().getValue(),
-				// 削除フラグ
-				domain.getDeleteFlg().getValue());
 	}
 }

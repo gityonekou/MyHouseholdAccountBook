@@ -12,6 +12,8 @@ package com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuKingakuItem;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -49,5 +51,38 @@ public class SisyutuKingakuReadWriteDto {
 	private final BigDecimal sisyutuKingakuC;
 	// 支出支払日
 	private final LocalDate sisyutuSiharaiDate;
+	
+	/**
+	 *<pre>
+	 * 支出金額テーブル情報ドメインモデルをもとにSisyutuKingakuReadWriteDtoを生成して返します。
+	 *</pre>
+	 * @param domain 支出金額テーブル情報ドメインモデル
+	 * @return 支出金額テーブル：SISYUTU_KINGAKU_TABLE読込・出力情報
+	 *
+	 */
+	public static SisyutuKingakuReadWriteDto from(SisyutuKingakuItem domain) {
+		
+		return new SisyutuKingakuReadWriteDto(
+				// ユーザID
+				domain.getUserId().getValue(),
+				// 対象年
+				domain.getTargetYear().getValue(),
+				// 対象月
+				domain.getTargetMonth().getValue(),
+				// 支出項目コード
+				domain.getSisyutuItemCode().getValue(),
+				// 親支出項目コード
+				domain.getParentSisyutuItemCode().getValue(),
+				// 支出予定金額
+				domain.getSisyutuYoteiKingaku().getValue(),
+				// 支出金額
+				domain.getSisyutuKingaku().getValue(),
+				// 支出金額B
+				domain.getSisyutuKingakuB().getValue(),
+				// 支出金額C
+				domain.getSisyutuKingakuC().getValue(),
+				// 支出支払日
+				domain.getSisyutushiharaiDate().getValue());
+	}
 	
 }

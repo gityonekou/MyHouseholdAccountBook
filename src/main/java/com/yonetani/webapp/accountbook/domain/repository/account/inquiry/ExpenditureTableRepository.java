@@ -12,6 +12,7 @@ package com.yonetani.webapp.accountbook.domain.repository.account.inquiry;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
 
 /**
@@ -61,7 +62,17 @@ public interface ExpenditureTableRepository {
 	
 	/**
 	 *<pre>
-	 * ユーザID、対象年月に対応する支出情報を取得します。
+	 * 検索条件に一致する支出情報を取得します。
+	 *</pre>
+	 * @param searchQuery 検索条件(ユーザID, 年月,支出コード)
+	 * @return 支出情報
+	 *
+	 */
+	ExpenditureItem findByUniqueKey(SearchQueryUserIdAndYearMonthAndSisyutuCode searchQuery);
+	
+	/**
+	 *<pre>
+	 * 検索条件に一致する支出情報のリストを取得します。
 	 *</pre>
 	 * @param searchQuery 検索条件(ユーザID, 対象年月(yyyyMM))
 	 * @return 支出情報のリスト

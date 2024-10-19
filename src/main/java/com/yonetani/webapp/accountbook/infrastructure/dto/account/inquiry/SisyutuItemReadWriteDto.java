@@ -9,6 +9,8 @@
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry;
 
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -45,36 +47,30 @@ public class SisyutuItemReadWriteDto {
 	
 	/**
 	 *<pre>
-	 * 引数のパラメータ値をもとにSisyutuItemReadWriteDtoを生成して返します。
+	 * 支出項目テーブル情報ドメインモデルをもとにSisyutuItemReadWriteDtoを生成して返します。
 	 *</pre>
-	 * @param userId   ユーザID
-	 * @param sisyutuItemCode 支出項目コード
-	 * @param sisyutuItemName 支出項目名
-	 * @param sisyutuItemDetailContext 支出項目詳細内容
-	 * @param parentSisyutuItemCode 親支出項目コード
-	 * @param sisyutuItemLevel 支出項目レベル(1～5)
-	 * @param sisyutuItemSort 支出項目表示順
-	 * @param enableUpdateFlg 更新可否フラグ
-	 * @return 支出項目テーブル:SISYUTU_ITEM_TABLE出力情報
+	 * @param domain 支出項目テーブル情報ドメインモデル
+	 * @return 支出項目テーブル:SISYUTU_ITEM_TABLE読込・出力情報
 	 *
 	 */
-	public static SisyutuItemReadWriteDto from(
-			String userId,
-			String sisyutuItemCode,
-			String sisyutuItemName,
-			String sisyutuItemDetailContext,
-			String parentSisyutuItemCode,
-			String sisyutuItemLevel,
-			String sisyutuItemSort,
-			boolean enableUpdateFlg) {
+	public static SisyutuItemReadWriteDto from(SisyutuItem domain) {
+		
 		return new SisyutuItemReadWriteDto(
-				userId,
-				sisyutuItemCode,
-				sisyutuItemName,
-				sisyutuItemDetailContext, 
-				parentSisyutuItemCode,
-				sisyutuItemLevel,
-				sisyutuItemSort,
-				enableUpdateFlg);
+				// ユーザID
+				domain.getUserId().getValue(),
+				// 支出項目コード
+				domain.getSisyutuItemCode().getValue(),
+				// 支出項目名
+				domain.getSisyutuItemName().getValue(),
+				// 支出項目詳細内容
+				domain.getSisyutuItemDetailContext().getValue(),
+				// 親支出項目コード
+				domain.getParentSisyutuItemCode().getValue(),
+				// 支出項目レベル(1～5)
+				domain.getSisyutuItemLevel().toString(),
+				// 支出項目表示順
+				domain.getSisyutuItemSort().getValue(),
+				// 更新可否フラグ
+				domain.getEnableUpdateFlg().getValue());
 	}
 }

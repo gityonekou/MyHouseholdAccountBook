@@ -65,7 +65,7 @@ public interface IncomeAndExpenditureTableMapper {
 	 *
 	 */
 	@Select("sql/account/inquiry/IncomeAndExpenditureTableSelectSql01.sql")
-	List<IncomeAndExpenditureReadWriteDto> selectUserIdAndYear(@Param("dto") UserIdAndYearSearchQueryDto dto);
+	public List<IncomeAndExpenditureReadWriteDto> selectUserIdAndYear(@Param("dto") UserIdAndYearSearchQueryDto dto);
 	
 	/**
 	 *<pre>
@@ -76,5 +76,5 @@ public interface IncomeAndExpenditureTableMapper {
 	 *
 	 */
 	@Select("sql/account/inquiry/IncomeAndExpenditureTableSelectSql02.sql")
-	IncomeAndExpenditureReadWriteDto selectUserIdAndYearMonth(@Param("dto") UserIdAndYearMonthSearchQueryDto dto);
+	public IncomeAndExpenditureReadWriteDto selectUserIdAndYearMonth(@Param("dto") UserIdAndYearMonthSearchQueryDto dto);
 }

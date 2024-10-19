@@ -46,7 +46,7 @@ public interface FixedCostTableMapper {
 	 *
 	 */
 	@Insert("sql/account/fixedcost/FixedCostTableInsertSql01.sql")
-	int insert(@Param("dto") FixedCostReadWriteDto writeDto);
+	public int insert(@Param("dto") FixedCostReadWriteDto writeDto);
 	
 	/**
 	 *<pre>
@@ -57,7 +57,7 @@ public interface FixedCostTableMapper {
 	 *
 	 */
 	@Update("sql/account/fixedcost/FixedCostTableUpdateSql01.sql")
-	int update(@Param("dto") FixedCostReadWriteDto writeDto);
+	public int update(@Param("dto") FixedCostReadWriteDto writeDto);
 	
 	/**
 	 *<pre>
@@ -68,7 +68,7 @@ public interface FixedCostTableMapper {
 	 *
 	 */
 	@Update("sql/account/fixedcost/FixedCostTableUpdateSql02.sql")
-	int delete(@Param("dto") FixedCostReadWriteDto writeDto);
+	public int delete(@Param("dto") FixedCostReadWriteDto writeDto);
 	
 	/**
 	 *<pre>
@@ -79,7 +79,7 @@ public interface FixedCostTableMapper {
 	 *
 	 */
 	@Select("sql/account/fixedcost/FixedCostTableSelectSql01.sql")
-	FixedCostReadWriteDto findByIdAndFixedCostCode(@Param("dto") UserIdAndFixedCostCodeSearchQueryDto search);
+	public FixedCostReadWriteDto findByIdAndFixedCostCode(@Param("dto") UserIdAndFixedCostCodeSearchQueryDto search);
 	
 	/**
 	 *<pre>
@@ -91,7 +91,7 @@ public interface FixedCostTableMapper {
 	 *
 	 */
 	@Select("sql/account/fixedcost/FixedCostInquirySelectSql01.sql")
-	List<FixedCostInquiryReadDto> findById(@Param("dto") UserIdSearchQueryDto userId);
+	public List<FixedCostInquiryReadDto> findById(@Param("dto") UserIdSearchQueryDto userId);
 	
 	/**
 	 *<pre>
@@ -103,7 +103,7 @@ public interface FixedCostTableMapper {
 	 *
 	 */
 	@Select("sql/account/fixedcost/FixedCostInquirySelectSql02.sql")
-	List<FixedCostInquiryReadDto> findByIdAndSisyutuItemCode(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
+	public List<FixedCostInquiryReadDto> findByIdAndSisyutuItemCode(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
 	
 	/**
 	 *<pre>
@@ -114,7 +114,7 @@ public interface FixedCostTableMapper {
 	 *
 	 */
 	@Select("sql/account/fixedcost/FixedCostTableListSelectSql01.sql")
-	List<FixedCostReadWriteDto> findByIdAndFixedCostShiharaiTukiList(@Param("dto") UserIdAndFixedCostShiharaiTukiListSearchQueryDto search);
+	public List<FixedCostReadWriteDto> findByIdAndFixedCostShiharaiTukiList(@Param("dto") UserIdAndFixedCostShiharaiTukiListSearchQueryDto search);
 	
 	/**
 	 *<pre>
@@ -125,7 +125,7 @@ public interface FixedCostTableMapper {
 	 *
 	 */
 	@Select("sql/account/fixedcost/FixedCostTableCountSql01.sql")
-	int countById(@Param("dto") UserIdSearchQueryDto userId);
+	public int countById(@Param("dto") UserIdSearchQueryDto userId);
 
 	/**
 	 *<pre>
@@ -136,6 +136,6 @@ public interface FixedCostTableMapper {
 	 *
 	 */
 	@Select("sql/account/fixedcost/FixedCostTableCountSql02.sql")
-	int countBySisyutuItemCode(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
+	public int countBySisyutuItemCode(@Param("dto") UserIdAndSisyutuItemCodeSearchQueryDto search);
 	
 }

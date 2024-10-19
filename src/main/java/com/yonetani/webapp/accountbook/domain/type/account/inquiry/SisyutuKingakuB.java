@@ -36,8 +36,8 @@ import lombok.RequiredArgsConstructor;
 public class SisyutuKingakuB {	
 	// 支出金額B
 	private final BigDecimal value;
-	// 割合
-	private final BigDecimal percentage;
+	// 値が0の「支出金額B」項目の値
+	public static final SisyutuKingakuB ZERO = SisyutuKingakuB.from(BigDecimal.ZERO.setScale(2));
 	
 	/**
 	 *<pre>
@@ -46,25 +46,19 @@ public class SisyutuKingakuB {
 	 * [非ガード節]
 	 * ・支出金額Bがnull値
 	 * [ガード節]
-	 * ・支出金額がnull値
 	 * ・支出金額Bがマイナス値
 	 * ・支出金額Bがスケール値が2以外
 	 * 
 	 *</pre>
 	 * @param kingakub 支出金額B
-	 * @param sisyutuKingaku 支出金額
-	 * @return 「支出金額B」項目(支出金額B, 割合)ドメインタイプ
+	 * @return 「支出金額B」項目ドメインタイプ
 	 *
 	 */
-	public static SisyutuKingakuB from(BigDecimal kingakub, SisyutuKingaku sisyutuKingaku) {
+	public static SisyutuKingakuB from(BigDecimal kingakub) {
 		
-		// ガード節(支出金額がnull値)
-		if(sisyutuKingaku == null) {
-			throw new MyHouseholdAccountBookRuntimeException("「支出金額B」項目の設定値が不正です。管理者に問い合わせてください。[sisyutuKingaku=null]");
-		}
 		// 非ガード(支出金額Bがnull値の場合、値nullの「支出金額B」項目ドメインタイプを生成
 		if (kingakub == null) {
-			return new SisyutuKingakuB(null, null);
+			return new SisyutuKingakuB(null);
 		}
 		// ガード節(支出金額Bがマイナス値)
 		if (BigDecimal.ZERO.compareTo(kingakub) > 0) {
@@ -75,11 +69,48 @@ public class SisyutuKingakuB {
 			throw new MyHouseholdAccountBookRuntimeException("「支出金額B」項目の設定値が不正です。管理者に問い合わせてください。[value=" + kingakub.scale() + "]");
 		}
 		
-		// 設定値OKの場合、支出金額Bの値と支出金額をもとに支出金額B項目ドメインタイプを生成
-		// 支出金額Bの割合=支出金額B/支出金額 * 100(四捨五入)
-		BigDecimal pt = kingakub.divide(sisyutuKingaku.getValue(), 2, RoundingMode.HALF_UP).multiply(DomainCommonUtils.ONE_HUNDRED_BIGDECIMAL);
-		return new SisyutuKingakuB(kingakub, pt);
+		// 支出金額B項目ドメインタイプを生成
+		return new SisyutuKingakuB(kingakub);
 		
+	}
+	
+	/**
+	 *<pre>
+	 * 支出金額Bの値を指定した支出金額Bの値で加算(this + addValue)した値を返します。
+	 *</pre>
+	 * @param addValue 加算する支出金額Bの値
+	 * 
+	 * @return 加算した支出金額Bの値(this + addValue)
+	 *
+	 */
+	public SisyutuKingakuB add(SisyutuKingakuB addValue) {
+		if(this.value == null) {
+			return addValue;
+		}
+		if(addValue.getValue() == null) {
+			return this;
+		}
+		return SisyutuKingakuB.from(this.value.add(addValue.getValue()));
+	}
+	
+	/**
+	 *<pre>
+	 * 支出金額Bの値を指定した支出金額Bの値で減算(this - subtractValue)した値を返します。
+	 *</pre>
+	 * @param subtractValue 減算する支出金額Bの値
+	 * @return 減算した支出金額Bの値(this - subtractValue)
+	 *
+	 */
+	public SisyutuKingakuB subtract(SisyutuKingakuB subtractValue) {
+		// 減算する支出金額の値がnullなら減算せずにthisの値を返す
+		if(subtractValue.getValue() == null) {
+			return this;
+		}
+		// thisがnullなら、減算後の値がマイナスとなる計算を実施したことになるのでデータ不正
+		if(this.value == null) {
+			throw new MyHouseholdAccountBookRuntimeException("「支出金額B」がnull値の場合におけるマイナス減算は不正です。管理者に問い合わせてください。[value=" + subtractValue.toSisyutuKingakuBString() + "]");
+		}
+		return new SisyutuKingakuB(this.value.subtract(subtractValue.getValue()));
 	}
 	
 	/**
@@ -96,15 +127,31 @@ public class SisyutuKingakuB {
 	
 	/**
 	 *<pre>
-	 * 支出金額Bの値が支出金額の何パーセントかを表した値。小数点以下0桁で四捨五入
+	 * 支出金額Bの値が支出金額の何パーセントかを取得。小数点以下0桁で四捨五入
 	 * 値がnull(支払金額B項目の値なし)の場合、空文字列を返却
+	 * 
+	 * [ガード節]
+	 * ・引数で指定した支出金額がnull値
+	 * 
 	 *</pre>
-	 * @return 支出金額Bの割合
+	 * @param sisyutuKingaku 支出金額Bの割合算出用の支出金額の値
+	 * @return 支出金額Bの割合(文字列)
 	 *
 	 */
-	public String toPercentageString() {
-		// 値がnullの場合空文字列を返却、null以外の場合はスケール0で四捨五入した文字列を返却
-		return (percentage == null) ? "" : percentage.setScale(0, RoundingMode.HALF_UP).toPlainString();
+	public String getPercentage(SisyutuKingaku sisyutuKingaku) {
+		// ガード節(支出金額がnull値)
+		if(sisyutuKingaku == null) {
+			throw new MyHouseholdAccountBookRuntimeException("支出金額がnull値です。管理者に問い合わせてください。[sisyutuKingaku=null]");
+		}
+		// 支出金額Bの値がnullの場合、空文字列を返却
+		if(value == null) {
+			return "";
+		}
+		
+		// 支出金額Bの割合=支出金額B/支出金額 * 100(四捨五入)
+		BigDecimal pt = value.divide(sisyutuKingaku.getValue(), 2, RoundingMode.HALF_UP).multiply(DomainCommonUtils.ONE_HUNDRED_BIGDECIMAL);
+		// スケール0で四捨五入した文字列を返却
+		return pt.setScale(0, RoundingMode.HALF_UP).toPlainString();
 	}
 	
 	/**
@@ -112,6 +159,6 @@ public class SisyutuKingakuB {
 	 */
 	@Override
 	public String toString() {
-		return "sisyutuKingaku=" + toSisyutuKingakuBString() + ",percentage=" + toPercentageString();
+		return "sisyutuKingaku=" + toSisyutuKingakuBString();
 	}
 }

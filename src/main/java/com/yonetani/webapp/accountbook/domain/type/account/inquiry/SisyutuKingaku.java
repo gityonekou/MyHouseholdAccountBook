@@ -71,6 +71,30 @@ public class SisyutuKingaku {
 	}
 	
 	/**
+	 *<pre>
+	 * 支出金額の値を指定した支出金額の値で加算(this + addValue)した値を返します。
+	 *</pre>
+	 * @param addValue 加算する支出金額の値
+	 * @return 加算した支出金額の値(this + addValue)
+	 *
+	 */
+	public SisyutuKingaku add(SisyutuKingaku addValue) {
+		return new SisyutuKingaku(this.value.add(addValue.getValue()));
+	}
+	
+	/**
+	 *<pre>
+	 * 支出金額の値を指定した支出金額の値で減算(this - subtractValue)した値を返します。
+	 *</pre>
+	 * @param subtractValue 減算する支出金額の値
+	 * @return 減算した支出金額の値(this - subtractValue)
+	 *
+	 */
+	public SisyutuKingaku subtract(SisyutuKingaku subtractValue) {
+		return new SisyutuKingaku(this.value.subtract(subtractValue.getValue()));
+	}
+	
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

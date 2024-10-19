@@ -14,6 +14,7 @@ package com.yonetani.webapp.accountbook.domain.repository.account.inquiry;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureItemList;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountYearMeisaiInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuKingakuItem;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuKingakuItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuItemCode;
@@ -57,10 +58,20 @@ public interface SisyutuKingakuTableRepository {
 	 * 検索条件に一致する支出金額テーブル情報を取得します。
 	 *</pre>
 	 * @param search 検索条件(ユーザID, 年月,支出項目コード)
-	 * @return 固定費情報
+	 * @return 支出金額情報
 	 *
 	 */
 	SisyutuKingakuItem findByUniqueKey(SearchQueryUserIdAndYearMonthAndSisyutuItemCode search);
+	
+	/**
+	 *<pre>
+	 * 検索条件に一致する支出金額テーブル情報のリストを取得します。
+	 *</pre>
+	 * @param search 検索条件(ユーザID, 年月)
+	 * @return 支出金額情報のリスト
+	 *
+	 */
+	SisyutuKingakuItemInquiryList findById(SearchQueryUserIdAndYearMonth search);
 	
 	/**
 	 *<pre>

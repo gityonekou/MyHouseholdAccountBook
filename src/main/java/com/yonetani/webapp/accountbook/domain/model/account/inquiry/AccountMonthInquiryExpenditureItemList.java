@@ -66,7 +66,7 @@ public class AccountMonthInquiryExpenditureItemList {
 		private final SisyutuItemLevel sisyutuItemLevel;
 		// 支出金額
 		private final SisyutuKingaku sisyutuKingaku;
-		// 支出金額b(支出金額B, 割合)
+		// 支出金額B
 		private final SisyutuKingakuB sisyutuKingakuB;
 		// 支払日
 		private final ShiharaiDate shiharaiDate;
@@ -92,15 +92,12 @@ public class AccountMonthInquiryExpenditureItemList {
 					BigDecimal sisyutuKingakuB,
 					LocalDate siharaiDate
 				) {
-			// 支出金額のドメインタイプを生成
-			SisyutuKingaku sisyutuKingakuVal = SisyutuKingaku.from(sisyutuKingaku);
-			
 			return new ExpenditureListItem(
 					SisyutuItemCode.from(sisyutuItemCode),
 					SisyutuItemName.from(sisyutuItemName),
 					SisyutuItemLevel.from(sisyutuItemLevel),
-					sisyutuKingakuVal,
-					SisyutuKingakuB.from(sisyutuKingakuB, sisyutuKingakuVal),
+					SisyutuKingaku.from(sisyutuKingaku),
+					SisyutuKingakuB.from(sisyutuKingakuB),
 					ShiharaiDate.from(siharaiDate));
 		}
 	}

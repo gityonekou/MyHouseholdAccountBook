@@ -19,6 +19,7 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.ExpenditureReadWriteDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthAndSisyutuCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthSearchQueryDto;
 
 /**
@@ -77,6 +78,18 @@ public interface ExpenditureTableMapper {
 	 */
 	@Select("sql/account/inquiry/ExpenditureTableSelectSql01.sql")
 	public List<ExpenditureReadWriteDto> findById(@Param("dto") UserIdAndYearMonthSearchQueryDto search);
+	
+	/**
+	 *<pre>
+	 * ユニークキー(ユーザID、対象年、対象月、支出コード)を条件に支出テーブルを参照します。
+	 *</pre>
+	 * @param search 検索条件:ユーザID、対象年、対象月、支出コード
+	 * @return 支出金額テーブル検索結果
+	 *
+	 */
+	@Select("sql/account/inquiry/ExpenditureTableSelectSql02.sql")
+	public ExpenditureReadWriteDto findByUniqueKey(@Param("dto") UserIdAndYearMonthAndSisyutuCodeSearchQueryDto search);
+	
 	
 	/**
 	 *<pre>

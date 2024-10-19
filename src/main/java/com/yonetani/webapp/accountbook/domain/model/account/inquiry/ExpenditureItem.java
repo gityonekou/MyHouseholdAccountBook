@@ -12,6 +12,8 @@ package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import org.springframework.util.StringUtils;
+
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ShiharaiDate;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuCode;
@@ -111,13 +113,21 @@ public class ExpenditureItem {
 			BigDecimal sisyutuYoteiKingaku,
 			BigDecimal sisyutuKingaku,
 			boolean deleteFlg) {
+		// イベントコードがnullの場合、null値のイベントコードを生成
+		EventCode eventCodeVal = null;
+		if(StringUtils.hasLength(eventCode)) {
+			eventCodeVal = EventCode.from(eventCode);
+		} else {
+			eventCodeVal = EventCode.NUL_EVENT_CODE;
+		}
+		// 支出テーブル情報を表すドメインモデルを生成して返却
 		return new ExpenditureItem(
 				UserId.from(userId),
 				TargetYear.from(targetYear),
 				TargetMonth.from(targetMonth),
 				SisyutuCode.from(sisyutuCode),
 				SisyutuItemCode.from(sisyutuItemCode),
-				EventCode.from(eventCode),
+				eventCodeVal,
 				SisyutuName.from(sisyutuName),
 				SisyutuKubun.from(sisyutuKubun),
 				SisyutuDetailContext.from(sisyutuDetailContext),

@@ -70,6 +70,18 @@ public class SisyutuYoteiKingaku {
 	}
 	
 	/**
+	 *<pre>
+	 * 支出予定金額の値を指定した支出予定金額の値で加算(this + addValue)した値を返します。
+	 *</pre>
+	 * @param addValue 加算する支出予定金額の値
+	 * @return 加算した支出予定金額の値(this + addValue)
+	 *
+	 */
+	public SisyutuYoteiKingaku add(SisyutuYoteiKingaku addValue) {
+		return new SisyutuYoteiKingaku(this.value.add(addValue.getValue()));
+	}
+	
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

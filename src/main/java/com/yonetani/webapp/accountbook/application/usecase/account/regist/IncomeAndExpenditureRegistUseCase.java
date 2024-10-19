@@ -1,5 +1,5 @@
 /**
- * 収支登録ユースケースです。
+, * 収支登録ユースケースです。
  * ・収支登録画面の表示情報取得(新規登録時)
  *
  *------------------------------------------------
@@ -27,6 +27,7 @@ import org.springframework.util.StringUtils;
 
 import com.yonetani.webapp.accountbook.common.component.CodeTableItemComponent;
 import com.yonetani.webapp.accountbook.common.component.SisyutuItemComponent;
+import com.yonetani.webapp.accountbook.common.component.SisyutuKingakuItemHolderComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.event.EventItem;
@@ -38,22 +39,26 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExp
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuKingakuItemHolder;
 import com.yonetani.webapp.accountbook.domain.model.common.CodeAndValuePair;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndEventCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostShiharaiTukiList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.event.EventItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiTuki;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKubun;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingaku;
@@ -108,6 +113,11 @@ public class IncomeAndExpenditureRegistUseCase {
 	private final ExpenditureTableRepository expenditureRepository;
 	// 収支テーブル:INCOME_AND_EXPENDITURE_TABLEリポジトリー
 	private final IncomeAndExpenditureTableRepository incomeAndExpenditureRepository;
+	// 支出金額テーブル:SISYUTU_KINGAKU_TABLEポジトリー
+	private final SisyutuKingakuTableRepository sisyutuKingakuTableRepository;
+	// 支出金額テーブル情報保持ホルダー生成用コンポーネント
+	private final SisyutuKingakuItemHolderComponent sisyutuKingakuItemHolderComponent;
+	
 	
 	/**
 	 *<pre>
@@ -196,7 +206,7 @@ public class IncomeAndExpenditureRegistUseCase {
 							// 支出名
 							domain.getFixedCostName().getValue(),
 							// 支出区分:デフォルトで無駄遣いなしを設定
-							MyHouseholdAccountBookContent.EXPENDITURE_KUBUN_NON_WASTED_SELECTED_VALUE,
+							SisyutuKubun.NON_WASTED.getValue(),
 							// 支出詳細
 							domain.getExpenditureDetailContext(),
 							// 支払日
@@ -650,8 +660,10 @@ public class IncomeAndExpenditureRegistUseCase {
 				// 支出詳細
 				expenditureItemForm.setExpenditureDetailContext(session.getExpenditureDetailContext());
 				// 支払日
-				expenditureItemForm.setSiharaiDate(LocalDate.parse(
-						targetYearMonth + session.getSiharaiDate(), MyHouseholdAccountBookContent.DATE_TIME_FORMATTER));
+				if(StringUtils.hasLength(session.getSiharaiDate())) {
+					expenditureItemForm.setSiharaiDate(LocalDate.parse(
+							targetYearMonth + session.getSiharaiDate(), MyHouseholdAccountBookContent.DATE_TIME_FORMATTER));
+				}
 				// 支出金額
 				expenditureItemForm.setExpenditureKingaku(DomainCommonUtils.convertInteger(session.getExpenditureKingaku()));
 				// 支払金額の0円開始設定フラグ
@@ -1197,6 +1209,8 @@ public class IncomeAndExpenditureRegistUseCase {
 		SisyutuYoteiKingakuTotalAmount sisyutuYoteiKingakuTotalAmount = SisyutuYoteiKingakuTotalAmount.ZERO;
 		// 支出金額合計
 		SisyutuKingakuTotalAmount sisyutuKingakuTotalAmount = SisyutuKingakuTotalAmount.ZERO;
+		// 対象年月の支出金額テーブル情報を保持したホルダーを生成
+		SisyutuKingakuItemHolder sisyutuKingakuItemHolder = sisyutuKingakuItemHolderComponent.build(search);
 		
 		// 支出情報の件数分繰り返す
 		for(ExpenditureRegistItem expenditureRegistData : expenditureRegistItemList) {
@@ -1232,6 +1246,8 @@ public class IncomeAndExpenditureRegistUseCase {
 				// 支出金額合計を加算
 				sisyutuKingakuTotalAmount = sisyutuKingakuTotalAmount.add(addExpenditureData.getSisyutuKingaku());
 				
+				// 支出金額テーブル情報に追加
+				sisyutuKingakuItemHolder.add(addExpenditureData);
 				// 支出情報更新あり
 				expenditureUpdateFlg = true;
 				
@@ -1241,6 +1257,13 @@ public class IncomeAndExpenditureRegistUseCase {
 				// アクションが更新の場合
 				if (Objects.equals(expenditureRegistData.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
 					
+					// 支出コード(セッション)の値をもとに、更新対象の支出コードのドメインタイプを生成
+					SisyutuCode sisyutuCode = SisyutuCode.from(expenditureRegistData.getExpenditureCode());
+					// 更新前の支出登録情報を取得(更新後-更新前の値を計算用)
+					// 値が取れない場合は該当データの更新でエラーとなるのでここではnull判定しない
+					ExpenditureItem beforeExpenditureData = expenditureRepository.findByUniqueKey(
+							SearchQueryUserIdAndYearMonthAndSisyutuCode.from(userId, targetYearMonth, sisyutuCode));
+					
 					// セッションの支出登録情報から支出テーブル情報(ドメイン)を生成
 					ExpenditureItem updExpenditureData = ExpenditureItem.createExpenditureItem(
 							// 初期登録かどうかのフラグ
@@ -1249,10 +1272,11 @@ public class IncomeAndExpenditureRegistUseCase {
 							userId,
 							// 対象年月
 							targetYearMonth,
-							// 支出コード(セッション)
-							SisyutuCode.from(expenditureRegistData.getExpenditureCode()),
+							// 支出コード
+							sisyutuCode,
 							// 支出登録情報(セッション)
 							expenditureRegistData);
+					
 					// 支出テーブルを更新
 					int updCount = expenditureRepository.update(updExpenditureData);
 					// 更新件数が1件以上の場合、業務エラー
@@ -1261,11 +1285,22 @@ public class IncomeAndExpenditureRegistUseCase {
 					}
 					// 支出金額合計を加算
 					sisyutuKingakuTotalAmount = sisyutuKingakuTotalAmount.add(updExpenditureData.getSisyutuKingaku());
+					
+					// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
+					sisyutuKingakuItemHolder.update(beforeExpenditureData, updExpenditureData);
+					
 					// 支出情報更新あり
 					expenditureUpdateFlg = true;
 					
 				// アクションが削除の場合
 				} else if (Objects.equals(expenditureRegistData.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_DELETE)) {
+					
+					// 支出コード(セッション)の値をもとに、削除対象の支出コードのドメインタイプを生成
+					SisyutuCode sisyutuCode = SisyutuCode.from(expenditureRegistData.getExpenditureCode());
+					// 削除前の支出登録情報を取得(更新後-更新前の値を計算用)
+					// 値が取れない場合は該当データの論理削除でエラーとなるのでここではnull判定しない
+					ExpenditureItem beforeExpenditureData = expenditureRepository.findByUniqueKey(
+							SearchQueryUserIdAndYearMonthAndSisyutuCode.from(userId, targetYearMonth, sisyutuCode));
 					
 					// セッションの支出登録情報から支出テーブル情報(ドメイン)を生成
 					ExpenditureItem delExpenditureData = ExpenditureItem.createExpenditureItem(
@@ -1275,8 +1310,8 @@ public class IncomeAndExpenditureRegistUseCase {
 							userId,
 							// 対象年月
 							targetYearMonth,
-							// 支出コード(セッション)
-							SisyutuCode.from(expenditureRegistData.getExpenditureCode()),
+							// 支出コード
+							sisyutuCode,
 							// 支出登録情報(セッション)
 							expenditureRegistData);
 					// 支出テーブルの対象データを論理削除
@@ -1285,6 +1320,10 @@ public class IncomeAndExpenditureRegistUseCase {
 					if(delCount != 1) {
 						throw new MyHouseholdAccountBookRuntimeException("支出テーブル：EXPENDITURE_TABLEへの削除件数が不正でした。[件数=" + delCount + "][delete data:" + delExpenditureData + "]");
 					}
+					
+					// 削除前の支出情報をもとに、対象の支出金額テーブル情報の情報を更新
+					sisyutuKingakuItemHolder.delete(beforeExpenditureData);
+					
 					// 支出情報更新あり
 					expenditureUpdateFlg = true;
 					
@@ -1301,8 +1340,24 @@ public class IncomeAndExpenditureRegistUseCase {
 		
 		// 支出情報更新ありの場合、支出金額テーブルを更新
 		if(expenditureUpdateFlg) {
-			// TODO：支出金額テーブルの登録処理から
-			//ここから
+			// ホルダーから新規追加データのリストを取得し対象件数分データを追加
+			sisyutuKingakuItemHolder.getAddList().forEach(addData -> {
+				// 支出金額テーブルに登録
+				int addCount = sisyutuKingakuTableRepository.add(addData);
+				// 追加件数が1件以上の場合、業務エラー
+				if(addCount != 1) {
+					throw new MyHouseholdAccountBookRuntimeException("支出金額テーブル:SISYUTU_KINGAKU_TABLEへの追加件数が不正でした。[件数=" + addCount + "][add data:" + addData + "]");
+				}
+			});
+			// ホルダーから更新データのリストを取得し対象件数分データを更新
+			sisyutuKingakuItemHolder.getUpdateList().forEach(updData -> {
+				// 支出金額テーブルを更新
+				int updCount = sisyutuKingakuTableRepository.update(updData);
+				// 更新件数が1件以上の場合、業務エラー
+				if(updCount != 1) {
+					throw new MyHouseholdAccountBookRuntimeException("支出金額テーブル:SISYUTU_KINGAKU_TABLEへの更新件数が不正でした。[件数=" + updCount + "][add data:" + updData + "]");
+				}
+			});
 		}
 		
 		// 収入情報、支出情報更新ありの場合、収支テーブルを更新
@@ -1497,8 +1552,8 @@ public class IncomeAndExpenditureRegistUseCase {
 				/* 支出区分が無駄遣いB(2)、無駄遣いC(3)の場合、支出名の先頭に支出区分の名称を追加 */
 				StringBuilder expenditureNameBuff = new StringBuilder(session.getExpenditureName().length() + 15);
 				// 支出区分が無駄遣いB(2)、無駄遣いC(3)と等しい場合
-				if(Objects.equals(session.getExpenditureKubun(), MyHouseholdAccountBookContent.EXPENDITURE_KUBUN_WASTED_B_SELECTED_VALUE)
-						|| Objects.equals(session.getExpenditureKubun(), MyHouseholdAccountBookContent.EXPENDITURE_KUBUN_WASTED_C_SELECTED_VALUE)) {
+				SisyutuKubun checkSisyutuKubun = SisyutuKubun.from(session.getExpenditureKubun());
+				if(SisyutuKubun.isWastedB(checkSisyutuKubun) || SisyutuKubun.isWastedC(checkSisyutuKubun)) {
 					// 支出区分の値をコード変換し、【支出区分コード値】の形式で設定
 					expenditureNameBuff.append("【");
 					expenditureNameBuff.append(codeTableItem.getCodeValue(

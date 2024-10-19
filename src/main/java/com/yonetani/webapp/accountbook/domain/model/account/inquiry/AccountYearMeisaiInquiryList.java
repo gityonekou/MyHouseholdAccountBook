@@ -113,10 +113,6 @@ public class AccountYearMeisaiInquiryList {
 				BigDecimal sisyutuKingaku,
 				BigDecimal syuusiKingaku
 				) {
-			
-			// 支出金額ドメインタイプを生成
-			SisyutuKingaku sisyutuKingakuVal = SisyutuKingaku.from(sisyutuKingaku);
-			
 			return new MeisaiInquiryListItem(
 					TargetMonth.from(month),
 					JigyouKeihiKingaku.from(jigyouKeihiKingaku),
@@ -125,8 +121,8 @@ public class AccountYearMeisaiInquiryList {
 					IruiJyuukyoSetubiKingaku.from(iruiJyuukyoSetubiKingaku),
 					InsyokuNitiyouhinKingaku.from(insyokuNitiyouhinKingaku),
 					SyumiGotakuKingaku.from(syumiGotakuKingaku),
-					SisyutuKingakuB.from(sisyutuKingakuB, sisyutuKingakuVal),
-					sisyutuKingakuVal,
+					SisyutuKingakuB.from(sisyutuKingakuB),
+					SisyutuKingaku.from(sisyutuKingaku),
 					SyuusiKingaku.from(syuusiKingaku));
 		}
 	}
@@ -170,7 +166,7 @@ public class AccountYearMeisaiInquiryList {
 					IruiJyuukyoSetubiKingaku.from(BigDecimal.ZERO),
 					InsyokuNitiyouhinKingaku.from(BigDecimal.ZERO),
 					SyumiGotakuKingaku.from(BigDecimal.ZERO),
-					SisyutuKingakuB.from(BigDecimal.ZERO, SisyutuKingaku.ZERO),
+					SisyutuKingakuB.from(SisyutuKingakuB.ZERO.getValue()),
 					SisyutuKingaku.from(SisyutuKingaku.ZERO.getValue()),
 					SyuusiKingaku.from(SyuusiKingaku.ZERO.getValue())
 					);
@@ -197,9 +193,6 @@ public class AccountYearMeisaiInquiryList {
 				sisyutuKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(sisyutuKingakuGoukeiWk, item.getSisyutuKingaku().getValue());
 				syuusiKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(syuusiKingakuGoukeiWk, item.getSyuusiKingaku().getValue());
 			}
-			// 支出金額合計のドメインタイプを作成(本来は、該当のドメインタイプ：SisyutuKingakuTotalAmountを使うべき
-			SisyutuKingaku sisyutuKingakuTotalAmount = SisyutuKingaku.from(sisyutuKingakuGoukeiWk);
-			
 			return new AccountYearMeisaiInquiryList(
 					values,
 					JigyouKeihiKingaku.from(jigyouKeihiKingakuGoukeiWk),
@@ -208,8 +201,8 @@ public class AccountYearMeisaiInquiryList {
 					IruiJyuukyoSetubiKingaku.from(iruiJyuukyoSetubiKingakuGoukeiWk),
 					InsyokuNitiyouhinKingaku.from(insyokuNitiyouhinKingakuGoukeiWk),
 					SyumiGotakuKingaku.from(syumiGotakuKingakuGoukeiWk),
-					SisyutuKingakuB.from(sisyutuKingakuBGoukeiWk, sisyutuKingakuTotalAmount),
-					sisyutuKingakuTotalAmount,
+					SisyutuKingakuB.from(sisyutuKingakuBGoukeiWk),
+					SisyutuKingaku.from(sisyutuKingakuGoukeiWk),
 					SyuusiKingaku.from(syuusiKingakuGoukeiWk)
 					);
 		}

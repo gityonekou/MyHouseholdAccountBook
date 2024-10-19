@@ -64,14 +64,25 @@ public interface SisyutuKingakuTableMapper {
 	
 	/**
 	 *<pre>
-	 * ユニークキー(ユーザID、対象年、対象月、支出項目ID)で支出金額テーブルを検索します。
+	 * ユニークキー(ユーザID、対象年、対象月、支出項目ID)を条件に支出金額テーブルを検索します。
 	 *</pre>
 	 * @param dto 検索条件:ユーザID、対象年、対象月、支出項目ID
 	 * @return 支出金額テーブル検索結果
 	 *
 	 */
+	@Select("sql/account/inquiry/SisyutuKingakuTableSelectSql01.sql")
+	public SisyutuKingakuReadWriteDto findByUniqueKey(@Param("dto") UserIdAndYearMonthAndSisyutuItemCodeSearchQueryDto dto);
+	
+	/**
+	 *<pre>
+	 * ユーザID、対象年、対象月を条件に支出金額テーブルを検索します。
+	 *</pre>
+	 * @param dto 検索条件:ユーザID、対象年、対象月
+	 * @return 支出金額テーブル検索結果のリスト
+	 *
+	 */
 	@Select("sql/account/inquiry/SisyutuKingakuTableSelectSql02.sql")
-	SisyutuKingakuReadWriteDto selectUserIdAndYearMonth(@Param("dto") UserIdAndYearMonthAndSisyutuItemCodeSearchQueryDto dto);
+	public List<SisyutuKingakuReadWriteDto> findById(@Param("dto") UserIdAndYearMonthSearchQueryDto dto);
 	
 	/**
 	 *<pre>
@@ -82,7 +93,7 @@ public interface SisyutuKingakuTableMapper {
 	 *
 	 */
 	@Select("sql/account/inquiry/SisyutuKingakuMonthInquirySelectSql01.sql")
-	List<SisyutuKingakuAndSisyutuItemReadDto> selectMonthSisyutuKingakuList(@Param("dto") UserIdAndYearMonthSearchQueryDto dto);
+	public List<SisyutuKingakuAndSisyutuItemReadDto> selectMonthSisyutuKingakuList(@Param("dto") UserIdAndYearMonthSearchQueryDto dto);
 	
 	
 	/**
@@ -94,5 +105,6 @@ public interface SisyutuKingakuTableMapper {
 	 *
 	 */
 	@Select("sql/account/inquiry/SisyutuKingakuYearInquirySelectSql01.sql")
-	AccountYearMeisaiInquiryReadDto selectYearSisyutuKingakuList(@Param("dto") UserIdAndYearMonthSearchQueryDto dto);
+	public AccountYearMeisaiInquiryReadDto selectYearSisyutuKingakuList(@Param("dto") UserIdAndYearMonthSearchQueryDto dto);
+	
 }

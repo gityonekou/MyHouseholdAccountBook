@@ -12,6 +12,8 @@ package com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -58,51 +60,39 @@ public class ExpenditureReadWriteDto {
 	
 	/**
 	 *<pre>
-	 * 引数のパラメータ値をもとにExpenditureReadWriteDtoを生成して返します。
+	 * 支出テーブル情報ドメインモデルをもとにExpenditureReadWriteDtoを生成して返します。
 	 *</pre>
-	 * @param userId   ユーザID
-	 * @param targetYear 対象年
-	 * @param targetMonth 対象月
-	 * @param sisyutuCode 支出コード
-	 * @param sisyutuItemCode 支出項目コード
-	 * @param eventCode イベントコード
-	 * @param sisyutuName 支出名称
-	 * @param sisyutuKubun 支出区分
-	 * @param sisyutuDetailContext 支出詳細
-	 * @param shiharaiDate 支払日
-	 * @param sisyutuYoteiKingaku 支出予定金額
-	 * @param sisyutuKingaku 支出金額
-	 * @param deleteFlg 削除フラグ
-	 * @return 支出項目テーブル:SISYUTU_ITEM_TABLE出力情報
+	 * @param domain 支出テーブル情報ドメインモデル
+	 * @return 支出テーブル:EXPENDITURE_TABLE読込・出力情報
 	 *
 	 */
-	public static ExpenditureReadWriteDto from(
-			String userId,
-			String targetYear,
-			String targetMonth,
-			String sisyutuCode,
-			String sisyutuItemCode,
-			String eventCode,
-			String sisyutuName,
-			String sisyutuKubun,
-			String sisyutuDetailContext,
-			LocalDate shiharaiDate,
-			BigDecimal sisyutuYoteiKingaku,
-			BigDecimal sisyutuKingaku,
-			boolean deleteFlg) {
+	public static ExpenditureReadWriteDto from(ExpenditureItem domain) {
 		return new ExpenditureReadWriteDto(
-				userId,
-				targetYear,
-				targetMonth,
-				sisyutuCode,
-				sisyutuItemCode,
-				eventCode,
-				sisyutuName, 
-				sisyutuKubun,
-				sisyutuDetailContext,
-				shiharaiDate,
-				sisyutuYoteiKingaku,
-				sisyutuKingaku,
-				deleteFlg);
+				// ユーザID
+				domain.getUserId().getValue(),
+				// 対象年
+				domain.getTargetYear().getValue(),
+				// 対象月
+				domain.getTargetMonth().getValue(),
+				// 支出コード
+				domain.getSisyutuCode().getValue(),
+				// 支出項目コード
+				domain.getSisyutuItemCode().getValue(),
+				// イベントコード
+				domain.getEventCode().getValue(),
+				// 支出名称
+				domain.getSisyutuName().getValue(),
+				// 支出区分
+				domain.getSisyutuKubun().getValue(),
+				// 支出詳細
+				domain.getSisyutuDetailContext().getValue(),
+				// 支払日
+				domain.getShiharaiDate().getValue(),
+				// 支出予定金額
+				domain.getSisyutuYoteiKingaku().getValue(),
+				// 支出金額
+				domain.getSisyutuKingaku().getValue(),
+				// 削除フラグ
+				domain.getDeleteFlg().getValue());
 	}
 }

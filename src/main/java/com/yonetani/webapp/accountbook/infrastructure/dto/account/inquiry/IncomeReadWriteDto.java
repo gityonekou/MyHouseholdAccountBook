@@ -11,6 +11,8 @@ package com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry;
 
 import java.math.BigDecimal;
 
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeItem;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -47,36 +49,29 @@ public class IncomeReadWriteDto {
 	
 	/**
 	 *<pre>
-	 * 引数のパラメータ値をもとにIncomeReadWriteDtoを生成して返します。
+	 * 収入テーブル情報ドメインモデルをもとにIncomeReadWriteDtoを生成して返します。
 	 *</pre>
-	 * @param userId ユーザID
-	 * @param targetYear 対象年
-	 * @param targetMonth 対象月
-	 * @param syuunyuuCode 収入コード
-	 * @param syuunyuuKubun 収入区分
-	 * @param syuunyuuDetailContext 収入詳細
-	 * @param syuunyuuKingaku 収入金額
-	 * @param deleteFlg 削除フラグ
-	 * @return 支出項目テーブル:SISYUTU_ITEM_TABLE出力情報
+	 * @param domain 収入テーブル情報ドメインモデル
+	 * @return 収入テーブル:INCOME_TABLE読込・出力情報
 	 *
 	 */
-	public static IncomeReadWriteDto from(
-			String userId,
-			String targetYear,
-			String targetMonth,
-			String syuunyuuCode,
-			String syuunyuuKubun,
-			String syuunyuuDetailContext,
-			BigDecimal syuunyuuKingaku,
-			boolean deleteFlg) {
+	public static IncomeReadWriteDto from(IncomeItem domain) {
 		return new IncomeReadWriteDto(
-				userId,
-				targetYear,
-				targetMonth,
-				syuunyuuCode,
-				syuunyuuKubun,
-				syuunyuuDetailContext,
-				syuunyuuKingaku,
-				deleteFlg);
+				// ユーザID
+				domain.getUserId().getValue(),
+				// 対象年
+				domain.getTargetYear().getValue(),
+				// 対象月
+				domain.getTargetMonth().getValue(),
+				// 収入コード
+				domain.getSyuunyuuCode().getValue(),
+				// 収入区分
+				domain.getSyuunyuuKubun().getValue(),
+				// 収入詳細
+				domain.getSyuunyuuDetailContext().getValue(),
+				// 収入金額
+				domain.getSyuunyuuKingaku().getValue(),
+				// 削除フラグ
+				domain.getDeleteFlg().getValue());
 	}
 }

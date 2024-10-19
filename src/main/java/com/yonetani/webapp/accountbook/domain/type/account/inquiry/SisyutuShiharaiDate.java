@@ -59,6 +59,39 @@ public class SisyutuShiharaiDate {
 	}
 	
 	/**
+	 *<pre>
+	 * この支出支払日の値と引数で指定した支出支払日の値を比較し大きいほうの値を返します。
+	 *</pre>
+	 * @param val 比較する支出支払日の値
+	 * @return　値が大きいほうの「支出支払日」項目の値
+	 *
+	 */
+	public SisyutuShiharaiDate max(SisyutuShiharaiDate val) {
+		if(value == null) {
+			return val;
+		}
+		if(val.getValue() == null) {
+			return this;
+		}
+		if(value.compareTo(val.getValue()) < 0) {
+			return val;
+		}
+		return this;
+	}
+	
+	/**
+	 *<pre>
+	 * この支出支払日の値と引数で指定した支払日の値を比較し大きいほうの値を返します。
+	 *</pre>
+	 * @param val 比較する支払日の値
+	 * @return　値が大きいほうの「支出支払日」項目の値
+	 *
+	 */
+	public SisyutuShiharaiDate max(ShiharaiDate val) {
+		return max(SisyutuShiharaiDate.from(val.getValue()));
+	}
+	
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

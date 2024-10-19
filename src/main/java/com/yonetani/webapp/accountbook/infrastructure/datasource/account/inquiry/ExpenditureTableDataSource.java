@@ -18,9 +18,11 @@ import org.springframework.stereotype.Repository;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.ExpenditureReadWriteDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthAndSisyutuCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry.ExpenditureTableMapper;
 
@@ -49,7 +51,7 @@ public class ExpenditureTableDataSource implements ExpenditureTableRepository {
 	@Override
 	public int add(ExpenditureItem data) {
 		// 支出情報を支出テーブルに出力
-		return mapper.insert(createExpenditureReadWriteDto(data));
+		return mapper.insert(ExpenditureReadWriteDto.from(data));
 	}
 	
 	/**
@@ -58,7 +60,7 @@ public class ExpenditureTableDataSource implements ExpenditureTableRepository {
 	@Override
 	public int update(ExpenditureItem data) {
 		// 支出テーブル:EXPENDITURE_TABLEを更新
-		return mapper.update(createExpenditureReadWriteDto(data));
+		return mapper.update(ExpenditureReadWriteDto.from(data));
 	}
 	
 	/**
@@ -67,7 +69,24 @@ public class ExpenditureTableDataSource implements ExpenditureTableRepository {
 	@Override
 	public int delete(ExpenditureItem data) {
 		// 支出テーブル:EXPENDITURE_TABLEから指定の支出情報を論理削除
-		return mapper.delete(createExpenditureReadWriteDto(data));
+		return mapper.delete(ExpenditureReadWriteDto.from(data));
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ExpenditureItem findByUniqueKey(SearchQueryUserIdAndYearMonthAndSisyutuCode searchQuery) {
+		// 検索結果を取得
+		ExpenditureReadWriteDto searchResult = mapper.findByUniqueKey(
+				UserIdAndYearMonthAndSisyutuCodeSearchQueryDto.from(searchQuery));
+		if(searchResult == null) {
+			// 検索結果なしの場合、nullを返却
+			return null;
+		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
+			return createExpenditureItem(searchResult);
+		}
 	}
 	
 	/**
@@ -147,43 +166,5 @@ public class ExpenditureTableDataSource implements ExpenditureTableRepository {
 				dto.getSisyutuKingaku(),
 				// 削除フラグ
 				dto.isDeleteFlg());
-	}
-	
-	/**
-	 *<pre>
-	 * 引数で指定した支出テーブル情報ドメインモデルから支出テーブル:EXPENDITURE_TABLE読込・出力情報を生成して返します。
-	 *</pre>
-	 * @param domain 支出テーブル情報ドメインモデル
-	 * @return 支出テーブル:EXPENDITURE_TABLE読込・出力情報
-	 *
-	 */
-	private ExpenditureReadWriteDto createExpenditureReadWriteDto(ExpenditureItem domain) {
-		return ExpenditureReadWriteDto.from(
-				// ユーザID
-				domain.getUserId().getValue(),
-				// 対象年
-				domain.getTargetYear().getValue(),
-				// 対象月
-				domain.getTargetMonth().getValue(),
-				// 支出コード
-				domain.getSisyutuCode().getValue(),
-				// 支出項目コード
-				domain.getSisyutuItemCode().getValue(),
-				// イベントコード
-				domain.getEventCode().getValue(),
-				// 支出名称
-				domain.getSisyutuName().getValue(),
-				// 支出区分
-				domain.getSisyutuKubun().getValue(),
-				// 支出詳細
-				domain.getSisyutuDetailContext().getValue(),
-				// 支払日
-				domain.getShiharaiDate().getValue(),
-				// 支出予定金額
-				domain.getSisyutuYoteiKingaku().getValue(),
-				// 支出金額
-				domain.getSisyutuKingaku().getValue(),
-				// 削除フラグ
-				domain.getDeleteFlg().getValue());
 	}
 }

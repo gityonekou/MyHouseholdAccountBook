@@ -49,7 +49,7 @@ public class IncomeAndExpenditureTableDataSource implements IncomeAndExpenditure
 	@Override
 	public int add(IncomeAndExpenditureItem data) {
 		// 収支テーブル情報を収支テーブルに出力
-		return mapper.insert(createIncomeAndExpenditureReadWriteDto(data));
+		return mapper.insert(IncomeAndExpenditureReadWriteDto.from(data));
 	}
 	
 	/**
@@ -58,7 +58,7 @@ public class IncomeAndExpenditureTableDataSource implements IncomeAndExpenditure
 	@Override
 	public int update(IncomeAndExpenditureItem data) {
 		// 収支テーブル:INCOME_AND_EXPENDITURE_TABLEを更新
-		return mapper.update(createIncomeAndExpenditureReadWriteDto(data));
+		return mapper.update(IncomeAndExpenditureReadWriteDto.from(data));
 	}
 	
 	/**
@@ -114,31 +114,5 @@ public class IncomeAndExpenditureTableDataSource implements IncomeAndExpenditure
 				dto.getExpenditureKingaku(),
 				// 収支
 				dto.getIncomeAndExpenditureKingaku());
-	}
-	
-	/**
-	 *<pre>
-	 * 引数で指定した収支テーブル情報ドメインモデルから収支テーブル:INCOME_AND_EXPENDITURE_TABLE読込・出力情報を生成して返します。
-	 *</pre>
-	 * @param domain 収支テーブル情報ドメインモデル
-	 * @return 収支テーブル:INCOME_AND_EXPENDITURE_TABLE読込・出力情報
-	 *
-	 */
-	private IncomeAndExpenditureReadWriteDto createIncomeAndExpenditureReadWriteDto(IncomeAndExpenditureItem domain) {
-		return IncomeAndExpenditureReadWriteDto.from(
-				// ユーザID
-				domain.getUserId().getValue(),
-				// 対象年
-				domain.getTargetYear().getValue(),
-				// 対象月
-				domain.getTargetMonth().getValue(),
-				// 収入金額
-				domain.getSyuunyuuKingaku().getValue(),
-				// 支出予定金額
-				domain.getSisyutuYoteiKingaku().getValue(),
-				// 支出金額
-				domain.getSisyutuKingaku().getValue(),
-				// 収支金額
-				domain.getSyuusiKingaku().getValue());
 	}
 }

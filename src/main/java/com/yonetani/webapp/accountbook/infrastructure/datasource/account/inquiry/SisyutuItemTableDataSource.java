@@ -51,7 +51,7 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 	@Override
 	public int add(SisyutuItem data) {
 		// 支出項目テーブル:SISYUTU_ITEM_TABLEにデータを追加します。
-		return mapper.insert(createSisyutuItemReadWriteDto(data));
+		return mapper.insert(SisyutuItemReadWriteDto.from(data));
 	}
 	
 	/**
@@ -60,7 +60,7 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 	@Override
 	public int update(SisyutuItem data) {
 		// 支出項目テーブル:SISYUTU_ITEM_TABLEの情報を指定の支出項目情報で更新します。
-		return mapper.update(createSisyutuItemReadWriteDto(data));
+		return mapper.update(SisyutuItemReadWriteDto.from(data));
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 	@Override
 	public int updateSisyutuItemDetailContext(SisyutuItem data) {
 		// 支出項目テーブル:SISYUTU_ITEM_TABLEの支出項目詳細内容項目の値を更新します。
-		return mapper.updateSisyutuItemDetailContext(createSisyutuItemReadWriteDto(data));
+		return mapper.updateSisyutuItemDetailContext(SisyutuItemReadWriteDto.from(data));
 	}
 	
 	/**
@@ -78,7 +78,7 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 	@Override
 	public int updateSisyutuItemSort(SisyutuItem data) {
 		// 支出項目テーブル:SISYUTU_ITEM_TABLEの支出項目表示順項目の値を更新します。
-		return mapper.updateSisyutuItemSort(createSisyutuItemReadWriteDto(data));
+		return mapper.updateSisyutuItemSort(SisyutuItemReadWriteDto.from(data));
 	}
 	
 	/**
@@ -185,33 +185,5 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 				dto.getSisyutuItemSort(),
 				// 更新可否フラグ
 				dto.isEnableUpdateFlg());
-	}
-	
-	/**
-	 *<pre>
-	 * 引数で指定した支出項目テーブル情報ドメインモデルからDTOを生成して返します。
-	 *</pre>
-	 * @param data 支出項目テーブル情報ドメインモデル
-	 * @return 支出項目テーブル:SISYUTU_ITEM_TABLE読込・出力情報
-	 *
-	 */
-	private SisyutuItemReadWriteDto createSisyutuItemReadWriteDto(SisyutuItem data) {
-		return SisyutuItemReadWriteDto.from(
-				// ユーザID
-				data.getUserId().getValue(),
-				// 支出項目コード
-				data.getSisyutuItemCode().getValue(),
-				// 支出項目名
-				data.getSisyutuItemName().getValue(),
-				// 支出項目詳細内容
-				data.getSisyutuItemDetailContext().getValue(),
-				// 親支出項目コード
-				data.getParentSisyutuItemCode().getValue(),
-				// 支出項目レベル(1～5)
-				data.getSisyutuItemLevel().toString(),
-				// 支出項目表示順
-				data.getSisyutuItemSort().getValue(),
-				// 更新可否フラグ
-				data.getEnableUpdateFlg().getValue());
 	}
 }

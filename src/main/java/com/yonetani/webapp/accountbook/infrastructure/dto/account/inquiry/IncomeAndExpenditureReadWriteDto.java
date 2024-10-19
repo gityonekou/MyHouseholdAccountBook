@@ -11,6 +11,8 @@ package com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry;
 
 import java.math.BigDecimal;
 
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureItem;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -45,33 +47,27 @@ public class IncomeAndExpenditureReadWriteDto {
 	
 	/**
 	 *<pre>
-	 * 引数のパラメータ値をもとにIncomeAndExpenditureReadWriteDtoを生成して返します。
+	 * 収支テーブル情報ドメインモデルをもとにIncomeAndExpenditureReadWriteDtoを生成して返します。
 	 *</pre>
-	 * @param userId ユーザID
-	 * @param targetYear 対象年
-	 * @param targetMonth 対象月
-	 * @param incomeKingaku 収入金額
-	 * @param expenditureEstimateKingaku 支出予定金額
-	 * @param expenditureKingaku 支出金額
-	 * @param incomeAndExpenditureKingaku 収支金額
-	 * @return 収支テーブル:INCOME_AND_EXPENDITURE_TABLE出力情報
+	 * @param domain 収支テーブル情報ドメインモデル
+	 * @return 収支テーブル:INCOME_AND_EXPENDITURE_TABLE読込・出力情報
 	 *
 	 */
-	public static IncomeAndExpenditureReadWriteDto from(
-			String userId,
-			String targetYear,
-			String targetMonth,
-			BigDecimal incomeKingaku,
-			BigDecimal expenditureEstimateKingaku,
-			BigDecimal expenditureKingaku,
-			BigDecimal incomeAndExpenditureKingaku) {
+	public static IncomeAndExpenditureReadWriteDto from(IncomeAndExpenditureItem domain) {
 		return new IncomeAndExpenditureReadWriteDto(
-				userId,
-				targetYear,
-				targetMonth,
-				incomeKingaku,
-				expenditureEstimateKingaku,
-				expenditureKingaku,
-				incomeAndExpenditureKingaku);
+				// ユーザID
+				domain.getUserId().getValue(),
+				// 対象年
+				domain.getTargetYear().getValue(),
+				// 対象月
+				domain.getTargetMonth().getValue(),
+				// 収入金額
+				domain.getSyuunyuuKingaku().getValue(),
+				// 支出予定金額
+				domain.getSisyutuYoteiKingaku().getValue(),
+				// 支出金額
+				domain.getSisyutuKingaku().getValue(),
+				// 収支金額
+				domain.getSyuusiKingaku().getValue());
 	}
 }
