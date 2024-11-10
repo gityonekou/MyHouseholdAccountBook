@@ -1,16 +1,14 @@
 /**
- * マイ家計簿の各月の収支画面から遷移する以下画面へのリダイレクト情報です。
- * ・買い物登録画面
- * ・各月の収支詳細表示画面
- * ・収支登録画面(更新)
+ * 買い物登録の各画面(トップ画面を含む)から遷移する以下画面へのリダイレクト情報です。
+ * ・買い物登録(簡易タイプ)画面
  *
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  コメントなど
- * 2024/09/16 : 1.00.00  新規作成
+ * 2024/11/03 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.presentation.response.account.inquiry;
+package com.yonetani.webapp.accountbook.presentation.response.account.regist;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -22,10 +20,8 @@ import lombok.RequiredArgsConstructor;
 
 /**
  *<pre>
- * マイ家計簿の各月の収支画面から遷移する以下画面へのリダイレクト情報です。
- * ・買い物登録画面
- * ・各月の収支詳細表示画面
- * ・収支登録画面(更新)
+ * 買い物登録の各画面(トップ画面を含む)から遷移する以下画面へのリダイレクト情報です。
+ * ・買い物登録(簡易タイプ)画面
  *
  *</pre>
  *
@@ -34,7 +30,7 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class AccountMonthInquiryRedirectResponse extends AbstractResponse {
+public class ShoppingRegistRedirectResponse extends AbstractResponse {
 	
 	// リダイレクト先URL
 	private final String redirectUrl;
@@ -49,10 +45,10 @@ public class AccountMonthInquiryRedirectResponse extends AbstractResponse {
 	 * @return 買い物登録画面にリダイレクトするためのレスポンス情報
 	 *
 	 */
-	public static AccountMonthInquiryRedirectResponse getShoppingAddRedirectInstance(String targetYearMonth) {
-		AccountMonthInquiryRedirectResponse response = new AccountMonthInquiryRedirectResponse(
-				// 買い物登録画面リダイレクトURL
-				"redirect:/myhacbook/accountregist/shoppingtopmenu/",
+	public static ShoppingRegistRedirectResponse getShoppingRegistRedirectInstance(String targetYearMonth) {
+		ShoppingRegistRedirectResponse response = new ShoppingRegistRedirectResponse(
+				// 買い物登録(簡易タイプ)画面リダイレクトURL
+				"redirect:/myhacbook/accountregist/shoppingregist/",
 				// 対象年月
 				targetYearMonth);
 		response.setTransactionSuccessFull();
@@ -61,16 +57,16 @@ public class AccountMonthInquiryRedirectResponse extends AbstractResponse {
 	
 	/**
 	 *<pre>
-	 * 収支登録画面(更新)にリダイレクトするためのレスポンス情報を生成して返します。
+	 * 買い物登録(簡易タイプ)画面にリダイレクトするためのレスポンス情報を生成して返します。
 	 *</pre>
 	 * @param targetYearMonth 対象年月
-	 * @return 収支登録画面(更新)にリダイレクトするためのレスポンス情報
+	 * @return 買い物登録(簡易タイプ)画面にリダイレクトするためのレスポンス情報
 	 *
 	 */
-	public static AccountMonthInquiryRedirectResponse getAccountMonthUpdateRedirectInstance(String targetYearMonth) {
-		AccountMonthInquiryRedirectResponse response = new AccountMonthInquiryRedirectResponse(
-				// 収支登録画面(更新)リダイレクトURL
-				"redirect:/myhacbook/accountregist/incomeandexpenditure/updateload/",
+	public static ShoppingRegistRedirectResponse getSimpleShoppingRegistRedirectInstance(String targetYearMonth) {
+		ShoppingRegistRedirectResponse response = new ShoppingRegistRedirectResponse(
+				// 買い物登録(簡易タイプ)画面リダイレクトURL
+				"redirect:/myhacbook/accountregist/simpleshoppingregist/",
 				// 対象年月
 				targetYearMonth);
 		response.setTransactionSuccessFull();

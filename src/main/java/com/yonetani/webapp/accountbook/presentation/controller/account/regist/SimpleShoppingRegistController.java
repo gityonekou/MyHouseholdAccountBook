@@ -1,7 +1,7 @@
 /**
- * 買い物登録画面表示を担当するコントローラーです。
+ * 買い物登録(簡易タイプ)画面表示を担当するコントローラーです。
  * 以下画面遷移を担当します。
- * ・買い物登録方法選択画面から買い物登録を選択：リダイレクトされて買い物登録画面へ:GET
+ * ・買い物登録方法選択画面から簡易タイプを選択：リダイレクトされて買い物登録(簡易タイプ)画面へ:GET
  *
  *------------------------------------------------
  * 更新履歴
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.yonetani.webapp.accountbook.application.usecase.account.regist.ShoppingRegistUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.account.regist.SimpleShoppingRegistUseCase;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
 import lombok.RequiredArgsConstructor;
@@ -25,9 +25,9 @@ import lombok.extern.log4j.Log4j2;
 
 /**
  *<pre>
- * 買い物登録画面表示を担当するコントローラーです。
+ * 買い物登録(簡易タイプ)画面表示を担当するコントローラーです。
  * 以下画面遷移を担当します。
- * ・買い物登録方法選択画面から買い物登録を選択：リダイレクトされて買い物登録画面へ:GET
+ * ・買い物登録方法選択画面から簡易タイプを選択：リダイレクトされて買い物登録(簡易タイプ)画面へ:GET
  *
  *</pre>
  *
@@ -37,22 +37,22 @@ import lombok.extern.log4j.Log4j2;
  */
 @Controller
 @Log4j2
-@RequestMapping("/myhacbook/accountregist/shoppingregist/")
+@RequestMapping("/myhacbook/accountregist/simpleshoppingregist/")
 @RequiredArgsConstructor
-public class ShoppingRegistController {
+public class SimpleShoppingRegistController {
 	
 	// UseCase
-	private final ShoppingRegistUseCase usecase;
+	private final SimpleShoppingRegistUseCase usecase;
 	// ユーザーセッション
 	private final LoginUserSession loginUserSession;
 	
 	/**
 	 *<pre>
-	 * 買い物登録画面表示のGET要求時マッピングです。
-	 * 買い物登録方法選択画面表示で買い物登録ボタン押下時のリダイレクト遷移リクエストを処理します。
+	 * 買い物登録(簡易タイプ)画面表示のGET要求時マッピングです。
+	 * 買い物登録方法選択画面表示で簡易タイプボタン押下時のリダイレクト遷移リクエストを処理します。
 	 *</pre>
 	 * @pararm targetYearMonth 表示対象の年月
-	 * @return 買い物登録画面情報
+	 * @return 買い物登録(簡易タイプ)画面情報
 	 *
 	 */
 	@GetMapping
@@ -65,4 +65,5 @@ public class ShoppingRegistController {
 				// レスポンスからModelAndViewを生成
 				.build();
 	}
+	
 }

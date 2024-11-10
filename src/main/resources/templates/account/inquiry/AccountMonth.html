@@ -5,6 +5,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
 		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
 		crossorigin="anonymous">
+<link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
 <title>各月の収支</title>
 </head>
 <body>
@@ -46,33 +47,89 @@
 							<!--/* 画面表示の段階で指定した年月の収支情報があるので、returnYearMonthの値にtargetYearMonthの値を設定する */-->
 							<input type="hidden" name="returnYearMonth" th:value="*{targetYearMonth}" />
 						</form>
+						
 						<!-- 収支表示 -->
 						<div class="card">
+							
 							<!-- 月毎収支まとめ表示エリア -->
 							<div class="card-body">
-								<ul class="list-group">
-									<li class="list-group-item list-group-item-info">収入額：<span th:text="${syuunyuuKingaku}"></span></li>
-									<li class="list-group-item">支出予定額：<span th:text="${sisyutuYoteiKingaku}"></span></li>
-									<li class="list-group-item">支出額：<span th:text="${sisyutuKingaku}"></span></li>
-									<li class="list-group-item list-group-item-info">収支：<span th:text="${syuusiKingaku}"></span></li>
-								</ul>
+								<table class="table table-sm table-bordered">
+									<tbody>
+										<tr class="table-info">
+											<td class="w15">収入額：</td>
+											<td class="w10" align="right" th:text="${syuunyuuKingaku}">収入額</td>
+											<td>&emsp;</td>
+										</tr>
+										<tr>
+											<td class="w15">支出予定額：</td>
+											<td class="w10" align="right" th:text="${sisyutuYoteiKingaku}">支出予定額</td>
+											<td>&emsp;</td>
+										</tr>
+										<tr>
+											<td class="w15">支出額：</td>
+											<td class="w10" align="right" th:text="${sisyutuKingaku}">支出額</td>
+											<td>&emsp;</td>
+										</tr>
+										<tr class="table-info">
+											<td class="w15">収支：</td>
+											<td class="w10" align="right" th:text="${syuusiKingaku}">収支</td>
+											<td>&emsp;</td>
+										</tr>
+									</tbody>
+								</table>
 							</div>
+							
 							<!-- 月毎支出表示(レベル2項目)表示エリア -->
 							<div class="card-body">
 								<th:block th:if="${#lists.size(expenditureItemList)}>0">
 								<table class="table table-sm table-borderless">
-									<thead class="border border-dark"><tr class="table-secondary"><th scope="col">支出項目</th><th scope="col">支払い年月日</th></tr></thead>
+									<thead class="border border-dark"><tr class="table-secondary"><th scope="col" class="w20">支出項目</th><th scope="col" class="w20">&emsp;</th><th scope="col" class="w10">支払い年月日</th><th scope="col">&emsp;</th></tr></thead>
 									<tbody>
 										<th:block th:each="item : ${expenditureItemList}">
 											<tr class="table-success border border-success" th:if="${item.sisyutuItemLevel == 1}">
-												<td th:if="${#strings.isEmpty(item.percentage)}">■<span th:text="${item.sisyutuItemName}"></span>：<span th:text="${item.sisyutuKingaku}"></span></td>
-												<td th:if="!${#strings.isEmpty(item.percentage)}">■<span th:text="${item.sisyutuItemName}"></span>：<span th:text="${item.sisyutuKingaku}"></span>&emsp;<code>(B:<span th:text="${item.sisyutuKingakuB}"></span>：<span th:text="${item.percentage}"></span>%)</code></td>
-												<td th:text="${item.siharaiDate}">支払日</td>
+												<td class="w20">■<span th:text="${item.sisyutuItemName}"></span>：</td>
+												<td class="w20" th:if="${#strings.isEmpty(item.percentage)}"><span th:text="${item.sisyutuKingaku}"></span></td>
+												<td class="w20" th:if="!${#strings.isEmpty(item.percentage)}"><span th:text="${item.sisyutuKingaku}"></span>&emsp;<code>(<span th:text="${item.sisyutuKingakuBC}"></span>：<span th:text="${item.percentage}"></span>%)</code></td>
+												<td class="w10" th:text="${item.siharaiDate}">支払日</td>
+												<td th:if="${#strings.isEmpty(item.percentage)}">&emsp;</td>
+												<td th:if="!${#strings.isEmpty(item.percentage)}">
+													<th:block th:if="!${#strings.isEmpty(item.percentageB)}">
+														<code>B:<span th:text="${item.sisyutuKingakuB}"></span>(<span th:text="${item.percentageB}"></span>%)</code>
+													</th:block>
+													<th:block th:if="!${#strings.isEmpty(item.percentageC)}">
+														<code>C:<span th:text="${item.sisyutuKingakuC}"></span>(<span th:text="${item.percentageC}"></span>%)</code>
+													</th:block>
+												</td>
 											</tr>
 											<tr th:if="${item.sisyutuItemLevel == 2}">
-												<td th:if="${#strings.isEmpty(item.percentage)}">&emsp;・<span th:text="${item.sisyutuItemName}"></span>：<span th:text="${item.sisyutuKingaku}"></span></td>
-												<td th:if="!${#strings.isEmpty(item.percentage)}">&emsp;・<span th:text="${item.sisyutuItemName}"></span>：<span th:text="${item.sisyutuKingaku}"></span>&emsp;<code>(B:<span th:text="${item.sisyutuKingakuB}"></span>：<span th:text="${item.percentage}"></span>%)</code></td>
-												<td th:text="${item.siharaiDate}">支払日</td>
+												<td class="w20">&emsp;<span th:text="${item.sisyutuItemName}"></span>：</td>
+												<td class="w20" th:if="${#strings.isEmpty(item.percentage)}"><span th:text="${item.sisyutuKingaku}"></span></td>
+												<td class="w20" th:if="!${#strings.isEmpty(item.percentage)}"><span th:text="${item.sisyutuKingaku}"></span>&emsp;<code>(<span th:text="${item.sisyutuKingakuBC}"></span>：<span th:text="${item.percentage}"></span>%)</code></td>
+												<td class="w10" th:text="${item.siharaiDate}">支払日</td>
+												<td th:if="${#strings.isEmpty(item.percentage)}">&emsp;</td>
+												<td th:if="!${#strings.isEmpty(item.percentage)}">
+													<th:block th:if="!${#strings.isEmpty(item.percentageB)}">
+														<code>B:<span th:text="${item.sisyutuKingakuB}"></span>(<span th:text="${item.percentageB}"></span>%)</code>
+													</th:block>
+													<th:block th:if="!${#strings.isEmpty(item.percentageC)}">
+														<code>C:<span th:text="${item.sisyutuKingakuC}"></span>(<span th:text="${item.percentageC}"></span>%)</code>
+													</th:block>	
+												</td>
+											</tr>
+											<tr th:if="${item.sisyutuItemLevel == 3}">
+												<td class="w20">&emsp;&emsp;・<span th:text="${item.sisyutuItemName}"></span>：</td>
+												<td class="w20" th:if="${#strings.isEmpty(item.percentage)}">&emsp;<span th:text="${item.sisyutuKingaku}"></span></td>
+												<td class="w20" th:if="!${#strings.isEmpty(item.percentage)}">&emsp;<span th:text="${item.sisyutuKingaku}"></span>&emsp;<code>(<span th:text="${item.sisyutuKingakuBC}"></span>：<span th:text="${item.percentage}"></span>%)</code></td>
+												<td class="w10" th:text="${item.siharaiDate}">支払日</td>
+												<td th:if="${#strings.isEmpty(item.percentage)}">&emsp;</td>
+												<td th:if="!${#strings.isEmpty(item.percentage)}">
+													<th:block th:if="!${#strings.isEmpty(item.percentageB)}">
+														<code>B:<span th:text="${item.sisyutuKingakuB}"></span>(<span th:text="${item.percentageB}"></span>%)</code>
+													</th:block>
+													<th:block th:if="!${#strings.isEmpty(item.percentageC)}">
+														<code>C:<span th:text="${item.sisyutuKingakuC}"></span>(<span th:text="${item.percentageC}"></span>%)</code>
+													</th:block>
+												</td>
 											</tr>
 										</th:block>
 									</tbody>
@@ -96,8 +153,7 @@
 			<div class="card-body">
 				<form id="DispatchAction" class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountmonth/dispatchaction/}">
 					<button class="btn btn-outline-primary" name="shoppinAdd" type="submit">買い物登録</button>
-					<button class="btn btn-outline-primary" name="accountMonthDetail" type="submit">詳細表示</button>
-					<button class="btn btn-outline-primary" name="accountMonthUpdate" type="submit">更新</button>
+					<button class="btn btn-outline-primary" name="accountMonthUpdate" type="submit">収支更新</button>
 					<input type="hidden" th:field="*{targetYearMonth}" />
 				</form>
 				

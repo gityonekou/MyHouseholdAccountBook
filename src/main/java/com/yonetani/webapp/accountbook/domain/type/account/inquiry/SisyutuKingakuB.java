@@ -143,8 +143,8 @@ public class SisyutuKingakuB {
 		if(sisyutuKingaku == null) {
 			throw new MyHouseholdAccountBookRuntimeException("支出金額がnull値です。管理者に問い合わせてください。[sisyutuKingaku=null]");
 		}
-		// 支出金額Bの値がnullの場合、空文字列を返却
-		if(value == null) {
+		// 支出金額Bの値がnullか0の場合、空文字列を返却
+		if(value == null || ZERO.getValue().compareTo(value) >= 0) {
 			return "";
 		}
 		

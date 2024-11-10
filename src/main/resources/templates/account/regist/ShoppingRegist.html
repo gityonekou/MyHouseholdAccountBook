@@ -5,7 +5,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
 		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
 		crossorigin="anonymous">
-<title>マイ家計簿買い物登録</title>
+<title>買い物登録</title>
 </head>
 <body>
 	<!--/* ヘッダー */-->
@@ -16,7 +16,9 @@
 		<div class="card">
 			<div class="card-body">
 				<h5 class="card-title">マイ家計簿(買い物登録)</h5>
-				<p class="card-text">何かのメッセージがある場合はここに表示</p>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
 			</div>
 			<div class="card-body">
 				買い物登録表示部

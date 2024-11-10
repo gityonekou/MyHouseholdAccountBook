@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<title>買い物登録</title>
+</head>
+<body>
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">買い物登録（簡易タイプ）</h5>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
+			</div>
+			
+			<!-- 簡易タイプ買い物登録エリア -->
+			<div class="card-body">
+				<div class="card">
+					<div class="card-body">
+						<p class="h6">■店舗選択エリア■</p>
+						<p class="card-text">対象の店舗とテンプレートを選択してください。</p>
+						<div class="mb-3">
+							<label for="exampleSelect" class="form-label">■店舗区分</label>
+							<select class="form-select" id="shopGroup">
+								<option value="" selected="selected">グループメニューを開く</option>
+								<option value="90">食品・日用品店舗</option>
+								<option value="91">ホームセンター</option>
+								<option value="92">衣類店舗</option>
+								<option value="93">家電量販店</option>
+								<option value="94">複合店舗</option>
+								<option value="95">外食</option>
+								<option value="96">ネットショップ</option>
+								<option value="97">イベント</option>
+								<option value="98">交通機関</option>
+								<option value="99">その他</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label for="validationServer01" class="form-label">■店舗名</label>
+							<select class="form-select" id="shopGroup">
+								<option value="" selected="selected">グループメニューを開く</option>
+								<option value="90">エイヴィ</option>
+								<option value="91">OK</option>
+								<option value="92">イオン</option>
+								<option value="93">いやげや</option>
+								<option value="94">ドン・キホーテ</option>
+								<option value="95">ロピア</option>
+								<option value="96">コンビニ</option>
+								<option value="99">その他</option>
+							</select>
+						</div>
+						<div class="mb-3">
+							<label for="validationServer01" class="form-label">■買い物日</label>
+							<div class="input-group w10">
+								<input type="text" class="form-control" id="kaimonobi" value="" required>
+							</div>
+						</div>
+						<!-- 収支(マージ)表示エリア -->
+						<table class="table table-sm table-borderless">
+							<thead><tr class="table-secondary">
+								<th scope="col">食料品<br>(必須)</th>
+								<th scope="col">食料品<br>(無駄遣い)</th>
+								<th scope="col">食料品<br>(お酒類)</th>
+								<th scope="col">外食</th>
+								<th scope="col">日常品</th>
+								<th scope="col">衣料品<br>(私服)</th>
+								<th scope="col">仕事</th>
+								<th scope="col">その他</th>
+								<th scope="col">クーポン</th>
+								<th scope="col">外税</th>
+								<th scope="col">合計</th>
+								<th scope="col"></th>
+							</tr></thead>
+							<tbody>
+								<tr>
+									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
+									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
+									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
+									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
+									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
+									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
+									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
+									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
+									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
+									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
+									<td class="w10"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="999,999" disabled>円</div></td>
+									<td></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			<!-- 登録ボタンエリア -->
+			<div class="card-body">
+				<button class="btn btn-outline-primary" type="button">家計簿参照</button>
+				<button class="btn btn-outline-primary" type="button">買い物更新</button>
+				<form name="accountdetail" class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountmonth/}">
+					<input type="hidden" name="targetYearMonth" value="202308" />
+				</form>
+				<form name="accountupdate" class="d-flex" method="post" th:action="@{/myhacbook/shopping/update/}">
+					<input type="hidden" name="target" value="202308" />
+				</form>
+			</div>
+		</div>
+	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+</body>
+</html>

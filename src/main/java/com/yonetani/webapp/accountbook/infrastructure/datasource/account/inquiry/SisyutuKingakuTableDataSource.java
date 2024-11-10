@@ -175,6 +175,7 @@ public class SisyutuKingakuTableDataSource implements SisyutuKingakuTableReposit
 					dto.getSisyutuItemLevel(),
 					dto.getSisyutuKingaku(),
 					dto.getSisyutuKingakuB(),
+					dto.getSisyutuKingakuC(),
 					dto.getSisyutuSiharaiDate())).collect(Collectors.toUnmodifiableList()));
 	}
 	

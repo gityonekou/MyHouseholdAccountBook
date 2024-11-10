@@ -33,7 +33,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryRedirectResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse.ExpenditureListItem;
-import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse.TargetYearMonthInfo;
+import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryTargetYearMonthInfo;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
@@ -82,14 +82,12 @@ public class AccountMonthInquiryUseCase {
 		// ユーザIDに対応する現在の対象年月の値を取得
 		NowTargetYearMonth yearMonth = userInquiry.getNowTargetYearMonth(UserId.from(user.getUserId()));
 		
-		// レスポンスを生成
-		AccountMonthInquiryResponse response = AccountMonthInquiryResponse.getInstance(
-				TargetYearMonthInfo.from(yearMonth.getYearMonth().getValue()));
+		// 収支画面に表示する対象年月情報を生成
+		AccountMonthInquiryTargetYearMonthInfo targetYearMonthInfo = AccountMonthInquiryTargetYearMonthInfo.from(
+				yearMonth.getYearMonth().getValue());
 		
-		// ユーザID,現在の対象年月を条件に支出項目のリストと収支金額を取得
-		execRead(user, yearMonth.getYearMonth().getValue(), response);
-		
-		return response;
+		// ユーザID,現在の対象年月を条件に支出項目のリストと収支金額を取得しレスポンス情報を返却
+		return execRead(user, targetYearMonthInfo);
 	}
 
 	/**
@@ -103,15 +101,9 @@ public class AccountMonthInquiryUseCase {
 	 */
 	public AccountMonthInquiryResponse read(LoginUserInfo user, String targetYearMonth) {
 		log.debug("read:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
-		
-		// レスポンスを生成
-		AccountMonthInquiryResponse response = AccountMonthInquiryResponse.getInstance(
-				TargetYearMonthInfo.from(targetYearMonth));
-		
-		// ユーザID,入力された対象年月を条件に支出項目のリストと収支金額を取得
-		execRead(user, targetYearMonth, response);
-		
-		return response;
+				
+		// ユーザID,入力された対象年月を条件に支出項目のリストと収支金額を取得しレスポンス情報を返却
+		return execRead(user, AccountMonthInquiryTargetYearMonthInfo.from(targetYearMonth));
 	}
 	
 	/**
@@ -130,20 +122,14 @@ public class AccountMonthInquiryUseCase {
 	 * @param user ユーザ情報
 	 * @param targetYearMonth 表示対象の年月
 	 * @param returnYearMonth 戻り先の対象の年月
-	 * @return
+	 * @return 月間収支情報(レスポンス)
 	 *
 	 */
 	public AccountMonthInquiryResponse read(LoginUserInfo user, String targetYearMonth, String returnYearMonth) {
 		log.debug("read:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",returnYearMonth=" + returnYearMonth);
 		
-		// レスポンスを生成
-		AccountMonthInquiryResponse response = AccountMonthInquiryResponse.getInstance(
-				TargetYearMonthInfo.from(targetYearMonth, returnYearMonth));
-		
-		// ユーザID,入力された対象年月を条件に支出項目のリストと収支金額を取得
-		execRead(user, targetYearMonth, response);
-		
-		return response;
+		// ユーザID,入力された対象年月を条件に支出項目のリストと収支金額を取得しレスポンス情報を返却
+		return execRead(user, AccountMonthInquiryTargetYearMonthInfo.from(targetYearMonth, returnYearMonth));
 	}
 	
 	/**
@@ -155,26 +141,10 @@ public class AccountMonthInquiryUseCase {
 	 * @return 買い物登録画面リダイレクト情報
 	 *
 	 */
-	public AbstractResponse readShoppinAddRedirectInfo(LoginUserInfo user, String targetYearMonth) {
-		log.debug("readShoppinAddRedirectInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+	public AbstractResponse readShoppingAddRedirectInfo(LoginUserInfo user, String targetYearMonth) {
+		log.debug("readShoppingAddRedirectInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
 		AccountMonthInquiryRedirectResponse response
-			= AccountMonthInquiryRedirectResponse.getShoppinAddRedirectInstance(targetYearMonth);
-		return response;
-	}
-	
-	/**
-	 *<pre>
-	 * 各月の収支詳細表示画面にリダイレクトするための情報を設定します。
-	 *</pre>
-	 * @param user ログインユーザ情報
-	 * @param targetYearMonth 収支の対象年月
-	 * @return 各月の収支詳細表示画面リダイレクト情報
-	 *
-	 */
-	public AbstractResponse readAccountMonthDetailRedirectInfo(LoginUserInfo user, String targetYearMonth) {
-		log.debug("readAccountMonthDetailRedirectInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
-		AccountMonthInquiryRedirectResponse response
-			= AccountMonthInquiryRedirectResponse.getAccountMonthDetailRedirectInstance(targetYearMonth);
+			= AccountMonthInquiryRedirectResponse.getShoppingAddRedirectInstance(targetYearMonth);
 		return response;
 	}
 	
@@ -199,16 +169,20 @@ public class AccountMonthInquiryUseCase {
 	 * 支出項目のリストと収支金額を取得します。
 	 *</pre>
 	 * @param user ユーザ情報
-	 * @param targetYearMonth 表示対象の年月
-	 * @param response 月間収支情報(レスポンス)
+	 * @param targetYearMonthInfo 表示対象の対象年月情報
+	 * @return 月間収支情報(レスポンス)
 	 *
 	 */
-	private void execRead(LoginUserInfo user, String targetYearMonth, AccountMonthInquiryResponse response) {
-		log.debug("execRead:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+	private AccountMonthInquiryResponse execRead(
+			LoginUserInfo user, AccountMonthInquiryTargetYearMonthInfo targetYearMonthInfo) {
+		log.debug("execRead:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonthInfo.getTargetYearMonth());
+		
+		// レスポンスを生成
+		AccountMonthInquiryResponse response = AccountMonthInquiryResponse.getInstance(targetYearMonthInfo);
 		
 		// 検索条件(ユーザID、年月(YYYYMM))をドメインオブジェクトに変換
 		SearchQueryUserIdAndYearMonth inquiryModel = SearchQueryUserIdAndYearMonth.from(
-				UserId.from(user.getUserId()), TargetYearMonth.from(targetYearMonth));
+				UserId.from(user.getUserId()), TargetYearMonth.from(targetYearMonthInfo.getTargetYearMonth()));
 		// ユーザID,対象年月を検索条件に支出金額情報のリストを取得
 		AccountMonthInquiryExpenditureItemList resultList = repository.select(inquiryModel);
 
@@ -261,6 +235,8 @@ public class AccountMonthInquiryUseCase {
 			// 収支金額
 			response.setSyuusiKingaku(sisyutuResult.getSyuusiKingaku().toString());
 		}
+		
+		return response;
 	}
 	
 	/**
@@ -273,13 +249,17 @@ public class AccountMonthInquiryUseCase {
 	 */
 	private List<ExpenditureListItem> convertExpenditureItemList(AccountMonthInquiryExpenditureItemList resultList) {
 		// 返却するリストを不変オブジェクトに変換する
-		return resultList.getValues().stream().map(domain ->
+		return resultList.getValues().stream().map(domain -> 
 		AccountMonthInquiryResponse.ExpenditureListItem.form(
 				domain.getSisyutuItemLevel().getValue(),
 				domain.getSisyutuItemName().getValue(),
 				domain.getSisyutuKingaku().toString(),
 				domain.getSisyutuKingakuB().toSisyutuKingakuBString(),
 				domain.getSisyutuKingakuB().getPercentage(domain.getSisyutuKingaku()),
+				domain.getSisyutuKingakuC().toSisyutuKingakuCString(),
+				domain.getSisyutuKingakuC().getPercentage(domain.getSisyutuKingaku()),
+				domain.getSisyutuKingakuBC().toSisyutuKingakuBCString(),
+				domain.getSisyutuKingakuBC().getPercentage(domain.getSisyutuKingaku()),
 				domain.getShiharaiDate().toString())).collect(Collectors.toUnmodifiableList());
 	}	
 }

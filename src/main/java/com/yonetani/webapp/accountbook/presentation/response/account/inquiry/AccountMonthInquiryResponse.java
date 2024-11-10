@@ -9,17 +9,12 @@
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.inquiry;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
-import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
 import lombok.AccessLevel;
@@ -40,85 +35,6 @@ import lombok.Setter;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class AccountMonthInquiryResponse extends AbstractResponse {
-
-	/**
-	 *<pre>
-	 * 表示する月の対象年月情報です。
-	 * 対象年、対象月、前月、次月、戻り時の表示年月の値を持ちます
-	 *
-	 *</pre>
-	 *
-	 * @author ：Kouki Yonetani
-	 * @since 家計簿アプリ(1.00.A)
-	 *
-	 */
-	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-	@Getter
-	public static class TargetYearMonthInfo {
-		// 対象年月
-		private final String targetYearMonth;
-		// 戻り時の表示対象年月
-		private final String returnYearMonth;
-		// 対象年
-		private final String targetYear;
-		// 前月
-		private final String beforeYearMonth;
-		// 翌月
-		private final String nextYearMonth;
-		// 「yyyy年MM月度」の年の値
-		private final String viewYear;
-		// 「yyyy年MM月度」の月の値
-		private final String viewMonth;
-		
-		/**
-		 *<pre>
-		 * 引数の値から表示する月の対象年月情報を生成して返します。
-		 *</pre>
-		 * @param targetYearMonth 表示対象の年月(YYYMM)
-		 * @param returnYearMonth 戻り時の表示対象年月
-		 * @return 表示する月の対象年月情報
-		 *
-		 */
-		public static TargetYearMonthInfo from(String targetYearMonth, String returnYearMonth) {
-			// 念のため、ここで入力値チェックを行う
-			if(!StringUtils.hasLength(targetYearMonth) || targetYearMonth.length() != 6) {
-				throw new MyHouseholdAccountBookRuntimeException("対象年月の値が不正です。管理者に問い合わせてください。[targetYearMonth=" + targetYearMonth + "]");
-			}
-			// 現在の対象年月からカレンダーを生成(前月・翌月の値取得用)
-			LocalDate yearMonthCalendar = LocalDate.parse(targetYearMonth + "01", MyHouseholdAccountBookContent.DATE_TIME_FORMATTER);
-			DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMM");
-			
-			return new TargetYearMonthInfo(
-					// 対象年月
-					targetYearMonth,
-					// 戻り時の表示対象年月
-					returnYearMonth,
-					// 対象年
-					targetYearMonth.substring(0, 4),
-					// 前月
-					yearMonthCalendar.minusMonths(1).format(format),
-					// 翌月
-					yearMonthCalendar.plusMonths(1).format(format),
-					// 「yyyy年MM月度」の年の値
-					targetYearMonth.substring(0, 4),
-					// 「yyyy年MM月度」の月の値
-					targetYearMonth.substring(4)
-					);
-		}
-		
-		/**
-		 *<pre>
-		 * 引数の値から表示する月の対象年月情報を生成して返します。
-		 * 戻り時の表示対象年月の値は引数で指定した対象年月と同じ値が設定されます。
-		 *</pre>
-		 * @param targetYearMonth 表示対象の年月(YYYMM)
-		 * @return 表示する月の対象年月情報
-		 *
-		 */
-		public static TargetYearMonthInfo from(String targetYearMonth) {
-			return TargetYearMonthInfo.from(targetYearMonth, targetYearMonth);
-		}
-	}
 	
 	/**
 	 *<pre>
@@ -142,7 +58,15 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 		private final String sisyutuKingaku;
 		// 支出金額B
 		private final String sisyutuKingakuB;
-		// 支出金額B割合
+		// 支出金額Bの割合
+		private final String percentageB;
+		// 支出金額C
+		private final String sisyutuKingakuC;
+		// 支出金額Cの割合
+		private final String percentageC;
+		// 支出金額BとC合計値
+		private final String sisyutuKingakuBC;
+		// 支出金額BとC合計値の割合
 		private final String percentage;
 		// 支払日
 		private final String siharaiDate;
@@ -154,8 +78,12 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 		 * @param sisyutuItemLevel 支出項目レベル
 		 * @param sisyutuItemName 支出項目名
 		 * @param sisyutuKingaku 支出金額
-		 * @param sisyutuKingakuB 支出金額b
-		 * @praam percentage 支出金額B割合
+		 * @param sisyutuKingakuB 支出金額B
+		 * @praam percentageB 支出金額B割合
+		 * @param sisyutuKingakuC 支出金額C
+		 * @praam percentageC 支出金額C割合
+		 * @param sisyutuKingakuBC 支出金額BとC合計値
+		 * @praam percentage 支出金額BとC合計値の割合
 		 * @param siharaiDate 支払日
 		 * @return 月毎の支出金額情報明細
 		 *
@@ -165,6 +93,10 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 				String sisyutuItemName,
 				String sisyutuKingaku,
 				String sisyutuKingakuB,
+				String percentageB,
+				String sisyutuKingakuC,
+				String percentageC,
+				String sisyutuKingakuBC,
 				String percentage,
 				String siharaiDate) {
 			return new ExpenditureListItem(
@@ -172,13 +104,17 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 					sisyutuItemName,
 					sisyutuKingaku,
 					sisyutuKingakuB,
+					percentageB,
+					sisyutuKingakuC,
+					percentageC,
+					sisyutuKingakuBC,
 					percentage,
 					siharaiDate);
 		}
 	}
 	
 	// 表示する月の対象年月情報
-	private final TargetYearMonthInfo targetYearMonthInfo;
+	private final AccountMonthInquiryTargetYearMonthInfo targetYearMonthInfo;
 	// 月毎の支出金額情報明細のリストです。
 	private List<ExpenditureListItem> expenditureItemList = new ArrayList<>();
 	
@@ -207,7 +143,7 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 	 * @return マイ家計簿の各月の収支画面表示情報
 	 *
 	 */
-	public static AccountMonthInquiryResponse getInstance(TargetYearMonthInfo targetYearMonthInfo) {
+	public static AccountMonthInquiryResponse getInstance(AccountMonthInquiryTargetYearMonthInfo targetYearMonthInfo) {
 		return new AccountMonthInquiryResponse(targetYearMonthInfo);
 	}
 	

@@ -149,12 +149,12 @@ public class AccountMonthInquiryController {
 	 *
 	 */
 	@PostMapping(value = "/dispatchaction/", params = "shoppinAdd")
-	public ModelAndView getShoppinAddRedirectLoad(
+	public ModelAndView getShoppingAddRedirectLoad(
 			@RequestParam("targetYearMonth") String targetYearMonth, RedirectAttributes redirectAttributes) {
-		log.debug("getShoppinAddRedirectLoad:targetYearMonth=" + targetYearMonth);
+		log.debug("getShoppingAddRedirectLoad:targetYearMonth=" + targetYearMonth);
 		
 		// 画面表示情報を取得
-		return this.usecase.readShoppinAddRedirectInfo(loginUserSession.getLoginUserInfo(), targetYearMonth)
+		return this.usecase.readShoppingAddRedirectInfo(loginUserSession.getLoginUserInfo(), targetYearMonth)
 			// レスポンスにログインユーザ名を設定
 			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 			// 買い物登録画面へリダイレクト
@@ -163,29 +163,7 @@ public class AccountMonthInquiryController {
 	
 	/**
 	 *<pre>
-	 * 詳細表示ボタン押下時のPOST要求時マッピングです。各月の収支詳細表示画面にリダイレクトします。
-	 *</pre>
-	 * @param targetYearMonth 表示対象の年月
-	 * @param redirectAttributes リダイレクト先引き継ぎ領域
-	 * @return 各月の収支詳細表示画面へリダイレクト
-	 *
-	 */
-	@PostMapping(value = "/dispatchaction/", params = "accountMonthDetail")
-	public ModelAndView getAccountMonthDetailRedirectLoad(
-			@RequestParam("targetYearMonth") String targetYearMonth, RedirectAttributes redirectAttributes) {
-		log.debug("getAccountMonthDetailRedirectLoad:targetYearMonth=" + targetYearMonth);
-		
-		// 画面表示情報を取得
-		return this.usecase.readAccountMonthDetailRedirectInfo(loginUserSession.getLoginUserInfo(), targetYearMonth)
-			// レスポンスにログインユーザ名を設定
-			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
-			// 各月の収支詳細表示画面へリダイレクト
-			.buildRedirect(redirectAttributes);
-	}
-	
-	/**
-	 *<pre>
-	 * 更新ボタン押下時のPOST要求時マッピングです。収支登録画面(更新)にリダイレクトします。
+	 * 収支更新ボタン押下時のPOST要求時マッピングです。収支登録画面(更新)にリダイレクトします。
 	 *</pre>
 	 * @param targetYearMonth 表示対象の年月
 	 * @param redirectAttributes リダイレクト先引き継ぎ領域

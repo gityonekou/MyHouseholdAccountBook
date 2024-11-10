@@ -22,6 +22,8 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemLe
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemName;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuB;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuBC;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuC;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -68,6 +70,10 @@ public class AccountMonthInquiryExpenditureItemList {
 		private final SisyutuKingaku sisyutuKingaku;
 		// 支出金額B
 		private final SisyutuKingakuB sisyutuKingakuB;
+		// 支出金額C
+		private final SisyutuKingakuC sisyutuKingakuC;
+		// 支出金額BとCの合計値
+		private final SisyutuKingakuBC sisyutuKingakuBC;
 		// 支払日
 		private final ShiharaiDate shiharaiDate;
 		
@@ -79,7 +85,8 @@ public class AccountMonthInquiryExpenditureItemList {
 		 * @param sisyutuItemName 支出項目名
 		 * @param sisyutuItemLevel 支出項目レベル(1～5)
 		 * @param sisyutuKingaku 支出金額
-		 * @param sisyutuKingakuB 支出金額b
+		 * @param sisyutuKingakuB 支出金額B
+		 * @param sisyutuKingakuC 支出金額C
 		 * @param siharaiDate 支払日
 		 * @return 月毎の支出項目明細
 		 *
@@ -90,14 +97,20 @@ public class AccountMonthInquiryExpenditureItemList {
 					String sisyutuItemLevel,
 					BigDecimal sisyutuKingaku,
 					BigDecimal sisyutuKingakuB,
+					BigDecimal sisyutuKingakuC,
 					LocalDate siharaiDate
 				) {
+			SisyutuKingakuB kinbakuB = SisyutuKingakuB.from(sisyutuKingakuB);
+			SisyutuKingakuC kinbakuC = SisyutuKingakuC.from(sisyutuKingakuC);
+			SisyutuKingakuBC kinbakuBC = SisyutuKingakuBC.from(kinbakuB, kinbakuC);
 			return new ExpenditureListItem(
 					SisyutuItemCode.from(sisyutuItemCode),
 					SisyutuItemName.from(sisyutuItemName),
 					SisyutuItemLevel.from(sisyutuItemLevel),
 					SisyutuKingaku.from(sisyutuKingaku),
-					SisyutuKingakuB.from(sisyutuKingakuB),
+					kinbakuB,
+					kinbakuC,
+					kinbakuBC,
 					ShiharaiDate.from(siharaiDate));
 		}
 	}
