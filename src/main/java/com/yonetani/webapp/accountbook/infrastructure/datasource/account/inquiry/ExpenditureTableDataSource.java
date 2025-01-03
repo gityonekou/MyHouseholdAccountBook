@@ -19,10 +19,14 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureI
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubun;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.ExpenditureReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthAndSisyutuCodeSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubunSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthAndSisyutuItemCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry.ExpenditureTableMapper;
 
@@ -96,6 +100,41 @@ public class ExpenditureTableDataSource implements ExpenditureTableRepository {
 	public ExpenditureItemInquiryList findById(SearchQueryUserIdAndYearMonth searchQuery) {
 		// 検索結果を取得
 		List<ExpenditureReadWriteDto> searchResult = mapper.findById(UserIdAndYearMonthSearchQueryDto.from(searchQuery));
+		if(searchResult == null) {
+			// 検索結果なしの場合、0件データを返却
+			return ExpenditureItemInquiryList.from(null);
+		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
+			return ExpenditureItemInquiryList.from(searchResult.stream().map(dto -> createExpenditureItem(dto))
+					.collect(Collectors.toUnmodifiableList()));
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ExpenditureItemInquiryList findById(SearchQueryUserIdAndYearMonthAndSisyutuItemCode searchQuery) {
+		// 検索結果を取得
+		List<ExpenditureReadWriteDto> searchResult = mapper.findByIdAndSisyutuItemCode(UserIdAndYearMonthAndSisyutuItemCodeSearchQueryDto.from(searchQuery));
+		if(searchResult == null) {
+			// 検索結果なしの場合、0件データを返却
+			return ExpenditureItemInquiryList.from(null);
+		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
+			return ExpenditureItemInquiryList.from(searchResult.stream().map(dto -> createExpenditureItem(dto))
+					.collect(Collectors.toUnmodifiableList()));
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ExpenditureItemInquiryList findById(
+			SearchQueryUserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubun searchQuery) {
+		// 検索結果を取得
+		List<ExpenditureReadWriteDto> searchResult = mapper.findByIdAndSisyutuItemCodeAndSisyutuKubun(UserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubunSearchQueryDto.from(searchQuery));
 		if(searchResult == null) {
 			// 検索結果なしの場合、0件データを返却
 			return ExpenditureItemInquiryList.from(null);

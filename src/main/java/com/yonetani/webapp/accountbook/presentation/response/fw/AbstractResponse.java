@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.util.CollectionUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -78,6 +79,19 @@ public abstract class AbstractResponse {
 	 */
 	public void addMessage(String message) {
 		messages.add(message);
+	}
+	
+	/**
+	 *<pre>
+	 * バリデーションチェックのエラーメッセージをメッセージ表示エリアに追加する必要がある場合、
+	 * このメソッドをオーバーライドして実装してください。
+	 *</pre>
+	 * @param bindingResult フォームのバリデーションチェック結果
+	 * @return このインスタンス
+	 *
+	 */
+	public AbstractResponse addBindingErrorMessage(BindingResult bindingResult) {
+		return this;
 	}
 	
 	/**

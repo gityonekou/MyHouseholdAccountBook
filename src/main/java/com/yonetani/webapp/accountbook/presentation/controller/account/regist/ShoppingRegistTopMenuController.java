@@ -63,7 +63,7 @@ public class ShoppingRegistTopMenuController {
 	public ModelAndView getSelectRegistLoad(@RequestParam("targetYearMonth") String targetYearMonth) {
 		log.debug("getSelectRegistLoad:targetYearMonth=" + targetYearMonth);
 		// 画面表示データ読込
-		return usecase.read(targetYearMonth)
+		return usecase.read(loginUserSession.getLoginUserInfo(), targetYearMonth)
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成

@@ -14,6 +14,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.shop.Shop;
 import com.yonetani.webapp.accountbook.domain.model.account.shop.ShopInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopKubunCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopKubunCodeList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSort;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSortBetweenAB;
@@ -78,7 +79,7 @@ public interface ShopTableRepository {
 	 * @return 店舗情報のリスト
 	 *
 	 */
-	ShopInquiryList findByIdAndShopSort(SearchQueryUserIdAndShopSort search);
+	ShopInquiryList findById(SearchQueryUserIdAndShopSort search);
 	
 	/**
 	 *<pre>
@@ -92,7 +93,7 @@ public interface ShopTableRepository {
 	 * @return 店舗情報のリスト
 	 *
 	 */
-	ShopInquiryList findByIdAndShopSortBetween(SearchQueryUserIdAndShopSortBetweenAB search);
+	ShopInquiryList findById(SearchQueryUserIdAndShopSortBetweenAB search);
 	
 	/**
 	 *<pre>
@@ -102,7 +103,17 @@ public interface ShopTableRepository {
 	 * @return 店舗情報のリスト
 	 *
 	 */
-	ShopInquiryList findByIdAndShopKubunCodeList(SearchQueryUserIdAndShopKubunCodeList search);
+	ShopInquiryList findById(SearchQueryUserIdAndShopKubunCodeList search);
+	
+	/**
+	 *<pre>
+	 * ユーザIDと指定の店舗区分コードに対応する店舗情報を取得します。
+	 *</pre>
+	 * @param search 検索対象のユーザIDと店舗区分コード
+	 * @return 店舗情報のリスト
+	 *
+	 */
+	ShopInquiryList findById(SearchQueryUserIdAndShopKubunCode search);
 	
 	/**
 	 *<pre>
@@ -112,7 +123,7 @@ public interface ShopTableRepository {
 	 * @return 店舗情報
 	 *
 	 */
-	Shop findByIdAndShopCode(SearchQueryUserIdAndShopCode search);
+	Shop findById(SearchQueryUserIdAndShopCode search);
 	
 	/**
 	 *<pre>

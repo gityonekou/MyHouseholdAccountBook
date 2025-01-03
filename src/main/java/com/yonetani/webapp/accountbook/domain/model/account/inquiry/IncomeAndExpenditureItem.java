@@ -195,4 +195,70 @@ public class IncomeAndExpenditureItem {
 			return false;
 		}
 	}
+	
+	/**
+	 *<pre>
+	 * 現在の収支テーブル情報(ドメイン)の支出金額の値に引数で指定した支出金額を加算した結果を返します。
+	 *</pre>
+	 * @param addValue　加算する支出金額の値
+	 * @return 支出金額を加算した収支テーブル情報(ドメイン)
+	 *
+	 */
+	public IncomeAndExpenditureItem addSisyutuKingaku(SisyutuKingaku addValue) {
+		
+		// 新しい支出金額
+		SisyutuKingaku addSisyutuKingaku = sisyutuKingaku.add(addValue);
+		// 新しい収支金額(収入金額 - 支出金額)
+		BigDecimal syuusiKingaku = syuunyuuKingaku.getValue().subtract(addSisyutuKingaku.getValue());
+		
+		// 支出テーブル情報(ドメイン)を生成して返却
+		return IncomeAndExpenditureItem.from(
+				// ユーザID
+				userId.getValue(),
+				//対象年
+				targetYear.getValue(),
+				// 対象月
+				targetMonth.getValue(),
+				// 収入金額
+				syuunyuuKingaku.getValue(),
+				// 支出予定金額
+				sisyutuYoteiKingaku.getValue(),
+				// 支出金額
+				addSisyutuKingaku.getValue(),
+				// 収支金額
+				syuusiKingaku);
+	}
+	
+	/**
+	 *<pre>
+	 * 現在の収支テーブル情報(ドメイン)の支出金額の値に引数で指定した支出金額を減算した結果を返します。
+	 *</pre>
+	 * @param subtractValue　減算する支出金額の値
+	 * @return 支出金額を減算した収支テーブル情報(ドメイン)
+	 *
+	 */
+	public IncomeAndExpenditureItem subtractSisyutuKingaku(SisyutuKingaku subtractValue) {
+		
+		// 新しい支出金額
+		SisyutuKingaku subtractSisyutuKingaku = sisyutuKingaku.subtract(subtractValue);
+		// 新しい収支金額(収入金額 - 支出金額)
+		BigDecimal syuusiKingaku = syuunyuuKingaku.getValue().subtract(subtractSisyutuKingaku.getValue());
+		
+		// 支出テーブル情報(ドメイン)を生成して返却
+		return IncomeAndExpenditureItem.from(
+				// ユーザID
+				userId.getValue(),
+				//対象年
+				targetYear.getValue(),
+				// 対象月
+				targetMonth.getValue(),
+				// 収入金額
+				syuunyuuKingaku.getValue(),
+				// 支出予定金額
+				sisyutuYoteiKingaku.getValue(),
+				// 支出金額
+				subtractSisyutuKingaku.getValue(),
+				// 収支金額
+				syuusiKingaku);
+	}
 }

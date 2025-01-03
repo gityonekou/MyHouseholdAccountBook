@@ -464,7 +464,7 @@ public class SisyutuKingakuItemHolder {
 				beforeItem.getParentSisyutuItemCode().getValue(),
 				// 支出予定金額の値は変更なし(前の値をそのまま設定)
 				beforeItem.getSisyutuYoteiKingaku().getValue(),
-				// 支出金額B
+				// 支出金額
 				sisyutuKingaku.getValue(),
 				// 支出金額B=前の値+加減算するの値
 				sisyutuKingakuB.getValue(),

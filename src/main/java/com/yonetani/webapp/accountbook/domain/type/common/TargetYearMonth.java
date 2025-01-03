@@ -63,9 +63,9 @@ public class TargetYearMonth {
 		if(!StringUtils.hasLength(yearMonth) || yearMonth.length() != 6) {
 			throw new MyHouseholdAccountBookRuntimeException("「年月」項目の値が不正です。管理者に問い合わせてください。[yearMonth=" + yearMonth + "]");
 		}
-		// カレンダーの日付として有効かどうか
+		// カレンダーの日付として有効かどうか(対象年月の値に01日を付けて、日付として有効かチェックする(01日なので、厳密チェックは不要となる)
 		try {
-			LocalDate.parse(yearMonth + "01", MyHouseholdAccountBookContent.STRICT_DATE_TIME_FORMATTER);
+			LocalDate.parse(yearMonth + "01", MyHouseholdAccountBookContent.DATE_TIME_FORMATTER);
 		} catch (DateTimeParseException ex) {
 			throw new MyHouseholdAccountBookRuntimeException("「年月」項目の設定値が不正です。管理者に問い合わせてください。[yearMonth=" + yearMonth + "]");
 		}

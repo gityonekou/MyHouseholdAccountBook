@@ -16,79 +16,70 @@ INSERT INTO AUTHORITIES (USERNAME, AUTHORITY) VALUES ('kouki', 'ROLE_USER');
 INSERT INTO ACCOUNT_BOOK_USER (USER_ID, NOW_TARGET_YEAR, NOW_TARGET_MONTH, USER_NAME) VALUES ('user', '2023', '08', 'テストユーザさん');
 INSERT INTO ACCOUNT_BOOK_USER (USER_ID, NOW_TARGET_YEAR, NOW_TARGET_MONTH, USER_NAME) VALUES ('kouki', '2023', '09', '米谷 幸城さん');
 -- 支出項目テーブル:SISYUTU_ITEM_TABLE
--- 事業経費
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG) 
-	VALUES ('kouki', '0001', '事業経費', '事業経費詳細を入力', '0001', '1','0100000000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0002', '固定経費', '固定経費詳細を入力', '0001', '2','0101000000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0003', '駐輪場代金', '駐輪場代金詳細を入力', '0002', '3','0101010000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0004', '電車定期券', '電車定期券詳細を入力', '0002', '3','0101020000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0005', 'レンタル代金', 'レンタル代金詳細を入力', '0002', '3','0101030000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0006', '勤務表PDF', '勤務表PDF詳細を入力', '0002', '3','0101040000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0007', '流動経費', '流動経費詳細を入力', '0001', '2','0102000000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0008', '文房具', '文房具詳細を入力', '0007', '3','0102010000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0009', '事業設備', '事業設備詳細を入力', '0007', '3','0102020000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0010', 'その他', 'その他詳細を入力', '0007', '3','0102030000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0011', '税金支払い', '税金支払い詳細を入力', '0001', '2','0103000000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0012', '消費税', '消費税詳細を入力', '0011', '3','0103010000', false);
--- 固定費(非課税)
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0013', '固定費(非課税)', '固定費(非課税)詳細を入力', '0013', '1','0200000000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0014', '社会保険', '社会保険詳細を入力', '0013', '2','0201000000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0015', '国民年金保険', '国民年金保険詳細を入力', '0014', '3','0201010000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0016', '健康保険', '健康保険詳細を入力', '0014', '3','0201020000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0017', 'イデコ', 'イデコ詳細を入力', '0013', '2','0202000000', false);
--- 固定費(課税)
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0018', '固定費(課税)', '固定費(課税)詳細を入力', '0018', '1','0300000000', false);
--- 衣類住居設備
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0019', '衣類住居設備', '衣類住居設備詳細を入力', '0019', '1','0400000000', false);
--- 飲食日用品
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0020', '飲食日用品', '飲食日用品詳細を入力', '0020', '1','0500000000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0021', '美容費', '美容費詳細を入力', '0020', '2','0501000000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0022', '日用消耗品', '日用消耗品詳細を入力', '0020', '2','0502000000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0023', '食費', '食費詳細を入力', '0020', '2','0503000000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0024', '一人プチ贅沢・外食', '一人プチ贅沢・外食詳細を入力 友人・家族との外食は交際費へ', '0020', '2','0504000000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0025', '雑貨', '雑貨詳細を入力', '0020', '2','0505000000', false);
-	
--- 趣味娯楽
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0026', '趣味娯楽', '趣味娯楽詳細を入力', '0026', '1','0600000000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0027', '交際費', '交際費詳細を入力', '0026', '2','0601000000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0028', '趣味娯楽費', '趣味娯楽費詳細を入力', '0026', '2','0602000000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0029', 'イベント', 'イベント詳細を入力', '0026', '2','0603000000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0030', 'コミケ', 'コミケイベント詳細を入力', '0029', '3','0603010000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0031', '父東京遠征', '父東京遠征イベント詳細を入力', '0029', '3','0603020000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0032', '実家帰省', '年末年始実家帰省イベント詳細を入力', '0029', '3','0603030000', false);
-INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, SISYUTU_ITEM_DETAIL_CONTEXT, PARENT_SISYUTU_ITEM_CODE,SISYUTU_ITEM_LEVEL,SISYUTU_ITEM_SORT, ENABLE_UPDATE_FLG)
-	VALUES ('kouki', '0033', 'その他', '趣味娯楽その他詳細を入力', '0026', '2','0699000000', false);
+INSERT INTO SISYUTU_ITEM_TABLE VALUES
+('kouki', '0001','事業経費','事業経費詳細を入力','0001','1','0100000000', false),
+('kouki', '0002','固定経費','固定経費詳細を入力','0001','2','0101000000', false),
+('kouki', '0003','駐輪場代金','駐輪場代金詳細を入力','0002','3','0101010000', false),
+('kouki', '0004','電車定期券','電車定期券詳細を入力','0002','3','0101020000', false),
+('kouki', '0005','レンタル代金','レンタル代金詳細を入力','0002','3','0101030000', false),
+('kouki', '0006','勤務表PDF','勤務表PDF詳細を入力','0002','3','0101040000', false),
+('kouki', '0007','流動経費','流動経費詳細を入力','0001','2','0102000000', false),
+('kouki', '0008','文房具','文房具詳細を入力','0007','3','0102010000', false),
+('kouki', '0009','事業設備','事業設備詳細を入力','0007','3','0102020000', false),
+('kouki', '0010','その他','その他詳細を入力','0007','3','0102990000', false),
+('kouki', '0011','租税公課','租税公課(税金支払い)詳細を入力','0001','2','0103000000', false),
+('kouki', '0012','消費税','消費税詳細を入力','0011','3','0103010000', false),
+('kouki', '0013','固定費(非課税)','固定費(非課税)詳細を入力','0013','1','0200000000', false),
+('kouki', '0014','社会保険','社会保険詳細を入力','0013','2','0201000000', false),
+('kouki', '0015','国民年金保険','国民年金保険詳細を入力','0014','3','0201010000', false),
+('kouki', '0016','健康保険','健康保険詳細を入力','0014','3','0201020000', false),
+('kouki', '0017','iDeCo(イデコ)','イデコ詳細を入力','0013','2','0202000000', false),
+('kouki', '0018','ふるさと納税','ふるさと納税(控除分)になります。非控除の2000円は別科目です、その他詳細を入力','0013','2','0204000000', false),
+('kouki', '0019','保険料控除','保険料控除詳細を入力','0013','2','0205000000', false),
+('kouki', '0020','生命保険料控除','生命保険料控除詳細を入力','0019','3','0205010000', false),
+('kouki', '0021','その他','固定費(非課税)その他詳細を入力','0013','2','0299000000', false),
+('kouki', '0022','寄附金控除','寄附金控除詳細を入力','0021','3','0299010000', false),
+('kouki', '0023','固定費(課税)','固定費(課税)詳細を入力','0023','1','0300000000', false),
+('kouki', '0024','税金支払い','税金支払い詳細を入力','0023','2','0301000000', false),
+('kouki', '0025','住民税','住民税詳細を入力','0024','3','0301010000', false),
+('kouki', '0026','所得税','所得税詳細を入力','0024','3','0301020000', false),
+('kouki', '0027','保険料','保険料詳細を入力','0023','2','0302000000', false),
+('kouki', '0028','生命保険(非課税分)','生命保険(非課税分)詳細を入力','0027','3','0302010000', false),
+('kouki', '0029','地代家賃','地代家賃詳細を入力','0023','2','0303000000', false),
+('kouki', '0030','家賃','家賃詳細を入力','0029','3','0303010000', false),
+('kouki', '0031','積立(投資)','積立(投資)詳細を入力','0023','2','0304000000', false),
+('kouki', '0032','積立ＮＩＳＡ','積立ＮＩＳＡ詳細を入力','0031','3','0304010000', false),
+('kouki', '0033','積立金','積立金詳細を入力','0023','2','0305000000', false),
+('kouki', '0034','翌年税金積立','翌年税金積立詳細を入力','0033','3','0305010000', false),
+('kouki', '0035','自由用途積立金','自由用途積立金詳細を入力','0033','3','0305020000', false),
+('kouki', '0036','水光熱通費','水光熱通費詳細を入力','0023','2','0306000000', false),
+('kouki', '0037','電気代','電気代詳細を入力','0036','3','0306010000', false),
+('kouki', '0038','ガス代','ガス代詳細を入力','0036','3','0306020000', false),
+('kouki', '0039','通信費','通信費詳細を入力','0036','3','0306030000', false),
+('kouki', '0040','水道代','水道代詳細を入力','0036','3','0306040000', false),
+('kouki', '0041','NHK','NHK詳細を入力','0036','3','0306050000', false),
+('kouki', '0042','その他','固定費(課税)その他詳細を入力','0023','2','0399000000', false),
+('kouki', '0043','控除外支払い','控除外支払い詳細を入力','0042','3','0399010000', false),
+('kouki', '0044','その他定期支払','その他定期支払詳細を入力','0042','3','0399020000', false),
+('kouki', '0045','衣類住居設備','衣類住居設備詳細を入力','0045','1','0400000000', false),
+('kouki', '0046','被服費','被服費詳細を入力','0045','2','0401000000', false),
+('kouki', '0047','住居設備','住居設備詳細を入力','0045','2','0402000000', false),
+('kouki', '0048','その他','衣類住居設備その他詳細を入力','0045','2','0499000000', false),
+('kouki', '0049','飲食日用品','飲食日用品詳細を入力','0049','1','0500000000', false),
+('kouki', '0050','日用消耗品','日用消耗品詳細を入力','0049','2','0501000000', false),
+('kouki', '0051','食費','食費詳細を入力','0049','2','0502000000', false),
+('kouki', '0052','一人プチ贅沢・外食','一人プチ贅沢・外食詳細を入力 友人・家族との外食は交際費へ','0049','2','0503000000', false),
+('kouki', '0053','雑貨','雑貨詳細を入力','0049','2','0504000000', false),
+('kouki', '0054','その他','飲食日用品その他詳細を入力','0049','2','0599000000', false),
+('kouki', '0055','趣味娯楽','趣味娯楽詳細を入力','0055','1','0600000000', false),
+('kouki', '0056','交際費','交際費詳細を入力','0055','2','0601000000', false),
+('kouki', '0057','趣味娯楽費','趣味娯楽費詳細を入力(漫画・雑誌などの経費以外の本はここに登録)','0055','2','0602000000', false),
+('kouki', '0058','イベント費','イベント費詳細を入力','0055','2','0603000000', false),
+('kouki', '0059','その他','趣味娯楽その他詳細を入力','0055','2','0699000000', false),
+('kouki', '0060', '小規模企業共済', '小規模企業共済詳細を入力', '0013', '2','0203000000', false),
+('kouki', '0061', 'コミケ', 'コミケイベント詳細を入力', '0058', '3','0603010000', false),
+('kouki', '0062', '父東京遠征', '父東京遠征イベント詳細を入力', '0058', '3','0603020000', false),
+('kouki', '0063', '実家帰省', '年末年始実家帰省イベント詳細を入力', '0058', '3','0603030000', false);
 
 
 -- 支出金額テーブル：SISYUTU_KINGAKU_TABLE
@@ -130,12 +121,20 @@ INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SOR
 -- 固定費テストデータ
 INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, SISYUTU_ITEM_CODE, FIXED_COST_KUBUN, FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT, FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU, DELETE_FLG) 
 	VALUES
- ('kouki', '0001', 'コミケ C014', '【内容詳細】2024年夏コミ', '0028', '2', '06', null, '15', 49800.00, false),
- ('kouki', '0002', '国民年金保険', null, '0015', '1', '00',null, '00', 16980.00, false),
- ('kouki', '0003', '散髪(奇数月)', '【内容詳細】奇数月に散髪', '0021', '1', '20',null, '03', 16980.00, false),
- ('kouki', '0004', '消費税支払(偶数月)', '【内容詳細】偶数月に消費税支払い', '0012', '1', '30',null, '19', 3260.00, false),
- ('kouki', '0005', 'その他任意で不定期の支払１', '【内容詳細】その他任意で不定期の支払１詳細内容', '0009', '1', '40','【支払月任意詳細】その他任意月１', '40', 36380.00, false),
- ('kouki', '0006', 'その他任意で不定期の支払２', null, '0009', '1', '40','【支払月任意詳細】その他任意月２', '40', 22910.00, false);
+ ('kouki', '0001', '飲食(無駄遣いなし)', '月毎の飲食(無駄遣いなし)予定金額', '0051', '2', '00', null, '40', 45600.00, false),
+ ('kouki', '0002', '飲食(無駄遣いB)', '月毎の飲食(無駄遣いB)予定金額', '0051', '2', '00', null, '40', 12300.00, false),
+ ('kouki', '0003', '飲食(無駄遣いC)', '月毎の飲食(無駄遣いC)予定金額', '0051', '2', '00', null, '40', 6500.00, false),
+ ('kouki', '0004', '日用消耗品', '月毎の日用消耗品予定金額', '0050', '2', '00', null, '40', 3500.00, false),
+ ('kouki', '0005', '被服費', '月毎の被服費予定金額', '0046', '2', '00', null, '40', 11000.00, false),
+ ('kouki', '0006', '住居設備', '月毎の住居設備予定金額', '0045', '2', '00', null, '40', 6700.00, false),
+ ('kouki', '0007', '外食', '月毎の外食予定金額', '0052', '2', '00', null, '40', 1500.00, false),
+ ('kouki', '0008', '事業流動経費', '月毎の事業流動経費予定金額', '0007', '2', '00', null, '40', 1200.00, false),
+ ('kouki', '0009', 'コミケ C014', '【内容詳細】2024年夏コミ', '0061', '2', '06', null, '15', 49800.00, false),
+ ('kouki', '0010', '国民年金保険', null, '0015', '1', '00',null, '00', 16980.00, false),
+ ('kouki', '0011', '散髪(奇数月)', '【内容詳細】奇数月に散髪', '0050', '1', '20',null, '03', 16980.00, false),
+ ('kouki', '0012', '消費税支払(偶数月)', '【内容詳細】偶数月に消費税支払い', '0012', '1', '30',null, '19', 3260.00, false),
+ ('kouki', '0013', 'その他任意で不定期の支払１', '【内容詳細】その他任意で不定期の支払１詳細内容', '0009', '1', '40','【支払月任意詳細】その他任意月１', '40', 36380.00, false),
+ ('kouki', '0014', 'その他任意で不定期の支払２', null, '0009', '1', '40','【支払月任意詳細】その他任意月２', '40', 22910.00, false);
 
 -- 収支テーブル：INCOME_AND_EXPENDITURE_TABLE
 INSERT INTO INCOME_AND_EXPENDITURE_TABLE (USER_ID, TARGET_YEAR, TARGET_MONTH, INCOME_KINGAKU, EXPENDITURE_ESTIMATE_KINGAKU, EXPENDITURE_KINGAKU, INCOME_AND_EXPENDITURE_KINGAKU)

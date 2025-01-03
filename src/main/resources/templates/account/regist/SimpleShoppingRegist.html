@@ -5,6 +5,18 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
 		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
 		crossorigin="anonymous">
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css"
+		rel="stylesheet" >
+<link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<link th:href="@{/css/MyHouseholdAccountBookDatepicker.css}" rel="stylesheet" type="text/css">
+<style>
+.w7{
+  width:7%;
+}
+.w8{
+  width:8%;
+}
+</style>
 <title>買い物登録</title>
 </head>
 <body>
@@ -15,7 +27,7 @@
 	<div class="col">
 		<div class="card">
 			<div class="card-body">
-				<h5 class="card-title">買い物登録（簡易タイプ）</h5>
+				<h5 class="card-title"><span th:text="${viewYear}"></span>年<span th:text="${viewMonth}"></span>月度買い物登録（簡易タイプ）</h5>
 				<th:block th:each="message : ${messages}">
 					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
 				</th:block>
@@ -25,95 +37,180 @@
 			<div class="card-body">
 				<div class="card">
 					<div class="card-body">
-						<p class="h6">■店舗選択エリア■</p>
-						<p class="card-text">対象の店舗とテンプレートを選択してください。</p>
-						<div class="mb-3">
-							<label for="exampleSelect" class="form-label">■店舗区分</label>
-							<select class="form-select" id="shopGroup">
-								<option value="" selected="selected">グループメニューを開く</option>
-								<option value="90">食品・日用品店舗</option>
-								<option value="91">ホームセンター</option>
-								<option value="92">衣類店舗</option>
-								<option value="93">家電量販店</option>
-								<option value="94">複合店舗</option>
-								<option value="95">外食</option>
-								<option value="96">ネットショップ</option>
-								<option value="97">イベント</option>
-								<option value="98">交通機関</option>
-								<option value="99">その他</option>
-							</select>
-						</div>
-						<div class="mb-3">
-							<label for="validationServer01" class="form-label">■店舗名</label>
-							<select class="form-select" id="shopGroup">
-								<option value="" selected="selected">グループメニューを開く</option>
-								<option value="90">エイヴィ</option>
-								<option value="91">OK</option>
-								<option value="92">イオン</option>
-								<option value="93">いやげや</option>
-								<option value="94">ドン・キホーテ</option>
-								<option value="95">ロピア</option>
-								<option value="96">コンビニ</option>
-								<option value="99">その他</option>
-							</select>
-						</div>
-						<div class="mb-3">
-							<label for="validationServer01" class="form-label">■買い物日</label>
-							<div class="input-group w10">
-								<input type="text" class="form-control" id="kaimonobi" value="" required>
+						<form name="SimpleShoppingRegistInfo" id="SimpleShoppingRegistInfo"  method="post" th:action="@{/myhacbook/accountregist/simpleshoppingregist/update/}" th:object="${simpleShoppingRegistInfoForm}">
+							<div class="mb-3">
+								<label for="exampleSelect" class="form-label">■店舗区分</label>
+								<select class="form-select" th:errorclass="is-invalid" th:field="*{shopKubunCode}" required>
+									<option th:each="item : ${shopKubunSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+								</select>
+			 					<p class="invalid-feedback" th:errors="*{shopKubunCode}"></p>
 							</div>
-						</div>
-						<!-- 収支(マージ)表示エリア -->
-						<table class="table table-sm table-borderless">
-							<thead><tr class="table-secondary">
-								<th scope="col">食料品<br>(必須)</th>
-								<th scope="col">食料品<br>(無駄遣い)</th>
-								<th scope="col">食料品<br>(お酒類)</th>
-								<th scope="col">外食</th>
-								<th scope="col">日常品</th>
-								<th scope="col">衣料品<br>(私服)</th>
-								<th scope="col">仕事</th>
-								<th scope="col">その他</th>
-								<th scope="col">クーポン</th>
-								<th scope="col">外税</th>
-								<th scope="col">合計</th>
-								<th scope="col"></th>
-							</tr></thead>
-							<tbody>
-								<tr>
-									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
-									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
-									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
-									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
-									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
-									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
-									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
-									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
-									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
-									<td class="w7"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="99,999">円</div></td>
-									<td class="w10"><div class="input-group"><input type="text" class="form-control" id="syokuryouhin" value="999,999" disabled>円</div></td>
-									<td></td>
+							<div class="mb-3">
+								<label for="validationServer01" class="form-label">■店舗名</label>
+								<select class="form-select" th:errorclass="is-invalid" th:field="*{shopCode}" required>
+									<option th:each="item : ${shopNameSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+								</select>
+			 					<p class="invalid-feedback" th:errors="*{shopCode}"></p>
+							</div>
+							<div class="mb-3">
+								<label for="validationServer01" class="form-label">■買い物日</label>
+								<div class="input-group w10">
+									<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{shoppingDate}" required>
+									<p class="invalid-feedback" th:errors="*{shoppingDate}"></p>
+									<!--/* isCheckedShoppingDateの結果を出力 */-->
+									<p class="invalid-feedback" th:errors="*{checkedShoppingDate}" style="display: block;"></p>
+									
+								</div>
+							</div>
+							<!-- 収支(マージ)表示エリア -->
+							<table class="table table-sm table-borderless">
+								<thead>
+								<tr class="table-secondary">
+									<th scope="col" class="w8"></th>
+									<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">食料品<br>(必須)</th>
+									<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">食料品B<br>(無駄遣い)</th>
+									<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">食料品C<br>(お酒類)</th>
+									<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">外食</th>
+									<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">日用品</th>
+									<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">衣料品<br>(私服)</th>
+									<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">仕事</th>
+									<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">住居設備</th>
+									<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">クーポン</th>
+									<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">合計</th>
+									<td></th>
 								</tr>
-							</tbody>
-						</table>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="w8 table-secondary" align="center"><b>購入金額</b></td>
+										<td class="w8"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingFoodExpenses}" style="text-align: right;">円</div></td>
+										<td class="w8"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingFoodBExpenses}" style="text-align: right;">円</div></td>
+										<td class="w8"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingFoodCExpenses}" style="text-align: right;">円</div></td>
+										<td class="w8"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingDineOutExpenses}" style="text-align: right;">円</div></td>
+										<td class="w8"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingConsumerGoodsExpenses}" style="text-align: right;">円</div></td>
+										<td class="w8"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingClothesExpenses}" style="text-align: right;">円</div></td>
+										<td class="w8"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingWorkExpenses}" style="text-align: right;">円</div></td>
+										<td class="w8"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingHouseEquipmentExpenses}" style="text-align: right;">円</div></td>
+										<td class="w8"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingCouponPrice}" style="text-align: right;">円</div></td>
+										<td class="w10"><div class="input-group"><input type="text" class="form-control" th:field="*{totalPurchasePriceView}" style="text-align: right;" disabled>円</div></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td class="w8 table-secondary" align="center"><b>消費税</b></td>
+										<td class="w8"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingFoodTaxExpenses}" style="text-align: right;">円</div></td>
+										<td class="w8"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingFoodBTaxExpenses}" style="text-align: right;">円</div></td>
+										<td class="w8"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingFoodCTaxExpenses}" style="text-align: right;">円</div></td>
+										<td class="w8"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingDineOutTaxExpenses}" style="text-align: right;">円</div></td>
+										<td class="w8"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingConsumerGoodsTaxExpenses}" style="text-align: right;">円</div></td>
+										<td class="w8"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingClothesTaxExpenses}" style="text-align: right;">円</div></td>
+										<td class="w8"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingWorkTaxExpenses}" style="text-align: right;">円</div></td>
+										<td class="w8"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingHouseEquipmentTaxExpenses}" style="text-align: right;">円</div></td>
+										<td class="w8"></td>
+										<td class="w10"><div class="input-group"><input type="text" class="form-control" th:field="*{taxTotalPurchasePriceView}" style="text-align: right;" disabled>円</div></td>
+										<td></td>
+									</tr>
+									<tr class="table-secondary">
+										<td class="w8" align="center"><b>備考</b></td>
+										<td colspan="8"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingRemarks}" placeholder="備考がある場合は入力"></div></td>
+										<td class="w8"></td>
+										<td class="w10"><div class="input-group"><input type="text" class="form-control" th:field="*{shoppingTotalAmountView}" style="text-align: right;" disabled>円</div></td>
+										<td><button class="btn btn-primary" type="button" name="execRegist" id="execRegist">登録</button></td>
+									</tr>
+								</tbody>
+							</table>
+							<input type="hidden" th:field="*{action}" />
+							<input type="hidden" th:field="*{targetYearMonth}" />
+							<input type="hidden" th:field="*{shoppingRegistCode}" />
+							<input type="hidden" th:field="*{totalPurchasePrice}" />
+							<input type="hidden" th:field="*{taxTotalPurchasePrice}" />
+							<input type="hidden" th:field="*{shoppingTotalAmount}" />
+						</form>
 					</div>
 				</div>
 			</div>
-			<!-- 登録ボタンエリア -->
+			<!-- 買い物情報一覧表示エリア -->
 			<div class="card-body">
-				<button class="btn btn-outline-primary" type="button">家計簿参照</button>
-				<button class="btn btn-outline-primary" type="button">買い物更新</button>
-				<form name="accountdetail" class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountmonth/}">
-					<input type="hidden" name="targetYearMonth" value="202308" />
-				</form>
-				<form name="accountupdate" class="d-flex" method="post" th:action="@{/myhacbook/shopping/update/}">
-					<input type="hidden" name="target" value="202308" />
-				</form>
+				<div class="card">
+					<div class="card-body">
+						<p class="h6">■登録済み買い物一覧情報■</p>
+						<!--/* 登録済み買い物情報一覧ありの場合、テーブルヘッダ部を表示 */-->
+						<th:block th:if="${#lists.size(shoppingRegistList)} > 0">
+						<p class="card-text">更新対象の買い物情報を選択してください。</p>
+						<table class="table table-sm table-bordered table-hover">
+							<thead>
+								<tr class="table-secondary">
+								<th scope="col" class="w5" style="vertical-align:middle; text-align:center;">買い物日</th>
+								<th scope="col" class="w15" style="vertical-align:middle; text-align:center;">店舗名</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">食料品<br>(必須)</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">食料品B<br>(無駄遣い)</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">食料品C<br>(お酒類)</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">外食</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">日用品</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">衣料品<br>(私服)</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">仕事</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">住居設備</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">クーポン金額</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">合計金額</th>
+								<th scope="col" class="w5"></th>
+								<th scope="col"></th>
+								</tr>
+							</thead>
+							<tbody>
+								<th:block th:each="item, itemStat : ${shoppingRegistList}">
+									<th:block th:if="${itemStat.odd}"><tr class="table-warning"></th:block>
+									<th:block th:if="${itemStat.even}"><tr></th:block>
+										<td align="center" th:text="${item.shoppingDay}">買い物日</td>
+										<td th:text="${item.shopName}">店舗名</td>
+										<td align="right" th:text="${item.shoppingFood}">食料品(必須)</td>
+										<td align="right" th:text="${item.shoppingFoodB}">食料品B(無駄遣い)</td>
+										<td align="right" th:text="${item.shoppingFoodC}">食料品C(お酒類)</td>
+										<td align="right" th:text="${item.shoppingDineOut}">外食</td>
+										<td align="right" th:text="${item.shoppingConsumerGoods}">日用品</td>
+										<td align="right" th:text="${item.shoppingClothes}">衣料品(私服)</td>
+										<td align="right" th:text="${item.shoppingWork}">仕事</td>
+										<td align="right" th:text="${item.shoppingHouseEquipment}">住居設備</td>
+										<td align="right" th:text="${item.shoppingCoupon}">クーポン金額</td>
+										<td align="right" th:text="${item.shoppingTotalAmount}">合計金額</td>
+										<td align="center"><a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/accountregist/simpleshoppingregist/updateload(targetYearMonth=${item.targetYearMonth},shoppingRegistCode=${item.shoppingRegistCode})}">訂正</a></td>
+										<td></td>
+									</tr>
+								</th:block>
+								<th:block th:if="${#lists.size(shoppingRegistList)} >= 2">
+									<tr class="table-secondary">
+										<td align="center">合計</td>
+										<td></td>
+										<td align="right" th:text="${totalShoppingFood}">食料品(必須)合計</td>
+										<td align="right" th:text="${totalShoppingFoodB}">食料品B(無駄遣い)合計</td>
+										<td align="right" th:text="${totalShoppingFoodC}">食料品C(お酒類)合計</td>
+										<td align="right" th:text="${totalShoppingDineOut}">外食合計</td>
+										<td align="right" th:text="${totalShoppingConsumerGoods}">日用品合計</td>
+										<td align="right" th:text="${totalShoppingClothes}">衣料品(私服)合計</td>
+										<td align="right" th:text="${totalShoppingWork}">仕事合計</td>
+										<td align="right" th:text="${totalShoppingHouseEquipment}">住居設備合計</td>
+										<td align="right" th:text="${totalShoppingCouponPrice}">クーポン金額合計</td>
+										<td align="right" th:text="${shoppingMonthTotalAmount}">月度買い物合計金額</td>
+										<td colspan="2"></td>
+									</tr>
+								</th:block>
+							</tbody>
+						</table>
+						</th:block>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
+	<!-- 店舗区分変更時のフォームデータコピー -->
+	<form name="shopKubunChangeForm" id="shopKubunChangeForm"  method="post" th:action="@{/myhacbook/accountregist/simpleshoppingregist/}">
+	</form>
 	
 	<!--/* フッター共通jsのインクルード) */-->
 	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	<!--/* 買い物登録（簡易タイプ）で使用するJavaScript */-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.13.1/jquery-ui.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+	<script type="text/javascript" th:src="@{/js/account/regist/SimpleShoppingRegist.js}"></script>
+	
 </body>
 </html>

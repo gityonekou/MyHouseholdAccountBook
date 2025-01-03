@@ -13,6 +13,8 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureI
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubun;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
 
 /**
@@ -79,6 +81,26 @@ public interface ExpenditureTableRepository {
 	 *
 	 */
 	ExpenditureItemInquiryList findById(SearchQueryUserIdAndYearMonth searchQuery);
+	
+	/**
+	 *<pre>
+	 * 検索条件に一致する支出情報のリストを取得します。
+	 *</pre>
+	 * @param searchQuery 検索条件(ユーザID, 対象年月(yyyyMM), 支出項目コード)
+	 * @return 支出情報のリスト
+	 *
+	 */
+	ExpenditureItemInquiryList findById(SearchQueryUserIdAndYearMonthAndSisyutuItemCode searchQuery);
+	
+	/**
+	 *<pre>
+	 * 検索条件に一致する支出情報のリストを取得します。
+	 *</pre>
+	 * @param searchQuery 検索条件(ユーザID, 対象年月(yyyyMM), 支出項目コード、支出区分)
+	 * @return 支出情報のリスト
+	 *
+	 */
+	ExpenditureItemInquiryList findById(SearchQueryUserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubun searchQuery);
 	
 	/**
 	 *<pre>

@@ -83,4 +83,24 @@ public class ExpenditureItemInquiryList {
 	public boolean isEmpty() {
 		return CollectionUtils.isEmpty(values);
 	}
+	
+	/**
+	 *<pre>
+	 * 検索結果のデータが1件かどうかを判定します。
+	 *</pre>
+	 * @return 1件の場合はtrue、1件以外の場合はfalse
+	 *
+	 */
+	public boolean isOne() {
+		// 空の場合はfalseを返却
+		if(CollectionUtils.isEmpty(values)) {
+			return false;
+		}
+		// 1件より多い場合はfalseを返却
+		if(values.size() > 1) {
+			return false;
+		}
+		// 1件の場合はtrueを返却
+		return true;
+	}
 }

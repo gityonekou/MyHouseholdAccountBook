@@ -12,10 +12,10 @@ package com.yonetani.webapp.accountbook.presentation.response.account.regist;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
-import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 /**
  *<pre>
@@ -28,10 +28,13 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class ShoppingRegistTopMenuResponse extends AbstractResponse {
+public class ShoppingRegistTopMenuResponse extends AbstractSimpleShoppingRegistListResponse {
 	
 	// 買い物登録を行う対象年月
 	private final String targetYearMonth;
+	// 未登録の支出項目があるかどうかのフラグ:未登録ありの場合、各種登録ボタンは押下不可となります。
+	@Setter
+	private boolean btnDisabled = false;
 	
 	/**
 	 *<pre>
@@ -42,7 +45,12 @@ public class ShoppingRegistTopMenuResponse extends AbstractResponse {
 	 *
 	 */
 	public static ShoppingRegistTopMenuResponse getInstance(TargetYearMonth targetYearMonth) {
-		return new ShoppingRegistTopMenuResponse(targetYearMonth.getValue());
+		// 買い物登録方法選択画面表示情報を生成
+		ShoppingRegistTopMenuResponse response = new ShoppingRegistTopMenuResponse(targetYearMonth.getValue());
+		// 対象年月を設定
+		response.setYearMonth(targetYearMonth.getValue());
+		// 画面表示情報を返却
+		return response;
 	}
 	
 	/**
@@ -54,6 +62,8 @@ public class ShoppingRegistTopMenuResponse extends AbstractResponse {
 		ModelAndView modelAndView = createModelAndView("account/regist/ShoppingRegistTopMenu");
 		// 対象年月
 		modelAndView.addObject("targetYearMonth", targetYearMonth);
+		// 各種登録ボタンを押下不可とするかどうか(未登録の支出項目があるかどうかのフラグ:未登録ありの場合押下不可とする)
+		modelAndView.addObject("btnDisabled", btnDisabled);
 		return modelAndView;
 	}
 }

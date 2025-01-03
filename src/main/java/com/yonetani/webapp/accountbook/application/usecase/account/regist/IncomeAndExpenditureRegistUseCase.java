@@ -205,8 +205,8 @@ public class IncomeAndExpenditureRegistUseCase {
 							"",
 							// 支出名
 							domain.getFixedCostName().getValue(),
-							// 支出区分:デフォルトで無駄遣いなしを設定
-							SisyutuKubun.NON_WASTED.getValue(),
+							// 支出区分:支出名から支出区分を取得
+							SisyutuKubun.from(domain.getFixedCostName()).getValue(),
 							// 支出詳細
 							domain.getExpenditureDetailContext(),
 							// 支払日

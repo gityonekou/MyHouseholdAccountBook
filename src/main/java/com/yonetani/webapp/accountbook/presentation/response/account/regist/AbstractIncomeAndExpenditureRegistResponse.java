@@ -14,11 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
-
-import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -38,7 +34,7 @@ import lombok.Setter;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class AbstractIncomeAndExpenditureRegistResponse extends AbstractResponse {
+public abstract class AbstractIncomeAndExpenditureRegistResponse extends AbstractRegistResponse {
 	
 	/**
 	 *<pre>
@@ -136,11 +132,6 @@ public abstract class AbstractIncomeAndExpenditureRegistResponse extends Abstrac
 		}
 	}
 	
-	// 「yyyy年MM月度」の年の値
-	private String viewYear;
-	// 「yyyy年MM月度」の月の値
-	private String viewMonth;
-	
 	// 収入情報
 	private List<IncomeListItem> incomeListInfo = new ArrayList<>();
 	// 収入金額合計
@@ -199,10 +190,6 @@ public abstract class AbstractIncomeAndExpenditureRegistResponse extends Abstrac
 	@Override
 	protected ModelAndView createModelAndView(String viewName) {
 		ModelAndView modelAndView = super.createModelAndView(viewName);
-		// 「yyyy年MM月度」の年の値
-		modelAndView.addObject("viewYear", viewYear);
-		// 「yyyy年MM月度」の月の値
-		modelAndView.addObject("viewMonth", viewMonth);
 		// 収入一覧情報
 		modelAndView.addObject("incomeListInfo", incomeListInfo);
 		// 収入金額合計
@@ -213,22 +200,5 @@ public abstract class AbstractIncomeAndExpenditureRegistResponse extends Abstrac
 		modelAndView.addObject("expenditureSumKingaku", expenditureSumKingaku);
 		
 		return modelAndView;
-	}
-	
-	/**
-	 *<pre>
-	 * 対象年月(yyyyMM)の値を年と月に分割して「yyyy年MM月度」の年の値、「yyyy年MM月度」の月の値に設定します。
-	 *</pre>
-	 * @param targetYearMonth 対象年月(yyyyMM)
-	 *
-	 */
-	protected void setYearMonth(String targetYearMonth) {
-		if(!StringUtils.hasLength(targetYearMonth) || targetYearMonth.length() != 6) {
-			throw new MyHouseholdAccountBookRuntimeException("対象年月の値が不正です。管理者に問い合わせてください。[targetYearMonth=" + targetYearMonth + "]");
-		}
-		// yyyyMMのyyyyの値を設定(年の値を設定)
-		viewYear = targetYearMonth.substring(0, 4);
-		// yyyyMMのMMの値を設定(月の値を設定)
-		viewMonth = targetYearMonth.substring(4);
 	}
 }

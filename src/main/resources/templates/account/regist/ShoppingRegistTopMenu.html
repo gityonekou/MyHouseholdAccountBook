@@ -6,6 +6,11 @@
 		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
 		crossorigin="anonymous">
 <link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<style>
+.w7{
+  width:7%;
+}
+</style>
 <title>マイ家計簿(買い物登録)</title>
 </head>
 <body>
@@ -16,33 +21,118 @@
 	<div class="col">
 		<div class="card">
 			<div class="card-body">
-				<h5 class="card-title">マイ家計簿(買い物登録)</h5>
+				<h5 class="card-title"><span th:text="${viewYear}"></span>年<span th:text="${viewMonth}"></span>月度買い物登録</h5>
 				<th:block th:each="message : ${messages}">
 					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
 				</th:block>
 			</div>
 			
 			<!-- 登録方法選択 -->
-			<form name="SelectRegistType" method="post" th:action="@{/myhacbook/accountregist/shoppingtopmenu/dispatchaction/}">
-				<div class="card-body">
+			<div class="card-body">
+				<form name="SelectRegistType" method="post" th:action="@{/myhacbook/accountregist/shoppingtopmenu/dispatchaction/}">
 					<button class="btn btn-outline-primary" type="button" id="date-shopping-add">テンプレート</button>
 					<span>&emsp;</span>
-					<button class="btn btn-outline-primary" type="submit" name="Shopping">買い物登録</button>
+					<button class="btn btn-outline-primary" type="submit" name="Shopping" th:disabled="${btnDisabled}">買い物登録</button>
 					<span>&emsp;</span>
-					<button class="btn btn-outline-primary" type="button" id="sisyutu-item">支出項目</button>
+					<button class="btn btn-outline-primary" type="button" id="sisyutu-item" th:disabled="${btnDisabled}">支出項目</button>
 					<span>&emsp;</span>
-					<button class="btn btn-outline-primary" type="button" id="Event">イベント</button>
+					<button class="btn btn-outline-primary" type="button" id="Event" th:disabled="${btnDisabled}">イベント</button>
 					<span>&emsp;</span>
-					<button class="btn btn-outline-primary" type="submit" name="SimpleType">簡易タイプ</button>
-					<br>
-					<br>
-					<br>
-					<p class="card-text">※支出項目は店舗を登録しない支出の場合に選択してください。</p>
-					<p class="card-text">【仕様】支出項目の場合は収支更新に遷移するでよいかどうか。。</p>
-					
+					<button class="btn btn-outline-primary" type="submit" name="SimpleType" th:disabled="${btnDisabled}">簡易タイプ</button>
+					<input type="hidden" name="targetYearMonth" th:value="*{targetYearMonth}" />
+				</form>
+				<br>
+				<br>
+				<br>
+				<p class="card-text">※支出項目は店舗を登録しない支出の場合に選択してください。</p>
+				<p class="card-text">【仕様】支出項目の場合は収支更新に遷移するでよいかどうか。。</p>
+			</div>
+			
+			<!-- 買い物情報一覧表示エリア -->
+			<th:block th:if="${#lists.size(shoppingRegistList)} > 0">
+			<div class="card-body">
+				<div class="card">
+					<div class="card-body">
+						<p class="h6">■登録済み買い物一覧情報■</p>
+						<!--/* 登録済み買い物情報一覧ありの場合、テーブルヘッダ部を表示 */-->
+						<table class="table table-sm table-bordered table-hover">
+							<thead>
+								<tr class="table-secondary">
+								<th scope="col" class="w5" style="vertical-align:middle; text-align:center;">買い物日</th>
+								<th scope="col" class="w20" style="vertical-align:middle; text-align:center;">店舗名</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">食料品<br>(必須)</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">食料品B<br>(無駄遣い)</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">食料品C<br>(お酒類)</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">外食</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">日用品</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">衣料品<br>(私服)</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">仕事</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">住居設備</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">クーポン金額</th>
+								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">合計金額</th>
+								<th scope="col"></th>
+								</tr>
+							</thead>
+							<tbody>
+								<th:block th:if="${#lists.size(shoppingRegistList)} >= 12">
+									<tr class="table-success">
+										<td align="center">合計</td>
+										<td></td>
+										<td align="right" th:text="${totalShoppingFood}">食料品(必須)合計</td>
+										<td align="right" th:text="${totalShoppingFoodB}">食料品B(無駄遣い)合計</td>
+										<td align="right" th:text="${totalShoppingFoodC}">食料品C(お酒類)合計</td>
+										<td align="right" th:text="${totalShoppingDineOut}">外食合計</td>
+										<td align="right" th:text="${totalShoppingConsumerGoods}">日用品合計</td>
+										<td align="right" th:text="${totalShoppingClothes}">衣料品(私服)合計</td>
+										<td align="right" th:text="${totalShoppingWork}">仕事合計</td>
+										<td align="right" th:text="${totalShoppingHouseEquipment}">住居設備合計</td>
+										<td align="right" th:text="${totalShoppingCouponPrice}">クーポン金額合計</td>
+										<td align="right" th:text="${shoppingMonthTotalAmount}">月度買い物合計金額</td>
+										<td></td>
+									</tr>
+								</th:block>
+								<th:block th:each="item, itemStat : ${shoppingRegistList}">
+									<th:block th:if="${itemStat.odd}"><tr class="table-warning"></th:block>
+									<th:block th:if="${itemStat.even}"><tr></th:block>
+										<td align="center" th:text="${item.shoppingDay}">買い物日</td>
+										<td th:text="${item.shopName}">店舗名</td>
+										<td align="right" th:text="${item.shoppingFood}">食料品(必須)</td>
+										<td align="right" th:text="${item.shoppingFoodB}">食料品B(無駄遣い)</td>
+										<td align="right" th:text="${item.shoppingFoodC}">食料品C(お酒類)</td>
+										<td align="right" th:text="${item.shoppingDineOut}">外食</td>
+										<td align="right" th:text="${item.shoppingConsumerGoods}">日用品</td>
+										<td align="right" th:text="${item.shoppingClothes}">衣料品(私服)</td>
+										<td align="right" th:text="${item.shoppingWork}">仕事</td>
+										<td align="right" th:text="${item.shoppingHouseEquipment}">住居設備</td>
+										<td align="right" th:text="${item.shoppingCoupon}">クーポン金額</td>
+										<td align="right" th:text="${item.shoppingTotalAmount}">合計金額</td>
+										<td></td>
+									</tr>
+								</th:block>
+								<th:block th:if="${#lists.size(shoppingRegistList)} >= 2">
+									<tr class="table-success">
+										<td align="center">合計</td>
+										<td></td>
+										<td align="right" th:text="${totalShoppingFood}">食料品(必須)合計</td>
+										<td align="right" th:text="${totalShoppingFoodB}">食料品B(無駄遣い)合計</td>
+										<td align="right" th:text="${totalShoppingFoodC}">食料品C(お酒類)合計</td>
+										<td align="right" th:text="${totalShoppingDineOut}">外食合計</td>
+										<td align="right" th:text="${totalShoppingConsumerGoods}">日用品合計</td>
+										<td align="right" th:text="${totalShoppingClothes}">衣料品(私服)合計</td>
+										<td align="right" th:text="${totalShoppingWork}">仕事合計</td>
+										<td align="right" th:text="${totalShoppingHouseEquipment}">住居設備合計</td>
+										<td align="right" th:text="${totalShoppingCouponPrice}">クーポン金額合計</td>
+										<td align="right" th:text="${shoppingMonthTotalAmount}">月度買い物合計金額</td>
+										<td></td>
+									</tr>
+								</th:block>
+							</tbody>
+						</table>
+					</div>
 				</div>
-				<input type="hidden" name="targetYearMonth" th:value="*{targetYearMonth}" />
-			</form>
+			</div>
+			</th:block>
+			
 		</div>
 	</div>
 	

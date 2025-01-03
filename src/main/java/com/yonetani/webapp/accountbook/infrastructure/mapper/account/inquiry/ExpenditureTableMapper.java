@@ -20,6 +20,8 @@ import org.apache.ibatis.annotations.Update;
 
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.ExpenditureReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthAndSisyutuCodeSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubunSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthAndSisyutuItemCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthSearchQueryDto;
 
 /**
@@ -90,6 +92,27 @@ public interface ExpenditureTableMapper {
 	@Select("sql/account/inquiry/ExpenditureTableSelectSql02.sql")
 	public ExpenditureReadWriteDto findByUniqueKey(@Param("dto") UserIdAndYearMonthAndSisyutuCodeSearchQueryDto search);
 	
+	/**
+	 *<pre>
+	 * 指定のユーザID、対象年月、支出項目コードを条件に支出テーブル:EXPENDITURE_TABLEを参照します。
+	 *</pre>
+	 * @param search 検索条件:ユーザID、対象年月、支出項目コード
+	 * @return 支出テーブル:EXPENDITURE_TABLE参照結果のリスト
+	 *
+	 */
+	@Select("sql/account/inquiry/ExpenditureTableSelectSql03.sql")
+	public List<ExpenditureReadWriteDto> findByIdAndSisyutuItemCode(@Param("dto")UserIdAndYearMonthAndSisyutuItemCodeSearchQueryDto search);
+	
+	/**
+	 *<pre>
+	 * 指定のユーザID、対象年月、支出項目コード、支出区分を条件に支出テーブル:EXPENDITURE_TABLEを参照します。
+	 *</pre>
+	 * @param search 検索条件:ユーザID、対象年月、支出項目コード、支出区分
+	 * @return 支出テーブル:EXPENDITURE_TABLE参照結果のリスト
+	 *
+	 */
+	@Select("sql/account/inquiry/ExpenditureTableSelectSql04.sql")
+	public List<ExpenditureReadWriteDto> findByIdAndSisyutuItemCodeAndSisyutuKubun(@Param("dto")UserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubunSearchQueryDto search);
 	
 	/**
 	 *<pre>

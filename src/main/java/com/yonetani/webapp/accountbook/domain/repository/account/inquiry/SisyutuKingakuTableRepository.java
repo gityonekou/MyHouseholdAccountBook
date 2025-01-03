@@ -55,7 +55,7 @@ public interface SisyutuKingakuTableRepository {
 	
 	/**
 	 *<pre>
-	 * 検索条件に一致する支出金額テーブル情報を取得します。
+	 * 検索条件(ユニークキー)に一致する支出金額テーブル情報を取得します。
 	 *</pre>
 	 * @param search 検索条件(ユーザID, 年月,支出項目コード)
 	 * @return 支出金額情報

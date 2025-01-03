@@ -187,4 +187,84 @@ public class ExpenditureItem {
 				// 削除フラグ
 				false);
 	}
+	
+	/**
+	 *<pre>
+	 * 現在の支出テーブル情報(ドメイン)情報の支出金額の値に引数で指定した支出金額を加算した結果を返します。
+	 *</pre>
+	 * @param addValue　加算する支出金額の値
+	 * @return 支出金額を加算した支出テーブル情報(ドメイン)情報
+	 *
+	 */
+	public ExpenditureItem addSisyutuKingaku(SisyutuKingaku addValue) {
+		// 支出テーブル情報(ドメイン)を生成して返却
+		return ExpenditureItem.from(
+				// ユーザID
+				userId.getValue(),
+				//対象年
+				targetYear.getValue(),
+				// 対象月
+				targetMonth.getValue(),
+				// 支出コード
+				sisyutuCode.getValue(),
+				// 支出項目コード
+				sisyutuItemCode.getValue(),
+				// イベントコード
+				eventCode.getValue(),
+				// 支出名称
+				sisyutuName.getValue(),
+				// 支出区分
+				sisyutuKubun.getValue(),
+				// 支出詳細
+				sisyutuDetailContext.getValue(),
+				// 支払日
+				shiharaiDate.getValue(),
+				// 支出予定金額
+				sisyutuYoteiKingaku.getValue(),
+				// 支出金額
+				sisyutuKingaku.add(addValue).getValue(),
+				// 削除フラグ
+				deleteFlg.getValue());
+		
+	}
+	
+	/**
+	 *<pre>
+	 * 現在の支出テーブル情報(ドメイン)情報の支出金額の値に引数で指定した支出金額を減算した結果を返します。
+	 *</pre>
+	 * @param subtractValue　減算する支出金額の値
+	 * @return 支出金額を減算した支出テーブル情報(ドメイン)情報
+	 *
+	 */
+	public ExpenditureItem subtractSisyutuKingaku(SisyutuKingaku subtractValue) {
+		// 支出テーブル情報(ドメイン)を生成して返却
+		return ExpenditureItem.from(
+				// ユーザID
+				userId.getValue(),
+				//対象年
+				targetYear.getValue(),
+				// 対象月
+				targetMonth.getValue(),
+				// 支出コード
+				sisyutuCode.getValue(),
+				// 支出項目コード
+				sisyutuItemCode.getValue(),
+				// イベントコード
+				eventCode.getValue(),
+				// 支出名称
+				sisyutuName.getValue(),
+				// 支出区分
+				sisyutuKubun.getValue(),
+				// 支出詳細
+				sisyutuDetailContext.getValue(),
+				// 支払日
+				shiharaiDate.getValue(),
+				// 支出予定金額
+				sisyutuYoteiKingaku.getValue(),
+				// 支出金額
+				sisyutuKingaku.subtract(subtractValue).getValue(),
+				// 削除フラグ
+				deleteFlg.getValue());
+		
+	}
 }

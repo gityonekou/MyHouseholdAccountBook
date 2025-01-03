@@ -124,9 +124,9 @@ public class ShoppingItemInfoManageUseCase {
 		sisyutuItemComponent.setSisyutuItemList(
 				// ログインユーザ情報
 				UserId.from(user.getUserId()),
-				// 検索条件:支出項目表示順A：日用消耗品の表示順の値:0502000000 (変更不可の値なので固定値)
+				// 検索条件:支出項目表示順A：日用消耗品の表示順の値:0501000000 (変更不可の値なので固定値)
 				SisyutuItemSort.from(MyHouseholdAccountBookContent.SISYUTU_ITEM_NITIYOU_SYOUMOUHIN_SORT_VALUE),
-				// 検索条件:支出項目表示順A：食費の表示順最大値:0503999999
+				// 検索条件:支出項目表示順A：食費の表示順最大値:0502999999
 				SisyutuItemSort.from(MyHouseholdAccountBookContent.SISYUTU_ITEM_INSYOKU_SORT_MAX_VALUE),
 				// 画面表示情報
 				response);
@@ -575,8 +575,7 @@ public class ShoppingItemInfoManageUseCase {
 		List<String> standardShopsList = Arrays.asList(MyHouseholdAccountBookContent.STANDARD_SHOPSLIST_KUBUN_CODE);
 		
 		// 基準店舗選択ボックスの表示情報を取得
-		ShopInquiryList shopSearchResult = shopRepository.findByIdAndShopKubunCodeList(
-				SearchQueryUserIdAndShopKubunCodeList.from(
+		ShopInquiryList shopSearchResult = shopRepository.findById(SearchQueryUserIdAndShopKubunCodeList.from(
 						// ユーザID
 						userId,
 						// 店舗区分コードのリスト

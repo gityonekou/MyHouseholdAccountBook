@@ -59,8 +59,14 @@ public class MyHouseholdAccountBookContent {
 	// 条件判定：コードテーブル:CODE_TABLE
 	//public static final String CODE_TABLE = "CODE_TABLE";
 	
-	/** コード定義区分(ショップ区分:001) */
+	/** コード定義区分(店舗区分:001) */
 	public static final String CODE_DEFINES_SHOP_KUBUN = "001";
+	/** コード定義:店舗区分で食品・日用品店舗(901)を選択時 */
+	public static final String SHOP_KUBUN_GROCERIES_SELECTED_VALUE = "901";
+	/** コード定義:店舗区分で薬局/薬局複合店/病院(905)を選択時 */
+	public static final String SHOP_KUBUN_MEDICALSHOP_SELECTED_VALUE = "905";
+	/** コード定義:店舗区分で理髪店(908)を選択時 */
+	public static final String SHOP_KUBUN_BARBERSHOP_SELECTED_VALUE = "908";
 	/** 商品登録画面で基準店舗選択ボックスに表示する店舗の店舗区分コード<br>
 	      飲食日用品(901)、ホームセンター(902)、薬局/薬局複合店(905)、複合店舗(907) */
 	public static final String[] STANDARD_SHOPSLIST_KUBUN_CODE = {"901","902","905","907"};
@@ -84,6 +90,16 @@ public class MyHouseholdAccountBookContent {
 	public static final String SHOPPING_ITEM_CAPACITY_UNIT = "005";
 	/** コード定義区分(支出区分:006) */
 	public static final String CODE_DEFINES_EXPENDITURE_KUBUN = "006";
+	/** コード定義:支出区分で無駄遣いなし(1)を選択時 */
+	public static final String NON_WASTED_SELECTED_VALUE = "1";
+	/** コード定義:支出区分で無駄遣いB(2)を選択時 */
+	public static final String WASTED_B_SELECTED_VALUE = "2";
+	/** コード定義の値:無駄遣いBの文字列(無駄遣いB) */
+	public static final String WASTED_B_VIEW_VALUE = "無駄遣いB";
+	/** コード定義:支出区分で無駄遣いC(3)を選択時 */
+	public static final String WASTED_C_SELECTED_VALUE = "3";
+	/** コード定義の値:無駄遣いCの文字列(無駄遣いC) */
+	public static final String WASTED_C_VIEW_VALUE = "無駄遣いC";
 	/** コード定義区分(固定費区分:007) */
 	public static final String CODE_DEFINES_FIXED_COST_KUBUN = "007";
 	/** コード定義:固定費区分で支払い金額確定を選択時 */
@@ -95,10 +111,23 @@ public class MyHouseholdAccountBookContent {
 	public static final String SISYUTU_ITEM_CODE_TEMPORARY_VALUE = "9999";
 	/** 支出項目表示順のその他項目の値:99 */
 	public static final String OTHER_SISYUTU_ITEM_SORT_VALUE = "99";
+	/** 支出項目コード:住居設備(0045) */
+	public static final String SISYUTU_ITEM_CODE_JYUUKYO_SETUBI_VALUE = "0045";
+	/** 支出項目コード:被服費(0046) */
+	public static final String SISYUTU_ITEM_CODE_HIFUKU_VALUE = "0046";
+	/** 支出項目コード:日用消耗品(0050) */
+	public static final String SISYUTU_ITEM_CODE_NITIYOU_SYOUMOUHIN_VALUE = "0050";
+	/** 支出項目コード:飲食(0051) */
+	public static final String SISYUTU_ITEM_CODE_INSYOKU_VALUE = "0051";
+	/** 支出項目コード:一人プチ贅沢・外食(0052) */
+	public static final String SISYUTU_ITEM_CODE_GAISYOKU_VALUE = "0052";
+	/** 支出項目コード:流動経費(0007) */
+	public static final String SISYUTU_ITEM_CODE_RYUUDOU_KEIHI_VALUE = "0007";
+	
 	/** 支出項目(日用消耗品)の支出項目表示順の値 */
-	public static final String SISYUTU_ITEM_NITIYOU_SYOUMOUHIN_SORT_VALUE = "0502000000";
+	public static final String SISYUTU_ITEM_NITIYOU_SYOUMOUHIN_SORT_VALUE = "0501000000";
 	/** 支出項目(食費)の支出項目表示順最大値 */
-	public static final String SISYUTU_ITEM_INSYOKU_SORT_MAX_VALUE = "0503999999";
+	public static final String SISYUTU_ITEM_INSYOKU_SORT_MAX_VALUE = "0502999999";
 	/** 支出項目(イベント)の支出項目表示順の値 */
 	public static final String SISYUTU_ITEM_EVENT_SORT_VALUE = "0603000000";
 	/** 支出項目(イベント)に属する支出項目表示順の最大値 */
@@ -117,13 +146,14 @@ public class MyHouseholdAccountBookContent {
 	/** 商品JANコードを検索条件に商品を検索 */
 	public static final String SEARCH_TARGET_SHOPPING_ITEM_JAN_CODE = "janCode";
 	
-	
+	/** 日付チェック用のフォーマットです */
+	public static final DateTimeFormatter YEAR_MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyyMM");
 	/** 日付チェック用のフォーマットです(うるう年でない年で29日を指定した場合、28日のLocalDateとして判断します */
 	public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 	/** 日付の厳密チェック用の日付フォーマットです */
 	// うるう年の厳密なチェックを行う場合のフォーマッターです
 	// (デフォルトだと、うるう年でない年の日付の値に2月29日を指定してparseを行っても2月28日のLocalDateとしてparse結果が返されるため)
 	// 厳密なチェックを行う場合、年のフォーマットはyyyyではなくuuuuを指定する必要があるので注意
-	public static final DateTimeFormatter STRICT_DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("uuuuMMdd").withResolverStyle(ResolverStyle.STRICT);
+	public static final DateTimeFormatter STRICT_DATE_TIME_FORMATTERA = DateTimeFormatter.ofPattern("uuuuMMdd").withResolverStyle(ResolverStyle.STRICT);
 	
 }

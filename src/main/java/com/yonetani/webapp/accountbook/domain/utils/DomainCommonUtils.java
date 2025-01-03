@@ -15,6 +15,8 @@ import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
+
 /**
  *<pre>
  * ドメイン層で使用する各種ユーティリティクラスです。
@@ -65,6 +67,20 @@ public class DomainCommonUtils {
 	public static synchronized String formatKingakuAndYen(BigDecimal value) {
 		// 値がnullの場合空文字列を返却、null以外の場合はスケール0で四捨五入+カンマ編集し、最後に円を付与した文字列を返却
 		return (value == null) ? "" : kingakuDecimalFormat.format(value.setScale(0, RoundingMode.HALF_UP)) + YEN;
+	}
+	
+	/**
+	 *<pre>
+	 * 日付の値を「yyyyMMdd」フォーマット編集した文字列の値を返却します。
+	 * nullの場合は空文字列が返却されます。
+	 *</pre>
+	 * @param date フォーマット編集する日付の値
+	 * @return フォーマット編集した日付の値
+	 *
+	 */
+	public static String formatyyyyMMdd(LocalDate date) {
+		// 値がnullの場合は空文字列を返却、null以外の場合はYYYY/MM/DD形式に変換した値を返却
+		return (date == null) ? "" : date.format(MyHouseholdAccountBookContent.STRICT_DATE_TIME_FORMATTERA);
 	}
 	
 	/**
