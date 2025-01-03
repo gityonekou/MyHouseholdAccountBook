@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.yonetani.webapp.accountbook.common.component.CodeTableItemComponent;
 import com.yonetani.webapp.accountbook.common.component.SisyutuKingakuItemHolderComponent;
@@ -271,6 +272,7 @@ public class SimpleShoppingRegistUseCase {
 	 * @return 買い物登録(簡易タイプ)画面の表示情報
 	 *
 	 */
+	@Transactional
 	public SimpleShoppingRegistResponse execAction(LoginUserInfo user, SimpleShoppingRegistInfoForm inputForm) {
 		log.debug("execAction:userid=" + user.getUserId() + ",inputForm=" + inputForm);
 		
