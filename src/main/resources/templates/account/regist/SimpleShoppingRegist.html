@@ -128,6 +128,17 @@
 					</div>
 				</div>
 			</div>
+			
+			<!-- 戻るメニュー -->
+			<div class="card-body">
+				<form name="ReturnInfo" id="ReturnInfo"  method="post" th:action="@{/myhacbook/accountregist/simpleshoppingregist/returndispatchaction/}" th:object="${simpleShoppingRegistInfoForm}">
+					<button class="btn btn-outline-primary" type="submit" name="ReturnShoppingTop">買い物登録トップへ</button>
+					<span>&emsp;</span>
+					<button class="btn btn-outline-primary" type="submit" name="ReturnMonth">各月の家計簿参照に戻る</button>
+					<input type="hidden" th:field="*{targetYearMonth}" />
+				</form>
+			</div>
+			
 			<!-- 買い物情報一覧表示エリア -->
 			<div class="card-body">
 				<div class="card">

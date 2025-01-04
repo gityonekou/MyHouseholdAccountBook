@@ -74,6 +74,42 @@ public class ShoppingRegistRedirectResponse extends AbstractResponse {
 	}
 	
 	/**
+	 *<pre>
+	 * 買い物登録方法選択画面(メニュー選択画面)にリダイレクトするためのレスポンス情報を生成して返します。
+	 *</pre>
+	 * @param targetYearMonth 対象年月
+	 * @return 買い物登録方法選択画面(メニュー選択画面)にリダイレクトするためのレスポンス情報
+	 *
+	 */
+	public static ShoppingRegistRedirectResponse getReturnShoppingTopRedirectInstance(String targetYearMonth) {
+		ShoppingRegistRedirectResponse response = new ShoppingRegistRedirectResponse(
+				// 買い物登録方法選択画面(メニュー選択画面)リダイレクトURL
+				"redirect:/myhacbook/accountregist/shoppingtopmenu/",
+				// 対象年月
+				targetYearMonth);
+		response.setTransactionSuccessFull();
+		return response;
+	}
+	
+	/**
+	 *<pre>
+	 * 各月の収支参照画面にリダイレクトするためのレスポンス情報を生成して返します。
+	 *</pre>
+	 * @param targetYearMonth 対象年月
+	 * @return 各月の収支参照画面にリダイレクトするためのレスポンス情報
+	 *
+	 */
+	public static ShoppingRegistRedirectResponse getReturnInquiryMonthRedirectInstance(String targetYearMonth) {
+		ShoppingRegistRedirectResponse response = new ShoppingRegistRedirectResponse(
+				// 各月の収支参照画面リダイレクトURL
+				"redirect:/myhacbook/accountinquiry/accountmonth/registComplete/",
+				// 対象年月
+				targetYearMonth);
+		response.setTransactionSuccessFull();
+		return response;
+	}
+	
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

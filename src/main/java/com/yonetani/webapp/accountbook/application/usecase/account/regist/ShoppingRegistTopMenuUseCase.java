@@ -159,6 +159,22 @@ public class ShoppingRegistTopMenuUseCase {
 	
 	/**
 	 *<pre>
+	 * 各月の収支参照画面にリダイレクトするための情報を設定します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param targetYearMonth 表示対象の対象年月
+	 * @return 各月の収支参照画面リダイレクト情報
+	 *
+	 */
+	public AbstractResponse readReturnInquiryMonthRedirectInfo(LoginUserInfo user, String targetYearMonth) {
+		log.debug("readReturnInquiryMonthRedirectInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+		ShoppingRegistRedirectResponse response
+			= ShoppingRegistRedirectResponse.getReturnInquiryMonthRedirectInstance(targetYearMonth);
+		return response;
+	}
+	
+	/**
+	 *<pre>
 	 * 簡易タイプ買い物リストの項目に対応する支出テーブル情報と支出金額テーブル情報が登録されてるかどうかをチェックします。
 	 * 未登録の場合、買い物情報の登録は不可となります。
 	 *</pre>

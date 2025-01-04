@@ -39,6 +39,8 @@
 					<button class="btn btn-outline-primary" type="button" id="Event" th:disabled="${btnDisabled}">イベント</button>
 					<span>&emsp;</span>
 					<button class="btn btn-outline-primary" type="submit" name="SimpleType" th:disabled="${btnDisabled}">簡易タイプ</button>
+					<span>&emsp;&emsp;&emsp;</span>
+					<button class="btn btn-outline-primary" type="submit" name="ReturnMonth">各月の家計簿参照に戻る</button>
 					<input type="hidden" name="targetYearMonth" th:value="*{targetYearMonth}" />
 				</form>
 				<br>

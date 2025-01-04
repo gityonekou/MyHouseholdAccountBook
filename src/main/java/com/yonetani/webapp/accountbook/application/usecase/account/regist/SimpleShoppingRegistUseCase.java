@@ -59,7 +59,9 @@ import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.SimpleShoppingRegistInfoForm;
+import com.yonetani.webapp.accountbook.presentation.response.account.regist.ShoppingRegistRedirectResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.SimpleShoppingRegistResponse;
+import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
@@ -726,6 +728,38 @@ public class SimpleShoppingRegistUseCase {
 		// トランザクション完了
 		response.setTransactionSuccessFull();
 		
+		return response;
+	}
+	
+	/**
+	 *<pre>
+	 * 買い物登録方法選択画面(メニュー選択画面)にリダイレクトするための情報を設定します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param targetYearMonth 表示対象の対象年月
+	 * @return 買い物登録方法選択画面(メニュー選択画面)リダイレクト情報
+	 *
+	 */
+	public AbstractResponse readReturnShoppingTopRedirectInfo(LoginUserInfo user, String targetYearMonth) {
+		log.debug("readReturnShoppingTopRedirectInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+		ShoppingRegistRedirectResponse response
+			= ShoppingRegistRedirectResponse.getReturnShoppingTopRedirectInstance(targetYearMonth);
+		return response;
+	}
+	
+	/**
+	 *<pre>
+	 * 各月の収支参照画面にリダイレクトするための情報を設定します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param targetYearMonth 表示対象の対象年月
+	 * @return 各月の収支参照画面リダイレクト情報
+	 *
+	 */
+	public AbstractResponse readReturnInquiryMonthRedirectInfo(LoginUserInfo user, String targetYearMonth) {
+		log.debug("readReturnInquiryMonthRedirectInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+		ShoppingRegistRedirectResponse response
+			= ShoppingRegistRedirectResponse.getReturnInquiryMonthRedirectInstance(targetYearMonth);
 		return response;
 	}
 	

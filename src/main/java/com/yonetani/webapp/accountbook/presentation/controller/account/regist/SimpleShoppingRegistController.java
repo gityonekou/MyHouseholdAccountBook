@@ -170,4 +170,48 @@ public class SimpleShoppingRegistController {
 				// レスポンスからModelAndViewを生成
 				.buildComplete(redirectMessages);
 	}
+	
+	/**
+	 *<pre>
+	 * 買い物登録トップへボタン押下時のPOST要求時マッピングです。買い物登録方法選択画面(メニュー選択画面)にリダイレクトします。
+	 *</pre>
+	 * @param targetYearMonth 表示対象の対象年月
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
+	 * @return 買い物登録方法選択画面(メニュー選択画面)へリダイレクト
+	 *
+	 */
+	@PostMapping(value = "/returndispatchaction/", params = "ReturnShoppingTop")
+	public ModelAndView getReturnShoppingTopRedirectLoad(
+			@RequestParam("targetYearMonth") String targetYearMonth, RedirectAttributes redirectAttributes) {
+		log.debug("getReturnShoppingTopRedirectLoad:targetYearMonth=" + targetYearMonth);
+		
+		// 画面表示情報を取得
+		return this.usecase.readReturnShoppingTopRedirectInfo(loginUserSession.getLoginUserInfo(), targetYearMonth)
+			// レスポンスにログインユーザ名を設定
+			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+			// 買い物登録画面へリダイレクト
+			.buildRedirect(redirectAttributes);
+	}
+	
+	/**
+	 *<pre>
+	 * 各月の家計簿参照に戻るボタン押下時のPOST要求時マッピングです。各月の収支参照画面にリダイレクトします。
+	 *</pre>
+	 * @param targetYearMonth 表示対象の対象年月
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
+	 * @return 各月の収支参照画面へリダイレクト
+	 *
+	 */
+	@PostMapping(value = "/returndispatchaction/", params = "ReturnMonth")
+	public ModelAndView getReturnInquiryMonthRedirectLoad(
+			@RequestParam("targetYearMonth") String targetYearMonth, RedirectAttributes redirectAttributes) {
+		log.debug("getReturnInquiryMonthRedirectLoad:targetYearMonth=" + targetYearMonth);
+		
+		// 画面表示情報を取得
+		return this.usecase.readReturnInquiryMonthRedirectInfo(loginUserSession.getLoginUserInfo(), targetYearMonth)
+			// レスポンスにログインユーザ名を設定
+			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+			// 買い物登録画面へリダイレクト
+			.buildRedirect(redirectAttributes);
+	}
 }
