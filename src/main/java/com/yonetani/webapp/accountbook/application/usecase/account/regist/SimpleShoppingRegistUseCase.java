@@ -50,6 +50,7 @@ import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableR
 import com.yonetani.webapp.accountbook.domain.repository.account.shoppingregist.ShoppingRegistTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKubun;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
@@ -712,6 +713,13 @@ public class SimpleShoppingRegistUseCase {
 			// 更新件数が1件以上の場合、業務エラー
 			if(updCount != 1) {
 				throw new MyHouseholdAccountBookRuntimeException("収支テーブル:INCOME_AND_EXPENDITURE_TABLEへの更新件数が不正でした。[件数=" + updCount + "][update data:" + updSyuusiData + "]");
+			}
+			// 支出テーブルから対象月の支出金額合計値を取得
+			SisyutuKingakuTotalAmount expenditureKingakuTotalAmount = expenditureRepository.sumExpenditureKingaku(searchYearMonth);
+			// 収支テーブルの支出金額の値と対象月の支出テーブルの支出金額合計値が一致するかを確認
+			SisyutuKingakuTotalAmount chkExpenditureKingaku = SisyutuKingakuTotalAmount.from(updSyuusiData.getSisyutuKingaku().getValue());
+			if(!chkExpenditureKingaku.equals(expenditureKingakuTotalAmount)) {
+				throw new MyHouseholdAccountBookRuntimeException("該当月の支出情報が一致しません。管理者に問い合わせてください。[yearMonth=" + searchYearMonth.getYearMonth() + "]");
 			}
 		}
 		
