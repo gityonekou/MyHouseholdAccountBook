@@ -34,8 +34,10 @@ import lombok.RequiredArgsConstructor;
 @EqualsAndHashCode
 public class ShiharaiKingaku {
 	// 支払金額
-	@Getter
 	private final BigDecimal value;
+	
+	// 値が0の「支出金額」項目の値
+	public static final ShiharaiKingaku ZERO = ShiharaiKingaku.from(BigDecimal.ZERO.setScale(2));
 	
 	/**
 	 *<pre>

@@ -137,9 +137,9 @@ public class FixedCostInquiryList {
 					// 固定費一覧明細情報のリスト:空
 					Collections.emptyList(),
 					// 奇数月合計=0
-					ShiharaiKingaku.from(BigDecimal.ZERO),
+					ShiharaiKingaku.ZERO,
 					// 偶数月合計=0
-					ShiharaiKingaku.from(BigDecimal.ZERO));
+					ShiharaiKingaku.ZERO);
 		} else {
 			/* 各種合計値を計算 */
 			// 奇数月合計

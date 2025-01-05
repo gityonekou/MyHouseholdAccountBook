@@ -111,10 +111,10 @@ public class MyHouseholdAccountBookContent {
 	public static final String SISYUTU_ITEM_CODE_TEMPORARY_VALUE = "9999";
 	/** 支出項目表示順のその他項目の値:99 */
 	public static final String OTHER_SISYUTU_ITEM_SORT_VALUE = "99";
-	/** 支出項目コード:住居設備(0045) */
-	public static final String SISYUTU_ITEM_CODE_JYUUKYO_SETUBI_VALUE = "0045";
 	/** 支出項目コード:被服費(0046) */
 	public static final String SISYUTU_ITEM_CODE_HIFUKU_VALUE = "0046";
+	/** 支出項目コード:住居設備(0047) */
+	public static final String SISYUTU_ITEM_CODE_JYUUKYO_SETUBI_VALUE = "0047";
 	/** 支出項目コード:日用消耗品(0050) */
 	public static final String SISYUTU_ITEM_CODE_NITIYOU_SYOUMOUHIN_VALUE = "0050";
 	/** 支出項目コード:飲食(0051) */
