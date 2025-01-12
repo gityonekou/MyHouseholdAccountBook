@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS SHOPPING_ITEM_TABLE (
 );
 
 
--- 固定費テーブル:FIXED_COST_TABLE ★登録未
+-- 固定費テーブル:FIXED_COST_TABLE ★本番テーブル定義登録済み★
 -- DROP TABLE IF EXISTS FIXED_COST_TABLE;
 CREATE TABLE IF NOT EXISTS FIXED_COST_TABLE (
 	-- ユーザID
@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS FIXED_COST_TABLE (
 );
 
 
--- イベントテーブル:EVENT_ITEM_TABLE ★登録未
+-- イベントテーブル:EVENT_ITEM_TABLE ★本番テーブル定義登録済み★
 -- DROP TABLE IF EXISTS EVENT_ITEM_TABLE;
 CREATE TABLE IF NOT EXISTS EVENT_ITEM_TABLE (
 	-- ユーザID
@@ -184,9 +184,9 @@ CREATE TABLE IF NOT EXISTS EVENT_ITEM_TABLE (
 
 
 -- ------------------------------------------------------------------------------------------
--- 収支関連作成中
+-- 収支関連
 -- ------------------------------------------------------------------------------------------
--- 収支テーブル：INCOME_AND_EXPENDITURE_TABLE ★削除・変更対象★
+-- 収支テーブル：INCOME_AND_EXPENDITURE_TABLE ★本番テーブル定義登録済み★
 -- DROP TABLE IF EXISTS INCOME_AND_EXPENDITURE_TABLE;
 CREATE TABLE IF NOT EXISTS INCOME_AND_EXPENDITURE_TABLE (
 	-- ユーザID
@@ -213,7 +213,7 @@ CREATE TABLE IF NOT EXISTS INCOME_AND_EXPENDITURE_TABLE (
 -- 件数は1ユーザ年12件にしかならないので、このテーブルではインデックス不要(フルスキャンOK)
 
 
--- 支出金額テーブル：SISYUTU_KINGAKU_TABLE ★削除・変更対象★
+-- 支出金額テーブル：SISYUTU_KINGAKU_TABLE  ★本番テーブル定義登録済み★
 -- DROP TABLE IF EXISTS SISYUTU_KINGAKU_TABLE;
 CREATE TABLE IF NOT EXISTS SISYUTU_KINGAKU_TABLE (
 	-- ユーザID
@@ -244,12 +244,12 @@ CREATE TABLE IF NOT EXISTS SISYUTU_KINGAKU_TABLE (
 	CONSTRAINT FK_SISYUTU_ITEM_CODE FOREIGN KEY(USER_ID, SISYUTU_ITEM_CODE) REFERENCES SISYUTU_ITEM_TABLE(USER_ID, SISYUTU_ITEM_CODE)
 );
 
--- 支出金額テーブルインデックス ★削除・変更対象★
+-- 支出金額テーブルインデックス
 CREATE INDEX SISYUTU_KINGAKU_TABLE_USER_YEAR ON SISYUTU_KINGAKU_TABLE (USER_ID, TARGET_YEAR);
 CREATE INDEX SISYUTU_KINGAKU_TABLE_USER_YEAR_MONTH ON SISYUTU_KINGAKU_TABLE (USER_ID, TARGET_YEAR, TARGET_MONTH);
 
 
--- 支出テーブル：EXPENDITURE_TABLE ★未登録★
+-- 支出テーブル：EXPENDITURE_TABLE  ★本番テーブル定義登録済み★
 -- DROP TABLE IF EXISTS EXPENDITURE_TABLE;
 CREATE TABLE IF NOT EXISTS EXPENDITURE_TABLE (
 	-- ユーザID
@@ -288,7 +288,7 @@ CREATE TABLE IF NOT EXISTS EXPENDITURE_TABLE (
 );
 
 
--- 収入テーブル：INCOME_TABLE ★未登録★
+-- 収入テーブル：INCOME_TABLE  ★本番テーブル定義登録済み★
 -- DROP TABLE IF EXISTS INCOME_TABLE;
 CREATE TABLE IF NOT EXISTS INCOME_TABLE (
 	-- ユーザID
@@ -313,7 +313,10 @@ CREATE TABLE IF NOT EXISTS INCOME_TABLE (
 	
 );
 
--- 買い物登録情報テーブル：SHOPPING_REGIST_TABLE ★未登録★
+-- ------------------------------------------------------------------------------------------
+-- 買い物登録関連
+-- ------------------------------------------------------------------------------------------
+-- 買い物登録情報テーブル：SHOPPING_REGIST_TABLE  ★本番テーブル定義登録済み★
 -- DROP TABLE IF EXISTS SHOPPING_REGIST_TABLE;
 CREATE TABLE IF NOT EXISTS SHOPPING_REGIST_TABLE (
 	-- ユーザID
