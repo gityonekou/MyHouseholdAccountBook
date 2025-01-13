@@ -18,6 +18,10 @@ import com.yonetani.webapp.accountbook.domain.model.common.AccountBookUser;
 import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.repository.common.AccountBookUserRepository;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
+import com.yonetani.webapp.accountbook.domain.type.common.UserName;
 import com.yonetani.webapp.accountbook.infrastructure.dto.common.AccountBookUserDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.common.AccountBookUserWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSearchQueryDto;
@@ -123,12 +127,12 @@ public class AccountBookUserDataSource implements AccountBookUserRepository {
 	private AccountBookUser createAccountBookUser(AccountBookUserDto dto) {
 		return AccountBookUser.from(
 				// ユーザID
-				dto.getUserId(),
+				UserId.from(dto.getUserId()),
 				// 現在の対象年
-				dto.getNowTargetYear(),
+				TargetYear.from(dto.getNowTargetYear()),
 				// 現在の対象月
-				dto.getNowTargetMonth(),
+				TargetMonth.from(dto.getNowTargetMonth()),
 				// ユーザ名
-				dto.getUserName());
+				UserName.from(dto.getUserName()));
 	}
 }

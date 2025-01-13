@@ -35,8 +35,11 @@ import com.yonetani.webapp.accountbook.domain.repository.adminmenu.AdminMenuUser
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.ShopBaseTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.SisyutuItemBaseTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.common.AccountBookUserRepository;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
+import com.yonetani.webapp.accountbook.domain.type.common.UserName;
 import com.yonetani.webapp.accountbook.presentation.request.adminmenu.AdminMenuUserInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.adminmenu.AdminMenuUserInfoResponse;
 
@@ -157,10 +160,10 @@ public class AdminMenuUserInfoUseCase {
 			
 			// 家計簿利用ユーザ情報
 			AccountBookUser accountBookUser = AccountBookUser.from(
-					userInfoForm.getUserId(),
-					domainTypeYearMonth.getYear(),
-					domainTypeYearMonth.getMonth(),
-					userInfoForm.getUserName());
+					UserId.from(userInfoForm.getUserId()),
+					TargetYear.from(domainTypeYearMonth.getYear()),
+					TargetMonth.from(domainTypeYearMonth.getMonth()),
+					UserName.from(userInfoForm.getUserName()));
 			
 			// 新規登録の場合
 			if(Objects.equals(userInfoForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {

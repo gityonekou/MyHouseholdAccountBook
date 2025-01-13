@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.yonetani.webapp</groupId>
 	<artifactId>MyHouseholdAccountBook</artifactId>
-	<version>1.0.0-Bata</version>
+	<version>1.0.1</version>
 	<packaging>jar</packaging>
 	<name>MyHouseholdAccountBook</name>
 	<description>マイ家計簿です(spring boot版)</description>
@@ -91,7 +91,7 @@
 
 <!-- 本番環境用DB -->
 <!--		<dependency> -->
-<!-- 			<groupId>org.mariadb.jdbc</groupId> -->
+<!--			<groupId>org.mariadb.jdbc</groupId> -->
 <!--			<artifactId>mariadb-java-client</artifactId> -->
 <!--			<scope>runtime</scope> -->
 <!--		</dependency> -->

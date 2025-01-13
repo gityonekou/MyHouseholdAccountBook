@@ -117,7 +117,8 @@ public class IncomeAndExpenditureRegistUseCase {
 	private final SisyutuKingakuTableRepository sisyutuKingakuTableRepository;
 	// 支出金額テーブル情報保持ホルダー生成用コンポーネント
 	private final SisyutuKingakuItemHolderComponent sisyutuKingakuItemHolderComponent;
-	
+	// 買い物登録時の支出項目に対応する支出テーブル情報と支出金額テーブル情報にアクセスするコンポーネント
+	private final ShoppingRegistExpenditureAndSisyutuKingakuComponent checkComponent;
 	
 	/**
 	 *<pre>
@@ -216,8 +217,14 @@ public class IncomeAndExpenditureRegistUseCase {
 							// 支払金額の0円開始設定フラグ
 							domain.getFixedCostKubun().isClearStart()
 						)).collect(Collectors.toList());
+			
 			// レスポンスにセッションの支出情報を設定
 			response.setExpenditureRegistItemList(expenditureRegistItemList);
+			// 買い物登録に必須の項目が支出登録情報のリスト(セッション登録情報)に設定されているかをチェック
+			checkComponent.checkExpenditureRegistItemList(expenditureRegistItemList).forEach(message -> {
+				// エラーメッセージを追加
+				response.addErrorMessage(message);
+			});
 			
 			// 固定費一覧から画面表示する支出一覧とセッション保存の支出一覧を設定
 			setIncomeAndExpenditureInfoList(userId, null, expenditureRegistItemList, response);
@@ -1404,6 +1411,16 @@ public class IncomeAndExpenditureRegistUseCase {
 				if(updCount != 1) {
 					throw new MyHouseholdAccountBookRuntimeException("収支テーブル:INCOME_AND_EXPENDITURE_TABLEへの更新件数が不正でした。[件数=" + updCount + "][update data:" + updSyuusiData + "]");
 				}
+			}
+			
+			// 買い物登録に必須の項目が支出テーブル、支出金額テーブルに登録されているかをチェック
+			StringBuilder msb = new StringBuilder();
+			checkComponent.checkExpenditureAndSisyutuKingaku(userId, targetYearMonth).forEach(message -> {
+				// エラーメッセージを追加
+				msb.append(message + "\n");
+			});
+			if(msb.length() != 0) {
+				throw new MyHouseholdAccountBookRuntimeException(msb.toString()); 
 			}
 			
 			response.addMessage(String.format("%s年%s月度の収支情報を登録しました。", targetYearMonth.getYear(), targetYearMonth.getMonth()));

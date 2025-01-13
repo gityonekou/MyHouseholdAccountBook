@@ -55,14 +55,14 @@ public class AccountBookUser {
 	 *
 	 */
 	public static AccountBookUser from(
-			String userId,
-			String nowTargetYear,
-			String nowTargetMonth,
-			String userName) {
+			UserId userId,
+			TargetYear nowTargetYear,
+			TargetMonth nowTargetMonth,
+			UserName userName) {
 		return new AccountBookUser(
-			UserId.from(userId),
-			TargetYear.from(nowTargetYear),
-			TargetMonth.from(nowTargetMonth),
-			UserName.from(userName));
+			userId,
+			nowTargetYear,
+			nowTargetMonth,
+			userName);
 	}
 }
