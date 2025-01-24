@@ -1,4 +1,4 @@
-# MyHouseholdAccountBook
+# MyHouseholdAccountBook(A_1.01版　develop)
 マイ家計簿のWebアプリケーションです。<br>
 SpringBootを使って作成しています。<br>
 各種、詳細設計書も作成予定です。<br>
