@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShopInfoManageResponse;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
@@ -41,6 +42,8 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  */
 // Web周りのコンフィグレーション以外(controllerは対象に含む)をインジェクションする
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
+// SpringBootアプリケーション設定ファイルにapplication-test.ymlを設定
+@ActiveProfiles("test")
 class ShopInfoManageUseCaseTest {
 	// 店情報管理ユースケースサービスをインジェクション
 	@Autowired
