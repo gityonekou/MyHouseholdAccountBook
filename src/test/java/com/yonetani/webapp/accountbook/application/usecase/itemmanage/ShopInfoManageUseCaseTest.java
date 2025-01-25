@@ -22,7 +22,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShopInfoManageResponse;
@@ -40,8 +39,13 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  * @since 家計簿アプリ(1.00.A)
  *
  */
-// Web周りのコンフィグレーション以外(controllerは対象に含む)をインジェクションする
-@SpringBootTest(webEnvironment = WebEnvironment.NONE)
+// Web周りのコンフィグレーション以外(controllerは対象に含む)をインジェクションする場合に指定
+// ただし、Spring Securityの以下@ConfigurationクラスのBean登録が動いてコケるのですべてのBean登録が必要となる
+// 「com.yonetani.webapp.accountbook.presentation.security.config.SecurityConfig.java」
+//@SpringBootTest(webEnvironment = WebEnvironment.NONE)
+
+// すべてのBeanをDIコンテナに登録する:Spring Securityの@Configurationクラス作成している場合はすべて必要(少なくとも、限定するとエラーになる)
+@SpringBootTest
 // SpringBootアプリケーション設定ファイルにapplication-test.ymlを設定
 @ActiveProfiles("test")
 class ShopInfoManageUseCaseTest {
