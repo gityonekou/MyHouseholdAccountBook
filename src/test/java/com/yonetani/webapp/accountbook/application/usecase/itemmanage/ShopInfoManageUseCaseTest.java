@@ -104,7 +104,6 @@ class ShopInfoManageUseCaseTest {
 		} else {
 			assertEquals("店舗情報取得結果が0件です。", res.getMessagesList().get(0), "0件データのエラーとなるかどうか");	
 		}
-		// 1件データかどうか
 	}
 
 	/**
