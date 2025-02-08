@@ -102,12 +102,11 @@
 		</dependency>
 
 <!-- 本番環境用DB -->
-<!--		<dependency> -->
-<!--			<groupId>org.mariadb.jdbc</groupId> -->
-<!--			<artifactId>mariadb-java-client</artifactId> -->
-<!--			<scope>runtime</scope> -->
-<!--		</dependency> -->
-
+		<dependency>
+			<groupId>org.mariadb.jdbc</groupId>
+			<artifactId>mariadb-java-client</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 
 <!--	jpaは本アプリでは使用しない -->
 <!--		<dependency> -->
