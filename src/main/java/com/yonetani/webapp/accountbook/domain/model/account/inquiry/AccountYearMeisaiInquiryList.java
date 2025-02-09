@@ -23,6 +23,8 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.KoteiHikazeiK
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.KoteiKazeiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuB;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuBC;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuC;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyumiGotakuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuusiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
@@ -77,8 +79,8 @@ public class AccountYearMeisaiInquiryList {
 		private final InsyokuNitiyouhinKingaku insyokuNitiyouhinKingaku;
 		// 趣味娯楽
 		private final SyumiGotakuKingaku syumiGotakuKingaku;
-		// 支出B
-		private final SisyutuKingakuB sisyutuKingakuB;
+		// 支出BC
+		private final SisyutuKingakuBC sisyutuKingakuBC;
 		// 支出
 		private final SisyutuKingaku sisyutuKingaku;
 		// 収支
@@ -96,6 +98,7 @@ public class AccountYearMeisaiInquiryList {
 		 * @param insyokuNitiyouhinKingaku 飲食日用品
 		 * @param syumiGotakuKingaku 趣味娯楽
 		 * @param sisyutuKingakuB 支出B
+		 * @param sisyutuKingakuC 支出C
 		 * @param sisyutuKingaku 支出
 		 * @param syuusiKingaku 収支
 		 * @return 年間収支(明細)情報のドメインモデル
@@ -110,6 +113,7 @@ public class AccountYearMeisaiInquiryList {
 				BigDecimal insyokuNitiyouhinKingaku,
 				BigDecimal syumiGotakuKingaku,
 				BigDecimal sisyutuKingakuB,
+				BigDecimal sisyutuKingakuC,
 				BigDecimal sisyutuKingaku,
 				BigDecimal syuusiKingaku
 				) {
@@ -121,7 +125,7 @@ public class AccountYearMeisaiInquiryList {
 					IruiJyuukyoSetubiKingaku.from(iruiJyuukyoSetubiKingaku),
 					InsyokuNitiyouhinKingaku.from(insyokuNitiyouhinKingaku),
 					SyumiGotakuKingaku.from(syumiGotakuKingaku),
-					SisyutuKingakuB.from(sisyutuKingakuB),
+					SisyutuKingakuBC.from(SisyutuKingakuB.from(sisyutuKingakuB), SisyutuKingakuC.from(sisyutuKingakuC)),
 					SisyutuKingaku.from(sisyutuKingaku),
 					SyuusiKingaku.from(syuusiKingaku));
 		}
@@ -141,8 +145,8 @@ public class AccountYearMeisaiInquiryList {
 	private final InsyokuNitiyouhinKingaku insyokuNitiyouhinKingakuGoukei;
 	// 趣味娯楽合計
 	private final SyumiGotakuKingaku syumiGotakuKingakuGoukei;
-	// 支出B合計
-	private final SisyutuKingakuB sisyutuKingakuBGoukei;
+	// 支出BC合計
+	private final SisyutuKingakuBC sisyutuKingakuBCGoukei;
 	// 支出合計
 	private final SisyutuKingaku sisyutuKingakuGoukei;
 	// 収支合計
@@ -166,9 +170,9 @@ public class AccountYearMeisaiInquiryList {
 					IruiJyuukyoSetubiKingaku.from(BigDecimal.ZERO),
 					InsyokuNitiyouhinKingaku.from(BigDecimal.ZERO),
 					SyumiGotakuKingaku.from(BigDecimal.ZERO),
-					SisyutuKingakuB.from(SisyutuKingakuB.ZERO.getValue()),
-					SisyutuKingaku.from(SisyutuKingaku.ZERO.getValue()),
-					SyuusiKingaku.from(SyuusiKingaku.ZERO.getValue())
+					SisyutuKingakuBC.ZERO,
+					SisyutuKingaku.ZERO,
+					SyuusiKingaku.ZERO
 					);
 		} else {
 			// 各種合計値を計算
@@ -178,7 +182,7 @@ public class AccountYearMeisaiInquiryList {
 			BigDecimal iruiJyuukyoSetubiKingakuGoukeiWk = BigDecimal.ZERO;
 			BigDecimal insyokuNitiyouhinKingakuGoukeiWk = BigDecimal.ZERO;
 			BigDecimal syumiGotakuKingakuGoukeiWk = BigDecimal.ZERO;
-			BigDecimal sisyutuKingakuBGoukeiWk = BigDecimal.ZERO.setScale(2);
+			SisyutuKingakuBC sisyutuKingakuBCGoukei = SisyutuKingakuBC.ZERO;
 			BigDecimal sisyutuKingakuGoukeiWk = BigDecimal.ZERO.setScale(2);
 			BigDecimal syuusiKingakuGoukeiWk = BigDecimal.ZERO.setScale(2);
 			
@@ -189,7 +193,7 @@ public class AccountYearMeisaiInquiryList {
 				iruiJyuukyoSetubiKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(iruiJyuukyoSetubiKingakuGoukeiWk, item.getIruiJyuukyoSetubiKingaku().getValue());
 				insyokuNitiyouhinKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(insyokuNitiyouhinKingakuGoukeiWk, item.getInsyokuNitiyouhinKingaku().getValue());
 				syumiGotakuKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(syumiGotakuKingakuGoukeiWk, item.getSyumiGotakuKingaku().getValue());
-				sisyutuKingakuBGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(sisyutuKingakuBGoukeiWk, item.getSisyutuKingakuB().getValue());
+				sisyutuKingakuBCGoukei = sisyutuKingakuBCGoukei.add(item.getSisyutuKingakuBC());
 				sisyutuKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(sisyutuKingakuGoukeiWk, item.getSisyutuKingaku().getValue());
 				syuusiKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(syuusiKingakuGoukeiWk, item.getSyuusiKingaku().getValue());
 			}
@@ -201,7 +205,7 @@ public class AccountYearMeisaiInquiryList {
 					IruiJyuukyoSetubiKingaku.from(iruiJyuukyoSetubiKingakuGoukeiWk),
 					InsyokuNitiyouhinKingaku.from(insyokuNitiyouhinKingakuGoukeiWk),
 					SyumiGotakuKingaku.from(syumiGotakuKingakuGoukeiWk),
-					SisyutuKingakuB.from(sisyutuKingakuBGoukeiWk),
+					sisyutuKingakuBCGoukei,
 					SisyutuKingaku.from(sisyutuKingakuGoukeiWk),
 					SyuusiKingaku.from(syuusiKingakuGoukeiWk)
 					);
@@ -238,7 +242,7 @@ public class AccountYearMeisaiInquiryList {
 			.append(",syumiGotakuKingakuGoukei:")
 			.append(syumiGotakuKingakuGoukei)
 			.append(",sisyutuKingakuBGoukei:")
-			.append(sisyutuKingakuBGoukei)
+			.append(sisyutuKingakuBCGoukei)
 			.append(",sisyutuKingakuGoukei:")
 			.append(sisyutuKingakuGoukei)
 			.append(",syuusiKingakuGoukei:")

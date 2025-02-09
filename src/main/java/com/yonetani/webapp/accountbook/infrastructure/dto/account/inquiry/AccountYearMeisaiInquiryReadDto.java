@@ -54,4 +54,6 @@ public class AccountYearMeisaiInquiryReadDto {
 	private final BigDecimal syumiGotakuKingaku;
 	// 支出B
 	private final BigDecimal sisyutuKingakuB;
+	// 支出C
+	private final BigDecimal sisyutuKingakuC;
 }

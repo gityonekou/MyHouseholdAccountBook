@@ -13,10 +13,12 @@
 package com.yonetani.webapp.accountbook.presentation.controller.account.inquiry;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.inquiry.AccountYearInquiryUseCase;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
@@ -189,5 +191,32 @@ public class AccountYearInquiryController {
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
 				.build();
+	}
+	
+	
+	/**
+	 *<pre>
+	 * 指定の対象年、対象月に対応する各月の収支画面にリダイレクトします。
+	 * 
+	 *</pre>
+	 * @param targetYear 表示対象の年度
+	 * @param targetMonth 表示対象の月度
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
+	 * @return 各月の収支参照画面へリダイレクト
+	 *
+	 */
+	@GetMapping(value="/dispatchtmonthinquiry")
+	public ModelAndView getDispatchtMonthInquiry(
+			@RequestParam("targetYear") String targetYear,
+			@RequestParam("targetMonth") String targetMonth,
+			RedirectAttributes redirectAttributes) {
+		log.debug("getDispatchtMonthInquiry:targetYear="+ targetYear + ",targetMonth:=" + targetMonth);
+		
+		// 画面表示データを読込
+		return this.usecasee.readReturnInquiryMonthRedirectInfo(loginUserSession.getLoginUserInfo(), targetYear, targetMonth)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// 買い物登録画面へリダイレクト
+				.buildRedirect(redirectAttributes);
 	}
 }

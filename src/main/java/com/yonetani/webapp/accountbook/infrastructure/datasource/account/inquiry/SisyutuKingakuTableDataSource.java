@@ -154,6 +154,7 @@ public class SisyutuKingakuTableDataSource implements SisyutuKingakuTableReposit
 							dto.getInsyokuNitiyouhinKingaku(),
 							dto.getSyumiGotakuKingaku(),
 							dto.getSisyutuKingakuB(),
+							dto.getSisyutuKingakuC(),
 							dto.getSisyutuKingaku(),
 							dto.getSyuusiKingaku()
 						)).collect(Collectors.toUnmodifiableList()));
