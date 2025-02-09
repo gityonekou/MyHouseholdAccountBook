@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.yonetani.webapp</groupId>
 	<artifactId>MyHouseholdAccountBook</artifactId>
-	<version>1.02.01</version>
+	<version>1.01.03</version>
 	<packaging>jar</packaging>
 	<name>MyHouseholdAccountBook</name>
 	<description>マイ家計簿です(spring boot版)</description>
@@ -90,11 +90,11 @@
 		</dependency>
 
 <!-- 本番環境用DB -->
-<!--		<dependency> -->
-<!--			<groupId>org.mariadb.jdbc</groupId> -->
-<!--			<artifactId>mariadb-java-client</artifactId> -->
-<!--			<scope>runtime</scope> -->
-<!--		</dependency> -->
+		<dependency>
+			<groupId>org.mariadb.jdbc</groupId>
+			<artifactId>mariadb-java-client</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 		
 		<!-- Spring Securityのテストパッケージ(Test実装時にコメントアウト外してセキュリティ関連のテストをする -->
 <!--		<dependency> -->

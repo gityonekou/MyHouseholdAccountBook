@@ -64,8 +64,10 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 		private final String insyokuNitiyouhinKingaku;
 		// 趣味娯楽
 		private final String syumiGotakuKingaku;
-		// 支出B
-		private final String sisyutuKingakuB;
+		// 支出BC
+		private final String sisyutuKingakuBC;
+		// 支出Bの割合
+		private final String percentageB;
 		// 支出
 		private final String sisyutuKingaku;
 		// 収支
@@ -82,7 +84,8 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 		 * @param iruiJyuukyoSetubiKingaku 衣類住居設備
 		 * @param insyokuNitiyouhinKingaku 飲食日用品
 		 * @param syumiGotakuKingaku 趣味娯楽
-		 * @param sisyutuKingakuB 支出B
+		 * @param sisyutuKingakuBC 支出BC
+		 * @param percentageB 支出Bの割合
 		 * @param sisyutuKingaku 支出
 		 * @param syuusiKingaku 収支
 		 * @return 年間収支(明細)情報の明細データ
@@ -96,7 +99,8 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 				String iruiJyuukyoSetubiKingaku,
 				String insyokuNitiyouhinKingaku,
 				String syumiGotakuKingaku,
-				String sisyutuKingakuB,
+				String sisyutuKingakuBC,
+				String percentageB,
 				String sisyutuKingaku,
 				String syuusiKingaku) {
 			return new MeisaiInquiryListItem(
@@ -107,7 +111,8 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 					iruiJyuukyoSetubiKingaku,
 					insyokuNitiyouhinKingaku,
 					syumiGotakuKingaku,
-					sisyutuKingakuB,
+					sisyutuKingakuBC,
+					percentageB,
 					sisyutuKingaku,
 					syuusiKingaku);
 		}
@@ -135,9 +140,12 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 	// 趣味娯楽合計
 	@Setter
 	private String syumiGotakuKingakuGoukei;
-	// 支出B合計
+	// 支出BC合計
 	@Setter
-	private String sisyutuKingakuBGoukei;
+	private String sisyutuKingakuBCGoukei;
+	// 支出BC合計のうち、支出B合計の割合
+	@Setter
+	private String percentageBGoukei;
 	// 支出合計
 	@Setter
 	private String sisyutuKingakuGoukei;
@@ -198,8 +206,10 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 		modelAndView.addObject("insyokuNitiyouhinKingakuGoukei", insyokuNitiyouhinKingakuGoukei);
 		// 趣味娯楽合計
 		modelAndView.addObject("syumiGotakuKingakuGoukei", syumiGotakuKingakuGoukei);
-		// 支出B合計
-		modelAndView.addObject("sisyutuKingakuBGoukei", sisyutuKingakuBGoukei);
+		// 支出BC合計
+		modelAndView.addObject("sisyutuKingakuBCGoukei", sisyutuKingakuBCGoukei);
+		// 支出BC合計のうち、支出B合計の割合
+		modelAndView.addObject("percentageBGoukei", percentageBGoukei);
 		// 支出金額合計
 		modelAndView.addObject("sisyutuKingakuGoukei", sisyutuKingakuGoukei);
 		// 収支合計
