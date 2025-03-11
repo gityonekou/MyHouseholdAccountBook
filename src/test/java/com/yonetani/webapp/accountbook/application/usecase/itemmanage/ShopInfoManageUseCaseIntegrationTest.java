@@ -15,6 +15,8 @@ package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -23,8 +25,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.ModelMap;
 
+import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
+import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShopInfoManageResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.ShopInfoManageResponse.ShopListItem;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 /**
@@ -48,13 +56,16 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 @SpringBootTest
 // SpringBootアプリケーション設定ファイルにapplication-test.ymlを設定
 @ActiveProfiles("test")
-class ShopInfoManageUseCaseTest {
+// 各テスト開始前にロールバックする
+@Transactional
+class ShopInfoManageUseCaseIntegrationTest {
 	// 店情報管理ユースケースサービスをインジェクション
 	@Autowired
 	private ShopInfoManageUseCase service;
 	
 	// ユーザ情報
-	private final LoginUserInfo TEST_USER = LoginUserInfo.from("kouki", "米谷 幸城");
+	private final LoginUserInfo TEST_USER = LoginUserInfo.from("TESTUSER001", "テストユーザ01");
+	
 	/**
 	 *<pre>
 	 * 【メソッドの説明を入力してください】
@@ -100,24 +111,49 @@ class ShopInfoManageUseCaseTest {
 	}
 
 	/**
+	 * 情報管理(お店)画面表示情報取得のインテグレーションテストです。
+	 * ユーザIDに対応する店情報なし(検索結果なし)時の結果情報が想定通りかをテストします。
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
 	 */
 	@Test
-	void testReadShopInfoLoginUserInfo() {
-		// 0件データかどうか
+	@Sql("ReadShopInfoQueryNotFoundTest.sql")
+	void testReadShopInfoQueryNotFound() {
+		// 検索結果なしとなる条件で画面表示情報を取得
 		ShopInfoManageResponse res = service.readShopInfo(TEST_USER);
 		if(res.getMessagesList().size() != 1) {
-			fail("エラーのレスポンスメッセージが設定されていない");
+			fail("検索結果なしのレスポンスメッセージが設定されていない");
 		} else {
 			assertEquals("店舗情報取得結果が0件です。", res.getMessagesList().get(0), "0件データのエラーとなるかどうか");	
 		}
+		
+		// 画面表示情報からviewを生成し、Modelマップを取得
+		ModelMap modelMap = res.build().getModelMap();
+		
+		// 店舗グループの選択ボックス情報を取得
+		SelectViewItem shopKubunItem = (SelectViewItem)modelMap.getAttribute("shopKubun");
+		List<OptionItem> shopKubunSelectList = shopKubunItem.getOptionList();
+		//選択ボックスの表示値が正しいことを確認
+		
+		// 店舗一覧情報の明細リストを取得
+		@SuppressWarnings("unchecked")
+		List<ShopListItem> shopList = (List<ShopListItem>)modelMap.getAttribute("shopList");
+		@SuppressWarnings("unchecked")
+		List<ShopListItem> nonEditShopList = (List<ShopListItem>)modelMap.getAttribute("nonEditShopList");
+		// 店舗一覧情報の明細リストが0件であること
+		assertNotNull(shopList, "店舗一覧情報の明細データ(変更可能分)がnullでないこと");
+		assertEquals(0, shopList.size(), "店舗一覧情報の明細データ(変更可能分)が0件であること");
+		assertNotNull(nonEditShopList, "店舗一覧情報の明細データ(変更不可分)がnullでないこと");
+		assertEquals(0, nonEditShopList.size(), "舗一覧情報の明細データ(変更不可分)が0件であること");
 	}
 
 	/**
+	 * 指定したユーザIDと店舗に応じた情報管理(お店)画面の表示情報取得のインテグレーションテストです。
+	 * ××の場合の結果情報が想定通りかをテストします。
+	 * 
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, java.lang.String)} のためのテスト・メソッド。
 	 */
 	@Test
-	void testReadShopInfoLoginUserInfoString() {
+	void testReadShopInfoFromShopCode() {
 		fail("まだ実装されていません");
 	}
 
