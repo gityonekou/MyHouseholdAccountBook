@@ -72,13 +72,14 @@
 						<table class="table table-sm table-borderless">
 							<thead><tr class="table-secondary">
 								<th scope="col" class="w5" style="vertical-align:middle; text-align:center;">年月</th>
+								<th scope="col" class="w10" style="vertical-align:middle; text-align:center;">収入（＋積立取崩）</th>
 								<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">事業経費</th>
 								<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">固定(非課税)</th>
 								<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">固定(課税)</th>
 								<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">衣類住居設備</th>
 								<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">飲食日用品</th>
-								<th scope="col" class="w10" style="vertical-align:middle; text-align:center;">支出BC合計(B割合)</th>
 								<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">趣味娯楽</th>
+								<th scope="col" class="w10" style="vertical-align:middle; text-align:center;">支出BC合計(B割合)</th>
 								<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">支出合計</th>
 								<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">収支</th>
 								<th scope="col" class="w10"></th>
@@ -89,13 +90,15 @@
 									<th:block th:if="${itemStat.odd}"><tr></th:block>
 									<th:block th:if="${itemStat.even}"><tr class="table-warning"></th:block>
 										<td align="center"><span th:text="${item.month}"></span>月</td>
+										<td align="center" th:if="${#strings.isEmpty(item.withdrewKingaku)}" th:text="${item.syuunyuuKingaku}">収入</td>
+										<td align="center" th:if="!${#strings.isEmpty(item.withdrewKingaku)}"><span th:text="${item.syuunyuuKingaku}"></span><br>（<span th:text="${item.withdrewKingaku}"></span>）</td>
 										<td align="center" th:text="${item.jigyouKeihiKingaku}">事業経費</td>
 										<td align="center" th:text="${item.koteiHikazeiKingaku}">固定(非課税)</td>
 										<td align="center" th:text="${item.koteiKazeiKingaku}">固定(課税)</td>
 										<td align="center" th:text="${item.iruiJyuukyoSetubiKingaku}">衣類住居設備</td>
 										<td align="center" th:text="${item.insyokuNitiyouhinKingaku}">飲食日用品</td>
-										<td align="center"><span th:text="${item.sisyutuKingakuBC}"></span>（<span th:text="${item.percentageB}"></span>%）</td>
 										<td align="center" th:text="${item.syumiGotakuKingaku}">趣味娯楽</td>
+										<td align="center"><span th:text="${item.sisyutuKingakuBC}"></span>（<span th:text="${item.percentageB}"></span>%）</td>
 										<td align="center" th:text="${item.sisyutuKingaku}">支出</td>
 										<td align="center" th:text="${item.syuusiKingaku}">収支</td>
 										<td align="center"><a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/accountinquiry/accountyear/dispatchtmonthinquiry(targetYear=*{targetYear},targetMonth=${item.month})}">詳細へ</a></td>
@@ -104,13 +107,15 @@
 								</th:block>
 								<tr class="table-success">
 									<td>合計</td>
+									<td align="center" th:if="${#strings.isEmpty(withdrewKingakuGoukei)}" th:text="${syuunyuuKingakuGoukei}">収入合計</td>
+									<td align="center" th:if="!${#strings.isEmpty(withdrewKingakuGoukei)}"><span th:text="${syuunyuuKingakuGoukei}"></span><br>（<span th:text="${withdrewKingakuGoukei}"></span>）</td>
 									<td align="center" th:text="${jigyouKeihiKingakuGoukei}">事業経費合計</td>
 									<td align="center" th:text="${koteiHikazeiKingakuGoukei}">固定(非課税)合計</td>
 									<td align="center" th:text="${koteiKazeiKingakuGoukei}">固定(課税)合計</td>
 									<td align="center" th:text="${iruiJyuukyoSetubiKingakuGoukei}">衣類住居設備合計</td>
 									<td align="center" th:text="${insyokuNitiyouhinKingakuGoukei}">飲食日用品合計</td>
-									<td align="center"><span th:text="${sisyutuKingakuBCGoukei}"></span>（<span th:text="${percentageBGoukei}"></span>%）</td>
 									<td align="center" th:text="${syumiGotakuKingakuGoukei}">趣味娯楽合計</td>
+									<td align="center"><span th:text="${sisyutuKingakuBCGoukei}"></span>（<span th:text="${percentageBGoukei}"></span>%）</td>
 									<td align="center" th:text="${sisyutuKingakuGoukei}">支出合計</td>
 									<td align="center" th:text="${syuusiKingakuGoukei}">収支合計</td>
 									<td colspan="2"></td>

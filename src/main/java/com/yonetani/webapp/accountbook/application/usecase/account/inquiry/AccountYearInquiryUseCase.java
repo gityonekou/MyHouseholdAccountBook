@@ -97,6 +97,8 @@ public class AccountYearInquiryUseCase {
 			/* 合計値を設定 */
 			// 収入金額合計
 			response.setSyuunyuuKingakuGoukei(resultList.getSyuunyuuKingakuGoukei().toString());
+			// 積立金取崩金額合計
+			response.setWithdrewKingakuGoukei(resultList.getWithdrewKingakuGoukei().toString());
 			// 支出予定金額合計
 			response.setSisyutuYoteiKingakuGoukei(resultList.getSisyutuYoteiKingakuGoukei().toString());
 			// 支出金額合計
@@ -121,6 +123,7 @@ public class AccountYearInquiryUseCase {
 			AccountYearMageInquiryResponse.MageInquiryListItem.from(
 					domain.getTargetMonth().getValue(),
 					domain.getSyuunyuuKingaku().toString(),
+					domain.getWithdrewKingaku().toString(),
 					domain.getSisyutuYoteiKingaku().toString(),
 					domain.getSisyutuKingaku().toString(),
 					domain.getSyuusiKingaku().toString())
@@ -162,6 +165,10 @@ public class AccountYearInquiryUseCase {
 			// 年間収支(マージ)(ドメインモデル)から年間収支(マージ)(レスポンス)への変換
 			response.addMeisaiInquiryList(convertMeisaiList(resultList));
 			/* 合計値を設定 */
+			// 収入金額合計
+			response.setSyuunyuuKingakuGoukei(resultList.getSyuunyuuKingakuGoukei().toString());
+			// 積立金取崩金額合計
+			response.setWithdrewKingakuGoukei(resultList.getWithdrewKingakuGoukei().toString());
 			// 事業経費合計
 			response.setJigyouKeihiKingakuGoukei(resultList.getJigyouKeihiKingakuGoukei().toString());
 			// 固定(非課税)合計
@@ -198,6 +205,8 @@ public class AccountYearInquiryUseCase {
 		return resultList.getValues().stream().map(domain ->
 			AccountYearMeisaiInquiryResponse.MeisaiInquiryListItem.from(
 					domain.getMonth().getValue(),
+					domain.getSyuunyuuKingaku().toString(),
+					domain.getWithdrewKingaku().toString(),
 					domain.getJigyouKeihiKingaku().toString(),
 					domain.getKoteiHikazeiKingaku().toString(),
 					domain.getKoteiKazeiKingaku().toString(),

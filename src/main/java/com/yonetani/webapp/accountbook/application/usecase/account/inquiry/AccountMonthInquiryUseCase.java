@@ -26,6 +26,7 @@ import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.Expendi
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.IncomingAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
@@ -211,9 +212,9 @@ public class AccountMonthInquiryUseCase {
 		} else {
 			// 収入テーブルから対象月の収入金額合計値を取得
 			SyuunyuuKingakuTotalAmount incomeKingakuTotalAmount = incomeRepository.sumIncomeKingaku(inquiryModel);
-			// 収支テーブルの収入金額の値と対象月の収入テーブルの収入金額合計値が一致するかを確認
-			SyuunyuuKingakuTotalAmount chkIncomeKingaku = SyuunyuuKingakuTotalAmount.from(sisyutuResult.getSyuunyuuKingaku().getValue());
-			if(!chkIncomeKingaku.equals(incomeKingakuTotalAmount)) {
+			// 収支テーブルの収入金額+積立金取崩金額の値と対象月の収入テーブルの収入金額合計値が一致するかを確認
+			IncomingAmount chkIncomeAmount = IncomingAmount.from(sisyutuResult.getSyuunyuuKingaku(), sisyutuResult.getWithdrewKingaku());
+			if(!chkIncomeAmount.getSyuunyuuKingakuTotalAmount().equals(incomeKingakuTotalAmount)) {
 				throw new MyHouseholdAccountBookRuntimeException("該当月の収入情報が一致しません。管理者に問い合わせてください。[yearMonth=" + inquiryModel.getYearMonth() + "]");
 			}
 			
@@ -230,6 +231,8 @@ public class AccountMonthInquiryUseCase {
 			response.setSyuunyuuKingaku(sisyutuResult.getSyuunyuuKingaku().toString());
 			// 支出金額
 			response.setSisyutuKingaku(sisyutuResult.getSisyutuKingaku().toString());
+			// 積立金取崩金額
+			response.setWithdrewKingaku(sisyutuResult.getWithdrewKingaku().toString());
 			// 支出予定金額
 			response.setSisyutuYoteiKingaku(sisyutuResult.getSisyutuYoteiKingaku().toString());
 			// 収支金額

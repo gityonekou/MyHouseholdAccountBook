@@ -63,6 +63,8 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiK
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
@@ -1118,7 +1120,10 @@ public class IncomeAndExpenditureRegistUseCase {
 		
 		// 収入情報更新ありの場合、収入テーブルを更新
 		boolean incomeUpdateFlg = false;
+		// 収入金額合計の初期値=0
 		SyuunyuuKingakuTotalAmount incomeKingakuTotalAmount = SyuunyuuKingakuTotalAmount.ZERO;
+		// 積立金取崩金額合計の初期値=null(値なしの場合、null値となるので初期値はnull)
+		WithdrewKingakuTotalAmount withdrewKingakuTotalAmount = WithdrewKingakuTotalAmount.NULL;
 		// 収入情報の件数分繰り返す
 		for(IncomeRegistItem incomeRegistData : incomeRegistItemList) {
 			
@@ -1126,7 +1131,9 @@ public class IncomeAndExpenditureRegistUseCase {
 			if(Objects.equals(incomeRegistData.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE)) {
 				
 				// 収入金額合計を加算
-				incomeKingakuTotalAmount = incomeKingakuTotalAmount.add(SyuunyuuKingaku.from(incomeRegistData.getIncomeKingaku()));
+				incomeKingakuTotalAmount = incomeKingakuTotalAmount.add(SyuunyuuKingaku.from(incomeRegistData));
+				// 積立金取崩金額合計を加算
+				withdrewKingakuTotalAmount = withdrewKingakuTotalAmount.add(WithdrewKingaku.from(incomeRegistData));
 				
 			// データタイプが新規追加の場合、収入テーブルに対象データを追加
 			} else if (Objects.equals(incomeRegistData.getDataType(), MyHouseholdAccountBookContent.DATA_TYPE_NEW)) {
@@ -1148,7 +1155,9 @@ public class IncomeAndExpenditureRegistUseCase {
 					throw new MyHouseholdAccountBookRuntimeException("収入テーブル:INCOME_TABLEへの追加件数が不正でした。[件数=" + addCount + "][add data:" + addIncomeData + "]");
 				}
 				// 収入金額合計を加算
-				incomeKingakuTotalAmount = incomeKingakuTotalAmount.add(addIncomeData.getSyuunyuuKingaku());
+				incomeKingakuTotalAmount = incomeKingakuTotalAmount.add(SyuunyuuKingaku.from(incomeRegistData));
+				// 積立金取崩金額合計を加算
+				withdrewKingakuTotalAmount = withdrewKingakuTotalAmount.add(WithdrewKingaku.from(incomeRegistData));
 				// 収入情報更新あり
 				incomeUpdateFlg = true;
 				
@@ -1175,7 +1184,9 @@ public class IncomeAndExpenditureRegistUseCase {
 						throw new MyHouseholdAccountBookRuntimeException("収入テーブル:INCOME_TABLEへの更新件数が不正でした。[件数=" + updCount + "][update data:" + updIncomeData + "]");
 					}
 					// 収入金額合計を加算
-					incomeKingakuTotalAmount = incomeKingakuTotalAmount.add(updIncomeData.getSyuunyuuKingaku());
+					incomeKingakuTotalAmount = incomeKingakuTotalAmount.add(SyuunyuuKingaku.from(incomeRegistData));
+					// 積立金取崩金額合計を加算
+					withdrewKingakuTotalAmount = withdrewKingakuTotalAmount.add(WithdrewKingaku.from(incomeRegistData));
 					// 収入情報更新あり
 					incomeUpdateFlg = true;
 					
@@ -1381,6 +1392,8 @@ public class IncomeAndExpenditureRegistUseCase {
 						targetYearMonth,
 						// 対象月の収入金額合計
 						incomeKingakuTotalAmount,
+						// 対象月の積立金取崩金額
+						withdrewKingakuTotalAmount,
 						// 対象月の支出予定金額合計
 						sisyutuYoteiKingakuTotalAmount,
 						// 対象月の支出金額合計
@@ -1403,6 +1416,8 @@ public class IncomeAndExpenditureRegistUseCase {
 						targetYearMonth,
 						// 対象月の収入金額合計
 						incomeKingakuTotalAmount,
+						// 対象月の積立金取崩金額
+						withdrewKingakuTotalAmount,
 						// 対象月の支出金額合計
 						sisyutuKingakuTotalAmount);
 				// 収支テーブルを更新

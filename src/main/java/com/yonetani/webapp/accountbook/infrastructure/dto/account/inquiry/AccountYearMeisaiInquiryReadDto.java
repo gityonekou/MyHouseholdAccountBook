@@ -36,6 +36,10 @@ import lombok.RequiredArgsConstructor;
 public class AccountYearMeisaiInquiryReadDto {
 	// 対象月
 	private final String month;
+	// 収入金額
+	private final BigDecimal incomeKingaku;
+	// 積立金取崩金額
+	private final BigDecimal withdrewKingaku;
 	// 支出
 	private final BigDecimal sisyutuKingaku;
 	// 収支

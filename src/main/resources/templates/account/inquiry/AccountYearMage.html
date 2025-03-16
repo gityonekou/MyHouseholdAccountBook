@@ -68,7 +68,7 @@
 							<thead>
 								<tr class="table-secondary">
 									<th scope="col" class="w5" style="vertical-align:middle; text-align:center;">年月</th>
-									<th scope="col" class="w10" style="vertical-align:middle; text-align:center;">収入</th>
+									<th scope="col" class="w15" style="vertical-align:middle; text-align:left;">収入（＋積立取崩）</th>
 									<th scope="col" class="w15" style="vertical-align:middle; text-align:center;">支出（支出予定）</th>
 									<th scope="col" class="w10" style="vertical-align:middle; text-align:center;">収支</th>
 									<th scope="col" class="w10"></th>
@@ -80,7 +80,8 @@
 									<th:block th:if="${itemStat.odd}"><tr></th:block>
 									<th:block th:if="${itemStat.even}"><tr class="table-warning"></th:block>
 										<td align="center"><span th:text="${item.month}"></span>月</td>
-										<td align="center" th:text="${item.syuunyuuKingaku}">収入</td>
+										<td align="left" th:if="${#strings.isEmpty(item.withdrewKingaku)}" th:text="${item.syuunyuuKingaku}">収入</td>
+										<td align="left" th:if="!${#strings.isEmpty(item.withdrewKingaku)}"><span th:text="${item.syuunyuuKingaku}"></span>（<span th:text="${item.withdrewKingaku}"></span>）</td>
 										<td align="center"><span th:text="${item.sisyutuKingaku}"></span>（<span th:text="${item.sisyutuYoteiKingaku}"></span>）</td>
 										<td align="center" th:text="${item.syuusiKingaku}">収支</td>
 										<td align="center"><a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/accountinquiry/accountyear/dispatchtmonthinquiry(targetYear=*{targetYear},targetMonth=${item.month})}">詳細へ</a></td>
@@ -89,7 +90,8 @@
 								</th:block>
 								<tr class="table-success">
 									<td>合計</td>
-									<td align="center" th:text="${syuunyuuKingakuGoukei}">収入合計</td>
+									<td align="left" th:if="${#strings.isEmpty(withdrewKingakuGoukei)}" th:text="${syuunyuuKingakuGoukei}">収入合計</td>
+									<td align="left" th:if="!${#strings.isEmpty(withdrewKingakuGoukei)}"><span th:text="${syuunyuuKingakuGoukei}"></span>（<span th:text="${withdrewKingakuGoukei}"></span>）</td>
 									<td align="center"><span th:text="${sisyutuKingakuGoukei}"></span>（<span th:text="${sisyutuYoteiKingakuGoukei}"></span>）</td>
 									<td align="center" th:text="${syuusiKingakuGoukei}">収支合計</td>
 									<td colspan="2"></td>
