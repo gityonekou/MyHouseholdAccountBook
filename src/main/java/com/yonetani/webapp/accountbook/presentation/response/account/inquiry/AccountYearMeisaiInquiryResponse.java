@@ -52,6 +52,10 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 	public static class MeisaiInquiryListItem {
 		// 対象月
 		private final String month;
+		// 収入金額
+		private final String syuunyuuKingaku;
+		// 積立金取崩金額
+		private final String withdrewKingaku;
 		// 事業経費
 		private final String jigyouKeihiKingaku;
 		// 固定(非課税)
@@ -78,6 +82,8 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 		 * 引数の値から年間収支(明細)情報の明細データを生成して返します。
 		 *</pre>
 		 * @param month 対象月
+		 * @param syuunyuuKingaku 収入金額
+		 * @param withdrewKingaku 積立金取崩金額
 		 * @param jigyouKeihiKingaku 事業経費
 		 * @param koteiHikazeiKingaku 固定(非課税)
 		 * @param koteiKazeiKingaku 固定(課税)
@@ -93,6 +99,8 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 		 */
 		public static MeisaiInquiryListItem from(
 				String month,
+				String syuunyuuKingaku,
+				String withdrewKingaku,
 				String jigyouKeihiKingaku,
 				String koteiHikazeiKingaku,
 				String koteiKazeiKingaku,
@@ -105,6 +113,8 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 				String syuusiKingaku) {
 			return new MeisaiInquiryListItem(
 					month,
+					syuunyuuKingaku,
+					withdrewKingaku,
 					jigyouKeihiKingaku,
 					koteiHikazeiKingaku,
 					koteiKazeiKingaku,
@@ -122,6 +132,12 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 	// 年間収支(明細)情報のリストです。
 	private List<MeisaiInquiryListItem> meisaiInquiryList = new ArrayList<>();
 	
+	// 収入金額合計
+	@Setter
+	private String syuunyuuKingakuGoukei;
+	// 積立金取崩金額合計
+	@Setter
+	private String withdrewKingakuGoukei;
 	// 事業経費合計
 	@Setter
 	private String jigyouKeihiKingakuGoukei;
@@ -194,6 +210,10 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 		modelAndView.addObject("targetYearInfo", targetYearInfo);
 		// 年間収支(明細)リストを追加
 		modelAndView.addObject("meisaiInquiryList", meisaiInquiryList);
+		// 収入金額合計
+		modelAndView.addObject("syuunyuuKingakuGoukei", syuunyuuKingakuGoukei);
+		// 積立金取崩金額合計
+		modelAndView.addObject("withdrewKingakuGoukei", withdrewKingakuGoukei);
 		// 事業経費合計
 		modelAndView.addObject("jigyouKeihiKingakuGoukei", jigyouKeihiKingakuGoukei);
 		// 固定(非課税)合計

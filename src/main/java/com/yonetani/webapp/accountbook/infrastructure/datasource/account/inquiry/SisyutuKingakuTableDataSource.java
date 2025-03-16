@@ -147,6 +147,8 @@ public class SisyutuKingakuTableDataSource implements SisyutuKingakuTableReposit
 		return AccountYearMeisaiInquiryList.from(result.stream().map(
 				dto -> MeisaiInquiryListItem.from(
 							dto.getMonth(),
+							dto.getIncomeKingaku(),
+							dto.getWithdrewKingaku(),
 							dto.getJigyouKeihiKingaku(),
 							dto.getKoteiHikazeiKingaku(),
 							dto.getKoteiKazeiKingaku(),

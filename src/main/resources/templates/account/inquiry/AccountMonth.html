@@ -60,6 +60,11 @@
 											<td class="w10" align="right" th:text="${syuunyuuKingaku}">収入額</td>
 											<td>&emsp;</td>
 										</tr>
+										<tr class="table-info" th:if="!${#strings.isEmpty(withdrewKingaku)}">
+											<td class="w15">積立金取崩額：</td>
+											<td class="w10" align="right" th:text="${withdrewKingaku}">積立金取崩額</td>
+											<td>&emsp;</td>
+										</tr>
 										<tr>
 											<td class="w15">支出予定額：</td>
 											<td class="w10" align="right" th:text="${sisyutuYoteiKingaku}">支出予定額</td>
