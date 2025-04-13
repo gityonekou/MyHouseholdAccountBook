@@ -16,7 +16,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
@@ -26,7 +25,6 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 /**
  *<pre>
@@ -79,32 +77,33 @@ public class ShopInfoManageResponse extends AbstractResponse {
 			return new ShopListItem(shopCode, shopName, shopKubunName, shopSort);
 		}
 	}
+	
+	// 店舗情報入力フォーム
+	private final ShopInfoForm shopInfoForm;
 	// 店舗グループ
 	private final SelectViewItem shopKubunItem;
 	// 店舗一覧情報の明細データ(変更可能分)
 	private List<ShopListItem> shopList = new ArrayList<>();
 	// 店舗一覧情報の明細データ(変更不可分)
 	private List<ShopListItem> nonEditShopList = new ArrayList<>();
-	// 店舗情報入力フォーム
-	@Setter
-	private ShopInfoForm shopInfoForm;
 	
 	/**
 	 *<pre>
 	 * デフォルト値からレスポンス情報を生成して返します。
 	 *</pre>
+	 * @param shopInfoForm 店舗情報入力フォーム
 	 * @param addList 店舗グループ表示情報のリスト
 	 * @return 情報管理(お店)画面表示情報
 	 *
 	 */
-	public static ShopInfoManageResponse getInstance(List<OptionItem> addList) {
+	public static ShopInfoManageResponse getInstance(ShopInfoForm shopInfoForm, List<OptionItem> addList) {
 		List<OptionItem> optionList = new ArrayList<>();
 		optionList.add(OptionItem.from("", "グループメニューを開く"));
 		if(!CollectionUtils.isEmpty(addList)) {
 			optionList.addAll(addList);
 		}
 		// グループメニューを開くを選択状態で情報管理(お店)画面表示情報を生成
-		return new ShopInfoManageResponse(SelectViewItem.from(optionList));
+		return new ShopInfoManageResponse(shopInfoForm, SelectViewItem.from(optionList));
 	}
 	
 	/**
@@ -139,32 +138,17 @@ public class ShopInfoManageResponse extends AbstractResponse {
 	public ModelAndView build() {
 		// 画面表示のModelとViewを生成
 		ModelAndView modelAndView = createModelAndView("itemmanage/ShopInfoManage");
+		
+		// 店舗情報入力フォーム
+		modelAndView.addObject("shopInfoForm", shopInfoForm);
 		// 店舗グループを設定
 		modelAndView.addObject("shopKubun", shopKubunItem);
 		// 店舗一覧情報を設定
 		modelAndView.addObject("shopList", shopList);
 		modelAndView.addObject("nonEditShopList", nonEditShopList);
-		// 店舗情報入力フォーム
-		if(shopInfoForm == null) {
-			shopInfoForm = new ShopInfoForm();
-			shopInfoForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_ADD);
-		}
-		modelAndView.addObject("shopInfoForm", shopInfoForm);
+
 		
 		return modelAndView;
-	}
-
-	/**
-	 *<pre>
-	 * バリデーションチェックを行った入力フォームの値から画面返却データのModelAndViewを生成して返します。
-	 *</pre>
-	 * @param shopForm バリデーションチェックを行った入力フォームの値
-	 * @return 画面返却データのModelAndView
-	 *
-	 */
-	public ModelAndView buildBindingError(ShopInfoForm shopForm) {
-		setShopInfoForm(shopForm);
-		return build();
 	}
 	
 	/**

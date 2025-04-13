@@ -66,6 +66,7 @@ public class ShopInfoManageUseCase {
 	
 	// 店舗情報取得リポジトリー
 	private final ShopTableRepository shopRepository;
+	
 	/**
 	 *<pre>
 	 * 指定したユーザIDに応じた情報管理(お店)画面の表示情報を取得します。
@@ -77,41 +78,18 @@ public class ShopInfoManageUseCase {
 	public ShopInfoManageResponse readShopInfo(LoginUserInfo user) {
 		log.debug("readShopInfo:userid=" + user.getUserId());
 		
-		// コードテーブルから店舗区分情報を取得
-		List<CodeAndValuePair> shopGroupList = codeTableItem.getCodeValues(MyHouseholdAccountBookContent.CODE_DEFINES_SHOP_KUBUN);
-		// 店舗グループをもとにレスポンスを生成
-		if(shopGroupList == null) {
-			throw new MyHouseholdAccountBookRuntimeException("コード定義ファイルに「店舗区分情報：" + MyHouseholdAccountBookContent.CODE_DEFINES_SHOP_KUBUN + "」が登録されていません。管理者に問い合わせてください");
-		}
-		// 店舗グループの選択ボックスは入力先でデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定
-		ShopInfoManageResponse response = ShopInfoManageResponse.getInstance(shopGroupList.stream().map(pair ->
-		OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList()));
-		
-		// ログインユーザの店舗情報を取得
-		ShopInquiryList shopSearchResult = shopRepository.findById(SearchQueryUserId.from(UserId.from(user.getUserId())));
-		if(shopSearchResult.isEmpty()) {
-			// 店舗情報が0件の場合、メッセージを設定
-			response.addMessage("店舗情報取得結果が0件です。");
-		} else {
-			// 店舗情報をレスポンスに設定
-			response.addShopList(shopSearchResult.getValues().stream().map(domain ->
-				ShopInfoManageResponse.ShopListItem.from(
-						domain.getShopCode().getValue(),
-						domain.getShopName().getValue(),
-						codeTableItem.getCodeValue(MyHouseholdAccountBookContent.CODE_DEFINES_SHOP_KUBUN, domain.getShopKubunCode().getValue()),
-						domain.getShopSort().getValue())
-			).collect(Collectors.toUnmodifiableList()));
-		}
-		
-		return response;
+		// 空の店舗情報のformデータをもとに情報管理(お店)画面を生成
+		ShopInfoForm form = new ShopInfoForm();
+		form.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_ADD);
+		return createShopInfoManageResponse(UserId.from(user.getUserId()), form);
 	}
 
 	/**
 	 *<pre>
 	 * 指定したユーザIDと店舗に応じた情報管理(お店)画面の表示情報を取得します。
 	 *</pre>
-	 * @param user　表示対象のユーザID
-	 * @param shopCodeStr　表示対象の店舗コード
+	 * @param user 表示対象のユーザID
+	 * @param shopCodeStr 表示対象の店舗コード
 	 * @return 情報管理(お店)画面の表示情報
 	 *
 	 */
@@ -123,33 +101,49 @@ public class ShopInfoManageUseCase {
 		// ドメインタイプ:店舗コード
 		ShopCode shopCode = ShopCode.from(shopCodeStr);
 		
-		// 店舗一覧情報を取得
-		ShopInfoManageResponse response = readShopInfo(user);
 		// 店舗IDに対応する店舗情報を取得
 		Shop shop = shopRepository.findById(SearchQueryUserIdAndShopCode.from(userId, shopCode));
 		if(shop == null) {
 			throw new MyHouseholdAccountBookRuntimeException("更新対象の店舗情報が存在しません。管理者に問い合わせてください。shopCode:" + shopCode);
-		} else {
-			// 店舗情報のformデータ
-			ShopInfoForm form = new ShopInfoForm();
-			// アクション
-			form.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE);
-			// 店舗コード
-			form.setShopCode(shop.getShopCode().getValue());
-			// 店舗区分
-			form.setShopKubun(shop.getShopKubunCode().getValue());
-			// 店舗名
-			form.setShopName(shop.getShopName().getValue());
-			// 表示順
-			form.setShopSort(Integer.parseInt(shop.getShopSort().getValue()));
-			// 表示順(更新比較用)
-			form.setShopSortBefore(shop.getShopSort().getValue());
-			
-			response.setShopInfoForm(form);
 		}
-		return response;
+		
+		// 店舗情報のformデータ
+		ShopInfoForm form = new ShopInfoForm();
+		// アクション
+		form.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE);
+		// 店舗コード
+		form.setShopCode(shop.getShopCode().getValue());
+		// 店舗区分
+		form.setShopKubun(shop.getShopKubunCode().getValue());
+		// 店舗名
+		form.setShopName(shop.getShopName().getValue());
+		// 表示順
+		form.setShopSort(Integer.parseInt(shop.getShopSort().getValue()));
+		// 表示順(更新比較用)
+		form.setShopSortBefore(shop.getShopSort().getValue());
+		
+		// 取得したformデータをもとに情報管理(お店)画面を生成して返却
+		return createShopInfoManageResponse(userId, form);
 	}
-
+	
+	/**
+	 *<pre>
+	 * お店情報登録・更新時のバリデーションチェックエラー時処理
+	 * 
+	 * 情報管理(お店)更新画面で登録実行時のバリデーションチェックNGとなった場合の各画面表示項目を取得します。
+	 * バリデーションチェック結果でNGの場合に呼び出してください。
+	 * 
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param inputForm 店舗情報入力フォームの入力値
+	 * @return 情報管理(お店)更新画面の表示情報
+	 *
+	 */
+	public ShopInfoManageResponse readUpdateBindingErrorSetInfo(LoginUserInfo user, ShopInfoForm inputForm) {
+		log.debug("readUpdateBindingErrorSetInfo:userid=" + user.getUserId() + ",inputForm=" + inputForm);
+		return createShopInfoManageResponse(UserId.from(user.getUserId()), inputForm);
+	}
+	
 	/**
 	 *<pre>
 	 * 店舗情報入力フォームの入力値に従い、アクション(登録 or 更新)を実行します。
@@ -162,7 +156,10 @@ public class ShopInfoManageUseCase {
 	@Transactional
 	public ShopInfoManageResponse execAction(LoginUserInfo user, ShopInfoForm shopForm) {
 		log.debug("execAction:userid=" + user.getUserId() + ",shopForm=" + shopForm);
-		ShopInfoManageResponse response = ShopInfoManageResponse.getInstance(null);
+		
+		// 正常時、初期表示にリダイレクトされるのでここでは空の店舗グループ表示情報で画面表示情報を作成
+		// 以降でエラー発生時は表示店舗グループが空で画面表示し、再登録の形とする
+		ShopInfoManageResponse response = ShopInfoManageResponse.getInstance(shopForm, null);
 		
 		// ドメインタイプ:ユーザID
 		UserId userId = UserId.from(user.getUserId());
@@ -193,6 +190,7 @@ public class ShopInfoManageUseCase {
 				// 指定した表示順より大きい表示順の値の店舗情報を取得
 				ShopInquiryList sortList = shopRepository.findById(SearchQueryUserIdAndShopSort.from(
 						userId, ShopSort.from(shopForm.getShopSort())));
+				// 条件に一致する店舗の表示順をインクリメント
 				if(!sortList.isEmpty()) {
 					sortList.getValues().forEach(data -> sortValueUpdateList.add(createChopData(data, 1)));
 				}
@@ -297,7 +295,53 @@ public class ShopInfoManageUseCase {
 		
 		return response;
 	}
-
+	
+	/**
+	 *<pre>
+	 * 指定したユーザIDで登録されている店舗情報を取得し、店舗情報入力フォームと店舗情報をもとに情報管理(お店)画面の表示情報を生成して返します。
+	 *</pre>
+	 * @param user 表示対象のユーザID
+	 * @param form 店舗情報入力フォーム
+	 * @return 情報管理(お店)画面の表示情報
+	 *
+	 */
+	private ShopInfoManageResponse createShopInfoManageResponse(UserId userId, ShopInfoForm form) {
+		
+		// コードテーブルから店舗区分情報を取得
+		List<CodeAndValuePair> shopGroupList = codeTableItem.getCodeValues(MyHouseholdAccountBookContent.CODE_DEFINES_SHOP_KUBUN);
+		// 店舗グループをもとにレスポンスを生成
+		if(shopGroupList == null) {
+			throw new MyHouseholdAccountBookRuntimeException("コード定義ファイルに「店舗区分情報：" + MyHouseholdAccountBookContent.CODE_DEFINES_SHOP_KUBUN + "」が登録されていません。管理者に問い合わせてください");
+		}
+		
+		// 情報管理(お店)画面の表示情報を生成して返却
+		ShopInfoManageResponse response = ShopInfoManageResponse.getInstance(
+				// 店舗情報入力フォーム
+				form,
+				// 店舗グループ表示情報のリスト
+				// 店舗グループの選択ボックスは入力先でデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定
+				shopGroupList.stream()
+					.map(pair -> OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue()))
+					.collect(Collectors.toList()));
+		
+		// ログインユーザの店舗情報を取得
+		ShopInquiryList shopSearchResult = shopRepository.findById(SearchQueryUserId.from(userId));
+		if(shopSearchResult.isEmpty()) {
+			// 店舗情報が0件の場合、メッセージを設定
+			response.addMessage("店舗情報取得結果が0件です。");
+		} else {
+			// 店舗情報をレスポンスに設定
+			response.addShopList(shopSearchResult.getValues().stream().map(domain ->
+				ShopInfoManageResponse.ShopListItem.from(
+						domain.getShopCode().getValue(),
+						domain.getShopName().getValue(),
+						codeTableItem.getCodeValue(MyHouseholdAccountBookContent.CODE_DEFINES_SHOP_KUBUN, domain.getShopKubunCode().getValue()),
+						domain.getShopSort().getValue())
+			).collect(Collectors.toUnmodifiableList()));
+		}
+		return response;
+	}
+	
 	/**
 	 *<pre>
 	 * 指定の店舗情報のうち、表示順の値を指定した増減分加算・減算した値で店舗情報を生成して返します。

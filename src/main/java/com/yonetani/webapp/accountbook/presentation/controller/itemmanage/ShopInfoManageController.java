@@ -113,11 +113,11 @@ public class ShopInfoManageController {
 		// チェック結果エラーの場合
 		if(bindingResult.hasErrors()) {
 			// 初期表示情報を取得し、入力チェックエラーを設定
-			return this.usecase.readShopInfo(loginUserSession.getLoginUserInfo())
+			return this.usecase.readUpdateBindingErrorSetInfo(loginUserSession.getLoginUserInfo(), shopForm)
 					// レスポンスにログインユーザ名を設定(AbstractResponseの同メソッドをオーバーライド済み)
 					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 					// レスポンスからModelAndViewを生成
-					.buildBindingError(shopForm);
+					.build();
 			
 		// チェック結果OKの場合
 		} else {
