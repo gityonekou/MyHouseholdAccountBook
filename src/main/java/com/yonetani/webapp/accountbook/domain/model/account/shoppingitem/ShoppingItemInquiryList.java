@@ -16,7 +16,6 @@ import java.util.List;
 import org.springframework.util.CollectionUtils;
 
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemName;
-import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCalories;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCapacity;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCapacityUnit;
@@ -27,6 +26,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.Shopping
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemKubunName;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemName;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemStandardPrice;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemStandardShopName;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -78,7 +78,7 @@ public class ShoppingItemInquiryList {
 		// 会社名
 		private final ShoppingItemCompanyName companyName;
 		// 基準店舗名
-		private final ShopName standardShopName;
+		private final ShoppingItemStandardShopName standardShopName;
 		// 基準価格
 		private final ShoppingItemStandardPrice standardPrice;
 		// 内容量
@@ -129,7 +129,7 @@ public class ShoppingItemInquiryList {
 					ShoppingItemJanCode.from(shoppingItemJanCode),
 					SisyutuItemName.from(sisyutuItemName),
 					ShoppingItemCompanyName.from(companyName),
-					ShopName.from(standardShopName),
+					ShoppingItemStandardShopName.from(standardShopName),
 					ShoppingItemStandardPrice.from(standardPrice),
 					ShoppingItemCapacity.from(shoppingItemCapacity),
 					ShoppingItemCapacityUnit.from(shoppingItemCapacityUnit),

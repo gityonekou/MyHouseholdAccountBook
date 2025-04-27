@@ -122,8 +122,14 @@ public class ShopInfoManageUseCase {
 		// 表示順(更新比較用)
 		form.setShopSortBefore(shop.getShopSort().getValue());
 		
-		// 取得したformデータをもとに情報管理(お店)画面を生成して返却
-		return createShopInfoManageResponse(userId, form);
+		// 取得したformデータをもとに情報管理(お店)画面を生成
+		ShopInfoManageResponse response = createShopInfoManageResponse(userId, form);
+		
+		// 更新店舗名をメッセージに表示
+		response.addMessage("店舗名「" + shop.getShopName().getValue() + "」の店舗を更新します。");
+		
+		// 情報管理(お店)画面のレスポンスを返却
+		return response;
 	}
 	
 	/**
@@ -190,6 +196,7 @@ public class ShopInfoManageUseCase {
 				// 指定した表示順より大きい表示順の値の店舗情報を取得
 				ShopInquiryList sortList = shopRepository.findById(SearchQueryUserIdAndShopSort.from(
 						userId, ShopSort.from(shopForm.getShopSort())));
+				
 				// 条件に一致する店舗の表示順をインクリメント
 				if(!sortList.isEmpty()) {
 					sortList.getValues().forEach(data -> sortValueUpdateList.add(createChopData(data, 1)));
@@ -206,7 +213,7 @@ public class ShopInfoManageUseCase {
 			
 			// 新規店舗情報を追加
 			int addCount = shopRepository.add(shop);
-			// 追加件数が1件以上の場合、業務エラー
+			// 追加件数が1件以外の場合、業務エラー
 			if(addCount != 1) {
 				throw new MyHouseholdAccountBookRuntimeException("店舗テーブルへの追加件数が不正でした。[件数=" + addCount + "][add data:" + shop + "]");
 			}
@@ -221,29 +228,36 @@ public class ShopInfoManageUseCase {
 				throw new MyHouseholdAccountBookRuntimeException("旧表示順の値が不正です。管理者に問い合わせてください。ShopSortBefore=" + shopForm.getShopSortBefore());
 				
 			}
+			// 店舗登録数の整合性チェック(900件以上登録不可なのにデータが登録されている)
+			if(count >= 900) {
+				response.addErrorMessage("店舗が900件以上登録されているため店舗情報を更新できません。管理者に問い合わせてください。");
+				return response;
+			}
 			
-			// 新しい表示順の値 > (900番より小さい)データ件数の場合、新しい表示順の値を(900番より小さい)データ件数に変更
-			if(shopForm.getShopSort() > count) {
+			// 新しい表示順がnullの場合、または、新しい表示順の値 > (900番より小さい)データ件数の場合、
+			// 新しい表示順の値を(900番より小さい)データ件数に変更
+			if(shopForm.getShopSort() == null || shopForm.getShopSort() > count) {
 				shopForm.setShopSort(count);
 			}
 			// 表示順が更新されている場合、既存データの新しい表示順の値を設定
-			ShopSort newShopSortValue = ShopSort.from(shopForm.getShopSort());
-			if(!newShopSortValue.equals(shopForm.getShopSortBefore())) {
-				log.debug(" 既存データの表示順調整ありshopSort Before:" + shopForm.getShopSortBefore() + ",New=" + newShopSortValue);
+			ShopSort newShopSort = ShopSort.from(shopForm.getShopSort());
+			if(!newShopSort.getValue().equals(shopForm.getShopSortBefore())) {
+				log.debug(" 既存データの表示順調整ありshopSort Before:" + shopForm.getShopSortBefore() + ",New=" + newShopSort);
 				
 				/* 新旧の表示順を比較し、既存データの表示順を変更するデータを取得 */
 				// 旧表示順＞新表示順の場合
-				if(shopForm.getShopSortBefore().compareTo(newShopSortValue.getValue()) > 0) {
+				if(shopForm.getShopSortBefore().compareTo(newShopSort.getValue()) > 0) {
 					/* 旧表示順＞新表示順の場合、新表示順～旧表示順 -1間のデータを取得し、表示順を＋１する */
 					// 検索条件(between a and b)のbの値を設定　＝　旧表示順 - 1の値
 					int searchBIntVal = Integer.parseInt(shopForm.getShopSortBefore()) - 1;
 					// 新表示順～旧表示順 -1間のデータを取得
 					ShopInquiryList sortList = shopRepository.findById(SearchQueryUserIdAndShopSortBetweenAB.from(
-							userId, newShopSortValue, ShopSort.from(searchBIntVal)));
+							userId, newShopSort, ShopSort.from(searchBIntVal)));
 					if(!sortList.isEmpty()) {
 						// 既存データの表示順= 表示順 + 1
 						sortList.getValues().forEach(updShopData -> sortValueUpdateList.add(createChopData(updShopData, 1)));
 					}
+					
 				// 旧表示順＜新表示順の場合(等しい条件は一つ上のif判定にて除外済みなのでelse文でOK
 				} else {
 					/* 旧表示順＜新表示順の場合、旧表示順+1 ～新表示順間のデータを取得し、表示順を-１する */
@@ -251,7 +265,7 @@ public class ShopInfoManageUseCase {
 					int searchAIntVal = Integer.parseInt(shopForm.getShopSortBefore()) + 1;
 					// 旧表示順+1 ～新表示順間のデータを取得
 					ShopInquiryList sortList = shopRepository.findById(SearchQueryUserIdAndShopSortBetweenAB.from(
-							userId, ShopSort.from(searchAIntVal), newShopSortValue));
+							userId, ShopSort.from(searchAIntVal), newShopSort));
 					if(!sortList.isEmpty()) {
 						// 既存データの表示順= 表示順 - 1
 						sortList.getValues().forEach(updShopData -> sortValueUpdateList.add(createChopData(updShopData, -1)));
@@ -265,7 +279,7 @@ public class ShopInfoManageUseCase {
 					shopForm.getShopCode(),
 					shopForm.getShopKubun(),
 					shopForm.getShopName(), 
-					newShopSortValue.getValue());
+					newShopSort.getValue());
 			int updateCount = shopRepository.update(shop);
 			// 更新件数が1件以上の場合、業務エラー
 			if(updateCount != 1) {
@@ -286,7 +300,7 @@ public class ShopInfoManageUseCase {
 			int updateSortDataCount = shopRepository.updateShopSort(updateSortData);
 			// 更新件数が1件以上の場合、業務エラー
 			if(updateSortDataCount != 1) {
-				throw new MyHouseholdAccountBookRuntimeException("店舗テーブルへの更新件数が不正でした。[add data:" + updateSortData + "]");
+				throw new MyHouseholdAccountBookRuntimeException("店舗テーブルへの更新件数が不正でした。[件数=" + updateSortDataCount + "][update data:" + updateSortData + "]");
 			}
 		});
 		

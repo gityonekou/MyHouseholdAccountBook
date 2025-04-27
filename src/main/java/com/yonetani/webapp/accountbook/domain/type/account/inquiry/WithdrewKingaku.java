@@ -3,8 +3,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2025/03/11 : 1.00.00  新規作成
+ * 日付       : version     コメントなど
+ * 2025/03/11 : 1.02.00(A)  新規作成
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
@@ -29,7 +29,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.02.A)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)

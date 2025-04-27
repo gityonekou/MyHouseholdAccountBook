@@ -7,8 +7,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2025/01/19 : 1.00.00  新規作成
+ * 日付       : version     コメントなど
+ * 2025/01/19 : 2.00.00(B)  新規作成
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
@@ -53,7 +53,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(2.00.B)
  *
  */
 // Web周りのコンフィグレーション以外(controllerは対象に含む)をインジェクションする場合に指定
@@ -247,7 +247,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	
 	/**
 	 * 指定したユーザIDと店舗に応じた情報管理(お店)画面の表示情報取得のインテグレーションテストです。
-	 * 指定した店舗情報の情報がフォームデータに設定されているかをテストします。
+	 * 指定した店舗情報の情報がメッセージとフォームデータに設定されているかをテストします。
 	 * 
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, java.lang.String)} のためのテスト・メソッド。
 	 */
@@ -256,7 +256,11 @@ class ShopInfoManageUseCaseIntegrationTest {
 	void testReadShopInfoFromShopCode() {
 		// 検索条件に対応する店舗情報6件、店舗コード(002)に対応する店舗情報ありで画面表示情報を取得
 		ShopInfoManageResponse res = service.readShopInfo(TEST_USER, "002");
-		assertEquals(0, res.getMessagesList().size(), "エラーメッセージが設定されていないこと");
+		if(res.getMessagesList().size() != 1) {
+			fail("更新対象店舗名のレスポンスメッセージが設定されていない");
+		} else {
+			assertEquals("店舗名「テストユーザ登録店舗０２」の店舗を更新します。", res.getMessagesList().get(0), "更新対象店舗名のレスポンスメッセージが設定されていること");	
+		}
 		
 		// 画面表示情報からviewを生成し、Modelマップを取得
 		ModelMap modelMap = res.build().getModelMap();
@@ -287,8 +291,8 @@ class ShopInfoManageUseCaseIntegrationTest {
 				() -> service.readShopInfo(TEST_USER, "900"),
 				"更新対象の店舗情報なしの場合エラーとなること");
 		assertEquals(
-				ex.getLocalizedMessage(),
 				"更新対象の店舗情報が存在しません。管理者に問い合わせてください。shopCode:900",
+				ex.getLocalizedMessage(),
 				"例外メッセージが等しいこと");
 	}
 	
@@ -562,7 +566,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql("ReadShopInfoQueryResultSixTest.sql")
 	void testExecUpdateType1Action() {
 		// 更新テスト用フォームデータを作成
-		ShopInfoForm form = inputUpdateShopInfoForm(null);
+		ShopInfoForm form = inputUpdateShopInfoForm("002");
 		
 		// 検索条件に対応する店舗情報6件で指定の店舗情報を更新
 		ShopInfoManageResponse res = service.execAction(TEST_USER, form);
@@ -722,12 +726,45 @@ class ShopInfoManageUseCaseIntegrationTest {
 	
 	/**
 	 * 表示順の更新結果が正しいことを確認します。
-	 * (店舗コード001の表示順を003に変更。002と003のデータの表示順が-1されていること)
+	 * (更新項目：表示順(002)→(null) :DB格納値は003であること)
+	 * (変更前の店舗コード003の表示順が002に更新されていること)
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql("ReadShopInfoQueryResultSixTest.sql")
 	void testExecUpdateType5Action() {
+		// 更新テスト用フォームデータを作成(表示順:null)
+		ShopInfoForm form = inputUpdateShopInfoForm(null);
+		// 検索条件に対応する店舗情報6件で指定の店舗情報を更新
+		ShopInfoManageResponse res = service.execAction(TEST_USER, form);
+		// 更新完了のメッセージが設定されていること
+		if(res.getMessagesList().size() != 1) {
+			fail("更新完了のレスポンスメッセージが設定されていない");
+		} else {
+			assertEquals("店舗を更新しました。[code:" + form.getShopCode() + "]" + form.getShopName(), res.getMessagesList().get(0), "更新完了のメッセージが設定されていること");	
+		}
+		// トランザクションが完了のステータスになっていること
+		assertTrue(res.isTransactionSuccessFull(), "トランザクションが完了のステータスになっていること");
+		
+		// DBデータの表示順の値更新結果が正しいこと
+		// 登録されたデータをロード
+		List<ShopReadWriteDto> resultList = execQueryAllShopList();
+		// 2件目データと3件目データの表示順が変わっていること
+		assertEquals("001", resultList.get(0).getShopSort(), "店舗表示順が001であること");
+		assertEquals("003", resultList.get(1).getShopSort(), "店舗表示順が003であること");
+		assertEquals("002", resultList.get(2).getShopSort(), "店舗表示順が002であること");
+		// 4件目以降の表示順の変更がないこと
+		assertEquals("901", resultList.get(3).getShopSort(), "店舗表示順が901であること");
+	}
+	
+	/**
+	 * 表示順の更新結果が正しいことを確認します。
+	 * (店舗コード001の表示順を003に変更。002と003のデータの表示順が-1されていること)
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 */
+	@Test
+	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	void testExecUpdateType6Action() {
 		// 更新テスト用フォームデータを作成(表示順:003)
 		ShopInfoForm form = inputUpdateShopInfoForm("003");
 		// 更新データの店舗コードを001に変更
@@ -755,7 +792,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 */
 	@Test
 	@Sql("ReadShopInfoQueryResultSixTest.sql")
-	void testExecUpdateType6Action() {
+	void testExecUpdateType7Action() {
 		// 更新テスト用フォームデータを作成(表示順:001)
 		ShopInfoForm form = inputUpdateShopInfoForm("001");
 		// 更新データの店舗コードを003に変更
@@ -786,7 +823,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql("ReadShopInfoQueryResultSixTest.sql")
 	void testExecUpdateShopSortBeforeEmptyAction() {
 		// 更新テスト用フォームデータを作成
-		ShopInfoForm form = inputUpdateShopInfoForm(null);
+		ShopInfoForm form = inputUpdateShopInfoForm("002");
 		// 更新前表示順の値にnullを設定
 		form.setShopSortBefore(null);
 		
@@ -795,8 +832,8 @@ class ShopInfoManageUseCaseIntegrationTest {
 				() -> service.execAction(TEST_USER, form),
 				"更新前表示順の値なしの場合、予期しないエラーとなること");
 		assertEquals(
-				ex.getLocalizedMessage(),
 				"旧表示順の値が不正です。管理者に問い合わせてください。ShopSortBefore=null",
+				ex.getLocalizedMessage(),
 				"例外メッセージが等しいこと");
 		
 	}
@@ -810,7 +847,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql("ReadShopInfoQueryResultSixTest.sql")
 	void testExecUpdateActionFailValueAction() {
 		// 更新テスト用フォームデータを作成
-		ShopInfoForm form = inputUpdateShopInfoForm(null);
+		ShopInfoForm form = inputUpdateShopInfoForm("002");
 		// アクションに削除を設定
 		form.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_DELETE);
 		// 更新前表示順の値にnullを設定
@@ -821,8 +858,8 @@ class ShopInfoManageUseCaseIntegrationTest {
 				() -> service.execAction(TEST_USER, form),
 				"アクションの設定値が新規追加・更新以外の場合、予期しないエラーとなること");
 		assertEquals(
-				ex.getLocalizedMessage(),
 				"未定義のアクションが設定されています。管理者に問い合わせてください。action=" + MyHouseholdAccountBookContent.ACTION_TYPE_DELETE,
+				ex.getLocalizedMessage(),
 				"例外メッセージが等しいこと");
 	}
 	
@@ -917,6 +954,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 *<pre>
 	 * 追加テスト用の店舗情報フォームデータを取得
 	 *</pre>
+	 * @param shopSort
 	 * @return
 	 *
 	 */
@@ -944,6 +982,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * 更新テスト用の店舗情報フォームデータを取得
 	 * (更新項目：店舗区分、店舗名、表示順(値nullの場合、値の変更なし)
 	 *</pre>
+	 * @param shopSort
 	 * @return
 	 *
 	 */
@@ -958,11 +997,11 @@ class ShopInfoManageUseCaseIntegrationTest {
 		form.setShopKubun("904");
 		// 店舗名
 		form.setShopName("靴店舗に更新(ホームセンター更新後)");
-		// 表示順:値がnullの場合、表示順の値は店舗コードと同じ値にする
+		// 表示順
 		if(shopSort != null) {
 			form.setShopSort(Integer.parseInt(shopSort));
 		} else {
-			form.setShopSort(Integer.parseInt(form.getShopCode()));
+			form.setShopSort(null);
 		}
 		// 表示順(更新比較用)
 		form.setShopSortBefore("002");
