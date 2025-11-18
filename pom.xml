@@ -10,10 +10,10 @@
 	</parent>
 	<groupId>com.yonetani.webapp</groupId>
 	<artifactId>MyHouseholdAccountBook</artifactId>
-	<version>B.2.00</version>
+	<version>1.0.0-dev</version>
 	<packaging>jar</packaging>
 	<name>MyHouseholdAccountBook</name>
-	<description>マイ家計簿です(B.2.00版)</description>
+	<description>マイ家計簿です(1.0.0-dev版 - DDDリファクタリング中)</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
