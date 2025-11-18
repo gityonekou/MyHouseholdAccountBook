@@ -149,6 +149,19 @@ class IncomeAmountTest {
 	}
 
 	@Test
+	@DisplayName("異常系：減算でnullを渡すと例外が発生する")
+	void testSubtract_異常系_null() {
+		// 準備
+		IncomeAmount amount = IncomeAmount.from(new BigDecimal("10000.00"));
+
+		// 実行 & 検証
+		assertThrows(
+			MyHouseholdAccountBookRuntimeException.class,
+			() -> amount.subtract(null)
+		);
+	}
+
+	@Test
 	@DisplayName("異常系：減算で結果がマイナスになる場合は例外が発生する")
 	void testSubtract_異常系_結果がマイナス() {
 		// 準備
