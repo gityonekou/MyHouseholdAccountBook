@@ -5,6 +5,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
 		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
 		crossorigin="anonymous">
+<link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
 <title>年間収支(マージ)</title>
 </head>
 <body>
@@ -64,22 +65,36 @@
 						<!-- 収支(マージ)表示エリア -->
 						<th:block th:if="${#lists.size(mageInquiryList)}>0">
 						<table class="table table-sm table-borderless">
-							<thead><tr class="table-secondary"><th scope="col">年月</th><th scope="col">収入</th><th scope="col">支出（支出予定）</th><th scope="col">収支</th></tr></thead>
+							<thead>
+								<tr class="table-secondary">
+									<th scope="col" class="w5" style="vertical-align:middle; text-align:center;">年月</th>
+									<th scope="col" class="w15" style="vertical-align:middle; text-align:left;">収入（＋積立取崩）</th>
+									<th scope="col" class="w15" style="vertical-align:middle; text-align:center;">支出（支出予定）</th>
+									<th scope="col" class="w10" style="vertical-align:middle; text-align:center;">収支</th>
+									<th scope="col" class="w10"></th>
+									<th scope="col"></th>
+								</tr>
+							</thead>
 							<tbody>
 								<th:block th:each="item, itemStat : ${mageInquiryList}">
-								<th:block th:if="${itemStat.odd}"><tr></th:block>
-								<th:block th:if="${itemStat.even}"><tr class="table-warning"></th:block>
-									<td><span th:text="${item.month}"></span>月</td>
-									<td th:text="${item.syuunyuuKingaku}">収入</td>
-									<td><span th:text="${item.sisyutuKingaku}"></span>&emsp;（<span th:text="${item.sisyutuYoteiKingaku}"></span>）</td>
-									<td th:text="${item.syuusiKingaku}">収支</td>
-								</tr>
+									<th:block th:if="${itemStat.odd}"><tr></th:block>
+									<th:block th:if="${itemStat.even}"><tr class="table-warning"></th:block>
+										<td align="center"><span th:text="${item.month}"></span>月</td>
+										<td align="left" th:if="${#strings.isEmpty(item.withdrewKingaku)}" th:text="${item.syuunyuuKingaku}">収入</td>
+										<td align="left" th:if="!${#strings.isEmpty(item.withdrewKingaku)}"><span th:text="${item.syuunyuuKingaku}"></span>（<span th:text="${item.withdrewKingaku}"></span>）</td>
+										<td align="center"><span th:text="${item.sisyutuKingaku}"></span>（<span th:text="${item.sisyutuYoteiKingaku}"></span>）</td>
+										<td align="center" th:text="${item.syuusiKingaku}">収支</td>
+										<td align="center"><a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/accountinquiry/accountyear/dispatchtmonthinquiry(targetYear=*{targetYear},targetMonth=${item.month})}">詳細へ</a></td>
+										<td></td>
+									</tr>
 								</th:block>
 								<tr class="table-success">
 									<td>合計</td>
-									<td th:text="${syuunyuuKingakuGoukei}">収入合計</td>
-									<td><span th:text="${sisyutuKingakuGoukei}"></span>&emsp;（<span th:text="${sisyutuYoteiKingakuGoukei}"></span>）</td>
-									<td th:text="${syuusiKingakuGoukei}">収支合計</td>
+									<td align="left" th:if="${#strings.isEmpty(withdrewKingakuGoukei)}" th:text="${syuunyuuKingakuGoukei}">収入合計</td>
+									<td align="left" th:if="!${#strings.isEmpty(withdrewKingakuGoukei)}"><span th:text="${syuunyuuKingakuGoukei}"></span>（<span th:text="${withdrewKingakuGoukei}"></span>）</td>
+									<td align="center"><span th:text="${sisyutuKingakuGoukei}"></span>（<span th:text="${sisyutuYoteiKingakuGoukei}"></span>）</td>
+									<td align="center" th:text="${syuusiKingakuGoukei}">収支合計</td>
+									<td colspan="2"></td>
 								</tr>
 							</tbody>
 						</table>
@@ -92,20 +107,6 @@
 					</div>
 					
 				</div>
-			</div>
-			<div class="card-body">
-				<button class="btn btn-outline-primary" id="shopping-add-btn" type="button">買い物登録</button>
-				<button class="btn btn-outline-primary" id="account-year-detai-btn" type="button">詳細表示</button>
-				<button class="btn btn-outline-primary" type="button">更新</button>
-				<form name="ShoppinAdd" class="d-flex" method="post" th:action="@{/myhacbook/accountregist/shopping/}">
-					<input type="hidden" th:field="*{targetYearMonth}" />
-				</form>
-				<form name="AccountYearDetail" class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountdetail/year/}">
-					<input type="hidden" th:field="*{targetYear}" />
-				</form>
-				<form name="accountupdate" class="d-flex" method="post" th:action="@{/myhacbook/accountregist/incomeandexpenditure/updateload/}">
-					<input type="hidden" th:field="*{targetYearMonth}" />
-				</form>
 			</div>
 		</div>
 	</div>

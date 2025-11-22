@@ -84,6 +84,8 @@ public class MyHouseholdAccountBookContent {
 	public static final String CODE_DEFINES_FIXED_COST_SHIHARAI_DAY = "003";
 	/** コード定義区分(収入区分:004) */
 	public static final String CODE_DEFINES_INCOME_KUBUN = "004";
+	/** コード定義:収入区分で積立からの取崩し(3)を選択時 */
+	public static final String INCOME_KUBUN_WITHDREW_SELECTED_VALUE = "3";
 	/** コード定義:収入区分でその他任意(9)を選択時 */
 	public static final String INCOME_KUBUN_OPTIONAL_SELECTED_VALUE = "9";
 	/** コード定義区分(商品内容量単位:005) */

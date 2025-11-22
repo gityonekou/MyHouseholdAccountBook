@@ -23,8 +23,14 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.KoteiHikazeiK
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.KoteiKazeiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuB;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuBC;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuC;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyumiGotakuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuusiKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 
@@ -65,6 +71,10 @@ public class AccountYearMeisaiInquiryList {
 	public static class MeisaiInquiryListItem {
 		// 対象月
 		private final TargetMonth month;
+		// 収入金額
+		private final SyuunyuuKingaku syuunyuuKingaku;
+		// 積立金取崩金額
+		private final WithdrewKingaku withdrewKingaku;
 		// 事業経費
 		private final JigyouKeihiKingaku jigyouKeihiKingaku;
 		// 固定(非課税)
@@ -77,8 +87,8 @@ public class AccountYearMeisaiInquiryList {
 		private final InsyokuNitiyouhinKingaku insyokuNitiyouhinKingaku;
 		// 趣味娯楽
 		private final SyumiGotakuKingaku syumiGotakuKingaku;
-		// 支出B
-		private final SisyutuKingakuB sisyutuKingakuB;
+		// 支出BC
+		private final SisyutuKingakuBC sisyutuKingakuBC;
 		// 支出
 		private final SisyutuKingaku sisyutuKingaku;
 		// 収支
@@ -89,6 +99,8 @@ public class AccountYearMeisaiInquiryList {
 		 * 引数の値から年間収支(明細)情報のドメインモデルを生成して返します。
 		 *</pre>
 		 * @param month 対象月
+		 * @param syuunyuuKingaku 収入金額
+		 * @param withdrewKingaku 積立金取崩金額
 		 * @param jigyouKeihiKingaku 事業経費
 		 * @param koteiHikazeiKingaku 固定(非課税)
 		 * @param koteiKazeiKingaku 固定(課税)
@@ -96,6 +108,7 @@ public class AccountYearMeisaiInquiryList {
 		 * @param insyokuNitiyouhinKingaku 飲食日用品
 		 * @param syumiGotakuKingaku 趣味娯楽
 		 * @param sisyutuKingakuB 支出B
+		 * @param sisyutuKingakuC 支出C
 		 * @param sisyutuKingaku 支出
 		 * @param syuusiKingaku 収支
 		 * @return 年間収支(明細)情報のドメインモデル
@@ -103,6 +116,8 @@ public class AccountYearMeisaiInquiryList {
 		 */
 		public static MeisaiInquiryListItem from(
 				String month,
+				BigDecimal syuunyuuKingaku,
+				BigDecimal withdrewKingaku,
 				BigDecimal jigyouKeihiKingaku,
 				BigDecimal koteiHikazeiKingaku,
 				BigDecimal koteiKazeiKingaku,
@@ -110,18 +125,21 @@ public class AccountYearMeisaiInquiryList {
 				BigDecimal insyokuNitiyouhinKingaku,
 				BigDecimal syumiGotakuKingaku,
 				BigDecimal sisyutuKingakuB,
+				BigDecimal sisyutuKingakuC,
 				BigDecimal sisyutuKingaku,
 				BigDecimal syuusiKingaku
 				) {
 			return new MeisaiInquiryListItem(
 					TargetMonth.from(month),
+					SyuunyuuKingaku.from(syuunyuuKingaku),
+					WithdrewKingaku.from(withdrewKingaku),
 					JigyouKeihiKingaku.from(jigyouKeihiKingaku),
 					KoteiHikazeiKingaku.from(koteiHikazeiKingaku),
 					KoteiKazeiKingaku.from(koteiKazeiKingaku),
 					IruiJyuukyoSetubiKingaku.from(iruiJyuukyoSetubiKingaku),
 					InsyokuNitiyouhinKingaku.from(insyokuNitiyouhinKingaku),
 					SyumiGotakuKingaku.from(syumiGotakuKingaku),
-					SisyutuKingakuB.from(sisyutuKingakuB),
+					SisyutuKingakuBC.from(SisyutuKingakuB.from(sisyutuKingakuB), SisyutuKingakuC.from(sisyutuKingakuC)),
 					SisyutuKingaku.from(sisyutuKingaku),
 					SyuusiKingaku.from(syuusiKingaku));
 		}
@@ -129,6 +147,10 @@ public class AccountYearMeisaiInquiryList {
 	
 	// 年間収支(明細)情報のリスト
 	private final List<MeisaiInquiryListItem> values;
+	// 収入金額合計
+	private final SyuunyuuKingaku syuunyuuKingakuGoukei;
+	// 積立金取崩金額
+	private final WithdrewKingaku withdrewKingakuGoukei;
 	// 事業経費合計
 	private final JigyouKeihiKingaku jigyouKeihiKingakuGoukei;
 	// 固定(非課税)合計
@@ -141,8 +163,8 @@ public class AccountYearMeisaiInquiryList {
 	private final InsyokuNitiyouhinKingaku insyokuNitiyouhinKingakuGoukei;
 	// 趣味娯楽合計
 	private final SyumiGotakuKingaku syumiGotakuKingakuGoukei;
-	// 支出B合計
-	private final SisyutuKingakuB sisyutuKingakuBGoukei;
+	// 支出BC合計
+	private final SisyutuKingakuBC sisyutuKingakuBCGoukei;
 	// 支出合計
 	private final SisyutuKingaku sisyutuKingakuGoukei;
 	// 収支合計
@@ -160,48 +182,56 @@ public class AccountYearMeisaiInquiryList {
 		if(CollectionUtils.isEmpty(values)) {
 			return new AccountYearMeisaiInquiryList(
 					Collections.emptyList(),
+					SyuunyuuKingaku.ZERO,
+					WithdrewKingaku.NULL,
 					JigyouKeihiKingaku.from(BigDecimal.ZERO),
 					KoteiHikazeiKingaku.from(BigDecimal.ZERO),
 					KoteiKazeiKingaku.from(BigDecimal.ZERO),
 					IruiJyuukyoSetubiKingaku.from(BigDecimal.ZERO),
 					InsyokuNitiyouhinKingaku.from(BigDecimal.ZERO),
 					SyumiGotakuKingaku.from(BigDecimal.ZERO),
-					SisyutuKingakuB.from(SisyutuKingakuB.ZERO.getValue()),
-					SisyutuKingaku.from(SisyutuKingaku.ZERO.getValue()),
-					SyuusiKingaku.from(SyuusiKingaku.ZERO.getValue())
+					SisyutuKingakuBC.ZERO,
+					SisyutuKingaku.ZERO,
+					SyuusiKingaku.ZERO
 					);
 		} else {
 			// 各種合計値を計算
+			SyuunyuuKingakuTotalAmount syuunyuuKingakuGoukei = SyuunyuuKingakuTotalAmount.ZERO;
+			WithdrewKingakuTotalAmount withdrewKingakuGoukei = WithdrewKingakuTotalAmount.NULL;
 			BigDecimal jigyouKeihiKingakuGoukeiWk = BigDecimal.ZERO;
 			BigDecimal koteiHikazeiKingakuGoukeiWk = BigDecimal.ZERO;
 			BigDecimal koteiKazeiKingakuGoukeiWk = BigDecimal.ZERO;
 			BigDecimal iruiJyuukyoSetubiKingakuGoukeiWk = BigDecimal.ZERO;
 			BigDecimal insyokuNitiyouhinKingakuGoukeiWk = BigDecimal.ZERO;
 			BigDecimal syumiGotakuKingakuGoukeiWk = BigDecimal.ZERO;
-			BigDecimal sisyutuKingakuBGoukeiWk = BigDecimal.ZERO.setScale(2);
+			SisyutuKingakuBC sisyutuKingakuBCGoukei = SisyutuKingakuBC.ZERO;
 			BigDecimal sisyutuKingakuGoukeiWk = BigDecimal.ZERO.setScale(2);
 			BigDecimal syuusiKingakuGoukeiWk = BigDecimal.ZERO.setScale(2);
 			
 			for(MeisaiInquiryListItem item : values) {
+				syuunyuuKingakuGoukei = syuunyuuKingakuGoukei.add(item.getSyuunyuuKingaku());
+				withdrewKingakuGoukei = withdrewKingakuGoukei.add(item.getWithdrewKingaku());
 				jigyouKeihiKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(jigyouKeihiKingakuGoukeiWk, item.getJigyouKeihiKingaku().getValue());
 				koteiHikazeiKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(koteiHikazeiKingakuGoukeiWk, item.getKoteiHikazeiKingaku().getValue());
 				koteiKazeiKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(koteiKazeiKingakuGoukeiWk, item.getKoteiKazeiKingaku().getValue());
 				iruiJyuukyoSetubiKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(iruiJyuukyoSetubiKingakuGoukeiWk, item.getIruiJyuukyoSetubiKingaku().getValue());
 				insyokuNitiyouhinKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(insyokuNitiyouhinKingakuGoukeiWk, item.getInsyokuNitiyouhinKingaku().getValue());
 				syumiGotakuKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(syumiGotakuKingakuGoukeiWk, item.getSyumiGotakuKingaku().getValue());
-				sisyutuKingakuBGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(sisyutuKingakuBGoukeiWk, item.getSisyutuKingakuB().getValue());
+				sisyutuKingakuBCGoukei = sisyutuKingakuBCGoukei.add(item.getSisyutuKingakuBC());
 				sisyutuKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(sisyutuKingakuGoukeiWk, item.getSisyutuKingaku().getValue());
 				syuusiKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(syuusiKingakuGoukeiWk, item.getSyuusiKingaku().getValue());
 			}
 			return new AccountYearMeisaiInquiryList(
 					values,
+					SyuunyuuKingaku.from(syuunyuuKingakuGoukei.getValue()),
+					WithdrewKingaku.from(withdrewKingakuGoukei.getValue()),
 					JigyouKeihiKingaku.from(jigyouKeihiKingakuGoukeiWk),
 					KoteiHikazeiKingaku.from(koteiHikazeiKingakuGoukeiWk),
 					KoteiKazeiKingaku.from(koteiKazeiKingakuGoukeiWk),
 					IruiJyuukyoSetubiKingaku.from(iruiJyuukyoSetubiKingakuGoukeiWk),
 					InsyokuNitiyouhinKingaku.from(insyokuNitiyouhinKingakuGoukeiWk),
 					SyumiGotakuKingaku.from(syumiGotakuKingakuGoukeiWk),
-					SisyutuKingakuB.from(sisyutuKingakuBGoukeiWk),
+					sisyutuKingakuBCGoukei,
 					SisyutuKingaku.from(sisyutuKingakuGoukeiWk),
 					SyuusiKingaku.from(syuusiKingakuGoukeiWk)
 					);
@@ -214,7 +244,7 @@ public class AccountYearMeisaiInquiryList {
 	@Override
 	public String toString() {
 		if(values.size() > 0) {
-			StringBuilder buff = new StringBuilder((values.size() + 2) * 320);
+			StringBuilder buff = new StringBuilder((values.size() + 2) * 400);
 			buff.append("年間収支(明細)情報:")
 			.append(values.size())
 			.append("件:");
@@ -225,7 +255,11 @@ public class AccountYearMeisaiInquiryList {
 				.append(values.get(i))
 				.append("]]");
 			}
-			buff.append("[[合計][jigyouKeihiKingakuGoukei:")
+			buff.append("[[合計][syuunyuuKingakuGoukei:")
+			.append(syuunyuuKingakuGoukei)
+			.append(",withdrewKingakuGoukei:")
+			.append(withdrewKingakuGoukei)
+			.append(",jigyouKeihiKingakuGoukei:")
 			.append(jigyouKeihiKingakuGoukei)
 			.append(",koteiHikazeiKingakuGoukei:")
 			.append(koteiHikazeiKingakuGoukei)
@@ -238,7 +272,7 @@ public class AccountYearMeisaiInquiryList {
 			.append(",syumiGotakuKingakuGoukei:")
 			.append(syumiGotakuKingakuGoukei)
 			.append(",sisyutuKingakuBGoukei:")
-			.append(sisyutuKingakuBGoukei)
+			.append(sisyutuKingakuBCGoukei)
 			.append(",sisyutuKingakuGoukei:")
 			.append(sisyutuKingakuGoukei)
 			.append(",syuusiKingakuGoukei:")

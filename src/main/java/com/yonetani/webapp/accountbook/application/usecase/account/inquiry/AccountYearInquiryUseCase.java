@@ -21,13 +21,17 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExp
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
+import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearInquiryRedirectResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearInquiryTargetYearInfo;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearMageInquiryResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearMageInquiryResponse.MageInquiryListItem;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearMeisaiInquiryResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountYearMeisaiInquiryResponse.MeisaiInquiryListItem;
+import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.RequiredArgsConstructor;
@@ -93,6 +97,8 @@ public class AccountYearInquiryUseCase {
 			/* 合計値を設定 */
 			// 収入金額合計
 			response.setSyuunyuuKingakuGoukei(resultList.getSyuunyuuKingakuGoukei().toString());
+			// 積立金取崩金額合計
+			response.setWithdrewKingakuGoukei(resultList.getWithdrewKingakuGoukei().toString());
 			// 支出予定金額合計
 			response.setSisyutuYoteiKingakuGoukei(resultList.getSisyutuYoteiKingakuGoukei().toString());
 			// 支出金額合計
@@ -117,6 +123,7 @@ public class AccountYearInquiryUseCase {
 			AccountYearMageInquiryResponse.MageInquiryListItem.from(
 					domain.getTargetMonth().getValue(),
 					domain.getSyuunyuuKingaku().toString(),
+					domain.getWithdrewKingaku().toString(),
 					domain.getSisyutuYoteiKingaku().toString(),
 					domain.getSisyutuKingaku().toString(),
 					domain.getSyuusiKingaku().toString())
@@ -158,6 +165,10 @@ public class AccountYearInquiryUseCase {
 			// 年間収支(マージ)(ドメインモデル)から年間収支(マージ)(レスポンス)への変換
 			response.addMeisaiInquiryList(convertMeisaiList(resultList));
 			/* 合計値を設定 */
+			// 収入金額合計
+			response.setSyuunyuuKingakuGoukei(resultList.getSyuunyuuKingakuGoukei().toString());
+			// 積立金取崩金額合計
+			response.setWithdrewKingakuGoukei(resultList.getWithdrewKingakuGoukei().toString());
 			// 事業経費合計
 			response.setJigyouKeihiKingakuGoukei(resultList.getJigyouKeihiKingakuGoukei().toString());
 			// 固定(非課税)合計
@@ -171,7 +182,9 @@ public class AccountYearInquiryUseCase {
 			// 趣味娯楽合計
 			response.setSyumiGotakuKingakuGoukei(resultList.getSyumiGotakuKingakuGoukei().toString());
 			// 支出B合計
-			response.setSisyutuKingakuBGoukei(resultList.getSisyutuKingakuBGoukei().toSisyutuKingakuBString());
+			response.setSisyutuKingakuBCGoukei(resultList.getSisyutuKingakuBCGoukei().toSisyutuKingakuBCString());
+			// 支出BC合計のうち、支出B合計の割合
+			response.setPercentageBGoukei(resultList.getSisyutuKingakuBCGoukei().getSisyutuKingakuBPercentage());
 			// 支出合計
 			response.setSisyutuKingakuGoukei(resultList.getSisyutuKingakuGoukei().toString());
 			// 収支合計
@@ -192,15 +205,41 @@ public class AccountYearInquiryUseCase {
 		return resultList.getValues().stream().map(domain ->
 			AccountYearMeisaiInquiryResponse.MeisaiInquiryListItem.from(
 					domain.getMonth().getValue(),
+					domain.getSyuunyuuKingaku().toString(),
+					domain.getWithdrewKingaku().toString(),
 					domain.getJigyouKeihiKingaku().toString(),
 					domain.getKoteiHikazeiKingaku().toString(),
 					domain.getKoteiKazeiKingaku().toString(),
 					domain.getIruiJyuukyoSetubiKingaku().toString(),
 					domain.getInsyokuNitiyouhinKingaku().toString(),
 					domain.getSyumiGotakuKingaku().toString(),
-					domain.getSisyutuKingakuB().toSisyutuKingakuBString(),
+					domain.getSisyutuKingakuBC().toSisyutuKingakuBCString(),
+					domain.getSisyutuKingakuBC().getSisyutuKingakuBPercentage(),
 					domain.getSisyutuKingaku().toString(),
 					domain.getSyuusiKingaku().toString())
 		).collect(Collectors.toUnmodifiableList());
+	}
+	
+	/**
+	 *<pre>
+	 * 各月の収支参照画面にリダイレクトするための情報を設定します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param targetYear 表示対象の年度
+	 * @param targetMonth 表示対象の月度
+	 * @return 各月の収支参照画面リダイレクト情報
+	 *
+	 */
+	public AbstractResponse readReturnInquiryMonthRedirectInfo(LoginUserInfo user, String targetYear, String targetMonth) {
+		log.debug("readReturnInquiryMonthRedirectInfo:userid=" + user.getUserId() + ",targetYear=" + targetYear + ",targetMonth=" + targetMonth);
+		
+		// 表示対象の年度、月度の値からドメインタイプ:対象年月を生成
+		TargetYearMonth targetYearMonth = TargetYearMonth.from(
+				TargetYear.from(targetYear).getValue() + TargetMonth.from(targetMonth).getValue());
+		// 各月の収支画面にリダイレクトするためのリダイレクト情報を生成して返却
+		AccountYearInquiryRedirectResponse response
+			= AccountYearInquiryRedirectResponse.getInquiryMonthRedirectInstance(targetYearMonth.getValue());
+		return response;
+		
 	}
 }

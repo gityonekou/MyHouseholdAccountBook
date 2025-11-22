@@ -52,6 +52,10 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 	public static class MeisaiInquiryListItem {
 		// 対象月
 		private final String month;
+		// 収入金額
+		private final String syuunyuuKingaku;
+		// 積立金取崩金額
+		private final String withdrewKingaku;
 		// 事業経費
 		private final String jigyouKeihiKingaku;
 		// 固定(非課税)
@@ -64,8 +68,10 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 		private final String insyokuNitiyouhinKingaku;
 		// 趣味娯楽
 		private final String syumiGotakuKingaku;
-		// 支出B
-		private final String sisyutuKingakuB;
+		// 支出BC
+		private final String sisyutuKingakuBC;
+		// 支出Bの割合
+		private final String percentageB;
 		// 支出
 		private final String sisyutuKingaku;
 		// 収支
@@ -76,13 +82,16 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 		 * 引数の値から年間収支(明細)情報の明細データを生成して返します。
 		 *</pre>
 		 * @param month 対象月
+		 * @param syuunyuuKingaku 収入金額
+		 * @param withdrewKingaku 積立金取崩金額
 		 * @param jigyouKeihiKingaku 事業経費
 		 * @param koteiHikazeiKingaku 固定(非課税)
 		 * @param koteiKazeiKingaku 固定(課税)
 		 * @param iruiJyuukyoSetubiKingaku 衣類住居設備
 		 * @param insyokuNitiyouhinKingaku 飲食日用品
 		 * @param syumiGotakuKingaku 趣味娯楽
-		 * @param sisyutuKingakuB 支出B
+		 * @param sisyutuKingakuBC 支出BC
+		 * @param percentageB 支出Bの割合
 		 * @param sisyutuKingaku 支出
 		 * @param syuusiKingaku 収支
 		 * @return 年間収支(明細)情報の明細データ
@@ -90,24 +99,30 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 		 */
 		public static MeisaiInquiryListItem from(
 				String month,
+				String syuunyuuKingaku,
+				String withdrewKingaku,
 				String jigyouKeihiKingaku,
 				String koteiHikazeiKingaku,
 				String koteiKazeiKingaku,
 				String iruiJyuukyoSetubiKingaku,
 				String insyokuNitiyouhinKingaku,
 				String syumiGotakuKingaku,
-				String sisyutuKingakuB,
+				String sisyutuKingakuBC,
+				String percentageB,
 				String sisyutuKingaku,
 				String syuusiKingaku) {
 			return new MeisaiInquiryListItem(
 					month,
+					syuunyuuKingaku,
+					withdrewKingaku,
 					jigyouKeihiKingaku,
 					koteiHikazeiKingaku,
 					koteiKazeiKingaku,
 					iruiJyuukyoSetubiKingaku,
 					insyokuNitiyouhinKingaku,
 					syumiGotakuKingaku,
-					sisyutuKingakuB,
+					sisyutuKingakuBC,
+					percentageB,
 					sisyutuKingaku,
 					syuusiKingaku);
 		}
@@ -117,6 +132,12 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 	// 年間収支(明細)情報のリストです。
 	private List<MeisaiInquiryListItem> meisaiInquiryList = new ArrayList<>();
 	
+	// 収入金額合計
+	@Setter
+	private String syuunyuuKingakuGoukei;
+	// 積立金取崩金額合計
+	@Setter
+	private String withdrewKingakuGoukei;
 	// 事業経費合計
 	@Setter
 	private String jigyouKeihiKingakuGoukei;
@@ -135,9 +156,12 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 	// 趣味娯楽合計
 	@Setter
 	private String syumiGotakuKingakuGoukei;
-	// 支出B合計
+	// 支出BC合計
 	@Setter
-	private String sisyutuKingakuBGoukei;
+	private String sisyutuKingakuBCGoukei;
+	// 支出BC合計のうち、支出B合計の割合
+	@Setter
+	private String percentageBGoukei;
 	// 支出合計
 	@Setter
 	private String sisyutuKingakuGoukei;
@@ -186,6 +210,10 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 		modelAndView.addObject("targetYearInfo", targetYearInfo);
 		// 年間収支(明細)リストを追加
 		modelAndView.addObject("meisaiInquiryList", meisaiInquiryList);
+		// 収入金額合計
+		modelAndView.addObject("syuunyuuKingakuGoukei", syuunyuuKingakuGoukei);
+		// 積立金取崩金額合計
+		modelAndView.addObject("withdrewKingakuGoukei", withdrewKingakuGoukei);
 		// 事業経費合計
 		modelAndView.addObject("jigyouKeihiKingakuGoukei", jigyouKeihiKingakuGoukei);
 		// 固定(非課税)合計
@@ -198,8 +226,10 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 		modelAndView.addObject("insyokuNitiyouhinKingakuGoukei", insyokuNitiyouhinKingakuGoukei);
 		// 趣味娯楽合計
 		modelAndView.addObject("syumiGotakuKingakuGoukei", syumiGotakuKingakuGoukei);
-		// 支出B合計
-		modelAndView.addObject("sisyutuKingakuBGoukei", sisyutuKingakuBGoukei);
+		// 支出BC合計
+		modelAndView.addObject("sisyutuKingakuBCGoukei", sisyutuKingakuBCGoukei);
+		// 支出BC合計のうち、支出B合計の割合
+		modelAndView.addObject("percentageBGoukei", percentageBGoukei);
 		// 支出金額合計
 		modelAndView.addObject("sisyutuKingakuGoukei", sisyutuKingakuGoukei);
 		// 収支合計

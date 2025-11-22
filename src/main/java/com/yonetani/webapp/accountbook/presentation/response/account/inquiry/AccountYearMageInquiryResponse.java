@@ -54,6 +54,8 @@ public class AccountYearMageInquiryResponse extends AbstractResponse {
 		private final String month;
 		// 収入金額
 		private final String syuunyuuKingaku;
+		// 積立金取崩金額
+		private final String withdrewKingaku;
 		// 支出予定金額
 		private final String sisyutuYoteiKingaku ;
 		// 支出金額
@@ -66,6 +68,7 @@ public class AccountYearMageInquiryResponse extends AbstractResponse {
 		 *</pre>
 		 * @param month 対象月(TARGET_MONTH)
 		 * @param syuunyuuKingaku 収入金額(INCOME_KINGAKU)
+		 * @param withdrewKingaku 積立金取崩金額(WITHDREW_KINGAKU)
 		 * @param sisyutuYoteiKingaku 支出予定金額(EXPENDITURE_ESTIMATE_KINGAKU)
 		 * @param sisyutuKingaku 支出金額(EXPENDITURE_KINGAKU)
 		 * @param syuusiKingaku 収支(INCOME_AND_EXPENDITURE_KINGAKU)
@@ -75,12 +78,14 @@ public class AccountYearMageInquiryResponse extends AbstractResponse {
 		public static MageInquiryListItem from(
 				String month,
 				String syuunyuuKingaku,
+				String withdrewKingaku,
 				String sisyutuYoteiKingaku,
 				String sisyutuKingaku,
 				String syuusiKingaku) {
 			return new MageInquiryListItem(
 					month,
 					syuunyuuKingaku,
+					withdrewKingaku,
 					sisyutuYoteiKingaku,
 					sisyutuKingaku,
 					syuusiKingaku) {
@@ -95,6 +100,9 @@ public class AccountYearMageInquiryResponse extends AbstractResponse {
 	// 収入金額合計
 	@Setter
 	private String syuunyuuKingakuGoukei;
+	// 積立金取崩金額合計
+	@Setter
+	private String withdrewKingakuGoukei;
 	// 支出予定金額合計
 	@Setter
 	private String sisyutuYoteiKingakuGoukei;
@@ -148,6 +156,8 @@ public class AccountYearMageInquiryResponse extends AbstractResponse {
 		modelAndView.addObject("mageInquiryList", mageInquiryList);
 		// 収入金額合計
 		modelAndView.addObject("syuunyuuKingakuGoukei", syuunyuuKingakuGoukei);
+		// 積立金取崩金額合計
+		modelAndView.addObject("withdrewKingakuGoukei", withdrewKingakuGoukei);
 		// 支出予定金額合計
 		modelAndView.addObject("sisyutuYoteiKingakuGoukei", sisyutuYoteiKingakuGoukei);
 		// 支出金額合計

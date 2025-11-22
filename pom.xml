@@ -10,10 +10,10 @@
 	</parent>
 	<groupId>com.yonetani.webapp</groupId>
 	<artifactId>MyHouseholdAccountBook</artifactId>
-	<version>1.0.1</version>
+	<version>B.2.00</version>
 	<packaging>jar</packaging>
 	<name>MyHouseholdAccountBook</name>
-	<description>マイ家計簿です(spring boot版)</description>
+	<description>マイ家計簿です(B.2.00版)</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>
@@ -39,11 +39,6 @@
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
 			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
 		</dependency>
 		<!-- ヘッダー部のレイアウト分割に使用します -->
 		<dependency>
@@ -74,13 +69,30 @@
 			<artifactId>mybatis-thymeleaf</artifactId>
 			<version>1.0.4</version>
 		</dependency>
-		<!-- MyBatis testを使用 -->
+		
+<!-- テストの設定 -->
+		<!-- SpringBootテストパッケージ -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<!-- Spring Securityテストパッケージ -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- MyBatisテストパッケージ -->
 		<dependency>
 			<groupId>org.mybatis.spring.boot</groupId>
 			<artifactId>mybatis-spring-boot-starter-test</artifactId>
 			<version>3.0.2</version>
 			<scope>test</scope>
 		</dependency>
+
 <!-- テスト環境用DB  -->
 		<!-- H2データベースを使用 -->
 		<dependency>
@@ -90,19 +102,13 @@
 		</dependency>
 
 <!-- 本番環境用DB -->
-<!--		<dependency> -->
-<!--			<groupId>org.mariadb.jdbc</groupId> -->
-<!--			<artifactId>mariadb-java-client</artifactId> -->
-<!--			<scope>runtime</scope> -->
-<!--		</dependency> -->
-		
-		<!-- Spring Securityのテストパッケージ(Test実装時にコメントアウト外してセキュリティ関連のテストをする -->
-<!--		<dependency> -->
-<!--			<groupId>org.springframework.security</groupId> -->
-<!--			<artifactId>spring-security-test</artifactId> -->
-<!--			<scope>test</scope> -->
-<!--		</dependency> -->
-<!--	jpaは本アプリでは使用しない予定 -->
+		<dependency>
+			<groupId>org.mariadb.jdbc</groupId>
+			<artifactId>mariadb-java-client</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+<!--	jpaは本アプリでは使用しない -->
 <!--		<dependency> -->
 <!--			<groupId>org.springframework.boot</groupId> -->
 <!--			<artifactId>spring-boot-starter-data-jpa</artifactId> -->
