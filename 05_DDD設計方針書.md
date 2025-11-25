@@ -108,14 +108,16 @@ com.yonetani.webapp.accountbook
 │   │       └── Shop.java
 │   │
 │   ├── type                # 値オブジェクト
-│   │   ├── common          # 共通
-│   │   │   ├── Money.java（抽象）
-│   │   │   ├── Identifier.java（抽象）
+│   │   ├── common          # 共通（全サブドメインで使用）
+│   │   │   ├── Money.java（抽象基底クラス）
+│   │   │   ├── IncomeAmount.java（収入金額）
+│   │   │   ├── ExpenditureAmount.java（支出金額）
+│   │   │   ├── BalanceAmount.java（収支金額）
+│   │   │   ├── CouponAmount.java（クーポン金額）
+│   │   │   ├── Identifier.java（抽象基底クラス）
 │   │   │   └── TargetYearMonth.java
-│   │   └── account         # 収支関連
-│   │       ├── IncomeAmount.java
-│   │       ├── ExpenditureAmount.java
-│   │       └── BalanceAmount.java
+│   │   └── account         # 収支関連の特化型
+│   │       └── （将来的に必要に応じて追加）
 │   │
 │   ├── repository          # リポジトリIF
 │   │   ├── IncomeAndExpenditureRepository.java
@@ -135,6 +137,32 @@ com.yonetani.webapp.accountbook
             ├── dto
             └── mapper
 ```
+
+### 3.1 パッケージ設計の方針
+
+#### 3.1.1 共通値オブジェクト（type.common）の配置基準
+
+**基準**: 複数のサブドメインで使用される基本概念は`common`パッケージに配置
+
+**common配置の対象**:
+- 金額系値オブジェクト（Money, IncomeAmount, ExpenditureAmount, BalanceAmount, CouponAmount）
+  - 理由: 収支、買い物、固定費など複数の機能で共通使用
+  - ドメイン全体の基本概念
+
+- 識別子系値オブジェクト（Identifier, UserId, など）
+  - 理由: 全てのエンティティで使用される基本型
+
+- 日付系値オブジェクト（TargetYearMonth）
+  - 理由: 複数の機能で共通使用
+
+**サブドメイン固有パッケージ（type.account など）の配置基準**:
+- 特定のサブドメインでのみ使用される特化型
+- 例: 収支計算の特殊なルールを持つ値オブジェクト
+
+**メリット**:
+1. **再利用性**: 共通の概念を全機能で統一的に使用
+2. **依存関係の明確化**: 買い物機能がaccount配下に依存する不自然さを回避
+3. **保守性**: 金額ルールの変更が一箇所で済む
 
 ---
 

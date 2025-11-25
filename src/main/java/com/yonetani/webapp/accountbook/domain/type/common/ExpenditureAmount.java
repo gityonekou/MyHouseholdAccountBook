@@ -115,4 +115,43 @@ public class ExpenditureAmount extends Money {
 
 		return new ExpenditureAmount(result);
 	}
+
+	/**
+	 *<pre>
+	 * クーポン金額を適用します。
+	 * 支出金額からクーポンによる割引額を差し引いた、実際の支払金額を返却します。
+	 *
+	 * [ビジネスルール]
+	 * ・クーポン適用後の金額が0未満になってはならない
+	 * ・クーポン金額は内部的にマイナス値として保持されているため、
+	 *   加算することで減算効果を得る
+	 *
+	 * [使用例]
+	 * - 買い物登録時の支払金額計算
+	 * - 商品金額合計 + 消費税 - クーポン金額 = 支払金額
+	 *
+	 *</pre>
+	 * @param coupon 適用するクーポン金額
+	 * @return クーポン適用後の支払金額
+	 * @throws MyHouseholdAccountBookRuntimeException クーポンがnull、または適用後の金額が0未満になる場合
+	 *
+	 */
+	public ExpenditureAmount applyCoupon(CouponAmount coupon) {
+		if(coupon == null) {
+			throw new MyHouseholdAccountBookRuntimeException(
+				"適用対象のクーポン金額がnullです。管理者に問い合わせてください。");
+		}
+
+		// CouponAmountは内部的にマイナス値なので、addで減算効果が得られる
+		BigDecimal result = this.getValue().add(coupon.getValue());
+
+		// ガード節（クーポン適用後の金額がマイナスは不正）
+		if(result.compareTo(BigDecimal.ZERO) < 0) {
+			throw new MyHouseholdAccountBookRuntimeException(
+				String.format("クーポン適用後の支払金額がマイナスになります。[支出金額=%s, クーポン金額=%s]",
+					this.toFormatString(), coupon.toFormatString()));
+		}
+
+		return new ExpenditureAmount(result);
+	}
 }

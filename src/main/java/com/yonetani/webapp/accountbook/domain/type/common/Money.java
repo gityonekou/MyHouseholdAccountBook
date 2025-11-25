@@ -163,6 +163,34 @@ public abstract class Money {
 
 	/**
 	 *<pre>
+	 * 画面表示・入力用に整数値を取得します。
+	 * スケール0で四捨五入した整数値を返却します。
+	 *
+	 * [使用例]
+	 * - 画面の入力フィールドへの初期値設定
+	 * - 整数での計算が必要な場合
+	 *</pre>
+	 * @return 整数値（long型）
+	 *
+	 */
+	public long toIntegerValue() {
+		return this.value.setScale(0, RoundingMode.HALF_UP).longValue();
+	}
+
+	/**
+	 *<pre>
+	 * 画面入力用に整数の文字列を取得します。
+	 * カンマ区切りなしの整数値を返却します。
+	 *</pre>
+	 * @return 整数値の文字列（例: "10000"）
+	 *
+	 */
+	public String toIntegerString() {
+		return String.valueOf(toIntegerValue());
+	}
+
+	/**
+	 *<pre>
 	 * 金額を画面表示用にフォーマットします。
 	 * スケール0で四捨五入し、カンマ区切り+円表記の文字列を返却します。
 	 *</pre>

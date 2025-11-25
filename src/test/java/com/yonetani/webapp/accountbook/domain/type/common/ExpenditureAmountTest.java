@@ -278,4 +278,110 @@ class ExpenditureAmountTest {
 		assertEquals("12,346円", amount1.toFormatString());
 		assertEquals("1,000,000円", amount2.toFormatString());
 	}
+
+	@Test
+	@DisplayName("正常系：toIntegerValueは整数値を返す")
+	void testToIntegerValue() {
+		// 準備
+		ExpenditureAmount amount1 = ExpenditureAmount.from(new BigDecimal("12345.67"));
+		ExpenditureAmount amount2 = ExpenditureAmount.from(new BigDecimal("1000000.00"));
+		ExpenditureAmount amount3 = ExpenditureAmount.from(new BigDecimal("12345.44"));
+		ExpenditureAmount amount4 = ExpenditureAmount.from(new BigDecimal("12345.50"));
+
+		// 検証（スケール0で四捨五入）
+		assertEquals(12346L, amount1.toIntegerValue());
+		assertEquals(1000000L, amount2.toIntegerValue());
+		assertEquals(12345L, amount3.toIntegerValue()); // 0.44 -> 切り捨て
+		assertEquals(12346L, amount4.toIntegerValue()); // 0.50 -> 切り上げ
+	}
+
+	@Test
+	@DisplayName("正常系：toIntegerStringは整数の文字列を返す")
+	void testToIntegerString() {
+		// 準備
+		ExpenditureAmount amount1 = ExpenditureAmount.from(new BigDecimal("12345.67"));
+		ExpenditureAmount amount2 = ExpenditureAmount.from(new BigDecimal("1000000.00"));
+
+		// 検証（カンマ区切りなしの整数値文字列）
+		assertEquals("12346", amount1.toIntegerString());
+		assertEquals("1000000", amount2.toIntegerString());
+	}
+
+	@Test
+	@DisplayName("正常系：applyCouponでクーポンを適用できる")
+	void testApplyCoupon_正常系() {
+		// 準備
+		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("10000.00"));
+		CouponAmount coupon = CouponAmount.from(new BigDecimal("1000.00"));
+
+		// 実行
+		ExpenditureAmount result = expenditure.applyCoupon(coupon);
+
+		// 検証（10000 - 1000 = 9000）
+		assertEquals(new BigDecimal("9000.00"), result.getValue());
+		// 元のオブジェクトは変更されていないことを確認（不変性）
+		assertEquals(new BigDecimal("10000.00"), expenditure.getValue());
+		assertEquals(new BigDecimal("-1000.00"), coupon.getValue());
+	}
+
+	@Test
+	@DisplayName("正常系：applyCouponで支出金額と同額のクーポンを適用すると0円になる")
+	void testApplyCoupon_正常系_0円になる() {
+		// 準備
+		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("5000.00"));
+		CouponAmount coupon = CouponAmount.from(new BigDecimal("5000.00"));
+
+		// 実行
+		ExpenditureAmount result = expenditure.applyCoupon(coupon);
+
+		// 検証
+		assertEquals(BigDecimal.ZERO.setScale(2), result.getValue());
+		assertTrue(result.isZero());
+	}
+
+	@Test
+	@DisplayName("正常系：applyCouponで割引なし（0円クーポン）を適用できる")
+	void testApplyCoupon_正常系_割引なし() {
+		// 準備
+		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("10000.00"));
+		CouponAmount coupon = CouponAmount.ZERO;
+
+		// 実行
+		ExpenditureAmount result = expenditure.applyCoupon(coupon);
+
+		// 検証（割引なしなので元の金額と同じ）
+		assertEquals(new BigDecimal("10000.00"), result.getValue());
+	}
+
+	@Test
+	@DisplayName("異常系：applyCouponでnullを渡すと例外が発生する")
+	void testApplyCoupon_異常系_null() {
+		// 準備
+		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("10000.00"));
+
+		// 実行 & 検証
+		MyHouseholdAccountBookRuntimeException exception = assertThrows(
+			MyHouseholdAccountBookRuntimeException.class,
+			() -> expenditure.applyCoupon(null)
+		);
+		assertTrue(exception.getMessage().contains("クーポン金額"));
+		assertTrue(exception.getMessage().contains("null"));
+	}
+
+	@Test
+	@DisplayName("異常系：applyCouponで支出金額より大きいクーポンを適用すると例外が発生する")
+	void testApplyCoupon_異常系_クーポンが大きすぎる() {
+		// 準備
+		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("5000.00"));
+		CouponAmount coupon = CouponAmount.from(new BigDecimal("6000.00"));
+
+		// 実行 & 検証
+		MyHouseholdAccountBookRuntimeException exception = assertThrows(
+			MyHouseholdAccountBookRuntimeException.class,
+			() -> expenditure.applyCoupon(coupon)
+		);
+		assertTrue(exception.getMessage().contains("マイナス"));
+		assertTrue(exception.getMessage().contains("支出金額"));
+		assertTrue(exception.getMessage().contains("クーポン金額"));
+	}
 }

@@ -299,4 +299,32 @@ class BalanceAmountTest {
 		assertEquals("1,000,000円", amount2.toFormatString());
 		assertEquals("-12,346円", amount3.toFormatString());
 	}
+
+	@Test
+	@DisplayName("正常系：toIntegerValueは整数値を返す")
+	void testToIntegerValue() {
+		// 準備
+		BalanceAmount amount1 = BalanceAmount.from(new BigDecimal("12345.67"));
+		BalanceAmount amount2 = BalanceAmount.from(new BigDecimal("-12345.67"));
+		BalanceAmount amount3 = BalanceAmount.from(new BigDecimal("12345.44"));
+		BalanceAmount amount4 = BalanceAmount.from(new BigDecimal("-12345.50"));
+
+		// 検証（スケール0で四捨五入）
+		assertEquals(12346L, amount1.toIntegerValue());
+		assertEquals(-12346L, amount2.toIntegerValue());
+		assertEquals(12345L, amount3.toIntegerValue()); // 0.44 -> 切り捨て
+		assertEquals(-12346L, amount4.toIntegerValue()); // -0.50 -> 切り上げ
+	}
+
+	@Test
+	@DisplayName("正常系：toIntegerStringは整数の文字列を返す")
+	void testToIntegerString() {
+		// 準備
+		BalanceAmount amount1 = BalanceAmount.from(new BigDecimal("12345.67"));
+		BalanceAmount amount2 = BalanceAmount.from(new BigDecimal("-12345.67"));
+
+		// 検証（カンマ区切りなしの整数値文字列）
+		assertEquals("12346", amount1.toIntegerString());
+		assertEquals("-12346", amount2.toIntegerString());
+	}
 }

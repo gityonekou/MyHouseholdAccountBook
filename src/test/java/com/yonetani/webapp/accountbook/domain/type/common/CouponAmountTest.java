@@ -266,4 +266,32 @@ class CouponAmountTest {
 		assertEquals("1,235円", amount2.toFormatString());
 		assertEquals("0円", amount3.toFormatString());
 	}
+
+	@Test
+	@DisplayName("正常系：toIntegerValueは整数値を返す（内部はマイナス値）")
+	void testToIntegerValue() {
+		// 準備
+		CouponAmount amount1 = CouponAmount.from(new BigDecimal("1234.56"));
+		CouponAmount amount2 = CouponAmount.from(new BigDecimal("500.00"));
+		CouponAmount amount3 = CouponAmount.from(new BigDecimal("1234.44"));
+		CouponAmount amount4 = CouponAmount.from(new BigDecimal("1234.50"));
+
+		// 検証（内部的にはマイナス値として保持されているので、マイナスの整数値）
+		assertEquals(-1235L, amount1.toIntegerValue());
+		assertEquals(-500L, amount2.toIntegerValue());
+		assertEquals(-1234L, amount3.toIntegerValue()); // -0.44 -> -1234
+		assertEquals(-1235L, amount4.toIntegerValue()); // -0.50 -> -1235
+	}
+
+	@Test
+	@DisplayName("正常系：toIntegerStringは整数の文字列を返す（内部はマイナス値）")
+	void testToIntegerString() {
+		// 準備
+		CouponAmount amount1 = CouponAmount.from(new BigDecimal("1234.56"));
+		CouponAmount amount2 = CouponAmount.from(new BigDecimal("500.00"));
+
+		// 検証（内部的にはマイナス値として保持されているので、マイナスの文字列）
+		assertEquals("-1235", amount1.toIntegerString());
+		assertEquals("-500", amount2.toIntegerString());
+	}
 }
