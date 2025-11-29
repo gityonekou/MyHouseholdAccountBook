@@ -1,7 +1,7 @@
 # マイ家計簿アプリケーション DDD設計方針書
 
 **作成日**: 2024年11月  
-**更新日**: 2025年11月17日  
+**更新日**: 2025年11月27日（固定費管理の設計を追加）  
 **対象**: リファクタリングプロジェクト全体
 
 ---
@@ -29,6 +29,7 @@
 - **収支**: IncomeAndExpenditure
 - **収入**: Income
 - **支出**: Expenditure
+- **固定費**: FixedCost
 - **買い物**: Shopping
 - **対象年月**: TargetYearMonth
 
@@ -36,9 +37,45 @@
 
 家計簿アプリケーションを以下のコンテキストに分割：
 
-1. **収支管理コンテキスト** - 月次・年次の収支管理
+1. **収支管理コンテキスト** - 月次・年次の収支管理、固定費管理
 2. **買い物管理コンテキスト** - 日々の買い物記録
 3. **マスタ管理コンテキスト** - 支出項目、店舗、イベント
+
+#### コンテキスト図
+
+```
+┌─────────────────────────────────────┐
+│   収支管理コンテキスト              │
+│                                     │
+│  ・収支（IncomeAndExpenditure）     │
+│  ・収入（Income）                   │
+│  ・支出（Expenditure）              │
+│  ・固定費（FixedCost）              │
+│                                     │
+└─────────────────────────────────────┘
+
+┌─────────────────────────────────────┐
+│   買い物管理コンテキスト            │
+│                                     │
+│  ・買い物（Shopping）               │
+│  ・買い物明細（ShoppingDetail）     │
+│                                     │
+└─────────────────────────────────────┘
+
+┌─────────────────────────────────────┐
+│   マスタ管理コンテキスト            │
+│                                     │
+│  ・支出項目（ExpenditureCategory）  │
+│  ・店舗（Shop）                     │
+│  ・イベント（Event）                │
+│                                     │
+└─────────────────────────────────────┘
+```
+
+**固定費が収支管理コンテキストに属する理由**:
+- 固定費の主な目的は「支出の自動生成」
+- 収支管理機能と密接に関連
+- 単純なCRUDではなくビジネスロジック（スケジュール判定、支出生成）を持つ
 
 ---
 
@@ -99,7 +136,8 @@ com.yonetani.webapp.accountbook
 │   │   ├── account         # 収支管理
 │   │   │   ├── IncomeAndExpenditure.java（集約ルート）
 │   │   │   ├── Income.java（エンティティ）
-│   │   │   └── Expenditure.java（エンティティ）
+│   │   │   ├── Expenditure.java（エンティティ）
+│   │   │   └── FixedCost.java（集約ルート）
 │   │   ├── shopping        # 買い物管理
 │   │   │   ├── Shopping.java（集約ルート）
 │   │   │   └── ShoppingDetail.java（エンティティ）
@@ -117,18 +155,23 @@ com.yonetani.webapp.accountbook
 │   │   │   ├── Identifier.java（抽象基底クラス）
 │   │   │   └── TargetYearMonth.java
 │   │   └── account         # 収支関連の特化型
-│   │       └── （将来的に必要に応じて追加）
+│   │       ├── PaymentSchedule.java（固定費スケジュール）
+│   │       ├── ValidPeriod.java（固定費有効期間）
+│   │       └── ScheduleType.java（スケジュールタイプ列挙型）
 │   │
 │   ├── repository          # リポジトリIF
 │   │   ├── IncomeAndExpenditureRepository.java
+│   │   ├── FixedCostRepository.java
 │   │   └── ShoppingRepository.java
 │   │
 │   ├── service             # ドメインサービス
-│   │   └── IncomeAndExpenditureService.java
+│   │   ├── IncomeAndExpenditureService.java
+│   │   └── IncomeAndExpenditureGenerationService.java
 │   │
 │   └── exception           # ドメイン例外
 │       ├── DomainException.java
-│       └── InvalidValueException.java
+│       ├── InvalidValueException.java
+│       └── FixedCostNotApplicableException.java
 │
 └── infrastructure
     └── datasource          # リポジトリ実装
@@ -229,12 +272,95 @@ public class Shopping {
 }
 ```
 
+#### 集約3: FixedCost（固定費）
+
+```java
+public class FixedCost {
+    // 集約ルート
+    private FixedCostId id;
+    private UserId userId;
+    
+    // 固定費情報
+    private FixedCostName name;              // 例: "家賃"
+    private ExpenditureAmount amount;        // 例: 100,000円
+    private ExpenditureCategoryId categoryId; // 支出項目ID
+    
+    // スケジュール（重要な業務ルール）
+    private PaymentSchedule schedule;        // 値オブジェクト
+    // - 毎月X日
+    // - 年1回X月X日
+    // - 2ヶ月ごと、など
+    
+    // 有効期間
+    private ValidPeriod validPeriod;         // 値オブジェクト
+    // - 開始年月
+    // - 終了年月（Optional）
+    
+    // ビジネスメソッド
+    
+    /**
+     * 指定月に固定費が発生するか判定
+     */
+    public boolean shouldGenerateFor(TargetYearMonth yearMonth) {
+        return validPeriod.contains(yearMonth) 
+            && schedule.matchesMonth(yearMonth);
+    }
+    
+    /**
+     * 指定月の支出を生成
+     */
+    public Expenditure generateExpenditure(
+            TargetYearMonth yearMonth,
+            ExpenditureId newId) {
+        
+        if (!shouldGenerateFor(yearMonth)) {
+            throw new FixedCostNotApplicableException(
+                "この月には固定費は発生しません");
+        }
+        
+        // 支出エンティティを生成
+        return Expenditure.create(
+            newId,
+            ExpenditureName.of(this.name.getValue() + "（固定費）"),
+            this.amount,
+            PaymentDate.fromSchedule(yearMonth, this.schedule),
+            this.categoryId,
+            Optional.empty() // イベントなし
+        );
+    }
+}
+```
+
+**不変条件**:
+1. 有効期間内でのみ支出を生成可能
+2. スケジュールに合致する月のみ支出を生成
+3. 生成される支出は固定費の情報を引き継ぐ
+
+**業務ルール**:
+- 固定費は定期的な支出を表す
+- 収支自動生成時に該当月の固定費から支出を生成
+- スケジュールパターン（毎月、年次、隔月など）に応じて判定
+
 ### 4.3 集約の境界
 
 **原則**: 1つの集約 = 1つのトランザクション境界
 
 - 収支と買い物は **別々の集約**
+- 収支と固定費も **別々の集約**
 - 支出項目マスタも **独立した集約**
+
+**固定費と収支の関係**:
+- 固定費は収支を「生成する」関係
+- 同一トランザクションで扱う必要はない
+- ドメインサービス（IncomeAndExpenditureGenerationService）が両者を協調させる
+
+```
+FixedCost（固定費）
+    ↓ generateExpenditure()
+Expenditure（支出）
+    ↓ addExpenditure()
+IncomeAndExpenditure（収支）
+```
 
 ---
 
@@ -388,6 +514,184 @@ public class TargetYearMonth {
     
     public String toYYYYMM() {
         return value.format(DateTimeFormatter.ofPattern("yyyyMM"));
+    }
+}
+```
+
+### 5.5 固定費関連の値オブジェクト
+
+固定費のスケジュール管理と有効期間を表す値オブジェクト。
+
+**注記**:
+- ValidPeriod（有効期間）は将来の拡張性を考慮した設計です
+- 現状の画面では有効期間の入力項目は存在しません
+- Phase 3の固定費管理リファクタリング時に、実際の業務要件に応じて以下を判断します：
+  - ValidPeriodを実装するか
+  - シンプルに開始年月のみで運用するか
+  - 将来の拡張に備えて設計のみ残すか
+
+#### PaymentSchedule（支払いスケジュール）
+
+```java
+/**
+ * 支払いスケジュール
+ * 固定費がいつ発生するかを定義
+ */
+public class PaymentSchedule {
+    private final ScheduleType type;  // MONTHLY, YEARLY, BIMONTHLY
+    private final int dayOfMonth;     // 支払日（1-31）
+    private final Optional<Integer> monthOfYear; // 年次の場合の月（1-12）
+    
+    private PaymentSchedule(ScheduleType type, int dayOfMonth, 
+                           Optional<Integer> monthOfYear) {
+        this.type = Objects.requireNonNull(type);
+        
+        if (dayOfMonth < 1 || dayOfMonth > 31) {
+            throw new InvalidValueException("支払日は1-31の範囲");
+        }
+        this.dayOfMonth = dayOfMonth;
+        
+        if (monthOfYear.isPresent()) {
+            int month = monthOfYear.get();
+            if (month < 1 || month > 12) {
+                throw new InvalidValueException("月は1-12の範囲");
+            }
+        }
+        this.monthOfYear = monthOfYear;
+    }
+    
+    /**
+     * 毎月支払いのスケジュール
+     */
+    public static PaymentSchedule monthly(int dayOfMonth) {
+        return new PaymentSchedule(ScheduleType.MONTHLY, dayOfMonth, 
+                                   Optional.empty());
+    }
+    
+    /**
+     * 年1回支払いのスケジュール
+     */
+    public static PaymentSchedule yearly(int month, int dayOfMonth) {
+        return new PaymentSchedule(ScheduleType.YEARLY, dayOfMonth, 
+                                   Optional.of(month));
+    }
+    
+    /**
+     * 2ヶ月ごと支払いのスケジュール
+     */
+    public static PaymentSchedule bimonthly(int dayOfMonth) {
+        return new PaymentSchedule(ScheduleType.BIMONTHLY, dayOfMonth, 
+                                   Optional.empty());
+    }
+    
+    /**
+     * 指定月にこのスケジュールが該当するか判定
+     */
+    public boolean matchesMonth(TargetYearMonth yearMonth) {
+        switch (type) {
+            case MONTHLY:
+                return true;  // 毎月発生
+            case YEARLY:
+                return yearMonth.getMonth() == monthOfYear.get();
+            case BIMONTHLY:
+                return yearMonth.getMonth() % 2 == 0;
+            default:
+                return false;
+        }
+    }
+    
+    public int getDayOfMonth() {
+        return dayOfMonth;
+    }
+}
+
+/**
+ * スケジュールタイプ
+ */
+public enum ScheduleType {
+    MONTHLY("毎月"),
+    YEARLY("年1回"),
+    BIMONTHLY("2ヶ月ごと");
+    
+    private final String displayName;
+    
+    ScheduleType(String displayName) {
+        this.displayName = displayName;
+    }
+    
+    public String getDisplayName() {
+        return displayName;
+    }
+}
+```
+
+#### ValidPeriod（有効期間）
+
+```java
+/**
+ * 有効期間
+ * 固定費がいつからいつまで有効かを定義
+ */
+public class ValidPeriod {
+    private final TargetYearMonth startYearMonth;
+    private final Optional<TargetYearMonth> endYearMonth;
+    
+    private ValidPeriod(TargetYearMonth startYearMonth, 
+                       Optional<TargetYearMonth> endYearMonth) {
+        this.startYearMonth = Objects.requireNonNull(startYearMonth);
+        this.endYearMonth = Objects.requireNonNull(endYearMonth);
+        
+        // 終了年月は開始年月より後でなければならない
+        if (endYearMonth.isPresent()) {
+            if (!endYearMonth.get().isAfter(startYearMonth)) {
+                throw new InvalidValueException(
+                    "終了年月は開始年月より後でなければなりません");
+            }
+        }
+    }
+    
+    /**
+     * 期限なしの有効期間
+     */
+    public static ValidPeriod indefinite(TargetYearMonth startYearMonth) {
+        return new ValidPeriod(startYearMonth, Optional.empty());
+    }
+    
+    /**
+     * 期限ありの有効期間
+     */
+    public static ValidPeriod limited(TargetYearMonth startYearMonth, 
+                                     TargetYearMonth endYearMonth) {
+        return new ValidPeriod(startYearMonth, Optional.of(endYearMonth));
+    }
+    
+    /**
+     * 指定月がこの有効期間に含まれるか判定
+     */
+    public boolean contains(TargetYearMonth yearMonth) {
+        boolean afterStart = !yearMonth.isBefore(startYearMonth);
+        boolean beforeEnd = endYearMonth
+            .map(end -> !yearMonth.isAfter(end))
+            .orElse(true);  // 終了なしの場合は常にtrue
+        
+        return afterStart && beforeEnd;
+    }
+    
+    /**
+     * 有効期間が終了しているか
+     */
+    public boolean isExpired(TargetYearMonth currentYearMonth) {
+        return endYearMonth
+            .map(end -> currentYearMonth.isAfter(end))
+            .orElse(false);  // 終了なしの場合は期限切れにならない
+    }
+    
+    public TargetYearMonth getStartYearMonth() {
+        return startYearMonth;
+    }
+    
+    public Optional<TargetYearMonth> getEndYearMonth() {
+        return endYearMonth;
     }
 }
 ```
@@ -557,6 +861,103 @@ public class IncomeAndExpenditureService {
 }
 ```
 
+### 7.3 収支生成サービス（固定費連携）
+
+固定費から支出を自動生成する責務を持つドメインサービス。
+
+```java
+// domain/service/IncomeAndExpenditureGenerationService.java
+@Service
+public class IncomeAndExpenditureGenerationService {
+    
+    private final FixedCostRepository fixedCostRepository;
+    
+    public IncomeAndExpenditureGenerationService(
+            FixedCostRepository fixedCostRepository) {
+        this.fixedCostRepository = fixedCostRepository;
+    }
+    
+    /**
+     * 指定月の収支を自動生成（固定費を含む）
+     * 
+     * @param userId ユーザーID
+     * @param yearMonth 対象年月
+     * @return 生成された収支（固定費からの支出を含む）
+     */
+    public IncomeAndExpenditure generateForMonth(
+            UserId userId,
+            TargetYearMonth yearMonth) {
+        
+        // 1. 新しい収支を作成
+        IncomeAndExpenditure incomeAndExpenditure = 
+            IncomeAndExpenditure.create(
+                IncomeAndExpenditureId.of(userId, yearMonth),
+                userId,
+                yearMonth
+            );
+        
+        // 2. ユーザーの固定費を取得
+        List<FixedCost> fixedCosts = 
+            fixedCostRepository.findByUserId(userId);
+        
+        // 3. 該当月に発生する固定費から支出を生成
+        for (FixedCost fixedCost : fixedCosts) {
+            if (fixedCost.shouldGenerateFor(yearMonth)) {
+                
+                // 新しい支出IDを生成
+                ExpenditureId newId = ExpenditureId.generate();
+                
+                // 固定費から支出を生成
+                Expenditure expenditure = 
+                    fixedCost.generateExpenditure(yearMonth, newId);
+                
+                // 収支に支出を追加
+                incomeAndExpenditure.addExpenditure(expenditure);
+            }
+        }
+        
+        return incomeAndExpenditure;
+    }
+    
+    /**
+     * 既存の収支に固定費からの支出を追加
+     * 
+     * @param incomeAndExpenditure 既存の収支
+     */
+    public void addFixedCostExpenditures(
+            IncomeAndExpenditure incomeAndExpenditure) {
+        
+        UserId userId = incomeAndExpenditure.getUserId();
+        TargetYearMonth yearMonth = incomeAndExpenditure.getTargetYearMonth();
+        
+        // ユーザーの固定費を取得
+        List<FixedCost> fixedCosts = 
+            fixedCostRepository.findByUserId(userId);
+        
+        // 該当月に発生する固定費から支出を生成して追加
+        for (FixedCost fixedCost : fixedCosts) {
+            if (fixedCost.shouldGenerateFor(yearMonth)) {
+                ExpenditureId newId = ExpenditureId.generate();
+                Expenditure expenditure = 
+                    fixedCost.generateExpenditure(yearMonth, newId);
+                incomeAndExpenditure.addExpenditure(expenditure);
+            }
+        }
+    }
+}
+```
+
+**このサービスの責務**:
+1. FixedCost集約とIncomeAndExpenditure集約の協調
+2. 固定費のスケジュール判定
+3. 支出の自動生成と収支への追加
+4. 両集約のライフサイクルの独立性を保つ
+
+**使用シーン**:
+- ユースケース層から呼び出される
+- 収支の新規作成時
+- 月次の収支自動生成バッチ
+
 ---
 
 ## 8. DDDの適用度合いと柔軟性
@@ -620,6 +1021,31 @@ public class IncomeAndExpenditureService {
 ✅ リポジトリパターン
 ```
 
+#### 8.2.4 固定費管理（FixedCost集約）
+
+**理由**:
+- 複雑なスケジュール判定ロジック
+- 支出の自動生成という重要な業務ルール
+- 収支管理との密接な連携
+- 有効期間の管理
+
+**適用内容**:
+```java
+✅ 集約パターン（FixedCost）
+✅ 値オブジェクト（PaymentSchedule、ValidPeriod、ScheduleType）
+✅ リポジトリパターン
+✅ ドメインサービス（IncomeAndExpenditureGenerationService）
+✅ ドメイン例外（FixedCostNotApplicableException）
+```
+
+**固定費がマスタ管理ではない理由**:
+| 比較項目 | マスタ管理（例: 店舗） | 固定費 |
+|---------|---------------------|--------|
+| 業務ロジック | ほぼなし（CRUD） | **複雑**（スケジュール判定、支出生成） |
+| 他集約との関連 | 参照されるのみ | **収支を生成する** |
+| 変更頻度 | 低い | **定期的に評価される** |
+| → 分類 | マスタ管理 | **独立した集約** |
+
 ---
 
 ### 8.3 柔軟にする領域（簡素化OK）
@@ -680,7 +1106,7 @@ public class IncomeAndExpenditureQueryServiceImpl {
 
 #### 8.3.3 バッチ処理
 
-**対象**: 固定費の自動登録、月次締めバッチなど
+**対象**: 月次締めバッチなど
 
 **理由**:
 - 一括処理のためパフォーマンスが重要
