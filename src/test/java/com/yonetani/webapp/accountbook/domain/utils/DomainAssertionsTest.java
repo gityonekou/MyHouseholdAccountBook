@@ -203,7 +203,7 @@ class DomainAssertionsTest {
 	@DisplayName("異常系：インスタンス化不可")
 	void testConstructor_ThrowsException() {
 		// 実行 & 検証
-		assertThrows(AssertionError.class, () -> {
+		assertThrows(java.lang.reflect.InvocationTargetException.class, () -> {
 			// リフレクションでコンストラクタを呼び出そうとする
 			java.lang.reflect.Constructor<DomainAssertions> constructor =
 				DomainAssertions.class.getDeclaredConstructor();
