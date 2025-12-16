@@ -17,18 +17,13 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.yonetani.webapp.accountbook.common.component.AccountBookUserInquiryUseCase;
-import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureItemList;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.IncomingAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
+import com.yonetani.webapp.accountbook.domain.service.account.inquiry.IncomeAndExpenditureConsistencyService;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryRedirectResponse;
@@ -60,14 +55,12 @@ public class AccountMonthInquiryUseCase {
 	
 	// ユーザ情報照会ユースケース
 	private final AccountBookUserInquiryUseCase userInquiry;
-	// 指定月の支出項目リスト取得リポジトリー
-	private final SisyutuKingakuTableRepository repository;
-	// 収支テーブル:INCOME_AND_EXPENDITURE_TABLEリポジトリー
+	// 指定月の支出金額情報を取得するリポジトリー
+	private final SisyutuKingakuTableRepository sisyutuRepository;
+	// 指定月の収支金額を取得するポジトリー
 	private final IncomeAndExpenditureTableRepository syuusiRepository;
-	// 収入テーブル:INCOME_TABLEリポジトリー
-	private final IncomeTableRepository incomeRepository;
-	// 支出テーブル:EXPENDITURE_TABLEリポジトリー
-	private final ExpenditureTableRepository expenditureRepository;
+	// 収支整合性検証ドメインサービス
+	private final IncomeAndExpenditureConsistencyService consistencyService;
 	
 	/**
 	 *<pre>
@@ -182,61 +175,45 @@ public class AccountMonthInquiryUseCase {
 		AccountMonthInquiryResponse response = AccountMonthInquiryResponse.getInstance(targetYearMonthInfo);
 		
 		// 検索条件(ユーザID、年月(YYYYMM))をドメインオブジェクトに変換
-		SearchQueryUserIdAndYearMonth inquiryModel = SearchQueryUserIdAndYearMonth.from(
+		SearchQueryUserIdAndYearMonth searchCondition = SearchQueryUserIdAndYearMonth.from(
 				UserId.from(user.getUserId()), TargetYearMonth.from(targetYearMonthInfo.getTargetYearMonth()));
-		// ユーザID,対象年月を検索条件に支出金額情報のリストを取得
-		AccountMonthInquiryExpenditureItemList resultList = repository.select(inquiryModel);
+
+		// ユーザID,対象年月を検索条件にドメインデータを取得
+		AccountMonthInquiryExpenditureItemList expenditureList = sisyutuRepository.select(searchCondition);
+		IncomeAndExpenditure incomeAndExpenditure = syuusiRepository.findByUserIdAndYearMonth(searchCondition);
+
+		// データ存在の整合性検証(収支データなし&支出金額データありの場合はエラー)
+		consistencyService.validateDataExistence(incomeAndExpenditure, expenditureList, searchCondition);
 
 		// 支出金額情報のリスト(ドメインモデル)をレスポンスに設定
-		if(resultList.isEmpty()) {
+		if(expenditureList.isEmpty()) {
 			// 支出金額情報のリストが0件の場合、メッセージを設定
 			response.addMessage("登録済みの支出金額情報が0件です。");
 		} else {
 			// 支出金額情報のリストをレスポンスに設定(ドメインモデルからレスポンスへの変換)
-			response.addExpenditureItemList(convertExpenditureItemList(resultList));
+			response.addExpenditureItemList(convertExpenditureItemList(expenditureList));
 		}
 
-		// ユーザID,現在の対象年月を条件に該当月の収支金額を取得
-		IncomeAndExpenditureItem sisyutuResult = syuusiRepository.select(inquiryModel);
-		if(sisyutuResult.isEmpty()) {
-			// 該当月の収支データ登録なしの場合で支出金額情報が登録済みの場合、不正データ登録のため予期しないエラーとする
-			// DBデータのメンテナンスが必要(どのタイミングで登録されたかを調査し、該当ユーザの該当月の出金額情報は削除）
-			if(!resultList.isEmpty()) {
-				throw new MyHouseholdAccountBookRuntimeException("該当月の収支データが未登録の状態で支出金額情報が登録済みの状態です。管理者に問い合わせてください。[yearMonth=" + inquiryModel.getYearMonth() + "]");
-			}
-			
-			// 検索結果が0件の場合、メッセージを設定
+		// 収支情報(ドメインモデル)をレスポンスに設定
+		if(incomeAndExpenditure.isEmpty()) {
+			// 該当月の収支データがない場合、メッセージを設定
 			response.addMessage("該当月の収支データがありません。");
 			response.setSyuusiDataFlg(false);
-			
 		} else {
-			// 収入テーブルから対象月の収入金額合計値を取得
-			SyuunyuuKingakuTotalAmount incomeKingakuTotalAmount = incomeRepository.sumIncomeKingaku(inquiryModel);
-			// 収支テーブルの収入金額+積立金取崩金額の値と対象月の収入テーブルの収入金額合計値が一致するかを確認
-			IncomingAmount chkIncomeAmount = IncomingAmount.from(sisyutuResult.getSyuunyuuKingaku(), sisyutuResult.getWithdrewKingaku());
-			if(!chkIncomeAmount.getSyuunyuuKingakuTotalAmount().equals(incomeKingakuTotalAmount)) {
-				throw new MyHouseholdAccountBookRuntimeException("該当月の収入情報が一致しません。管理者に問い合わせてください。[yearMonth=" + inquiryModel.getYearMonth() + "]");
-			}
-			
-			// 支出テーブルから対象月の支出金額合計値を取得
-			SisyutuKingakuTotalAmount expenditureKingakuTotalAmount = expenditureRepository.sumExpenditureKingaku(inquiryModel);
-			// 収支テーブルの支出金額の値と対象月の支出テーブルの支出金額合計値が一致するかを確認
-			SisyutuKingakuTotalAmount chkExpenditureKingaku = SisyutuKingakuTotalAmount.from(sisyutuResult.getSisyutuKingaku().getValue());
-			if(!chkExpenditureKingaku.equals(expenditureKingakuTotalAmount)) {
-				throw new MyHouseholdAccountBookRuntimeException("該当月の支出情報が一致しません。管理者に問い合わせてください。[yearMonth=" + inquiryModel.getYearMonth() + "]");
-			}
-			
+			// 収支整合性検証(収入・支出の合計値が収支テーブルの値と一致するかをドメインサービスで検証)
+			consistencyService.validateAll(incomeAndExpenditure, searchCondition);
+
 			// 収支情報(ドメインモデル)から収支情報(レスポンス)への変換
 			// 収入金額
-			response.setSyuunyuuKingaku(sisyutuResult.getSyuunyuuKingaku().toString());
+			response.setSyuunyuuKingaku(incomeAndExpenditure.getIncomeAmount().toFormatString());
 			// 支出金額
-			response.setSisyutuKingaku(sisyutuResult.getSisyutuKingaku().toString());
+			response.setSisyutuKingaku(incomeAndExpenditure.getExpenditureAmount().toFormatString());
 			// 積立金取崩金額
-			response.setWithdrewKingaku(sisyutuResult.getWithdrewKingaku().toString());
+			response.setWithdrewKingaku(incomeAndExpenditure.getWithdrewAmount().toFormatString());
 			// 支出予定金額
-			response.setSisyutuYoteiKingaku(sisyutuResult.getSisyutuYoteiKingaku().toString());
+			response.setSisyutuYoteiKingaku(incomeAndExpenditure.getEstimatedExpenditureAmount().toString());
 			// 収支金額
-			response.setSyuusiKingaku(sisyutuResult.getSyuusiKingaku().toString());
+			response.setSyuusiKingaku(incomeAndExpenditure.getBalanceAmount().toString());
 		}
 		
 		return response;

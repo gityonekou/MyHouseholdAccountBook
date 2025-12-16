@@ -34,8 +34,9 @@ import lombok.Setter;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 public class AccountMonthInquiryResponse extends AbstractResponse {
-	
+
 	/**
 	 *<pre>
 	 * 月毎の支出金額情報明細です
@@ -166,37 +167,63 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 	/**
 	 *<pre>
 	 * 現在のレスポンス情報から画面返却データのModelAndViewを生成して返します。
-	 * 
+	 * Controller層でsyuusiDataFlgをチェックし、適切なビルドメソッドを呼び出してください。
+	 *
+	 * 【非推奨】このメソッドは互換性のために残されていますが、新規実装では使用しないでください。
+	 * 代わりにbuildWithData()またはbuildRegistCheck()を使用してください。
 	 *</pre>
 	 * @return 画面返却データのModelAndView
 	 *
 	 */
 	@Override
+	@Deprecated
 	public ModelAndView build() {
 		if(syuusiDataFlg) {
-			// 指定月の収支情報ありの場合、マイ家計簿(各月の収支)画面のModelとViewを生成
-			ModelAndView modelAndView = createModelAndView("account/inquiry/AccountMonth");
-			// 対象年、対象月、前月、次月の値を設定
-			modelAndView.addObject("targetYearMonthInfo", targetYearMonthInfo);
-			// 収入金額
-			modelAndView.addObject("syuunyuuKingaku", syuunyuuKingaku);
-			// 支出金額
-			modelAndView.addObject("sisyutuKingaku", sisyutuKingaku);
-			// 積立金取崩金額
-			modelAndView.addObject("withdrewKingaku", withdrewKingaku);
-			// 支出予定金額
-			modelAndView.addObject("sisyutuYoteiKingaku", sisyutuYoteiKingaku);
-			// 収支金額
-			modelAndView.addObject("syuusiKingaku", syuusiKingaku);
-			// 月毎の支出項目明細リストを追加
-			modelAndView.addObject("expenditureItemList", expenditureItemList);
-			return modelAndView;
+			return buildWithData();
 		} else {
-			// 指定月の収支情報なしの場合、マイ家計簿(各月の収支：収支登録確認)画面のModelとViewを生成
-			ModelAndView modelAndView = createModelAndView("account/inquiry/AccountMonthRegistCheck");
-			// 対象年、対象月、前月、次月の値を設定
-			modelAndView.addObject("targetYearMonthInfo", targetYearMonthInfo);
-			return modelAndView;
+			return buildRegistCheck();
 		}
+	}
+
+	/**
+	 *<pre>
+	 * 収支データありの場合の画面返却データ（AccountMonth画面）を生成して返します。
+	 *</pre>
+	 * @return マイ家計簿(各月の収支)画面のModelAndView
+	 *
+	 */
+	public ModelAndView buildWithData() {
+		// マイ家計簿(各月の収支)画面のModelとViewを生成
+		ModelAndView modelAndView = createModelAndView("account/inquiry/AccountMonth");
+		// 対象年、対象月、前月、次月の値を設定
+		modelAndView.addObject("targetYearMonthInfo", targetYearMonthInfo);
+		// 収入金額
+		modelAndView.addObject("syuunyuuKingaku", syuunyuuKingaku);
+		// 支出金額
+		modelAndView.addObject("sisyutuKingaku", sisyutuKingaku);
+		// 積立金取崩金額
+		modelAndView.addObject("withdrewKingaku", withdrewKingaku);
+		// 支出予定金額
+		modelAndView.addObject("sisyutuYoteiKingaku", sisyutuYoteiKingaku);
+		// 収支金額
+		modelAndView.addObject("syuusiKingaku", syuusiKingaku);
+		// 月毎の支出項目明細リストを追加
+		modelAndView.addObject("expenditureItemList", expenditureItemList);
+		return modelAndView;
+	}
+
+	/**
+	 *<pre>
+	 * 収支データなしの場合の画面返却データ（AccountMonthRegistCheck画面）を生成して返します。
+	 *</pre>
+	 * @return マイ家計簿(各月の収支：収支登録確認)画面のModelAndView
+	 *
+	 */
+	public ModelAndView buildRegistCheck() {
+		// マイ家計簿(各月の収支：収支登録確認)画面のModelとViewを生成
+		ModelAndView modelAndView = createModelAndView("account/inquiry/AccountMonthRegistCheck");
+		// 対象年、対象月、前月、次月の値を設定
+		modelAndView.addObject("targetYearMonthInfo", targetYearMonthInfo);
+		return modelAndView;
 	}
 }

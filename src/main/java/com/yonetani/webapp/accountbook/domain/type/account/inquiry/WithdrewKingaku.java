@@ -10,11 +10,11 @@
 package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.session.IncomeRegistItem;
 
 import lombok.AccessLevel;
@@ -42,11 +42,11 @@ public class WithdrewKingaku {
 	public static final WithdrewKingaku ZERO = WithdrewKingaku.from(BigDecimal.ZERO.setScale(2));
 	// 値がnullの「積立金取崩金額」項目の値
 	public static final WithdrewKingaku NULL = WithdrewKingaku.from((BigDecimal)null);
-	
+
 	/**
 	 *<pre>
 	 * 「積立金取崩金額」項目の値を表すドメインタイプを生成します
-	 * 
+	 *
 	 * [非ガード節]
 	 * ・null値
 	 * [ガード節]
@@ -71,15 +71,15 @@ public class WithdrewKingaku {
 		if(withdrewKingaku.scale() != 2) {
 			throw new MyHouseholdAccountBookRuntimeException("「積立金取崩金額」項目のスケール値が不正です。管理者に問い合わせてください。[scale=" + withdrewKingaku.scale() + "]");
 		}
-		
+
 		// 「積立金取崩金額」項目の値を生成して返却
 		return new WithdrewKingaku(withdrewKingaku);
 	}
-	
+
 	/**
 	 *<pre>
 	 * 収支登録情報(セッション情報)の値から「積立金取崩金額」項目の値を表すドメインタイプを生成します
-	 * 
+	 *
 	 * [ガード節]
 	 * ・null値
 	 *</pre>
@@ -99,7 +99,7 @@ public class WithdrewKingaku {
 		// 収入区分が「積立からの取崩し(3)」以外の場合、収入金額の収支登録情報(セッション情報)となるので値nullの積立金取崩金額を生成して返却
 		return NULL;
 	}
-	
+
 	/**
 	 *<pre>
 	 * 積立金取崩金額の値(BigDecimal)を返します。値がnullの場合、値0のBigDecimalを返します。
@@ -116,11 +116,35 @@ public class WithdrewKingaku {
 	}
 
 	/**
+	 *<pre>
+	 * 金額を画面表示用にフォーマットします。
+	 * スケール0で四捨五入し、カンマ区切り+円表記の文字列を返却します。
+	 * null値の場合は空文字列を返却します。
+	 *</pre>
+	 * @return フォーマット済み文字列（例: "10,000円"）。null値の場合は空文字列
+	 *
+	 */
+	public String toFormatString() {
+		// null値の場合は空文字列を返却
+		if(value == null) {
+			return "";
+		}
+		// スケール0で四捨五入
+		long roundedValue = value.setScale(0, RoundingMode.HALF_UP).longValue();
+		// カンマ区切り+円表記
+		return String.format("%,d円", roundedValue);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String toString() {
-		// スケール0で四捨五入+カンマ編集した文字列を返却(nullの場合、空文字列を返却)
-		return DomainCommonUtils.formatKingakuAndYen(value);
+		// 値の文字列表現を返却（デバッグ用）
+		// null値の場合は空文字列を返却
+		if(value == null) {
+			return "";
+		}
+		return value.toString();
 	}
 }

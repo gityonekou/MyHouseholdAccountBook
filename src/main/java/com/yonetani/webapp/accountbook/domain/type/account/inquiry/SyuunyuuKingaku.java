@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2023/10/15 : 1.00.00  新規作成
+ * 2025/12/14 : 1.01.00  Money基底クラス継承に変更
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
@@ -14,17 +15,18 @@ import java.util.Objects;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
+import com.yonetani.webapp.accountbook.domain.type.common.Money;
 import com.yonetani.webapp.accountbook.presentation.session.IncomeRegistItem;
 
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  *<pre>
  * 「収入金額」項目の値を表すドメインタイプです
+ *
+ * [ビジネスルール]
+ * ・収入金額は0以上の値である必要があります
+ * ・マイナスの収入金額は許可されません
  *
  *</pre>
  *
@@ -32,19 +34,27 @@ import lombok.RequiredArgsConstructor;
  * @since 家計簿アプリ(1.00.A)
  *
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-@EqualsAndHashCode
-public class SyuunyuuKingaku {
-	// 収入金額
-	private final BigDecimal value;
+@EqualsAndHashCode(callSuper = true)
+public class SyuunyuuKingaku extends Money {
+
 	// 値が0の「収入金額」項目の値
 	public static final SyuunyuuKingaku ZERO = SyuunyuuKingaku.from(BigDecimal.ZERO.setScale(2));
-	
+
+	/**
+	 *<pre>
+	 * コンストラクタ（privateでファクトリメソッド経由のみ生成可能）
+	 *</pre>
+	 * @param value 収入金額
+	 *
+	 */
+	private SyuunyuuKingaku(BigDecimal value) {
+		super(value);
+	}
+
 	/**
 	 *<pre>
 	 * 「収入金額」項目の値を表すドメインタイプを生成します
-	 * 
+	 *
 	 * [ガード節]
 	 * ・null値
 	 * ・マイナス値
@@ -55,19 +65,15 @@ public class SyuunyuuKingaku {
 	 *
 	 */
 	public static SyuunyuuKingaku from(BigDecimal syuunyuuKingaku) {
-		// ガード節(null)
-		if(syuunyuuKingaku == null) {
-			throw new MyHouseholdAccountBookRuntimeException("「収入金額」項目の設定値がnullです。管理者に問い合わせてください。");
-		}
+		// 基本検証（null、スケール）
+		Money.validate(syuunyuuKingaku, "収入金額");
+
 		// ガード節(マイナス値)
 		if(BigDecimal.ZERO.compareTo(syuunyuuKingaku) > 0) {
-			throw new MyHouseholdAccountBookRuntimeException("「収入金額」項目の設定値がマイナスです。管理者に問い合わせてください。[value=" + syuunyuuKingaku.intValue() + "]");
+			throw new MyHouseholdAccountBookRuntimeException(
+				"「収入金額」項目の設定値がマイナスです。管理者に問い合わせてください。[value=" + syuunyuuKingaku.intValue() + "]");
 		}
-		// ガード節(スケール値が2以外)
-		if(syuunyuuKingaku.scale() != 2) {
-			throw new MyHouseholdAccountBookRuntimeException("「収入金額」項目のスケール値が不正です。管理者に問い合わせてください。[scale=" + syuunyuuKingaku.scale() + "]");
-		}
-		
+
 		// 「収入金額」項目の値を生成して返却
 		return new SyuunyuuKingaku(syuunyuuKingaku);
 	}
@@ -94,14 +100,5 @@ public class SyuunyuuKingaku {
 		}
 		// 収支登録情報(セッション情報)の収入金額から「収入金額」項目の値を生成して返却
 		return new SyuunyuuKingaku(income.getIncomeKingaku());
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		// スケール0で四捨五入+カンマ編集した文字列を返却
-		return DomainCommonUtils.formatKingakuAndYen(value);
 	}
 }
