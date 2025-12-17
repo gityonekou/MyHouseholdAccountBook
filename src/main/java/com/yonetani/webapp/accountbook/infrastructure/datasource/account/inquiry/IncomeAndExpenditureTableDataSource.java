@@ -174,15 +174,15 @@ public class IncomeAndExpenditureTableDataSource implements IncomeAndExpenditure
 				// 対象年月
 				targetYearMonth,
 				// 収入金額
-				dto.getIncomeKingaku() != null ? SyuunyuuKingaku.from(dto.getIncomeKingaku()) : null,
+				SyuunyuuKingaku.from(dto.getIncomeKingaku()),
 				// 積立金取崩金額
-				dto.getWithdrewKingaku() != null ? WithdrewKingaku.from(dto.getWithdrewKingaku()) : null,
+				WithdrewKingaku.from(dto.getWithdrewKingaku()),
 				// 支出予定金額
-				dto.getExpenditureEstimateKingaku() != null ? SisyutuYoteiKingaku.from(dto.getExpenditureEstimateKingaku()) : null,
+				SisyutuYoteiKingaku.from(dto.getExpenditureEstimateKingaku()),
 				// 支出金額
-				dto.getExpenditureKingaku() != null ? SisyutuKingaku.from(dto.getExpenditureKingaku()) : null,
+				SisyutuKingaku.from(dto.getExpenditureKingaku()),
 				// 収支金額
-				dto.getIncomeAndExpenditureKingaku() != null ? SyuusiKingaku.from(dto.getIncomeAndExpenditureKingaku()) : null
+				SyuusiKingaku.from(dto.getIncomeAndExpenditureKingaku())
 		);
 	}
 }

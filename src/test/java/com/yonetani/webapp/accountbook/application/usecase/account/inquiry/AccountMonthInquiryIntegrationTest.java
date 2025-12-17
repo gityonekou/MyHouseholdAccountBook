@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2025/11/30 : 1.00.00  新規作成
+ * 2025/12/17 : 1.00.00  正常系テストケース追加（積立金取崩金額null）
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.inquiry;
@@ -36,9 +37,10 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  * [テストシナリオ]
  * 1. 正常系: データ存在、整合性OK（202511）
  * 2. 正常系: データなし（202512）
- * 3. 異常系: 収入金額不整合（202510）
- * 4. 異常系: 支出金額不整合（202509）
- * 5. 異常系: 収支データなし、支出データあり（202508）
+ * 3. 正常系: 積立金取崩金額なし（202601）
+ * 4. 異常系: 収入金額不整合（202510）
+ * 5. 異常系: 支出金額不整合（202509）
+ * 6. 異常系: 収支データなし、支出データあり（202508）
  *
  *</pre>
  *
@@ -129,6 +131,38 @@ class AccountMonthInquiryIntegrationTest {
         assertFalse(response.getMessagesList().isEmpty());
         assertTrue(response.getMessagesList().stream()
             .anyMatch(msg -> msg.contains("該当月の収支データがありません")));
+    }
+
+    @Test
+    @DisplayName("正常系：積立金取崩金額なし - 202601")
+    void testRead_NormalCase_NoWithdrewAmount() {
+        // Given: テストユーザ、対象年月202601（積立金取崩金額なし）
+        LoginUserInfo user = createLoginUser();
+        String targetYearMonth = "202601";
+
+        // When: 月次収支を照会
+        AccountMonthInquiryResponse response = useCase.read(user, targetYearMonth);
+
+        // Then: レスポンスが正しく返却される
+        assertNotNull(response);
+        assertNotNull(response.getTargetYearMonthInfo());
+        assertEquals("202601", response.getTargetYearMonthInfo().getTargetYearMonth());
+        assertTrue(response.isSyuusiDataFlg());
+
+        // Then: 収支データの検証
+        assertEquals("300,000円", response.getSyuunyuuKingaku());
+        assertEquals("240,000円", response.getSisyutuKingaku());
+        // WithdrewKingakuがnullの場合は空文字列として返却されることを検証
+        assertEquals("", response.getWithdrewKingaku());
+        assertEquals("250,000円", response.getSisyutuYoteiKingaku());
+        assertEquals("60,000円", response.getSyuusiKingaku());
+
+        // Then: 支出項目リストの検証
+        assertNotNull(response.getExpenditureItemList());
+        assertEquals(5, response.getExpenditureItemList().size());
+
+        // Then: メッセージなし
+        assertTrue(response.getMessagesList().isEmpty() || response.getMessagesList().size() == 0);
     }
 
     // ========================================
