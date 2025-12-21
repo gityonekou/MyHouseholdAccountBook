@@ -20,7 +20,7 @@ import java.util.Map;
 import com.yonetani.webapp.accountbook.common.component.SisyutuItemComponent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuB;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuC;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKubun;
@@ -96,7 +96,7 @@ public class SisyutuKingakuItemHolder {
 		// 支出金額の増減フラグ
 		private final int sisyutuKingakuFlg;
 		// 支出金額増減値
-		private final SisyutuKingaku sisyutuKingaku;
+		private final ExpenditureAmount sisyutuKingaku;
 		// 支出金額Bの増減フラグ
 		private final int sisyutuKingakuBFlg;
 		// 支出金額B増減値
@@ -126,7 +126,7 @@ public class SisyutuKingakuItemHolder {
 					 ? FLG_SUBTRACT : FLG_ADD;
 			
 			// 支出金額増減値
-			SisyutuKingaku zougenti = SisyutuKingaku.from(
+			ExpenditureAmount zougenti = ExpenditureAmount.from(
 					beforeData.getSisyutuKingaku().getValue().subtract(afterData.getSisyutuKingaku().getValue()).abs());
 			
 			// 支出B、支出C加減算初期値
@@ -430,7 +430,7 @@ public class SisyutuKingakuItemHolder {
 		// 前のデータの値を減算しホルダーに登録
 		try {
 			// 支出金額=前の値+加減算するの値
-			SisyutuKingaku sisyutuKingaku = null;
+			ExpenditureAmount sisyutuKingaku = null;
 			if(sabunData.getSisyutuKingakuFlg() == FLG_ADD) {
 				sisyutuKingaku = beforeItem.getSisyutuKingaku().add(sabunData.getSisyutuKingaku());
 			} else {

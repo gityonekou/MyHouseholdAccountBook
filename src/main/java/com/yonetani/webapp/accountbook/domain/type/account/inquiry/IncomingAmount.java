@@ -12,6 +12,7 @@ package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
 
 import java.math.BigDecimal;
 
+import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 
@@ -41,29 +42,29 @@ public class IncomingAmount {
 	/**
 	 *<pre>
 	 * 「入り金額」項目の値を表すドメインタイプを生成します。
-	 * 
+	 *
 	 * [ガード節]
 	 * ・収入金額項目、積立金取崩金額項目がnull値
 	 * （注意：積立金取崩金額項目の値自体はnull値を許容しています。)
-	 * 
+	 *
 	 *</pre>
-	 * @param syuunyuuKingaku 収入金額項目の値
+	 * @param incomeAmount 収入金額項目の値
 	 * @param withdrewKingaku 積立金取崩金額項目の値
 	 * @return 「入り金額」項目ドメインタイプ
 	 *
 	 */
-	public static IncomingAmount from(SyuunyuuKingaku syuunyuuKingaku, WithdrewKingaku withdrewKingaku) {
+	public static IncomingAmount from(IncomeAmount incomeAmount, WithdrewKingaku withdrewKingaku) {
 		// ガード節(収入金額項目=null)
-		if(syuunyuuKingaku == null) {
-			throw new MyHouseholdAccountBookRuntimeException("「入り金額」項目の設定値がnullです。管理者に問い合わせてください。[syuunyuuKingaku=null]");
+		if(incomeAmount == null) {
+			throw new MyHouseholdAccountBookRuntimeException("「入り金額」項目の設定値がnullです。管理者に問い合わせてください。[incomeAmount=null]");
 		}
 		// ガード節(収入金額項目=null)
 		if(withdrewKingaku == null) {
 			throw new MyHouseholdAccountBookRuntimeException("「入り金額」項目の設定値がnullです。管理者に問い合わせてください。[withdrewKingaku=null]");
 		}
-		
+
 		// 収入金額 + 積立金取崩金額の値で「入り金額」項目の値を生成して返却
-		return new IncomingAmount(syuunyuuKingaku.getValue().add(withdrewKingaku.getNullSafeValue()));
+		return new IncomingAmount(incomeAmount.getValue().add(withdrewKingaku.getNullSafeValue()));
 	}
 	
 	/**

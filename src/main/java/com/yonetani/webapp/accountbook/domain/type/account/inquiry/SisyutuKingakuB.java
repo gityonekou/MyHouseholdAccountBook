@@ -12,6 +12,7 @@ package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 
@@ -129,27 +130,27 @@ public class SisyutuKingakuB {
 	 *<pre>
 	 * 支出金額Bの値が支出金額の何パーセントかを取得。小数点以下0桁で四捨五入
 	 * 値がnull(支払金額B項目の値なし)の場合、空文字列を返却
-	 * 
+	 *
 	 * [ガード節]
 	 * ・引数で指定した支出金額がnull値
-	 * 
+	 *
 	 *</pre>
-	 * @param sisyutuKingaku 支出金額Bの割合算出用の支出金額の値
+	 * @param expenditureAmount 支出金額Bの割合算出用の支出金額の値
 	 * @return 支出金額Bの割合(文字列)
 	 *
 	 */
-	public String getPercentage(SisyutuKingaku sisyutuKingaku) {
+	public String getPercentage(ExpenditureAmount expenditureAmount) {
 		// ガード節(支出金額がnull値)
-		if(sisyutuKingaku == null) {
-			throw new MyHouseholdAccountBookRuntimeException("支出金額がnull値です。管理者に問い合わせてください。[sisyutuKingaku=null]");
+		if(expenditureAmount == null) {
+			throw new MyHouseholdAccountBookRuntimeException("支出金額がnull値です。管理者に問い合わせてください。[expenditureAmount=null]");
 		}
 		// 支出金額Bの値がnullか0の場合、空文字列を返却
 		if(value == null || ZERO.getValue().compareTo(value) >= 0) {
 			return "";
 		}
-		
+
 		// 支出金額Bの割合=支出金額B/支出金額 * 100(四捨五入)
-		BigDecimal pt = value.divide(sisyutuKingaku.getValue(), 2, RoundingMode.HALF_UP).multiply(DomainCommonUtils.ONE_HUNDRED_BIGDECIMAL);
+		BigDecimal pt = value.divide(expenditureAmount.getValue(), 2, RoundingMode.HALF_UP).multiply(DomainCommonUtils.ONE_HUNDRED_BIGDECIMAL);
 		// スケール0で四捨五入した文字列を返却
 		return pt.setScale(0, RoundingMode.HALF_UP).toPlainString();
 	}

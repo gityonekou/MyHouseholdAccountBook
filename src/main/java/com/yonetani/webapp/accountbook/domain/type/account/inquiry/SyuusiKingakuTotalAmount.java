@@ -79,7 +79,7 @@ public class SyuusiKingakuTotalAmount {
 	 * @return 加算した収支金額合計の値(this + addValue)
 	 *
 	 */
-	public SyuusiKingakuTotalAmount add(SyuusiKingaku addValue) {
+	public SyuusiKingakuTotalAmount add(com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount addValue) {
 		return new SyuusiKingakuTotalAmount(this.value.add(addValue.getValue()));
 	}
 	

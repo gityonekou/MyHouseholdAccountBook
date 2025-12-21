@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 
 /**
@@ -105,7 +106,7 @@ class SisyutuKingakuTotalAmountTest {
 	@DisplayName("正常系：支出金額から生成できる")
 	void testFrom_正常系_支出金額から() {
 		// 準備
-		SisyutuKingaku expenditure = SisyutuKingaku.from(new BigDecimal("10000.00"));
+		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("10000.00"));
 
 		// 実行
 		SisyutuKingakuTotalAmount total = SisyutuKingakuTotalAmount.from(expenditure);
@@ -120,7 +121,7 @@ class SisyutuKingakuTotalAmountTest {
 	void testAdd_正常系() {
 		// 準備
 		SisyutuKingakuTotalAmount total = SisyutuKingakuTotalAmount.from(new BigDecimal("10000.00"));
-		SisyutuKingaku add = SisyutuKingaku.from(new BigDecimal("5000.00"));
+		ExpenditureAmount add = ExpenditureAmount.from(new BigDecimal("5000.00"));
 
 		// 実行
 		SisyutuKingakuTotalAmount result = total.add(add);

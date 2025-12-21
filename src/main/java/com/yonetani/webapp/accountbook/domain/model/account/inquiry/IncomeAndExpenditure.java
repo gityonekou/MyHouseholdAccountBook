@@ -11,12 +11,12 @@ package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
 
 import java.util.Objects;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingaku;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuusiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
@@ -66,15 +66,15 @@ public class IncomeAndExpenditure {
 	// 対象年月
 	private final TargetYearMonth targetYearMonth;
 	// 収入金額
-	private final SyuunyuuKingaku incomeAmount;
+	private final IncomeAmount incomeAmount;
 	// 積立金取崩金額
 	private final WithdrewKingaku withdrewAmount;
 	// 支出予定金額
 	private final SisyutuYoteiKingaku estimatedExpenditureAmount;
 	// 支出金額
-	private final SisyutuKingaku expenditureAmount;
+	private final ExpenditureAmount expenditureAmount;
 	// 収支金額
-	private final SyuusiKingaku balanceAmount;
+	private final BalanceAmount balanceAmount;
 
 	/**
 	 *<pre>
@@ -105,11 +105,11 @@ public class IncomeAndExpenditure {
 	public static IncomeAndExpenditure reconstruct(
 			UserId userId,
 			TargetYearMonth targetYearMonth,
-			SyuunyuuKingaku incomeAmount,
+			IncomeAmount incomeAmount,
 			WithdrewKingaku withdrewAmount,
 			SisyutuYoteiKingaku estimatedExpenditureAmount,
-			SisyutuKingaku expenditureAmount,
-			SyuusiKingaku balanceAmount) {
+			ExpenditureAmount expenditureAmount,
+			BalanceAmount balanceAmount) {
 
 		// 不変条件の検証
 		Objects.requireNonNull(userId, "userId must not be null");
@@ -179,7 +179,7 @@ public class IncomeAndExpenditure {
 	 *
 	 */
 	public SyuunyuuKingakuTotalAmount getTotalIncome() {
-		SyuunyuuKingaku income = incomeAmount != null ? incomeAmount : SyuunyuuKingaku.ZERO;
+		IncomeAmount income = incomeAmount != null ? incomeAmount : IncomeAmount.ZERO;
 		WithdrewKingaku withdrew = withdrewAmount != null ? withdrewAmount : WithdrewKingaku.ZERO;
 		return SyuunyuuKingakuTotalAmount.from(income, withdrew);
 	}

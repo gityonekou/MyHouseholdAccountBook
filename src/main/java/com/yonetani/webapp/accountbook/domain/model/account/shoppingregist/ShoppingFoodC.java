@@ -13,7 +13,7 @@ package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
 import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCTaxExpenses;
@@ -39,7 +39,7 @@ import lombok.RequiredArgsConstructor;
 @EqualsAndHashCode
 public class ShoppingFoodC {
 	// 食料品C(お酒類)金額
-	private final SisyutuKingaku value;
+	private final ExpenditureAmount value;
 	// 残クーポン額
 	private final ShoppingCouponPrice residualCouponPrice;
 	
@@ -84,31 +84,31 @@ public class ShoppingFoodC {
 		
 		// 食料品C(お酒類)金額がnull値の場合、null値を持った「食料品C(お酒類)」項目を生成
 		if(expenses.getValue() == null) {
-			return new ShoppingFoodC(SisyutuKingaku.ZERO, couponPrice);
+			return new ShoppingFoodC(ExpenditureAmount.ZERO, couponPrice);
 		}
-		
+
 		// 食料品C(お酒類)金額を計算
 		BigDecimal foodValue = (taxExpenses.getValue() == null) ? expenses.getValue() : expenses.getValue().add(taxExpenses.getValue());
-		
+
 		// クーポン指定なしなら割引適応なしで食料品C(お酒類)を生成
 		if(couponPrice.getValue() == null) {
-			return new ShoppingFoodC(SisyutuKingaku.from(foodValue), ShoppingCouponPrice.from(null));
+			return new ShoppingFoodC(ExpenditureAmount.from(foodValue), ShoppingCouponPrice.from(null));
 		}
-		
+
 		// 食料品C(お酒類)金額からクーポン金額を割引
 		BigDecimal discountValue = foodValue.add(couponPrice.getValue());
-		
+
 		// 割引後の金額がマイナス値)：食料品C(お酒類)金額は割引適応でなし。残クーポン値は食料品C(お酒類)金額の値(マイナス値)
 		int compareToValue = BigDecimal.ZERO.compareTo(discountValue);
 		if (compareToValue > 0) {
-			return new ShoppingFoodC(SisyutuKingaku.ZERO, ShoppingCouponPrice.from(discountValue));
+			return new ShoppingFoodC(ExpenditureAmount.ZERO, ShoppingCouponPrice.from(discountValue));
 		}
 		// 割引後の金額が0)：食料品C(お酒類)金額は割引適応でなし。残クーポン値もなし
 		if (compareToValue == 0) {
-			return new ShoppingFoodC(SisyutuKingaku.ZERO, ShoppingCouponPrice.from(null));
+			return new ShoppingFoodC(ExpenditureAmount.ZERO, ShoppingCouponPrice.from(null));
 		}
 		// 割引後の金額が0より大きい)：食料品C(お酒類)金額は割引適応後の値。残クーポン値はなし
-		return new ShoppingFoodC(SisyutuKingaku.from(discountValue), ShoppingCouponPrice.from(null));
+		return new ShoppingFoodC(ExpenditureAmount.from(discountValue), ShoppingCouponPrice.from(null));
 		
 	}
 	
@@ -123,6 +123,6 @@ public class ShoppingFoodC {
 	 *
 	 */
 	public boolean hasSisyutuKingaku() {
-		return !value.equals(SisyutuKingaku.ZERO);
+		return !value.equals(ExpenditureAmount.ZERO);
 	}
 }

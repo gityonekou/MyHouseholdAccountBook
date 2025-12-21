@@ -14,6 +14,7 @@ package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
 import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.Money;
 
 import lombok.EqualsAndHashCode;
@@ -86,7 +87,7 @@ public class SyuunyuuKingakuTotalAmount extends Money {
 	 * @return 「収入金額合計」項目ドメインタイプ
 	 *
 	 */
-	public static SyuunyuuKingakuTotalAmount from(SyuunyuuKingaku income, WithdrewKingaku withdrew) {
+	public static SyuunyuuKingakuTotalAmount from(IncomeAmount income, WithdrewKingaku withdrew) {
 		// ガード節(収入金額がnull)
 		if(income == null) {
 			throw new MyHouseholdAccountBookRuntimeException("収入金額の設定値がnullです。管理者に問い合わせてください。");
@@ -103,7 +104,7 @@ public class SyuunyuuKingakuTotalAmount extends Money {
 		// 「収入金額合計」項目の値を生成して返却
 		return new SyuunyuuKingakuTotalAmount(totalAmount);
 	}
-	
+
 	/**
 	 *<pre>
 	 * 収入金額合計の値を指定した収入金額の値で加算(this + addValue)した値を返します。
@@ -112,7 +113,7 @@ public class SyuunyuuKingakuTotalAmount extends Money {
 	 * @return 加算した収入金額合計の値(this + addValue)
 	 *
 	 */
-	public SyuunyuuKingakuTotalAmount add(SyuunyuuKingaku addValue) {
+	public SyuunyuuKingakuTotalAmount add(IncomeAmount addValue) {
 		return new SyuunyuuKingakuTotalAmount(super.add(addValue));
 	}
 }

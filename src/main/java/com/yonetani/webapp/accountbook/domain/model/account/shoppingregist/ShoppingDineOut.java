@@ -13,7 +13,7 @@ package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
 import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutTaxExpenses;
@@ -39,7 +39,7 @@ import lombok.RequiredArgsConstructor;
 @EqualsAndHashCode
 public class ShoppingDineOut {
 	// 外食金額
-	private final SisyutuKingaku value;
+	private final ExpenditureAmount value;
 	// 残クーポン額
 	private final ShoppingCouponPrice residualCouponPrice;
 	
@@ -84,31 +84,31 @@ public class ShoppingDineOut {
 		
 		// 外食金額がnull値の場合、null値を持った「外食」項目を生成
 		if(expenses.getValue() == null) {
-			return new ShoppingDineOut(SisyutuKingaku.ZERO, couponPrice);
+			return new ShoppingDineOut(ExpenditureAmount.ZERO, couponPrice);
 		}
-		
+
 		// 外食金額を計算
 		BigDecimal dineOutValue = (taxExpenses.getValue() == null) ? expenses.getValue() : expenses.getValue().add(taxExpenses.getValue());
-		
+
 		// クーポン指定なしなら割引適応なしで外食を生成
 		if(couponPrice.getValue() == null) {
-			return new ShoppingDineOut(SisyutuKingaku.from(dineOutValue), ShoppingCouponPrice.from(null));
+			return new ShoppingDineOut(ExpenditureAmount.from(dineOutValue), ShoppingCouponPrice.from(null));
 		}
-		
+
 		// 外食金額からクーポン金額を割引
 		BigDecimal discountValue = dineOutValue.add(couponPrice.getValue());
-		
+
 		// 割引後の金額がマイナス値)：外食金額は割引適応でなし。残クーポン値は外食金額の値(マイナス値)
 		int compareToValue = BigDecimal.ZERO.compareTo(discountValue);
 		if (compareToValue > 0) {
-			return new ShoppingDineOut(SisyutuKingaku.ZERO, ShoppingCouponPrice.from(discountValue));
+			return new ShoppingDineOut(ExpenditureAmount.ZERO, ShoppingCouponPrice.from(discountValue));
 		}
 		// 割引後の金額が0)：外食金額は割引適応でなし。残クーポン値もなし
 		if (compareToValue == 0) {
-			return new ShoppingDineOut(SisyutuKingaku.ZERO, ShoppingCouponPrice.from(null));
+			return new ShoppingDineOut(ExpenditureAmount.ZERO, ShoppingCouponPrice.from(null));
 		}
 		// 割引後の金額が0より大きい)：外食金額は割引適応後の値。残クーポン値はなし
-		return new ShoppingDineOut(SisyutuKingaku.from(discountValue), ShoppingCouponPrice.from(null));
+		return new ShoppingDineOut(ExpenditureAmount.from(discountValue), ShoppingCouponPrice.from(null));
 		
 	}
 	
@@ -123,6 +123,6 @@ public class ShoppingDineOut {
 	 *
 	 */
 	public boolean hasSisyutuKingaku() {
-		return !value.equals(SisyutuKingaku.ZERO);
+		return !value.equals(ExpenditureAmount.ZERO);
 	}
 }

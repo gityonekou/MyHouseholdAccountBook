@@ -19,7 +19,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExp
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
 
@@ -150,7 +150,7 @@ public class IncomeAndExpenditureConsistencyService {
 			expenditureRepository.sumExpenditureKingaku(searchCondition);
 
 		// 収支集約から期待値を取得
-		SisyutuKingaku expectedAmount = aggregate.getExpenditureAmount();
+		ExpenditureAmount expectedAmount = aggregate.getExpenditureAmount();
 
 		// 整合性チェック（値オブジェクト同士で比較）
 		if (expectedAmount != null) {

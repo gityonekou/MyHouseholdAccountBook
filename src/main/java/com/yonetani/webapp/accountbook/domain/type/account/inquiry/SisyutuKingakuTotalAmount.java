@@ -13,6 +13,7 @@ package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
 import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.Money;
 
 import lombok.EqualsAndHashCode;
@@ -81,7 +82,7 @@ public class SisyutuKingakuTotalAmount extends Money {
 	 * @return 「支出金額合計」項目ドメインタイプ
 	 *
 	 */
-	public static SisyutuKingakuTotalAmount from(SisyutuKingaku expenditure) {
+	public static SisyutuKingakuTotalAmount from(ExpenditureAmount expenditure) {
 		// ガード節(支出金額がnull)
 		if(expenditure == null) {
 			throw new MyHouseholdAccountBookRuntimeException("支出金額の設定値がnullです。管理者に問い合わせてください。");
@@ -99,7 +100,7 @@ public class SisyutuKingakuTotalAmount extends Money {
 	 * @return 加算した支出金額合計の値(this + addValue)
 	 *
 	 */
-	public SisyutuKingakuTotalAmount add(SisyutuKingaku addValue) {
+	public SisyutuKingakuTotalAmount add(ExpenditureAmount addValue) {
 		return new SisyutuKingakuTotalAmount(super.add(addValue));
 	}
 }

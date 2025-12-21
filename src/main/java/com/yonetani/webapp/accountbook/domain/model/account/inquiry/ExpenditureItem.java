@@ -19,7 +19,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ShiharaiDate;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKubun;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuName;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingaku;
@@ -75,7 +75,7 @@ public class ExpenditureItem {
 	// 支出予定金額
 	private final SisyutuYoteiKingaku sisyutuYoteiKingaku;
 	// 支出金額
-	private final SisyutuKingaku sisyutuKingaku;
+	private final ExpenditureAmount sisyutuKingaku;
 	// 削除フラグ
 	private final DeleteFlg deleteFlg;
 	
@@ -133,7 +133,7 @@ public class ExpenditureItem {
 				SisyutuDetailContext.from(sisyutuDetailContext),
 				ShiharaiDate.from(shiharaiDate),
 				SisyutuYoteiKingaku.from(sisyutuYoteiKingaku),
-				SisyutuKingaku.from(sisyutuKingaku),
+				ExpenditureAmount.from(sisyutuKingaku),
 				DeleteFlg.from(deleteFlg));
 		
 	}
@@ -196,7 +196,7 @@ public class ExpenditureItem {
 	 * @return 支出金額を加算した支出テーブル情報(ドメイン)情報
 	 *
 	 */
-	public ExpenditureItem addSisyutuKingaku(SisyutuKingaku addValue) {
+	public ExpenditureItem addSisyutuKingaku(ExpenditureAmount addValue) {
 		// 支出テーブル情報(ドメイン)を生成して返却
 		return ExpenditureItem.from(
 				// ユーザID
@@ -236,7 +236,7 @@ public class ExpenditureItem {
 	 * @return 支出金額を減算した支出テーブル情報(ドメイン)情報
 	 *
 	 */
-	public ExpenditureItem subtractSisyutuKingaku(SisyutuKingaku subtractValue) {
+	public ExpenditureItem subtractSisyutuKingaku(ExpenditureAmount subtractValue) {
 		// 支出テーブル情報(ドメイン)を生成して返却
 		return ExpenditureItem.from(
 				// ユーザID

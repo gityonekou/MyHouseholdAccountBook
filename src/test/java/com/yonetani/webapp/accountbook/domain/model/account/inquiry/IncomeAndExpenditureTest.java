@@ -11,11 +11,11 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingaku;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuusiKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingaku;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
@@ -38,11 +38,11 @@ class IncomeAndExpenditureTest {
 		// 準備
 		UserId userId = UserId.from("user01");
 		TargetYearMonth yearMonth = TargetYearMonth.from("202511");
-		SyuunyuuKingaku income = SyuunyuuKingaku.from(new BigDecimal("350000.00"));
+		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
 		WithdrewKingaku withdrew = WithdrewKingaku.from(new BigDecimal("50000.00"));
 		SisyutuYoteiKingaku estimatedExpenditure = SisyutuYoteiKingaku.from(new BigDecimal("300000.00"));
-		SisyutuKingaku expenditure = SisyutuKingaku.from(new BigDecimal("280000.00"));
-		SyuusiKingaku balance = SyuusiKingaku.from(new BigDecimal("120000.00"));
+		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("280000.00"));
+		BalanceAmount balance = BalanceAmount.from(new BigDecimal("120000.00"));
 
 		// 実行
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
@@ -72,10 +72,10 @@ class IncomeAndExpenditureTest {
 		// 準備
 		UserId userId = UserId.from("user01");
 		TargetYearMonth yearMonth = TargetYearMonth.from("202509");
-		SyuunyuuKingaku income = SyuunyuuKingaku.from(new BigDecimal("400000.00"));
+		IncomeAmount income = IncomeAmount.from(new BigDecimal("400000.00"));
 		SisyutuYoteiKingaku estimatedExpenditure = SisyutuYoteiKingaku.from(new BigDecimal("270000.00"));
-		SisyutuKingaku expenditure = SisyutuKingaku.from(new BigDecimal("250000.00"));
-		SyuusiKingaku balance = SyuusiKingaku.from(new BigDecimal("150000.00"));
+		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("250000.00"));
+		BalanceAmount balance = BalanceAmount.from(new BigDecimal("150000.00"));
 
 		// 実行
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
@@ -99,7 +99,7 @@ class IncomeAndExpenditureTest {
 	void testReconstruct_UserIdNull_ThrowsException() {
 		// 準備
 		TargetYearMonth yearMonth = TargetYearMonth.from("202511");
-		SyuunyuuKingaku income = SyuunyuuKingaku.from(new BigDecimal("350000.00"));
+		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
 
 		// 実行 & 検証
 		assertThrows(NullPointerException.class, () -> {
@@ -120,7 +120,7 @@ class IncomeAndExpenditureTest {
 	void testReconstruct_TargetYearMonthNull_ThrowsException() {
 		// 準備
 		UserId userId = UserId.from("user01");
-		SyuunyuuKingaku income = SyuunyuuKingaku.from(new BigDecimal("350000.00"));
+		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
 
 		// 実行 & 検証
 		assertThrows(NullPointerException.class, () -> {
@@ -189,7 +189,7 @@ class IncomeAndExpenditureTest {
 		// 準備
 		UserId userId = UserId.from("user01");
 		TargetYearMonth yearMonth = TargetYearMonth.from("202511");
-		SyuunyuuKingaku income = SyuunyuuKingaku.from(new BigDecimal("350000.00"));
+		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
 		WithdrewKingaku withdrew = WithdrewKingaku.from(new BigDecimal("50000.00"));
 
 		// 実行
@@ -208,7 +208,7 @@ class IncomeAndExpenditureTest {
 		// 準備
 		UserId userId = UserId.from("user01");
 		TargetYearMonth yearMonth = TargetYearMonth.from("202509");
-		SyuunyuuKingaku income = SyuunyuuKingaku.from(new BigDecimal("400000.00"));
+		IncomeAmount income = IncomeAmount.from(new BigDecimal("400000.00"));
 
 		// 実行
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
@@ -241,7 +241,7 @@ class IncomeAndExpenditureTest {
 		// 準備
 		UserId userId = UserId.from("user01");
 		TargetYearMonth yearMonth = TargetYearMonth.from("202511");
-		SyuunyuuKingaku income = SyuunyuuKingaku.from(new BigDecimal("350000.00"));
+		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
 
 		// 実行
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
@@ -274,7 +274,7 @@ class IncomeAndExpenditureTest {
 		// 準備
 		UserId userId = UserId.from("user01");
 		TargetYearMonth yearMonth = TargetYearMonth.from("202511");
-		SyuunyuuKingaku income = SyuunyuuKingaku.from(new BigDecimal("350000.00"));
+		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
 		WithdrewKingaku withdrew = WithdrewKingaku.from(new BigDecimal("50000.00"));
 
 		// 実行
@@ -297,7 +297,7 @@ class IncomeAndExpenditureTest {
 		UserId userId = UserId.from("user01");
 		TargetYearMonth yearMonth1 = TargetYearMonth.from("202511");
 		TargetYearMonth yearMonth2 = TargetYearMonth.from("202509");
-		SyuunyuuKingaku income = SyuunyuuKingaku.from(new BigDecimal("350000.00"));
+		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
 
 		// 実行
 		IncomeAndExpenditure aggregate1 = IncomeAndExpenditure.reconstruct(

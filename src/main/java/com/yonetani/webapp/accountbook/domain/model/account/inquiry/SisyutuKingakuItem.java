@@ -14,7 +14,7 @@ import java.time.LocalDate;
 
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ParentSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuB;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuC;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuShiharaiDate;
@@ -58,7 +58,7 @@ public class SisyutuKingakuItem {
 	// 支出予定金額
 	private final SisyutuYoteiKingaku sisyutuYoteiKingaku;
 	// 支出金額
-	private final SisyutuKingaku sisyutuKingaku;
+	private final ExpenditureAmount sisyutuKingaku;
 	// 支出金額B
 	private final SisyutuKingakuB sisyutuKingakuB;
 	// 支出金額C
@@ -102,7 +102,7 @@ public class SisyutuKingakuItem {
 				SisyutuItemCode.from(sisyutuItemCode),
 				ParentSisyutuItemCode.from(parentSisyutuItemCode),
 				SisyutuYoteiKingaku.from(sisyutuYoteiKingaku),
-				SisyutuKingaku.from(sisyutuKingaku),
+				ExpenditureAmount.from(sisyutuKingaku),
 				SisyutuKingakuB.from(sisyutuKingakuB),
 				SisyutuKingakuC.from(sisyutuKingakuC),
 				SisyutuShiharaiDate.from(sisyutushiharaiDate));

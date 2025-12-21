@@ -20,7 +20,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ShiharaiDate;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemLevel;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemName;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuB;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuBC;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuC;
@@ -67,7 +67,7 @@ public class AccountMonthInquiryExpenditureItemList {
 		// 支出項目レベル(1～5)
 		private final SisyutuItemLevel sisyutuItemLevel;
 		// 支出金額
-		private final SisyutuKingaku sisyutuKingaku;
+		private final ExpenditureAmount sisyutuKingaku;
 		// 支出金額B
 		private final SisyutuKingakuB sisyutuKingakuB;
 		// 支出金額C
@@ -107,7 +107,7 @@ public class AccountMonthInquiryExpenditureItemList {
 					SisyutuItemCode.from(sisyutuItemCode),
 					SisyutuItemName.from(sisyutuItemName),
 					SisyutuItemLevel.from(sisyutuItemLevel),
-					SisyutuKingaku.from(sisyutuKingaku),
+					ExpenditureAmount.from(sisyutuKingaku),
 					kinbakuB,
 					kinbakuC,
 					kinbakuBC,

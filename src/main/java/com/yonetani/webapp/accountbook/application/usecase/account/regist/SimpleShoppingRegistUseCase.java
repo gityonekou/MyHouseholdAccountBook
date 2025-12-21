@@ -45,7 +45,7 @@ import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeA
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.shoppingregist.ShoppingRegistTableRepository;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
@@ -449,7 +449,7 @@ public class SimpleShoppingRegistUseCase {
 			couponResidualValue = houseEquipment.getResidualCouponPrice();
 			
 			// 収支テーブル情報に合計値を設定し更新情報とする
-			updSyuusiData = beforeSyuusiData.addSisyutuKingaku(SisyutuKingaku.from(addData.getShoppingTotalAmount().getValue()));
+			updSyuusiData = beforeSyuusiData.addSisyutuKingaku(ExpenditureAmount.from(addData.getShoppingTotalAmount().getValue()));
 			
 			// 完了メッセージ
 			response.addMessage("買い物情報を新規登録しました。[code:" + addData.getShoppingRegistCode() + "]");
@@ -642,7 +642,7 @@ public class SimpleShoppingRegistUseCase {
 			// 更新前・更新後の合計金額差額を収支テーブルの支出金額の値に反映
 			int comp = beforeData.getShoppingTotalAmount().getValue().compareTo(updData.getShoppingTotalAmount().getValue());
 			// 支出金額増減値
-			SisyutuKingaku zougenti = SisyutuKingaku.from(beforeData.getShoppingTotalAmount().getValue().subtract(updData.getShoppingTotalAmount().getValue()).abs());
+			ExpenditureAmount zougenti = ExpenditureAmount.from(beforeData.getShoppingTotalAmount().getValue().subtract(updData.getShoppingTotalAmount().getValue()).abs());
 			if(comp > 0) {
 				updSyuusiData = beforeSyuusiData.subtractSisyutuKingaku(zougenti);
 			}

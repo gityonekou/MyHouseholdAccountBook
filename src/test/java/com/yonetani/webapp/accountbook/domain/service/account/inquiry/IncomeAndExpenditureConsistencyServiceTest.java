@@ -27,10 +27,10 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExp
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
@@ -66,7 +66,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			SearchQueryUserIdAndYearMonth.from(userId, yearMonth);
 
 		// 収支集約：収入350,000 + 積立取崩50,000 = 合計400,000
-		SyuunyuuKingaku income = SyuunyuuKingaku.from(new BigDecimal("350000.00"));
+		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
 			userId, yearMonth, income,
 			com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingaku.from(new BigDecimal("50000.00")),
@@ -94,7 +94,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			SearchQueryUserIdAndYearMonth.from(userId, yearMonth);
 
 		// 収支集約：収入350,000 + 積立取崩50,000 = 合計400,000
-		SyuunyuuKingaku income = SyuunyuuKingaku.from(new BigDecimal("350000.00"));
+		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
 			userId, yearMonth, income,
 			com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingaku.from(new BigDecimal("50000.00")),
@@ -131,7 +131,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			SearchQueryUserIdAndYearMonth.from(userId, yearMonth);
 
 		// 収支集約：支出280,000
-		SisyutuKingaku expenditure = SisyutuKingaku.from(new BigDecimal("280000.00"));
+		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("280000.00"));
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
 			userId, yearMonth, null, null, null, expenditure, null
 		);
@@ -157,7 +157,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			SearchQueryUserIdAndYearMonth.from(userId, yearMonth);
 
 		// 収支集約：支出280,000
-		SisyutuKingaku expenditure = SisyutuKingaku.from(new BigDecimal("280000.00"));
+		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("280000.00"));
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
 			userId, yearMonth, null, null, null, expenditure, null
 		);
@@ -192,7 +192,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			SearchQueryUserIdAndYearMonth.from(userId, yearMonth);
 
 		// 収支集約：データあり
-		SyuunyuuKingaku income = SyuunyuuKingaku.from(new BigDecimal("350000.00"));
+		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
 			userId, yearMonth, income, null, null, null, null
 		);
@@ -215,7 +215,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			SearchQueryUserIdAndYearMonth.from(userId, yearMonth);
 
 		// 収支集約：データあり
-		SyuunyuuKingaku income = SyuunyuuKingaku.from(new BigDecimal("350000.00"));
+		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
 			userId, yearMonth, income, null, null, null, null
 		);
@@ -294,8 +294,8 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			SearchQueryUserIdAndYearMonth.from(userId, yearMonth);
 
 		// 収支集約：収入400,000、支出280,000
-		SyuunyuuKingaku income = SyuunyuuKingaku.from(new BigDecimal("350000.00"));
-		SisyutuKingaku expenditure = SisyutuKingaku.from(new BigDecimal("280000.00"));
+		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
+		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("280000.00"));
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
 			userId, yearMonth, income,
 			com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingaku.from(new BigDecimal("50000.00")),
@@ -326,8 +326,8 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			SearchQueryUserIdAndYearMonth.from(userId, yearMonth);
 
 		// 収支集約
-		SyuunyuuKingaku income = SyuunyuuKingaku.from(new BigDecimal("350000.00"));
-		SisyutuKingaku expenditure = SisyutuKingaku.from(new BigDecimal("280000.00"));
+		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
+		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("280000.00"));
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
 			userId, yearMonth, income,
 			com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingaku.from(new BigDecimal("50000.00")),
@@ -358,8 +358,8 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			SearchQueryUserIdAndYearMonth.from(userId, yearMonth);
 
 		// 収支集約
-		SyuunyuuKingaku income = SyuunyuuKingaku.from(new BigDecimal("350000.00"));
-		SisyutuKingaku expenditure = SisyutuKingaku.from(new BigDecimal("280000.00"));
+		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
+		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("280000.00"));
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
 			userId, yearMonth, income,
 			com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingaku.from(new BigDecimal("50000.00")),

@@ -213,7 +213,7 @@ public class AccountMonthInquiryUseCase {
 			// 支出予定金額
 			response.setSisyutuYoteiKingaku(incomeAndExpenditure.getEstimatedExpenditureAmount().toString());
 			// 収支金額
-			response.setSyuusiKingaku(incomeAndExpenditure.getBalanceAmount().toString());
+			response.setSyuusiKingaku(incomeAndExpenditure.getBalanceAmount().toFormatString());
 		}
 		
 		return response;

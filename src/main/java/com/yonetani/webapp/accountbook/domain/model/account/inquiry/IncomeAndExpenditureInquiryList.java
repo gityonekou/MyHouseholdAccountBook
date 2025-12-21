@@ -10,19 +10,19 @@
  */
 package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingakuTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuusiKingaku;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuusiKingakuTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingakuTotalAmount;
 
@@ -49,15 +49,15 @@ public class IncomeAndExpenditureInquiryList {
 	private final List<IncomeAndExpenditureItem> values;
 	
 	// 収入金額合計
-	private final SyuunyuuKingaku syuunyuuKingakuGoukei;
+	private final IncomeAmount syuunyuuKingakuGoukei;
 	// 積立金取崩金額
 	private final WithdrewKingaku withdrewKingakuGoukei;
 	// 支出予定金額合計
 	private final SisyutuYoteiKingaku sisyutuYoteiKingakuGoukei;
 	// 支出金額合計
-	private final SisyutuKingaku sisyutuKingakuGoukei;
+	private final ExpenditureAmount sisyutuKingakuGoukei;
 	// 収支合計
-	private final SyuusiKingaku syuusiKingakuGoukei;
+	private final BalanceAmount syuusiKingakuGoukei;
 	
 	/**
 	 *<pre>
@@ -71,33 +71,33 @@ public class IncomeAndExpenditureInquiryList {
 		if(CollectionUtils.isEmpty(values)) {
 			return new IncomeAndExpenditureInquiryList(
 					Collections.emptyList(),
-					SyuunyuuKingaku.ZERO,
+					IncomeAmount.ZERO,
 					WithdrewKingaku.NULL,
 					SisyutuYoteiKingaku.ZERO,
-					SisyutuKingaku.ZERO,
-					SyuusiKingaku.ZERO);
+					ExpenditureAmount.ZERO,
+					BalanceAmount.ZERO);
 		} else {
 			// 各種合計値を計算
 			SyuunyuuKingakuTotalAmount syuunyuuKingakuGoukei = SyuunyuuKingakuTotalAmount.ZERO;
 			WithdrewKingakuTotalAmount withdrewKingakuGoukei = WithdrewKingakuTotalAmount.NULL;
 			SisyutuYoteiKingakuTotalAmount sisyutuYoteiKingakuGoukei = SisyutuYoteiKingakuTotalAmount.ZERO;
 			SisyutuKingakuTotalAmount sisyutuKingakuGoukei = SisyutuKingakuTotalAmount.ZERO;
-			SyuusiKingakuTotalAmount syuusiKingakuGoukei = SyuusiKingakuTotalAmount.ZERO;
-			
+			BigDecimal syuusiKingakuGoukeiWk = BigDecimal.ZERO.setScale(2);
+
 			for(IncomeAndExpenditureItem item : values) {
 				syuunyuuKingakuGoukei = syuunyuuKingakuGoukei.add(item.getSyuunyuuKingaku());
 				withdrewKingakuGoukei = withdrewKingakuGoukei.add(item.getWithdrewKingaku());
 				sisyutuYoteiKingakuGoukei = sisyutuYoteiKingakuGoukei.add(item.getSisyutuYoteiKingaku());
 				sisyutuKingakuGoukei = sisyutuKingakuGoukei.add(item.getSisyutuKingaku());
-				syuusiKingakuGoukei = syuusiKingakuGoukei.add(item.getSyuusiKingaku());
+				syuusiKingakuGoukeiWk = syuusiKingakuGoukeiWk.add(item.getSyuusiKingaku().getValue());
 			}
 			return new IncomeAndExpenditureInquiryList(
 					values,
-					SyuunyuuKingaku.from(syuunyuuKingakuGoukei.getValue()),
+					IncomeAmount.from(syuunyuuKingakuGoukei.getValue()),
 					WithdrewKingaku.from(withdrewKingakuGoukei.getValue()),
 					SisyutuYoteiKingaku.from(sisyutuYoteiKingakuGoukei.getValue()),
-					SisyutuKingaku.from(sisyutuKingakuGoukei.getValue()),
-					SyuusiKingaku.from(syuusiKingakuGoukei.getValue()));
+					ExpenditureAmount.from(sisyutuKingakuGoukei.getValue()),
+					BalanceAmount.from(syuusiKingakuGoukeiWk));
 		}
 	}
 	/**

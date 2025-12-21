@@ -13,7 +13,7 @@ package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
 import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkTaxExpenses;
@@ -39,7 +39,7 @@ import lombok.RequiredArgsConstructor;
 @EqualsAndHashCode
 public class ShoppingWork {
 	// 仕事金額
-	private final SisyutuKingaku value;
+	private final ExpenditureAmount value;
 	// 残クーポン額
 	private final ShoppingCouponPrice residualCouponPrice;
 	
@@ -84,31 +84,31 @@ public class ShoppingWork {
 		
 		// 仕事金額がnull値の場合、null値を持った「仕事」項目を生成
 		if(expenses.getValue() == null) {
-			return new ShoppingWork(SisyutuKingaku.ZERO, couponPrice);
+			return new ShoppingWork(ExpenditureAmount.ZERO, couponPrice);
 		}
-		
+
 		// 仕事金額を計算
 		BigDecimal workValue = (taxExpenses.getValue() == null) ? expenses.getValue() : expenses.getValue().add(taxExpenses.getValue());
-		
+
 		// クーポン指定なしなら割引適応なしで仕事を生成
 		if(couponPrice.getValue() == null) {
-			return new ShoppingWork(SisyutuKingaku.from(workValue), ShoppingCouponPrice.from(null));
+			return new ShoppingWork(ExpenditureAmount.from(workValue), ShoppingCouponPrice.from(null));
 		}
-		
+
 		// 仕事金額からクーポン金額を割引
 		BigDecimal discountValue = workValue.add(couponPrice.getValue());
-		
+
 		// 割引後の金額がマイナス値)：仕事金額は割引適応でなし。残クーポン値は仕事金額の値(マイナス値)
 		int compareToValue = BigDecimal.ZERO.compareTo(discountValue);
 		if (compareToValue > 0) {
-			return new ShoppingWork(SisyutuKingaku.ZERO, ShoppingCouponPrice.from(discountValue));
+			return new ShoppingWork(ExpenditureAmount.ZERO, ShoppingCouponPrice.from(discountValue));
 		}
 		// 割引後の金額が0)：仕事金額は割引適応でなし。残クーポン値もなし
 		if (compareToValue == 0) {
-			return new ShoppingWork(SisyutuKingaku.ZERO, ShoppingCouponPrice.from(null));
+			return new ShoppingWork(ExpenditureAmount.ZERO, ShoppingCouponPrice.from(null));
 		}
 		// 割引後の金額が0より大きい)：仕事金額は割引適応後の値。残クーポン値はなし
-		return new ShoppingWork(SisyutuKingaku.from(discountValue), ShoppingCouponPrice.from(null));
+		return new ShoppingWork(ExpenditureAmount.from(discountValue), ShoppingCouponPrice.from(null));
 		
 	}
 	
@@ -123,6 +123,6 @@ public class ShoppingWork {
 	 *
 	 */
 	public boolean hasSisyutuKingaku() {
-		return !value.equals(SisyutuKingaku.ZERO);
+		return !value.equals(ExpenditureAmount.ZERO);
 	}
 }

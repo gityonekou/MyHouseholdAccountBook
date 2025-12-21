@@ -71,7 +71,7 @@ class IncomeAmountTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> IncomeAmount.from(null)
+			() -> IncomeAmount.from((BigDecimal)null)
 		);
 		assertTrue(exception.getMessage().contains("収入金額"));
 		assertTrue(exception.getMessage().contains("null"));

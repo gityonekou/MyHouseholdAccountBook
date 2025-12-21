@@ -11,13 +11,13 @@ package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
 
 import java.math.BigDecimal;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingakuTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuusiKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
@@ -54,15 +54,15 @@ public class IncomeAndExpenditureItem {
 	// 対象月
 	private final TargetMonth targetMonth;
 	// 収入金額
-	private final SyuunyuuKingaku syuunyuuKingaku;
+	private final IncomeAmount syuunyuuKingaku;
 	// 積立金取崩金額
 	private final WithdrewKingaku withdrewKingaku;
 	// 支出予定金額
 	private final SisyutuYoteiKingaku sisyutuYoteiKingaku;
 	// 支出金額
-	private final SisyutuKingaku sisyutuKingaku;
+	private final ExpenditureAmount sisyutuKingaku;
 	// 収支金額
-	private final SyuusiKingaku syuusiKingaku;
+	private final BalanceAmount syuusiKingaku;
 	
 	/**
 	 *<pre>
@@ -92,11 +92,11 @@ public class IncomeAndExpenditureItem {
 				UserId.from(userId),
 				TargetYear.from(targetYear),
 				TargetMonth.from(targetMonth),
-				SyuunyuuKingaku.from(syuunyuuKingaku),
+				IncomeAmount.from(syuunyuuKingaku),
 				WithdrewKingaku.from(withdrewKingaku),
 				SisyutuYoteiKingaku.from(sisyutuYoteiKingaku),
-				SisyutuKingaku.from(sisyutuKingaku),
-				SyuusiKingaku.from(syuusiKingaku));
+				ExpenditureAmount.from(sisyutuKingaku),
+				BalanceAmount.from(syuusiKingaku));
 	}
 	
 	/**
@@ -223,10 +223,10 @@ public class IncomeAndExpenditureItem {
 	 * @return 支出金額を加算した収支テーブル情報(ドメイン)
 	 *
 	 */
-	public IncomeAndExpenditureItem addSisyutuKingaku(SisyutuKingaku addValue) {
-		
+	public IncomeAndExpenditureItem addSisyutuKingaku(ExpenditureAmount addValue) {
+
 		// 新しい支出金額
-		SisyutuKingaku addSisyutuKingaku = sisyutuKingaku.add(addValue);
+		ExpenditureAmount addSisyutuKingaku = sisyutuKingaku.add(addValue);
 		// 入り方金額 = 収入金額 + 積立金取崩金額
 		BigDecimal incomingAmount = syuunyuuKingaku.getValue().add(withdrewKingaku.getNullSafeValue());
 		// 新しい収支金額(入り方金額 - 支出金額合計)
@@ -260,10 +260,10 @@ public class IncomeAndExpenditureItem {
 	 * @return 支出金額を減算した収支テーブル情報(ドメイン)
 	 *
 	 */
-	public IncomeAndExpenditureItem subtractSisyutuKingaku(SisyutuKingaku subtractValue) {
-		
+	public IncomeAndExpenditureItem subtractSisyutuKingaku(ExpenditureAmount subtractValue) {
+
 		// 新しい支出金額
-		SisyutuKingaku subtractSisyutuKingaku = sisyutuKingaku.subtract(subtractValue);
+		ExpenditureAmount subtractSisyutuKingaku = sisyutuKingaku.subtract(subtractValue);
 		// 入り方金額 = 収入金額 + 積立金取崩金額
 		BigDecimal incomingAmount = syuunyuuKingaku.getValue().add(withdrewKingaku.getNullSafeValue());
 		// 新しい収支金額(入り方金額 - 支出金額)

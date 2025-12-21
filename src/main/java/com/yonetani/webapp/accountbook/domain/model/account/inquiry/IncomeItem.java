@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuDetailContext;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKubun;
 import com.yonetani.webapp.accountbook.domain.type.common.DeleteFlg;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
@@ -57,7 +57,7 @@ public class IncomeItem {
 	// 収入詳細
 	private final SyuunyuuDetailContext syuunyuuDetailContext;
 	// 収入金額
-	private final SyuunyuuKingaku syuunyuuKingaku;
+	private final IncomeAmount syuunyuuKingaku;
 	// 削除フラグ
 	private final DeleteFlg deleteFlg;
 	
@@ -92,7 +92,7 @@ public class IncomeItem {
 				SyuunyuuCode.from(syuunyuuCode),
 				SyuunyuuKubun.from(syuunyuuKubun),
 				SyuunyuuDetailContext.from(syuunyuuDetailContext),
-				SyuunyuuKingaku.from(syuunyuuKingaku),
+				IncomeAmount.from(syuunyuuKingaku),
 				DeleteFlg.from(deleteFlg));
 		
 	}
