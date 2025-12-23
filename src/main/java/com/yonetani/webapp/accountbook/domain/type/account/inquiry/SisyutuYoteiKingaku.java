@@ -12,36 +12,37 @@ package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
 import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
+import com.yonetani.webapp.accountbook.domain.type.common.Money;
 
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  *<pre>
  * 「支出予定金額」項目の値を表すドメインタイプです
- * 
+ *
  *</pre>
  *
  * @author ：Kouki Yonetani
  * @since 家計簿アプリ(1.00.A)
  *
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-@EqualsAndHashCode
-public class SisyutuYoteiKingaku {
-	// 支出予定金額
-	private final BigDecimal value;
+@EqualsAndHashCode(callSuper = true)
+public class SisyutuYoteiKingaku extends Money {
+
+	/**
+	 * コンストラクタ
+	 * @param value 支出予定金額
+	 */
+	private SisyutuYoteiKingaku(BigDecimal value) {
+		super(value);
+	}
 	// 値が0の「支出予定金額」項目の値
 	public static final SisyutuYoteiKingaku ZERO = SisyutuYoteiKingaku.from(BigDecimal.ZERO.setScale(2));
 	
 	/**
 	 *<pre>
 	 * 「支出予定金額」項目の値を表すドメインタイプを生成します
-	 * 
+	 *
 	 * [ガード節]
 	 * ・null値
 	 * ・マイナス値
@@ -52,19 +53,14 @@ public class SisyutuYoteiKingaku {
 	 *
 	 */
 	public static SisyutuYoteiKingaku from(BigDecimal sisyutuYoteiKingaku) {
-		// ガード節(null)
-		if(sisyutuYoteiKingaku == null) {
-			throw new MyHouseholdAccountBookRuntimeException("「支出予定金額」項目の設定値がnullです。管理者に問い合わせてください。");
-		}
-		// ガード節(マイナス値)
+		// 基底クラスのバリデーションを実行（null非許容、スケール2チェック）
+		validate(sisyutuYoteiKingaku, "支出予定金額");
+		// ガード節(マイナス値) - 支出予定金額は0以上である必要がある
 		if(BigDecimal.ZERO.compareTo(sisyutuYoteiKingaku) > 0) {
-			throw new MyHouseholdAccountBookRuntimeException("「支出予定金額」項目の設定値がマイナスです。管理者に問い合わせてください。[value=" + sisyutuYoteiKingaku.intValue() + "]");
+			throw new MyHouseholdAccountBookRuntimeException(
+				String.format("「支出予定金額」項目の設定値がマイナスです。管理者に問い合わせてください。[value=%d]",
+					sisyutuYoteiKingaku.intValue()));
 		}
-		// ガード節(スケール値が2以外)
-		if(sisyutuYoteiKingaku.scale() != 2) {
-			throw new MyHouseholdAccountBookRuntimeException("「支出予定金額」項目のスケール値が不正です。管理者に問い合わせてください。[scale=" + sisyutuYoteiKingaku.scale() + "]");
-		}
-		
 		// 「支出予定金額」項目の値を生成して返却
 		return new SisyutuYoteiKingaku(sisyutuYoteiKingaku);
 	}
@@ -78,15 +74,6 @@ public class SisyutuYoteiKingaku {
 	 *
 	 */
 	public SisyutuYoteiKingaku add(SisyutuYoteiKingaku addValue) {
-		return new SisyutuYoteiKingaku(this.value.add(addValue.getValue()));
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		// スケール0で四捨五入+カンマ編集した文字列を返却
-		return DomainCommonUtils.formatKingakuAndYen(value);
+		return new SisyutuYoteiKingaku(super.add(addValue));
 	}
 }

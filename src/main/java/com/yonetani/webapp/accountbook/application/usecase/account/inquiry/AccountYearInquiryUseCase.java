@@ -124,7 +124,7 @@ public class AccountYearInquiryUseCase {
 					domain.getTargetMonth().getValue(),
 					domain.getSyuunyuuKingaku().toString(),
 					domain.getWithdrewKingaku().toString(),
-					domain.getSisyutuYoteiKingaku().toString(),
+					domain.getSisyutuYoteiKingaku().toFormatString(),
 					domain.getSisyutuKingaku().toString(),
 					domain.getSyuusiKingaku().toString())
 		).collect(Collectors.toUnmodifiableList());

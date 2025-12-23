@@ -211,7 +211,7 @@ public class AccountMonthInquiryUseCase {
 			// 積立金取崩金額
 			response.setWithdrewKingaku(incomeAndExpenditure.getWithdrewAmount().toFormatString());
 			// 支出予定金額
-			response.setSisyutuYoteiKingaku(incomeAndExpenditure.getEstimatedExpenditureAmount().toString());
+			response.setSisyutuYoteiKingaku(incomeAndExpenditure.getSisyutuYoteiKingaku().toFormatString());
 			// 収支金額
 			response.setSyuusiKingaku(incomeAndExpenditure.getBalanceAmount().toFormatString());
 		}
@@ -229,14 +229,14 @@ public class AccountMonthInquiryUseCase {
 	 */
 	private List<ExpenditureListItem> convertExpenditureItemList(AccountMonthInquiryExpenditureItemList resultList) {
 		// 返却するリストを不変オブジェクトに変換する
-		return resultList.getValues().stream().map(domain -> 
+		return resultList.getValues().stream().map(domain ->
 		AccountMonthInquiryResponse.ExpenditureListItem.form(
 				domain.getSisyutuItemLevel().getValue(),
 				domain.getSisyutuItemName().getValue(),
 				domain.getSisyutuKingaku().toString(),
-				domain.getSisyutuKingakuB().toSisyutuKingakuBString(),
+				domain.getSisyutuKingakuB().toFormatString(),
 				domain.getSisyutuKingakuB().getPercentage(domain.getSisyutuKingaku()),
-				domain.getSisyutuKingakuC().toSisyutuKingakuCString(),
+				domain.getSisyutuKingakuC().toFormatString(),
 				domain.getSisyutuKingakuC().getPercentage(domain.getSisyutuKingaku()),
 				domain.getSisyutuKingakuBC().toSisyutuKingakuBCString(),
 				domain.getSisyutuKingakuBC().getPercentage(domain.getSisyutuKingaku()),

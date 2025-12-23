@@ -70,7 +70,7 @@ public class IncomeAndExpenditure {
 	// 積立金取崩金額
 	private final WithdrewKingaku withdrewAmount;
 	// 支出予定金額
-	private final SisyutuYoteiKingaku estimatedExpenditureAmount;
+	private final SisyutuYoteiKingaku sisyutuYoteiKingaku;
 	// 支出金額
 	private final ExpenditureAmount expenditureAmount;
 	// 収支金額

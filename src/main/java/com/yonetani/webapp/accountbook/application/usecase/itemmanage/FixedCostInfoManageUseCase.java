@@ -169,7 +169,7 @@ public class FixedCostInfoManageUseCase {
 								// 固定費支払月
 								searchResult.getFixedCostShiharaiDay().getValue()),
 						// 支払金額
-						searchResult.getShiharaiKingaku().toString()));
+						searchResult.getShiharaiKingaku().toFormatString()));
 		// 固定費一覧をレスポンスに設定
 		setFixedCostItemList(userId, response);
 		
@@ -637,7 +637,7 @@ public class FixedCostInfoManageUseCase {
 						// 固定費支払月
 						domain.getFixedCostShiharaiDay().getValue()),
 				// 支払金額
-				domain.getShiharaiKingaku().toString(),
+				domain.getShiharaiKingaku().toFormatString(),
 				// その他任意詳細：固定費支払月任意詳細
 				domain.getFixedCostShiharaiTukiOptionalContext().getValue())
 		).collect(Collectors.toUnmodifiableList());

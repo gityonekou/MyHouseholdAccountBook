@@ -11,12 +11,12 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingaku;
-import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingaku;
+import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
@@ -61,7 +61,7 @@ class IncomeAndExpenditureTest {
 		assertEquals(yearMonth, aggregate.getTargetYearMonth());
 		assertEquals(income, aggregate.getIncomeAmount());
 		assertEquals(withdrew, aggregate.getWithdrewAmount());
-		assertEquals(estimatedExpenditure, aggregate.getEstimatedExpenditureAmount());
+		assertEquals(estimatedExpenditure, aggregate.getSisyutuYoteiKingaku());
 		assertEquals(expenditure, aggregate.getExpenditureAmount());
 		assertEquals(balance, aggregate.getBalanceAmount());
 	}
@@ -152,7 +152,7 @@ class IncomeAndExpenditureTest {
 		assertEquals(yearMonth, aggregate.getTargetYearMonth());
 		assertNull(aggregate.getIncomeAmount());
 		assertNull(aggregate.getWithdrewAmount());
-		assertNull(aggregate.getEstimatedExpenditureAmount());
+		assertNull(aggregate.getSisyutuYoteiKingaku());
 		assertNull(aggregate.getExpenditureAmount());
 		assertNull(aggregate.getBalanceAmount());
 		assertTrue(aggregate.isEmpty());
