@@ -21,6 +21,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,13 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
  * @since 家計簿アプリ(1.00.A)
  *
  */
+///////////////////////////////////////////////////////////////////////////////
+//メモ(このファイルをコピーしてテストを作成する際は以下のメモはコピー不要です
+//Eclipseだと@SqlアノテーションでAccountMonthInquiryIntegrationTest.sqlのinsert文の日本語の値をinsertした際は
+//デフォルトでをUTF-8でinsertするため問題なかったが、VSCodeでMavenコマンドラインから実行すると文字化けしてしまう。
+//これは、SQLスクリプト（@Sqlアノテーションで実行されるスクリプト）がUTF-8で読み込まれていないことを示している。
+//そのため、config = @SqlConfig(encoding = "UTF-8")プロパティを追加することで対応
+///////////////////////////////////////////////////////////////////////////////
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -45,7 +53,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 @Sql(scripts = {
 	"/sql/initsql/schema_test.sql",
 	"/com/yonetani/webapp/accountbook/application/usecase/account/inquiry/AccountMonthInquiryIntegrationTest.sql"
-})
+}, config = @SqlConfig(encoding = "UTF-8"))
 public class AccountMonthInquiryControllerIntegrationTest {
 
 	@Autowired

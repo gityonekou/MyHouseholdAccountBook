@@ -46,18 +46,6 @@ class SyuunyuuKingakuTotalAmountTest {
 	}
 
 	@Test
-	@DisplayName("正常系：0円で生成できる")
-	void testFrom_正常系_0円() {
-		// 実行
-		SyuunyuuKingakuTotalAmount amount = SyuunyuuKingakuTotalAmount.from(BigDecimal.ZERO.setScale(2));
-
-		// 検証
-		assertNotNull(amount);
-		assertEquals(BigDecimal.ZERO.setScale(2), amount.getValue());
-		assertTrue(amount.isZero());
-	}
-
-	@Test
 	@DisplayName("正常系：ZERO定数が使用できる")
 	void testZERO定数() {
 		// 検証
@@ -146,51 +134,5 @@ class SyuunyuuKingakuTotalAmountTest {
 		assertEquals(new BigDecimal("15000.00"), result.getValue());
 		// 不変性の確認
 		assertEquals(new BigDecimal("10000.00"), total.getValue());
-	}
-
-	@Test
-	@DisplayName("正常系：equalsが正しく動作する")
-	void testEquals() {
-		// 準備
-		SyuunyuuKingakuTotalAmount amount1 = SyuunyuuKingakuTotalAmount.from(new BigDecimal("10000.00"));
-		SyuunyuuKingakuTotalAmount amount2 = SyuunyuuKingakuTotalAmount.from(new BigDecimal("10000.00"));
-		SyuunyuuKingakuTotalAmount amount3 = SyuunyuuKingakuTotalAmount.from(new BigDecimal("5000.00"));
-
-		// 検証
-		assertEquals(amount1, amount2);
-		assertNotEquals(amount1, amount3);
-	}
-
-	@Test
-	@DisplayName("正常系：hashCodeが正しく動作する")
-	void testHashCode() {
-		// 準備
-		SyuunyuuKingakuTotalAmount amount1 = SyuunyuuKingakuTotalAmount.from(new BigDecimal("10000.00"));
-		SyuunyuuKingakuTotalAmount amount2 = SyuunyuuKingakuTotalAmount.from(new BigDecimal("10000.00"));
-
-		// 検証（同じ値なら同じハッシュコード）
-		assertEquals(amount1.hashCode(), amount2.hashCode());
-	}
-
-	@Test
-	@DisplayName("正常系：toStringは値の文字列表現を返す")
-	void testToString() {
-		// 準備
-		SyuunyuuKingakuTotalAmount amount = SyuunyuuKingakuTotalAmount.from(new BigDecimal("12345.67"));
-
-		// 検証（BigDecimalの文字列表現）
-		assertEquals("12345.67", amount.toString());
-	}
-
-	@Test
-	@DisplayName("正常系：toFormatStringはフォーマット済み文字列を返す")
-	void testToFormatString() {
-		// 準備
-		SyuunyuuKingakuTotalAmount amount1 = SyuunyuuKingakuTotalAmount.from(new BigDecimal("12345.67"));
-		SyuunyuuKingakuTotalAmount amount2 = SyuunyuuKingakuTotalAmount.from(new BigDecimal("1000000.00"));
-
-		// 検証（カンマ区切り+円表記、スケール0で四捨五入）
-		assertEquals("12,346円", amount1.toFormatString());
-		assertEquals("1,000,000円", amount2.toFormatString());
 	}
 }

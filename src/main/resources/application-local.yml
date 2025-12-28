@@ -44,6 +44,9 @@ spring:
         - classpath:sql/initsql/data.sql
       # (DB初期化用SQL↑実行を)常に行う.EMBEDDED=h2dbのとき、の意味. ALWAYSは無条件
       mode: embedded
+      # SQLスクリプトのエンコーディング
+      #   2025/12/27 テストデータをinsertするときに日本語が文字化けする場合がある(VSCodeのMavenコマンドライン実行時など)ので明示的に文字コードを指定
+      encoding: UTF-8
 
   # MyBatisを使用する場合は以下は不要？？
   #jpa

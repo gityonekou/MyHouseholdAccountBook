@@ -58,7 +58,7 @@ class DateValueTest {
 		// 検証
 		assertNotNull(result);
 		assertEquals(date, result.getValue());
-		assertEquals("2025/11/29", result.toString());
+		assertEquals("2025-11-29", result.toString());
 	}
 
 	@Test
@@ -82,8 +82,8 @@ class DateValueTest {
 		// 検証
 		assertNotNull(result);
 		assertEquals(LocalDate.of(2025, 11, 29), result.getValue());
-		assertEquals("20251129", result.toStringFormatyyyyMMdd());
-		assertEquals("2025/11/29", result.toStringFormatyyyySPMMSPdd());
+		assertEquals("20251129", result.toCompactString());
+		assertEquals("2025/11/29", result.toDisplayString());
 	}
 
 	@Test
@@ -270,6 +270,56 @@ class DateValueTest {
 	}
 
 	@Test
+	@DisplayName("正常系：toCompactString - yyyyMMdd形式")
+	void testToCompactString() {
+		// 実行
+		TestDateValue result = TestDateValue.from("20251129");
+
+		// 検証
+		assertEquals("20251129", result.toCompactString());
+	}
+
+	@Test
+	@DisplayName("正常系：toDisplayString - yyyy/MM/dd形式")
+	void testToDisplayString() {
+		// 実行
+		TestDateValue result = TestDateValue.from("20251129");
+
+		// 検証
+		assertEquals("2025/11/29", result.toDisplayString());
+	}
+
+	@Test
+	@DisplayName("正常系：toJapaneseDisplayString - yyyy年MM月dd日形式")
+	void testToJapaneseDisplayString() {
+		// 実行
+		TestDateValue result = TestDateValue.from("20251129");
+
+		// 検証
+		assertEquals("2025年11月29日", result.toJapaneseDisplayString());
+	}
+
+	@Test
+	@DisplayName("正常系：toJapaneseYearMonthString - yyyy年MM月形式")
+	void testToJapaneseYearMonthString() {
+		// 実行
+		TestDateValue result = TestDateValue.from("20251129");
+
+		// 検証
+		assertEquals("2025年11月", result.toJapaneseYearMonthString());
+	}
+
+	@Test
+	@DisplayName("正常系：toString - ISO-8601形式（yyyy-MM-dd）")
+	void testToString() {
+		// 実行
+		TestDateValue result = TestDateValue.from("20251129");
+
+		// 検証
+		assertEquals("2025-11-29", result.toString());
+	}
+
+	@Test
 	@DisplayName("正常系：equals - 同じ値")
 	void testEquals_SameValue() {
 		// 準備
@@ -290,5 +340,31 @@ class DateValueTest {
 
 		// 実行 & 検証
 		assertNotEquals(date1, date2);
+	}
+
+	@Test
+	@DisplayName("正常系：境界値 - 月末")
+	void testBoundaryValue_EndOfMonth() {
+		// 実行：2月末日（閏年）
+		TestDateValue leapYear = TestDateValue.from("20240229");
+		assertEquals(LocalDate.of(2024, 2, 29), leapYear.getValue());
+
+		// 実行：2月末日（平年）
+		TestDateValue normalYear = TestDateValue.from("20250228");
+		assertEquals(LocalDate.of(2025, 2, 28), normalYear.getValue());
+
+		// 実行：12月末日
+		TestDateValue endOfYear = TestDateValue.from("20251231");
+		assertEquals(LocalDate.of(2025, 12, 31), endOfYear.getValue());
+	}
+
+	@Test
+	@DisplayName("正常系：境界値 - 月初")
+	void testBoundaryValue_StartOfMonth() {
+		// 実行
+		TestDateValue result = TestDateValue.from("20251101");
+
+		// 検証
+		assertEquals(LocalDate.of(2025, 11, 1), result.getValue());
 	}
 }

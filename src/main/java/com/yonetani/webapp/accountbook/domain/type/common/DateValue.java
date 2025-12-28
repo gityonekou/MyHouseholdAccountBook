@@ -14,9 +14,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -47,6 +45,15 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @EqualsAndHashCode
 public abstract class DateValue {
+
+	// yyyyMMdd形式のフォーマッター
+	private static final DateTimeFormatter YYYYMMDD_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
+	// yyyy/MM/dd形式のフォーマッター
+	private static final DateTimeFormatter YYYY_SP_MM_SP_DD_FORMAT = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+	// yyyy年MM月dd日形式のフォーマッター（日本語表示用）
+	private static final DateTimeFormatter JAPANESE_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy年MM月dd日");
+	// yyyy年MM月形式のフォーマッター（日本語年月表示用）
+	private static final DateTimeFormatter JAPANESE_YEAR_MONTH_FORMAT = DateTimeFormatter.ofPattern("yyyy年MM月");
 
 	// 日付の値
 	private final LocalDate value;
@@ -99,7 +106,7 @@ public abstract class DateValue {
 					typeName, dateString));
 		}
 		try {
-			return LocalDate.parse(dateString, MyHouseholdAccountBookContent.DATE_TIME_FORMATTER);
+			return LocalDate.parse(dateString, YYYYMMDD_FORMAT);
 		} catch (DateTimeParseException ex) {
 			throw new MyHouseholdAccountBookRuntimeException(
 				String.format("「%s」項目の設定値が不正です。管理者に問い合わせてください。[dateString=%s]",
@@ -192,24 +199,46 @@ public abstract class DateValue {
 
 	/**
 	 *<pre>
-	 * 日付をyyyyMMdd形式の文字列で取得します。
+	 * 日付をコンパクト形式（yyyyMMdd）の文字列で取得します。
 	 *</pre>
 	 * @return yyyyMMdd形式の文字列
 	 *
 	 */
-	public String toStringFormatyyyyMMdd() {
-		return this.value.format(MyHouseholdAccountBookContent.DATE_TIME_FORMATTER);
+	public String toCompactString() {
+		return this.value.format(YYYYMMDD_FORMAT);
 	}
 
 	/**
 	 *<pre>
-	 * 日付をyyyy/MM/dd形式の文字列で取得します。
+	 * 日付を表示用形式（yyyy/MM/dd）の文字列で取得します。
 	 *</pre>
 	 * @return yyyy/MM/dd形式の文字列
 	 *
 	 */
-	public String toStringFormatyyyySPMMSPdd() {
-		return DomainCommonUtils.formatyyyySPMMSPdd(this.value);
+	public String toDisplayString() {
+		return this.value.format(YYYY_SP_MM_SP_DD_FORMAT);
+	}
+
+	/**
+	 *<pre>
+	 * 日付を日本語表示用形式（yyyy年MM月dd日）の文字列で取得します。
+	 *</pre>
+	 * @return yyyy年MM月dd日形式の文字列
+	 *
+	 */
+	public String toJapaneseDisplayString() {
+		return this.value.format(JAPANESE_DATE_FORMAT);
+	}
+
+	/**
+	 *<pre>
+	 * 日付を日本語年月表示用形式（yyyy年MM月）の文字列で取得します。
+	 *</pre>
+	 * @return yyyy年MM月形式の文字列
+	 *
+	 */
+	public String toJapaneseYearMonthString() {
+		return this.value.format(JAPANESE_YEAR_MONTH_FORMAT);
 	}
 
 	/**
@@ -217,7 +246,7 @@ public abstract class DateValue {
 	 */
 	@Override
 	public String toString() {
-		// YYYY/MM/DD形式で返却（デバッグ用）
-		return toStringFormatyyyySPMMSPdd();
+		// ISO-8601形式（yyyy-MM-dd）で返却（デバッグ用）
+		return this.value.toString();
 	}
 }

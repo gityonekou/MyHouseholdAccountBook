@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/06/03 : 1.00.00  新規作成
+ * 2025/12/21 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
@@ -28,7 +29,10 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = true)
 public class ShiharaiKingaku extends Money {
-
+	
+	/** 値が0の「支払金額」項目の値 */
+	public static final ShiharaiKingaku ZERO = ShiharaiKingaku.from(BigDecimal.ZERO.setScale(2));
+	
 	/**
 	 * コンストラクタ
 	 * @param value 支払金額
@@ -36,9 +40,6 @@ public class ShiharaiKingaku extends Money {
 	private ShiharaiKingaku(BigDecimal value) {
 		super(value);
 	}
-	
-	// 値が0の「支払金額」項目の値
-	public static final ShiharaiKingaku ZERO = ShiharaiKingaku.from(BigDecimal.ZERO.setScale(2));
 	
 	/**
 	 *<pre>

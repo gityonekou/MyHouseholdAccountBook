@@ -30,7 +30,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class BalanceAmount extends Money {
 
-	// 値が0の「収支金額」項目の値
+	/** 値が0の「収支金額」項目の値 */
 	public static final BalanceAmount ZERO = new BalanceAmount(BigDecimal.ZERO.setScale(2));
 
 	/**

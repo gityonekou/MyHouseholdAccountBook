@@ -32,7 +32,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class ExpenditureAmount extends Money {
 
-	// 値が0の「支出金額」項目の値
+	/** 値が0の「支出金額」項目の値 */
 	public static final ExpenditureAmount ZERO = new ExpenditureAmount(BigDecimal.ZERO.setScale(2));
 
 	/**

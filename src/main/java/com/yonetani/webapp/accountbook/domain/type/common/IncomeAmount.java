@@ -36,7 +36,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class IncomeAmount extends Money {
 
-	// 値が0の「収入金額」項目の値
+	/** 値が0の「収入金額」項目の値 */
 	public static final IncomeAmount ZERO = new IncomeAmount(BigDecimal.ZERO.setScale(2));
 
 	/**

@@ -20,10 +20,10 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ShiharaiDate;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemLevel;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemName;
-import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuB;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuBC;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuC;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -102,7 +102,6 @@ public class AccountMonthInquiryExpenditureItemList {
 				) {
 			SisyutuKingakuB kinbakuB = SisyutuKingakuB.from(sisyutuKingakuB);
 			SisyutuKingakuC kinbakuC = SisyutuKingakuC.from(sisyutuKingakuC);
-			SisyutuKingakuBC kinbakuBC = SisyutuKingakuBC.from(kinbakuB, kinbakuC);
 			return new ExpenditureListItem(
 					SisyutuItemCode.from(sisyutuItemCode),
 					SisyutuItemName.from(sisyutuItemName),
@@ -110,7 +109,7 @@ public class AccountMonthInquiryExpenditureItemList {
 					ExpenditureAmount.from(sisyutuKingaku),
 					kinbakuB,
 					kinbakuC,
-					kinbakuBC,
+					SisyutuKingakuBC.from(kinbakuB, kinbakuC),
 					ShiharaiDate.from(siharaiDate));
 		}
 	}

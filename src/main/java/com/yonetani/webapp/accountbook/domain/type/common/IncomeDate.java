@@ -11,7 +11,6 @@ package com.yonetani.webapp.accountbook.domain.type.common;
 
 import java.time.LocalDate;
 
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 

@@ -10,6 +10,7 @@
 package com.yonetani.webapp.accountbook.domain.type.common;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 
@@ -39,7 +40,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class CouponAmount extends Money {
 
-	// 値が0の「クーポン金額」項目の値（割引なし）
+	/** 値が0の「クーポン金額」項目の値（割引なし） */
 	public static final CouponAmount ZERO = new CouponAmount(BigDecimal.ZERO.setScale(2));
 
 	/**
@@ -136,7 +137,7 @@ public class CouponAmount extends Money {
 	@Override
 	public String toFormatString() {
 		// 割引額（正の値）として表示
-		long roundedValue = this.getDiscountAmount().setScale(0, java.math.RoundingMode.HALF_UP).longValue();
+		long roundedValue = this.getDiscountAmount().setScale(0, RoundingMode.HALF_UP).longValue();
 		return String.format("%,d円", roundedValue);
 	}
 }

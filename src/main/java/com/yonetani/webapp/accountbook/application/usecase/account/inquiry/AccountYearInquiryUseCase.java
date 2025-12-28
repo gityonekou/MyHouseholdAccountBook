@@ -182,7 +182,7 @@ public class AccountYearInquiryUseCase {
 			// 趣味娯楽合計
 			response.setSyumiGotakuKingakuGoukei(resultList.getSyumiGotakuKingakuGoukei().toString());
 			// 支出B合計
-			response.setSisyutuKingakuBCGoukei(resultList.getSisyutuKingakuBCGoukei().toSisyutuKingakuBCString());
+			response.setSisyutuKingakuBCGoukei(resultList.getSisyutuKingakuBCGoukei().toFormatString());
 			// 支出BC合計のうち、支出B合計の割合
 			response.setPercentageBGoukei(resultList.getSisyutuKingakuBCGoukei().getSisyutuKingakuBPercentage());
 			// 支出合計
@@ -213,7 +213,7 @@ public class AccountYearInquiryUseCase {
 					domain.getIruiJyuukyoSetubiKingaku().toString(),
 					domain.getInsyokuNitiyouhinKingaku().toString(),
 					domain.getSyumiGotakuKingaku().toString(),
-					domain.getSisyutuKingakuBC().toSisyutuKingakuBCString(),
+					domain.getSisyutuKingakuBC().toFormatString(),
 					domain.getSisyutuKingakuBC().getSisyutuKingakuBPercentage(),
 					domain.getSisyutuKingaku().toString(),
 					domain.getSyuusiKingaku().toString())

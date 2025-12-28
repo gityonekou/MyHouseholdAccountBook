@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
@@ -48,13 +49,20 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  * @since 家計簿アプリ(1.00.00)
  *
  */
+///////////////////////////////////////////////////////////////////////////////
+// メモ(このファイルをコピーしてテストを作成する際は以下のメモはコピー不要です
+// 　Eclipseだと@SqlアノテーションでAccountMonthInquiryIntegrationTest.sqlのinsert文の日本語の値をinsertした際は
+// 　デフォルトでをUTF-8でinsertするため問題なかったが、VSCodeでMavenコマンドラインから実行すると文字化けしてしまう。
+// 　これは、SQLスクリプト（@Sqlアノテーションで実行されるスクリプト）がUTF-8で読み込まれていないことを示している。
+// 　そのため、config = @SqlConfig(encoding = "UTF-8")プロパティを追加することで対応
+///////////////////////////////////////////////////////////////////////////////
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
 @Sql(scripts = {
     "/sql/initsql/schema_test.sql",
     "/com/yonetani/webapp/accountbook/application/usecase/account/inquiry/AccountMonthInquiryIntegrationTest.sql"
-})
+}, config = @SqlConfig(encoding = "UTF-8"))
 class AccountMonthInquiryIntegrationTest {
 
     @Autowired
@@ -97,6 +105,30 @@ class AccountMonthInquiryIntegrationTest {
         // Then: 支出項目リストの検証
         assertNotNull(response.getExpenditureItemList());
         assertEquals(7, response.getExpenditureItemList().size());
+
+        // Then: 支出項目の詳細検証（支出金額B/C/BCのフォーマット確認）
+        // 先頭の支出項目（SISYUTU_ITEM_CODE='0001'）を検証
+        // テストデータ: SISYUTU_KINGAKU=210000, B=150000, C=30000, BC=180000
+        var firstItem = response.getExpenditureItemList().get(0);
+        assertEquals("食費", firstItem.getSisyutuItemName()); // 支出項目名
+        assertEquals("210,000円", firstItem.getSisyutuKingaku()); // 支出金額
+        assertEquals("150,000円", firstItem.getSisyutuKingakuB()); // 支出金額B（toFormatString()でフォーマット済み）
+        assertEquals("71", firstItem.getPercentageB()); // 支出金額Bの割合 (150000/210000*100≒71%)
+        assertEquals("30,000円", firstItem.getSisyutuKingakuC()); // 支出金額C（toFormatString()でフォーマット済み）
+        assertEquals("14", firstItem.getPercentageC()); // 支出金額Cの割合 (30000/210000*100≒14%)
+        assertEquals("180,000円", firstItem.getSisyutuKingakuBC()); // 支出金額BC（toFormatString()でフォーマット済み）
+        assertEquals("86", firstItem.getPercentage()); // 支出金額BCの割合 (180000/210000*100≒86%)
+
+        // 3番目の支出項目（SISYUTU_ITEM_CODE='0003'、支出金額C=NULLのケース）を検証
+        // テストデータ: SISYUTU_KINGAKU=30000, B=30000, C=NULL, BC=30000
+        var thirdItem = response.getExpenditureItemList().get(2);
+        assertEquals("外食", thirdItem.getSisyutuItemName()); // 支出項目名
+        assertEquals("30,000円", thirdItem.getSisyutuKingakuB()); // 支出金額B
+        assertEquals("100", thirdItem.getPercentageB()); // 支出金額Bの割合 (30000/30000*100=100%)
+        assertEquals("", thirdItem.getSisyutuKingakuC()); // 支出金額C=NULLの場合は空文字
+        assertEquals("", thirdItem.getPercentageC()); // 支出金額CがNULLの場合、割合も空文字
+        assertEquals("30,000円", thirdItem.getSisyutuKingakuBC()); // 支出金額BC
+        assertEquals("100", thirdItem.getPercentage()); // 支出金額BCの割合 (30000/30000*100=100%)
 
         // Then: メッセージなし
         assertTrue(response.getMessagesList().isEmpty() || response.getMessagesList().size() == 0);

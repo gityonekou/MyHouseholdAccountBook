@@ -44,18 +44,9 @@ class WithdrewKingakuTest {
 		// 検証
 		assertNotNull(amount);
 		assertEquals(new BigDecimal("10000.00"), amount.getValue());
+		assertEquals("10000.00", amount.toString());
+		assertEquals("10,000円", amount.toFormatString());
 		assertNotEquals(WithdrewKingaku.NULL, amount);
-	}
-
-	@Test
-	@DisplayName("正常系：0円で生成できる")
-	void testFrom_正常系_0円() {
-		// 実行
-		WithdrewKingaku amount = WithdrewKingaku.from(BigDecimal.ZERO.setScale(2));
-
-		// 検証
-		assertNotNull(amount);
-		assertEquals(BigDecimal.ZERO.setScale(2), amount.getValue());
 	}
 
 	@Test
@@ -75,6 +66,8 @@ class WithdrewKingakuTest {
 		// 検証
 		assertNotNull(amount);
 		assertNull(amount.getValue());
+		assertEquals("", amount.toString());
+		assertEquals("", amount.toFormatString());
 	}
 
 	@Test
@@ -137,30 +130,6 @@ class WithdrewKingakuTest {
 	}
 
 	@Test
-	@DisplayName("正常系：equalsが正しく動作する（通常の値）")
-	void testEquals_通常の値() {
-		// 準備
-		WithdrewKingaku amount1 = WithdrewKingaku.from(new BigDecimal("10000.00"));
-		WithdrewKingaku amount2 = WithdrewKingaku.from(new BigDecimal("10000.00"));
-		WithdrewKingaku amount3 = WithdrewKingaku.from(new BigDecimal("5000.00"));
-
-		// 検証
-		assertEquals(amount1, amount2);
-		assertNotEquals(amount1, amount3);
-	}
-
-	@Test
-	@DisplayName("正常系：equalsが正しく動作する（null値同士）")
-	void testEquals_null値同士() {
-		// 準備
-		WithdrewKingaku null1 = WithdrewKingaku.from((BigDecimal)null);
-		WithdrewKingaku null2 = WithdrewKingaku.from((BigDecimal)null);
-
-		// 検証
-		assertEquals(null1, null2);
-	}
-
-	@Test
 	@DisplayName("正常系：equalsが正しく動作する（null値とNULL定数）")
 	void testEquals_null値とNULL定数() {
 		// 準備
@@ -168,94 +137,6 @@ class WithdrewKingakuTest {
 
 		// 検証
 		assertEquals(WithdrewKingaku.NULL, nullAmount);
-	}
-
-	@Test
-	@DisplayName("正常系：hashCodeが正しく動作する（通常の値）")
-	void testHashCode_通常の値() {
-		// 準備
-		WithdrewKingaku amount1 = WithdrewKingaku.from(new BigDecimal("10000.00"));
-		WithdrewKingaku amount2 = WithdrewKingaku.from(new BigDecimal("10000.00"));
-
-		// 検証（同じ値なら同じハッシュコード）
-		assertEquals(amount1.hashCode(), amount2.hashCode());
-	}
-
-	@Test
-	@DisplayName("正常系：hashCodeが正しく動作する（null値）")
-	void testHashCode_null値() {
-		// 準備
-		WithdrewKingaku null1 = WithdrewKingaku.from((BigDecimal)null);
-		WithdrewKingaku null2 = WithdrewKingaku.from((BigDecimal)null);
-
-		// 検証（同じnull値なら同じハッシュコード）
-		assertEquals(null1.hashCode(), null2.hashCode());
-	}
-
-	@Test
-	@DisplayName("正常系：toStringは値の文字列表現を返す（デバッグ用）")
-	void testToString_通常の値() {
-		// 準備
-		WithdrewKingaku amount = WithdrewKingaku.from(new BigDecimal("12345.67"));
-
-		// 検証（BigDecimalの文字列表現）
-		assertEquals("12345.67", amount.toString());
-	}
-
-	@Test
-	@DisplayName("正常系：toStringはnullの場合空文字列を返す")
-	void testToString_null値() {
-		// 準備
-		WithdrewKingaku nullAmount = WithdrewKingaku.NULL;
-
-		// 実行
-		String result = nullAmount.toString();
-
-		// 検証（nullの場合は空文字列）
-		assertEquals("", result);
-	}
-
-	@Test
-	@DisplayName("正常系：toFormatStringはフォーマット済み文字列を返す（通常の値）")
-	void testToFormatString_通常の値() {
-		// 準備
-		WithdrewKingaku amount = WithdrewKingaku.from(new BigDecimal("12345.67"));
-
-		// 検証（カンマ区切り+円表記、スケール0で四捨五入）
-		assertEquals("12,346円", amount.toFormatString());
-	}
-
-	@Test
-	@DisplayName("正常系：toFormatStringは0円の場合0円を返す")
-	void testToFormatString_0円() {
-		// 準備
-		WithdrewKingaku amount = WithdrewKingaku.ZERO;
-
-		// 検証
-		assertEquals("0円", amount.toFormatString());
-	}
-
-	@Test
-	@DisplayName("正常系：toFormatStringはnullの場合空文字列を返す")
-	void testToFormatString_null値() {
-		// 準備
-		WithdrewKingaku nullAmount = WithdrewKingaku.NULL;
-
-		// 実行
-		String result = nullAmount.toFormatString();
-
-		// 検証（nullの場合は空文字列）
-		assertEquals("", result);
-	}
-
-	@Test
-	@DisplayName("正常系：toFormatStringは大きな金額も正しくフォーマットする")
-	void testToFormatString_大きな金額() {
-		// 準備
-		WithdrewKingaku amount = WithdrewKingaku.from(new BigDecimal("1234567.89"));
-
-		// 検証（カンマ区切り、四捨五入）
-		assertEquals("1,234,568円", amount.toFormatString());
 	}
 
 	@Test

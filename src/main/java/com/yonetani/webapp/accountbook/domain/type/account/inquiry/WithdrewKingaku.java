@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version     コメントなど
  * 2025/03/11 : 1.02.00(A)  新規作成
+ * 2025/12/21 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
@@ -31,7 +32,12 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = true)
 public class WithdrewKingaku extends NullableMoney {
-
+	
+	/** 値が0の「積立金取崩金額」項目の値 */
+	public static final WithdrewKingaku ZERO = WithdrewKingaku.from(BigDecimal.ZERO.setScale(2));
+	/** 値がnullの「積立金取崩金額」項目の値 */
+	public static final WithdrewKingaku NULL = WithdrewKingaku.from((BigDecimal)null);
+	
 	/**
 	 * コンストラクタ
 	 * @param value 積立金取崩金額
@@ -39,12 +45,7 @@ public class WithdrewKingaku extends NullableMoney {
 	private WithdrewKingaku(BigDecimal value) {
 		super(value);
 	}
-
-	// 値が0の「積立金取崩金額」項目の値
-	public static final WithdrewKingaku ZERO = WithdrewKingaku.from(BigDecimal.ZERO.setScale(2));
-	// 値がnullの「積立金取崩金額」項目の値
-	public static final WithdrewKingaku NULL = WithdrewKingaku.from((BigDecimal)null);
-
+	
 	/**
 	 *<pre>
 	 * 「積立金取崩金額」項目の値を表すドメインタイプを生成します

@@ -37,7 +37,7 @@ public class SyuusiKingakuTotalAmount {
 	// 収支金額合計
 	private final BigDecimal value;
 	
-	// 値が0の「収支金額合計」項目の値
+	/** 値が0の「収支金額合計」項目の値 */
 	public static final SyuusiKingakuTotalAmount ZERO = SyuusiKingakuTotalAmount.from(BigDecimal.ZERO.setScale(2));
 	
 	/**

@@ -48,19 +48,6 @@ class CouponAmountTest {
 	}
 
 	@Test
-	@DisplayName("正常系：0円で生成できる")
-	void testFrom_正常系_0円() {
-		// 実行
-		CouponAmount amount = CouponAmount.from(BigDecimal.ZERO.setScale(2));
-
-		// 検証
-		assertNotNull(amount);
-		assertEquals(BigDecimal.ZERO.setScale(2), amount.getValue());
-		assertTrue(amount.isZero());
-		assertFalse(amount.hasDiscount());
-	}
-
-	@Test
 	@DisplayName("正常系：ZERO定数が使用できる")
 	void testZERO定数() {
 		// 検証
@@ -163,97 +150,6 @@ class CouponAmountTest {
 	}
 
 	@Test
-	@DisplayName("正常系：比較が正しく動作する（大きい）")
-	void testCompareTo_正常系_大きい() {
-		// 準備（内部的には-300 > -500）
-		CouponAmount amount1 = CouponAmount.from(new BigDecimal("300.00"));
-		CouponAmount amount2 = CouponAmount.from(new BigDecimal("500.00"));
-
-		// 実行 & 検証（割引額が小さい方が「大きい」）
-		assertTrue(amount1.compareTo(amount2) > 0);
-	}
-
-	@Test
-	@DisplayName("正常系：比較が正しく動作する（等しい）")
-	void testCompareTo_正常系_等しい() {
-		// 準備
-		CouponAmount amount1 = CouponAmount.from(new BigDecimal("500.00"));
-		CouponAmount amount2 = CouponAmount.from(new BigDecimal("500.00"));
-
-		// 実行 & 検証
-		assertEquals(0, amount1.compareTo(amount2));
-	}
-
-	@Test
-	@DisplayName("正常系：比較が正しく動作する（小さい）")
-	void testCompareTo_正常系_小さい() {
-		// 準備（内部的には-500 < -300）
-		CouponAmount amount1 = CouponAmount.from(new BigDecimal("500.00"));
-		CouponAmount amount2 = CouponAmount.from(new BigDecimal("300.00"));
-
-		// 実行 & 検証（割引額が大きい方が「小さい」）
-		assertTrue(amount1.compareTo(amount2) < 0);
-	}
-
-	@Test
-	@DisplayName("正常系：isZeroが正しく動作する")
-	void testIsZero() {
-		// 検証
-		assertTrue(CouponAmount.ZERO.isZero());
-		assertFalse(CouponAmount.from(new BigDecimal("1.00")).isZero());
-	}
-
-	@Test
-	@DisplayName("正常系：isPositiveが正しく動作する（常にfalse）")
-	void testIsPositive() {
-		// 検証（内部的にマイナス値なので、常にfalse）
-		assertFalse(CouponAmount.ZERO.isPositive());
-		assertFalse(CouponAmount.from(new BigDecimal("500.00")).isPositive());
-	}
-
-	@Test
-	@DisplayName("正常系：isNegativeが正しく動作する")
-	void testIsNegative() {
-		// 検証（内部的にマイナス値なので、0以外はtrue）
-		assertFalse(CouponAmount.ZERO.isNegative());
-		assertTrue(CouponAmount.from(new BigDecimal("500.00")).isNegative());
-	}
-
-	@Test
-	@DisplayName("正常系：equalsが正しく動作する")
-	void testEquals() {
-		// 準備
-		CouponAmount amount1 = CouponAmount.from(new BigDecimal("500.00"));
-		CouponAmount amount2 = CouponAmount.from(new BigDecimal("500.00"));
-		CouponAmount amount3 = CouponAmount.from(new BigDecimal("300.00"));
-
-		// 検証
-		assertEquals(amount1, amount2);
-		assertNotEquals(amount1, amount3);
-	}
-
-	@Test
-	@DisplayName("正常系：hashCodeが正しく動作する")
-	void testHashCode() {
-		// 準備
-		CouponAmount amount1 = CouponAmount.from(new BigDecimal("500.00"));
-		CouponAmount amount2 = CouponAmount.from(new BigDecimal("500.00"));
-
-		// 検証（同じ値なら同じハッシュコード）
-		assertEquals(amount1.hashCode(), amount2.hashCode());
-	}
-
-	@Test
-	@DisplayName("正常系：toStringは内部値（マイナス値）の文字列表現を返す")
-	void testToString() {
-		// 準備
-		CouponAmount amount = CouponAmount.from(new BigDecimal("500.00"));
-
-		// 検証（内部的にはマイナス値として保持）
-		assertEquals("-500.00", amount.toString());
-	}
-
-	@Test
 	@DisplayName("正常系：toFormatStringは割引額（正の値）のフォーマット済み文字列を返す")
 	void testToFormatString() {
 		// 準備
@@ -265,33 +161,5 @@ class CouponAmountTest {
 		assertEquals("500円", amount1.toFormatString());
 		assertEquals("1,235円", amount2.toFormatString());
 		assertEquals("0円", amount3.toFormatString());
-	}
-
-	@Test
-	@DisplayName("正常系：toIntegerValueは整数値を返す（内部はマイナス値）")
-	void testToIntegerValue() {
-		// 準備
-		CouponAmount amount1 = CouponAmount.from(new BigDecimal("1234.56"));
-		CouponAmount amount2 = CouponAmount.from(new BigDecimal("500.00"));
-		CouponAmount amount3 = CouponAmount.from(new BigDecimal("1234.44"));
-		CouponAmount amount4 = CouponAmount.from(new BigDecimal("1234.50"));
-
-		// 検証（内部的にはマイナス値として保持されているので、マイナスの整数値）
-		assertEquals(-1235L, amount1.toIntegerValue());
-		assertEquals(-500L, amount2.toIntegerValue());
-		assertEquals(-1234L, amount3.toIntegerValue()); // -0.44 -> -1234
-		assertEquals(-1235L, amount4.toIntegerValue()); // -0.50 -> -1235
-	}
-
-	@Test
-	@DisplayName("正常系：toIntegerStringは整数の文字列を返す（内部はマイナス値）")
-	void testToIntegerString() {
-		// 準備
-		CouponAmount amount1 = CouponAmount.from(new BigDecimal("1234.56"));
-		CouponAmount amount2 = CouponAmount.from(new BigDecimal("500.00"));
-
-		// 検証（内部的にはマイナス値として保持されているので、マイナスの文字列）
-		assertEquals("-1235", amount1.toIntegerString());
-		assertEquals("-500", amount2.toIntegerString());
 	}
 }

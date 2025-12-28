@@ -7,6 +7,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2023/09/23 : 1.00.00  新規作成
+ * 2025/12/21 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.inquiry;
@@ -233,12 +234,12 @@ public class AccountMonthInquiryUseCase {
 		AccountMonthInquiryResponse.ExpenditureListItem.form(
 				domain.getSisyutuItemLevel().getValue(),
 				domain.getSisyutuItemName().getValue(),
-				domain.getSisyutuKingaku().toString(),
+				domain.getSisyutuKingaku().toFormatString(),
 				domain.getSisyutuKingakuB().toFormatString(),
 				domain.getSisyutuKingakuB().getPercentage(domain.getSisyutuKingaku()),
 				domain.getSisyutuKingakuC().toFormatString(),
 				domain.getSisyutuKingakuC().getPercentage(domain.getSisyutuKingaku()),
-				domain.getSisyutuKingakuBC().toSisyutuKingakuBCString(),
+				domain.getSisyutuKingakuBC().toFormatString(),
 				domain.getSisyutuKingakuBC().getPercentage(domain.getSisyutuKingaku()),
 				domain.getShiharaiDate().toString())).collect(Collectors.toUnmodifiableList());
 	}	

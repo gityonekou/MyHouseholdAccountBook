@@ -6,7 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/09/20 : 1.00.00  新規作成
- * 2025/12/15 : 1.01.00  Money基底クラス継承に変更
+ * 2025/12/21 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
@@ -32,7 +32,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class SyuunyuuKingakuTotalAmount extends Money {
 
-	// 値が0の「収入金額合計」項目の値
+	/** 値が0の「収入金額合計」項目の値 */
 	public static final SyuunyuuKingakuTotalAmount ZERO = SyuunyuuKingakuTotalAmount.from(BigDecimal.ZERO.setScale(2));
 
 	/**

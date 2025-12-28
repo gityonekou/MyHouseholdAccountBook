@@ -37,7 +37,7 @@ public class SisyutuYoteiKingakuTotalAmount {
 	// 支出予定金額合計
 	private final BigDecimal value;
 	
-	// 値が0の「支出予定金額合計」項目の値
+	/** 値が0の「支出予定金額合計」項目の値 */
 	public static final SisyutuYoteiKingakuTotalAmount ZERO = SisyutuYoteiKingakuTotalAmount.from(BigDecimal.ZERO.setScale(2));
 	
 	/**

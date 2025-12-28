@@ -16,6 +16,8 @@
 	<description>マイ家計簿です(1.0.0-dev版 - DDDリファクタリング中)</description>
 	<properties>
 		<java.version>17</java.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 	<dependencies>
 		<dependency>

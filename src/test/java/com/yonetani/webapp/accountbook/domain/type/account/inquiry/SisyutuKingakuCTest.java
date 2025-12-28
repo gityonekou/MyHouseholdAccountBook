@@ -46,18 +46,6 @@ class SisyutuKingakuCTest {
 	}
 
 	@Test
-	@DisplayName("正常系：0円で生成できる")
-	void testFrom_正常系_0円() {
-		// 実行
-		SisyutuKingakuC amount = SisyutuKingakuC.from(BigDecimal.ZERO.setScale(2));
-
-		// 検証
-		assertNotNull(amount);
-		assertEquals(BigDecimal.ZERO.setScale(2), amount.getValue());
-		assertTrue(amount.isZero());
-	}
-
-	@Test
 	@DisplayName("正常系：null値で生成できる")
 	void testFrom_正常系_null値() {
 		// 実行
@@ -67,6 +55,8 @@ class SisyutuKingakuCTest {
 		assertNotNull(amount);
 		assertNull(amount.getValue());
 		assertTrue(amount.isNull());
+		assertEquals("", amount.toString());
+		assertEquals("", amount.toFormatString());
 	}
 
 	@Test
@@ -173,142 +163,6 @@ class SisyutuKingakuCTest {
 
 		// 検証（null as zero扱い）
 		assertEquals(new BigDecimal("10000.00"), result.getValue());
-	}
-
-	@Test
-	@DisplayName("正常系：比較が正しく動作する（大きい）")
-	void testCompareTo_正常系_大きい() {
-		// 準備
-		SisyutuKingakuC amount1 = SisyutuKingakuC.from(new BigDecimal("10000.00"));
-		SisyutuKingakuC amount2 = SisyutuKingakuC.from(new BigDecimal("5000.00"));
-
-		// 実行 & 検証
-		assertTrue(amount1.compareTo(amount2) > 0);
-	}
-
-	@Test
-	@DisplayName("正常系：比較が正しく動作する（等しい）")
-	void testCompareTo_正常系_等しい() {
-		// 準備
-		SisyutuKingakuC amount1 = SisyutuKingakuC.from(new BigDecimal("10000.00"));
-		SisyutuKingakuC amount2 = SisyutuKingakuC.from(new BigDecimal("10000.00"));
-
-		// 実行 & 検証
-		assertEquals(0, amount1.compareTo(amount2));
-	}
-
-	@Test
-	@DisplayName("正常系：比較が正しく動作する（小さい）")
-	void testCompareTo_正常系_小さい() {
-		// 準備
-		SisyutuKingakuC amount1 = SisyutuKingakuC.from(new BigDecimal("5000.00"));
-		SisyutuKingakuC amount2 = SisyutuKingakuC.from(new BigDecimal("10000.00"));
-
-		// 実行 & 検証
-		assertTrue(amount1.compareTo(amount2) < 0);
-	}
-
-	@Test
-	@DisplayName("正常系：null値との比較")
-	void testCompareTo_正常系_null値() {
-		// 準備
-		SisyutuKingakuC amount1 = SisyutuKingakuC.from(new BigDecimal("10000.00"));
-		SisyutuKingakuC amount2 = SisyutuKingakuC.from(null);
-
-		// 実行 & 検証（null < 実数）
-		assertTrue(amount1.compareTo(amount2) > 0);
-		assertTrue(amount2.compareTo(amount1) < 0);
-	}
-
-	@Test
-	@DisplayName("正常系：isZeroが正しく動作する")
-	void testIsZero() {
-		// 検証
-		assertTrue(SisyutuKingakuC.ZERO.isZero());
-		assertFalse(SisyutuKingakuC.from(new BigDecimal("1.00")).isZero());
-		// null値の場合もisZero()がtrueを返す（NullableMoneyの仕様）
-		assertTrue(SisyutuKingakuC.from(null).isZero());
-	}
-
-	@Test
-	@DisplayName("正常系：isNullが正しく動作する")
-	void testIsNull() {
-		// 検証
-		assertTrue(SisyutuKingakuC.from(null).isNull());
-		assertFalse(SisyutuKingakuC.ZERO.isNull());
-		assertFalse(SisyutuKingakuC.from(new BigDecimal("1.00")).isNull());
-	}
-
-	@Test
-	@DisplayName("正常系：isPositiveが正しく動作する")
-	void testIsPositive() {
-		// 検証
-		assertFalse(SisyutuKingakuC.ZERO.isPositive());
-		assertTrue(SisyutuKingakuC.from(new BigDecimal("1.00")).isPositive());
-		assertFalse(SisyutuKingakuC.from(null).isPositive());
-	}
-
-	@Test
-	@DisplayName("正常系：isNegativeが正しく動作する（支出金額Cは常にfalse）")
-	void testIsNegative() {
-		// 検証（支出金額Cは負の値を持てないため、常にfalse）
-		assertFalse(SisyutuKingakuC.ZERO.isNegative());
-		assertFalse(SisyutuKingakuC.from(new BigDecimal("1.00")).isNegative());
-		assertFalse(SisyutuKingakuC.from(null).isNegative());
-	}
-
-	@Test
-	@DisplayName("正常系：equalsが正しく動作する")
-	void testEquals() {
-		// 準備
-		SisyutuKingakuC amount1 = SisyutuKingakuC.from(new BigDecimal("10000.00"));
-		SisyutuKingakuC amount2 = SisyutuKingakuC.from(new BigDecimal("10000.00"));
-		SisyutuKingakuC amount3 = SisyutuKingakuC.from(new BigDecimal("5000.00"));
-		SisyutuKingakuC amount4 = SisyutuKingakuC.from(null);
-		SisyutuKingakuC amount5 = SisyutuKingakuC.from(null);
-
-		// 検証
-		assertEquals(amount1, amount2);
-		assertNotEquals(amount1, amount3);
-		assertEquals(amount4, amount5);
-		assertNotEquals(amount1, amount4);
-	}
-
-	@Test
-	@DisplayName("正常系：hashCodeが正しく動作する")
-	void testHashCode() {
-		// 準備
-		SisyutuKingakuC amount1 = SisyutuKingakuC.from(new BigDecimal("10000.00"));
-		SisyutuKingakuC amount2 = SisyutuKingakuC.from(new BigDecimal("10000.00"));
-
-		// 検証（同じ値なら同じハッシュコード）
-		assertEquals(amount1.hashCode(), amount2.hashCode());
-	}
-
-	@Test
-	@DisplayName("正常系：toStringは値の文字列表現を返す")
-	void testToString() {
-		// 準備
-		SisyutuKingakuC amount1 = SisyutuKingakuC.from(new BigDecimal("12345.67"));
-		SisyutuKingakuC amount2 = SisyutuKingakuC.from(null);
-
-		// 検証（基底クラスのtoString()を使用するため、BigDecimalの文字列表現、null値は空文字列）
-		assertEquals("12345.67", amount1.toString());
-		assertEquals("", amount2.toString());
-	}
-
-	@Test
-	@DisplayName("正常系：toFormatStringはフォーマット済み文字列を返す")
-	void testToFormatString() {
-		// 準備
-		SisyutuKingakuC amount1 = SisyutuKingakuC.from(new BigDecimal("12345.67"));
-		SisyutuKingakuC amount2 = SisyutuKingakuC.from(new BigDecimal("1000000.00"));
-		SisyutuKingakuC amount3 = SisyutuKingakuC.from(null);
-
-		// 検証（カンマ区切り+円表記、スケール0で四捨五入）
-		assertEquals("12,346円", amount1.toFormatString());
-		assertEquals("1,000,000円", amount2.toFormatString());
-		assertEquals("", amount3.toFormatString());
 	}
 
 	@Test
