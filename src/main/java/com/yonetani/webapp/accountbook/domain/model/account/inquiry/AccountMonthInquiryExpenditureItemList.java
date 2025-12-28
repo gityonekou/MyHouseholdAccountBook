@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2023/09/30 : 1.00.00  新規作成
+ * 2025/12/28 : 1.00.00  ShiharaiDateをPaymentDateに置き換え
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
@@ -16,7 +17,7 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ShiharaiDate;
+import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemLevel;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemName;
@@ -75,7 +76,7 @@ public class AccountMonthInquiryExpenditureItemList {
 		// 支出金額BとCの合計値
 		private final SisyutuKingakuBC sisyutuKingakuBC;
 		// 支払日
-		private final ShiharaiDate shiharaiDate;
+		private final PaymentDate shiharaiDate;
 		
 		/**
 		 *<pre>
@@ -110,7 +111,7 @@ public class AccountMonthInquiryExpenditureItemList {
 					kinbakuB,
 					kinbakuC,
 					SisyutuKingakuBC.from(kinbakuB, kinbakuC),
-					ShiharaiDate.from(siharaiDate));
+					PaymentDate.from(siharaiDate));
 		}
 	}
 	

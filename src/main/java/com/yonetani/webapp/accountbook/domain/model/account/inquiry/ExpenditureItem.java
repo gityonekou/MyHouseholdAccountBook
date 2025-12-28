@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/09/07 : 1.00.00  新規作成
+ * 2025/12/28 : 1.00.00  ShiharaiDateをPaymentDateに置き換え
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
@@ -15,7 +16,7 @@ import java.time.LocalDate;
 import org.springframework.util.StringUtils;
 
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ShiharaiDate;
+import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
@@ -71,7 +72,7 @@ public class ExpenditureItem {
 	// 支出詳細
 	private final SisyutuDetailContext sisyutuDetailContext;
 	// 支払日
-	private final ShiharaiDate shiharaiDate;
+	private final PaymentDate shiharaiDate;
 	// 支出予定金額
 	private final SisyutuYoteiKingaku sisyutuYoteiKingaku;
 	// 支出金額
@@ -131,7 +132,7 @@ public class ExpenditureItem {
 				SisyutuName.from(sisyutuName),
 				SisyutuKubun.from(sisyutuKubun),
 				SisyutuDetailContext.from(sisyutuDetailContext),
-				ShiharaiDate.from(shiharaiDate),
+				PaymentDate.from(shiharaiDate),
 				SisyutuYoteiKingaku.from(sisyutuYoteiKingaku),
 				ExpenditureAmount.from(sisyutuKingaku),
 				DeleteFlg.from(deleteFlg));
@@ -179,7 +180,7 @@ public class ExpenditureItem {
 				// 支出詳細
 				expenditureData.getExpenditureDetailContext(),
 				// 支払日
-				ShiharaiDate.from(yearMonthDomain.getValue(), expenditureData.getSiharaiDate()).getValue(),
+				PaymentDate.from(yearMonthDomain.getValue(), expenditureData.getSiharaiDate()).getValue(),
 				// 支出予定金額
 				sisyutuYoteiKingaku,
 				// 支出金額

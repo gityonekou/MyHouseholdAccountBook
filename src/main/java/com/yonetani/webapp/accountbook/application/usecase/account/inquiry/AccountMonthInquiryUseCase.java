@@ -241,6 +241,6 @@ public class AccountMonthInquiryUseCase {
 				domain.getSisyutuKingakuC().getPercentage(domain.getSisyutuKingaku()),
 				domain.getSisyutuKingakuBC().toFormatString(),
 				domain.getSisyutuKingakuBC().getPercentage(domain.getSisyutuKingaku()),
-				domain.getShiharaiDate().toString())).collect(Collectors.toUnmodifiableList());
+				domain.getShiharaiDate().toDisplayString())).collect(Collectors.toUnmodifiableList());
 	}	
 }

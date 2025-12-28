@@ -108,7 +108,7 @@ class AccountMonthInquiryIntegrationTest {
 
         // Then: 支出項目の詳細検証（支出金額B/C/BCのフォーマット確認）
         // 先頭の支出項目（SISYUTU_ITEM_CODE='0001'）を検証
-        // テストデータ: SISYUTU_KINGAKU=210000, B=150000, C=30000, BC=180000
+        // テストデータ: SISYUTU_KINGAKU=210000, B=150000, C=30000, BC=180000, SIHARAI_DATE='2025-11-30'
         var firstItem = response.getExpenditureItemList().get(0);
         assertEquals("食費", firstItem.getSisyutuItemName()); // 支出項目名
         assertEquals("210,000円", firstItem.getSisyutuKingaku()); // 支出金額
@@ -118,9 +118,10 @@ class AccountMonthInquiryIntegrationTest {
         assertEquals("14", firstItem.getPercentageC()); // 支出金額Cの割合 (30000/210000*100≒14%)
         assertEquals("180,000円", firstItem.getSisyutuKingakuBC()); // 支出金額BC（toFormatString()でフォーマット済み）
         assertEquals("86", firstItem.getPercentage()); // 支出金額BCの割合 (180000/210000*100≒86%)
+        assertEquals("2025/11/30", firstItem.getSiharaiDate()); // 支払日（toDisplayString()でフォーマット済み）
 
-        // 3番目の支出項目（SISYUTU_ITEM_CODE='0003'、支出金額C=NULLのケース）を検証
-        // テストデータ: SISYUTU_KINGAKU=30000, B=30000, C=NULL, BC=30000
+        // 3番目の支出項目（SISYUTU_ITEM_CODE='0003'、支出金額C=NULL、支払日=NULLのケース）を検証
+        // テストデータ: SISYUTU_KINGAKU=30000, B=30000, C=NULL, BC=30000, SIHARAI_DATE=NULL
         var thirdItem = response.getExpenditureItemList().get(2);
         assertEquals("外食", thirdItem.getSisyutuItemName()); // 支出項目名
         assertEquals("30,000円", thirdItem.getSisyutuKingakuB()); // 支出金額B
@@ -129,6 +130,7 @@ class AccountMonthInquiryIntegrationTest {
         assertEquals("", thirdItem.getPercentageC()); // 支出金額CがNULLの場合、割合も空文字
         assertEquals("30,000円", thirdItem.getSisyutuKingakuBC()); // 支出金額BC
         assertEquals("100", thirdItem.getPercentage()); // 支出金額BCの割合 (30000/30000*100=100%)
+        assertEquals("", thirdItem.getSiharaiDate()); // 支払日=NULLなら空文字列
 
         // Then: メッセージなし
         assertTrue(response.getMessagesList().isEmpty() || response.getMessagesList().size() == 0);

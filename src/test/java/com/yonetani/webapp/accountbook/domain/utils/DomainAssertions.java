@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.yonetani.webapp.accountbook.domain.type.common.DateValue;
+import com.yonetani.webapp.accountbook.domain.type.common.NullableDateValue;
 import com.yonetani.webapp.accountbook.domain.type.common.Identifier;
 import com.yonetani.webapp.accountbook.domain.type.common.Money;
 
@@ -184,6 +185,71 @@ public class DomainAssertions {
 	public static void assertDateAfter(DateValue expected, DateValue actual) {
 		assertNotNull(actual, "DateValue値オブジェクトがnullです");
 		assertNotNull(expected, "比較対象のDateValue値オブジェクトがnullです");
+		assertTrue(actual.isAfter(expected),
+			String.format("日付が後ではありません。期待値より後=%s, 実際=%s",
+				expected.getValue(), actual.getValue()));
+	}
+
+	// ========================================
+	// NullableDateValue系値オブジェクトのアサーション
+	// ========================================
+
+	/**
+	 *<pre>
+	 * NullableDateValue値オブジェクトの日付が期待値と等しいことを検証します。
+	 *</pre>
+	 * @param year 期待する年
+	 * @param month 期待する月
+	 * @param day 期待する日
+	 * @param actual 検証対象のNullableDateValue
+	 */
+	public static void assertDateEquals(int year, int month, int day, NullableDateValue actual) {
+		assertNotNull(actual, "NullableDateValue値オブジェクトがnullです");
+		LocalDate expected = LocalDate.of(year, month, day);
+		assertEquals(expected, actual.getValue(),
+			String.format("日付が一致しません。期待値=%s, 実際=%s",
+				expected, actual.getValue()));
+	}
+
+	/**
+	 *<pre>
+	 * NullableDateValue値オブジェクトの日付が期待値と等しいことを検証します（LocalDate版）。
+	 *</pre>
+	 * @param expectedDate 期待する日付
+	 * @param actual 検証対象のNullableDateValue
+	 */
+	public static void assertDateEquals(LocalDate expectedDate, NullableDateValue actual) {
+		assertNotNull(actual, "NullableDateValue値オブジェクトがnullです");
+		assertEquals(expectedDate, actual.getValue(),
+			String.format("日付が一致しません。期待値=%s, 実際=%s",
+				expectedDate, actual.getValue()));
+	}
+
+	/**
+	 *<pre>
+	 * NullableDateValue値オブジェクトの日付が期待値より前であることを検証します。
+	 *</pre>
+	 * @param expected 比較対象のNullableDateValue
+	 * @param actual 検証対象のNullableDateValue
+	 */
+	public static void assertDateBefore(NullableDateValue expected, NullableDateValue actual) {
+		assertNotNull(actual, "NullableDateValue値オブジェクトがnullです");
+		assertNotNull(expected, "比較対象のNullableDateValue値オブジェクトがnullです");
+		assertTrue(actual.isBefore(expected),
+			String.format("日付が前ではありません。期待値より前=%s, 実際=%s",
+				expected.getValue(), actual.getValue()));
+	}
+
+	/**
+	 *<pre>
+	 * NullableDateValue値オブジェクトの日付が期待値より後であることを検証します。
+	 *</pre>
+	 * @param expected 比較対象のNullableDateValue
+	 * @param actual 検証対象のNullableDateValue
+	 */
+	public static void assertDateAfter(NullableDateValue expected, NullableDateValue actual) {
+		assertNotNull(actual, "NullableDateValue値オブジェクトがnullです");
+		assertNotNull(expected, "比較対象のNullableDateValue値オブジェクトがnullです");
 		assertTrue(actual.isAfter(expected),
 			String.format("日付が後ではありません。期待値より後=%s, 実際=%s",
 				expected.getValue(), actual.getValue()));

@@ -24,6 +24,7 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
  * @since 家計簿アプリ(1.00.00)
  *
  */
+ @DisplayName("日付基底クラス(DateValue)のテスト")
 class DateValueTest {
 
 	// テスト用の具象クラス
@@ -59,6 +60,10 @@ class DateValueTest {
 		assertNotNull(result);
 		assertEquals(date, result.getValue());
 		assertEquals("2025-11-29", result.toString());
+		assertEquals("20251129", result.toCompactString());
+		assertEquals("2025/11/29", result.toDisplayString());
+		assertEquals("2025年11月29日", result.toJapaneseDisplayString());
+		assertEquals("2025年11月", result.toJapaneseYearMonthString());
 	}
 
 	@Test

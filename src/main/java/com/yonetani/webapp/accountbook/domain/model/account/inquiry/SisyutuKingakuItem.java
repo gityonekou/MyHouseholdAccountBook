@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/10/08 : 1.00.00  新規作成
+ * 2025/12/28 : 1.00.00  SisyutuShiharaiDateをPaymentDateに置き換え
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
@@ -17,7 +18,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCo
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuB;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuC;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuShiharaiDate;
+import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
@@ -64,7 +65,7 @@ public class SisyutuKingakuItem {
 	// 支出金額C
 	private final SisyutuKingakuC sisyutuKingakuC;
 	// 支出支払日
-	private final SisyutuShiharaiDate sisyutushiharaiDate;
+	private final PaymentDate sisyutushiharaiDate;
 	
 	/**
 	 *<pre>
@@ -105,7 +106,7 @@ public class SisyutuKingakuItem {
 				ExpenditureAmount.from(sisyutuKingaku),
 				SisyutuKingakuB.from(sisyutuKingakuB),
 				SisyutuKingakuC.from(sisyutuKingakuC),
-				SisyutuShiharaiDate.from(sisyutushiharaiDate));
+				PaymentDate.from(sisyutushiharaiDate));
 		
 	}
 }
