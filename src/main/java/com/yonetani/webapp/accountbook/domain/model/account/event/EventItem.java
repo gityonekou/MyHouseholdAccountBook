@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/08/18 : 1.00.00  新規作成
+ * 2025/12/28 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.event;
@@ -12,11 +13,10 @@ package com.yonetani.webapp.accountbook.domain.model.account.event;
 import java.time.LocalDate;
 
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
+import com.yonetani.webapp.accountbook.domain.type.account.event.EventDate;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventDetailContext;
-import com.yonetani.webapp.accountbook.domain.type.account.event.EventEndDate;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventExitFlg;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventName;
-import com.yonetani.webapp.accountbook.domain.type.account.event.EventStartDate;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
@@ -52,9 +52,9 @@ public class EventItem {
 	// イベント内容詳細
 	private final EventDetailContext eventDetailContext;
 	// イベント開始日
-	private final EventStartDate eventStartDate;
+	private final EventDate eventStartDate;
 	// イベント終了日
-	private final EventEndDate eventEndDate;
+	private final EventDate eventEndDate;
 	// イベント終了フラグ
 	private final EventExitFlg eventExitFlg;
 	
@@ -81,8 +81,8 @@ public class EventItem {
 				SisyutuItemCode.from(sisyutuItemCode),
 				EventName.from(eventName),
 				EventDetailContext.from(eventDetailContext),
-				EventStartDate.from(eventStartDate),
-				EventEndDate.from(eventEndDate),
+				EventDate.from(eventStartDate),
+				EventDate.from(eventEndDate),
 				EventExitFlg.from(eventExitFlg)
 				);
 	}

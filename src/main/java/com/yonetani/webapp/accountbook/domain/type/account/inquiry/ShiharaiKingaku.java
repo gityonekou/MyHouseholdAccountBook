@@ -31,7 +31,7 @@ import lombok.EqualsAndHashCode;
 public class ShiharaiKingaku extends Money {
 	
 	/** 値が0の「支払金額」項目の値 */
-	public static final ShiharaiKingaku ZERO = ShiharaiKingaku.from(BigDecimal.ZERO.setScale(2));
+	public static final ShiharaiKingaku ZERO = ShiharaiKingaku.from(Money.MONEY_ZERO);
 	
 	/**
 	 * コンストラクタ
@@ -56,14 +56,17 @@ public class ShiharaiKingaku extends Money {
 	 *
 	 */
 	public static ShiharaiKingaku from(BigDecimal kingaku) {
+		
 		// 基底クラスのバリデーションを実行（null非許容、スケール2チェック）
 		validate(kingaku, "支払金額");
+		
 		// ガード節(マイナス値) - 支払金額は0以上である必要がある
 		if(BigDecimal.ZERO.compareTo(kingaku) > 0) {
 			throw new MyHouseholdAccountBookRuntimeException(
 				String.format("「支払金額」項目の設定値がマイナスです。管理者に問い合わせてください。[value=%d]",
 					kingaku.intValue()));
 		}
+		
 		return new ShiharaiKingaku(kingaku);
 	}
 }

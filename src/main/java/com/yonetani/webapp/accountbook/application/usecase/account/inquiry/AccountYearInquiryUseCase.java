@@ -7,6 +7,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2023/10/09 : 1.00.00  新規作成
+ * 2025/12/28 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.inquiry;
@@ -95,16 +96,16 @@ public class AccountYearInquiryUseCase {
 			// 年間収支(マージ)(ドメインモデル)から年間収支(マージ)(レスポンス)への変換
 			response.addMageInquiryList(convertMageList(resultList));
 			/* 合計値を設定 */
-			// 収入金額合計
-			response.setSyuunyuuKingakuGoukei(resultList.getSyuunyuuKingakuGoukei().toString());
+			// 収入金額合計(積立金取崩金額以外の収入金額合計)
+			response.setSyuunyuuKingakuGoukei(resultList.getIncomeTotalAmount().toFormatString());
 			// 積立金取崩金額合計
-			response.setWithdrewKingakuGoukei(resultList.getWithdrewKingakuGoukei().toString());
+			response.setWithdrewKingakuGoukei(resultList.getWithdrawingTotalAmount().toFormatString());
 			// 支出予定金額合計
-			response.setSisyutuYoteiKingakuGoukei(resultList.getSisyutuYoteiKingakuGoukei().toString());
+			response.setSisyutuYoteiKingakuGoukei(resultList.getExpectedExpenditureTotalAmount().toFormatString());
 			// 支出金額合計
-			response.setSisyutuKingakuGoukei(resultList.getSisyutuKingakuGoukei().toString());
+			response.setSisyutuKingakuGoukei(resultList.getExpenditureTotalAmount().toFormatString());
 			// 収支合計
-			response.setSyuusiKingakuGoukei(resultList.getSyuusiKingakuGoukei().toString());
+			response.setSyuusiKingakuGoukei(resultList.getBalanceTotalAmount().toFormatString());
 		}
 		
 		return response;
@@ -122,11 +123,11 @@ public class AccountYearInquiryUseCase {
 		return resultList.getValues().stream().map(domain ->
 			AccountYearMageInquiryResponse.MageInquiryListItem.from(
 					domain.getTargetMonth().getValue(),
-					domain.getSyuunyuuKingaku().toString(),
-					domain.getWithdrewKingaku().toString(),
-					domain.getSisyutuYoteiKingaku().toFormatString(),
-					domain.getSisyutuKingaku().toString(),
-					domain.getSyuusiKingaku().toString())
+					domain.getIncomeAmount().toFormatString(),
+					domain.getWithdrawingAmount().toFormatString(),
+					domain.getExpectedExpenditureAmount().toFormatString(),
+					domain.getExpenditureAmount().toFormatString(),
+					domain.getBalanceAmount().toFormatString())
 		).collect(Collectors.toUnmodifiableList());
 	}
 
@@ -165,10 +166,10 @@ public class AccountYearInquiryUseCase {
 			// 年間収支(マージ)(ドメインモデル)から年間収支(マージ)(レスポンス)への変換
 			response.addMeisaiInquiryList(convertMeisaiList(resultList));
 			/* 合計値を設定 */
-			// 収入金額合計
-			response.setSyuunyuuKingakuGoukei(resultList.getSyuunyuuKingakuGoukei().toString());
+			// 収入金額合計(積立金取崩金額以外の収入金額合計)
+			response.setSyuunyuuKingakuGoukei(resultList.getIncomeTotalAmount().toFormatString());
 			// 積立金取崩金額合計
-			response.setWithdrewKingakuGoukei(resultList.getWithdrewKingakuGoukei().toString());
+			response.setWithdrewKingakuGoukei(resultList.getWithdrawingTotalAmount().toFormatString());
 			// 事業経費合計
 			response.setJigyouKeihiKingakuGoukei(resultList.getJigyouKeihiKingakuGoukei().toString());
 			// 固定(非課税)合計
@@ -181,14 +182,14 @@ public class AccountYearInquiryUseCase {
 			response.setInsyokuNitiyouhinKingakuGoukei(resultList.getInsyokuNitiyouhinKingakuGoukei().toString());
 			// 趣味娯楽合計
 			response.setSyumiGotakuKingakuGoukei(resultList.getSyumiGotakuKingakuGoukei().toString());
-			// 支出B合計
-			response.setSisyutuKingakuBCGoukei(resultList.getSisyutuKingakuBCGoukei().toFormatString());
-			// 支出BC合計のうち、支出B合計の割合
-			response.setPercentageBGoukei(resultList.getSisyutuKingakuBCGoukei().getSisyutuKingakuBPercentage());
+			// 無駄遣い合計支出金額合計
+			response.setSisyutuKingakuBCGoukei(resultList.getTotalWasteExpenditureTotalAmount().toFormatString());
+			// 無駄遣い合計支出金額合計のうち、無駄遣い（軽度）支出金額合計の割合
+			response.setPercentageBGoukei(resultList.getTotalWasteExpenditureTotalAmount().getMinorWasteExpenditurePercentage());
 			// 支出合計
-			response.setSisyutuKingakuGoukei(resultList.getSisyutuKingakuGoukei().toString());
+			response.setSisyutuKingakuGoukei(resultList.getExpenditureTotalAmount().toFormatString());
 			// 収支合計
-			response.setSyuusiKingakuGoukei(resultList.getSyuusiKingakuGoukei().toString());
+			response.setSyuusiKingakuGoukei(resultList.getBalanceTotalAmount().toFormatString());
 		}
 		return response;
 	}
@@ -205,18 +206,18 @@ public class AccountYearInquiryUseCase {
 		return resultList.getValues().stream().map(domain ->
 			AccountYearMeisaiInquiryResponse.MeisaiInquiryListItem.from(
 					domain.getMonth().getValue(),
-					domain.getSyuunyuuKingaku().toString(),
-					domain.getWithdrewKingaku().toString(),
+					domain.getIncomeAmount().toFormatString(),
+					domain.getWithdrawingAmount().toFormatString(),
 					domain.getJigyouKeihiKingaku().toString(),
 					domain.getKoteiHikazeiKingaku().toString(),
 					domain.getKoteiKazeiKingaku().toString(),
 					domain.getIruiJyuukyoSetubiKingaku().toString(),
 					domain.getInsyokuNitiyouhinKingaku().toString(),
 					domain.getSyumiGotakuKingaku().toString(),
-					domain.getSisyutuKingakuBC().toFormatString(),
-					domain.getSisyutuKingakuBC().getSisyutuKingakuBPercentage(),
-					domain.getSisyutuKingaku().toString(),
-					domain.getSyuusiKingaku().toString())
+					domain.getTotalWasteExpenditure().toFormatString(),
+					domain.getTotalWasteExpenditure().getMinorWasteExpenditurePercentage(),
+					domain.getExpenditureAmount().toFormatString(),
+					domain.getBalanceAmount().toFormatString())
 		).collect(Collectors.toUnmodifiableList());
 	}
 	

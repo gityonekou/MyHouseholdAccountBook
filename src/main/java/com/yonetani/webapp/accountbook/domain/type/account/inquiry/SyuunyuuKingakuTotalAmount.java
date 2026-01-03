@@ -1,6 +1,11 @@
 /**
- * 「収入金額合計」項目の値を表すドメインタイプです。
- * 「収入金額」項目と「積立金取崩金額」項目の合算値が「収入金額合計」項目の値となります。
+ * 収入金額合計の値を表すドメインタイプです。
+ * 「収入金額」項目と「積立金取崩金額」項目の合算値が収入金額合計の値となります。
+ * 
+ * 注意事項：
+ * 画面の「収入金額合計」項目（IncomeTotalAmountクラス）とは別の責務を持ちます。
+ * IncomeTotalAmountクラスは収入区分1,2,4の収入金額を表すドメインタイプであり、
+ * SyuunyuuKingakuTotalAmountクラスは収入金額合計（収入区分1,2,4の収入金額合計 + 収入区分3の積立金取崩金額）を表すドメインタイプです。
  *
  *------------------------------------------------
  * 更新履歴
@@ -22,7 +27,13 @@ import lombok.EqualsAndHashCode;
 /**
  *<pre>
  * 「収入金額合計」項目の値を表すドメインタイプです。
+ * 「収入金額」項目と「積立金取崩金額」項目の合算値が「収入金額合計」項目の値となります。
  *
+ * 注意事項：
+ * 画面の「収入金額合計」項目（IncomeTotalAmountクラス）とは別の責務を持ちます。
+ * IncomeTotalAmountクラスは収入区分1,2,4の収入金額を表すドメインタイプであり、
+ * SyuunyuuKingakuTotalAmountクラスは収入金額合計（収入区分1,2,4の収入金額合計 + 収入区分3の積立金取崩金額）を表すドメインタイプです。
+ * 
  *</pre>
  *
  * @author ：Kouki Yonetani
@@ -33,7 +44,7 @@ import lombok.EqualsAndHashCode;
 public class SyuunyuuKingakuTotalAmount extends Money {
 
 	/** 値が0の「収入金額合計」項目の値 */
-	public static final SyuunyuuKingakuTotalAmount ZERO = SyuunyuuKingakuTotalAmount.from(BigDecimal.ZERO.setScale(2));
+	public static final SyuunyuuKingakuTotalAmount ZERO = SyuunyuuKingakuTotalAmount.from(Money.MONEY_ZERO);
 
 	/**
 	 *<pre>
@@ -60,11 +71,14 @@ public class SyuunyuuKingakuTotalAmount extends Money {
 	 *
 	 */
 	public static SyuunyuuKingakuTotalAmount from(BigDecimal totalAmount) {
-		Money.validate(totalAmount, "収入金額合計");
+		// 基底クラスのバリデーションを実行（null非許容、スケール2チェック）
+		validate(totalAmount, "収入金額合計");
+		
 		// ガード節(マイナス値)
 		if(BigDecimal.ZERO.compareTo(totalAmount) > 0) {
 			throw new MyHouseholdAccountBookRuntimeException("「収入金額合計」項目の設定値がマイナスです。管理者に問い合わせてください。[value=" + totalAmount.intValue() + "]");
 		}
+		
 		// 「収入金額合計」項目の値を生成して返却
 		return new SyuunyuuKingakuTotalAmount(totalAmount);
 	}
@@ -83,28 +97,28 @@ public class SyuunyuuKingakuTotalAmount extends Money {
 	 *
 	 *</pre>
 	 * @param income 収入金額
-	 * @param withdrew 積立金取崩金額
+	 * @param withdrawing 積立金取崩金額
 	 * @return 「収入金額合計」項目ドメインタイプ
 	 *
 	 */
-	public static SyuunyuuKingakuTotalAmount from(IncomeAmount income, WithdrewKingaku withdrew) {
+	public static SyuunyuuKingakuTotalAmount from(IncomeAmount income, WithdrawingAmount withdrawing) {
 		// ガード節(収入金額がnull)
 		if(income == null) {
 			throw new MyHouseholdAccountBookRuntimeException("収入金額の設定値がnullです。管理者に問い合わせてください。");
 		}
 		// ガード節(積立金取崩金額がnull)
-		if(withdrew == null) {
+		if(withdrawing == null) {
 			throw new MyHouseholdAccountBookRuntimeException("積立金取崩金額の設定値がnullです。管理者に問い合わせてください。");
 		}
 
 		// 収入金額と積立金取崩金額を加算して収入金額合計を生成
 		// 積立金取崩金額はnull値を持つ可能性があるため、getNullSafeValue()を使用
-		BigDecimal totalAmount = income.getValue().add(withdrew.getNullSafeValue());
+		BigDecimal totalAmount = income.getValue().add(withdrawing.getNullSafeValue());
 
 		// 「収入金額合計」項目の値を生成して返却
 		return new SyuunyuuKingakuTotalAmount(totalAmount);
 	}
-
+	
 	/**
 	 *<pre>
 	 * 収入金額合計の値を指定した収入金額の値で加算(this + addValue)した値を返します。
@@ -114,6 +128,6 @@ public class SyuunyuuKingakuTotalAmount extends Money {
 	 *
 	 */
 	public SyuunyuuKingakuTotalAmount add(IncomeAmount addValue) {
-		return new SyuunyuuKingakuTotalAmount(super.add(addValue));
+		return SyuunyuuKingakuTotalAmount.from(super.add(addValue));
 	}
 }

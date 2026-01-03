@@ -1,11 +1,11 @@
 /**
  * 「支出金額合計」項目の値を表すドメインタイプです。
+ * リファクタリングにより、クラス名変更しました(SisyutuKingakuTotalAmount → ExpenditureTotalAmount)
  *
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  コメントなど
- * 2024/09/22 : 1.00.00  新規作成
- * 2025/12/21 : 1.01.00  リファクタリング対応(DDD適応)
+ * 2025/12/28 : 1.00.00  リファクタリング対応(DDD適応)により新規作成
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
@@ -25,14 +25,14 @@ import lombok.EqualsAndHashCode;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @EqualsAndHashCode(callSuper = true)
-public class SisyutuKingakuTotalAmount extends Money {
+public class ExpenditureTotalAmount extends Money {
 
 	/** 値が0の「支出金額合計」項目の値 */
-	public static final SisyutuKingakuTotalAmount ZERO = SisyutuKingakuTotalAmount.from(BigDecimal.ZERO.setScale(2));
+	public static final ExpenditureTotalAmount ZERO = ExpenditureTotalAmount.from(Money.MONEY_ZERO);
 
 	/**
 	 *<pre>
@@ -41,7 +41,7 @@ public class SisyutuKingakuTotalAmount extends Money {
 	 * @param value 支出金額合計
 	 *
 	 */
-	private SisyutuKingakuTotalAmount(BigDecimal value) {
+	private ExpenditureTotalAmount(BigDecimal value) {
 		super(value);
 	}
 
@@ -59,14 +59,18 @@ public class SisyutuKingakuTotalAmount extends Money {
 	 * @return 「支出金額合計」項目ドメインタイプ
 	 *
 	 */
-	public static SisyutuKingakuTotalAmount from(BigDecimal totalAmount) {
-		Money.validate(totalAmount, "支出金額合計");
+	public static ExpenditureTotalAmount from(BigDecimal totalAmount) {
+		
+		// 基底クラスのバリデーションを実行（null非許容、スケール2チェック）
+		validate(totalAmount, "支出金額合計");
+		
 		// ガード節(マイナス値)
 		if(BigDecimal.ZERO.compareTo(totalAmount) > 0) {
 			throw new MyHouseholdAccountBookRuntimeException("「支出金額合計」項目の設定値がマイナスです。管理者に問い合わせてください。[value=" + totalAmount.intValue() + "]");
 		}
+		
 		// 「支出金額合計」項目の値を生成して返却
-		return new SisyutuKingakuTotalAmount(totalAmount);
+		return new ExpenditureTotalAmount(totalAmount);
 	}
 
 	/**
@@ -82,14 +86,14 @@ public class SisyutuKingakuTotalAmount extends Money {
 	 * @return 「支出金額合計」項目ドメインタイプ
 	 *
 	 */
-	public static SisyutuKingakuTotalAmount from(ExpenditureAmount expenditure) {
+	public static ExpenditureTotalAmount from(ExpenditureAmount expenditure) {
 		// ガード節(支出金額がnull)
 		if(expenditure == null) {
 			throw new MyHouseholdAccountBookRuntimeException("支出金額の設定値がnullです。管理者に問い合わせてください。");
 		}
 
 		// 支出金額から支出金額合計を生成して返却
-		return new SisyutuKingakuTotalAmount(expenditure.getValue());
+		return new ExpenditureTotalAmount(expenditure.getValue());
 	}
 
 	/**
@@ -100,7 +104,7 @@ public class SisyutuKingakuTotalAmount extends Money {
 	 * @return 加算した支出金額合計の値(this + addValue)
 	 *
 	 */
-	public SisyutuKingakuTotalAmount add(ExpenditureAmount addValue) {
-		return new SisyutuKingakuTotalAmount(super.add(addValue));
+	public ExpenditureTotalAmount add(ExpenditureAmount addValue) {
+		return ExpenditureTotalAmount.from(super.add(addValue));
 	}
 }

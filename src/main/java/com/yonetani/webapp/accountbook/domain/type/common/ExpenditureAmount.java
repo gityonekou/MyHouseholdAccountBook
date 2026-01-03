@@ -26,14 +26,14 @@ import lombok.EqualsAndHashCode;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @EqualsAndHashCode(callSuper = true)
 public class ExpenditureAmount extends Money {
 
 	/** 値が0の「支出金額」項目の値 */
-	public static final ExpenditureAmount ZERO = new ExpenditureAmount(BigDecimal.ZERO.setScale(2));
+	public static final ExpenditureAmount ZERO = new ExpenditureAmount(Money.MONEY_ZERO);
 
 	/**
 	 *<pre>
@@ -61,8 +61,8 @@ public class ExpenditureAmount extends Money {
 	 *
 	 */
 	public static ExpenditureAmount from(BigDecimal value) {
-		// 基本検証（null、スケール）
-		Money.validate(value, "支出金額");
+		// 基底クラスのバリデーションを実行（null非許容、スケール2チェック）
+		validate(value, "支出金額");
 
 		// ガード節(マイナス値)
 		if(BigDecimal.ZERO.compareTo(value) > 0) {
@@ -83,11 +83,7 @@ public class ExpenditureAmount extends Money {
 	 *
 	 */
 	public ExpenditureAmount add(ExpenditureAmount addValue) {
-		if(addValue == null) {
-			throw new MyHouseholdAccountBookRuntimeException(
-				"加算対象の支出金額がnullです。管理者に問い合わせてください。");
-		}
-		return new ExpenditureAmount(super.add(addValue));
+		return ExpenditureAmount.from(super.add(addValue));
 	}
 
 	/**
@@ -101,19 +97,16 @@ public class ExpenditureAmount extends Money {
 	 *
 	 */
 	public ExpenditureAmount subtract(ExpenditureAmount subtractValue) {
-		if(subtractValue == null) {
-			throw new MyHouseholdAccountBookRuntimeException(
-				"減算対象の支出金額がnullです。管理者に問い合わせてください。");
-		}
+		// 基底クラスの減算処理を実行
 		BigDecimal result = super.subtract(subtractValue);
 
-		// 結果がマイナスになる場合はエラー
+		// 減算結果がマイナスになる場合はエラー
 		if(result.compareTo(BigDecimal.ZERO) < 0) {
 			throw new MyHouseholdAccountBookRuntimeException(
 				"支出金額の減算結果がマイナスになります。管理者に問い合わせてください。");
 		}
 
-		return new ExpenditureAmount(result);
+		return ExpenditureAmount.from(result);
 	}
 
 	/**
@@ -152,6 +145,6 @@ public class ExpenditureAmount extends Money {
 					this.toFormatString(), coupon.toFormatString()));
 		}
 
-		return new ExpenditureAmount(result);
+		return ExpenditureAmount.from(result);
 	}
 }

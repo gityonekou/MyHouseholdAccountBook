@@ -1,11 +1,12 @@
 /**
  * 「支出予定金額」項目の値を表すドメインタイプです
+ * リファクタリングにより、クラス名変更しました(SisyutuYoteiKingaku → ExpectedExpenditureAmount)
+ * 
  *
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  コメントなど
- * 2023/10/15 : 1.00.00  新規作成
- * 2025/12/21 : 1.01.00  リファクタリング対応(DDD適応)
+ * 2025/12/28 : 1.00.00  リファクタリング対応(DDD適応)により新規作成
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
@@ -24,20 +25,20 @@ import lombok.EqualsAndHashCode;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @EqualsAndHashCode(callSuper = true)
-public class SisyutuYoteiKingaku extends Money {
+public class ExpectedExpenditureAmount extends Money {
 	
-	// 値が0の「支出予定金額」項目の値
-	public static final SisyutuYoteiKingaku ZERO = SisyutuYoteiKingaku.from(BigDecimal.ZERO.setScale(2));
+	/** 値が0の「支出予定金額」項目の値 */
+	public static final ExpectedExpenditureAmount ZERO = ExpectedExpenditureAmount.from(Money.MONEY_ZERO);
 	
 	/**
 	 * コンストラクタ
 	 * @param value 支出予定金額
 	 */
-	private SisyutuYoteiKingaku(BigDecimal value) {
+	private ExpectedExpenditureAmount(BigDecimal value) {
 		super(value);
 	}
 	
@@ -50,21 +51,24 @@ public class SisyutuYoteiKingaku extends Money {
 	 * ・マイナス値
 	 * ・スケール値が2以外
 	 *</pre>
-	 * @param sisyutuYoteiKingaku 支出予定金額
+	 * @param amount 支出予定金額
 	 * @return 「支出予定金額」項目ドメインタイプ
 	 *
 	 */
-	public static SisyutuYoteiKingaku from(BigDecimal sisyutuYoteiKingaku) {
+	public static ExpectedExpenditureAmount from(BigDecimal amount) {
+		
 		// 基底クラスのバリデーションを実行（null非許容、スケール2チェック）
-		validate(sisyutuYoteiKingaku, "支出予定金額");
+		validate(amount, "支出予定金額");
+		
 		// ガード節(マイナス値) - 支出予定金額は0以上である必要がある
-		if(BigDecimal.ZERO.compareTo(sisyutuYoteiKingaku) > 0) {
+		if(BigDecimal.ZERO.compareTo(amount) > 0) {
 			throw new MyHouseholdAccountBookRuntimeException(
 				String.format("「支出予定金額」項目の設定値がマイナスです。管理者に問い合わせてください。[value=%d]",
-					sisyutuYoteiKingaku.intValue()));
+						amount.intValue()));
 		}
+		
 		// 「支出予定金額」項目の値を生成して返却
-		return new SisyutuYoteiKingaku(sisyutuYoteiKingaku);
+		return new ExpectedExpenditureAmount(amount);
 	}
 	
 	/**
@@ -75,7 +79,7 @@ public class SisyutuYoteiKingaku extends Money {
 	 * @return 加算した支出予定金額の値(this + addValue)
 	 *
 	 */
-	public SisyutuYoteiKingaku add(SisyutuYoteiKingaku addValue) {
-		return new SisyutuYoteiKingaku(super.add(addValue));
+	public ExpectedExpenditureAmount add(ExpectedExpenditureAmount addValue) {
+		return ExpectedExpenditureAmount.from(super.add(addValue));
 	}
 }

@@ -37,7 +37,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
@@ -45,6 +45,9 @@ import lombok.RequiredArgsConstructor;
 @EqualsAndHashCode
 public abstract class Money {
 
+	/** 値が0の金額の値 */
+	protected static final BigDecimal MONEY_ZERO = BigDecimal.ZERO.setScale(2);
+	
 	// 金額の値（スケール2固定: 小数点以下2桁）
 	private final BigDecimal value;
 

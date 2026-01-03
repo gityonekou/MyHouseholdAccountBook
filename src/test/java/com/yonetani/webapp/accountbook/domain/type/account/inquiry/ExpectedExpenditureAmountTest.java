@@ -1,5 +1,5 @@
 /**
- * SisyutuYoteiKingaku(支出予定金額)のテストクラスです。
+ * ExpectedExpenditureAmount(支出予定金額)のテストクラスです。
  *
  *------------------------------------------------
  * 更新履歴
@@ -20,7 +20,7 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
 
 /**
  *<pre>
- * SisyutuYoteiKingaku(支出予定金額)のテストクラスです。
+ * ExpectedExpenditureAmount(支出予定金額)のテストクラスです。
  *
  *</pre>
  *
@@ -28,14 +28,14 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
  * @since 家計簿アプリ(1.00.00)
  *
  */
-@DisplayName("支出予定金額(SisyutuYoteiKingaku)のテスト")
-class SisyutuYoteiKingakuTest {
+@DisplayName("支出予定金額(ExpectedExpenditureAmount)のテスト")
+class ExpectedExpenditureAmountTest {
 
 	@Test
 	@DisplayName("正常系：正の金額で生成できる")
 	void testFrom_正常系_正の金額() {
 		// 実行
-		SisyutuYoteiKingaku amount = SisyutuYoteiKingaku.from(new BigDecimal("10000.00"));
+		ExpectedExpenditureAmount amount = ExpectedExpenditureAmount.from(new BigDecimal("10000.00"));
 
 		// 検証
 		assertNotNull(amount);
@@ -48,9 +48,9 @@ class SisyutuYoteiKingakuTest {
 	@DisplayName("正常系：ZERO定数が使用できる")
 	void testZERO定数() {
 		// 検証
-		assertNotNull(SisyutuYoteiKingaku.ZERO);
-		assertTrue(SisyutuYoteiKingaku.ZERO.isZero());
-		assertEquals(BigDecimal.ZERO.setScale(2), SisyutuYoteiKingaku.ZERO.getValue());
+		assertNotNull(ExpectedExpenditureAmount.ZERO);
+		assertTrue(ExpectedExpenditureAmount.ZERO.isZero());
+		assertEquals(BigDecimal.ZERO.setScale(2), ExpectedExpenditureAmount.ZERO.getValue());
 	}
 
 	@Test
@@ -59,7 +59,7 @@ class SisyutuYoteiKingakuTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> SisyutuYoteiKingaku.from((BigDecimal)null)
+			() -> ExpectedExpenditureAmount.from((BigDecimal)null)
 		);
 		assertTrue(exception.getMessage().contains("支出予定金額"));
 		assertTrue(exception.getMessage().contains("null"));
@@ -71,7 +71,7 @@ class SisyutuYoteiKingakuTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> SisyutuYoteiKingaku.from(new BigDecimal("-1000.00"))
+			() -> ExpectedExpenditureAmount.from(new BigDecimal("-1000.00"))
 		);
 		assertTrue(exception.getMessage().contains("支出予定金額"));
 		assertTrue(exception.getMessage().contains("マイナス"));
@@ -83,7 +83,7 @@ class SisyutuYoteiKingakuTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> SisyutuYoteiKingaku.from(new BigDecimal("10000"))
+			() -> ExpectedExpenditureAmount.from(new BigDecimal("10000"))
 		);
 		assertTrue(exception.getMessage().contains("支出予定金額"));
 		assertTrue(exception.getMessage().contains("スケール"));
@@ -93,11 +93,11 @@ class SisyutuYoteiKingakuTest {
 	@DisplayName("正常系：加算が正しく動作する")
 	void testAdd_正常系() {
 		// 準備
-		SisyutuYoteiKingaku amount1 = SisyutuYoteiKingaku.from(new BigDecimal("10000.00"));
-		SisyutuYoteiKingaku amount2 = SisyutuYoteiKingaku.from(new BigDecimal("5000.00"));
+		ExpectedExpenditureAmount amount1 = ExpectedExpenditureAmount.from(new BigDecimal("10000.00"));
+		ExpectedExpenditureAmount amount2 = ExpectedExpenditureAmount.from(new BigDecimal("5000.00"));
 
 		// 実行
-		SisyutuYoteiKingaku result = amount1.add(amount2);
+		ExpectedExpenditureAmount result = amount1.add(amount2);
 
 		// 検証
 		assertEquals(new BigDecimal("15000.00"), result.getValue());

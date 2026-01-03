@@ -16,8 +16,8 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 
 /**
  *<pre>
@@ -95,25 +95,25 @@ class SyuunyuuKingakuTotalAmountTest {
 	void testFrom_正常系_収入金額と積立金取崩金額() {
 		// 準備
 		IncomeAmount income = IncomeAmount.from(new BigDecimal("10000.00"));
-		WithdrewKingaku withdrew = WithdrewKingaku.from(new BigDecimal("5000.00"));
+		WithdrawingAmount withdrawing = WithdrawingAmount.from(new BigDecimal("5000.00"));
 
 		// 実行
-		SyuunyuuKingakuTotalAmount total = SyuunyuuKingakuTotalAmount.from(income, withdrew);
+		SyuunyuuKingakuTotalAmount total = SyuunyuuKingakuTotalAmount.from(income, withdrawing);
 
 		// 検証
 		assertNotNull(total);
 		assertEquals(new BigDecimal("15000.00"), total.getValue());
 	}
-
+	
 	@Test
 	@DisplayName("正常系：積立金取崩金額がnullの場合も正しく動作する")
 	void testFrom_正常系_積立金取崩金額がnull() {
 		// 準備
 		IncomeAmount income = IncomeAmount.from(new BigDecimal("10000.00"));
-		WithdrewKingaku withdrew = WithdrewKingaku.NULL;
+		WithdrawingAmount withdrawing = WithdrawingAmount.NULL;
 
 		// 実行
-		SyuunyuuKingakuTotalAmount total = SyuunyuuKingakuTotalAmount.from(income, withdrew);
+		SyuunyuuKingakuTotalAmount total = SyuunyuuKingakuTotalAmount.from(income, withdrawing);
 
 		// 検証（getNullSafeValue()により0として扱われる）
 		assertNotNull(total);

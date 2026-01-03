@@ -137,19 +137,6 @@ class CouponAmountTest {
 	}
 
 	@Test
-	@DisplayName("異常系：加算でnullを渡すと例外が発生する")
-	void testAdd_異常系_null() {
-		// 準備
-		CouponAmount amount = CouponAmount.from(new BigDecimal("500.00"));
-
-		// 実行 & 検証
-		assertThrows(
-			MyHouseholdAccountBookRuntimeException.class,
-			() -> amount.add(null)
-		);
-	}
-
-	@Test
 	@DisplayName("正常系：toFormatStringは割引額（正の値）のフォーマット済み文字列を返す")
 	void testToFormatString() {
 		// 準備

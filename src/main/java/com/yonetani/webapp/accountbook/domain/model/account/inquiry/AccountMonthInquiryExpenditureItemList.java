@@ -5,7 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2023/09/30 : 1.00.00  新規作成
- * 2025/12/28 : 1.00.00  ShiharaiDateをPaymentDateに置き換え
+ * 2025/12/28 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
@@ -17,14 +17,14 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
-import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.MinorWasteExpenditure;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SevereWasteExpenditure;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemLevel;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemName;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuB;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuBC;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuC;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalWasteExpenditure;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -68,15 +68,15 @@ public class AccountMonthInquiryExpenditureItemList {
 		// 支出項目レベル(1～5)
 		private final SisyutuItemLevel sisyutuItemLevel;
 		// 支出金額
-		private final ExpenditureAmount sisyutuKingaku;
-		// 支出金額B
-		private final SisyutuKingakuB sisyutuKingakuB;
-		// 支出金額C
-		private final SisyutuKingakuC sisyutuKingakuC;
-		// 支出金額BとCの合計値
-		private final SisyutuKingakuBC sisyutuKingakuBC;
+		private final ExpenditureAmount expenditureAmount;
+		// 無駄遣い（軽度）支出金額
+		private final MinorWasteExpenditure minorWasteExpenditure;
+		// 無駄遣い（重度）支出金額
+		private final SevereWasteExpenditure severeWasteExpenditure;
+		// 無駄遣い合計支出金額
+		private final TotalWasteExpenditure totalWasteExpenditure;
 		// 支払日
-		private final PaymentDate shiharaiDate;
+		private final PaymentDate paymentDate;
 		
 		/**
 		 *<pre>
@@ -85,10 +85,10 @@ public class AccountMonthInquiryExpenditureItemList {
 		 * @param sisyutuItemCode 支出項目コード
 		 * @param sisyutuItemName 支出項目名
 		 * @param sisyutuItemLevel 支出項目レベル(1～5)
-		 * @param sisyutuKingaku 支出金額
-		 * @param sisyutuKingakuB 支出金額B
-		 * @param sisyutuKingakuC 支出金額C
-		 * @param siharaiDate 支払日
+		 * @param expenditureAmount 支出金額
+		 * @param minorWasteExpenditure 無駄遣い（軽度）支出金額
+		 * @param severeWasteExpenditure 無駄遣い（重度）支出金額
+		 * @param paymentDate 支払日
 		 * @return 月毎の支出項目明細
 		 *
 		 */
@@ -96,22 +96,25 @@ public class AccountMonthInquiryExpenditureItemList {
 					String sisyutuItemCode,
 					String sisyutuItemName,
 					String sisyutuItemLevel,
-					BigDecimal sisyutuKingaku,
-					BigDecimal sisyutuKingakuB,
-					BigDecimal sisyutuKingakuC,
-					LocalDate siharaiDate
+					BigDecimal expenditureAmount,
+					BigDecimal minorWasteExpenditure,
+					BigDecimal severeWasteExpenditure,
+					LocalDate paymentDate
 				) {
-			SisyutuKingakuB kinbakuB = SisyutuKingakuB.from(sisyutuKingakuB);
-			SisyutuKingakuC kinbakuC = SisyutuKingakuC.from(sisyutuKingakuC);
+			// 無駄遣い合計支出金額生成用に無駄遣い（軽度）支出金額のドメインオブジェクトを生成
+			MinorWasteExpenditure minor = MinorWasteExpenditure.from(minorWasteExpenditure);
+			// 無駄遣い合計支出金額生成用に無駄遣い（重度）支出金額のドメインオブジェクトを生成
+			SevereWasteExpenditure severe = SevereWasteExpenditure.from(severeWasteExpenditure);
+			// 月毎の支出項目明細ドメインモデルを生成して返す
 			return new ExpenditureListItem(
 					SisyutuItemCode.from(sisyutuItemCode),
 					SisyutuItemName.from(sisyutuItemName),
 					SisyutuItemLevel.from(sisyutuItemLevel),
-					ExpenditureAmount.from(sisyutuKingaku),
-					kinbakuB,
-					kinbakuC,
-					SisyutuKingakuBC.from(kinbakuB, kinbakuC),
-					PaymentDate.from(siharaiDate));
+					ExpenditureAmount.from(expenditureAmount),
+					minor,
+					severe,
+					TotalWasteExpenditure.from(minor, severe),
+					PaymentDate.from(paymentDate));
 		}
 	}
 	

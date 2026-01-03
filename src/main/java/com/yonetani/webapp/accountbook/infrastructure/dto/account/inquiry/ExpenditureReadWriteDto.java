@@ -89,7 +89,7 @@ public class ExpenditureReadWriteDto {
 				// 支払日
 				domain.getShiharaiDate().getValue(),
 				// 支出予定金額
-				domain.getSisyutuYoteiKingaku().getValue(),
+				domain.getExpectedExpenditureAmount().getValue(),
 				// 支出金額
 				domain.getSisyutuKingaku().getValue(),
 				// 削除フラグ

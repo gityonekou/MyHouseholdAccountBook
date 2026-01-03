@@ -1,10 +1,11 @@
 /**
- * SisyutuKingakuB(支出金額B)のテストクラスです。
+ * MinorWasteExpenditure(無駄遣い（軽度）支出金額)のテストクラスです。
  *
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  コメントなど
  * 2025/12/23 : 1.00.00  新規作成
+ * 2025/12/28 : 1.01.00  クラス名変更(SisyutuKingakuBTest → MinorWasteExpenditureTest)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
@@ -21,7 +22,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 
 /**
  *<pre>
- * SisyutuKingakuB(支出金額B)のテストクラスです。
+ * MinorWasteExpenditure(無駄遣い（軽度）支出金額)のテストクラスです。
  *
  *</pre>
  *
@@ -29,14 +30,14 @@ import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
  * @since 家計簿アプリ(1.00.00)
  *
  */
-@DisplayName("支出金額B(SisyutuKingakuB)のテスト")
-class SisyutuKingakuBTest {
+@DisplayName("無駄遣い（軽度）支出金額(MinorWasteExpenditure)のテスト")
+class MinorWasteExpenditureTest {
 
 	@Test
 	@DisplayName("正常系：正の金額で生成できる")
 	void testFrom_正常系_正の金額() {
 		// 実行
-		SisyutuKingakuB amount = SisyutuKingakuB.from(new BigDecimal("10000.00"));
+		MinorWasteExpenditure amount = MinorWasteExpenditure.from(new BigDecimal("10000.00"));
 
 		// 検証
 		assertNotNull(amount);
@@ -49,7 +50,7 @@ class SisyutuKingakuBTest {
 	@DisplayName("正常系：null値で生成できる")
 	void testFrom_正常系_null値() {
 		// 実行
-		SisyutuKingakuB amount = SisyutuKingakuB.from(null);
+		MinorWasteExpenditure amount = MinorWasteExpenditure.from(null);
 
 		// 検証
 		assertNotNull(amount);
@@ -63,9 +64,9 @@ class SisyutuKingakuBTest {
 	@DisplayName("正常系：ZERO定数が使用できる")
 	void testZERO定数() {
 		// 検証
-		assertNotNull(SisyutuKingakuB.ZERO);
-		assertTrue(SisyutuKingakuB.ZERO.isZero());
-		assertEquals(BigDecimal.ZERO.setScale(2), SisyutuKingakuB.ZERO.getValue());
+		assertNotNull(MinorWasteExpenditure.ZERO);
+		assertTrue(MinorWasteExpenditure.ZERO.isZero());
+		assertEquals(BigDecimal.ZERO.setScale(2), MinorWasteExpenditure.ZERO.getValue());
 	}
 
 	@Test
@@ -74,9 +75,9 @@ class SisyutuKingakuBTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> SisyutuKingakuB.from(new BigDecimal("-1000.00"))
+			() -> MinorWasteExpenditure.from(new BigDecimal("-1000.00"))
 		);
-		assertTrue(exception.getMessage().contains("支出金額B"));
+		assertTrue(exception.getMessage().contains("無駄遣い（軽度）支出金額"));
 		assertTrue(exception.getMessage().contains("マイナス"));
 	}
 
@@ -86,9 +87,9 @@ class SisyutuKingakuBTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> SisyutuKingakuB.from(new BigDecimal("10000"))
+			() -> MinorWasteExpenditure.from(new BigDecimal("10000"))
 		);
-		assertTrue(exception.getMessage().contains("支出金額B"));
+		assertTrue(exception.getMessage().contains("無駄遣い（軽度）支出金額"));
 		assertTrue(exception.getMessage().contains("スケール"));
 	}
 
@@ -96,11 +97,11 @@ class SisyutuKingakuBTest {
 	@DisplayName("正常系：加算が正しく動作する")
 	void testAdd_正常系() {
 		// 準備
-		SisyutuKingakuB amount1 = SisyutuKingakuB.from(new BigDecimal("10000.00"));
-		SisyutuKingakuB amount2 = SisyutuKingakuB.from(new BigDecimal("5000.00"));
+		MinorWasteExpenditure amount1 = MinorWasteExpenditure.from(new BigDecimal("10000.00"));
+		MinorWasteExpenditure amount2 = MinorWasteExpenditure.from(new BigDecimal("5000.00"));
 
 		// 実行
-		SisyutuKingakuB result = amount1.add(amount2);
+		MinorWasteExpenditure result = amount1.add(amount2);
 
 		// 検証
 		assertEquals(new BigDecimal("15000.00"), result.getValue());
@@ -111,11 +112,11 @@ class SisyutuKingakuBTest {
 	@DisplayName("正常系：null値との加算")
 	void testAdd_正常系_null値() {
 		// 準備
-		SisyutuKingakuB amount1 = SisyutuKingakuB.from(new BigDecimal("10000.00"));
-		SisyutuKingakuB amount2 = SisyutuKingakuB.from(null);
+		MinorWasteExpenditure amount1 = MinorWasteExpenditure.from(new BigDecimal("10000.00"));
+		MinorWasteExpenditure amount2 = MinorWasteExpenditure.from(null);
 
 		// 実行
-		SisyutuKingakuB result = amount1.add(amount2);
+		MinorWasteExpenditure result = amount1.add(amount2);
 
 		// 検証（null as zero扱い）
 		assertEquals(new BigDecimal("10000.00"), result.getValue());
@@ -125,11 +126,11 @@ class SisyutuKingakuBTest {
 	@DisplayName("正常系：減算が正しく動作する")
 	void testSubtract_正常系() {
 		// 準備
-		SisyutuKingakuB amount1 = SisyutuKingakuB.from(new BigDecimal("10000.00"));
-		SisyutuKingakuB amount2 = SisyutuKingakuB.from(new BigDecimal("3000.00"));
+		MinorWasteExpenditure amount1 = MinorWasteExpenditure.from(new BigDecimal("10000.00"));
+		MinorWasteExpenditure amount2 = MinorWasteExpenditure.from(new BigDecimal("3000.00"));
 
 		// 実行
-		SisyutuKingakuB result = amount1.subtract(amount2);
+		MinorWasteExpenditure result = amount1.subtract(amount2);
 
 		// 検証
 		assertEquals(new BigDecimal("7000.00"), result.getValue());
@@ -140,8 +141,8 @@ class SisyutuKingakuBTest {
 	@DisplayName("異常系：null値からの減算で例外が発生する")
 	void testSubtract_異常系_null値から減算() {
 		// 準備
-		SisyutuKingakuB amount1 = SisyutuKingakuB.from(null);
-		SisyutuKingakuB amount2 = SisyutuKingakuB.from(new BigDecimal("3000.00"));
+		MinorWasteExpenditure amount1 = MinorWasteExpenditure.from(null);
+		MinorWasteExpenditure amount2 = MinorWasteExpenditure.from(new BigDecimal("3000.00"));
 
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
@@ -155,11 +156,11 @@ class SisyutuKingakuBTest {
 	@DisplayName("正常系：null値を減算する")
 	void testSubtract_正常系_null値を減算() {
 		// 準備
-		SisyutuKingakuB amount1 = SisyutuKingakuB.from(new BigDecimal("10000.00"));
-		SisyutuKingakuB amount2 = SisyutuKingakuB.from(null);
+		MinorWasteExpenditure amount1 = MinorWasteExpenditure.from(new BigDecimal("10000.00"));
+		MinorWasteExpenditure amount2 = MinorWasteExpenditure.from(null);
 
 		// 実行
-		SisyutuKingakuB result = amount1.subtract(amount2);
+		MinorWasteExpenditure result = amount1.subtract(amount2);
 
 		// 検証（null as zero扱い）
 		assertEquals(new BigDecimal("10000.00"), result.getValue());
@@ -169,11 +170,11 @@ class SisyutuKingakuBTest {
 	@DisplayName("正常系：getPercentageが正しく割合を計算する")
 	void testGetPercentage_正常系() {
 		// 準備
-		SisyutuKingakuB kingakuB = SisyutuKingakuB.from(new BigDecimal("3000.00"));
+		MinorWasteExpenditure minorWaste = MinorWasteExpenditure.from(new BigDecimal("3000.00"));
 		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("10000.00"));
 
 		// 実行
-		String percentage = kingakuB.getPercentage(expenditure);
+		String percentage = minorWaste.getPercentage(expenditure);
 
 		// 検証（3000/10000*100 = 30%）
 		assertEquals("30", percentage);
@@ -183,11 +184,11 @@ class SisyutuKingakuBTest {
 	@DisplayName("正常系：getPercentageで四捨五入が正しく動作する")
 	void testGetPercentage_正常系_四捨五入() {
 		// 準備
-		SisyutuKingakuB kingakuB = SisyutuKingakuB.from(new BigDecimal("3333.00"));
+		MinorWasteExpenditure minorWaste = MinorWasteExpenditure.from(new BigDecimal("3333.00"));
 		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("10000.00"));
 
 		// 実行
-		String percentage = kingakuB.getPercentage(expenditure);
+		String percentage = minorWaste.getPercentage(expenditure);
 
 		// 検証（3333/10000*100 = 33.33 -> 33%）
 		assertEquals("33", percentage);
@@ -197,11 +198,11 @@ class SisyutuKingakuBTest {
 	@DisplayName("正常系：getPercentageでnull値は空文字列を返す")
 	void testGetPercentage_正常系_null値() {
 		// 準備
-		SisyutuKingakuB kingakuB = SisyutuKingakuB.from(null);
+		MinorWasteExpenditure minorWaste = MinorWasteExpenditure.from(null);
 		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("10000.00"));
 
 		// 実行
-		String percentage = kingakuB.getPercentage(expenditure);
+		String percentage = minorWaste.getPercentage(expenditure);
 
 		// 検証
 		assertEquals("", percentage);
@@ -211,11 +212,11 @@ class SisyutuKingakuBTest {
 	@DisplayName("正常系：getPercentageで0円は空文字列を返す")
 	void testGetPercentage_正常系_0円() {
 		// 準備
-		SisyutuKingakuB kingakuB = SisyutuKingakuB.ZERO;
+		MinorWasteExpenditure minorWaste = MinorWasteExpenditure.ZERO;
 		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("10000.00"));
 
 		// 実行
-		String percentage = kingakuB.getPercentage(expenditure);
+		String percentage = minorWaste.getPercentage(expenditure);
 
 		// 検証
 		assertEquals("", percentage);
@@ -225,29 +226,14 @@ class SisyutuKingakuBTest {
 	@DisplayName("異常系：getPercentageで支出金額がnullの場合は例外")
 	void testGetPercentage_異常系_支出金額null() {
 		// 準備
-		SisyutuKingakuB kingakuB = SisyutuKingakuB.from(new BigDecimal("3000.00"));
+		MinorWasteExpenditure minorWaste = MinorWasteExpenditure.from(new BigDecimal("3000.00"));
 
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> kingakuB.getPercentage(null)
+			() -> minorWaste.getPercentage(null)
 		);
 		assertTrue(exception.getMessage().contains("支出金額"));
 		assertTrue(exception.getMessage().contains("null"));
-	}
-
-	@Test
-	@DisplayName("正常系：toSisyutuKingakuBString（非推奨）が正しく動作する")
-	@SuppressWarnings("deprecation")
-	void testToSisyutuKingakuBString() {
-		// 準備
-		SisyutuKingakuB amount = SisyutuKingakuB.from(new BigDecimal("12345.67"));
-
-		// 実行
-		String formatted = amount.toSisyutuKingakuBString();
-
-		// 検証（toFormatStringと同じ結果）
-		assertEquals("12,346円", formatted);
-		assertEquals(amount.toFormatString(), formatted);
 	}
 }

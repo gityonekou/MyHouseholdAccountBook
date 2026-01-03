@@ -210,9 +210,9 @@ public class AccountMonthInquiryUseCase {
 			// 支出金額
 			response.setSisyutuKingaku(incomeAndExpenditure.getExpenditureAmount().toFormatString());
 			// 積立金取崩金額
-			response.setWithdrewKingaku(incomeAndExpenditure.getWithdrewAmount().toFormatString());
+			response.setWithdrewKingaku(incomeAndExpenditure.getWithdrawingAmount().toFormatString());
 			// 支出予定金額
-			response.setSisyutuYoteiKingaku(incomeAndExpenditure.getSisyutuYoteiKingaku().toFormatString());
+			response.setSisyutuYoteiKingaku(incomeAndExpenditure.getExpectedExpenditureAmount().toFormatString());
 			// 収支金額
 			response.setSyuusiKingaku(incomeAndExpenditure.getBalanceAmount().toFormatString());
 		}
@@ -234,13 +234,13 @@ public class AccountMonthInquiryUseCase {
 		AccountMonthInquiryResponse.ExpenditureListItem.form(
 				domain.getSisyutuItemLevel().getValue(),
 				domain.getSisyutuItemName().getValue(),
-				domain.getSisyutuKingaku().toFormatString(),
-				domain.getSisyutuKingakuB().toFormatString(),
-				domain.getSisyutuKingakuB().getPercentage(domain.getSisyutuKingaku()),
-				domain.getSisyutuKingakuC().toFormatString(),
-				domain.getSisyutuKingakuC().getPercentage(domain.getSisyutuKingaku()),
-				domain.getSisyutuKingakuBC().toFormatString(),
-				domain.getSisyutuKingakuBC().getPercentage(domain.getSisyutuKingaku()),
-				domain.getShiharaiDate().toDisplayString())).collect(Collectors.toUnmodifiableList());
+				domain.getExpenditureAmount().toFormatString(),
+				domain.getMinorWasteExpenditure().toFormatString(),
+				domain.getMinorWasteExpenditure().getPercentage(domain.getExpenditureAmount()),
+				domain.getSevereWasteExpenditure().toFormatString(),
+				domain.getSevereWasteExpenditure().getPercentage(domain.getExpenditureAmount()),
+				domain.getTotalWasteExpenditure().toFormatString(),
+				domain.getTotalWasteExpenditure().getPercentage(domain.getExpenditureAmount()),
+				domain.getPaymentDate().toDisplayString())).collect(Collectors.toUnmodifiableList());
 	}	
 }

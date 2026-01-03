@@ -21,10 +21,10 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.IncomeAndExpenditureReadWriteDto;
@@ -176,9 +176,9 @@ public class IncomeAndExpenditureTableDataSource implements IncomeAndExpenditure
 				// 収入金額
 				IncomeAmount.from(dto.getIncomeKingaku()),
 				// 積立金取崩金額
-				WithdrewKingaku.from(dto.getWithdrewKingaku()),
+				WithdrawingAmount.from(dto.getWithdrewKingaku()),
 				// 支出予定金額
-				SisyutuYoteiKingaku.from(dto.getExpenditureEstimateKingaku()),
+				ExpectedExpenditureAmount.from(dto.getExpenditureEstimateKingaku()),
 				// 支出金額
 				ExpenditureAmount.from(dto.getExpenditureKingaku()),
 				// 収支金額

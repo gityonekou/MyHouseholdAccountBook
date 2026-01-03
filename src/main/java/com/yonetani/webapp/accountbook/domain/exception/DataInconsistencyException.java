@@ -22,7 +22,7 @@ package com.yonetani.webapp.accountbook.domain.exception;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 public class DataInconsistencyException extends DomainException {

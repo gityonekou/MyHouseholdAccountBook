@@ -8,12 +8,13 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2025/11/29 : 1.00.00  新規作成
- * 2025/12/28 : 1.00.00  NullableDateValueを継承するようリファクタリング
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
 
 import java.time.LocalDate;
+
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -38,7 +39,7 @@ import lombok.Getter;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Getter
@@ -136,7 +137,7 @@ public class PaymentDate extends NullableDateValue {
 	 */
 	public PaymentDate max(PaymentDate other) {
 		if(other == null) {
-			throw new com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException(
+			throw new MyHouseholdAccountBookRuntimeException(
 				"比較対象の支払日がnullです。管理者に問い合わせてください。");
 		}
 		// thisがnullの場合はotherを返却

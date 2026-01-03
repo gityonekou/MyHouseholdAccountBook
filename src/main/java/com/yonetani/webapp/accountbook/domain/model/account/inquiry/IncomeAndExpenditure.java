@@ -11,9 +11,9 @@ package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
 
 import java.util.Objects;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
@@ -68,9 +68,9 @@ public class IncomeAndExpenditure {
 	// 収入金額
 	private final IncomeAmount incomeAmount;
 	// 積立金取崩金額
-	private final WithdrewKingaku withdrewAmount;
+	private final WithdrawingAmount withdrawingAmount;
 	// 支出予定金額
-	private final SisyutuYoteiKingaku sisyutuYoteiKingaku;
+	private final ExpectedExpenditureAmount expectedExpenditureAmount;
 	// 支出金額
 	private final ExpenditureAmount expenditureAmount;
 	// 収支金額
@@ -95,7 +95,7 @@ public class IncomeAndExpenditure {
 	 * @param userId ユーザID
 	 * @param targetYearMonth 対象年月
 	 * @param incomeAmount 収入金額
-	 * @param withdrewAmount 積立金取崩金額
+	 * @param withdrawingAmount 積立金取崩金額
 	 * @param estimatedExpenditureAmount 支出予定金額
 	 * @param expenditureAmount 支出金額
 	 * @param balanceAmount 収支金額
@@ -106,8 +106,8 @@ public class IncomeAndExpenditure {
 			UserId userId,
 			TargetYearMonth targetYearMonth,
 			IncomeAmount incomeAmount,
-			WithdrewKingaku withdrewAmount,
-			SisyutuYoteiKingaku estimatedExpenditureAmount,
+			WithdrawingAmount withdrawingAmount,
+			ExpectedExpenditureAmount estimatedExpenditureAmount,
 			ExpenditureAmount expenditureAmount,
 			BalanceAmount balanceAmount) {
 
@@ -119,7 +119,7 @@ public class IncomeAndExpenditure {
 			userId,
 			targetYearMonth,
 			incomeAmount,
-			withdrewAmount,
+			withdrawingAmount,
 			estimatedExpenditureAmount,
 			expenditureAmount,
 			balanceAmount
@@ -152,7 +152,7 @@ public class IncomeAndExpenditure {
 			userId,
 			targetYearMonth,
 			null,  // incomeAmount
-			null,  // withdrewAmount
+			null,  // withdrawingAmount
 			null,  // estimatedExpenditureAmount
 			null,  // expenditureAmount
 			null   // balanceAmount
@@ -180,8 +180,8 @@ public class IncomeAndExpenditure {
 	 */
 	public SyuunyuuKingakuTotalAmount getTotalIncome() {
 		IncomeAmount income = incomeAmount != null ? incomeAmount : IncomeAmount.ZERO;
-		WithdrewKingaku withdrew = withdrewAmount != null ? withdrewAmount : WithdrewKingaku.ZERO;
-		return SyuunyuuKingakuTotalAmount.from(income, withdrew);
+		WithdrawingAmount withdrawing = withdrawingAmount != null ? withdrawingAmount : WithdrawingAmount.ZERO;
+		return SyuunyuuKingakuTotalAmount.from(income, withdrawing);
 	}
 
 	/**

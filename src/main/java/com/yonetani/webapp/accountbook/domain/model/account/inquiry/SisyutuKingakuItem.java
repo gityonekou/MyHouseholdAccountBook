@@ -16,10 +16,10 @@ import java.time.LocalDate;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ParentSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuB;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuC;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.MinorWasteExpenditure;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SevereWasteExpenditure;
 import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
@@ -57,13 +57,13 @@ public class SisyutuKingakuItem {
 	// 親支出項目コード
 	private final ParentSisyutuItemCode parentSisyutuItemCode;
 	// 支出予定金額
-	private final SisyutuYoteiKingaku sisyutuYoteiKingaku;
+	private final ExpectedExpenditureAmount expectedExpenditureAmount;
 	// 支出金額
 	private final ExpenditureAmount sisyutuKingaku;
-	// 支出金額B
-	private final SisyutuKingakuB sisyutuKingakuB;
-	// 支出金額C
-	private final SisyutuKingakuC sisyutuKingakuC;
+	// 無駄遣い（軽度）支出金額
+	private final MinorWasteExpenditure minorWasteExpenditure;
+	// 無駄遣い（重度）支出金額
+	private final SevereWasteExpenditure severeWasteExpenditure;
 	// 支出支払日
 	private final PaymentDate sisyutushiharaiDate;
 	
@@ -78,8 +78,8 @@ public class SisyutuKingakuItem {
 	 * @param parentSisyutuItemCode 親支出項目コード
 	 * @param sisyutuYoteiKingaku 支出予定金額
 	 * @param sisyutuKingaku 支出金額
-	 * @param sisyutuKingakuB 支出金額B
-	 * @param sisyutuKingakuC 支出金額C
+	 * @param minorWasteExpenditure 無駄遣い（軽度）支出金額
+	 * @param severeWasteExpenditure 無駄遣い（重度）支出金額
 	 * @param sisyutushiharaiDate 支出支払日
 	 * @return 支出金額テーブル情報を表すドメインモデル
 	 *
@@ -102,10 +102,10 @@ public class SisyutuKingakuItem {
 				TargetMonth.from(targetMonth),
 				SisyutuItemCode.from(sisyutuItemCode),
 				ParentSisyutuItemCode.from(parentSisyutuItemCode),
-				SisyutuYoteiKingaku.from(sisyutuYoteiKingaku),
+				ExpectedExpenditureAmount.from(sisyutuYoteiKingaku),
 				ExpenditureAmount.from(sisyutuKingaku),
-				SisyutuKingakuB.from(sisyutuKingakuB),
-				SisyutuKingakuC.from(sisyutuKingakuC),
+				MinorWasteExpenditure.from(sisyutuKingakuB),
+				SevereWasteExpenditure.from(sisyutuKingakuC),
 				PaymentDate.from(sisyutushiharaiDate));
 		
 	}

@@ -17,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingAmount;
 
 /**
  *<pre>
@@ -95,10 +96,11 @@ class BalanceAmountTest {
 	void testCalculate_正常系_黒字() {
 		// 準備
 		IncomeAmount income = IncomeAmount.from(new BigDecimal("100000.00"));
+		WithdrawingAmount withdrawing = WithdrawingAmount.NULL;
 		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("80000.00"));
 
 		// 実行
-		BalanceAmount balance = BalanceAmount.calculate(income, expenditure);
+		BalanceAmount balance = BalanceAmount.calculate(income, withdrawing, expenditure);
 
 		// 検証
 		assertEquals(new BigDecimal("20000.00"), balance.getValue());
@@ -110,11 +112,12 @@ class BalanceAmountTest {
 	@DisplayName("正常系：calculate()で赤字が正しく計算される")
 	void testCalculate_正常系_赤字() {
 		// 準備
-		IncomeAmount income = IncomeAmount.from(new BigDecimal("80000.00"));
+		IncomeAmount income = IncomeAmount.from(new BigDecimal("60000.00"));
+		WithdrawingAmount withdrawing = WithdrawingAmount.from(new BigDecimal("20000.00"));
 		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("100000.00"));
 
 		// 実行
-		BalanceAmount balance = BalanceAmount.calculate(income, expenditure);
+		BalanceAmount balance = BalanceAmount.calculate(income, withdrawing, expenditure);
 
 		// 検証
 		assertEquals(new BigDecimal("-20000.00"), balance.getValue());
@@ -126,11 +129,12 @@ class BalanceAmountTest {
 	@DisplayName("正常系：calculate()で収支0が正しく計算される")
 	void testCalculate_正常系_収支0() {
 		// 準備
-		IncomeAmount income = IncomeAmount.from(new BigDecimal("100000.00"));
+		IncomeAmount income = IncomeAmount.from(new BigDecimal("50000.00"));
+		WithdrawingAmount withdrawing = WithdrawingAmount.from(new BigDecimal("50000.00"));
 		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("100000.00"));
 
 		// 実行
-		BalanceAmount balance = BalanceAmount.calculate(income, expenditure);
+		BalanceAmount balance = BalanceAmount.calculate(income, withdrawing, expenditure);
 
 		// 検証
 		assertEquals(BigDecimal.ZERO.setScale(2), balance.getValue());

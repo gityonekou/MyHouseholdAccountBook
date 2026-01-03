@@ -42,14 +42,17 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @EqualsAndHashCode
 public abstract class NullableMoney {
-
+	
+	/** 値が0の金額の値 */
+	protected static final BigDecimal NULLABLE_MONEY_ZERO = BigDecimal.ZERO.setScale(2);
+	
 	// 金額の値（スケール2固定: 小数点以下2桁、null許容）
 	private final BigDecimal value;
 
@@ -202,7 +205,7 @@ public abstract class NullableMoney {
 	public BigDecimal getNullSafeValue() {
 		// valueがnullの場合、値0のBigDecimalを返却
 		if(value == null) {
-			return BigDecimal.ZERO.setScale(2);
+			return NULLABLE_MONEY_ZERO;
 		}
 		return value;
 	}

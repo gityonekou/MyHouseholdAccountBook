@@ -20,7 +20,7 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
 
 import lombok.RequiredArgsConstructor;
@@ -146,7 +146,7 @@ public class IncomeAndExpenditureConsistencyService {
 			SearchQueryUserIdAndYearMonth searchCondition) {
 
 		// 支出テーブルから合計金額を取得
-		SisyutuKingakuTotalAmount actualTotal =
+		ExpenditureTotalAmount actualTotal =
 			expenditureRepository.sumExpenditureKingaku(searchCondition);
 
 		// 収支集約から期待値を取得
@@ -154,7 +154,7 @@ public class IncomeAndExpenditureConsistencyService {
 
 		// 整合性チェック（値オブジェクト同士で比較）
 		if (expectedAmount != null) {
-			SisyutuKingakuTotalAmount expectedTotal = SisyutuKingakuTotalAmount.from(expectedAmount);
+			ExpenditureTotalAmount expectedTotal = ExpenditureTotalAmount.from(expectedAmount);
 			if (!expectedTotal.equals(actualTotal)) {
 				throw new ExpenditureAmountInconsistencyException(
 					String.format(

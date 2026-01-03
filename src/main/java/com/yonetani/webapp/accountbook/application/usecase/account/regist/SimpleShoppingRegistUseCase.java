@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/11/03 : 1.00.00  新規作成
+ * 2025/12/28 : 1.01.00  リファクタリング対応（DDD適応：Phase4までの内容を反映) 
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.regist;
@@ -45,11 +46,11 @@ import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeA
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.shoppingregist.ShoppingRegistTableRepository;
-import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingRegistCode;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
@@ -693,9 +694,9 @@ public class SimpleShoppingRegistUseCase {
 				throw new MyHouseholdAccountBookRuntimeException("収支テーブル:INCOME_AND_EXPENDITURE_TABLEへの更新件数が不正でした。[件数=" + updCount + "][update data:" + updSyuusiData + "]");
 			}
 			// 支出テーブルから対象月の支出金額合計値を取得
-			SisyutuKingakuTotalAmount expenditureKingakuTotalAmount = expenditureRepository.sumExpenditureKingaku(searchYearMonth);
+			ExpenditureTotalAmount expenditureKingakuTotalAmount = expenditureRepository.sumExpenditureKingaku(searchYearMonth);
 			// 収支テーブルの支出金額の値と対象月の支出テーブルの支出金額合計値が一致するかを確認
-			SisyutuKingakuTotalAmount chkExpenditureKingaku = SisyutuKingakuTotalAmount.from(updSyuusiData.getSisyutuKingaku().getValue());
+			ExpenditureTotalAmount chkExpenditureKingaku = ExpenditureTotalAmount.from(updSyuusiData.getExpenditureAmount().getValue());
 			if(!chkExpenditureKingaku.equals(expenditureKingakuTotalAmount)) {
 				throw new MyHouseholdAccountBookRuntimeException("該当月の支出情報が一致しません。管理者に問い合わせてください。[yearMonth=" + searchYearMonth.getYearMonth() + "]");
 			}

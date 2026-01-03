@@ -1,5 +1,7 @@
 /**
  * 「収支金額」項目の値を表すドメインタイプです。
+ * 収支金額は収入金額合計(「収入金額」項目と「積立金取崩金額」項目の合算値) - 支出金額で計算されます。
+ * ※収入金額合計は別途定義されたSyuunyuuKingakuTotalAmountドメインタイプを使用します。
  *
  *------------------------------------------------
  * 更新履歴
@@ -11,6 +13,9 @@ package com.yonetani.webapp.accountbook.domain.type.common;
 
 import java.math.BigDecimal;
 
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingAmount;
+
 import lombok.EqualsAndHashCode;
 
 /**
@@ -18,20 +23,22 @@ import lombok.EqualsAndHashCode;
  * 「収支金額」項目の値を表すドメインタイプです。
  *
  * [ビジネスルール]
- * ・収支金額は収入金額 - 支出金額で計算されます
+ * ・収支金額は収入金額合計(「収入金額」項目と「積立金取崩金額」項目の合算値) - 支出金額で計算されます
  * ・マイナス値も許可されます（赤字の場合）
+ * 
+ * ※収入金額合計は別途定義されたSyuunyuuKingakuTotalAmountドメインタイプを使用します。
  *
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @EqualsAndHashCode(callSuper = true)
 public class BalanceAmount extends Money {
 
 	/** 値が0の「収支金額」項目の値 */
-	public static final BalanceAmount ZERO = new BalanceAmount(BigDecimal.ZERO.setScale(2));
+	public static final BalanceAmount ZERO = new BalanceAmount(Money.MONEY_ZERO);
 
 	/**
 	 *<pre>
@@ -59,29 +66,36 @@ public class BalanceAmount extends Money {
 	 *
 	 */
 	public static BalanceAmount from(BigDecimal value) {
-		// 基本検証（null、スケール）
-		Money.validate(value, "収支金額");
+		// 基底クラスのバリデーションを実行（null非許容、スケール2チェック）
+		validate(value, "収支金額");
 
 		// 収支金額はマイナス値も許可
 		return new BalanceAmount(value);
 	}
-
+	
 	/**
 	 *<pre>
-	 * 収入金額と支出金額から収支金額を計算します。
+	 * 収入金額(積立金取崩金額以外の収入金額)と積立金取崩金額と支出金額から収支金額を計算します。
 	 *
-	 * 計算式：収支金額 = 収入金額 - 支出金額
+	 * 計算式：収支金額 = 収入金額(積立金取崩金額以外の収入金額) + 積立金取崩金額 - 支出金額
 	 *</pre>
-	 * @param income 収入金額
-	 * @param expenditure 支出金額
+	 * @param incomeAmount 収入金額(積立金取崩金額以外の収入金額)
+	 * @param withdrawingAmount 積立金取崩金額
+	 * @param expenditureAmount 支出金額
 	 * @return 計算された収支金額
 	 *
 	 */
-	public static BalanceAmount calculate(IncomeAmount income, ExpenditureAmount expenditure) {
-		BigDecimal balance = income.getValue().subtract(expenditure.getValue());
-		return new BalanceAmount(balance);
+	public static BalanceAmount calculate(IncomeAmount incomeAmount, WithdrawingAmount withdrawingAmount, ExpenditureAmount expenditureAmount) {
+		// 入り方金額 = 収入金額 + 積立金取崩金額
+		SyuunyuuKingakuTotalAmount income = SyuunyuuKingakuTotalAmount.from(incomeAmount, withdrawingAmount);
+		
+		// 収支金額 = 入り方金額 - 支出金額合計
+		BigDecimal balance = income.getValue().subtract(expenditureAmount.getValue());
+		
+		// 収支金額ドメインタイプを生成して返却
+		return BalanceAmount.from(balance);
 	}
-
+	
 	/**
 	 *<pre>
 	 * 収支金額が赤字（マイナス）かどうかを判定します。

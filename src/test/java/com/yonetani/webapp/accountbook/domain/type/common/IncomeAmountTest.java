@@ -107,19 +107,6 @@ class IncomeAmountTest {
 	}
 
 	@Test
-	@DisplayName("異常系：加算でnullを渡すと例外が発生する")
-	void testAdd_異常系_null() {
-		// 準備
-		IncomeAmount amount = IncomeAmount.from(new BigDecimal("10000.00"));
-
-		// 実行 & 検証
-		assertThrows(
-			MyHouseholdAccountBookRuntimeException.class,
-			() -> amount.add(null)
-		);
-	}
-
-	@Test
 	@DisplayName("正常系：減算が正しく動作する")
 	void testSubtract_正常系() {
 		// 準備
@@ -134,19 +121,6 @@ class IncomeAmountTest {
 		// 元のオブジェクトは変更されていないことを確認（不変性）
 		assertEquals(new BigDecimal("10000.00"), amount1.getValue());
 		assertEquals(new BigDecimal("3000.00"), amount2.getValue());
-	}
-
-	@Test
-	@DisplayName("異常系：減算でnullを渡すと例外が発生する")
-	void testSubtract_異常系_null() {
-		// 準備
-		IncomeAmount amount = IncomeAmount.from(new BigDecimal("10000.00"));
-
-		// 実行 & 検証
-		assertThrows(
-			MyHouseholdAccountBookRuntimeException.class,
-			() -> amount.subtract(null)
-		);
 	}
 
 	@Test

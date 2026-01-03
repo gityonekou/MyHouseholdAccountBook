@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2023/10/14 : 1.00.00  新規作成
+ * 2025/12/28 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry;
@@ -64,14 +65,14 @@ public class IncomeAndExpenditureReadWriteDto {
 				// 対象月
 				domain.getTargetMonth().getValue(),
 				// 収入金額
-				domain.getSyuunyuuKingaku().getValue(),
+				domain.getIncomeAmount().getValue(),
 				// 積立金取崩金額
-				domain.getWithdrewKingaku().getValue(),
+				domain.getWithdrawingAmount().getValue(),
 				// 支出予定金額
-				domain.getSisyutuYoteiKingaku().getValue(),
+				domain.getExpectedExpenditureAmount().getValue(),
 				// 支出金額
-				domain.getSisyutuKingaku().getValue(),
+				domain.getExpenditureAmount().getValue(),
 				// 収支金額
-				domain.getSyuusiKingaku().getValue());
+				domain.getBalanceAmount().getValue());
 	}
 }

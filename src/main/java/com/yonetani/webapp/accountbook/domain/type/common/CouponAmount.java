@@ -34,14 +34,14 @@ import lombok.EqualsAndHashCode;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @EqualsAndHashCode(callSuper = true)
 public class CouponAmount extends Money {
 
 	/** 値が0の「クーポン金額」項目の値（割引なし） */
-	public static final CouponAmount ZERO = new CouponAmount(BigDecimal.ZERO.setScale(2));
+	public static final CouponAmount ZERO = new CouponAmount(Money.MONEY_ZERO);
 
 	/**
 	 *<pre>
@@ -70,8 +70,8 @@ public class CouponAmount extends Money {
 	 *
 	 */
 	public static CouponAmount from(BigDecimal value) {
-		// 基本検証（null、スケール）
-		Money.validate(value, "クーポン金額");
+		// 基底クラスのバリデーションを実行（null非許容、スケール2チェック）
+		validate(value, "クーポン金額");
 
 		// ガード節(マイナス値 - 正の値のみ受け付ける)
 		if(BigDecimal.ZERO.compareTo(value) > 0) {
@@ -119,11 +119,7 @@ public class CouponAmount extends Money {
 	 *
 	 */
 	public CouponAmount add(CouponAmount addValue) {
-		if(addValue == null) {
-			throw new MyHouseholdAccountBookRuntimeException(
-				"加算対象のクーポン金額がnullです。管理者に問い合わせてください。");
-		}
-		return new CouponAmount(super.add(addValue));
+		return CouponAmount.from(super.add(addValue));
 	}
 
 	/**

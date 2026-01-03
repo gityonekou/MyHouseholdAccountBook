@@ -19,11 +19,11 @@ import java.util.Map;
 
 import com.yonetani.webapp.accountbook.common.component.SisyutuItemComponent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.MinorWasteExpenditure;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SevereWasteExpenditure;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
-import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuB;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuC;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKubun;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -97,14 +97,14 @@ public class SisyutuKingakuItemHolder {
 		private final int sisyutuKingakuFlg;
 		// 支出金額増減値
 		private final ExpenditureAmount sisyutuKingaku;
-		// 支出金額Bの増減フラグ
-		private final int sisyutuKingakuBFlg;
-		// 支出金額B増減値
-		private final SisyutuKingakuB sisyutuKingakuB;
-		// 支出金額Cの増減フラグ
-		private final int sisyutuKingakuCFlg;
-		// 支出金額C(支出金額C)増減値
-		private final SisyutuKingakuC sisyutuKingakuC;
+		// 無駄遣い（軽度）支出金額の増減フラグ
+		private final int minorWasteExpenditureFlg;
+		// 無駄遣い（軽度）支出金額増減値
+		private final MinorWasteExpenditure minorWasteExpenditure;
+		// 無駄遣い（重度）支出金額の増減フラグ
+		private final int severeWasteExpenditureFlg;
+		// 無駄遣い（重度）支出金額増減値
+		private final SevereWasteExpenditure severeWasteExpenditure;
 		
 		/**
 		 *<pre>
@@ -129,48 +129,48 @@ public class SisyutuKingakuItemHolder {
 			ExpenditureAmount zougenti = ExpenditureAmount.from(
 					beforeData.getSisyutuKingaku().getValue().subtract(afterData.getSisyutuKingaku().getValue()).abs());
 			
-			// 支出B、支出C加減算初期値
-			int sisyutuBFlg = FLG_ADD;
-			SisyutuKingakuB zougentiBWk = SisyutuKingakuB.from(null);
-			int sisyutuCFlg = FLG_ADD;
-			SisyutuKingakuC zougentiCWk = SisyutuKingakuC.from(null);
+			// 無駄遣い（軽度）、無駄遣い（重度）加減算初期値
+			int minorFlg = FLG_ADD;
+			MinorWasteExpenditure zougentiMinorWk = MinorWasteExpenditure.from(null);
+			int severeFlg = FLG_ADD;
+			SevereWasteExpenditure zougentiSevereWk = SevereWasteExpenditure.from(null);
 			
 			// 更新前と更新後で支出区分の値が同じ場合
 			if(beforeKubun.getValue().equals(afterKubun.getValue())) {
-				
-				// 支出区分が区分Bの場合、支出Bの値を加減算
+
+				// 支出区分が区分B（無駄遣い軽度）の場合、無駄遣い（軽度）の値を加減算
 				if(SisyutuKubun.isWastedB(beforeKubun)) {
-					sisyutuBFlg = sisyutuFlg;
-					zougentiBWk = SisyutuKingakuB.from(zougenti.getValue());
-					
-				// 支出区分が区分Cの場合、支出Cの値を加減算
+					minorFlg = sisyutuFlg;
+					zougentiMinorWk = MinorWasteExpenditure.from(zougenti.getValue());
+
+				// 支出区分が区分C（無駄遣い重度）の場合、無駄遣い（重度）の値を加減算
 				} else if(SisyutuKubun.isWastedC(beforeKubun)) {
-					sisyutuCFlg = sisyutuFlg;
-					zougentiCWk = SisyutuKingakuC.from(zougenti.getValue());
+					severeFlg = sisyutuFlg;
+					zougentiSevereWk = SevereWasteExpenditure.from(zougenti.getValue());
 				}
-				
+
 			// 更新前と更新後で支出区分の値が違う場合
 			} else {
-				// 支出金額Bの設定
-				// 更新前の支出区分が区分Bの場合、支出Bの値を減算
+				// 無駄遣い（軽度）支出金額の設定
+				// 更新前の支出区分が区分B（無駄遣い軽度）の場合、無駄遣い（軽度）の値を減算
 				if(SisyutuKubun.isWastedB(beforeKubun)) {
-					sisyutuBFlg = FLG_SUBTRACT;
-					zougentiBWk = beforeData.getSisyutuKingakuB();
-					
-				// 更新後の支出区分が区分Bの場合、支出Bの値を加算
+					minorFlg = FLG_SUBTRACT;
+					zougentiMinorWk = beforeData.getMinorWasteExpenditure();
+
+				// 更新後の支出区分が区分B（無駄遣い軽度）の場合、無駄遣い（軽度）の値を加算
 				} else if (SisyutuKubun.isWastedB(afterKubun)) {
-					zougentiBWk = afterData.getSisyutuKingakuB();
+					zougentiMinorWk = afterData.getMinorWasteExpenditure();
 				}
-				
-				// 支出金額Cの設定
-				// 更新前の支出区分が区分Cの場合、支出Cの値を減算
+
+				// 無駄遣い（重度）支出金額の設定
+				// 更新前の支出区分が区分C（無駄遣い重度）の場合、無駄遣い（重度）の値を減算
 				if(SisyutuKubun.isWastedC(beforeKubun)) {
-					sisyutuCFlg = FLG_SUBTRACT;
-					zougentiCWk = beforeData.getSisyutuKingakuC();
-					
-				// 更新後の支出区分が区分Cの場合、支出Cの値を加算
+					severeFlg = FLG_SUBTRACT;
+					zougentiSevereWk = beforeData.getSevereWasteExpenditure();
+
+				// 更新後の支出区分が区分C（無駄遣い重度）の場合、無駄遣い（重度）の値を加算
 				} else if (SisyutuKubun.isWastedC(afterKubun)) {
-					zougentiCWk = afterData.getSisyutuKingakuC();
+					zougentiSevereWk = afterData.getSevereWasteExpenditure();
 				}
 			}
 			
@@ -184,14 +184,14 @@ public class SisyutuKingakuItemHolder {
 					sisyutuFlg,
 					// 支出金額増減値
 					zougenti,
-					// 支出金額Bを加算するか減算するかのフラグ
-					sisyutuBFlg,
-					// 支出金額B増減値
-					zougentiBWk,
-					// 支出金額Cを加算するか減算するかのフラグ
-					sisyutuCFlg,
-					// 支出金額B増減値
-					zougentiCWk);
+					// 無駄遣い（軽度）支出金額を加算するか減算するかのフラグ
+					minorFlg,
+					// 無駄遣い（軽度）支出金額増減値
+					zougentiMinorWk,
+					// 無駄遣い（重度）支出金額を加算するか減算するかのフラグ
+					severeFlg,
+					// 無駄遣い（重度）支出金額増減値
+					zougentiSevereWk);
 		}
 	}
 	
@@ -379,13 +379,13 @@ public class SisyutuKingakuItemHolder {
 					// 親支出項目コード
 					beforeItem.getParentSisyutuItemCode().getValue(),
 					// 支出予定金額=前の値+新規の値
-					beforeItem.getSisyutuYoteiKingaku().add(addItem.getSisyutuYoteiKingaku()).getValue(),
+					beforeItem.getExpectedExpenditureAmount().add(addItem.getExpectedExpenditureAmount()).getValue(),
 					// 支出金額=前の値+新規の値
 					beforeItem.getSisyutuKingaku().add(addItem.getSisyutuKingaku()).getValue(),
-					// 支出金額B=前の値+新規の値
-					beforeItem.getSisyutuKingakuB().add(addItem.getSisyutuKingakuB()).getValue(),
-					// 支出金額C=前の値+新規の値
-					beforeItem.getSisyutuKingakuC().add(addItem.getSisyutuKingakuC()).getValue(),
+					// 無駄遣い（軽度）支出金額=前の値+新規の値
+					beforeItem.getMinorWasteExpenditure().add(addItem.getMinorWasteExpenditure()).getValue(),
+					// 無駄遣い（重度）支出金額=前の値+新規の値
+					beforeItem.getSevereWasteExpenditure().add(addItem.getSevereWasteExpenditure()).getValue(),
 					// 支出支払日=前の値と支出情報(ドメイン)の支払日のどちらか大きいほうの値
 					beforeItem.getSisyutushiharaiDate().max(addExpenditureData.getShiharaiDate()).getValue()));
 		}
@@ -436,19 +436,19 @@ public class SisyutuKingakuItemHolder {
 			} else {
 				sisyutuKingaku = beforeItem.getSisyutuKingaku().subtract(sabunData.getSisyutuKingaku());
 			}
-			// 支出金額B=前の値+加減算するの値
-			SisyutuKingakuB sisyutuKingakuB = null;
-			if(sabunData.getSisyutuKingakuBFlg() == FLG_ADD) {
-				sisyutuKingakuB = beforeItem.getSisyutuKingakuB().add(sabunData.getSisyutuKingakuB());
+			// 無駄遣い（軽度）支出金額=前の値+加減算するの値
+			MinorWasteExpenditure minorWaste = null;
+			if(sabunData.getMinorWasteExpenditureFlg() == FLG_ADD) {
+				minorWaste = beforeItem.getMinorWasteExpenditure().add(sabunData.getMinorWasteExpenditure());
 			} else {
-				sisyutuKingakuB = beforeItem.getSisyutuKingakuB().subtract(sabunData.getSisyutuKingakuB());
+				minorWaste = beforeItem.getMinorWasteExpenditure().subtract(sabunData.getMinorWasteExpenditure());
 			}
-			// 支出金額C=前の値+加減算するの値
-			SisyutuKingakuC sisyutuKingakuC = null;
-			if(sabunData.getSisyutuKingakuCFlg() == FLG_ADD) {
-				sisyutuKingakuC = beforeItem.getSisyutuKingakuC().add(sabunData.getSisyutuKingakuC());
+			// 無駄遣い（重度）支出金額=前の値+加減算するの値
+			SevereWasteExpenditure severeWaste = null;
+			if(sabunData.getSevereWasteExpenditureFlg() == FLG_ADD) {
+				severeWaste = beforeItem.getSevereWasteExpenditure().add(sabunData.getSevereWasteExpenditure());
 			} else {
-				sisyutuKingakuC = beforeItem.getSisyutuKingakuC().subtract(sabunData.getSisyutuKingakuC());
+				severeWaste = beforeItem.getSevereWasteExpenditure().subtract(sabunData.getSevereWasteExpenditure());
 			}
 			// 支出金額情報を差額分更新
 			updateData.setSisyutuKingakuItem(SisyutuKingakuItem.from(
@@ -463,13 +463,13 @@ public class SisyutuKingakuItemHolder {
 				// 親支出項目コード
 				beforeItem.getParentSisyutuItemCode().getValue(),
 				// 支出予定金額の値は変更なし(前の値をそのまま設定)
-				beforeItem.getSisyutuYoteiKingaku().getValue(),
+				beforeItem.getExpectedExpenditureAmount().getValue(),
 				// 支出金額
 				sisyutuKingaku.getValue(),
-				// 支出金額B=前の値+加減算するの値
-				sisyutuKingakuB.getValue(),
-				// 支出金額C=前の値+加減算するの値
-				sisyutuKingakuC.getValue(),
+				// 無駄遣い（軽度）支出金額=前の値+加減算するの値
+				minorWaste.getValue(),
+				// 無駄遣い（重度）支出金額=前の値+加減算するの値
+				severeWaste.getValue(),
 				// 支出支払日=前の値と更新後の支出情報(ドメイン)の支払日のどちらか大きいほうの値
 				beforeItem.getSisyutushiharaiDate().max(sabunData.getAfterData().getSisyutushiharaiDate()).getValue()));
 		} catch (Exception ex) {
@@ -530,13 +530,13 @@ public class SisyutuKingakuItemHolder {
 				// 親支出項目コード
 				beforeItem.getParentSisyutuItemCode().getValue(),
 				// 支出予定金額の値は変更なし(前の値をそのまま設定)
-				beforeItem.getSisyutuYoteiKingaku().getValue(),
+				beforeItem.getExpectedExpenditureAmount().getValue(),
 				// 支出金額=前の値-減算するの値
 				beforeItem.getSisyutuKingaku().subtract(subtractItem.getSisyutuKingaku()).getValue(),
-				// 支出金額B=前の値-減算するの値
-				beforeItem.getSisyutuKingakuB().subtract(subtractItem.getSisyutuKingakuB()).getValue(),
-				// 支出金額C=前の値-減算するの値
-				beforeItem.getSisyutuKingakuC().subtract(subtractItem.getSisyutuKingakuC()).getValue(),
+				// 無駄遣い（軽度）支出金額=前の値-減算するの値
+				beforeItem.getMinorWasteExpenditure().subtract(subtractItem.getMinorWasteExpenditure()).getValue(),
+				// 無駄遣い（重度）支出金額=前の値-減算するの値
+				beforeItem.getSevereWasteExpenditure().subtract(subtractItem.getSevereWasteExpenditure()).getValue(),
 				// 支出支払日の値は変更なし(前の値をsubtractItem設定)
 				beforeItem.getSisyutushiharaiDate().getValue()));
 		} catch (Exception ex) {
@@ -583,7 +583,7 @@ public class SisyutuKingakuItemHolder {
 				// 親支出項目コード
 				sisyutuItem.getParentSisyutuItemCode().getValue(),
 				// 支出予定金額
-				expenditureData.getSisyutuYoteiKingaku().getValue(),
+				expenditureData.getExpectedExpenditureAmount().getValue(),
 				// 支出金額
 				expenditureData.getSisyutuKingaku().getValue(),
 				// 支出金額B

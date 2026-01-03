@@ -11,9 +11,9 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
@@ -39,8 +39,8 @@ class IncomeAndExpenditureTest {
 		UserId userId = UserId.from("user01");
 		TargetYearMonth yearMonth = TargetYearMonth.from("202511");
 		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
-		WithdrewKingaku withdrew = WithdrewKingaku.from(new BigDecimal("50000.00"));
-		SisyutuYoteiKingaku estimatedExpenditure = SisyutuYoteiKingaku.from(new BigDecimal("300000.00"));
+		WithdrawingAmount withdrawing = WithdrawingAmount.from(new BigDecimal("50000.00"));
+		ExpectedExpenditureAmount estimatedExpenditure = ExpectedExpenditureAmount.from(new BigDecimal("300000.00"));
 		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("280000.00"));
 		BalanceAmount balance = BalanceAmount.from(new BigDecimal("120000.00"));
 
@@ -49,7 +49,7 @@ class IncomeAndExpenditureTest {
 			userId,
 			yearMonth,
 			income,
-			withdrew,
+			withdrawing,
 			estimatedExpenditure,
 			expenditure,
 			balance
@@ -60,20 +60,20 @@ class IncomeAndExpenditureTest {
 		assertEquals(userId, aggregate.getUserId());
 		assertEquals(yearMonth, aggregate.getTargetYearMonth());
 		assertEquals(income, aggregate.getIncomeAmount());
-		assertEquals(withdrew, aggregate.getWithdrewAmount());
-		assertEquals(estimatedExpenditure, aggregate.getSisyutuYoteiKingaku());
+		assertEquals(withdrawing, aggregate.getWithdrawingAmount());
+		assertEquals(estimatedExpenditure, aggregate.getExpectedExpenditureAmount());
 		assertEquals(expenditure, aggregate.getExpenditureAmount());
 		assertEquals(balance, aggregate.getBalanceAmount());
 	}
 
 	@Test
 	@DisplayName("正常系：reconstruct - 積立取崩金額がnullの収支集約を生成")
-	void testReconstruct_WithdrewIsNull() {
+	void testReconstruct_WithdrawingIsNull() {
 		// 準備
 		UserId userId = UserId.from("user01");
 		TargetYearMonth yearMonth = TargetYearMonth.from("202509");
 		IncomeAmount income = IncomeAmount.from(new BigDecimal("400000.00"));
-		SisyutuYoteiKingaku estimatedExpenditure = SisyutuYoteiKingaku.from(new BigDecimal("270000.00"));
+		ExpectedExpenditureAmount estimatedExpenditure = ExpectedExpenditureAmount.from(new BigDecimal("270000.00"));
 		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("250000.00"));
 		BalanceAmount balance = BalanceAmount.from(new BigDecimal("150000.00"));
 
@@ -82,7 +82,7 @@ class IncomeAndExpenditureTest {
 			userId,
 			yearMonth,
 			income,
-			null,  // withdrew
+			null,  // withdrawing
 			estimatedExpenditure,
 			expenditure,
 			balance
@@ -90,7 +90,7 @@ class IncomeAndExpenditureTest {
 
 		// 検証
 		assertNotNull(aggregate);
-		assertNull(aggregate.getWithdrewAmount());
+		assertNull(aggregate.getWithdrawingAmount());
 		assertEquals(income, aggregate.getIncomeAmount());
 	}
 
@@ -151,8 +151,8 @@ class IncomeAndExpenditureTest {
 		assertEquals(userId, aggregate.getUserId());
 		assertEquals(yearMonth, aggregate.getTargetYearMonth());
 		assertNull(aggregate.getIncomeAmount());
-		assertNull(aggregate.getWithdrewAmount());
-		assertNull(aggregate.getSisyutuYoteiKingaku());
+		assertNull(aggregate.getWithdrawingAmount());
+		assertNull(aggregate.getExpectedExpenditureAmount());
 		assertNull(aggregate.getExpenditureAmount());
 		assertNull(aggregate.getBalanceAmount());
 		assertTrue(aggregate.isEmpty());
@@ -185,16 +185,16 @@ class IncomeAndExpenditureTest {
 
 	@Test
 	@DisplayName("正常系：getTotalIncome - 収入と積立取崩の合計を取得")
-	void testGetTotalIncome_WithWithdrew() {
+	void testGetTotalIncome_Withdrawing() {
 		// 準備
 		UserId userId = UserId.from("user01");
 		TargetYearMonth yearMonth = TargetYearMonth.from("202511");
 		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
-		WithdrewKingaku withdrew = WithdrewKingaku.from(new BigDecimal("50000.00"));
+		WithdrawingAmount withdrawing = WithdrawingAmount.from(new BigDecimal("50000.00"));
 
 		// 実行
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
-			userId, yearMonth, income, withdrew, null, null, null
+			userId, yearMonth, income, withdrawing, null, null, null
 		);
 		SyuunyuuKingakuTotalAmount total = aggregate.getTotalIncome();
 
@@ -204,7 +204,7 @@ class IncomeAndExpenditureTest {
 
 	@Test
 	@DisplayName("正常系：getTotalIncome - 積立取崩がnullの場合、収入金額のみ")
-	void testGetTotalIncome_WithdrewIsNull() {
+	void testGetTotalIncome_WithdrawingIsNull() {
 		// 準備
 		UserId userId = UserId.from("user01");
 		TargetYearMonth yearMonth = TargetYearMonth.from("202509");
@@ -275,14 +275,14 @@ class IncomeAndExpenditureTest {
 		UserId userId = UserId.from("user01");
 		TargetYearMonth yearMonth = TargetYearMonth.from("202511");
 		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
-		WithdrewKingaku withdrew = WithdrewKingaku.from(new BigDecimal("50000.00"));
+		WithdrawingAmount withdrawing = WithdrawingAmount.from(new BigDecimal("50000.00"));
 
 		// 実行
 		IncomeAndExpenditure aggregate1 = IncomeAndExpenditure.reconstruct(
-			userId, yearMonth, income, withdrew, null, null, null
+			userId, yearMonth, income, withdrawing, null, null, null
 		);
 		IncomeAndExpenditure aggregate2 = IncomeAndExpenditure.reconstruct(
-			userId, yearMonth, income, withdrew, null, null, null
+			userId, yearMonth, income, withdrawing, null, null, null
 		);
 
 		// 検証
