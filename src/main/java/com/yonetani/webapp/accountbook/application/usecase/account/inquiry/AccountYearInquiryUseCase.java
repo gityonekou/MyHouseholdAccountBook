@@ -97,7 +97,7 @@ public class AccountYearInquiryUseCase {
 			response.addMageInquiryList(convertMageList(resultList));
 			/* 合計値を設定 */
 			// 収入金額合計(積立金取崩金額以外の収入金額合計)
-			response.setSyuunyuuKingakuGoukei(resultList.getIncomeTotalAmount().toFormatString());
+			response.setSyuunyuuKingakuGoukei(resultList.getRegularIncomeTotalAmount().toFormatString());
 			// 積立金取崩金額合計
 			response.setWithdrewKingakuGoukei(resultList.getWithdrawingTotalAmount().toFormatString());
 			// 支出予定金額合計
@@ -122,8 +122,8 @@ public class AccountYearInquiryUseCase {
 	private List<MageInquiryListItem> convertMageList(IncomeAndExpenditureInquiryList resultList) {
 		return resultList.getValues().stream().map(domain ->
 			AccountYearMageInquiryResponse.MageInquiryListItem.from(
-					domain.getTargetMonth().getValue(),
-					domain.getIncomeAmount().toFormatString(),
+					domain.getTargetYearMonth().getMonth(),
+					domain.getRegularIncomeAmount().toFormatString(),
 					domain.getWithdrawingAmount().toFormatString(),
 					domain.getExpectedExpenditureAmount().toFormatString(),
 					domain.getExpenditureAmount().toFormatString(),
@@ -167,7 +167,7 @@ public class AccountYearInquiryUseCase {
 			response.addMeisaiInquiryList(convertMeisaiList(resultList));
 			/* 合計値を設定 */
 			// 収入金額合計(積立金取崩金額以外の収入金額合計)
-			response.setSyuunyuuKingakuGoukei(resultList.getIncomeTotalAmount().toFormatString());
+			response.setSyuunyuuKingakuGoukei(resultList.getRegularIncomeTotalAmount().toFormatString());
 			// 積立金取崩金額合計
 			response.setWithdrewKingakuGoukei(resultList.getWithdrawingTotalAmount().toFormatString());
 			// 事業経費合計
@@ -183,12 +183,12 @@ public class AccountYearInquiryUseCase {
 			// 趣味娯楽合計
 			response.setSyumiGotakuKingakuGoukei(resultList.getSyumiGotakuKingakuGoukei().toString());
 			// 無駄遣い合計支出金額合計
-			response.setSisyutuKingakuBCGoukei(resultList.getTotalWasteExpenditureTotalAmount().toFormatString());
+			response.setSisyutuKingakuBCGoukei(resultList.getWasteExpenditureTotalAmount().toFormatString());
 			// 無駄遣い合計支出金額合計のうち、無駄遣い（軽度）支出金額合計の割合
-			response.setPercentageBGoukei(resultList.getTotalWasteExpenditureTotalAmount().getMinorWasteExpenditurePercentage());
-			// 支出合計
+			response.setPercentageBGoukei(resultList.getWasteExpenditureTotalAmount().getMinorWasteExpenditurePercentage());
+			// 支出金額合計
 			response.setSisyutuKingakuGoukei(resultList.getExpenditureTotalAmount().toFormatString());
-			// 収支合計
+			// 収支金額合計
 			response.setSyuusiKingakuGoukei(resultList.getBalanceTotalAmount().toFormatString());
 		}
 		return response;
@@ -206,7 +206,7 @@ public class AccountYearInquiryUseCase {
 		return resultList.getValues().stream().map(domain ->
 			AccountYearMeisaiInquiryResponse.MeisaiInquiryListItem.from(
 					domain.getMonth().getValue(),
-					domain.getIncomeAmount().toFormatString(),
+					domain.getRegularIncomeAmount().toFormatString(),
 					domain.getWithdrawingAmount().toFormatString(),
 					domain.getJigyouKeihiKingaku().toString(),
 					domain.getKoteiHikazeiKingaku().toString(),

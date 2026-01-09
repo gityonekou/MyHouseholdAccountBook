@@ -14,12 +14,11 @@ import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalAvailableFunds;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
-import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
-import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
+import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
@@ -47,12 +46,10 @@ public class IncomeAndExpenditureItem {
 	
 	// ユーザID
 	private final UserId userId;
-	// 対象年
-	private final TargetYear targetYear;
-	// 対象月
-	private final TargetMonth targetMonth;
+	// 対象年月
+	private final TargetYearMonth targetYearMonth;
 	// 収入金額(積立金取崩金額以外の収入金額)
-	private final IncomeAmount incomeAmount;
+	private final RegularIncomeAmount regularIncomeAmount;
 	// 積立金取崩金額
 	private final WithdrawingAmount withdrawingAmount;
 	// 支出予定金額
@@ -69,9 +66,9 @@ public class IncomeAndExpenditureItem {
 	 * @param userId ユーザID
 	 * @param targetYear 対象年
 	 * @param targetMonth 対象月
-	 * @param incomeAmount 収入金額(積立金取崩金額以外の収入金額)
+	 * @param regularIncomeAmount 収入金額(積立金取崩金額以外の収入金額)
 	 * @param withdrawingAmount 積立金取崩金額
-	 * @param sisyutuYoteiKingaku 支出予定金額
+	 * @param expectedExpenditureAmount 支出予定金額
 	 * @param expenditureAmount 支出金額
 	 * @param balanceAmount 収支金額
 	 * @return 収支テーブル情報を表すドメインモデル
@@ -81,18 +78,17 @@ public class IncomeAndExpenditureItem {
 			String userId,
 			String targetYear,
 			String targetMonth,
-			BigDecimal incomeAmount,
+			BigDecimal regularIncomeAmount,
 			BigDecimal withdrawingAmount,
-			BigDecimal sisyutuYoteiKingaku,
+			BigDecimal expectedExpenditureAmount,
 			BigDecimal expenditureAmount,
 			BigDecimal balanceAmount) {
 		return new IncomeAndExpenditureItem(
 				UserId.from(userId),
-				TargetYear.from(targetYear),
-				TargetMonth.from(targetMonth),
-				IncomeAmount.from(incomeAmount),
+				TargetYearMonth.from(targetYear, targetMonth),
+				RegularIncomeAmount.from(regularIncomeAmount),
 				WithdrawingAmount.from(withdrawingAmount),
-				ExpectedExpenditureAmount.from(sisyutuYoteiKingaku),
+				ExpectedExpenditureAmount.from(expectedExpenditureAmount),
 				ExpenditureAmount.from(expenditureAmount),
 				BalanceAmount.from(balanceAmount));
 	}
@@ -105,7 +101,7 @@ public class IncomeAndExpenditureItem {
 	 *
 	 */
 	public static IncomeAndExpenditureItem fromEmpty() {
-		return new IncomeAndExpenditureItem(null, null, null, null, null, null, null, null);
+		return new IncomeAndExpenditureItem(null, null, null, null, null, null, null);
 	}
 	
 	/**
@@ -114,7 +110,7 @@ public class IncomeAndExpenditureItem {
 	 *</pre>
 	 * @param userId ユーザID
 	 * @param yearMonth 対象年月(ドメイン)
-	 * @param incomeAmount 対象月の収入金額(積立金取崩金額以外の収入金額)
+	 * @param regularIncomeAmount 対象月の収入金額(積立金取崩金額以外の収入金額)
 	 * @param withdrawingAmount 対象月の積立金取崩金額
 	 * @param expectedExpenditureAmount 対象月の支出予定金額
 	 * @param expenditureAmount 対象月の支出金額
@@ -124,13 +120,15 @@ public class IncomeAndExpenditureItem {
 	public static IncomeAndExpenditureItem createAddTypeIncomeAndExpenditureItem(
 			UserId userId,
 			TargetYearMonth yearMonth,
-			IncomeAmount incomeAmount,
+			RegularIncomeAmount regularIncomeAmount,
 			WithdrawingAmount withdrawingAmount,
 			ExpectedExpenditureAmount expectedExpenditureAmount,
 			ExpenditureAmount expenditureAmount) {
 		
-		// 収支金額 = 収入金額(積立金取崩金額以外の収入金額) + 積立金取崩金額 - 支出金額
-		BalanceAmount balance = BalanceAmount.calculate(incomeAmount, withdrawingAmount, expenditureAmount);
+		// 利用可能資金合計を計算
+		TotalAvailableFunds availableFunds = TotalAvailableFunds.from(regularIncomeAmount, withdrawingAmount);
+		// 収支金額 = 利用可能資金合計 - 支出金額
+		BalanceAmount balance = BalanceAmount.calculate(availableFunds, expenditureAmount);
 		
 		// 支出テーブル情報(ドメイン)を生成して返却
 		return IncomeAndExpenditureItem.from(
@@ -141,7 +139,7 @@ public class IncomeAndExpenditureItem {
 				// 対象月
 				yearMonth.getMonth(),
 				// 収入金額(積立金取崩金額以外の収入金額)
-				incomeAmount.getValue(),
+				regularIncomeAmount.getValue(),
 				// 積立金取崩金額
 				withdrawingAmount.getValue(),
 				// 支出予定金額
@@ -161,7 +159,7 @@ public class IncomeAndExpenditureItem {
 	 *</pre>
 	 * @param userId ユーザID
 	 * @param yearMonth 対象年月(ドメイン)
-	 * @param incomeAmount 対象月の収入金額(積立金取崩金額以外の収入金額)
+	 * @param regularIncomeAmount 対象月の収入金額(積立金取崩金額以外の収入金額)
 	 * @param withdrawingAmount 対象月の積立金取崩金額
 	 * @param expenditureAmount 対象月の支出金額
 	 * @return 収支テーブル情報(ドメイン)
@@ -170,12 +168,14 @@ public class IncomeAndExpenditureItem {
 	public static IncomeAndExpenditureItem createUpdTypeIncomeAndExpenditureItem(
 			UserId userId,
 			TargetYearMonth yearMonth,
-			IncomeAmount incomeAmount,
+			RegularIncomeAmount regularIncomeAmount,
 			WithdrawingAmount withdrawingAmount,
 			ExpenditureAmount expenditureAmount) {
 		
-		// 収支金額 = 収入金額(積立金取崩金額以外の収入金額) + 積立金取崩金額 - 支出金額
-		BalanceAmount balance = BalanceAmount.calculate(incomeAmount, withdrawingAmount, expenditureAmount);
+		// 利用可能資金合計を計算
+		TotalAvailableFunds availableFunds = TotalAvailableFunds.from(regularIncomeAmount, withdrawingAmount);
+		// 収支金額 = 利用可能資金合計 - 支出金額
+		BalanceAmount balance = BalanceAmount.calculate(availableFunds, expenditureAmount);
 		
 		// 支出テーブル情報(ドメイン)を生成して返却
 		return IncomeAndExpenditureItem.from(
@@ -185,8 +185,8 @@ public class IncomeAndExpenditureItem {
 				yearMonth.getYear(),
 				// 対象月
 				yearMonth.getMonth(),
-				// 収入金額
-				incomeAmount.getValue(),
+				// 収入金額(積立金取崩金額以外の収入金額)
+				regularIncomeAmount.getValue(),
 				// 積立金取崩金額
 				withdrawingAmount.getValue(),
 				// 支出予定金額
@@ -195,21 +195,6 @@ public class IncomeAndExpenditureItem {
 				expenditureAmount.getValue(),
 				// 収支金額
 				balance.getValue());
-	}
-	
-	/**
-	 *<pre>
-	 * 検索結果が設定されているかどうかを判定します。
-	 *</pre>
-	 * @return 空の場合はtrue、値が設定されている場合はfalse
-	 *
-	 */
-	public boolean isEmpty() {
-		if(userId == null) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 	
 	/**
@@ -225,19 +210,22 @@ public class IncomeAndExpenditureItem {
 		// 新しい支出金額
 		ExpenditureAmount updExpenditureAmount = expenditureAmount.add(addValue);
 		
-		// 収支金額 = 収入金額(積立金取崩金額以外の収入金額) + 積立金取崩金額 - 支出金額
-		BalanceAmount balance = BalanceAmount.calculate(incomeAmount, withdrawingAmount, updExpenditureAmount);
+		// 利用可能資金合計を計算
+		TotalAvailableFunds availableFunds = TotalAvailableFunds.from(regularIncomeAmount, withdrawingAmount);
+		
+		// 収支金額を計算
+		BalanceAmount balance = BalanceAmount.calculate(availableFunds, updExpenditureAmount);
 		
 		// 支出テーブル情報(ドメイン)を生成して返却
 		return IncomeAndExpenditureItem.from(
 				// ユーザID
 				userId.getValue(),
 				//対象年
-				targetYear.getValue(),
+				targetYearMonth.getYear(),
 				// 対象月
-				targetMonth.getValue(),
-				// 収入金額
-				incomeAmount.getValue(),
+				targetYearMonth.getMonth(),
+				// 収入金額(積立金取崩金額以外の収入金額)
+				regularIncomeAmount.getValue(),
 				// 積立金取崩金額
 				withdrawingAmount.getValue(),
 				// 支出予定金額
@@ -261,19 +249,22 @@ public class IncomeAndExpenditureItem {
 		// 新しい支出金額
 		ExpenditureAmount updExpenditureAmount = expenditureAmount.subtract(subtractValue);
 		
-		// 収支金額 = 収入金額(積立金取崩金額以外の収入金額) + 積立金取崩金額 - 支出金額
-		BalanceAmount balance = BalanceAmount.calculate(incomeAmount, withdrawingAmount, updExpenditureAmount);
+		// 利用可能資金合計を計算
+		TotalAvailableFunds availableFunds = TotalAvailableFunds.from(regularIncomeAmount, withdrawingAmount);
+		
+		// 収支金額を計算
+		BalanceAmount balance = BalanceAmount.calculate(availableFunds, updExpenditureAmount);
 		
 		// 支出テーブル情報(ドメイン)を生成して返却
 		return IncomeAndExpenditureItem.from(
 				// ユーザID
 				userId.getValue(),
 				//対象年
-				targetYear.getValue(),
+				targetYearMonth.getYear(),
 				// 対象月
-				targetMonth.getValue(),
-				// 収入金額
-				incomeAmount.getValue(),
+				targetYearMonth.getMonth(),
+				// 収入金額(積立金取崩金額以外の収入金額)
+				regularIncomeAmount.getValue(),
 				// 積立金取崩金額
 				withdrawingAmount.getValue(),
 				// 支出予定金額

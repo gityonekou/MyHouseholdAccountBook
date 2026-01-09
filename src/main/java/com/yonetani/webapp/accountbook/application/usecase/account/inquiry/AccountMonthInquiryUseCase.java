@@ -182,7 +182,7 @@ public class AccountMonthInquiryUseCase {
 		// ユーザID,対象年月を検索条件にドメインデータを取得
 		AccountMonthInquiryExpenditureItemList expenditureList = sisyutuRepository.select(searchCondition);
 		IncomeAndExpenditure incomeAndExpenditure = syuusiRepository.findByUserIdAndYearMonth(searchCondition);
-
+		
 		// データ存在の整合性検証(収支データなし&支出金額データありの場合はエラー)
 		consistencyService.validateDataExistence(incomeAndExpenditure, expenditureList, searchCondition);
 
@@ -205,8 +205,8 @@ public class AccountMonthInquiryUseCase {
 			consistencyService.validateAll(incomeAndExpenditure, searchCondition);
 
 			// 収支情報(ドメインモデル)から収支情報(レスポンス)への変換
-			// 収入金額
-			response.setSyuunyuuKingaku(incomeAndExpenditure.getIncomeAmount().toFormatString());
+			// 収入金額(積立金取崩金額以外の収入金額)
+			response.setSyuunyuuKingaku(incomeAndExpenditure.getRegularIncomeAmount().toFormatString());
 			// 支出金額
 			response.setSisyutuKingaku(incomeAndExpenditure.getExpenditureAmount().toFormatString());
 			// 積立金取崩金額

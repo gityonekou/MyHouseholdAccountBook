@@ -1,10 +1,10 @@
 /**
- * IncomeAmount(収入金額)のテストクラスです。
+ * RegularIncomeAmount(通常収入金額)のテストクラスです。
  *
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  コメントなど
- * 2026/01/05 : 1.00.00  新規作成
+ * 2025/11/18 : 1.00.00  新規作成
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
@@ -20,7 +20,7 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
 
 /**
  *<pre>
- * IncomeAmount(収入金額)のテストクラスです。
+ * RegularIncomeAmount(通常収入金額)のテストクラスです。
  *
  *</pre>
  *
@@ -28,14 +28,14 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
  * @since 家計簿アプリ(1.00.00)
  *
  */
-@DisplayName("収入金額(IncomeAmount)のテスト")
-class IncomeAmountTest {
+@DisplayName("通常収入金額(RegularIncomeAmount)のテスト")
+class RegularIncomeAmountTest {
 
 	@Test
 	@DisplayName("正常系：正の金額で生成できる")
 	void testFrom_正常系_正の金額() {
 		// 実行
-		IncomeAmount amount = IncomeAmount.from(new BigDecimal("10000.00"));
+		RegularIncomeAmount amount = RegularIncomeAmount.from(new BigDecimal("10000.00"));
 
 		// 検証
 		assertNotNull(amount);
@@ -48,9 +48,9 @@ class IncomeAmountTest {
 	@DisplayName("正常系：ZERO定数が使用できる")
 	void testZERO定数() {
 		// 検証
-		assertNotNull(IncomeAmount.ZERO);
-		assertTrue(IncomeAmount.ZERO.isZero());
-		assertEquals(BigDecimal.ZERO.setScale(2), IncomeAmount.ZERO.getValue());
+		assertNotNull(RegularIncomeAmount.ZERO);
+		assertTrue(RegularIncomeAmount.ZERO.isZero());
+		assertEquals(BigDecimal.ZERO.setScale(2), RegularIncomeAmount.ZERO.getValue());
 	}
 
 	@Test
@@ -59,9 +59,9 @@ class IncomeAmountTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> IncomeAmount.from((BigDecimal)null)
+			() -> RegularIncomeAmount.from((BigDecimal)null)
 		);
-		assertTrue(exception.getMessage().contains("収入金額"));
+		assertTrue(exception.getMessage().contains("通常収入金額"));
 		assertTrue(exception.getMessage().contains("null"));
 	}
 
@@ -71,9 +71,9 @@ class IncomeAmountTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> IncomeAmount.from(new BigDecimal("-1000.00"))
+			() -> RegularIncomeAmount.from(new BigDecimal("-1000.00"))
 		);
-		assertTrue(exception.getMessage().contains("収入金額"));
+		assertTrue(exception.getMessage().contains("通常収入金額"));
 		assertTrue(exception.getMessage().contains("マイナス"));
 	}
 
@@ -83,9 +83,9 @@ class IncomeAmountTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> IncomeAmount.from(new BigDecimal("10000"))
+			() -> RegularIncomeAmount.from(new BigDecimal("10000"))
 		);
-		assertTrue(exception.getMessage().contains("収入金額"));
+		assertTrue(exception.getMessage().contains("通常収入金額"));
 		assertTrue(exception.getMessage().contains("スケール"));
 	}
 
@@ -93,11 +93,11 @@ class IncomeAmountTest {
 	@DisplayName("正常系：加算が正しく動作する")
 	void testAdd_正常系() {
 		// 準備
-		IncomeAmount amount1 = IncomeAmount.from(new BigDecimal("10000.00"));
-		IncomeAmount amount2 = IncomeAmount.from(new BigDecimal("5000.00"));
+		RegularIncomeAmount amount1 = RegularIncomeAmount.from(new BigDecimal("10000.00"));
+		RegularIncomeAmount amount2 = RegularIncomeAmount.from(new BigDecimal("5000.00"));
 
 		// 実行
-		IncomeAmount result = amount1.add(amount2);
+		RegularIncomeAmount result = amount1.add(amount2);
 
 		// 検証
 		assertEquals(new BigDecimal("15000.00"), result.getValue());
@@ -110,11 +110,11 @@ class IncomeAmountTest {
 	@DisplayName("正常系：減算が正しく動作する")
 	void testSubtract_正常系() {
 		// 準備
-		IncomeAmount amount1 = IncomeAmount.from(new BigDecimal("10000.00"));
-		IncomeAmount amount2 = IncomeAmount.from(new BigDecimal("3000.00"));
+		RegularIncomeAmount amount1 = RegularIncomeAmount.from(new BigDecimal("10000.00"));
+		RegularIncomeAmount amount2 = RegularIncomeAmount.from(new BigDecimal("3000.00"));
 
 		// 実行
-		IncomeAmount result = amount1.subtract(amount2);
+		RegularIncomeAmount result = amount1.subtract(amount2);
 
 		// 検証
 		assertEquals(new BigDecimal("7000.00"), result.getValue());
@@ -127,8 +127,8 @@ class IncomeAmountTest {
 	@DisplayName("異常系：減算で結果がマイナスになる場合は例外が発生する")
 	void testSubtract_異常系_結果がマイナス() {
 		// 準備
-		IncomeAmount amount1 = IncomeAmount.from(new BigDecimal("5000.00"));
-		IncomeAmount amount2 = IncomeAmount.from(new BigDecimal("10000.00"));
+		RegularIncomeAmount amount1 = RegularIncomeAmount.from(new BigDecimal("5000.00"));
+		RegularIncomeAmount amount2 = RegularIncomeAmount.from(new BigDecimal("10000.00"));
 
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(

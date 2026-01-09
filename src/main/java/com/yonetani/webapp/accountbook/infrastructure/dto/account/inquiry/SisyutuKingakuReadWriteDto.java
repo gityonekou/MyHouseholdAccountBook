@@ -77,13 +77,13 @@ public class SisyutuKingakuReadWriteDto {
 				// 支出予定金額
 				domain.getExpectedExpenditureAmount().getValue(),
 				// 支出金額
-				domain.getSisyutuKingaku().getValue(),
+				domain.getExpenditureAmount().getValue(),
 				// 無駄遣い（軽度）支出金額
 				domain.getMinorWasteExpenditure().getValue(),
 				// 無駄遣い（重度）支出金額
 				domain.getSevereWasteExpenditure().getValue(),
 				// 支出支払日
-				domain.getSisyutushiharaiDate().getValue());
+				domain.getPaymentDate().getValue());
 	}
 	
 }

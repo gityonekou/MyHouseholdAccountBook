@@ -13,9 +13,9 @@ import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuDetailContext;
-import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKubun;
 import com.yonetani.webapp.accountbook.domain.type.common.DeleteFlg;
+import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
@@ -57,7 +57,7 @@ public class IncomeItem {
 	// 収入詳細
 	private final SyuunyuuDetailContext syuunyuuDetailContext;
 	// 収入金額
-	private final IncomeAmount syuunyuuKingaku;
+	private final IncomeAmount incomeAmount;
 	// 削除フラグ
 	private final DeleteFlg deleteFlg;
 	
@@ -71,7 +71,7 @@ public class IncomeItem {
 	 * @param syuunyuuCode 収入コード
 	 * @param syuunyuuKubun 収入区分
 	 * @param syuunyuuDetailContext 収入詳細
-	 * @param syuunyuuKingaku 収入金額
+	 * @param incomeAmount 収入金額
 	 * @param deleteFlg 削除フラグ
 	 * @return 収入テーブル情報を表すドメインモデル
 	 *
@@ -83,7 +83,7 @@ public class IncomeItem {
 			String syuunyuuCode,
 			String syuunyuuKubun,
 			String syuunyuuDetailContext,
-			BigDecimal syuunyuuKingaku,
+			BigDecimal incomeAmount,
 			boolean deleteFlg) {
 		return new IncomeItem(
 				UserId.from(userId),
@@ -92,7 +92,7 @@ public class IncomeItem {
 				SyuunyuuCode.from(syuunyuuCode),
 				SyuunyuuKubun.from(syuunyuuKubun),
 				SyuunyuuDetailContext.from(syuunyuuDetailContext),
-				IncomeAmount.from(syuunyuuKingaku),
+				IncomeAmount.from(incomeAmount),
 				DeleteFlg.from(deleteFlg));
 		
 	}

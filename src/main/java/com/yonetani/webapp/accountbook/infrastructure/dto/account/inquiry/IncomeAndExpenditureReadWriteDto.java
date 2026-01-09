@@ -61,11 +61,11 @@ public class IncomeAndExpenditureReadWriteDto {
 				// ユーザID
 				domain.getUserId().getValue(),
 				// 対象年
-				domain.getTargetYear().getValue(),
+				domain.getTargetYearMonth().getYear(),
 				// 対象月
-				domain.getTargetMonth().getValue(),
-				// 収入金額
-				domain.getIncomeAmount().getValue(),
+				domain.getTargetYearMonth().getMonth(),
+				// 収入金額(積立金取崩金額以外の収入金額)
+				domain.getRegularIncomeAmount().getValue(),
 				// 積立金取崩金額
 				domain.getWithdrawingAmount().getValue(),
 				// 支出予定金額

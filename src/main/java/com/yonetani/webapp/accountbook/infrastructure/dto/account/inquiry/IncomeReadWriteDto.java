@@ -70,7 +70,7 @@ public class IncomeReadWriteDto {
 				// 収入詳細
 				domain.getSyuunyuuDetailContext().getValue(),
 				// 収入金額
-				domain.getSyuunyuuKingaku().getValue(),
+				domain.getIncomeAmount().getValue(),
 				// 削除フラグ
 				domain.getDeleteFlg().getValue());
 	}

@@ -1,7 +1,7 @@
 /**
  * 「収支金額」項目の値を表すドメインタイプです。
- * 収支金額は収入金額合計(「収入金額」項目と「積立金取崩金額」項目の合算値) - 支出金額で計算されます。
- * ※収入金額合計は別途定義されたSyuunyuuKingakuTotalAmountドメインタイプを使用します。
+ * 収支金額は利用可能資金合計(「通常収入金額」項目と「積立金取崩金額」項目の合算値) - 支出金額で計算されます。
+ * ※利用可能資金合計は別途定義されたTotalAvailableFundsドメインタイプを使用します。
  *
  *------------------------------------------------
  * 更新履歴
@@ -13,8 +13,7 @@ package com.yonetani.webapp.accountbook.domain.type.common;
 
 import java.math.BigDecimal;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalAvailableFunds;
 
 import lombok.EqualsAndHashCode;
 
@@ -23,10 +22,10 @@ import lombok.EqualsAndHashCode;
  * 「収支金額」項目の値を表すドメインタイプです。
  *
  * [ビジネスルール]
- * ・収支金額は収入金額合計(「収入金額」項目と「積立金取崩金額」項目の合算値) - 支出金額で計算されます
+ * ・収支金額は利用可能資金合計(「通常収入金額」項目と「積立金取崩金額」項目の合算値) - 支出金額で計算されます
  * ・マイナス値も許可されます（赤字の場合）
- * 
- * ※収入金額合計は別途定義されたSyuunyuuKingakuTotalAmountドメインタイプを使用します。
+ *
+ * ※利用可能資金合計は別途定義されたTotalAvailableFundsドメインタイプを使用します。
  *
  *</pre>
  *
@@ -75,23 +74,26 @@ public class BalanceAmount extends Money {
 	
 	/**
 	 *<pre>
-	 * 収入金額(積立金取崩金額以外の収入金額)と積立金取崩金額と支出金額から収支金額を計算します。
+	 * 利用可能資金合計と支出金額から収支金額を計算します。
 	 *
-	 * 計算式：収支金額 = 収入金額(積立金取崩金額以外の収入金額) + 積立金取崩金額 - 支出金額
+	 * 計算式：収支金額 = 利用可能資金合計 - 支出金額
+	 *
+	 *
+	 * [設計意図]
+	 * ・単一責任の原則：BalanceAmountは収支計算のみを責務とする
+	 * ・情報エキスパート：利用可能資金の構成はTotalAvailableFundsが知っている
+	 * ・拡張性：将来ローンなどが追加されてもこのメソッドのシグネチャは変更不要
+	 *
 	 *</pre>
-	 * @param incomeAmount 収入金額(積立金取崩金額以外の収入金額)
-	 * @param withdrawingAmount 積立金取崩金額
+	 * @param availableFunds 利用可能資金合計
 	 * @param expenditureAmount 支出金額
 	 * @return 計算された収支金額
 	 *
 	 */
-	public static BalanceAmount calculate(IncomeAmount incomeAmount, WithdrawingAmount withdrawingAmount, ExpenditureAmount expenditureAmount) {
-		// 入り方金額 = 収入金額 + 積立金取崩金額
-		SyuunyuuKingakuTotalAmount income = SyuunyuuKingakuTotalAmount.from(incomeAmount, withdrawingAmount);
-		
-		// 収支金額 = 入り方金額 - 支出金額合計
-		BigDecimal balance = income.getValue().subtract(expenditureAmount.getValue());
-		
+	public static BalanceAmount calculate(TotalAvailableFunds availableFunds, ExpenditureAmount expenditureAmount) {
+		// 収支金額 = 利用可能資金合計 - 支出金額
+		BigDecimal balance = availableFunds.getValue().subtract(expenditureAmount.getValue());
+
 		// 収支金額ドメインタイプを生成して返却
 		return BalanceAmount.from(balance);
 	}

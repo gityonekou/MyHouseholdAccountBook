@@ -21,7 +21,7 @@ import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.Expendi
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalAvailableFunds;
 
 import lombok.RequiredArgsConstructor;
 
@@ -68,11 +68,11 @@ public class IncomeAndExpenditureConsistencyService {
 	 * 収入金額の整合性を検証します。
 	 *
 	 * [ビジネスルール]
-	 * ・収支テーブルの(収入金額 + 積立取崩金額) = 収入テーブルの合計金額
+	 * ・収支テーブルの利用可能資金合計(通常収入金額 + 積立取崩金額) = 収入テーブルの合計金額
 	 *
 	 * [検証内容]
-	 * 1. 収入テーブルから収入金額の合計を取得
-	 * 2. 収支集約から収入合計（収入 + 積立取崩）を取得
+	 * 1. 収入テーブルから利用可能資金の合計を取得
+	 * 2. 収支集約から利用可能資金合計（通常収入 + 積立取崩）を取得
 	 * 3. 2つの値を比較し、一致しない場合は例外をスロー
 	 *
 	 * [例外]
@@ -94,12 +94,12 @@ public class IncomeAndExpenditureConsistencyService {
 			IncomeAndExpenditure aggregate,
 			SearchQueryUserIdAndYearMonth searchCondition) {
 
-		// 収入テーブルから合計金額を取得
-		SyuunyuuKingakuTotalAmount actualTotal =
+		// 収入テーブルから利用可能資金合計を取得
+		TotalAvailableFunds actualTotal =
 			incomeRepository.sumIncomeKingaku(searchCondition);
 
-		// 収支集約から期待値を取得（収入 + 積立取崩）
-		SyuunyuuKingakuTotalAmount expectedTotal = aggregate.getTotalIncome();
+		// 収支集約から期待値を取得（通常収入 + 積立取崩）
+		TotalAvailableFunds expectedTotal = aggregate.getTotalIncome();
 
 		// 整合性チェック
 		if (!expectedTotal.equals(actualTotal)) {

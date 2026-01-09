@@ -18,9 +18,9 @@ import java.util.List;
 import org.springframework.util.CollectionUtils;
 
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.BalanceTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.IncomeTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.RegularIncomeTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingTotalAmount;
 
 import lombok.AccessLevel;
@@ -46,7 +46,7 @@ public class IncomeAndExpenditureInquiryList {
 	private final List<IncomeAndExpenditureItem> values;
 	
 	// 収入金額合計(積立金取崩金額以外の収入金額合計)
-	private final IncomeTotalAmount incomeTotalAmount;
+	private final RegularIncomeTotalAmount regularIncomeTotalAmount;
 	// 積立金取崩金額合計
 	private final WithdrawingTotalAmount withdrawingTotalAmount;
 	// 支出予定金額合計
@@ -68,21 +68,21 @@ public class IncomeAndExpenditureInquiryList {
 		if(CollectionUtils.isEmpty(values)) {
 			return new IncomeAndExpenditureInquiryList(
 					Collections.emptyList(),
-					IncomeTotalAmount.ZERO,
+					RegularIncomeTotalAmount.ZERO,
 					WithdrawingTotalAmount.NULL,
 					ExpectedExpenditureTotalAmount.ZERO,
 					ExpenditureTotalAmount.ZERO,
 					BalanceTotalAmount.ZERO);
 		} else {
 			// 各種合計値を計算
-			IncomeTotalAmount IncomeAmountGoukei = IncomeTotalAmount.ZERO;
+			RegularIncomeTotalAmount regularIncomeAmountGoukei = RegularIncomeTotalAmount.ZERO;
 			WithdrawingTotalAmount withdrewAmountGoukei = WithdrawingTotalAmount.NULL;
 			ExpectedExpenditureTotalAmount sisyutuYoteiKingakuGoukei = ExpectedExpenditureTotalAmount.ZERO;
 			ExpenditureTotalAmount expenditureAmountGoukei = ExpenditureTotalAmount.ZERO;
 			BalanceTotalAmount balanceAmountGoukei = BalanceTotalAmount.ZERO;
 
 			for(IncomeAndExpenditureItem item : values) {
-				IncomeAmountGoukei = IncomeAmountGoukei.add(item.getIncomeAmount());
+				regularIncomeAmountGoukei = regularIncomeAmountGoukei.add(item.getRegularIncomeAmount());
 				withdrewAmountGoukei = withdrewAmountGoukei.add(item.getWithdrawingAmount());
 				sisyutuYoteiKingakuGoukei = sisyutuYoteiKingakuGoukei.add(item.getExpectedExpenditureAmount());
 				expenditureAmountGoukei = expenditureAmountGoukei.add(item.getExpenditureAmount());
@@ -90,7 +90,7 @@ public class IncomeAndExpenditureInquiryList {
 			}
 			return new IncomeAndExpenditureInquiryList(
 					values,
-					IncomeAmountGoukei,
+					regularIncomeAmountGoukei,
 					withdrewAmountGoukei,
 					sisyutuYoteiKingakuGoukei,
 					expenditureAmountGoukei,
@@ -114,8 +114,8 @@ public class IncomeAndExpenditureInquiryList {
 				.append(values.get(i))
 				.append("]]");
 			}
-			buff.append("[[合計][incomeTotalAmount:")
-			.append(incomeTotalAmount)
+			buff.append("[[合計][regularIncomeTotalAmount:")
+			.append(regularIncomeTotalAmount)
 			.append(",withdrawingTotalAmount:")
 			.append(withdrawingTotalAmount)
 			.append(",sisyutuYoteiKingakuTotalAmount:")

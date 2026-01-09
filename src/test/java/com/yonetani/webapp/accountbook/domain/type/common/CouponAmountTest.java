@@ -35,16 +35,13 @@ class CouponAmountTest {
 	@DisplayName("正常系：正の金額で生成できる")
 	void testFrom_正常系_正の金額() {
 		// 実行（正の値500で指定）
-		CouponAmount amount = CouponAmount.from(new BigDecimal("500.00"));
+		CouponAmount amount = CouponAmount.from(new BigDecimal("1500.00"));
 
-		// 検証（内部的にはマイナス値として保持）
+		// 検証
 		assertNotNull(amount);
-		assertEquals(new BigDecimal("-500.00"), amount.getValue());
-		assertEquals("-500.00", amount.toString());
-		// getDiscountAmount()は正の値を返す
-		assertEquals(new BigDecimal("500.00"), amount.getDiscountAmount());
-		// toFormatString()も正の値で表示
-		assertEquals("500円", amount.toFormatString());
+		assertEquals(new BigDecimal("1500.00"), amount.getValue());
+		assertEquals("1500.00", amount.toString());
+		assertEquals("1,500円", amount.toFormatString());
 	}
 
 	@Test
@@ -94,19 +91,6 @@ class CouponAmountTest {
 	}
 
 	@Test
-	@DisplayName("正常系：getDiscountAmount()が正の値を返す")
-	void testGetDiscountAmount() {
-		// 準備
-		CouponAmount amount = CouponAmount.from(new BigDecimal("1000.00"));
-
-		// 実行
-		BigDecimal discountAmount = amount.getDiscountAmount();
-
-		// 検証（内部はマイナスだが、getDiscountAmount()は正の値を返す）
-		assertEquals(new BigDecimal("1000.00"), discountAmount);
-	}
-
-	@Test
 	@DisplayName("正常系：hasDiscount()が正しく動作する")
 	void testHasDiscount() {
 		// 準備
@@ -128,25 +112,10 @@ class CouponAmountTest {
 		// 実行
 		CouponAmount result = amount1.add(amount2);
 
-		// 検証（内部的には-500 + -300 = -800）
-		assertEquals(new BigDecimal("-800.00"), result.getValue());
-		assertEquals(new BigDecimal("800.00"), result.getDiscountAmount());
+		// 検証（500 + 300 = 800）
+		assertEquals(new BigDecimal("800.00"), result.getValue());
 		// 元のオブジェクトは変更されていないことを確認（不変性）
-		assertEquals(new BigDecimal("-500.00"), amount1.getValue());
-		assertEquals(new BigDecimal("-300.00"), amount2.getValue());
-	}
-
-	@Test
-	@DisplayName("正常系：toFormatStringは割引額（正の値）のフォーマット済み文字列を返す")
-	void testToFormatString() {
-		// 準備
-		CouponAmount amount1 = CouponAmount.from(new BigDecimal("500.00"));
-		CouponAmount amount2 = CouponAmount.from(new BigDecimal("1234.56"));
-		CouponAmount amount3 = CouponAmount.ZERO;
-
-		// 検証（カンマ区切り+円表記、スケール0で四捨五入、正の値で表示）
-		assertEquals("500円", amount1.toFormatString());
-		assertEquals("1,235円", amount2.toFormatString());
-		assertEquals("0円", amount3.toFormatString());
+		assertEquals(new BigDecimal("500.00"), amount1.getValue());
+		assertEquals(new BigDecimal("300.00"), amount2.getValue());
 	}
 }

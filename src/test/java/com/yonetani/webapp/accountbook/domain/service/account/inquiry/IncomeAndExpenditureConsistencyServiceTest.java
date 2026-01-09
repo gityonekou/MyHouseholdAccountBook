@@ -28,10 +28,10 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalAvailableFunds;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
@@ -67,7 +67,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			SearchQueryUserIdAndYearMonth.from(userId, yearMonth);
 
 		// 収支集約：収入350,000 + 積立取崩50,000 = 合計400,000
-		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
+		RegularIncomeAmount income = RegularIncomeAmount.from(new BigDecimal("350000.00"));
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
 			userId, yearMonth, income,
 			WithdrawingAmount.from(new BigDecimal("50000.00")),
@@ -76,7 +76,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 
 		// モック設定：収入テーブルの合計も400,000
 		when(incomeRepository.sumIncomeKingaku(searchCondition))
-			.thenReturn(SyuunyuuKingakuTotalAmount.from(new BigDecimal("400000.00")));
+			.thenReturn(TotalAvailableFunds.from(new BigDecimal("400000.00")));
 
 		// 実行 & 検証（例外がスローされないことを確認）
 		assertDoesNotThrow(() -> service.validateIncomeConsistency(aggregate, searchCondition));
@@ -95,7 +95,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			SearchQueryUserIdAndYearMonth.from(userId, yearMonth);
 
 		// 収支集約：収入350,000 + 積立取崩50,000 = 合計400,000
-		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
+		RegularIncomeAmount income = RegularIncomeAmount.from(new BigDecimal("350000.00"));
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
 			userId, yearMonth, income,
 			WithdrawingAmount.from(new BigDecimal("50000.00")),
@@ -104,7 +104,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 
 		// モック設定：収入テーブルの合計は420,000（不整合）
 		when(incomeRepository.sumIncomeKingaku(searchCondition))
-			.thenReturn(SyuunyuuKingakuTotalAmount.from(new BigDecimal("420000.00")));
+			.thenReturn(TotalAvailableFunds.from(new BigDecimal("420000.00")));
 
 		// 実行 & 検証
 		IncomeAmountInconsistencyException exception = assertThrows(
@@ -193,7 +193,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			SearchQueryUserIdAndYearMonth.from(userId, yearMonth);
 
 		// 収支集約：データあり
-		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
+		RegularIncomeAmount income = RegularIncomeAmount.from(new BigDecimal("350000.00"));
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
 			userId, yearMonth, income, null, null, null, null
 		);
@@ -216,7 +216,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			SearchQueryUserIdAndYearMonth.from(userId, yearMonth);
 
 		// 収支集約：データあり
-		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
+		RegularIncomeAmount income = RegularIncomeAmount.from(new BigDecimal("350000.00"));
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
 			userId, yearMonth, income, null, null, null, null
 		);
@@ -295,7 +295,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			SearchQueryUserIdAndYearMonth.from(userId, yearMonth);
 
 		// 収支集約：収入400,000、支出280,000
-		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
+		RegularIncomeAmount income = RegularIncomeAmount.from(new BigDecimal("350000.00"));
 		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("280000.00"));
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
 			userId, yearMonth, income,
@@ -305,7 +305,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 
 		// モック設定
 		when(incomeRepository.sumIncomeKingaku(searchCondition))
-			.thenReturn(SyuunyuuKingakuTotalAmount.from(new BigDecimal("400000.00")));
+			.thenReturn(TotalAvailableFunds.from(new BigDecimal("400000.00")));
 		when(expenditureRepository.sumExpenditureKingaku(searchCondition))
 			.thenReturn(ExpenditureTotalAmount.from(new BigDecimal("280000.00")));
 
@@ -327,7 +327,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			SearchQueryUserIdAndYearMonth.from(userId, yearMonth);
 
 		// 収支集約
-		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
+		RegularIncomeAmount income = RegularIncomeAmount.from(new BigDecimal("350000.00"));
 		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("280000.00"));
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
 			userId, yearMonth, income,
@@ -337,7 +337,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 
 		// モック設定：収入が不整合
 		when(incomeRepository.sumIncomeKingaku(searchCondition))
-			.thenReturn(SyuunyuuKingakuTotalAmount.from(new BigDecimal("420000.00")));
+			.thenReturn(TotalAvailableFunds.from(new BigDecimal("420000.00")));
 
 		// 実行 & 検証
 		assertThrows(IncomeAmountInconsistencyException.class,
@@ -359,7 +359,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			SearchQueryUserIdAndYearMonth.from(userId, yearMonth);
 
 		// 収支集約
-		IncomeAmount income = IncomeAmount.from(new BigDecimal("350000.00"));
+		RegularIncomeAmount income = RegularIncomeAmount.from(new BigDecimal("350000.00"));
 		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("280000.00"));
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
 			userId, yearMonth, income,
@@ -369,7 +369,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 
 		// モック設定：収入は一致、支出が不整合
 		when(incomeRepository.sumIncomeKingaku(searchCondition))
-			.thenReturn(SyuunyuuKingakuTotalAmount.from(new BigDecimal("400000.00")));
+			.thenReturn(TotalAvailableFunds.from(new BigDecimal("400000.00")));
 		when(expenditureRepository.sumExpenditureKingaku(searchCondition))
 			.thenReturn(ExpenditureTotalAmount.from(new BigDecimal("300000.00")));
 

@@ -1,5 +1,5 @@
 /**
- * IncomeTotalAmount(収入金額合計)のテストクラスです。
+ * RegularIncomeTotalAmount(通常収入金額合計)のテストクラスです。
  *
  *------------------------------------------------
  * 更新履歴
@@ -17,11 +17,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
 
 /**
  *<pre>
- * IncomeTotalAmount(収入金額合計)のテストクラスです。
+ * RegularIncomeTotalAmount(通常収入金額合計)のテストクラスです。
  *
  *</pre>
  *
@@ -29,14 +29,14 @@ import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
  * @since 家計簿アプリ(1.00)
  *
  */
-@DisplayName("収入金額合計(IncomeTotalAmount)のテスト")
-class IncomeTotalAmountTest {
+@DisplayName("通常収入金額合計(RegularIncomeTotalAmount)のテスト")
+class RegularIncomeTotalAmountTest {
 
 	@Test
 	@DisplayName("正常系：正の金額で生成できる")
 	void testFrom_正常系_正の金額() {
 		// 実行
-		IncomeTotalAmount amount = IncomeTotalAmount.from(new BigDecimal("10000.00"));
+		RegularIncomeTotalAmount amount = RegularIncomeTotalAmount.from(new BigDecimal("10000.00"));
 
 		// 検証
 		assertNotNull(amount);
@@ -49,9 +49,9 @@ class IncomeTotalAmountTest {
 	@DisplayName("正常系：ZERO定数が使用できる")
 	void testZERO定数() {
 		// 検証
-		assertNotNull(IncomeTotalAmount.ZERO);
-		assertTrue(IncomeTotalAmount.ZERO.isZero());
-		assertEquals(BigDecimal.ZERO.setScale(2), IncomeTotalAmount.ZERO.getValue());
+		assertNotNull(RegularIncomeTotalAmount.ZERO);
+		assertTrue(RegularIncomeTotalAmount.ZERO.isZero());
+		assertEquals(BigDecimal.ZERO.setScale(2), RegularIncomeTotalAmount.ZERO.getValue());
 	}
 
 	@Test
@@ -60,9 +60,9 @@ class IncomeTotalAmountTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> IncomeTotalAmount.from((BigDecimal)null)
+			() -> RegularIncomeTotalAmount.from((BigDecimal)null)
 		);
-		assertTrue(exception.getMessage().contains("収入金額合計"));
+		assertTrue(exception.getMessage().contains("通常収入金額合計"));
 		assertTrue(exception.getMessage().contains("null"));
 	}
 
@@ -72,9 +72,9 @@ class IncomeTotalAmountTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> IncomeTotalAmount.from(new BigDecimal("-1000.00"))
+			() -> RegularIncomeTotalAmount.from(new BigDecimal("-1000.00"))
 		);
-		assertTrue(exception.getMessage().contains("収入金額合計"));
+		assertTrue(exception.getMessage().contains("通常収入金額合計"));
 		assertTrue(exception.getMessage().contains("マイナス"));
 	}
 
@@ -84,9 +84,9 @@ class IncomeTotalAmountTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> IncomeTotalAmount.from(new BigDecimal("10000"))
+			() -> RegularIncomeTotalAmount.from(new BigDecimal("10000"))
 		);
-		assertTrue(exception.getMessage().contains("収入金額合計"));
+		assertTrue(exception.getMessage().contains("通常収入金額合計"));
 		assertTrue(exception.getMessage().contains("スケール"));
 	}
 
@@ -94,11 +94,11 @@ class IncomeTotalAmountTest {
 	@DisplayName("正常系：加算が正しく動作する")
 	void testAdd_正常系() {
 		// 準備
-		IncomeTotalAmount amount1 = IncomeTotalAmount.from(new BigDecimal("10000.00"));
-		IncomeAmount amount2 = IncomeAmount.from(new BigDecimal("5000.00"));
+		RegularIncomeTotalAmount amount1 = RegularIncomeTotalAmount.from(new BigDecimal("10000.00"));
+		RegularIncomeAmount amount2 = RegularIncomeAmount.from(new BigDecimal("5000.00"));
 
 		// 実行
-		IncomeTotalAmount result = amount1.add(amount2);
+		RegularIncomeTotalAmount result = amount1.add(amount2);
 
 		// 検証
 		assertEquals(new BigDecimal("15000.00"), result.getValue());
@@ -111,11 +111,11 @@ class IncomeTotalAmountTest {
 	@DisplayName("正常系：0への加算が正しく動作する")
 	void testAdd_正常系_0への加算() {
 		// 準備
-		IncomeTotalAmount amount1 = IncomeTotalAmount.ZERO;
-		IncomeAmount amount2 = IncomeAmount.from(new BigDecimal("5000.00"));
+		RegularIncomeTotalAmount amount1 = RegularIncomeTotalAmount.ZERO;
+		RegularIncomeAmount amount2 = RegularIncomeAmount.from(new BigDecimal("5000.00"));
 
 		// 実行
-		IncomeTotalAmount result = amount1.add(amount2);
+		RegularIncomeTotalAmount result = amount1.add(amount2);
 
 		// 検証
 		assertEquals(new BigDecimal("5000.00"), result.getValue());

@@ -15,7 +15,7 @@ import java.time.LocalDate;
 
 import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.IncomeDate;
 import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
@@ -68,13 +68,13 @@ public class DomainTestDataFactory {
 
 	/**
 	 *<pre>
-	 * IncomeAmountを生成します。
+	 * RegularIncomeAmountを生成します。
 	 *</pre>
 	 * @param amount 金額（整数値）
-	 * @return IncomeAmount
+	 * @return RegularIncomeAmount
 	 */
-	public static IncomeAmount createIncomeAmount(long amount) {
-		return IncomeAmount.from(toBigDecimal(amount));
+	public static RegularIncomeAmount createIncomeAmount(long amount) {
+		return RegularIncomeAmount.from(toBigDecimal(amount));
 	}
 
 	/**
@@ -229,9 +229,9 @@ public class DomainTestDataFactory {
 	 *<pre>
 	 * テスト用の標準的な収入金額を生成します。
 	 *</pre>
-	 * @return IncomeAmount（100,000円）
+	 * @return RegularIncomeAmount（100,000円）
 	 */
-	public static IncomeAmount createStandardIncome() {
+	public static RegularIncomeAmount createStandardIncome() {
 		return createIncomeAmount(100000);
 	}
 

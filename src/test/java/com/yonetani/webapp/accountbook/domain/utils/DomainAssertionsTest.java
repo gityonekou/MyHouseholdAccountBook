@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
@@ -31,7 +31,7 @@ class DomainAssertionsTest {
 	@DisplayName("正常系：Money値の検証 - 整数値")
 	void testAssertMoneyEquals_Long() {
 		// 準備
-		IncomeAmount income = DomainTestDataFactory.createIncomeAmount(100000);
+		RegularIncomeAmount income = DomainTestDataFactory.createIncomeAmount(100000);
 
 		// 実行 & 検証（例外がスローされないことを確認）
 		assertDoesNotThrow(() ->
@@ -43,7 +43,7 @@ class DomainAssertionsTest {
 	@DisplayName("正常系：Money値の検証 - BigDecimal")
 	void testAssertMoneyEquals_BigDecimal() {
 		// 準備
-		IncomeAmount income = DomainTestDataFactory.createIncomeAmount(100000);
+		RegularIncomeAmount income = DomainTestDataFactory.createIncomeAmount(100000);
 
 		// 実行 & 検証
 		assertDoesNotThrow(() ->
@@ -55,8 +55,8 @@ class DomainAssertionsTest {
 	@DisplayName("正常系：Money値の検証 - Money同士")
 	void testAssertMoneyEquals_Money() {
 		// 準備
-		IncomeAmount income1 = DomainTestDataFactory.createIncomeAmount(100000);
-		IncomeAmount income2 = DomainTestDataFactory.createIncomeAmount(100000);
+		RegularIncomeAmount income1 = DomainTestDataFactory.createIncomeAmount(100000);
+		RegularIncomeAmount income2 = DomainTestDataFactory.createIncomeAmount(100000);
 
 		// 実行 & 検証
 		assertDoesNotThrow(() ->
@@ -68,7 +68,7 @@ class DomainAssertionsTest {
 	@DisplayName("異常系：Money値の検証 - 金額不一致")
 	void testAssertMoneyEquals_Mismatch() {
 		// 準備
-		IncomeAmount income = DomainTestDataFactory.createIncomeAmount(100000);
+		RegularIncomeAmount income = DomainTestDataFactory.createIncomeAmount(100000);
 
 		// 実行 & 検証
 		assertThrows(AssertionError.class, () ->
@@ -80,7 +80,7 @@ class DomainAssertionsTest {
 	@DisplayName("正常系：Money値が0であることを検証")
 	void testAssertMoneyIsZero() {
 		// 準備
-		IncomeAmount income = DomainTestDataFactory.createIncomeAmount(0);
+		RegularIncomeAmount income = DomainTestDataFactory.createIncomeAmount(0);
 
 		// 実行 & 検証
 		assertDoesNotThrow(() ->
@@ -92,7 +92,7 @@ class DomainAssertionsTest {
 	@DisplayName("異常系：Money値が0でない")
 	void testAssertMoneyIsZero_NotZero() {
 		// 準備
-		IncomeAmount income = DomainTestDataFactory.createIncomeAmount(100);
+		RegularIncomeAmount income = DomainTestDataFactory.createIncomeAmount(100);
 
 		// 実行 & 検証
 		assertThrows(AssertionError.class, () ->
@@ -104,7 +104,7 @@ class DomainAssertionsTest {
 	@DisplayName("正常系：Money値が正の値であることを検証")
 	void testAssertMoneyIsPositive() {
 		// 準備
-		IncomeAmount income = DomainTestDataFactory.createIncomeAmount(100000);
+		RegularIncomeAmount income = DomainTestDataFactory.createIncomeAmount(100000);
 
 		// 実行 & 検証
 		assertDoesNotThrow(() ->

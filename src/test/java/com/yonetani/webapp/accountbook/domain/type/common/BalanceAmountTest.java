@@ -17,7 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalAvailableFunds;
 
 /**
  *<pre>
@@ -92,58 +92,6 @@ class BalanceAmountTest {
 	}
 
 	@Test
-	@DisplayName("正常系：calculate()で黒字が正しく計算される")
-	void testCalculate_正常系_黒字() {
-		// 準備
-		IncomeAmount income = IncomeAmount.from(new BigDecimal("100000.00"));
-		WithdrawingAmount withdrawing = WithdrawingAmount.NULL;
-		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("80000.00"));
-
-		// 実行
-		BalanceAmount balance = BalanceAmount.calculate(income, withdrawing, expenditure);
-
-		// 検証
-		assertEquals(new BigDecimal("20000.00"), balance.getValue());
-		assertTrue(balance.isSurplus());
-		assertFalse(balance.isDeficit());
-	}
-
-	@Test
-	@DisplayName("正常系：calculate()で赤字が正しく計算される")
-	void testCalculate_正常系_赤字() {
-		// 準備
-		IncomeAmount income = IncomeAmount.from(new BigDecimal("60000.00"));
-		WithdrawingAmount withdrawing = WithdrawingAmount.from(new BigDecimal("20000.00"));
-		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("100000.00"));
-
-		// 実行
-		BalanceAmount balance = BalanceAmount.calculate(income, withdrawing, expenditure);
-
-		// 検証
-		assertEquals(new BigDecimal("-20000.00"), balance.getValue());
-		assertTrue(balance.isDeficit());
-		assertFalse(balance.isSurplus());
-	}
-
-	@Test
-	@DisplayName("正常系：calculate()で収支0が正しく計算される")
-	void testCalculate_正常系_収支0() {
-		// 準備
-		IncomeAmount income = IncomeAmount.from(new BigDecimal("50000.00"));
-		WithdrawingAmount withdrawing = WithdrawingAmount.from(new BigDecimal("50000.00"));
-		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("100000.00"));
-
-		// 実行
-		BalanceAmount balance = BalanceAmount.calculate(income, withdrawing, expenditure);
-
-		// 検証
-		assertEquals(BigDecimal.ZERO.setScale(2), balance.getValue());
-		assertTrue(balance.isZero());
-		assertFalse(balance.isSurplus());
-		assertFalse(balance.isDeficit());
-	}
-
-	@Test
 	@DisplayName("正常系：isDeficitが正しく動作する")
 	void testIsDeficit() {
 		// 準備
@@ -169,5 +117,54 @@ class BalanceAmountTest {
 		assertFalse(deficit.isSurplus());
 		assertTrue(surplus.isSurplus());
 		assertFalse(zero.isSurplus());
+	}
+
+	@Test
+	@DisplayName("正常系：calculate(TotalAvailableFunds, ExpenditureAmount)で黒字が正しく計算される")
+	void testCalculate_新メソッド_正常系_黒字() {
+		// 準備
+		TotalAvailableFunds availableFunds = TotalAvailableFunds.from(new BigDecimal("150000.00"));
+		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("100000.00"));
+
+		// 実行
+		BalanceAmount balance = BalanceAmount.calculate(availableFunds, expenditure);
+
+		// 検証
+		assertEquals(new BigDecimal("50000.00"), balance.getValue());
+		assertTrue(balance.isSurplus());
+		assertFalse(balance.isDeficit());
+	}
+
+	@Test
+	@DisplayName("正常系：calculate(TotalAvailableFunds, ExpenditureAmount)で赤字が正しく計算される")
+	void testCalculate_新メソッド_正常系_赤字() {
+		// 準備
+		TotalAvailableFunds availableFunds = TotalAvailableFunds.from(new BigDecimal("80000.00"));
+		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("120000.00"));
+
+		// 実行
+		BalanceAmount balance = BalanceAmount.calculate(availableFunds, expenditure);
+
+		// 検証
+		assertEquals(new BigDecimal("-40000.00"), balance.getValue());
+		assertTrue(balance.isDeficit());
+		assertFalse(balance.isSurplus());
+	}
+
+	@Test
+	@DisplayName("正常系：calculate(TotalAvailableFunds, ExpenditureAmount)で収支0が正しく計算される")
+	void testCalculate_新メソッド_正常系_収支0() {
+		// 準備
+		TotalAvailableFunds availableFunds = TotalAvailableFunds.from(new BigDecimal("100000.00"));
+		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("100000.00"));
+
+		// 実行
+		BalanceAmount balance = BalanceAmount.calculate(availableFunds, expenditure);
+
+		// 検証
+		assertEquals(BigDecimal.ZERO.setScale(2), balance.getValue());
+		assertTrue(balance.isZero());
+		assertFalse(balance.isSurplus());
+		assertFalse(balance.isDeficit());
 	}
 }

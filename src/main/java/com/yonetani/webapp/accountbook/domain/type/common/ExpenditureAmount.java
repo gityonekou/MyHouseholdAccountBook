@@ -116,8 +116,6 @@ public class ExpenditureAmount extends Money {
 	 *
 	 * [ビジネスルール]
 	 * ・クーポン適用後の金額が0未満になってはならない
-	 * ・クーポン金額は内部的にマイナス値として保持されているため、
-	 *   加算することで減算効果を得る
 	 *
 	 * [使用例]
 	 * - 買い物登録時の支払金額計算
@@ -135,8 +133,8 @@ public class ExpenditureAmount extends Money {
 				"適用対象のクーポン金額がnullです。管理者に問い合わせてください。");
 		}
 
-		// CouponAmountは内部的にマイナス値なので、addで減算効果が得られる
-		BigDecimal result = this.getValue().add(coupon.getValue());
+		// 支払金額にクーポン金額を適用（支出金額 - クーポン金額）
+		BigDecimal result = this.getValue().subtract(coupon.getValue());
 
 		// ガード節（クーポン適用後の金額がマイナスは不正）
 		if(result.compareTo(BigDecimal.ZERO) < 0) {

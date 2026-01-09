@@ -22,7 +22,7 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
@@ -174,7 +174,7 @@ public class IncomeAndExpenditureTableDataSource implements IncomeAndExpenditure
 				// 対象年月
 				targetYearMonth,
 				// 収入金額
-				IncomeAmount.from(dto.getIncomeKingaku()),
+				RegularIncomeAmount.from(dto.getIncomeKingaku()),
 				// 積立金取崩金額
 				WithdrawingAmount.from(dto.getWithdrewKingaku()),
 				// 支出予定金額

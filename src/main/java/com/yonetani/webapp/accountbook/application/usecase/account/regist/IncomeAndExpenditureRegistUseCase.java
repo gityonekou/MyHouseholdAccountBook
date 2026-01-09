@@ -62,7 +62,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKubun;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
@@ -277,7 +277,7 @@ public class IncomeAndExpenditureRegistUseCase {
 						// 収入詳細
 						domain.getSyuunyuuDetailContext().getValue(),
 						// 収入金額
-						domain.getSyuunyuuKingaku().getValue())
+						domain.getIncomeAmount().getValue())
 				).collect(Collectors.toList());
 		// レスポンスにセッションの収入情報を設定
 		response.setIncomeRegistItemList(incomeRegistItemList);
@@ -305,13 +305,13 @@ public class IncomeAndExpenditureRegistUseCase {
 						// 支出詳細
 						domain.getSisyutuDetailContext().getValue(),
 						// 支払日(日付からDDの値を取得して設定):DBはnull可
-						(domain.getShiharaiDate().getValue() != null) ?
+						(domain.getPaymentDate().getValue() != null) ?
 								// 値ありの場合、日付から日にちの値を取得(文字列で値を設定)
-								String.format("%02d", domain.getShiharaiDate().getValue().getDayOfMonth()) :
+								String.format("%02d", domain.getPaymentDate().getValue().getDayOfMonth()) :
 								// 値なしの場合、nullを設定
 								null,
 						// 支払金額
-						domain.getSisyutuKingaku().getValue(),
+						domain.getExpenditureAmount().getValue(),
 						// 支払金額の0円開始設定フラグ
 						false)
 				).collect(Collectors.toList());
@@ -1119,7 +1119,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		// 収入情報更新ありの場合、収入テーブルを更新
 		boolean incomeUpdateFlg = false;
 		// 収入金額の初期値=0
-		IncomeAmount incomeAmount = IncomeAmount.ZERO;
+		RegularIncomeAmount incomeAmount = RegularIncomeAmount.ZERO;
 		// 積立金取崩金額の初期値=null(値なしの場合、null値となるので初期値はnull)
 		WithdrawingAmount withdrawingAmount = WithdrawingAmount.NULL;
 		// 収入情報の件数分繰り返す
@@ -1129,7 +1129,7 @@ public class IncomeAndExpenditureRegistUseCase {
 			if(Objects.equals(incomeRegistData.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE)) {
 				
 				// 収入金額を加算
-				incomeAmount = incomeAmount.add(IncomeAmount.from(incomeRegistData));
+				incomeAmount = incomeAmount.add(RegularIncomeAmount.from(incomeRegistData));
 				// 積立金取崩金額を加算
 				withdrawingAmount = withdrawingAmount.add(WithdrawingAmount.from(incomeRegistData));
 				
@@ -1153,7 +1153,7 @@ public class IncomeAndExpenditureRegistUseCase {
 					throw new MyHouseholdAccountBookRuntimeException("収入テーブル:INCOME_TABLEへの追加件数が不正でした。[件数=" + addCount + "][add data:" + addIncomeData + "]");
 				}
 				// 収入金額を加算
-				incomeAmount = incomeAmount.add(IncomeAmount.from(incomeRegistData));
+				incomeAmount = incomeAmount.add(RegularIncomeAmount.from(incomeRegistData));
 				// 積立金取崩金額を加算
 				withdrawingAmount = withdrawingAmount.add(WithdrawingAmount.from(incomeRegistData));
 				// 収入情報更新あり
@@ -1182,7 +1182,7 @@ public class IncomeAndExpenditureRegistUseCase {
 						throw new MyHouseholdAccountBookRuntimeException("収入テーブル:INCOME_TABLEへの更新件数が不正でした。[件数=" + updCount + "][update data:" + updIncomeData + "]");
 					}
 					// 収入金額を加算
-					incomeAmount = incomeAmount.add(IncomeAmount.from(incomeRegistData));
+					incomeAmount = incomeAmount.add(RegularIncomeAmount.from(incomeRegistData));
 					// 積立金取崩金額を加算
 					withdrawingAmount = withdrawingAmount.add(WithdrawingAmount.from(incomeRegistData));
 					// 収入情報更新あり
@@ -1260,7 +1260,7 @@ public class IncomeAndExpenditureRegistUseCase {
 				// 支出予定金額を加算
 				expectedExpenditureAmount = expectedExpenditureAmount.add(addExpenditureData.getExpectedExpenditureAmount());
 				// 支出金額を加算
-				expenditureAmount = expenditureAmount.add(addExpenditureData.getSisyutuKingaku());
+				expenditureAmount = expenditureAmount.add(addExpenditureData.getExpenditureAmount());
 				
 				// 支出金額テーブル情報に追加
 				sisyutuKingakuItemHolder.add(addExpenditureData);
@@ -1300,7 +1300,7 @@ public class IncomeAndExpenditureRegistUseCase {
 						throw new MyHouseholdAccountBookRuntimeException("支出テーブル：EXPENDITURE_TABLEへの更新件数が不正でした。[件数=" + updCount + "][update data:" + updExpenditureData + "]");
 					}
 					// 支出金額を加算
-					expenditureAmount = expenditureAmount.add(updExpenditureData.getSisyutuKingaku());
+					expenditureAmount = expenditureAmount.add(updExpenditureData.getExpenditureAmount());
 					
 					// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
 					sisyutuKingakuItemHolder.update(beforeExpenditureData, updExpenditureData);

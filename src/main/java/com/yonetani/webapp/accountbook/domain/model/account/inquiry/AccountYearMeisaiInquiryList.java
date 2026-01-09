@@ -19,21 +19,22 @@ import org.springframework.util.CollectionUtils;
 
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.BalanceTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.IncomeTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.InsyokuNitiyouhinKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.IruiJyuukyoSetubiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.JigyouKeihiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.KoteiHikazeiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.KoteiKazeiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.MinorWasteExpenditure;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.RegularIncomeTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SevereWasteExpenditure;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyumiGotakuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalWasteExpenditure;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WasteExpenditureTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 
@@ -75,7 +76,7 @@ public class AccountYearMeisaiInquiryList {
 		// 対象月
 		private final TargetMonth month;
 		// 収入金額(積立金取崩金額以外の収入金額)
-		private final IncomeAmount incomeAmount;
+		private final RegularIncomeAmount regularIncomeAmount;
 		// 積立金取崩金額
 		private final WithdrawingAmount withdrawingAmount;
 		// 事業経費
@@ -102,7 +103,7 @@ public class AccountYearMeisaiInquiryList {
 		 * 引数の値から年間収支(明細)情報のドメインモデルを生成して返します。
 		 *</pre>
 		 * @param month 対象月
-		 * @param incomeAmount 収入金額(積立金取崩金額以外の収入金額)
+		 * @param regularIncomeAmount 収入金額(積立金取崩金額以外の収入金額)
 		 * @param withdrawingAmount 積立金取崩金額
 		 * @param jigyouKeihiKingaku 事業経費
 		 * @param koteiHikazeiKingaku 固定(非課税)
@@ -119,7 +120,7 @@ public class AccountYearMeisaiInquiryList {
 		 */
 		public static MeisaiInquiryListItem from(
 				String month,
-				BigDecimal incomeAmount,
+				BigDecimal regularIncomeAmount,
 				BigDecimal withdrawingAmount,
 				BigDecimal jigyouKeihiKingaku,
 				BigDecimal koteiHikazeiKingaku,
@@ -134,7 +135,7 @@ public class AccountYearMeisaiInquiryList {
 				) {
 			return new MeisaiInquiryListItem(
 					TargetMonth.from(month),
-					IncomeAmount.from(incomeAmount),
+					RegularIncomeAmount.from(regularIncomeAmount),
 					WithdrawingAmount.from(withdrawingAmount),
 					JigyouKeihiKingaku.from(jigyouKeihiKingaku),
 					KoteiHikazeiKingaku.from(koteiHikazeiKingaku),
@@ -151,7 +152,7 @@ public class AccountYearMeisaiInquiryList {
 	// 年間収支(明細)情報のリスト
 	private final List<MeisaiInquiryListItem> values;
 	// 収入金額合計(積立金取崩金額合計以外の収入金額合計)
-	private final IncomeTotalAmount incomeTotalAmount;
+	private final RegularIncomeTotalAmount regularIncomeTotalAmount;
 	// 積立金取崩金額合計
 	private final WithdrawingTotalAmount withdrawingTotalAmount;
 	// 事業経費合計
@@ -167,8 +168,7 @@ public class AccountYearMeisaiInquiryList {
 	// 趣味娯楽合計
 	private final SyumiGotakuKingaku syumiGotakuKingakuGoukei;
 	// 無駄遣い合計支出金額の合計金額
-	// TODO: 合算値のクラスを新規作成すること:TotalWasteExpenditureTotalAmount
-	private final TotalWasteExpenditure totalWasteExpenditureTotalAmount;
+	private final WasteExpenditureTotalAmount wasteExpenditureTotalAmount;
 	// 支出金額合計
 	private final ExpenditureTotalAmount expenditureTotalAmount;
 	// 収支金額合計
@@ -186,7 +186,7 @@ public class AccountYearMeisaiInquiryList {
 		if(CollectionUtils.isEmpty(values)) {
 			return new AccountYearMeisaiInquiryList(
 					Collections.emptyList(),
-					IncomeTotalAmount.ZERO,
+					RegularIncomeTotalAmount.ZERO,
 					WithdrawingTotalAmount.NULL,
 					JigyouKeihiKingaku.from(BigDecimal.ZERO),
 					KoteiHikazeiKingaku.from(BigDecimal.ZERO),
@@ -194,14 +194,14 @@ public class AccountYearMeisaiInquiryList {
 					IruiJyuukyoSetubiKingaku.from(BigDecimal.ZERO),
 					InsyokuNitiyouhinKingaku.from(BigDecimal.ZERO),
 					SyumiGotakuKingaku.from(BigDecimal.ZERO),
-					TotalWasteExpenditure.ZERO,
+					WasteExpenditureTotalAmount.ZERO,
 					ExpenditureTotalAmount.ZERO,
 					BalanceTotalAmount.ZERO
 					);
 		} else {
 			/* 各種合計値を計算 */
 			// 収入金額合計(積立金取崩金額合計以外の収入金額合計)
-			IncomeTotalAmount incomeAmountGoukei = IncomeTotalAmount.ZERO;
+			RegularIncomeTotalAmount regularIncomeAmountGoukei = RegularIncomeTotalAmount.ZERO;
 			// 積立金取崩金額合計
 			WithdrawingTotalAmount withdrawingAmountGoukei = WithdrawingTotalAmount.NULL;
 			// 事業経費合計
@@ -217,14 +217,14 @@ public class AccountYearMeisaiInquiryList {
 			// 趣味娯楽合計
 			BigDecimal syumiGotakuKingakuGoukei = BigDecimal.ZERO;
 			// 無駄遣い合計支出金額の合計金額
-			TotalWasteExpenditure totalWasteExpenditureAmountGoukei = TotalWasteExpenditure.ZERO;
+			WasteExpenditureTotalAmount wasteExpenditureTotalAmountGoukei = WasteExpenditureTotalAmount.ZERO;
 			// 支出金額合計
 			ExpenditureTotalAmount expenditureAmountGoukei = ExpenditureTotalAmount.ZERO;
 			// 収支金額合計
 			BalanceTotalAmount balanceAmountGoukei = BalanceTotalAmount.ZERO;
 			
 			for(MeisaiInquiryListItem item : values) {
-				incomeAmountGoukei = incomeAmountGoukei.add(item.getIncomeAmount());
+				regularIncomeAmountGoukei = regularIncomeAmountGoukei.add(item.getRegularIncomeAmount());
 				withdrawingAmountGoukei = withdrawingAmountGoukei.add(item.getWithdrawingAmount());
 				jigyouKeihiKingakuGoukei = DomainCommonUtils.addBigDecimalNullSafe(jigyouKeihiKingakuGoukei, item.getJigyouKeihiKingaku().getValue());
 				koteiHikazeiKingakuGoukei = DomainCommonUtils.addBigDecimalNullSafe(koteiHikazeiKingakuGoukei, item.getKoteiHikazeiKingaku().getValue());
@@ -232,13 +232,13 @@ public class AccountYearMeisaiInquiryList {
 				iruiJyuukyoSetubiKingakuGoukei = DomainCommonUtils.addBigDecimalNullSafe(iruiJyuukyoSetubiKingakuGoukei, item.getIruiJyuukyoSetubiKingaku().getValue());
 				insyokuNitiyouhinKingakuGoukei = DomainCommonUtils.addBigDecimalNullSafe(insyokuNitiyouhinKingakuGoukei, item.getInsyokuNitiyouhinKingaku().getValue());
 				syumiGotakuKingakuGoukei = DomainCommonUtils.addBigDecimalNullSafe(syumiGotakuKingakuGoukei, item.getSyumiGotakuKingaku().getValue());
-				totalWasteExpenditureAmountGoukei = totalWasteExpenditureAmountGoukei.add(item.getTotalWasteExpenditure());
+				wasteExpenditureTotalAmountGoukei = wasteExpenditureTotalAmountGoukei.add(item.getTotalWasteExpenditure());
 				expenditureAmountGoukei = expenditureAmountGoukei.add(item.getExpenditureAmount());
 				balanceAmountGoukei = balanceAmountGoukei.add(item.getBalanceAmount());
 			}
 			return new AccountYearMeisaiInquiryList(
 					values,
-					incomeAmountGoukei,
+					regularIncomeAmountGoukei,
 					withdrawingAmountGoukei,
 					JigyouKeihiKingaku.from(jigyouKeihiKingakuGoukei),
 					KoteiHikazeiKingaku.from(koteiHikazeiKingakuGoukei),
@@ -246,7 +246,7 @@ public class AccountYearMeisaiInquiryList {
 					IruiJyuukyoSetubiKingaku.from(iruiJyuukyoSetubiKingakuGoukei),
 					InsyokuNitiyouhinKingaku.from(insyokuNitiyouhinKingakuGoukei),
 					SyumiGotakuKingaku.from(syumiGotakuKingakuGoukei),
-					totalWasteExpenditureAmountGoukei,
+					wasteExpenditureTotalAmountGoukei,
 					expenditureAmountGoukei,
 					balanceAmountGoukei
 					);
@@ -270,8 +270,8 @@ public class AccountYearMeisaiInquiryList {
 				.append(values.get(i))
 				.append("]]");
 			}
-			buff.append("[[合計][incomeTotalAmount:")
-			.append(incomeTotalAmount)
+			buff.append("[[合計][regularIncomeTotalAmount:")
+			.append(regularIncomeTotalAmount)
 			.append(",withdrawingTotalAmount:")
 			.append(withdrawingTotalAmount)
 			.append(",jigyouKeihiKingakuGoukei:")
@@ -286,8 +286,8 @@ public class AccountYearMeisaiInquiryList {
 			.append(insyokuNitiyouhinKingakuGoukei)
 			.append(",syumiGotakuKingakuGoukei:")
 			.append(syumiGotakuKingakuGoukei)
-			.append(",totalWasteExpenditureTotalAmount:")
-			.append(totalWasteExpenditureTotalAmount)
+			.append(",wasteExpenditureTotalAmount:")
+			.append(wasteExpenditureTotalAmount)
 			.append(",expenditureTotalAmount:")
 			.append(expenditureTotalAmount)
 			.append(",balanceTotalAmount:")

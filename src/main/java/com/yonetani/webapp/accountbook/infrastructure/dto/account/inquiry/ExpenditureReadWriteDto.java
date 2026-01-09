@@ -87,11 +87,11 @@ public class ExpenditureReadWriteDto {
 				// 支出詳細
 				domain.getSisyutuDetailContext().getValue(),
 				// 支払日
-				domain.getShiharaiDate().getValue(),
+				domain.getPaymentDate().getValue(),
 				// 支出予定金額
 				domain.getExpectedExpenditureAmount().getValue(),
 				// 支出金額
-				domain.getSisyutuKingaku().getValue(),
+				domain.getExpenditureAmount().getValue(),
 				// 削除フラグ
 				domain.getDeleteFlg().getValue());
 	}

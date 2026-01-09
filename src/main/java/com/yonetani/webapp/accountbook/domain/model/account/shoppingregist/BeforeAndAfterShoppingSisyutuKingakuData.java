@@ -40,7 +40,7 @@ public class BeforeAndAfterShoppingSisyutuKingakuData {
 	// 支出金額の増減フラグ
 	private final int sisyutuKingakuFlg;
 	// 支出金額増減値
-	private final ExpenditureAmount sisyutuKingaku;
+	private final ExpenditureAmount expenditureAmount;
 	// 支出金額の増減値で更新した支出テーブル情報
 	private final ExpenditureItem updExpenditureItem;
 	

@@ -12,11 +12,11 @@ package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
 import java.util.Objects;
 
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalAvailableFunds;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
@@ -65,8 +65,8 @@ public class IncomeAndExpenditure {
 	private final UserId userId;
 	// 対象年月
 	private final TargetYearMonth targetYearMonth;
-	// 収入金額
-	private final IncomeAmount incomeAmount;
+	// 収入金額(積立金取崩金額以外の収入金額)
+	private final RegularIncomeAmount regularIncomeAmount;
 	// 積立金取崩金額
 	private final WithdrawingAmount withdrawingAmount;
 	// 支出予定金額
@@ -75,7 +75,7 @@ public class IncomeAndExpenditure {
 	private final ExpenditureAmount expenditureAmount;
 	// 収支金額
 	private final BalanceAmount balanceAmount;
-
+	
 	/**
 	 *<pre>
 	 * データベースから取得した収支データを再構成して集約を生成します。
@@ -89,12 +89,11 @@ public class IncomeAndExpenditure {
 	 * ・金額項目はnullを許可（データなしの場合）
 	 *
 	 * [注意事項]
-	 * ・Phase 2では金額計算は行わない
 	 * ・データベースに保存されている値をそのまま設定
 	 *</pre>
 	 * @param userId ユーザID
 	 * @param targetYearMonth 対象年月
-	 * @param incomeAmount 収入金額
+	 * @param regularIncomeAmount 収入金額(積立金取崩金額以外の収入金額)
 	 * @param withdrawingAmount 積立金取崩金額
 	 * @param estimatedExpenditureAmount 支出予定金額
 	 * @param expenditureAmount 支出金額
@@ -105,7 +104,7 @@ public class IncomeAndExpenditure {
 	public static IncomeAndExpenditure reconstruct(
 			UserId userId,
 			TargetYearMonth targetYearMonth,
-			IncomeAmount incomeAmount,
+			RegularIncomeAmount regularIncomeAmount,
 			WithdrawingAmount withdrawingAmount,
 			ExpectedExpenditureAmount estimatedExpenditureAmount,
 			ExpenditureAmount expenditureAmount,
@@ -118,7 +117,7 @@ public class IncomeAndExpenditure {
 		return new IncomeAndExpenditure(
 			userId,
 			targetYearMonth,
-			incomeAmount,
+			regularIncomeAmount,
 			withdrawingAmount,
 			estimatedExpenditureAmount,
 			expenditureAmount,
@@ -151,7 +150,7 @@ public class IncomeAndExpenditure {
 		return new IncomeAndExpenditure(
 			userId,
 			targetYearMonth,
-			null,  // incomeAmount
+			null,  // regularIncomeAmount
 			null,  // withdrawingAmount
 			null,  // estimatedExpenditureAmount
 			null,  // expenditureAmount
@@ -161,27 +160,27 @@ public class IncomeAndExpenditure {
 
 	/**
 	 *<pre>
-	 * 収入合計金額を取得します（収入 + 積立取崩）。
+	 * 利用可能資金合計を取得します（通常収入 + 積立取崩）。
 	 *
 	 * [使用箇所]
 	 * ・整合性検証サービスで使用
 	 * ・収入テーブルの合計金額との比較に使用
 	 *
 	 * [計算ロジック]
-	 * ・収入金額 + 積立取崩金額
+	 * ・通常収入金額 + 積立取崩金額
 	 * ・nullの場合は0として扱う
 	 *
 	 * [Phase 2の仕様]
 	 * ・データベースから取得した値を使用して計算
 	 * ・整合性検証の期待値として使用
 	 *</pre>
-	 * @return 収入合計金額（収入 + 積立取崩）
+	 * @return 利用可能資金合計（通常収入 + 積立取崩）
 	 *
 	 */
-	public SyuunyuuKingakuTotalAmount getTotalIncome() {
-		IncomeAmount income = incomeAmount != null ? incomeAmount : IncomeAmount.ZERO;
+	public TotalAvailableFunds getTotalIncome() {
+		RegularIncomeAmount regularIncome = regularIncomeAmount != null ? regularIncomeAmount : RegularIncomeAmount.ZERO;
 		WithdrawingAmount withdrawing = withdrawingAmount != null ? withdrawingAmount : WithdrawingAmount.ZERO;
-		return SyuunyuuKingakuTotalAmount.from(income, withdrawing);
+		return TotalAvailableFunds.from(regularIncome, withdrawing);
 	}
 
 	/**
@@ -199,7 +198,7 @@ public class IncomeAndExpenditure {
 	 *
 	 */
 	public boolean isDataExists() {
-		return incomeAmount != null;
+		return regularIncomeAmount != null;
 	}
 
 	/**

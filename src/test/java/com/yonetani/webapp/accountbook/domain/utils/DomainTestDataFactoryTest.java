@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.IncomeDate;
 import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
@@ -36,7 +36,7 @@ class DomainTestDataFactoryTest {
 	@DisplayName("正常系：IncomeAmountを生成")
 	void testCreateIncomeAmount() {
 		// 実行
-		IncomeAmount result = DomainTestDataFactory.createIncomeAmount(100000);
+		RegularIncomeAmount result = DomainTestDataFactory.createIncomeAmount(100000);
 
 		// 検証
 		assertNotNull(result);
@@ -168,7 +168,7 @@ class DomainTestDataFactoryTest {
 	@DisplayName("正常系：標準的な収入金額を生成")
 	void testCreateStandardIncome() {
 		// 実行
-		IncomeAmount result = DomainTestDataFactory.createStandardIncome();
+		RegularIncomeAmount result = DomainTestDataFactory.createStandardIncome();
 
 		// 検証
 		assertNotNull(result);
