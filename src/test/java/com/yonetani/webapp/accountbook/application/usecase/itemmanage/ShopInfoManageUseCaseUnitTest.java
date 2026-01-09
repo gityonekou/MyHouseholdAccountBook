@@ -350,12 +350,12 @@ class ShopInfoManageUseCaseUnitTest {
 		verify(shopRepository, never()).updateShopSort(any());
 		
 		// updateメソッドに渡された引数の値を確認
-		Shop addShop = updateCaptor.getValue();
-		assertEquals("TESTUSER001", addShop.getUserId().getValue(), "ユーザIDがTESTUSER001であること");
-		assertEquals("002", addShop.getShopCode().getValue(), "店舗コードが002であること");
-		assertEquals("904", addShop.getShopKubunCode().getValue(), "店舗区分コードが904であること");
-		assertEquals("靴店舗に更新(ホームセンター更新後)", addShop.getShopName().getValue(), "店舗名が「靴店舗に更新(ホームセンター更新後)」であること");
-		assertEquals("003", addShop.getShopSort().getValue(), "店舗表示順が003であること");
+		Shop updShop = updateCaptor.getValue();
+		assertEquals("TESTUSER001", updShop.getUserId().getValue(), "ユーザIDがTESTUSER001であること");
+		assertEquals("002", updShop.getShopCode().getValue(), "店舗コードが002であること");
+		assertEquals("904", updShop.getShopKubunCode().getValue(), "店舗区分コードが904であること");
+		assertEquals("靴店舗に更新(ホームセンター更新後)", updShop.getShopName().getValue(), "店舗名が「靴店舗に更新(ホームセンター更新後)」であること");
+		assertEquals("003", updShop.getShopSort().getValue(), "店舗表示順が003であること");
 	}
 	
 	/**

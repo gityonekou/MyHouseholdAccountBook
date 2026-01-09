@@ -10,6 +10,7 @@
  */
 package com.yonetani.webapp.accountbook.domain.repository.account.inquiry;
 
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
@@ -66,5 +67,25 @@ public interface IncomeAndExpenditureTableRepository {
 	 *
 	 */
 	IncomeAndExpenditureItem select(SearchQueryUserIdAndYearMonth searchQuery);
-	
+
+	/**
+	 *<pre>
+	 * 指定年月度に対応する収支集約を取得します。
+	 *
+	 * [Phase 2で追加]
+	 * ・照会機能のリファクタリングで使用
+	 * ・IncomeAndExpenditure集約を返す
+	 * ・データが存在しない場合は空の集約を返す
+	 *
+	 * [既存のselect()メソッドとの違い]
+	 * ・既存: IncomeAndExpenditureItemを返す（登録・更新機能で使用）
+	 * ・新規: IncomeAndExpenditureを返す（照会機能で使用）
+	 *
+	 *</pre>
+	 * @param searchQuery 検索条件(ユーザID, 年月度)
+	 * @return 収支集約（データなしの場合は空の集約）
+	 *
+	 */
+	IncomeAndExpenditure findByUserIdAndYearMonth(SearchQueryUserIdAndYearMonth searchQuery);
+
 }

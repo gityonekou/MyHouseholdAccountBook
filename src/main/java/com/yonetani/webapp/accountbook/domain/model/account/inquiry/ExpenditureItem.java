@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/09/07 : 1.00.00  新規作成
+ * 2025/12/28 : 1.00.00  ShiharaiDateをPaymentDateに置き換え
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
@@ -15,15 +16,15 @@ import java.time.LocalDate;
 import org.springframework.util.StringUtils;
 
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ShiharaiDate;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKubun;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuName;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.common.DeleteFlg;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
@@ -71,11 +72,11 @@ public class ExpenditureItem {
 	// 支出詳細
 	private final SisyutuDetailContext sisyutuDetailContext;
 	// 支払日
-	private final ShiharaiDate shiharaiDate;
+	private final PaymentDate paymentDate;
 	// 支出予定金額
-	private final SisyutuYoteiKingaku sisyutuYoteiKingaku;
+	private final ExpectedExpenditureAmount expectedExpenditureAmount;
 	// 支出金額
-	private final SisyutuKingaku sisyutuKingaku;
+	private final ExpenditureAmount expenditureAmount;
 	// 削除フラグ
 	private final DeleteFlg deleteFlg;
 	
@@ -92,9 +93,9 @@ public class ExpenditureItem {
 	 * @param sisyutuName 支出名称
 	 * @param sisyutuKubun 支出区分
 	 * @param sisyutuDetailContext 支出詳細
-	 * @param shiharaiDate 支払日
-	 * @param sisyutuYoteiKingaku 支出予定金額
-	 * @param sisyutuKingaku 支出金額
+	 * @param paymentDate 支払日
+	 * @param expectedExpenditureAmount 支出予定金額
+	 * @param expenditureAmount 支出金額
 	 * @param deleteFlg 削除フラグ
 	 * @return 支出テーブル情報を表すドメインモデル
 	 *
@@ -109,9 +110,9 @@ public class ExpenditureItem {
 			String sisyutuName,
 			String sisyutuKubun,
 			String sisyutuDetailContext,
-			LocalDate shiharaiDate,
-			BigDecimal sisyutuYoteiKingaku,
-			BigDecimal sisyutuKingaku,
+			LocalDate paymentDate,
+			BigDecimal expectedExpenditureAmount,
+			BigDecimal expenditureAmount,
 			boolean deleteFlg) {
 		// イベントコードがnullの場合、null値のイベントコードを生成
 		EventCode eventCodeVal = null;
@@ -131,9 +132,9 @@ public class ExpenditureItem {
 				SisyutuName.from(sisyutuName),
 				SisyutuKubun.from(sisyutuKubun),
 				SisyutuDetailContext.from(sisyutuDetailContext),
-				ShiharaiDate.from(shiharaiDate),
-				SisyutuYoteiKingaku.from(sisyutuYoteiKingaku),
-				SisyutuKingaku.from(sisyutuKingaku),
+				PaymentDate.from(paymentDate),
+				ExpectedExpenditureAmount.from(expectedExpenditureAmount),
+				ExpenditureAmount.from(expenditureAmount),
 				DeleteFlg.from(deleteFlg));
 		
 	}
@@ -154,9 +155,9 @@ public class ExpenditureItem {
 			SisyutuCode expenditureCode, ExpenditureRegistItem expenditureData) {
 		
 		// 支出予定金額：対象月の新規登録時のみ、支出金額の設定値を支出予定金額として設定。対象月の更新時は新規追加時を含めすべて0を設定
-		BigDecimal sisyutuYoteiKingaku = (initFlg) ? expenditureData.getExpenditureKingaku() : SisyutuYoteiKingaku.ZERO.getValue();
+		BigDecimal expectedExpenditureAmount = (initFlg) ? expenditureData.getExpenditureKingaku() : ExpectedExpenditureAmount.ZERO.getValue();
 		// 支出金額：固定費の対象データが初期値0フラグが設定していある場合は支出金額は0を設定、それ以外は設定されている支出金額を設定
-		BigDecimal sisyutuKingaku = (expenditureData.isClearStartFlg()) ? SisyutuYoteiKingaku.ZERO.getValue() : expenditureData.getExpenditureKingaku();
+		BigDecimal sisyutuKingaku = (expenditureData.isClearStartFlg()) ? ExpenditureAmount.ZERO.getValue() : expenditureData.getExpenditureKingaku();
 		
 		// 支出テーブル情報(ドメイン)を生成して返却
 		return ExpenditureItem.from(
@@ -179,9 +180,9 @@ public class ExpenditureItem {
 				// 支出詳細
 				expenditureData.getExpenditureDetailContext(),
 				// 支払日
-				ShiharaiDate.from(yearMonthDomain.getValue(), expenditureData.getSiharaiDate()).getValue(),
+				PaymentDate.from(yearMonthDomain.getValue(), expenditureData.getSiharaiDate()).getValue(),
 				// 支出予定金額
-				sisyutuYoteiKingaku,
+				expectedExpenditureAmount,
 				// 支出金額
 				sisyutuKingaku,
 				// 削除フラグ
@@ -196,7 +197,7 @@ public class ExpenditureItem {
 	 * @return 支出金額を加算した支出テーブル情報(ドメイン)情報
 	 *
 	 */
-	public ExpenditureItem addSisyutuKingaku(SisyutuKingaku addValue) {
+	public ExpenditureItem addSisyutuKingaku(ExpenditureAmount addValue) {
 		// 支出テーブル情報(ドメイン)を生成して返却
 		return ExpenditureItem.from(
 				// ユーザID
@@ -218,11 +219,11 @@ public class ExpenditureItem {
 				// 支出詳細
 				sisyutuDetailContext.getValue(),
 				// 支払日
-				shiharaiDate.getValue(),
+				paymentDate.getValue(),
 				// 支出予定金額
-				sisyutuYoteiKingaku.getValue(),
+				expectedExpenditureAmount.getValue(),
 				// 支出金額
-				sisyutuKingaku.add(addValue).getValue(),
+				expenditureAmount.add(addValue).getValue(),
 				// 削除フラグ
 				deleteFlg.getValue());
 		
@@ -236,7 +237,7 @@ public class ExpenditureItem {
 	 * @return 支出金額を減算した支出テーブル情報(ドメイン)情報
 	 *
 	 */
-	public ExpenditureItem subtractSisyutuKingaku(SisyutuKingaku subtractValue) {
+	public ExpenditureItem subtractSisyutuKingaku(ExpenditureAmount subtractValue) {
 		// 支出テーブル情報(ドメイン)を生成して返却
 		return ExpenditureItem.from(
 				// ユーザID
@@ -258,11 +259,11 @@ public class ExpenditureItem {
 				// 支出詳細
 				sisyutuDetailContext.getValue(),
 				// 支払日
-				shiharaiDate.getValue(),
+				paymentDate.getValue(),
 				// 支出予定金額
-				sisyutuYoteiKingaku.getValue(),
+				expectedExpenditureAmount.getValue(),
 				// 支出金額
-				sisyutuKingaku.subtract(subtractValue).getValue(),
+				expenditureAmount.subtract(subtractValue).getValue(),
 				// 削除フラグ
 				deleteFlg.getValue());
 		

@@ -31,6 +31,7 @@ import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 
@@ -128,7 +129,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryNotFoundTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryNotFoundTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testReadShopInfoQueryNotFound() {
 		// 検索結果なしとなる条件で画面表示情報を取得
 		ShopInfoManageResponse res = service.readShopInfo(TEST_USER);
@@ -173,7 +174,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultOneTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultOneTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testReadShopInfoQueryResultOne() {
 		// 検索条件に対応する店舗情報1件で画面表示情報を取得
 		ShopInfoManageResponse res = service.readShopInfo(TEST_USER);
@@ -199,7 +200,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryNonEditResultOneTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryNonEditResultOneTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testReadShopInfoQueryNonEditResultOne() {
 		// 検索条件に対応する店舗情報1件で画面表示情報を取得
 		ShopInfoManageResponse res = service.readShopInfo(TEST_USER);
@@ -225,7 +226,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testReadShopInfoQueryResultSix() {
 		// 検索条件に対応する店舗情報6件で画面表示情報を取得
 		ShopInfoManageResponse res = service.readShopInfo(TEST_USER);
@@ -252,7 +253,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, java.lang.String)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testReadShopInfoFromShopCode() {
 		// 検索条件に対応する店舗情報6件、店舗コード(002)に対応する店舗情報ありで画面表示情報を取得
 		ShopInfoManageResponse res = service.readShopInfo(TEST_USER, "002");
@@ -283,7 +284,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, java.lang.String)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testReadShopInfoNotFoundFromShopCode() {
 		// 検索条件に対応する店舗情報1件で画面表示情報を取得
 		MyHouseholdAccountBookRuntimeException ex = assertThrows(
@@ -303,7 +304,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readUpdateBindingErrorSetInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testReadUpdateBindingErrorSetInfo() {
 		// テスト用フォームデータを作成
 		ShopInfoForm form = inputUpdateShopInfoForm(null);
@@ -323,7 +324,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryNotFoundTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryNotFoundTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddType1Action() {
 		// 新規追加テスト用フォームデータを作成(表示順=null:表示順は自動採番)
 		ShopInfoForm form = inputAddShopInfoForm(null);
@@ -361,7 +362,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryNonEditResultOneTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryNonEditResultOneTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddType2Action() {
 		// 新規追加テスト用フォームデータを作成(表示順=002)
 		ShopInfoForm form = inputAddShopInfoForm("002");
@@ -394,7 +395,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddType3Action() {
 		// 新規追加テスト用フォームデータを作成(表示順=null:表示順は自動採番)
 		ShopInfoForm form = inputAddShopInfoForm(null);
@@ -430,7 +431,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddType4Action() {
 		// 新規追加テスト用フォームデータを作成(表示順=001)
 		ShopInfoForm form = inputAddShopInfoForm("001");
@@ -466,7 +467,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddType5Action() {
 		// 新規追加テスト用フォームデータを作成(表示順=002)
 		ShopInfoForm form = inputAddShopInfoForm("002");
@@ -501,7 +502,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddType6Action() {
 		// 新規追加テスト用フォームデータを作成(表示順=004)
 		ShopInfoForm form = inputAddShopInfoForm("004");
@@ -534,7 +535,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddType7Action() {
 		// 新規追加テスト用フォームデータを作成(表示順=005)
 		ShopInfoForm form = inputAddShopInfoForm("005");
@@ -563,7 +564,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateType1Action() {
 		// 更新テスト用フォームデータを作成
 		ShopInfoForm form = inputUpdateShopInfoForm("002");
@@ -618,7 +619,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateType2Action() {
 		// 更新テスト用フォームデータを作成(表示順:001)
 		ShopInfoForm form = inputUpdateShopInfoForm("001");
@@ -665,7 +666,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateType3Action() {
 		// 更新テスト用フォームデータを作成(表示順:003)
 		ShopInfoForm form = inputUpdateShopInfoForm("003");
@@ -698,7 +699,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateType4Action() {
 		// 更新テスト用フォームデータを作成(表示順:004)
 		ShopInfoForm form = inputUpdateShopInfoForm("004");
@@ -731,7 +732,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateType5Action() {
 		// 更新テスト用フォームデータを作成(表示順:null)
 		ShopInfoForm form = inputUpdateShopInfoForm(null);
@@ -763,7 +764,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateType6Action() {
 		// 更新テスト用フォームデータを作成(表示順:003)
 		ShopInfoForm form = inputUpdateShopInfoForm("003");
@@ -791,7 +792,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateType7Action() {
 		// 更新テスト用フォームデータを作成(表示順:001)
 		ShopInfoForm form = inputUpdateShopInfoForm("001");
@@ -820,7 +821,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateShopSortBeforeEmptyAction() {
 		// 更新テスト用フォームデータを作成
 		ShopInfoForm form = inputUpdateShopInfoForm("002");
@@ -844,7 +845,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ReadShopInfoQueryResultSixTest.sql")
+	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateActionFailValueAction() {
 		// 更新テスト用フォームデータを作成
 		ShopInfoForm form = inputUpdateShopInfoForm("002");

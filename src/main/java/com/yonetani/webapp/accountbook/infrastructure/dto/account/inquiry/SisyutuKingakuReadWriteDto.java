@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/10/13 : 1.00.00  新規作成
+ * 2025/12/28 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry;
@@ -74,15 +75,15 @@ public class SisyutuKingakuReadWriteDto {
 				// 親支出項目コード
 				domain.getParentSisyutuItemCode().getValue(),
 				// 支出予定金額
-				domain.getSisyutuYoteiKingaku().getValue(),
+				domain.getExpectedExpenditureAmount().getValue(),
 				// 支出金額
-				domain.getSisyutuKingaku().getValue(),
-				// 支出金額B
-				domain.getSisyutuKingakuB().getValue(),
-				// 支出金額C
-				domain.getSisyutuKingakuC().getValue(),
+				domain.getExpenditureAmount().getValue(),
+				// 無駄遣い（軽度）支出金額
+				domain.getMinorWasteExpenditure().getValue(),
+				// 無駄遣い（重度）支出金額
+				domain.getSevereWasteExpenditure().getValue(),
 				// 支出支払日
-				domain.getSisyutushiharaiDate().getValue());
+				domain.getPaymentDate().getValue());
 	}
 	
 }

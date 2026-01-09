@@ -22,6 +22,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.inquiry.AccountMonthInquiryUseCase;
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.presentation.response.account.inquiry.AccountMonthInquiryResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
@@ -59,18 +61,23 @@ public class AccountMonthInquiryController {
 	 * 現在の決算月の収支画面初期表示のGET要求時マッピングです。
 	 * トップメニューからの遷移(初期表示)時に呼び出されます。
 	 *</pre>
-	 * @return マイ家計簿(各月の収支)画面
+	 * @return マイ家計簿(各月の収支)画面 または マイ家計簿(各月の収支：収支登録確認)画面
 	 *
 	 */
 	@GetMapping
 	public ModelAndView getInitAccountMonth() {
 		log.debug("getInitAccountMonth:");
 		// 画面表示データ読込
-		return this.usecase.read(loginUserSession.getLoginUserInfo())
-				// レスポンスにログインユーザ名を設定
-				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
-				// レスポンスからModelAndViewを生成
-				.build();
+		AccountMonthInquiryResponse response = this.usecase.read(loginUserSession.getLoginUserInfo());
+		// レスポンスにログインユーザ名を設定
+		response.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName());
+
+		// 収支データの有無でビューを切り替え
+		if (response.isSyuusiDataFlg()) {
+			return response.buildWithData();
+		} else {
+			return response.buildRegistCheck();
+		}
 	}
 	
 	/**
@@ -78,19 +85,24 @@ public class AccountMonthInquiryController {
 	 * 指定月の収支画面表示のPOST要求時マッピングです。他のタブからの遷移時に呼び出されます。
 	 *</pre>
 	 * @param targetYearMonth 表示対象の年月
-	 * @return マイ家計簿(各月の収支)画面
+	 * @return マイ家計簿(各月の収支)画面 または マイ家計簿(各月の収支：収支登録確認)画面
 	 *
 	 */
 	@PostMapping
 	public ModelAndView postAccountMonth(@RequestParam("targetYearMonth") String targetYearMonth) {
 		log.debug("postAccountMonth:targetYearMonth="+ targetYearMonth);
-		
+
 		// 画面表示情報読込
-		return this.usecase.read(loginUserSession.getLoginUserInfo(), targetYearMonth)
-				// レスポンスにログインユーザ名を設定
-				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
-				// レスポンスからModelAndViewを生成
-				.build();
+		AccountMonthInquiryResponse response = this.usecase.read(loginUserSession.getLoginUserInfo(), targetYearMonth);
+		// レスポンスにログインユーザ名を設定
+		response.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName());
+
+		// 収支データの有無でビューを切り替え
+		if (response.isSyuusiDataFlg()) {
+			return response.buildWithData();
+		} else {
+			return response.buildRegistCheck();
+		}
 	}
 	
 	/**
@@ -99,7 +111,7 @@ public class AccountMonthInquiryController {
 	 *</pre>
 	 * @param beforeYearMonth 前月の年月(表示対象の年月の値)
 	 * @param returnYearMonth 戻り時の年月(遷移元画面で表示した年月の値)
-	 * @return マイ家計簿(各月の収支)画面
+	 * @return マイ家計簿(各月の収支)画面 または マイ家計簿(各月の収支：収支登録確認)画面
 	 *
 	 */
 	@PostMapping(value="/targetcontrol/", params = "targetBeforeBtn")
@@ -107,13 +119,18 @@ public class AccountMonthInquiryController {
 			@RequestParam("beforeYearMonth") String beforeYearMonth,
 			@RequestParam("returnYearMonth") String returnYearMonth) {
 		log.debug("postBeforeAccountMonth:beforeYearMonth="+ beforeYearMonth + ",returnYearMonth:=" + returnYearMonth);
-		
+
 		// 画面表示情報読込
-		return this.usecase.read(loginUserSession.getLoginUserInfo(), beforeYearMonth, returnYearMonth)
-				// レスポンスにログインユーザ名を設定
-				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
-				// レスポンスからModelAndViewを生成
-				.build();
+		AccountMonthInquiryResponse response = this.usecase.read(loginUserSession.getLoginUserInfo(), beforeYearMonth, returnYearMonth);
+		// レスポンスにログインユーザ名を設定
+		response.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName());
+
+		// 収支データの有無でビューを切り替え
+		if (response.isSyuusiDataFlg()) {
+			return response.buildWithData();
+		} else {
+			return response.buildRegistCheck();
+		}
 	}
 	
 	/**
@@ -122,7 +139,7 @@ public class AccountMonthInquiryController {
 	 *</pre>
 	 * @param nextYearMonth 次月の年月(表示対象の年月の値)
 	 * @param returnYearMonth 戻り時の年月(遷移元画面で表示した年月の値)
-	 * @return マイ家計簿(各月の収支)画面
+	 * @return マイ家計簿(各月の収支)画面 または マイ家計簿(各月の収支：収支登録確認)画面
 	 *
 	 */
 	@PostMapping(value="/targetcontrol/", params = "targetNextBtn")
@@ -130,13 +147,18 @@ public class AccountMonthInquiryController {
 			@RequestParam("nextYearMonth") String nextYearMonth,
 			@RequestParam("returnYearMonth") String returnYearMonth) {
 		log.debug("postNextAccountMonth:nextYearMonth="+ nextYearMonth + ",returnYearMonth:=" + returnYearMonth);
-		
+
 		// 画面表示情報読込
-		return this.usecase.read(loginUserSession.getLoginUserInfo(), nextYearMonth, returnYearMonth)
-				// レスポンスにログインユーザ名を設定
-				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
-				// レスポンスからModelAndViewを生成
-				.build();
+		AccountMonthInquiryResponse response = this.usecase.read(loginUserSession.getLoginUserInfo(), nextYearMonth, returnYearMonth);
+		// レスポンスにログインユーザ名を設定
+		response.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName());
+
+		// 収支データの有無でビューを切り替え
+		if (response.isSyuusiDataFlg()) {
+			return response.buildWithData();
+		} else {
+			return response.buildRegistCheck();
+		}
 	}
 	
 	/**
@@ -187,6 +209,8 @@ public class AccountMonthInquiryController {
 	 *<pre>
 	 * 各種登録処理で、各月の収支画面にリダイレクト(Get要求時)のマッピングです。
 	 * 対象月の収支画面を表示します。
+	 *
+	 * 【前提条件】登録・更新完了後のリダイレクトのため、収支データは必ず存在する
 	 *</pre>
 	 * @param targetYearMonth 表示対象の年月
 	 * @param redirectMessages リダイレクト元から引き継いだメッセージ
@@ -197,12 +221,25 @@ public class AccountMonthInquiryController {
 	public ModelAndView registComplete(
 			@RequestParam("targetYearMonth") String targetYearMonth, @ModelAttribute CompleteRedirectMessages redirectMessages) {
 		log.debug("registComplete:targetYearMonth="+ targetYearMonth + ",input=" + redirectMessages);
-		
+
 		// 画面表示情報を取得
-		return this.usecase.read(loginUserSession.getLoginUserInfo(), targetYearMonth)
-			// レスポンスにログインユーザ名を設定
-			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
-			// レスポンスからModelAndViewを生成
-			.buildComplete(redirectMessages);
+		AccountMonthInquiryResponse response = this.usecase.read(loginUserSession.getLoginUserInfo(), targetYearMonth);
+		// レスポンスにログインユーザ名を設定
+		response.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName());
+
+		// リダイレクト元から引き継いだメッセージを画面表示メッセージに設定
+		if (redirectMessages.getRedirectMessages() != null && !redirectMessages.getRedirectMessages().isEmpty()) {
+			redirectMessages.getRedirectMessages().forEach(response::addMessage);
+		}
+
+		// 登録・更新完了後なので収支データは必ず存在するはず
+		// データが存在しない場合はシステムエラー（登録処理の不具合など）
+		if (!response.isSyuusiDataFlg()) {
+			log.error("登録完了後に収支データが存在しません。yearMonth={}", targetYearMonth);
+			throw new MyHouseholdAccountBookRuntimeException(
+				"データの整合性エラーが発生しました。管理者に連絡してください。");
+		}
+
+		return response.buildWithData();
 	}
 }
