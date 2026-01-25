@@ -39,7 +39,7 @@ spring:
     init:
       # ddlのロード
       schema-locations:
-        - classpath:sql/initsql/schema_test.sql
+        - classpath:sql/initsql/schema_unit_test.sql
       # 各テストケースに依存しない初期登録データ
       # data-locations:
       #   - classpath:sql/initsql/data_test.sql

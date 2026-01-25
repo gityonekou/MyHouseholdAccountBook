@@ -17,6 +17,7 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -34,8 +35,10 @@ import lombok.RequiredArgsConstructor;
 public abstract class AbstractRegistResponse extends AbstractResponse {
 	
 	// 「yyyy年MM月度」の年の値
+	@Getter
 	private String viewYear;
 	// 「yyyy年MM月度」の月の値
+	@Getter
 	private String viewMonth;
 	
 	/**

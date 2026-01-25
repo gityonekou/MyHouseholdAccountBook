@@ -63,6 +63,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
     "/sql/initsql/schema_test.sql",
     "/com/yonetani/webapp/accountbook/application/usecase/account/inquiry/AccountMonthInquiryIntegrationTest.sql"
 }, config = @SqlConfig(encoding = "UTF-8"))
+@DisplayName("収支管理機能 月次収支照会のUseCaseテスト（統合テスト）")
 class AccountMonthInquiryIntegrationTest {
 
     @Autowired

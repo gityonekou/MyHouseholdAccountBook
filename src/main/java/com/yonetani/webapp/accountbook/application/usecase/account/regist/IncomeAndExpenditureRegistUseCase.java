@@ -185,7 +185,7 @@ public class IncomeAndExpenditureRegistUseCase {
 			response.addMessage("条件に一致する登録済み固定費が999件以上登録されています。固定費管理画面で対象件数を999件以下にしてください。");
 			
 		} else {
-			/* 登録済みの固定費一覧情報からセッションに設定されている支出情報のリストを作成 */
+			/* 登録済みの固定費一覧情報からセッションに設定する支出登録情報リストを作成 */
 			/* 作成するセッションデータのリストは登録・更新・削除で変更される可能性があるので変更可のリストを指定して作成します */
 			// 仮登録用支出コードの末尾3桁(999)のインクリメント用
 			AtomicInteger count = new AtomicInteger(1);
@@ -218,15 +218,15 @@ public class IncomeAndExpenditureRegistUseCase {
 							domain.getFixedCostKubun().isClearStart()
 						)).collect(Collectors.toList());
 			
-			// レスポンスにセッションの支出情報を設定
+			// レスポンスにセッションの支出登録情報を設定
 			response.setExpenditureRegistItemList(expenditureRegistItemList);
-			// 買い物登録に必須の項目が支出登録情報のリスト(セッション登録情報)に設定されているかをチェック
+			// 買い物登録に必須の項目がセッションの支出登録情報に設定されているかをチェック
 			checkComponent.checkExpenditureRegistItemList(expenditureRegistItemList).forEach(message -> {
 				// エラーメッセージを追加
 				response.addErrorMessage(message);
 			});
 			
-			// 固定費一覧から画面表示する支出一覧とセッション保存の支出一覧を設定
+			// セッションの支出登録情報をもとに、画面表示する支出一覧情報を設定(収入情報は未登録のためnullを設定)
 			setIncomeAndExpenditureInfoList(userId, null, expenditureRegistItemList, response);
 		}
 		return response;
@@ -262,7 +262,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		if(incomeList.isEmpty()) {
 			throw new MyHouseholdAccountBookRuntimeException("更新対象の収入情報が収入テーブルに存在しません。管理者に問い合わせてください。[search=" + search + "]");
 		}
-		// 収支テーブルから取得した収支情報をセッションの収支情報リストに設定
+		// 収入テーブルから取得した収入情報をセッションの収入登録情報に変換
 		// 注意：セッション情報のリストは編集可とする必要があるので、可変リストで作成する必要あり
 		List<IncomeRegistItem> incomeRegistItemList = incomeList.getValues().stream().map(
 				domain -> IncomeRegistItem.from(
@@ -279,12 +279,12 @@ public class IncomeAndExpenditureRegistUseCase {
 						// 収入金額
 						domain.getIncomeAmount().getValue())
 				).collect(Collectors.toList());
-		// レスポンスにセッションの収入情報を設定
+		// レスポンスにセッションの収入登録情報を設定
 		response.setIncomeRegistItemList(incomeRegistItemList);
 		
 		// 支出テーブルから対象年月の支出情報を取得(未登録の場合ありのため、0件チェックは不要)
 		ExpenditureItemInquiryList expenditureList = expenditureRepository.findById(search);
-		// 支出テーブルから取得した支出情報をセッションの支出情報リストに設定
+		// 支出テーブルから取得した支出情報をセッションの支出登録情報に変換
 		// 注意：セッション情報のリストは編集可とする必要があるので、可変リストで作成する必要あり
 		List<ExpenditureRegistItem> expenditureRegistItemList = expenditureList.getValues().stream().map(
 				domain -> ExpenditureRegistItem.from(
@@ -315,10 +315,10 @@ public class IncomeAndExpenditureRegistUseCase {
 						// 支払金額の0円開始設定フラグ
 						false)
 				).collect(Collectors.toList());
-		// レスポンスにセッションの支出情報を設定
+		// レスポンスにセッションの支出登録情報を設定
 		response.setExpenditureRegistItemList(expenditureRegistItemList);
 		
-		// 固定費一覧から画面表示する支出一覧とセッション保存の支出一覧を設定
+		// セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を設定
 		setIncomeAndExpenditureInfoList(userId, incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
@@ -340,7 +340,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		log.debug("readIncomeAndExpenditureInfoList:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
 		// レスポンスを生成
 		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
-		// セッション情報の各収支一覧情報を画面表示情報に設定
+		// セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を設定
 		setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
@@ -371,7 +371,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		// レスポンスを生成
 		IncomeAndExpenditureRegistResponse response = createIncomeItemFormResponse(targetYearMonth, incomeItemForm);
 		
-		// セッション情報の各収支一覧情報を画面表示情報に設定
+		// セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を設定
 		setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
@@ -432,7 +432,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		// レスポンスを生成
 		IncomeAndExpenditureRegistResponse response = createIncomeItemFormResponse(targetYearMonth, incomeItemForm);
 		
-		// セッション情報の各収支一覧情報を画面表示情報に設定
+		// セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を設定
 		setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
@@ -458,7 +458,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		// レスポンスを生成
 		IncomeAndExpenditureRegistResponse response = createIncomeItemFormResponse(targetYearMonth, inputForm);
 		
-		// セッション情報の各収支一覧情報を画面表示情報に設定
+		// セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を設定
 		setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
@@ -687,7 +687,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		// レスポンスを生成
 		IncomeAndExpenditureRegistResponse response = createExpenditureItemFormResponse(targetYearMonth, expenditureItemForm);
 		
-		// セッション情報の各収支一覧情報を画面表示情報に設定
+		// セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を設定
 		setIncomeAndExpenditureInfoList(userId, incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
@@ -713,7 +713,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		// レスポンスを生成
 		IncomeAndExpenditureRegistResponse response = createExpenditureItemFormResponse(targetYearMonth, inputForm);
 		
-		// セッション情報の各収支一覧情報を画面表示情報に設定
+		// セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を設定
 		setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
@@ -998,7 +998,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		// レスポンスを生成
 		IncomeAndExpenditureRegistResponse response = createExpenditureItemFormResponse(targetYearMonth, expenditureItemForm);
 		
-		// セッション情報の各収支一覧情報を画面表示情報に設定
+		// セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を設定
 		setIncomeAndExpenditureInfoList(userId, incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
@@ -1021,7 +1021,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		
 		// レスポンスを生成
 		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(targetYearMonth);
-		// セッション情報の各収支一覧情報を画面表示情報に設定
+		// セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を設定
 		setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
 		
 		return response;
@@ -1044,7 +1044,7 @@ public class IncomeAndExpenditureRegistUseCase {
 		
 		// レスポンスを生成
 		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
-		// セッション情報の各収支一覧情報を画面表示情報に設定
+		// セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を設定
 		setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
 		// メッセージを設定
 		response.addMessage("収入情報が未登録です。");
@@ -1512,12 +1512,12 @@ public class IncomeAndExpenditureRegistUseCase {
 	
 	/**
 	 *<pre>
-	 * セッションの収入情報、支出情報の各一覧情報を画面情報に設定します。
+	 * セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を生成し画面情報(レスポンス情報)に設定します。
 	 *</pre>
 	 * @param userId ログインユーザID
-	 * @param incomeRegistItemList セッションに設定されている収支情報のリスト
-	 * @param expenditureRegistItemList セッションに設定されている支出情報のリスト
-	 * @param response 収入一覧、支出一覧レスポンス情報
+	 * @param incomeRegistItemList セッションに設定されている収入登録情報のリスト
+	 * @param expenditureRegistItemList セッションに設定されている支出登録情報のリスト
+	 * @param response 収入一覧、支出一覧画面情報(レスポンス情報)
 	 *
 	 */
 	private void setIncomeAndExpenditureInfoList(
@@ -1599,7 +1599,7 @@ public class IncomeAndExpenditureRegistUseCase {
 				// 支出項目コードに対応する支出項目情報を取得
 				SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(userId, SisyutuItemCode.from(session.getSisyutuItemCode()));
 				if(sisyutuItem == null) {
-					new MyHouseholdAccountBookRuntimeException(
+					throw new MyHouseholdAccountBookRuntimeException(
 							"支出項目コードに対応する支出項目情報が存在しません。管理者に問い合わせてください。[sisyutuItemCode=" + session.getSisyutuItemCode() + "]");
 				}
 				

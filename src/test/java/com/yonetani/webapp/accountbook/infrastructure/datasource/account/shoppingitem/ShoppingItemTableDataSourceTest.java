@@ -60,7 +60,7 @@ import com.yonetani.webapp.accountbook.infrastructure.mapper.account.shoppingite
 // @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 
 // SpringBootアプリケーション設定ファイルにapplication-test.ymlを設定
-@ActiveProfiles("test")
+@ActiveProfiles("unit-test")
 class ShoppingItemTableDataSourceTest {
 	
 	// ShoppingItemTableRepository

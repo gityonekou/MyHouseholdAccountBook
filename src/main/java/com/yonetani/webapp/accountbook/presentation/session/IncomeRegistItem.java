@@ -1,5 +1,5 @@
 /**
- * セッションに設定する収支登録情報です。
+ * セッションに設定する収入登録情報です。
  *
  *------------------------------------------------
  * 更新履歴
@@ -20,7 +20,7 @@ import lombok.ToString;
 
 /**
  *<pre>
- * セッションに設定する収支登録情報です。
+ * セッションに設定する収入登録情報です。
  *
  *</pre>
  *
@@ -51,7 +51,7 @@ public class IncomeRegistItem implements Serializable {
 	
 	/**
 	 *<pre>
-	 * 引数の値からセッションに設定する収支登録情報を生成して返します。
+	 * 引数の値からセッションに設定する収入登録情報を生成して返します。
 	 *</pre>
 	 * @param dataType データタイプ(新規 or ロード)
 	 * @param action アクション(追加／更新／削除)
@@ -59,7 +59,7 @@ public class IncomeRegistItem implements Serializable {
 	 * @param incomeKubun 収入区分
 	 * @param incomeDetailContext 収入詳細
 	 * @param incomeKingaku 収入金額
-	 * @return 収支登録情報
+	 * @return 収入登録情報
 	 *
 	 */
 	public static IncomeRegistItem from(

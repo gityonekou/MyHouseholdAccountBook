@@ -22,7 +22,11 @@ import lombok.RequiredArgsConstructor;
 
 /**
  *<pre>
- * 「支出区分」項目の値を表すドメインタイプです
+ * 「支出区分」項目の値を表すドメインタイプです。
+ * 支出区分には以下の3種類があります。
+ * ・無駄遣いなし
+ * ・無駄遣い（軽度）
+ * ・無駄遣い（重度）
  *
  *</pre>
  *
@@ -37,11 +41,11 @@ public class SisyutuKubun {
 	// 支出区分
 	private final String value;
 	
-	/** 支出区分(無駄使いなし) */
+	/** 支出区分：無駄使いなし */
 	public static final SisyutuKubun NON_WASTED = SisyutuKubun.from(MyHouseholdAccountBookContent.NON_WASTED_SELECTED_VALUE);
-	/** 支出区分(無駄遣いB) */
+	/** 支出区分：無駄遣い（軽度） */
 	public static final SisyutuKubun WASTED_B = SisyutuKubun.from(MyHouseholdAccountBookContent.WASTED_B_SELECTED_VALUE);
-	/** 支出区分(無駄遣いC) */
+	/** 支出区分：無駄遣い（重度） */
 	public static final SisyutuKubun WASTED_C = SisyutuKubun.from(MyHouseholdAccountBookContent.WASTED_C_SELECTED_VALUE);
 	
 	/**
@@ -50,7 +54,7 @@ public class SisyutuKubun {
 	 * 
 	 * [ガード節]
 	 * ・空文字列
-	 * ・値が不正値(無駄遣いなし(1)、無駄遣いB(2)、無駄遣いC(3)のどれでもない)
+	 * ・値が不正値(無駄遣いなし(1)、無駄遣い（軽度）(2)、無駄遣い（重度）(3)のどれでもない)
 	 * 
 	 *</pre>
 	 * @param kubun 支出区分
@@ -62,7 +66,7 @@ public class SisyutuKubun {
 		if(!StringUtils.hasLength(kubun)) {
 			throw new MyHouseholdAccountBookRuntimeException("「支出区分」項目の設定値が空文字列です。管理者に問い合わせてください。");
 		}
-		// ガード節(値が不正値=無駄遣いなし(1)、無駄遣いB(2)、無駄遣いC(3)のどれでもない)
+		// ガード節(値が不正値=無駄遣いなし、無駄遣い（軽度）、無駄遣い（重度）のどれでもない)
 		if(kubun.equals(MyHouseholdAccountBookContent.NON_WASTED_SELECTED_VALUE)
 				|| kubun.equals(MyHouseholdAccountBookContent.WASTED_B_SELECTED_VALUE)
 				|| kubun.equals(MyHouseholdAccountBookContent.WASTED_C_SELECTED_VALUE)) {
@@ -75,8 +79,8 @@ public class SisyutuKubun {
 	/**
 	 *<pre>
 	 * 「固定費名(支払名)」項目の値に「支出区分」項目の値の文字列が含まれる場合、該当する支出区分の「支出区分」項目ドメインタイプを生成します。
-	 * ・「固定費名(支払名)」項目の値に文字列「無駄遣いB」が含まれる場合、「無駄遣いB」の支出区分を設定
-	 * ・「固定費名(支払名)」項目の値に文字列「無駄遣いC」が含まれる場合、「無駄遣いC」の支出区分を設定
+	 * ・「固定費名(支払名)」項目の値に文字列「無駄遣いB」が含まれる場合、「無駄遣い（軽度）」の支出区分を設定
+	 * ・「固定費名(支払名)」項目の値に文字列「無駄遣いC」が含まれる場合、「無駄遣い（重度）」の支出区分を設定
 	 * ・無駄遣いなし、及び、どの文字列も含まない場合、「無駄遣いなし」の支出区分を設定
 	 * 　
 	 *</pre>
@@ -108,10 +112,10 @@ public class SisyutuKubun {
 	
 	/**
 	 *<pre>
-	 * 指定した支出区分項目の値が「無駄遣いB」かどうかを判定します。
+	 * 指定した支出区分項目の値が「無駄遣い（軽度）」かどうかを判定します。
 	 *</pre>
 	 * @param kubun 支出区分項目
-	 * @return 値が「無駄遣いB」の場合、true、それ以外はfalse
+	 * @return 値が「無駄遣い（軽度）」の場合、true、それ以外はfalse
 	 *
 	 */
 	public static boolean isWastedB(SisyutuKubun kubun) {
@@ -120,10 +124,10 @@ public class SisyutuKubun {
 	
 	/**
 	 *<pre>
-	 * 指定した支出区分項目の値が「無駄遣いC」かどうかを判定します。
+	 * 指定した支出区分項目の値が「無駄遣い（重度）」かどうかを判定します。
 	 *</pre>
 	 * @param kubun 支出区分項目
-	 * @return 値が「無駄遣いC」の場合、true、それ以外はfalse
+	 * @return 値が「無駄遣い（重度）」の場合、true、それ以外はfalse
 	 *
 	 */
 	public static boolean isWastedC(SisyutuKubun kubun) {

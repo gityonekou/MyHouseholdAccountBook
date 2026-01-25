@@ -42,15 +42,19 @@ import lombok.Setter;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class IncomeAndExpenditureRegistResponse extends AbstractIncomeAndExpenditureRegistResponse {
-	
+
 	// 収入情報入力フォーム
+	@Getter
 	private final IncomeItemForm incomeItemForm;
 	// 収入区分選択ボックス
+	@Getter
 	private final SelectViewItem incomeKubunSelectList;
-	
+
 	// 支出情報入力フォーム
+	@Getter
 	private final ExpenditureItemForm expenditureItemForm;
 	// 支出区分選択ボックス
+	@Getter
 	private final SelectViewItem expenditureKubunSelectList;
 	
 	// セッション管理する収入登録情報のリストです。

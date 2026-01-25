@@ -133,15 +133,19 @@ public abstract class AbstractIncomeAndExpenditureRegistResponse extends Abstrac
 	}
 	
 	// 収入情報
+	@Getter
 	private List<IncomeListItem> incomeListInfo = new ArrayList<>();
 	// 収入金額合計
 	@Setter
+	@Getter
 	private String incomeSumKingaku;
-	
+
 	// 支出情報
+	@Getter
 	private List<ExpenditureListItem> expenditureListInfo = new ArrayList<>();
 	// 支出金額合計
 	@Setter
+	@Getter
 	private String expenditureSumKingaku;
 	
 	
