@@ -25,6 +25,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.IncomeAndExpenditureRegistResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.session.ExpenditureRegistItem;
@@ -52,17 +53,19 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  *   2. 正常系: 新規登録画面表示_10月固定費（偶数月）画面表示データ検証 - 202510
  *   3. 正常系: 新規登録画面表示_11月固定費（奇数月）セッションデータ検証 - 202511
  *   4. 正常系: 新規登録画面表示_11月固定費（奇数月）画面表示データ検証 - 202511
- *   5. 正常系: 新規登録画面表示_固定費なし - 202512
+ *   5. 正常系: 新規登録画面表示_固定費なし（画面表示データ0件確認含む） - 202512
  *   6. 正常系: 新規登録_必須登録データ未登録時メッセージ確認 - 202510
  *   7. 正常系: 新規登録_全必須登録データ登録済みメッセージ確認 - 202510
  *   8. 正常系: 新規登録_一部必須登録データのみ登録時メッセージ確認 - 202510
  * readUpdateInfo:
  *   9. 正常系: 更新画面表示_セッションデータ検証 - 202511
  *  10. 正常系: 更新画面表示_画面表示データ検証 - 202511
+ *  11. 異常系: 更新_収入テーブル情報なし・支出テーブル情報あり → 例外 - 202509
+ *  12. 正常系: 更新_収入テーブル情報あり・支出テーブル情報なし → 支出リスト空 - 202508
  * readIncomeAndExpenditureInfoList:
- *  11. 正常系: 収入・支出一覧再表示
+ *  13. 正常系: 収入・支出一覧再表示
  * readRegistCheckErrorSetInfo:
- *  12. 正常系: 入力確認エラー_収入未登録
+ *  14. 正常系: 入力確認エラー_収入未登録
  *
  *</pre>
  *
@@ -543,6 +546,18 @@ class IncomeAndExpenditureInitIntegrationTest {
         assertFalse(response.getMessagesList().isEmpty());
         assertTrue(response.getMessagesList().stream()
             .anyMatch(msg -> msg.contains("条件に一致する登録済み固定費が0件でした")));
+
+        // Then: 新規登録時は収入一覧情報が0件であることを確認
+        assertTrue(response.getIncomeListInfo().isEmpty());
+
+        // Then: 固定費なしの場合、支出一覧情報も0件であることを確認
+        assertTrue(response.getExpenditureListInfo().isEmpty());
+
+        // Then: 新規登録時は収入金額合計がnullであることを確認
+        assertNull(response.getIncomeSumKingaku());
+
+        // Then: 固定費なしの場合、支出金額合計がnullであることを確認
+        assertNull(response.getExpenditureSumKingaku());
     }
 
     /**
@@ -836,6 +851,88 @@ class IncomeAndExpenditureInitIntegrationTest {
 
         // Then: 更新画面ではメッセージなし（正常系）
         assertTrue(response.getMessagesList().isEmpty());
+    }
+
+    /**
+     * 異常系テスト: 収入テーブル情報なし、支出テーブル情報ありの場合
+     *
+     * <p>更新対象の収入情報が収入テーブルに存在しない場合、
+     * MyHouseholdAccountBookRuntimeExceptionが発生することを確認する。</p>
+     */
+    @Test
+    @Sql(scripts = {
+        "/sql/initsql/schema_test.sql",
+        "/com/yonetani/webapp/accountbook/application/usecase/account/regist/IncomeAndExpenditureInitIntegrationTest.sql",
+        "/com/yonetani/webapp/accountbook/application/usecase/account/regist/IncomeAndExpenditureInitIntegrationTest_UpdateInfo_NoIncome.sql"
+    }, config = @SqlConfig(encoding = "UTF-8"))
+    @DisplayName("異常系：更新_収入テーブル情報なし・支出テーブル情報あり → 例外")
+    void testReadUpdateInfo_Exception_NoIncomeWithExpenditure() {
+        // Given: テストユーザ、対象年月202509（収入情報なし、支出情報あり）
+        LoginUserInfo user = createLoginUser();
+        String targetYearMonth = "202509";
+
+        // When & Then: 収入情報が未登録のため例外が発生する
+        MyHouseholdAccountBookRuntimeException exception = assertThrows(
+            MyHouseholdAccountBookRuntimeException.class,
+            () -> useCase.readUpdateInfo(user, targetYearMonth)
+        );
+
+        // Then: 例外メッセージに収入情報未登録の旨が含まれること
+        assertTrue(exception.getMessage().contains("更新対象の収入情報が収入テーブルに存在しません"));
+    }
+
+    /**
+     * 境界系テスト: 収入テーブル情報あり、支出テーブル情報なしの場合
+     *
+     * <p>支出情報が未登録の場合、支出登録情報リストが空リストとなることを確認する。
+     * （過去データの場合、現在の必須データが未登録の場合ありのため、0件チェックを含めた整合性チェックは不要）</p>
+     */
+    @Test
+    @Sql(scripts = {
+        "/sql/initsql/schema_test.sql",
+        "/com/yonetani/webapp/accountbook/application/usecase/account/regist/IncomeAndExpenditureInitIntegrationTest.sql",
+        "/com/yonetani/webapp/accountbook/application/usecase/account/regist/IncomeAndExpenditureInitIntegrationTest_UpdateInfo_NoExpenditure.sql"
+    }, config = @SqlConfig(encoding = "UTF-8"))
+    @DisplayName("正常系：更新_収入テーブル情報あり・支出テーブル情報なし → 支出リスト空")
+    void testReadUpdateInfo_NormalCase_IncomeOnlyNoExpenditure() {
+        // Given: テストユーザ、対象年月202508（収入情報あり、支出情報なし）
+        LoginUserInfo user = createLoginUser();
+        String targetYearMonth = "202508";
+
+        // When: 更新画面を表示
+        IncomeAndExpenditureRegistResponse response = useCase.readUpdateInfo(user, targetYearMonth);
+
+        // Then: レスポンスが正しく返却される
+        assertNotNull(response);
+
+        // Then: 収入情報が1件取得されていること
+        assertNotNull(response.getIncomeRegistItemList());
+        assertEquals(1, response.getIncomeRegistItemList().size());
+
+        // 収入情報の検証
+        var incomeItem = response.getIncomeRegistItemList().get(0);
+        assertEquals("load", incomeItem.getDataType()); // データタイプ：DBロード
+        assertEquals("non", incomeItem.getAction()); // アクション：更新なし
+        assertEquals("01", incomeItem.getIncomeCode()); // 収入コード
+        assertEquals("1", incomeItem.getIncomeKubun()); // 収入区分：給与
+        assertEquals("8月給与（支出なし確認用）", incomeItem.getIncomeDetailContext()); // 収入詳細
+        assertEquals(new BigDecimal("280000.00"), incomeItem.getIncomeKingaku()); // 収入金額
+
+        // Then: 支出情報が0件（空リスト）であることを確認
+        assertNotNull(response.getExpenditureRegistItemList());
+        assertTrue(response.getExpenditureRegistItemList().isEmpty());
+
+        // Then: 画面表示用の収入一覧が1件であることを確認
+        assertEquals(1, response.getIncomeListInfo().size());
+
+        // Then: 画面表示用の支出一覧が0件であることを確認
+        assertTrue(response.getExpenditureListInfo().isEmpty());
+
+        // Then: 収入金額合計が正しく設定されていること
+        assertEquals("280,000円", response.getIncomeSumKingaku());
+
+        // Then: 支出情報なしの場合、支出金額合計がnullであることを確認
+        assertNull(response.getExpenditureSumKingaku());
     }
 
     // ========================================

@@ -282,7 +282,8 @@ public class IncomeAndExpenditureRegistUseCase {
 		// レスポンスにセッションの収入登録情報を設定
 		response.setIncomeRegistItemList(incomeRegistItemList);
 		
-		// 支出テーブルから対象年月の支出情報を取得(未登録の場合ありのため、0件チェックは不要)
+		// 支出テーブルから対象年月の支出情報を取得
+		// (過去データの場合、現在の必須データが未登録の場合ありのため、0件チェックを含めた整合性チェックは不要)
 		ExpenditureItemInquiryList expenditureList = expenditureRepository.findById(search);
 		// 支出テーブルから取得した支出情報をセッションの支出登録情報に変換
 		// 注意：セッション情報のリストは編集可とする必要があるので、可変リストで作成する必要あり
