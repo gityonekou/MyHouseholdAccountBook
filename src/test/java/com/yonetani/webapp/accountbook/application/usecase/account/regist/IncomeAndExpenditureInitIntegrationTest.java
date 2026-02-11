@@ -25,6 +25,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.IncomeAndExpenditureRegistResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
@@ -63,7 +64,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  *  11. 異常系: 更新_収入テーブル情報なし・支出テーブル情報あり → 例外 - 202509
  *  12. 正常系: 更新_収入テーブル情報あり・支出テーブル情報なし → 支出リスト空 - 202508
  * readIncomeAndExpenditureInfoList:
- *  13. 正常系: 収入・支出一覧再表示
+ *  13. 正常系: 収入・支出一覧再表示（削除アクション設定データの除外確認含む）
  * readRegistCheckErrorSetInfo:
  *  14. 正常系: 入力確認エラー_収入未登録
  *
@@ -128,8 +129,8 @@ class IncomeAndExpenditureInitIntegrationTest {
         // 固定費支払日(FIXED_COST_SHIHARAI_DAY)='00'の場合、支払日は'01'に変換され設定される
         // 固定費区分(FIXED_COST_KUBUN)='1'の場合、0円開始設定フラグはfalseが設定される
         var firstItem = response.getExpenditureRegistItemList().get(0);
-        assertEquals("new", firstItem.getDataType()); // データタイプ設定値は常に'new'
-        assertEquals("add", firstItem.getAction()); // アクション設定値は常に'add'
+        assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, firstItem.getDataType()); // データタイプ設定値は常に'new'
+        assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, firstItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, firstItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
         assertEquals("0030", firstItem.getSisyutuItemCode()); // 支出項目コード（家賃）
         assertEquals("", firstItem.getEventCode());  // イベントコード設定値は常に空文字列
@@ -146,8 +147,8 @@ class IncomeAndExpenditureInitIntegrationTest {
         // 固定費支払日(FIXED_COST_SHIHARAI_DAY)='20'の場合、支払日は'20'が設定される
         // 固定費区分(FIXED_COST_KUBUN)='2'の場合、0円開始設定フラグはtrueが設定される
         var secondItem = response.getExpenditureRegistItemList().get(1);
-        assertEquals("new", secondItem.getDataType()); // データタイプ設定値は常に'new'
-        assertEquals("add", secondItem.getAction()); // アクション設定値は常に'add'
+        assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, secondItem.getDataType()); // データタイプ設定値は常に'new'
+        assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, secondItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, secondItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
         assertEquals("0040", secondItem.getSisyutuItemCode()); // 支出項目コード（水道代）
         assertEquals("", secondItem.getEventCode());  // イベントコード設定値は常に空文字列
@@ -163,8 +164,8 @@ class IncomeAndExpenditureInitIntegrationTest {
         // 固定費支払日(FIXED_COST_SHIHARAI_DAY)='25'の場合、支払日は'25'が設定される
         // 固定費区分(FIXED_COST_KUBUN)='1'の場合、0円開始設定フラグはfalseが設定される
         var thirdItem = response.getExpenditureRegistItemList().get(2);
-        assertEquals("new", thirdItem.getDataType()); // データタイプ設定値は常に'new'
-        assertEquals("add", thirdItem.getAction()); // アクション設定値は常に'add'
+        assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, thirdItem.getDataType()); // データタイプ設定値は常に'new'
+        assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, thirdItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, thirdItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
         assertEquals("0039", thirdItem.getSisyutuItemCode()); // 支出項目コード（通信費）
         assertEquals("", thirdItem.getEventCode());  // イベントコード設定値は常に空文字列
@@ -180,8 +181,8 @@ class IncomeAndExpenditureInitIntegrationTest {
         // 固定費支払日(FIXED_COST_SHIHARAI_DAY)='31'の場合、支払日は'31'が設定される
         // 固定費区分(FIXED_COST_KUBUN)='2'の場合、0円開始設定フラグはtrueが設定される
         var fourthItem = response.getExpenditureRegistItemList().get(3);
-        assertEquals("new", fourthItem.getDataType()); // データタイプ設定値は常に'new'
-        assertEquals("add", fourthItem.getAction()); // アクション設定値は常に'add'
+        assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, fourthItem.getDataType()); // データタイプ設定値は常に'new'
+        assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, fourthItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, fourthItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
         assertEquals("0037", fourthItem.getSisyutuItemCode()); // 支出項目コード（電気代）
         assertEquals("", fourthItem.getEventCode());  // イベントコード設定値は常に空文字列
@@ -198,8 +199,8 @@ class IncomeAndExpenditureInitIntegrationTest {
         // 固定費区分(FIXED_COST_KUBUN)='1'の場合、0円開始設定フラグはfalseが設定される
         // メモ：無駄遣いCとKUBUN='2'の組み合わせは11月固定費テストの「【5番目】ガス代(無駄遣いC)」のデータで確認
         var fifthItem = response.getExpenditureRegistItemList().get(4);
-        assertEquals("new", fifthItem.getDataType()); // データタイプ設定値は常に'new'
-        assertEquals("add", fifthItem.getAction()); // アクション設定値は常に'add'
+        assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, fifthItem.getDataType()); // データタイプ設定値は常に'new'
+        assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, fifthItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, fifthItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
         assertEquals("0038", fifthItem.getSisyutuItemCode()); // 支出項目コード（ガス代）
         assertEquals("", fifthItem.getEventCode());  // イベントコード設定値は常に空文字列
@@ -236,7 +237,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 
         // Then: 収入情報入力フォームが正しく設定されている（新規登録用の初期値）
         assertNotNull(response.getIncomeItemForm());
-        assertEquals("add", response.getIncomeItemForm().getAction()); // アクション：新規追加
+        assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, response.getIncomeItemForm().getAction()); // アクション：新規追加
         assertEquals("【新規追加】", response.getIncomeItemForm().getIncomeKubunName()); // 収入区分名
         assertNull(response.getIncomeItemForm().getIncomeCode()); // 収入コード：未設定
         assertNull(response.getIncomeItemForm().getIncomeKubun()); // 収入区分：未設定
@@ -336,8 +337,8 @@ class IncomeAndExpenditureInitIntegrationTest {
         // 固定費支払日(FIXED_COST_SHIHARAI_DAY)='00'の場合、支払日は'01'に変換され設定される
         // 固定費区分(FIXED_COST_KUBUN)='1'の場合、0円開始設定フラグはfalseが設定される
         var firstItem = response.getExpenditureRegistItemList().get(0);
-        assertEquals("new", firstItem.getDataType()); // データタイプ設定値は常に'new'
-        assertEquals("add", firstItem.getAction()); // アクション設定値は常に'add'
+        assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, firstItem.getDataType()); // データタイプ設定値は常に'new'
+        assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, firstItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, firstItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
         assertEquals("0030", firstItem.getSisyutuItemCode()); // 支出項目コード（家賃）
         assertEquals("", firstItem.getEventCode());  // イベントコード設定値は常に空文字列
@@ -354,8 +355,8 @@ class IncomeAndExpenditureInitIntegrationTest {
         // 固定費支払日(FIXED_COST_SHIHARAI_DAY)='20'の場合、支払日は'20'が設定される
         // 固定費区分(FIXED_COST_KUBUN)='1'の場合、0円開始設定フラグはfalseが設定される
         var secondItem = response.getExpenditureRegistItemList().get(1);
-        assertEquals("new", secondItem.getDataType()); // データタイプ設定値は常に'new'
-        assertEquals("add", secondItem.getAction()); // アクション設定値は常に'add'
+        assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, secondItem.getDataType()); // データタイプ設定値は常に'new'
+        assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, secondItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, secondItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
         assertEquals("0040", secondItem.getSisyutuItemCode()); // 支出項目コード（水道代）
         assertEquals("", secondItem.getEventCode());  // イベントコード設定値は常に空文字列
@@ -373,8 +374,8 @@ class IncomeAndExpenditureInitIntegrationTest {
         // メモ：無駄遣いBとKUBUN='2'の組み合わせは10月固定費テストの「【4番目】電気代(無駄遣いB)」のデータで確認
         // 支出詳細：パターン4（DETAIL_CONTEXT=値あり, OPTIONAL_CONTEXT=値あり）→ "詳細値/任意詳細値"
         var thirdItem = response.getExpenditureRegistItemList().get(2);
-        assertEquals("new", thirdItem.getDataType()); // データタイプ設定値は常に'new'
-        assertEquals("add", thirdItem.getAction()); // アクション設定値は常に'add'
+        assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, thirdItem.getDataType()); // データタイプ設定値は常に'new'
+        assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, thirdItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, thirdItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
         assertEquals("0039", thirdItem.getSisyutuItemCode()); // 支出項目コード（通信費）
         assertEquals("", thirdItem.getEventCode());  // イベントコード設定値は常に空文字列
@@ -391,8 +392,8 @@ class IncomeAndExpenditureInitIntegrationTest {
         // 固定費区分(FIXED_COST_KUBUN)='1'の場合、0円開始設定フラグはfalseが設定される
         // 支出詳細：パターン3（DETAIL_CONTEXT=null, OPTIONAL_CONTEXT=値あり）→ "任意詳細値"
         var fourthItem = response.getExpenditureRegistItemList().get(3);
-        assertEquals("new", fourthItem.getDataType()); // データタイプ設定値は常に'new'
-        assertEquals("add", fourthItem.getAction()); // アクション設定値は常に'add'
+        assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, fourthItem.getDataType()); // データタイプ設定値は常に'new'
+        assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, fourthItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, fourthItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
         assertEquals("0037", fourthItem.getSisyutuItemCode()); // 支出項目コード（電気代）
         assertEquals("", fourthItem.getEventCode());  // イベントコード設定値は常に空文字列
@@ -409,8 +410,8 @@ class IncomeAndExpenditureInitIntegrationTest {
         // 固定費区分(FIXED_COST_KUBUN)='2'の場合、0円開始設定フラグはtrueが設定される
         // 支出詳細：パターン1（DETAIL_CONTEXT=null, OPTIONAL_CONTEXT=null）→ ""
         var fifthItem = response.getExpenditureRegistItemList().get(4);
-        assertEquals("new", fifthItem.getDataType()); // データタイプ設定値は常に'new'
-        assertEquals("add", fifthItem.getAction()); // アクション設定値は常に'add'
+        assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, fifthItem.getDataType()); // データタイプ設定値は常に'new'
+        assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, fifthItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, fifthItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
         assertEquals("0038", fifthItem.getSisyutuItemCode()); // 支出項目コード（ガス代）
         assertEquals("", fifthItem.getEventCode());  // イベントコード設定値は常に空文字列
@@ -446,7 +447,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 
         // Then: 収入情報入力フォームが正しく設定されている（新規登録用の初期値）
         assertNotNull(response.getIncomeItemForm());
-        assertEquals("add", response.getIncomeItemForm().getAction()); // アクション：新規追加
+        assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, response.getIncomeItemForm().getAction()); // アクション：新規追加
         assertEquals("【新規追加】", response.getIncomeItemForm().getIncomeKubunName()); // 収入区分名
         assertNull(response.getIncomeItemForm().getIncomeCode()); // 収入コード：未設定
         assertNull(response.getIncomeItemForm().getIncomeKubun()); // 収入区分：未設定
@@ -692,8 +693,8 @@ class IncomeAndExpenditureInitIntegrationTest {
 
         // 【1件目】収入コード='01': 給与
         var firstIncome = response.getIncomeRegistItemList().get(0);
-        assertEquals("load", firstIncome.getDataType()); // データタイプ：DBロード
-        assertEquals("non", firstIncome.getAction()); // アクション：更新なし
+        assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_LOAD, firstIncome.getDataType()); // データタイプ：DBロード
+        assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, firstIncome.getAction()); // アクション：更新なし
         assertEquals("01", firstIncome.getIncomeCode()); // 収入コード
         assertEquals("1", firstIncome.getIncomeKubun()); // 収入区分：給与
         assertEquals("11月給与", firstIncome.getIncomeDetailContext()); // 収入詳細
@@ -701,8 +702,8 @@ class IncomeAndExpenditureInitIntegrationTest {
 
         // 【2件目】収入コード='02': 副業
         var secondIncome = response.getIncomeRegistItemList().get(1);
-        assertEquals("load", secondIncome.getDataType()); // データタイプ：DBロード
-        assertEquals("non", secondIncome.getAction()); // アクション：更新なし
+        assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_LOAD, secondIncome.getDataType()); // データタイプ：DBロード
+        assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, secondIncome.getAction()); // アクション：更新なし
         assertEquals("02", secondIncome.getIncomeCode()); // 収入コード
         assertEquals("2", secondIncome.getIncomeKubun()); // 収入区分：副業
         assertEquals("11月副業収入", secondIncome.getIncomeDetailContext()); // 収入詳細
@@ -718,8 +719,8 @@ class IncomeAndExpenditureInitIntegrationTest {
         // 【1件目】支出コード='001': 電気代
         // 支出区分='1'（無駄遣いなし）の場合
         var firstExpenditure = response.getExpenditureRegistItemList().get(0);
-        assertEquals("load", firstExpenditure.getDataType()); // データタイプ：DBロード
-        assertEquals("non", firstExpenditure.getAction()); // アクション：更新なし
+        assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_LOAD, firstExpenditure.getDataType()); // データタイプ：DBロード
+        assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, firstExpenditure.getAction()); // アクション：更新なし
         assertEquals("001", firstExpenditure.getExpenditureCode()); // 支出コード
         assertEquals("0037", firstExpenditure.getSisyutuItemCode()); // 支出項目コード（電気代）
         assertNull(firstExpenditure.getEventCode()); // イベントコード（DBでnull→nullが設定される）
@@ -733,8 +734,8 @@ class IncomeAndExpenditureInitIntegrationTest {
         // 【2件目】支出コード='002': ガス代(無駄遣いB)
         // 支出区分='2'（無駄遣いB）、支払日=NULL のケース
         var secondExpenditure = response.getExpenditureRegistItemList().get(1);
-        assertEquals("load", secondExpenditure.getDataType()); // データタイプ：DBロード
-        assertEquals("non", secondExpenditure.getAction()); // アクション：更新なし
+        assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_LOAD, secondExpenditure.getDataType()); // データタイプ：DBロード
+        assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, secondExpenditure.getAction()); // アクション：更新なし
         assertEquals("002", secondExpenditure.getExpenditureCode()); // 支出コード
         assertEquals("0038", secondExpenditure.getSisyutuItemCode()); // 支出項目コード（ガス代）
         assertNull(secondExpenditure.getEventCode()); // イベントコード（DBでnull→nullが設定される）
@@ -747,8 +748,8 @@ class IncomeAndExpenditureInitIntegrationTest {
 
         // 【3件目】支出コード='003': 水道代
         var thirdExpenditure = response.getExpenditureRegistItemList().get(2);
-        assertEquals("load", thirdExpenditure.getDataType()); // データタイプ：DBロード
-        assertEquals("non", thirdExpenditure.getAction()); // アクション：更新なし
+        assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_LOAD, thirdExpenditure.getDataType()); // データタイプ：DBロード
+        assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, thirdExpenditure.getAction()); // アクション：更新なし
         assertEquals("003", thirdExpenditure.getExpenditureCode()); // 支出コード
         assertEquals("0040", thirdExpenditure.getSisyutuItemCode()); // 支出項目コード（水道代）
         assertNull(thirdExpenditure.getEventCode()); // イベントコード（DBでnull→nullが設定される）
@@ -911,8 +912,8 @@ class IncomeAndExpenditureInitIntegrationTest {
 
         // 収入情報の検証
         var incomeItem = response.getIncomeRegistItemList().get(0);
-        assertEquals("load", incomeItem.getDataType()); // データタイプ：DBロード
-        assertEquals("non", incomeItem.getAction()); // アクション：更新なし
+        assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_LOAD, incomeItem.getDataType()); // データタイプ：DBロード
+        assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, incomeItem.getAction()); // アクション：更新なし
         assertEquals("01", incomeItem.getIncomeCode()); // 収入コード
         assertEquals("1", incomeItem.getIncomeKubun()); // 収入区分：給与
         assertEquals("8月給与（支出なし確認用）", incomeItem.getIncomeDetailContext()); // 収入詳細
@@ -940,7 +941,7 @@ class IncomeAndExpenditureInitIntegrationTest {
     // ========================================
 
     @Test
-    @DisplayName("正常系：収入・支出一覧再表示")
+    @DisplayName("正常系：収入・支出一覧再表示（削除アクション設定データの除外確認含む）")
     void testReadIncomeAndExpenditureInfoList_NormalCase() {
         // Given: テストユーザ、対象年月、セッションの収入・支出リスト
         LoginUserInfo user = createLoginUser();
@@ -949,21 +950,37 @@ class IncomeAndExpenditureInitIntegrationTest {
         // セッションデータのモック（収入情報リスト）
         List<IncomeRegistItem> incomeRegistItemList = new ArrayList<>();
         incomeRegistItemList.add(IncomeRegistItem.from(
-            "LOAD", "NON", "01", "1", "テスト収入詳細", new BigDecimal("350000")));
+        		MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, "01", "1", "テスト収入詳細", new BigDecimal("350000")));
+        // 削除アクションが設定された収入データ（画面表示から除外されるべき）
+        incomeRegistItemList.add(IncomeRegistItem.from(
+        		MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_DELETE, "02", "2", "削除対象収入", new BigDecimal("100000")));
 
         // セッションデータのモック（支出情報リスト）
         List<ExpenditureRegistItem> expenditureRegistItemList = new ArrayList<>();
         expenditureRegistItemList.add(ExpenditureRegistItem.from(
-            "LOAD", "NON", "001", "0001", "", "電気代", "1",
-            "支払詳細", "20251130", new BigDecimal("12000"), false));
+        		MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, "001", "0001", "", "電気代", "1",
+            "支払詳細", "30", new BigDecimal("12000"), false));
+        // 削除アクションが設定された支出データ（画面表示から除外されるべき）
+        expenditureRegistItemList.add(ExpenditureRegistItem.from(
+        		MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_DELETE, "002", "0037", "", "削除対象支出", "1",
+            "削除対象詳細", "15", new BigDecimal("5000"), false));
 
         // When: 収入・支出一覧を再表示
         IncomeAndExpenditureRegistResponse response = useCase.readIncomeAndExpenditureInfoList(
             user, targetYearMonth, incomeRegistItemList, expenditureRegistItemList);
 
         // Then: レスポンスが返却される
-        // ※セッションデータ⇒画面表示データの変換検証はreadInitInfo/readUpdateInfoテストで網羅済み
         assertNotNull(response);
+
+        // Then: 削除アクションの収入データは画面表示用一覧に含まれないこと
+        // セッションデータには2件（表示1件＋削除1件）だが、画面表示用は1件のみ
+        assertEquals(1, response.getIncomeListInfo().size());
+        assertEquals("01", response.getIncomeListInfo().get(0).getIncomeCode());
+
+        // Then: 削除アクションの支出データは画面表示用一覧に含まれないこと
+        // セッションデータには2件（表示1件＋削除1件）だが、画面表示用は1件のみ
+        assertEquals(1, response.getExpenditureListInfo().size());
+        assertEquals("001", response.getExpenditureListInfo().get(0).getExpenditureCode());
     }
 
     // ========================================
@@ -983,7 +1000,7 @@ class IncomeAndExpenditureInitIntegrationTest {
         // セッションデータのモック（支出情報リスト）
         List<ExpenditureRegistItem> expenditureRegistItemList = new ArrayList<>();
         expenditureRegistItemList.add(ExpenditureRegistItem.from(
-            "NEW", "ADD", "2026011210000001", "0001", "", "電気代", "1",
+        		MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD, "2026011210000001", "0001", "", "電気代", "1",
             "支払詳細", "20251130", new BigDecimal("10000"), false));
 
         // When: 入力確認時のエラー処理
