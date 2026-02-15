@@ -58,7 +58,7 @@ public abstract class AbstractExpenditureItemInfoManageResponse extends Abstract
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	@Getter
-	private static class ExpenditureItem {
+	public static class ExpenditureItem {
 		// 支出項目コード
 		private final String sisyutuItemCode;
 		// 支出項目名
