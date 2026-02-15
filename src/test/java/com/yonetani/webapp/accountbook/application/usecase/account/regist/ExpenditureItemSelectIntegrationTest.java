@@ -26,8 +26,6 @@ package com.yonetani.webapp.accountbook.application.usecase.account.regist;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.List;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,11 +34,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.ModelAndView;
 
-import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.ExpenditureSelectItemForm;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.ExpenditureItemSelectResponse;
-import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 /**
@@ -83,7 +78,6 @@ class ExpenditureItemSelectIntegrationTest {
 	 * ・支出項目一覧が階層構造で取得される
 	 * ・トップレベル（Level1）に6カテゴリが存在する
 	 * ・メッセージなし（エラーなし）
-	 * ・ビュー名が正しい
 	 *</pre>
 	 */
 	@Test
@@ -99,16 +93,11 @@ class ExpenditureItemSelectIntegrationTest {
 		assertNotNull(response);
 		assertFalse(response.hasMessages(), "メッセージが設定されていないこと");
 
-		// Then: ModelAndViewからビュー名と支出項目一覧を検証
-		ModelAndView mav = response.build();
-		assertEquals("account/regist/ExpenditureItemSelect", mav.getViewName());
-
-		// 支出項目一覧（トップレベルはLevel1の6カテゴリ）
-		@SuppressWarnings("unchecked")
-		List<Object> expenditureItemList = (List<Object>) mav.getModel().get("expenditureItemList");
-		assertNotNull(expenditureItemList, "支出項目一覧が設定されていること");
+		// Then: 支出項目一覧（トップレベルはLevel1の6カテゴリ）
+		assertNotNull(response.getExpenditureItemList(), "支出項目一覧が設定されていること");
 		// Level1: 事業経費(0001), 固定費(非課税)(0013), 固定費(課税)(0023), 衣類住居設備(0045), 飲食日用品(0049), 趣味娯楽(0055)
-		assertEquals(6, expenditureItemList.size(), "トップレベル（Level1）のカテゴリが6件であること");
+		assertEquals(6, response.getExpenditureItemList().size(), "トップレベル（Level1）のカテゴリが6件であること");
+		
 	}
 
 	// ===========================================
@@ -140,26 +129,21 @@ class ExpenditureItemSelectIntegrationTest {
 		// Then: レスポンスが正しく返却される
 		assertNotNull(response);
 
-		// Then: ModelAndViewから各フィールドを検証
-		ModelAndView mav = response.build();
-		assertEquals("account/regist/ExpenditureItemSelect", mav.getViewName());
+		// Then: 支出項目名：＞区切りの3階層表示
+		assertEquals("固定費(課税)＞水光熱通費＞電気代", response.getSisyutuItemName());
+		// Then: 支出項目詳細内容
+		assertEquals("電気代詳細を入力", response.getSisyutuItemDetailContext());
 
-		// 支出項目名：＞区切りの3階層表示
-		assertEquals("固定費(課税)＞水光熱通費＞電気代", mav.getModel().get("sisyutuItemName"));
-		// 支出項目詳細内容
-		assertEquals("電気代詳細を入力", mav.getModel().get("sisyutuItemDetailContext"));
+		// Then: フォームデータ
+		assertNotNull(response.getExpenditureSelectItemForm());
+		assertEquals("0037", response.getExpenditureSelectItemForm().getSisyutuItemCode());
+		assertFalse(response.getExpenditureSelectItemForm().isEventCodeRequired(), "非イベント系項目のためeventCodeRequired=false");
 
-		// フォームデータ
-		ExpenditureSelectItemForm form = (ExpenditureSelectItemForm) mav.getModel().get("expenditureSelectItemForm");
-		assertNotNull(form);
-		assertEquals("0037", form.getSisyutuItemCode());
-		assertFalse(form.isEventCodeRequired(), "非イベント系項目のためeventCodeRequired=false");
+		// Then: イベント選択ボックスなし
+		assertNull(response.getEventSelectList(), "非イベント系項目のためeventSelectList=null");
 
-		// イベント選択ボックスなし
-		assertNull(mav.getModel().get("eventSelectList"), "非イベント系項目のためeventSelectList=null");
-
-		// 支出項目一覧も取得される
-		assertNotNull(mav.getModel().get("expenditureItemList"));
+		// Then: 支出項目一覧も取得される
+		assertNotNull(response.getExpenditureItemList());
 	}
 
 	/**
@@ -185,24 +169,19 @@ class ExpenditureItemSelectIntegrationTest {
 		// When: 支出項目選択
 		ExpenditureItemSelectResponse response = useCase.readExpenditureItemActSelect(user, sisyutuItemCode);
 
-		// Then: ModelAndViewから各フィールドを検証
-		ModelAndView mav = response.build();
+		// Then: 支出項目名：＞区切りの2階層表示
+		assertEquals("趣味娯楽＞イベント費", response.getSisyutuItemName());
+		// Then: 支出項目詳細内容
+		assertEquals("イベント費詳細を入力", response.getSisyutuItemDetailContext());
 
-		// 支出項目名：＞区切りの2階層表示
-		assertEquals("趣味娯楽＞イベント費", mav.getModel().get("sisyutuItemName"));
-		// 支出項目詳細内容
-		assertEquals("イベント費詳細を入力", mav.getModel().get("sisyutuItemDetailContext"));
+		// Then: フォームデータ
+		assertNotNull(response.getExpenditureSelectItemForm());
+		assertEquals("0058", response.getExpenditureSelectItemForm().getSisyutuItemCode());
+		assertTrue(response.getExpenditureSelectItemForm().isEventCodeRequired(), "イベント系項目のためeventCodeRequired=true");
+		assertEquals("0001", response.getExpenditureSelectItemForm().getEventCode(), "先頭イベントのコードが設定される");
 
-		// フォームデータ
-		ExpenditureSelectItemForm form = (ExpenditureSelectItemForm) mav.getModel().get("expenditureSelectItemForm");
-		assertNotNull(form);
-		assertEquals("0058", form.getSisyutuItemCode());
-		assertTrue(form.isEventCodeRequired(), "イベント系項目のためeventCodeRequired=true");
-		assertEquals("0001", form.getEventCode(), "先頭イベントのコードが設定される");
-
-		// イベント選択ボックスあり
-		SelectViewItem eventSelectList = (SelectViewItem) mav.getModel().get("eventSelectList");
-		assertNotNull(eventSelectList, "イベント系項目のためeventSelectListが存在する");
+		// Then: イベント選択ボックスあり
+		assertNotNull(response.getEventSelectList(), "イベント系項目のためeventSelectListが存在する");
 	}
 
 	/**
@@ -225,22 +204,18 @@ class ExpenditureItemSelectIntegrationTest {
 		// When: 支出項目選択
 		ExpenditureItemSelectResponse response = useCase.readExpenditureItemActSelect(user, sisyutuItemCode);
 
-		// Then: ModelAndViewから各フィールドを検証
-		ModelAndView mav = response.build();
+		// Then: 支出項目名：＞区切りの2階層表示
+		assertEquals("固定費(課税)＞水光熱通費", response.getSisyutuItemName());
+		// Then: 支出項目詳細内容
+		assertEquals("水光熱通費詳細を入力", response.getSisyutuItemDetailContext());
 
-		// 支出項目名：＞区切りの2階層表示
-		assertEquals("固定費(課税)＞水光熱通費", mav.getModel().get("sisyutuItemName"));
-		// 支出項目詳細内容
-		assertEquals("水光熱通費詳細を入力", mav.getModel().get("sisyutuItemDetailContext"));
+		// Then: フォームデータ
+		assertNotNull(response.getExpenditureSelectItemForm());
+		assertEquals("0036", response.getExpenditureSelectItemForm().getSisyutuItemCode());
+		assertFalse(response.getExpenditureSelectItemForm().isEventCodeRequired(), "非イベント系項目のためeventCodeRequired=false");
 
-		// フォームデータ
-		ExpenditureSelectItemForm form = (ExpenditureSelectItemForm) mav.getModel().get("expenditureSelectItemForm");
-		assertNotNull(form);
-		assertEquals("0036", form.getSisyutuItemCode());
-		assertFalse(form.isEventCodeRequired(), "非イベント系項目のためeventCodeRequired=false");
-
-		// イベント選択ボックスなし
-		assertNull(mav.getModel().get("eventSelectList"));
+		// Then: イベント選択ボックスなし
+		assertNull(response.getEventSelectList());
 	}
 
 	/**
@@ -263,21 +238,17 @@ class ExpenditureItemSelectIntegrationTest {
 		// When: 支出項目選択
 		ExpenditureItemSelectResponse response = useCase.readExpenditureItemActSelect(user, sisyutuItemCode);
 
-		// Then: ModelAndViewから各フィールドを検証
-		ModelAndView mav = response.build();
+		// Then: 支出項目名：Level1なので＞区切りなし
+		assertEquals("事業経費", response.getSisyutuItemName());
+		// Then: 支出項目詳細内容
+		assertEquals("事業経費詳細を入力", response.getSisyutuItemDetailContext());
 
-		// 支出項目名：Level1なので＞区切りなし
-		assertEquals("事業経費", mav.getModel().get("sisyutuItemName"));
-		// 支出項目詳細内容
-		assertEquals("事業経費詳細を入力", mav.getModel().get("sisyutuItemDetailContext"));
+		// Then: フォームデータ
+		assertNotNull(response.getExpenditureSelectItemForm());
+		assertEquals("0001", response.getExpenditureSelectItemForm().getSisyutuItemCode());
+		assertFalse(response.getExpenditureSelectItemForm().isEventCodeRequired());
 
-		// フォームデータ
-		ExpenditureSelectItemForm form = (ExpenditureSelectItemForm) mav.getModel().get("expenditureSelectItemForm");
-		assertNotNull(form);
-		assertEquals("0001", form.getSisyutuItemCode());
-		assertFalse(form.isEventCodeRequired());
-
-		// イベント選択ボックスなし
-		assertNull(mav.getModel().get("eventSelectList"));
+		// Then: イベント選択ボックスなし
+		assertNull(response.getEventSelectList());
 	}
 }

@@ -110,7 +110,9 @@ See `docs/Phase5_計画書.md` for detailed refactoring plan.
 - `docs/Phase5_Step1_詳細設計書.md` - Detailed design
 - `docs/Phase5_Step2_結合テスト作成計画書.md` - Integration test plan
 - `docs/test-data-design-rules.md` - Test data conventions
+- `docs/integration-test-guidelines.md` - UseCase integration test detailed guidelines (response verification, assertion rules, session/DB patterns)
 - `docs/DDD設計_金額クラス統合判断基準.md` - Money class design decisions
+- `07_テスト方針書.md` - Project-wide test strategy (coverage targets, naming conventions, quality standards)
 
 ## Japanese Conventions
 

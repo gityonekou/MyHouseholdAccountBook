@@ -20,6 +20,7 @@ import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.O
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractExpenditureItemInfoManageResponse;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
@@ -34,6 +35,7 @@ import lombok.Setter;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 public class ExpenditureItemSelectResponse extends AbstractExpenditureItemInfoManageResponse {
 
 	// 選択した支出項目・イベント情報のフォームデータ

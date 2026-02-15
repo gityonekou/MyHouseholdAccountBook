@@ -159,6 +159,7 @@ public abstract class AbstractExpenditureItemInfoManageResponse extends Abstract
 	}
 	
 	// 支出項目一覧情報の明細データ
+	@Getter
 	private List<ExpenditureItem> expenditureItemList = new ArrayList<>();
 	
 	/**
