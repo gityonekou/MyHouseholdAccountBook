@@ -1350,7 +1350,7 @@ public class IncomeAndExpenditureRegistUseCase {
 				}
 				
 			} else {
-				throw new MyHouseholdAccountBookRuntimeException("未定義のアクションが設定されています。管理者に問い合わせてください。"
+				throw new MyHouseholdAccountBookRuntimeException("未定義のデータタイプが設定されています。管理者に問い合わせてください。"
 						+ "dataType=" + expenditureRegistData.getDataType() + "action=" + expenditureRegistData.getAction());
 			}
 		}

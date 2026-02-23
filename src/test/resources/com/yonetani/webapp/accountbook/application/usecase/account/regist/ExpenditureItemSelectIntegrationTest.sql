@@ -99,6 +99,10 @@ INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, S
 -- 3. イベントテーブルデータ
 -- ----------------------------------------
 -- イベント系支出項目のテストケースで使用
--- イベントコード="0001"は支出項目コード="0058"（イベント費）に紐付くイベント
+-- テスト③では EVENT_DETAIL_CONTEXT あり・なし 両方のプルダウン表示を検証するため、
+-- 以下の2件を登録する（EVENT_START_DATE昇順がプルダウン順）
+--   0001: EVENT_DETAIL_CONTEXT あり → 表示テキスト = "0001のテストイベント【0001のテストイベント詳細】"
+--   0002: EVENT_DETAIL_CONTEXT なし → 表示テキスト = "0002のテストイベント"
 INSERT INTO EVENT_ITEM_TABLE (USER_ID, EVENT_CODE, SISYUTU_ITEM_CODE, EVENT_NAME, EVENT_DETAIL_CONTEXT, EVENT_START_DATE, EVENT_END_DATE, EVENT_EXIT_FLG) VALUES
-('user01', '0001', '0058', 'テストイベント', 'テストイベント詳細', '2025-01-01', '2025-12-31', false);
+('user01', '0001', '0058', '0001のテストイベント', '0001のテストイベント詳細', '2025-01-01', '2025-12-31', false),
+('user01', '0002', '0058', '0002のテストイベント', null, '2025-06-01', '2025-12-31', false);

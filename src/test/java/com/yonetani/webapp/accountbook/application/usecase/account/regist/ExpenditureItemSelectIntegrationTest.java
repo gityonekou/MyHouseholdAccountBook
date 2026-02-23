@@ -76,8 +76,14 @@ class ExpenditureItemSelectIntegrationTest {
 	 *
 	 * 【検証内容】
 	 * ・支出項目一覧が階層構造で取得される
-	 * ・トップレベル（Level1）に6カテゴリが存在する
+	 * ・トップレベル（Level1）に6カテゴリが存在する（SISYUTU_ITEM_SORT昇順）
+	 * ・各Level1カテゴリの支出項目コードが正しい
+	 * ・ExpenditureSelectItemFormはnull（支出項目コード未選択状態）
 	 * ・メッセージなし（エラーなし）
+	 *
+	 * 【注意】ExpenditureItemの全フィールド・親子関係の詳細検証は、
+	 *　　　　SisyutuItemComponentおよびExpenditureItemInfoManageUseCaseの責務のため、
+	 *　　　　ここでは支出項目コードの簡易確認のみ実施する。
 	 *</pre>
 	 */
 	@Test
@@ -93,11 +99,20 @@ class ExpenditureItemSelectIntegrationTest {
 		assertNotNull(response);
 		assertFalse(response.hasMessages(), "メッセージが設定されていないこと");
 
-		// Then: 支出項目一覧（トップレベルはLevel1の6カテゴリ）
+		// Then: ExpenditureSelectItemFormはnull（支出項目未選択状態）
+		// 画面ロジック(ExpenditureItemSelect.html)でnullかどうかで表示内容が切り替わるため確認
+		assertNull(response.getExpenditureSelectItemForm(), "ExpenditureSelectItemFormはnullであること（支出項目未選択）");
+
+		// Then: 支出項目一覧（トップレベルはLevel1の6カテゴリ、SISYUTU_ITEM_SORT昇順）
 		assertNotNull(response.getExpenditureItemList(), "支出項目一覧が設定されていること");
-		// Level1: 事業経費(0001), 固定費(非課税)(0013), 固定費(課税)(0023), 衣類住居設備(0045), 飲食日用品(0049), 趣味娯楽(0055)
 		assertEquals(6, response.getExpenditureItemList().size(), "トップレベル（Level1）のカテゴリが6件であること");
-		
+		// 各Level1カテゴリの支出項目コードを確認（SISYUTU_ITEM_SORT昇順）
+		assertEquals("0001", response.getExpenditureItemList().get(0).getSisyutuItemCode(), "1番目: 事業経費");
+		assertEquals("0013", response.getExpenditureItemList().get(1).getSisyutuItemCode(), "2番目: 固定費(非課税)");
+		assertEquals("0023", response.getExpenditureItemList().get(2).getSisyutuItemCode(), "3番目: 固定費(課税)");
+		assertEquals("0045", response.getExpenditureItemList().get(3).getSisyutuItemCode(), "4番目: 衣類住居設備");
+		assertEquals("0049", response.getExpenditureItemList().get(4).getSisyutuItemCode(), "5番目: 飲食日用品");
+		assertEquals("0055", response.getExpenditureItemList().get(5).getSisyutuItemCode(), "6番目: 趣味娯楽");
 	}
 
 	// ===========================================
@@ -114,6 +129,12 @@ class ExpenditureItemSelectIntegrationTest {
 	 * ・支出項目詳細内容が設定される
 	 * ・フォームのsisyutuItemCodeが正しい
 	 * ・イベント関連の設定がない
+	 * ・支出項目一覧（トップレベルはLevel1の6カテゴリ）が設定される
+	 *   ※readExpenditureItemActSelectはreadExpenditureAddSelectと異なるメソッドのため個別に確認
+	 *
+	 * 【注意】ExpenditureItemの全フィールド・親子関係の詳細検証は、
+	 *　　　　SisyutuItemComponentおよびExpenditureItemInfoManageUseCaseの責務のため、
+	 *　　　　ここでは支出項目コードの簡易確認のみ実施する。
 	 *</pre>
 	 */
 	@Test
@@ -142,8 +163,15 @@ class ExpenditureItemSelectIntegrationTest {
 		// Then: イベント選択ボックスなし
 		assertNull(response.getEventSelectList(), "非イベント系項目のためeventSelectList=null");
 
-		// Then: 支出項目一覧も取得される
-		assertNotNull(response.getExpenditureItemList());
+		// Then: 支出項目一覧（トップレベルはLevel1の6カテゴリ、SISYUTU_ITEM_SORT昇順）
+		assertNotNull(response.getExpenditureItemList(), "支出項目一覧が設定されていること");
+		assertEquals(6, response.getExpenditureItemList().size(), "トップレベル（Level1）のカテゴリが6件であること");
+		assertEquals("0001", response.getExpenditureItemList().get(0).getSisyutuItemCode(), "1番目: 事業経費");
+		assertEquals("0013", response.getExpenditureItemList().get(1).getSisyutuItemCode(), "2番目: 固定費(非課税)");
+		assertEquals("0023", response.getExpenditureItemList().get(2).getSisyutuItemCode(), "3番目: 固定費(課税)");
+		assertEquals("0045", response.getExpenditureItemList().get(3).getSisyutuItemCode(), "4番目: 衣類住居設備");
+		assertEquals("0049", response.getExpenditureItemList().get(4).getSisyutuItemCode(), "5番目: 飲食日用品");
+		assertEquals("0055", response.getExpenditureItemList().get(5).getSisyutuItemCode(), "6番目: 趣味娯楽");
 	}
 
 	/**
@@ -180,8 +208,17 @@ class ExpenditureItemSelectIntegrationTest {
 		assertTrue(response.getExpenditureSelectItemForm().isEventCodeRequired(), "イベント系項目のためeventCodeRequired=true");
 		assertEquals("0001", response.getExpenditureSelectItemForm().getEventCode(), "先頭イベントのコードが設定される");
 
-		// Then: イベント選択ボックスあり
+		// Then: イベント選択ボックスあり（2件: EVENT_START_DATE昇順）
 		assertNotNull(response.getEventSelectList(), "イベント系項目のためeventSelectListが存在する");
+		assertEquals(2, response.getEventSelectList().getOptionList().size(), "イベント選択肢が2件であること");
+		// 1番目: EVENT_DETAIL_CONTEXTあり → "0001のテストイベント【0001のテストイベント詳細】"
+		assertEquals("0001", response.getEventSelectList().getOptionList().get(0).getValue(), "1番目のプルダウン選択値");
+		assertEquals("0001のテストイベント【0001のテストイベント詳細】",
+				response.getEventSelectList().getOptionList().get(0).getText(), "1番目のプルダウン表示テキスト");
+		// 2番目: EVENT_DETAIL_CONTEXTなし → "0002のテストイベント"
+		assertEquals("0002", response.getEventSelectList().getOptionList().get(1).getValue(), "2番目のプルダウン選択値");
+		assertEquals("0002のテストイベント",
+				response.getEventSelectList().getOptionList().get(1).getText(), "2番目のプルダウン表示テキスト");
 	}
 
 	/**
