@@ -26,6 +26,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
 
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItem;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItemInquiryList;
@@ -174,7 +175,7 @@ class ShoppingItemTableDataSourceTest {
 	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingitem.ShoppingItemTableDataSource#update(com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItem)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ShoppingItemTableDataSourceUpdateTest.sql")
+	@Sql(value = "ShoppingItemTableDataSourceUpdateTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testUpdate() {
 		/* 全項目の更新チェック */
 		// テストデータ2を読み込み、ShoppingItemの各パラメータに設定
@@ -277,7 +278,7 @@ class ShoppingItemTableDataSourceTest {
 	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingitem.ShoppingItemTableDataSource#findByIdAndShoppingItemCode(com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemCode)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ShoppingItemTableDataSourceFindByIdAndShoppingItemCodeTest.sql")
+	@Sql(value = "ShoppingItemTableDataSourceFindByIdAndShoppingItemCodeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testFindByIdAndShoppingItemCode() {
 		/* 全項目の取得チェック */
 		// 期待値
@@ -338,7 +339,7 @@ class ShoppingItemTableDataSourceTest {
 	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingitem.ShoppingItemTableDataSource#findByIdAndSisyutuItemCode(com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ShoppingItemTableDataSourceFindByIdAndSisyutuItemCodeTest.sql")
+	@Sql(value = "ShoppingItemTableDataSourceFindByIdAndSisyutuItemCodeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testFindByIdAndSisyutuItemCode() {
 		/* 対象データなしの場合、0件となること(支出項目コード) */
 		ShoppingItemInquiryList actualNotFound = repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID", "0040"));
@@ -381,7 +382,7 @@ class ShoppingItemTableDataSourceTest {
 	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingitem.ShoppingItemTableDataSource#findByIdAndShoppingItemJanCode(com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemJanCode)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ShoppingItemTableDataSourceFindByIdAndShoppingItemJanCodeTest.sql")
+	@Sql(value = "ShoppingItemTableDataSourceFindByIdAndShoppingItemJanCodeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testFindByIdAndShoppingItemJanCode() {
 		/* 対象データなしの場合、0件となること(商品JANコード) */
 		assertTrue(repository.findByIdAndShoppingItemJanCode(createSearchQueryUserIdAndShoppingItemJanCode("TEST-USER-ID", "9999999999999")).isEmpty(),
@@ -429,7 +430,7 @@ class ShoppingItemTableDataSourceTest {
 	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingitem.ShoppingItemTableDataSource#countById(com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ShoppingItemTableDataSourceCountByIdTest.sql")
+	@Sql(value = "ShoppingItemTableDataSourceCountByIdTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testCountById() {
 		/* 対象データなしの場合、0件となること */
 		assertEquals(0, repository.countById(createSearchQueryUserId("TEST-USER-ID_NOT_FOUND")), "対象データなしの場合、0件となること");
@@ -441,7 +442,7 @@ class ShoppingItemTableDataSourceTest {
 	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingitem.ShoppingItemTableDataSource#countByIdAndShoppingItemJanCode(com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemJanCode)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ShoppingItemTableDataSourceCountByIdAndShoppingItemJanCodeTest.sql")
+	@Sql(value = "ShoppingItemTableDataSourceCountByIdAndShoppingItemJanCodeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testCountByIdAndShoppingItemJanCode() {
 		/* 対象データなしの場合、0件となること(ユーザID) */
 		assertEquals(0, repository.countByIdAndShoppingItemJanCode(createSearchQueryUserIdAndShoppingItemJanCode("TEST-USER-ID_NOT_FOUND", "1234567890100")), "対象データなしの場合、0件となること(ユーザID)");
