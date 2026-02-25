@@ -2,7 +2,7 @@
  * 支出項目選択機能の結合テストクラスです。
  *
  * <pre>
- * IncomeAndExpenditureRegistUseCase の以下メソッドをテストします。
+ * ExpenditureItemSelectUseCase の以下メソッドをテストします。
  *
  * [対象メソッド]
  * 1. readExpenditureAddSelect - 支出項目選択画面初期表示（支出項目一覧取得）
@@ -42,7 +42,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  *<pre>
  * 支出項目選択機能の結合テストクラスです。
  *
- * IncomeAndExpenditureRegistUseCaseの支出項目選択関連メソッドについて、
+ * ExpenditureItemSelectUseCaseについて、
  * UseCase→Component→Repository→DB の結合動作を検証します。
  *</pre>
  *
@@ -57,7 +57,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 class ExpenditureItemSelectIntegrationTest {
 
 	@Autowired
-	private IncomeAndExpenditureRegistUseCase useCase;
+	private ExpenditureItemSelectUseCase useCase;
 
 	/**
 	 * テスト用のログインユーザ情報を作成します。

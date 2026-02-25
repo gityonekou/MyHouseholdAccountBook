@@ -47,6 +47,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.yonetani.webapp.accountbook.application.usecase.account.regist.ExpenditureItemSelectUseCase;
 import com.yonetani.webapp.accountbook.application.usecase.account.regist.IncomeAndExpenditureRegistUseCase;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.ExpenditureItemForm;
@@ -104,6 +105,8 @@ import lombok.extern.log4j.Log4j2;
 public class IncomeAndExpenditureRegistController {
 	// UseCase
 	private final IncomeAndExpenditureRegistUseCase usecase;
+	// 支出項目選択UseCase
+	private final ExpenditureItemSelectUseCase expenditureItemSelectUseCase;
 	// ユーザーセッション
 	private final LoginUserSession loginUserSession;
 	// 収支一覧セッション
@@ -333,7 +336,7 @@ public class IncomeAndExpenditureRegistController {
 	public ModelAndView getExpenditureAddSelect() {
 		log.debug("getExpenditureAddSelect:");
 		// 画面表示情報を取得
-		return this.usecase.readExpenditureAddSelect(loginUserSession.getLoginUserInfo())
+		return this.expenditureItemSelectUseCase.readExpenditureAddSelect(loginUserSession.getLoginUserInfo())
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
@@ -478,7 +481,7 @@ public class IncomeAndExpenditureRegistController {
 	public ModelAndView getExpenditureItemActSelect(@RequestParam("sisyutuItemCode") String sisyutuItemCode) {
 		log.debug("getExpenditureItemActSelect:sisyutuItemCode=" + sisyutuItemCode);
 		// 画面表示情報を取得
-		return this.usecase.readExpenditureItemActSelect(
+		return this.expenditureItemSelectUseCase.readExpenditureItemActSelect(
 					// ログインユーザ情報
 					loginUserSession.getLoginUserInfo(),
 					// 支出項目コード
