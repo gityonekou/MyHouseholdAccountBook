@@ -45,7 +45,10 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.regist.ExpenditureItemSelectUseCase;
-import com.yonetani.webapp.accountbook.application.usecase.account.regist.IncomeAndExpenditureRegistUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.account.regist.ExpenditureRegistUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.account.regist.IncomeAndExpenditureInitUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.account.regist.IncomeAndExpenditureRegistConfirmUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.account.regist.IncomeRegistUseCase;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.presentation.controller.MyHouseholdAccountBookControllerAdvice;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
@@ -90,12 +93,21 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 
 	// MVCモック
 	private MockMvc mockMvc;
-	// 収支登録ユースケース(本物のSpring Bean)
+	// 収支登録初期表示ユースケース(本物のSpring Bean)
 	@Autowired
-	private IncomeAndExpenditureRegistUseCase incomeAndExpenditureRegistUseCase;
+	private IncomeAndExpenditureInitUseCase incomeAndExpenditureRegistUseCase;
 	// 支出項目選択ユースケース(本物のSpring Bean)
 	@Autowired
 	private ExpenditureItemSelectUseCase expenditureItemSelectUseCase;
+	// 収入登録ユースケース(本物のSpring Bean)
+	@Autowired
+	private IncomeRegistUseCase incomeRegistUseCase;
+	// 支出登録ユースケース(本物のSpring Bean)
+	@Autowired
+	private ExpenditureRegistUseCase expenditureRegistUseCase;
+	// 収支登録確認ユースケース(本物のSpring Bean)
+	@Autowired
+	private IncomeAndExpenditureRegistConfirmUseCase incomeAndExpenditureRegistConfirmUseCase;
 	// モック:ログインユーザセッション情報
 	@Mock
 	private LoginUserSession mockLoginUserSession;
@@ -116,7 +128,7 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 		this.mockMvc = MockMvcBuilders
 				// 収支登録コントローラーのセットアップ
 				.standaloneSetup(new IncomeAndExpenditureRegistController(
-						incomeAndExpenditureRegistUseCase, expenditureItemSelectUseCase, mockLoginUserSession, mockRegistListSession))
+						incomeAndExpenditureRegistUseCase, expenditureItemSelectUseCase, incomeRegistUseCase, expenditureRegistUseCase, incomeAndExpenditureRegistConfirmUseCase, mockLoginUserSession, mockRegistListSession))
 				// ControllerAdviceのセットアップ(例外発生時のハンドリング)
 				.setControllerAdvice(new MyHouseholdAccountBookControllerAdvice(mockLoginUserSession))
 				// MVCモックのビルド

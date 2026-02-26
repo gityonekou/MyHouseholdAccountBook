@@ -38,7 +38,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  * 収支登録・更新画面の収入登録機能の統合テストクラスです。
  *
  * [テスト方針]
- * ・既存機能の動作を保証するために、リファクタリング前の振る舞いを記録
+ * ・IncomeRegistUseCaseの動作を保証するために、リファクタリング後の振る舞いを検証
  * ・セッション操作を含む全レイヤーの結合テスト
  * ・正常系・異常系の両方をカバー
  *
@@ -81,7 +81,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 class IncomeRegistIntegrationTest {
 
     @Autowired
-    private IncomeAndExpenditureRegistUseCase useCase;
+    private IncomeRegistUseCase useCase;
 
     /**
      * テスト用のログインユーザ情報を作成します。

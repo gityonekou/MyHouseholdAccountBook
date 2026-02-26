@@ -98,7 +98,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 class IncomeAndExpenditureRegistConfirmIntegrationTest {
 
 	@Autowired
-	private IncomeAndExpenditureRegistUseCase useCase;
+	private IncomeAndExpenditureRegistConfirmUseCase useCase;
 
 	@Autowired
 	private IncomeTableRepository incomeRepository;

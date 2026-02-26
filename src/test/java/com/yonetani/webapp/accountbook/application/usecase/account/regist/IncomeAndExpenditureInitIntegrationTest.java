@@ -85,7 +85,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 class IncomeAndExpenditureInitIntegrationTest {
 
     @Autowired
-    private IncomeAndExpenditureRegistUseCase useCase;
+    private IncomeAndExpenditureInitUseCase useCase;
 
     /**
      * テスト用のログインユーザ情報を作成します。
