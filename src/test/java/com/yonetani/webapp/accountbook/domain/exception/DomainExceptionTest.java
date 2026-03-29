@@ -18,7 +18,7 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
 class DomainExceptionTest {

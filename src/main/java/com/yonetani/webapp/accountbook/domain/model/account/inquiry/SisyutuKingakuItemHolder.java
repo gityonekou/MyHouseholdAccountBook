@@ -8,6 +8,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/10/13 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
@@ -19,10 +20,10 @@ import java.util.Map;
 
 import com.yonetani.webapp.accountbook.common.component.SisyutuItemComponent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.MinorWasteExpenditure;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SevereWasteExpenditure;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKubun;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.MinorWasteExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SevereWasteExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 
 import lombok.AccessLevel;
@@ -40,7 +41,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -96,15 +97,15 @@ public class SisyutuKingakuItemHolder {
 		// 支出金額の増減フラグ
 		private final int sisyutuKingakuFlg;
 		// 支出金額増減値
-		private final ExpenditureAmount sisyutuKingaku;
+		private final ExpenditureAmount expenditureAmount;
 		// 無駄遣い（軽度）支出金額の増減フラグ
 		private final int minorWasteExpenditureFlg;
 		// 無駄遣い（軽度）支出金額増減値
-		private final MinorWasteExpenditure minorWasteExpenditure;
+		private final MinorWasteExpenditureAmount minorWasteExpenditureAmount;
 		// 無駄遣い（重度）支出金額の増減フラグ
 		private final int severeWasteExpenditureFlg;
 		// 無駄遣い（重度）支出金額増減値
-		private final SevereWasteExpenditure severeWasteExpenditure;
+		private final SevereWasteExpenditureAmount severeWasteExpenditureAmount;
 		
 		/**
 		 *<pre>
@@ -118,8 +119,8 @@ public class SisyutuKingakuItemHolder {
 		 *
 		 */
 		static BeforeAndAfterSisyutuKingakuData from(
-				SisyutuKingakuItem beforeData, SisyutuKubun beforeKubun, 
-				SisyutuKingakuItem afterData, SisyutuKubun afterKubun) {
+				SisyutuKingakuItem beforeData, ExpenditureCategory beforeKubun, 
+				SisyutuKingakuItem afterData, ExpenditureCategory afterKubun) {
 			
 			// 支出金額を加算するか減算するかのフラグ(前＞後なら減算,それ以外は加算) 非null項目なのでnullチェック不要
 			int sisyutuFlg = (beforeData.getExpenditureAmount().getValue().compareTo(afterData.getExpenditureAmount().getValue()) > 0)
@@ -131,46 +132,46 @@ public class SisyutuKingakuItemHolder {
 			
 			// 無駄遣い（軽度）、無駄遣い（重度）加減算初期値
 			int minorFlg = FLG_ADD;
-			MinorWasteExpenditure zougentiMinorWk = MinorWasteExpenditure.from(null);
+			MinorWasteExpenditureAmount zougentiMinorWk = MinorWasteExpenditureAmount.from(null);
 			int severeFlg = FLG_ADD;
-			SevereWasteExpenditure zougentiSevereWk = SevereWasteExpenditure.from(null);
+			SevereWasteExpenditureAmount zougentiSevereWk = SevereWasteExpenditureAmount.from(null);
 			
 			// 更新前と更新後で支出区分の値が同じ場合
 			if(beforeKubun.getValue().equals(afterKubun.getValue())) {
 
 				// 支出区分が区分B（無駄遣い軽度）の場合、無駄遣い（軽度）の値を加減算
-				if(SisyutuKubun.isWastedB(beforeKubun)) {
+				if(ExpenditureCategory.isWastedB(beforeKubun)) {
 					minorFlg = sisyutuFlg;
-					zougentiMinorWk = MinorWasteExpenditure.from(zougenti.getValue());
+					zougentiMinorWk = MinorWasteExpenditureAmount.from(zougenti.getValue());
 
 				// 支出区分が区分C（無駄遣い重度）の場合、無駄遣い（重度）の値を加減算
-				} else if(SisyutuKubun.isWastedC(beforeKubun)) {
+				} else if(ExpenditureCategory.isWastedC(beforeKubun)) {
 					severeFlg = sisyutuFlg;
-					zougentiSevereWk = SevereWasteExpenditure.from(zougenti.getValue());
+					zougentiSevereWk = SevereWasteExpenditureAmount.from(zougenti.getValue());
 				}
 
 			// 更新前と更新後で支出区分の値が違う場合
 			} else {
 				// 無駄遣い（軽度）支出金額の設定
 				// 更新前の支出区分が区分B（無駄遣い軽度）の場合、無駄遣い（軽度）の値を減算
-				if(SisyutuKubun.isWastedB(beforeKubun)) {
+				if(ExpenditureCategory.isWastedB(beforeKubun)) {
 					minorFlg = FLG_SUBTRACT;
-					zougentiMinorWk = beforeData.getMinorWasteExpenditure();
+					zougentiMinorWk = beforeData.getMinorWasteExpenditureAmount();
 
 				// 更新後の支出区分が区分B（無駄遣い軽度）の場合、無駄遣い（軽度）の値を加算
-				} else if (SisyutuKubun.isWastedB(afterKubun)) {
-					zougentiMinorWk = afterData.getMinorWasteExpenditure();
+				} else if (ExpenditureCategory.isWastedB(afterKubun)) {
+					zougentiMinorWk = afterData.getMinorWasteExpenditureAmount();
 				}
 
 				// 無駄遣い（重度）支出金額の設定
 				// 更新前の支出区分が区分C（無駄遣い重度）の場合、無駄遣い（重度）の値を減算
-				if(SisyutuKubun.isWastedC(beforeKubun)) {
+				if(ExpenditureCategory.isWastedC(beforeKubun)) {
 					severeFlg = FLG_SUBTRACT;
-					zougentiSevereWk = beforeData.getSevereWasteExpenditure();
+					zougentiSevereWk = beforeData.getSevereWasteExpenditureAmount();
 
 				// 更新後の支出区分が区分C（無駄遣い重度）の場合、無駄遣い（重度）の値を加算
-				} else if (SisyutuKubun.isWastedC(afterKubun)) {
-					zougentiSevereWk = afterData.getSevereWasteExpenditure();
+				} else if (ExpenditureCategory.isWastedC(afterKubun)) {
+					zougentiSevereWk = afterData.getSevereWasteExpenditureAmount();
 				}
 			}
 			
@@ -198,7 +199,7 @@ public class SisyutuKingakuItemHolder {
 	// 支出項目情報取得コンポーネント
 	private final SisyutuItemComponent sisyutuItemComponent;
 	// 支出金額テーブルのデータを格納したマップ
-	private Map<SisyutuItemCode, SisyutuKingakuItemData> sisyutuKingakuItemMap = new HashMap<SisyutuItemCode, SisyutuKingakuItemData>();
+	private Map<ExpenditureItemCode, SisyutuKingakuItemData> sisyutuKingakuItemMap = new HashMap<ExpenditureItemCode, SisyutuKingakuItemData>();
 	
 	/**
 	 *<pre>
@@ -220,7 +221,7 @@ public class SisyutuKingakuItemHolder {
 			data.setStatus(STATUS_NON_UPDATE);
 			
 			// 内部保持用データを支出項目コードをキーにマップに登録
-			holder.sisyutuKingakuItemMap.put(inputData.getSisyutuItemCode(), data);
+			holder.sisyutuKingakuItemMap.put(inputData.getExpenditureItemCode(), data);
 		});
 		// 作成したホルダーを返却
 		return holder;
@@ -236,7 +237,7 @@ public class SisyutuKingakuItemHolder {
 	 */
 	public void add(ExpenditureItem addExpenditureData) {
 		// 新規の出金額テーブル情報をホルダーに登録
-		addItemMap(addExpenditureData.getSisyutuItemCode(), addExpenditureData);
+		addItemMap(addExpenditureData.getExpenditureItemCode(), addExpenditureData);
 	}
 	
 	/**
@@ -255,7 +256,7 @@ public class SisyutuKingakuItemHolder {
 				// ユーザID
 				updExpData.getUserId(),
 				// 支出項目コード
-				updExpData.getSisyutuItemCode());
+				updExpData.getExpenditureItemCode());
 		
 		// 更新前の支出金額テーブル情報を作成
 		SisyutuKingakuItem beforeItem = createSisyutuKingakuItem(sisyutuItem, beforeData);
@@ -264,9 +265,9 @@ public class SisyutuKingakuItemHolder {
 		
 		// 更新前-更新後
 		BeforeAndAfterSisyutuKingakuData sabunData = BeforeAndAfterSisyutuKingakuData.from(
-				beforeItem, beforeData.getSisyutuKubun(), afterItem, updExpData.getSisyutuKubun());
+				beforeItem, beforeData.getExpenditureCategory(), afterItem, updExpData.getExpenditureCategory());
 		// 更新する支出情報を元に、ホルダーに登録されている支出金額情報を指定された支出情報の値分加減算します。
-		updateItemMap(updExpData.getSisyutuItemCode(), sabunData);
+		updateItemMap(updExpData.getExpenditureItemCode(), sabunData);
 	}
 	
 	/**
@@ -280,13 +281,13 @@ public class SisyutuKingakuItemHolder {
 	public void delete(ExpenditureItem deleteData) {
 		
 		// 支出項目コードに対応する支出項目情報を取得
-		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(deleteData.getUserId(), deleteData.getSisyutuItemCode());
+		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(deleteData.getUserId(), deleteData.getExpenditureItemCode());
 		
 		// 支出テーブル情報から更新対象の支出金額テーブル情報を作成
 		SisyutuKingakuItem deleteItem = createSisyutuKingakuItem(sisyutuItem, deleteData);
 		
 		// 削除する支出情報を元に、ホルダーに登録されている支出金額情報を指定された支出情報の値分減算します。
-		subtractItemMap(deleteData.getSisyutuItemCode(), deleteItem);
+		subtractItemMap(deleteData.getExpenditureItemCode(), deleteItem);
 	}
 	
 	/**
@@ -337,7 +338,7 @@ public class SisyutuKingakuItemHolder {
 	 * @param addExpenditureData 支出情報(ドメイン)
 	 *
 	 */
-	private void addItemMap(SisyutuItemCode sisyutuItemCode, ExpenditureItem addExpenditureData) {
+	private void addItemMap(ExpenditureItemCode sisyutuItemCode, ExpenditureItem addExpenditureData) {
 		
 		// 支出項目コードに対応する支出項目情報を取得
 		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(
@@ -375,17 +376,17 @@ public class SisyutuKingakuItemHolder {
 					// 対象月
 					beforeItem.getTargetMonth().getValue(),
 					// 支出項目コード
-					beforeItem.getSisyutuItemCode().getValue(),
+					beforeItem.getExpenditureItemCode().getValue(),
 					// 親支出項目コード
-					beforeItem.getParentSisyutuItemCode().getValue(),
+					beforeItem.getParentExpenditureItemCode().getValue(),
 					// 支出予定金額=前の値+新規の値
 					beforeItem.getExpectedExpenditureAmount().add(addItem.getExpectedExpenditureAmount()).getValue(),
 					// 支出金額=前の値+新規の値
 					beforeItem.getExpenditureAmount().add(addItem.getExpenditureAmount()).getValue(),
 					// 無駄遣い（軽度）支出金額=前の値+新規の値
-					beforeItem.getMinorWasteExpenditure().add(addItem.getMinorWasteExpenditure()).getValue(),
+					beforeItem.getMinorWasteExpenditureAmount().add(addItem.getMinorWasteExpenditureAmount()).getValue(),
 					// 無駄遣い（重度）支出金額=前の値+新規の値
-					beforeItem.getSevereWasteExpenditure().add(addItem.getSevereWasteExpenditure()).getValue(),
+					beforeItem.getSevereWasteExpenditureAmount().add(addItem.getSevereWasteExpenditureAmount()).getValue(),
 					// 支出支払日=前の値と支出情報(ドメイン)の支払日のどちらか大きいほうの値
 					beforeItem.getPaymentDate().max(addExpenditureData.getPaymentDate()).getValue()));
 		}
@@ -394,12 +395,12 @@ public class SisyutuKingakuItemHolder {
 		sisyutuKingakuItemMap.put(sisyutuItemCode, addData);
 		
 		// 親の支出項目コード == 支出項目コードの場合、再帰終了
-		if(sisyutuItem.getParentSisyutuItemCode().getValue().equals(
-				sisyutuItem.getSisyutuItemCode().getValue())) {
+		if(sisyutuItem.getParentExpenditureItemCode().getValue().equals(
+				sisyutuItem.getExpenditureItemCode().getValue())) {
 			return;
 		// 親の支出項目コード != 支出項目コードの場合、親の支出項目コードをもとに再帰呼び出し
 		} else {
-			addItemMap(SisyutuItemCode.from(sisyutuItem.getParentSisyutuItemCode()), addExpenditureData);
+			addItemMap(ExpenditureItemCode.from(sisyutuItem.getParentExpenditureItemCode()), addExpenditureData);
 		}
 	}
 	
@@ -411,7 +412,7 @@ public class SisyutuKingakuItemHolder {
 	 * @param sabunData 支出金額情報(ドメイン)の更新前・更新後の差額を表したデータ
 	 *
 	 */
-	private void updateItemMap(SisyutuItemCode sisyutuItemCode, BeforeAndAfterSisyutuKingakuData sabunData) {
+	private void updateItemMap(ExpenditureItemCode sisyutuItemCode, BeforeAndAfterSisyutuKingakuData sabunData) {
 		
 		// ホルダーから加減算対象の支出金額情報を取得
 		SisyutuKingakuItemData updateData = sisyutuKingakuItemMap.get(sisyutuItemCode);
@@ -432,23 +433,23 @@ public class SisyutuKingakuItemHolder {
 			// 支出金額=前の値+加減算するの値
 			ExpenditureAmount sisyutuKingaku = null;
 			if(sabunData.getSisyutuKingakuFlg() == FLG_ADD) {
-				sisyutuKingaku = beforeItem.getExpenditureAmount().add(sabunData.getSisyutuKingaku());
+				sisyutuKingaku = beforeItem.getExpenditureAmount().add(sabunData.getExpenditureAmount());
 			} else {
-				sisyutuKingaku = beforeItem.getExpenditureAmount().subtract(sabunData.getSisyutuKingaku());
+				sisyutuKingaku = beforeItem.getExpenditureAmount().subtract(sabunData.getExpenditureAmount());
 			}
 			// 無駄遣い（軽度）支出金額=前の値+加減算するの値
-			MinorWasteExpenditure minorWaste = null;
+			MinorWasteExpenditureAmount minorWaste = null;
 			if(sabunData.getMinorWasteExpenditureFlg() == FLG_ADD) {
-				minorWaste = beforeItem.getMinorWasteExpenditure().add(sabunData.getMinorWasteExpenditure());
+				minorWaste = beforeItem.getMinorWasteExpenditureAmount().add(sabunData.getMinorWasteExpenditureAmount());
 			} else {
-				minorWaste = beforeItem.getMinorWasteExpenditure().subtract(sabunData.getMinorWasteExpenditure());
+				minorWaste = beforeItem.getMinorWasteExpenditureAmount().subtract(sabunData.getMinorWasteExpenditureAmount());
 			}
 			// 無駄遣い（重度）支出金額=前の値+加減算するの値
-			SevereWasteExpenditure severeWaste = null;
+			SevereWasteExpenditureAmount severeWaste = null;
 			if(sabunData.getSevereWasteExpenditureFlg() == FLG_ADD) {
-				severeWaste = beforeItem.getSevereWasteExpenditure().add(sabunData.getSevereWasteExpenditure());
+				severeWaste = beforeItem.getSevereWasteExpenditureAmount().add(sabunData.getSevereWasteExpenditureAmount());
 			} else {
-				severeWaste = beforeItem.getSevereWasteExpenditure().subtract(sabunData.getSevereWasteExpenditure());
+				severeWaste = beforeItem.getSevereWasteExpenditureAmount().subtract(sabunData.getSevereWasteExpenditureAmount());
 			}
 			// 支出金額情報を差額分更新
 			updateData.setSisyutuKingakuItem(SisyutuKingakuItem.from(
@@ -459,9 +460,9 @@ public class SisyutuKingakuItemHolder {
 				// 対象月
 				beforeItem.getTargetMonth().getValue(),
 				// 支出項目コード
-				beforeItem.getSisyutuItemCode().getValue(),
+				beforeItem.getExpenditureItemCode().getValue(),
 				// 親支出項目コード
-				beforeItem.getParentSisyutuItemCode().getValue(),
+				beforeItem.getParentExpenditureItemCode().getValue(),
 				// 支出予定金額の値は変更なし(前の値をそのまま設定)
 				beforeItem.getExpectedExpenditureAmount().getValue(),
 				// 支出金額
@@ -484,12 +485,12 @@ public class SisyutuKingakuItemHolder {
 		// 支出項目コードに対応する支出項目情報を取得
 		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(beforeItem.getUserId(), sisyutuItemCode);
 		// 親の支出項目コード == 支出項目コードの場合、再帰終了
-		if(sisyutuItem.getParentSisyutuItemCode().getValue().equals(
-				sisyutuItem.getSisyutuItemCode().getValue())) {
+		if(sisyutuItem.getParentExpenditureItemCode().getValue().equals(
+				sisyutuItem.getExpenditureItemCode().getValue())) {
 			return;
 		// 親の支出項目コード != 支出項目コードの場合、親の支出項目コードをもとに再帰呼び出し
 		} else {
-			updateItemMap(SisyutuItemCode.from(sisyutuItem.getParentSisyutuItemCode()), sabunData);
+			updateItemMap(ExpenditureItemCode.from(sisyutuItem.getParentExpenditureItemCode()), sabunData);
 		}
 	}
 	
@@ -501,7 +502,7 @@ public class SisyutuKingakuItemHolder {
 	 * @param subtractItem 支出金額情報(ドメイン)
 	 *
 	 */
-	private void subtractItemMap(SisyutuItemCode sisyutuItemCode, SisyutuKingakuItem subtractItem) {
+	private void subtractItemMap(ExpenditureItemCode sisyutuItemCode, SisyutuKingakuItem subtractItem) {
 		
 		// ホルダーから減算対象の支出金額情報を取得
 		SisyutuKingakuItemData subtractData = sisyutuKingakuItemMap.get(sisyutuItemCode);
@@ -526,17 +527,17 @@ public class SisyutuKingakuItemHolder {
 				// 対象月
 				beforeItem.getTargetMonth().getValue(),
 				// 支出項目コード
-				beforeItem.getSisyutuItemCode().getValue(),
+				beforeItem.getExpenditureItemCode().getValue(),
 				// 親支出項目コード
-				beforeItem.getParentSisyutuItemCode().getValue(),
+				beforeItem.getParentExpenditureItemCode().getValue(),
 				// 支出予定金額の値は変更なし(前の値をそのまま設定)
 				beforeItem.getExpectedExpenditureAmount().getValue(),
 				// 支出金額=前の値-減算するの値
 				beforeItem.getExpenditureAmount().subtract(subtractItem.getExpenditureAmount()).getValue(),
 				// 無駄遣い（軽度）支出金額=前の値-減算するの値
-				beforeItem.getMinorWasteExpenditure().subtract(subtractItem.getMinorWasteExpenditure()).getValue(),
+				beforeItem.getMinorWasteExpenditureAmount().subtract(subtractItem.getMinorWasteExpenditureAmount()).getValue(),
 				// 無駄遣い（重度）支出金額=前の値-減算するの値
-				beforeItem.getSevereWasteExpenditure().subtract(subtractItem.getSevereWasteExpenditure()).getValue(),
+				beforeItem.getSevereWasteExpenditureAmount().subtract(subtractItem.getSevereWasteExpenditureAmount()).getValue(),
 				// 支出支払日の値は変更なし(前の値をsubtractItem設定)
 				beforeItem.getPaymentDate().getValue()));
 		} catch (Exception ex) {
@@ -551,13 +552,13 @@ public class SisyutuKingakuItemHolder {
 		// 支出項目コードに対応する支出項目情報を取得
 		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(subtractItem.getUserId(), sisyutuItemCode);
 		// 親の支出項目コード == 支出項目コードの場合、再帰終了
-		if(sisyutuItem.getParentSisyutuItemCode().getValue().equals(
-				sisyutuItem.getSisyutuItemCode().getValue())) {
+		if(sisyutuItem.getParentExpenditureItemCode().getValue().equals(
+				sisyutuItem.getExpenditureItemCode().getValue())) {
 			return;
 		
 		// 親の支出項目コード != 支出項目コードの場合、親の支出項目コードをもとに再帰呼び出し
 		} else {
-			subtractItemMap(SisyutuItemCode.from(sisyutuItem.getParentSisyutuItemCode()), subtractItem);
+			subtractItemMap(ExpenditureItemCode.from(sisyutuItem.getParentExpenditureItemCode()), subtractItem);
 		}
 	}
 	
@@ -579,18 +580,18 @@ public class SisyutuKingakuItemHolder {
 				// 対象月
 				expenditureData.getTargetMonth().getValue(),
 				// 支出項目コード
-				sisyutuItem.getSisyutuItemCode().getValue(),
+				sisyutuItem.getExpenditureItemCode().getValue(),
 				// 親支出項目コード
-				sisyutuItem.getParentSisyutuItemCode().getValue(),
+				sisyutuItem.getParentExpenditureItemCode().getValue(),
 				// 支出予定金額
 				expenditureData.getExpectedExpenditureAmount().getValue(),
 				// 支出金額
 				expenditureData.getExpenditureAmount().getValue(),
 				// 支出金額B：無駄遣い（軽度）支出金額
-				SisyutuKubun.isWastedB(expenditureData.getSisyutuKubun())
+				ExpenditureCategory.isWastedB(expenditureData.getExpenditureCategory())
 					? expenditureData.getExpenditureAmount().getValue() : null,
 				// 支出金額C：無駄遣い（重度）支出金額
-				SisyutuKubun.isWastedC(expenditureData.getSisyutuKubun())
+				ExpenditureCategory.isWastedC(expenditureData.getExpenditureCategory())
 				? expenditureData.getExpenditureAmount().getValue() : null,
 				// 支出支払日
 				expenditureData.getPaymentDate().getValue());

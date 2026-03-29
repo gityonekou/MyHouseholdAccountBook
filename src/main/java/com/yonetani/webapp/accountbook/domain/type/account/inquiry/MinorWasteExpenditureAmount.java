@@ -1,6 +1,6 @@
 /**
  * 「無駄遣い（軽度）支出金額」項目の値を表すドメインタイプです
- * リファクタリングにより、クラス名変更しました(SisyutuKingakuB → MinorWasteExpenditure)
+ * リファクタリングにより、クラス名変更しました(SisyutuKingakuB → MinorWasteExpenditureAmount)
  *
  *------------------------------------------------
  * 更新履歴
@@ -34,16 +34,16 @@ import lombok.EqualsAndHashCode;
  *
  */
 @EqualsAndHashCode(callSuper = true)
-public class MinorWasteExpenditure extends NullableMoney {
+public class MinorWasteExpenditureAmount extends NullableMoney {
 
 	/** 値が0の「無駄遣い（軽度）支出金額」項目の値 */
-	public static final MinorWasteExpenditure ZERO = MinorWasteExpenditure.from(NullableMoney.NULLABLE_MONEY_ZERO);
+	public static final MinorWasteExpenditureAmount ZERO = MinorWasteExpenditureAmount.from(NullableMoney.NULLABLE_MONEY_ZERO);
 
 	/**
 	 * コンストラクタ
 	 * @param value 無駄遣い（軽度）支出金額
 	 */
-	private MinorWasteExpenditure(BigDecimal value) {
+	private MinorWasteExpenditureAmount(BigDecimal value) {
 		super(value);
 	}
 
@@ -62,13 +62,13 @@ public class MinorWasteExpenditure extends NullableMoney {
 	 * @return 「無駄遣い（軽度）支出金額」項目ドメインタイプ
 	 *
 	 */
-	public static MinorWasteExpenditure from(BigDecimal amount) {
+	public static MinorWasteExpenditureAmount from(BigDecimal amount) {
 		
 		// 基底クラスのバリデーションを実行（null許容、スケール2、マイナス値チェック）
 		validate(amount, "無駄遣い（軽度）支出金額");
 		
 		// 無駄遣い（軽度）支出金額項目ドメインタイプを生成
-		return new MinorWasteExpenditure(amount);
+		return new MinorWasteExpenditureAmount(amount);
 	}
 
 	/**
@@ -80,8 +80,8 @@ public class MinorWasteExpenditure extends NullableMoney {
 	 * @return 加算した無駄遣い（軽度）支出金額の値(this + addValue)
 	 *
 	 */
-	public MinorWasteExpenditure add(MinorWasteExpenditure addValue) {
-		return MinorWasteExpenditure.from(super.add(addValue));
+	public MinorWasteExpenditureAmount add(MinorWasteExpenditureAmount addValue) {
+		return MinorWasteExpenditureAmount.from(super.add(addValue));
 	}
 
 	/**
@@ -92,8 +92,8 @@ public class MinorWasteExpenditure extends NullableMoney {
 	 * @return 減算した無駄遣い（軽度）支出金額の値(this - subtractValue)
 	 *
 	 */
-	public MinorWasteExpenditure subtract(MinorWasteExpenditure subtractValue) {
-		return MinorWasteExpenditure.from(super.subtract(subtractValue));
+	public MinorWasteExpenditureAmount subtract(MinorWasteExpenditureAmount subtractValue) {
+		return MinorWasteExpenditureAmount.from(super.subtract(subtractValue));
 	}
 
 	/**

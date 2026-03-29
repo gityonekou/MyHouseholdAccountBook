@@ -5,15 +5,16 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/09/07 : 1.00.00  新規作成
+ * 2025/12/28 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
 
 import java.math.BigDecimal;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuDetailContext;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKubun;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.IncomeCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.IncomeCode;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.IncomeDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.common.DeleteFlg;
 import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
@@ -35,7 +36,7 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -51,11 +52,11 @@ public class IncomeItem {
 	// 対象月
 	private final TargetMonth targetMonth;
 	// 収入コード
-	private final SyuunyuuCode syuunyuuCode;
+	private final IncomeCode incomeCode;
 	// 収入区分
-	private final SyuunyuuKubun syuunyuuKubun;
+	private final IncomeCategory incomeCategory;
 	// 収入詳細
-	private final SyuunyuuDetailContext syuunyuuDetailContext;
+	private final IncomeDetailContext incomeDetailContext;
 	// 収入金額
 	private final IncomeAmount incomeAmount;
 	// 削除フラグ
@@ -68,9 +69,9 @@ public class IncomeItem {
 	 * @param userId ユーザID
 	 * @param targetYear 対象年
 	 * @param targetMonth 対象月
-	 * @param syuunyuuCode 収入コード
-	 * @param syuunyuuKubun 収入区分
-	 * @param syuunyuuDetailContext 収入詳細
+	 * @param incomeCode 収入コード
+	 * @param incomeCategory 収入区分
+	 * @param incomeDetailContext 収入詳細
 	 * @param incomeAmount 収入金額
 	 * @param deleteFlg 削除フラグ
 	 * @return 収入テーブル情報を表すドメインモデル
@@ -80,18 +81,18 @@ public class IncomeItem {
 			String userId,
 			String targetYear,
 			String targetMonth,
-			String syuunyuuCode,
-			String syuunyuuKubun,
-			String syuunyuuDetailContext,
+			String incomeCode,
+			String incomeCategory,
+			String incomeDetailContext,
 			BigDecimal incomeAmount,
 			boolean deleteFlg) {
 		return new IncomeItem(
 				UserId.from(userId),
 				TargetYear.from(targetYear),
 				TargetMonth.from(targetMonth),
-				SyuunyuuCode.from(syuunyuuCode),
-				SyuunyuuKubun.from(syuunyuuKubun),
-				SyuunyuuDetailContext.from(syuunyuuDetailContext),
+				IncomeCode.from(incomeCode),
+				IncomeCategory.from(incomeCategory),
+				IncomeDetailContext.from(incomeDetailContext),
 				IncomeAmount.from(incomeAmount),
 				DeleteFlg.from(deleteFlg));
 		
@@ -108,7 +109,7 @@ public class IncomeItem {
 	 * @return 収入テーブル情報(ドメイン)
 	 *
 	 */
-	public static IncomeItem createIncomeItem(UserId userId, TargetYearMonth yearMonthDomain, SyuunyuuCode incomeCode, IncomeRegistItem incomeData) {
+	public static IncomeItem createIncomeItem(UserId userId, TargetYearMonth yearMonthDomain, IncomeCode incomeCode, IncomeRegistItem incomeData) {
 		return IncomeItem.from(
 				// ユーザID
 				userId.getValue(),
@@ -119,7 +120,7 @@ public class IncomeItem {
 				// 収入コード
 				incomeCode.getValue(),
 				// 収入区分
-				incomeData.getIncomeKubun(),
+				incomeData.getIncomeCategory(),
 				// 収入詳細
 				incomeData.getIncomeDetailContext(),
 				// 収入金額

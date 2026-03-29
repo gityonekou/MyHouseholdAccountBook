@@ -5,7 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/11/03 : 1.00.00  新規作成
- * 2025/12/28 : 1.01.00  リファクタリング対応（DDD適応：Phase4までの内容を反映) 
+ * 2025/12/28 : 1.01.00  リファクタリング対応（DDD適応) 
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.regist;
@@ -28,12 +28,12 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExp
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuKingakuItemHolder;
 import com.yonetani.webapp.accountbook.domain.model.account.shop.ShopInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.BeforeAndAfterShoppingSisyutuKingakuData;
+import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.MinorWasteShoppingFood;
+import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.SevereWasteShoppingFood;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.ShoppingClothes;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.ShoppingConsumerGoods;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.ShoppingDineOut;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.ShoppingFood;
-import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.ShoppingFoodB;
-import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.ShoppingFoodC;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.ShoppingHouseEquipment;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.ShoppingRegist;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.ShoppingWork;
@@ -71,7 +71,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Service
@@ -181,7 +181,7 @@ public class SimpleShoppingRegistUseCase {
 		// 備考
 		inputForm.setShoppingRemarks(result.getShoppingRemarks().getValue());
 		// 食料品(必須)
-		inputForm.setShoppingFoodExpenses(DomainCommonUtils.convertInteger(result.getShoppingFoodExpenses().getValue()));
+		inputForm.setShoppingFoodExpenses(DomainCommonUtils.convertInteger(result.getShoppingFoodExpenditureAmount().getValue()));
 		// 消費税：食料品(必須)
 		inputForm.setShoppingFoodTaxExpenses(DomainCommonUtils.convertInteger(result.getShoppingFoodTaxExpenses().getValue()));
 		// 食料品B(無駄遣い)
@@ -351,8 +351,8 @@ public class SimpleShoppingRegistUseCase {
 			
 			// 支出テーブル情報を更新
 			// 飲食(無駄づかいなし)
-			ShoppingFood food = ShoppingFood.from(addData.getShoppingFoodExpenses(), addData.getShoppingFoodTaxExpenses(), couponResidualValue);
-			if(food.hasSisyutuKingaku()) {
+			ShoppingFood food = ShoppingFood.from(addData.getShoppingFoodExpenditureAmount(), addData.getShoppingFoodTaxExpenses(), couponResidualValue);
+			if(food.hasExpenditureAmount()) {
 				// 飲食(無駄づかいなし)の支出テーブル情報を作成
 				ExpenditureItem updFoodExpenditureItem = beforeFoodItem.addSisyutuKingaku(food.getValue());
 				// 更新対象の支出テーブル情報に追加
@@ -362,9 +362,9 @@ public class SimpleShoppingRegistUseCase {
 			}
 			couponResidualValue = food.getResidualCouponPrice();
 			
-			// 飲食(無駄遣いB)
-			ShoppingFoodB foodB = ShoppingFoodB.from(addData.getShoppingFoodBExpenses(), addData.getShoppingFoodBTaxExpenses(), couponResidualValue);
-			if(foodB.hasSisyutuKingaku()) {
+			// 食料品(無駄遣い（軽度）) 項目のドメインを生成し、支出金額を持つ場合は「支出項目：飲食」の無駄遣い（軽度）＝ 飲食(無駄遣いB)として登録
+			MinorWasteShoppingFood foodB = MinorWasteShoppingFood.from(addData.getShoppingFoodBExpenses(), addData.getShoppingFoodBTaxExpenses(), couponResidualValue);
+			if(foodB.hasExpenditureAmount()) {
 				// 飲食(無駄遣いB)の支出テーブル情報を作成
 				ExpenditureItem updFoodBExpenditureItem = beforeFoodBItem.addSisyutuKingaku(foodB.getValue());
 				// 更新対象の支出テーブル情報に追加
@@ -374,9 +374,9 @@ public class SimpleShoppingRegistUseCase {
 			}
 			couponResidualValue = foodB.getResidualCouponPrice();
 			
-			// 飲食(無駄遣いC)
-			ShoppingFoodC foodC = ShoppingFoodC.from(addData.getShoppingFoodCExpenses(), addData.getShoppingFoodCTaxExpenses(), couponResidualValue);
-			if(foodC.hasSisyutuKingaku()) {
+			// 食料品(無駄遣い（重度）) 項目のドメインを生成し、支出金額を持つ場合は「支出項目：飲食」の無駄遣い（重度）＝ 飲食(無駄遣いC)として登録
+			SevereWasteShoppingFood foodC = SevereWasteShoppingFood.from(addData.getShoppingFoodCExpenses(), addData.getShoppingFoodCTaxExpenses(), couponResidualValue);
+			if(foodC.hasExpenditureAmount()) {
 				// 飲食(無駄遣いC)の支出テーブル情報を作成
 				ExpenditureItem updFoodCExpenditureItem = beforeFoodCItem.addSisyutuKingaku(foodC.getValue());
 				// 更新対象の支出テーブル情報に追加
@@ -389,7 +389,7 @@ public class SimpleShoppingRegistUseCase {
 			
 			// 外食
 			ShoppingDineOut dineOut = ShoppingDineOut.from(addData.getShoppingDineOutExpenses(), addData.getShoppingDineOutTaxExpenses(), couponResidualValue);
-			if(dineOut.hasSisyutuKingaku()) {
+			if(dineOut.hasExpenditureAmount()) {
 				// 外食の支出テーブル情報を作成
 				ExpenditureItem updDineOutExpenditureItem = beforeDineOutItem.addSisyutuKingaku(dineOut.getValue());
 				// 更新対象の支出テーブル情報に追加
@@ -402,7 +402,7 @@ public class SimpleShoppingRegistUseCase {
 			
 			// 日用消耗品
 			ShoppingConsumerGoods consumerGoods = ShoppingConsumerGoods.from(addData.getShoppingConsumerGoodsExpenses(), addData.getShoppingConsumerGoodsTaxExpenses(), couponResidualValue);
-			if(consumerGoods.hasSisyutuKingaku()) {
+			if(consumerGoods.hasExpenditureAmount()) {
 				// 日用消耗品の支出テーブル情報を作成
 				ExpenditureItem updConsumerGoodsExpenditureItem = beforeConsumerGoodsItem.addSisyutuKingaku(consumerGoods.getValue());
 				// 更新対象の支出テーブル情報に追加
@@ -415,7 +415,7 @@ public class SimpleShoppingRegistUseCase {
 			
 			// 被服費
 			ShoppingClothes clothes = ShoppingClothes.from(addData.getShoppingClothesExpenses(), addData.getShoppingClothesTaxExpenses(), couponResidualValue);
-			if(clothes.hasSisyutuKingaku()) {
+			if(clothes.hasExpenditureAmount()) {
 				// 被服費の支出テーブル情報を作成
 				ExpenditureItem updClothesExpenditureItem = beforeClothesItem.addSisyutuKingaku(clothes.getValue());
 				// 更新対象の支出テーブル情報に追加
@@ -427,7 +427,7 @@ public class SimpleShoppingRegistUseCase {
 			
 			// 仕事
 			ShoppingWork work = ShoppingWork.from(addData.getShoppingWorkExpenses(), addData.getShoppingWorkTaxExpenses(), couponResidualValue);
-			if(work.hasSisyutuKingaku()) {
+			if(work.hasExpenditureAmount()) {
 				// 仕事の支出テーブル情報を作成
 				ExpenditureItem updWorkExpenditureItem = beforeWorkItem.addSisyutuKingaku(work.getValue());
 				// 更新対象の支出テーブル情報に追加
@@ -439,7 +439,7 @@ public class SimpleShoppingRegistUseCase {
 			
 			// 住居設備
 			ShoppingHouseEquipment houseEquipment = ShoppingHouseEquipment.from(addData.getShoppingHouseEquipmentExpenses(), addData.getShoppingHouseEquipmentTaxExpenses(), couponResidualValue);
-			if(houseEquipment.hasSisyutuKingaku()) {
+			if(houseEquipment.hasExpenditureAmount()) {
 				// 住居設備の支出テーブル情報を作成
 				ExpenditureItem updHouseEquipmentExpenditureItem = beforeHouseEquipmentItem.addSisyutuKingaku(houseEquipment.getValue());
 				// 更新対象の支出テーブル情報に追加
@@ -489,8 +489,8 @@ public class SimpleShoppingRegistUseCase {
 			
 			/* 支出テーブル情報を更新 */
 			// 飲食(無駄づかいなし)
-			ShoppingFood beforeFood = ShoppingFood.from(beforeData.getShoppingFoodExpenses(), beforeData.getShoppingFoodTaxExpenses(), beforeCouponResidualValue);
-			ShoppingFood afterFood = ShoppingFood.from(updData.getShoppingFoodExpenses(), updData.getShoppingFoodTaxExpenses(), afterCouponResidualValue);
+			ShoppingFood beforeFood = ShoppingFood.from(beforeData.getShoppingFoodExpenditureAmount(), beforeData.getShoppingFoodTaxExpenses(), beforeCouponResidualValue);
+			ShoppingFood afterFood = ShoppingFood.from(updData.getShoppingFoodExpenditureAmount(), updData.getShoppingFoodTaxExpenses(), afterCouponResidualValue);
 			beforeCouponResidualValue = beforeFood.getResidualCouponPrice();
 			afterCouponResidualValue = afterFood.getResidualCouponPrice();
 			BeforeAndAfterShoppingSisyutuKingakuData updFood = BeforeAndAfterShoppingSisyutuKingakuData.from(
@@ -508,8 +508,8 @@ public class SimpleShoppingRegistUseCase {
 			}
 			
 			// 飲食(無駄遣いB)
-			ShoppingFoodB beforeFoodB = ShoppingFoodB.from(beforeData.getShoppingFoodBExpenses(), beforeData.getShoppingFoodBTaxExpenses(), beforeCouponResidualValue);
-			ShoppingFoodB afterFoodB = ShoppingFoodB.from(updData.getShoppingFoodBExpenses(), updData.getShoppingFoodBTaxExpenses(), afterCouponResidualValue);
+			MinorWasteShoppingFood beforeFoodB = MinorWasteShoppingFood.from(beforeData.getShoppingFoodBExpenses(), beforeData.getShoppingFoodBTaxExpenses(), beforeCouponResidualValue);
+			MinorWasteShoppingFood afterFoodB = MinorWasteShoppingFood.from(updData.getShoppingFoodBExpenses(), updData.getShoppingFoodBTaxExpenses(), afterCouponResidualValue);
 			beforeCouponResidualValue = beforeFoodB.getResidualCouponPrice();
 			afterCouponResidualValue = afterFoodB.getResidualCouponPrice();
 			BeforeAndAfterShoppingSisyutuKingakuData updFoodB = BeforeAndAfterShoppingSisyutuKingakuData.from(
@@ -527,8 +527,8 @@ public class SimpleShoppingRegistUseCase {
 			}
 			
 			// 飲食(無駄遣いC)
-			ShoppingFoodC beforeFoodC = ShoppingFoodC.from(beforeData.getShoppingFoodCExpenses(), beforeData.getShoppingFoodCTaxExpenses(), beforeCouponResidualValue);
-			ShoppingFoodC afterFoodC = ShoppingFoodC.from(updData.getShoppingFoodCExpenses(), updData.getShoppingFoodCTaxExpenses(), afterCouponResidualValue);
+			SevereWasteShoppingFood beforeFoodC = SevereWasteShoppingFood.from(beforeData.getShoppingFoodCExpenses(), beforeData.getShoppingFoodCTaxExpenses(), beforeCouponResidualValue);
+			SevereWasteShoppingFood afterFoodC = SevereWasteShoppingFood.from(updData.getShoppingFoodCExpenses(), updData.getShoppingFoodCTaxExpenses(), afterCouponResidualValue);
 			beforeCouponResidualValue = beforeFoodC.getResidualCouponPrice();
 			afterCouponResidualValue = afterFoodC.getResidualCouponPrice();
 			BeforeAndAfterShoppingSisyutuKingakuData updFoodC = BeforeAndAfterShoppingSisyutuKingakuData.from(

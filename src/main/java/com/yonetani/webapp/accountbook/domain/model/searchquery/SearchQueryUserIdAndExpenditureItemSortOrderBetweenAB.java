@@ -8,11 +8,12 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/04/15 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.searchquery;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemSort;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemSortOrder;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
 import lombok.AccessLevel;
@@ -31,21 +32,21 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @ToString
 @EqualsAndHashCode
-public class SearchQueryUserIdAndSisyutuItemSortBetweenAB {
+public class SearchQueryUserIdAndExpenditureItemSortOrderBetweenAB {
 	
 	// ユーザID
 	private final UserId userId;
 	// 支出項目表示順A
-	private final SisyutuItemSort sisyutuItemSortA;
+	private final ExpenditureItemSortOrder expenditureItemSortA;
 	// 支出項目表示順B
-	private final SisyutuItemSort sisyutuItemSortB;
+	private final ExpenditureItemSortOrder expenditureItemSortB;
 	
 	/**
 	 *<pre>
@@ -55,13 +56,13 @@ public class SearchQueryUserIdAndSisyutuItemSortBetweenAB {
 	 * ・支出項目表示順B
 	 *</pre>
 	 * @param userId ユーザID
-	 * @param sisyutuItemSortA 支出項目表示順A
-	 * @param sisyutuItemSortB 支出項目表示順B
+	 * @param expenditureItemSortA 支出項目表示順A
+	 * @param expenditureItemSortB 支出項目表示順B
 	 * @return 検索条件(ユーザID, 支出項目表示順A, 支出項目表示順B)
 	 *
 	 */
-	public static SearchQueryUserIdAndSisyutuItemSortBetweenAB from(
-			UserId userId, SisyutuItemSort sisyutuItemSortA, SisyutuItemSort sisyutuItemSortB) {
-		return new SearchQueryUserIdAndSisyutuItemSortBetweenAB(userId, sisyutuItemSortA, sisyutuItemSortB);
+	public static SearchQueryUserIdAndExpenditureItemSortOrderBetweenAB from(
+			UserId userId, ExpenditureItemSortOrder expenditureItemSortA, ExpenditureItemSortOrder expenditureItemSortB) {
+		return new SearchQueryUserIdAndExpenditureItemSortOrderBetweenAB(userId, expenditureItemSortA, expenditureItemSortB);
 	}
 }

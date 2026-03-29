@@ -71,7 +71,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @SpringBootTest
@@ -132,10 +132,10 @@ class IncomeAndExpenditureInitIntegrationTest {
         assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, firstItem.getDataType()); // データタイプ設定値は常に'new'
         assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, firstItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, firstItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
-        assertEquals("0030", firstItem.getSisyutuItemCode()); // 支出項目コード（家賃）
+        assertEquals("0030", firstItem.getExpenditureItemCode()); // 支出項目コード（家賃）
         assertEquals("", firstItem.getEventCode());  // イベントコード設定値は常に空文字列
         assertEquals("家賃", firstItem.getExpenditureName()); // 支出名
-        assertEquals("1", firstItem.getExpenditureKubun());  // 支出区分:'1'(無駄遣いなし)
+        assertEquals("1", firstItem.getExpenditureCategory());  // 支出区分:'1'(無駄遣いなし)
         assertEquals("家賃支払詳細", firstItem.getExpenditureDetailContext()); // 支出詳細
         assertEquals("01", firstItem.getSiharaiDate()); // 支払日：00→01
         assertEquals(new BigDecimal("62000.00"), firstItem.getExpenditureKingaku()); // 支払金額
@@ -150,10 +150,10 @@ class IncomeAndExpenditureInitIntegrationTest {
         assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, secondItem.getDataType()); // データタイプ設定値は常に'new'
         assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, secondItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, secondItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
-        assertEquals("0040", secondItem.getSisyutuItemCode()); // 支出項目コード（水道代）
+        assertEquals("0040", secondItem.getExpenditureItemCode()); // 支出項目コード（水道代）
         assertEquals("", secondItem.getEventCode());  // イベントコード設定値は常に空文字列
         assertEquals("水道代", secondItem.getExpenditureName()); // 支出名
-        assertEquals("1", secondItem.getExpenditureKubun());  // 支出区分:'1'(無駄遣いなし)
+        assertEquals("1", secondItem.getExpenditureCategory());  // 支出区分:'1'(無駄遣いなし)
         assertEquals("水道代詳細(無駄遣いB)", secondItem.getExpenditureDetailContext()); // 支出詳細
         assertEquals("20", secondItem.getSiharaiDate()); // 支払日：20→20
         assertEquals(new BigDecimal("5000.00"), secondItem.getExpenditureKingaku()); // 支払金額
@@ -167,10 +167,10 @@ class IncomeAndExpenditureInitIntegrationTest {
         assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, thirdItem.getDataType()); // データタイプ設定値は常に'new'
         assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, thirdItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, thirdItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
-        assertEquals("0039", thirdItem.getSisyutuItemCode()); // 支出項目コード（通信費）
+        assertEquals("0039", thirdItem.getExpenditureItemCode()); // 支出項目コード（通信費）
         assertEquals("", thirdItem.getEventCode());  // イベントコード設定値は常に空文字列
         assertEquals("通信費(無駄遣いB)", thirdItem.getExpenditureName()); // 支出名
-        assertEquals("2", thirdItem.getExpenditureKubun());  // 支出区分:'2'(無駄遣い（軽度）)
+        assertEquals("2", thirdItem.getExpenditureCategory());  // 支出区分:'2'(無駄遣い（軽度）)
         assertEquals("携帯電話・インターネット詳細", thirdItem.getExpenditureDetailContext()); // 支出詳細
         assertEquals("25", thirdItem.getSiharaiDate()); // 支払日：25→25
         assertEquals(new BigDecimal("7000.00"), thirdItem.getExpenditureKingaku()); // 支払金額
@@ -184,10 +184,10 @@ class IncomeAndExpenditureInitIntegrationTest {
         assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, fourthItem.getDataType()); // データタイプ設定値は常に'new'
         assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, fourthItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, fourthItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
-        assertEquals("0037", fourthItem.getSisyutuItemCode()); // 支出項目コード（電気代）
+        assertEquals("0037", fourthItem.getExpenditureItemCode()); // 支出項目コード（電気代）
         assertEquals("", fourthItem.getEventCode());  // イベントコード設定値は常に空文字列
         assertEquals("電気代(無駄遣いB)", fourthItem.getExpenditureName()); // 支出名
-        assertEquals("2", fourthItem.getExpenditureKubun());  // 支出区分:'2'(無駄遣い（軽度）)
+        assertEquals("2", fourthItem.getExpenditureCategory());  // 支出区分:'2'(無駄遣い（軽度）)
         assertEquals("電気代詳細", fourthItem.getExpenditureDetailContext()); // 支出詳細
         assertEquals("31", fourthItem.getSiharaiDate()); // 支払日：31→31（10月は31日まで）
         assertEquals(new BigDecimal("10000.00"), fourthItem.getExpenditureKingaku()); // 支払金額
@@ -202,10 +202,10 @@ class IncomeAndExpenditureInitIntegrationTest {
         assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, fifthItem.getDataType()); // データタイプ設定値は常に'new'
         assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, fifthItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, fifthItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
-        assertEquals("0038", fifthItem.getSisyutuItemCode()); // 支出項目コード（ガス代）
+        assertEquals("0038", fifthItem.getExpenditureItemCode()); // 支出項目コード（ガス代）
         assertEquals("", fifthItem.getEventCode());  // イベントコード設定値は常に空文字列
         assertEquals("ガス代(無駄遣いC)", fifthItem.getExpenditureName()); // 支出名
-        assertEquals("3", fifthItem.getExpenditureKubun());  // 支出区分:'3'(無駄遣い（重度）)
+        assertEquals("3", fifthItem.getExpenditureCategory());  // 支出区分:'3'(無駄遣い（重度）)
         assertEquals("ガス代詳細", fifthItem.getExpenditureDetailContext()); // 支出詳細
         assertEquals("31", fifthItem.getSiharaiDate()); // 支払日：40→31（10月は31日まで）
         assertEquals(new BigDecimal("8000.00"), fifthItem.getExpenditureKingaku()); // 支払金額
@@ -340,10 +340,10 @@ class IncomeAndExpenditureInitIntegrationTest {
         assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, firstItem.getDataType()); // データタイプ設定値は常に'new'
         assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, firstItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, firstItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
-        assertEquals("0030", firstItem.getSisyutuItemCode()); // 支出項目コード（家賃）
+        assertEquals("0030", firstItem.getExpenditureItemCode()); // 支出項目コード（家賃）
         assertEquals("", firstItem.getEventCode());  // イベントコード設定値は常に空文字列
         assertEquals("家賃", firstItem.getExpenditureName()); // 支出名
-        assertEquals("1", firstItem.getExpenditureKubun());  // 支出区分:'1'(無駄遣いなし)
+        assertEquals("1", firstItem.getExpenditureCategory());  // 支出区分:'1'(無駄遣いなし)
         assertEquals("家賃支払詳細", firstItem.getExpenditureDetailContext()); // 支出詳細
         assertEquals("01", firstItem.getSiharaiDate()); // 支払日：00→01
         assertEquals(new BigDecimal("62000.00"), firstItem.getExpenditureKingaku()); // 支払金額
@@ -358,10 +358,10 @@ class IncomeAndExpenditureInitIntegrationTest {
         assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, secondItem.getDataType()); // データタイプ設定値は常に'new'
         assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, secondItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, secondItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
-        assertEquals("0040", secondItem.getSisyutuItemCode()); // 支出項目コード（水道代）
+        assertEquals("0040", secondItem.getExpenditureItemCode()); // 支出項目コード（水道代）
         assertEquals("", secondItem.getEventCode());  // イベントコード設定値は常に空文字列
         assertEquals("水道代", secondItem.getExpenditureName()); // 支出名
-        assertEquals("1", secondItem.getExpenditureKubun());  // 支出区分:'1'(無駄遣いなし) ※FIXED_COST_NAMEで判定
+        assertEquals("1", secondItem.getExpenditureCategory());  // 支出区分:'1'(無駄遣いなし) ※FIXED_COST_NAMEで判定
         assertEquals("水道代詳細(無駄遣いC)", secondItem.getExpenditureDetailContext()); // 支出詳細
         assertEquals("20", secondItem.getSiharaiDate()); // 支払日：20→20
         assertEquals(new BigDecimal("5000.00"), secondItem.getExpenditureKingaku()); // 支払金額
@@ -377,10 +377,10 @@ class IncomeAndExpenditureInitIntegrationTest {
         assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, thirdItem.getDataType()); // データタイプ設定値は常に'new'
         assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, thirdItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, thirdItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
-        assertEquals("0039", thirdItem.getSisyutuItemCode()); // 支出項目コード（通信費）
+        assertEquals("0039", thirdItem.getExpenditureItemCode()); // 支出項目コード（通信費）
         assertEquals("", thirdItem.getEventCode());  // イベントコード設定値は常に空文字列
         assertEquals("通信費(無駄遣いB)", thirdItem.getExpenditureName()); // 支出名
-        assertEquals("2", thirdItem.getExpenditureKubun());  // 支出区分:'2'(無駄遣い（軽度）)
+        assertEquals("2", thirdItem.getExpenditureCategory());  // 支出区分:'2'(無駄遣い（軽度）)
         assertEquals("携帯電話・インターネット詳細/11月通信費追加詳細", thirdItem.getExpenditureDetailContext()); // 支出詳細：パターン4
         assertEquals("25", thirdItem.getSiharaiDate()); // 支払日：25→25
         assertEquals(new BigDecimal("7000.00"), thirdItem.getExpenditureKingaku()); // 支払金額
@@ -395,10 +395,10 @@ class IncomeAndExpenditureInitIntegrationTest {
         assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, fourthItem.getDataType()); // データタイプ設定値は常に'new'
         assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, fourthItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, fourthItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
-        assertEquals("0037", fourthItem.getSisyutuItemCode()); // 支出項目コード（電気代）
+        assertEquals("0037", fourthItem.getExpenditureItemCode()); // 支出項目コード（電気代）
         assertEquals("", fourthItem.getEventCode());  // イベントコード設定値は常に空文字列
         assertEquals("電気代(無駄遣いC)", fourthItem.getExpenditureName()); // 支出名
-        assertEquals("3", fourthItem.getExpenditureKubun());  // 支出区分:'3'(無駄遣い（重度）)
+        assertEquals("3", fourthItem.getExpenditureCategory());  // 支出区分:'3'(無駄遣い（重度）)
         assertEquals("11月電気代任意詳細", fourthItem.getExpenditureDetailContext()); // 支出詳細：パターン3
         assertEquals("30", fourthItem.getSiharaiDate()); // 支払日：31→30（11月は30日まで）
         assertEquals(new BigDecimal("10000.00"), fourthItem.getExpenditureKingaku()); // 支払金額
@@ -413,10 +413,10 @@ class IncomeAndExpenditureInitIntegrationTest {
         assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, fifthItem.getDataType()); // データタイプ設定値は常に'new'
         assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, fifthItem.getAction()); // アクション設定値は常に'add'
         assertEquals(17, fifthItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
-        assertEquals("0038", fifthItem.getSisyutuItemCode()); // 支出項目コード（ガス代）
+        assertEquals("0038", fifthItem.getExpenditureItemCode()); // 支出項目コード（ガス代）
         assertEquals("", fifthItem.getEventCode());  // イベントコード設定値は常に空文字列
         assertEquals("ガス代(無駄遣いC)", fifthItem.getExpenditureName()); // 支出名
-        assertEquals("3", fifthItem.getExpenditureKubun());  // 支出区分:'3'(無駄遣い（重度）)
+        assertEquals("3", fifthItem.getExpenditureCategory());  // 支出区分:'3'(無駄遣い（重度）)
         assertEquals("", fifthItem.getExpenditureDetailContext()); // 支出詳細：パターン1（両方NULL→空文字）
         assertEquals("30", fifthItem.getSiharaiDate()); // 支払日：40→30（11月は30日まで）
         assertEquals(new BigDecimal("8000.00"), fifthItem.getExpenditureKingaku()); // 支払金額
@@ -696,7 +696,7 @@ class IncomeAndExpenditureInitIntegrationTest {
         assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_LOAD, firstIncome.getDataType()); // データタイプ：DBロード
         assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, firstIncome.getAction()); // アクション：更新なし
         assertEquals("01", firstIncome.getIncomeCode()); // 収入コード
-        assertEquals("1", firstIncome.getIncomeKubun()); // 収入区分：給与
+        assertEquals("1", firstIncome.getIncomeCategory()); // 収入区分：給与
         assertEquals("11月給与", firstIncome.getIncomeDetailContext()); // 収入詳細
         assertEquals(new BigDecimal("350000.00"), firstIncome.getIncomeKingaku()); // 収入金額
 
@@ -705,7 +705,7 @@ class IncomeAndExpenditureInitIntegrationTest {
         assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_LOAD, secondIncome.getDataType()); // データタイプ：DBロード
         assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, secondIncome.getAction()); // アクション：更新なし
         assertEquals("02", secondIncome.getIncomeCode()); // 収入コード
-        assertEquals("2", secondIncome.getIncomeKubun()); // 収入区分：副業
+        assertEquals("2", secondIncome.getIncomeCategory()); // 収入区分：副業
         assertEquals("11月副業収入", secondIncome.getIncomeDetailContext()); // 収入詳細
         assertEquals(new BigDecimal("30000.00"), secondIncome.getIncomeKingaku()); // 収入金額
 
@@ -722,10 +722,10 @@ class IncomeAndExpenditureInitIntegrationTest {
         assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_LOAD, firstExpenditure.getDataType()); // データタイプ：DBロード
         assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, firstExpenditure.getAction()); // アクション：更新なし
         assertEquals("001", firstExpenditure.getExpenditureCode()); // 支出コード
-        assertEquals("0037", firstExpenditure.getSisyutuItemCode()); // 支出項目コード（電気代）
+        assertEquals("0037", firstExpenditure.getExpenditureItemCode()); // 支出項目コード（電気代）
         assertNull(firstExpenditure.getEventCode()); // イベントコード（DBでnull→nullが設定される）
         assertEquals("電気代", firstExpenditure.getExpenditureName()); // 支出名
-        assertEquals("1", firstExpenditure.getExpenditureKubun()); // 支出区分：無駄遣いなし
+        assertEquals("1", firstExpenditure.getExpenditureCategory()); // 支出区分：無駄遣いなし
         assertEquals("電気代支払", firstExpenditure.getExpenditureDetailContext()); // 支出詳細
         assertEquals("30", firstExpenditure.getSiharaiDate()); // 支払日：30日
         assertEquals(new BigDecimal("12000.00"), firstExpenditure.getExpenditureKingaku()); // 支払金額
@@ -737,10 +737,10 @@ class IncomeAndExpenditureInitIntegrationTest {
         assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_LOAD, secondExpenditure.getDataType()); // データタイプ：DBロード
         assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, secondExpenditure.getAction()); // アクション：更新なし
         assertEquals("002", secondExpenditure.getExpenditureCode()); // 支出コード
-        assertEquals("0038", secondExpenditure.getSisyutuItemCode()); // 支出項目コード（ガス代）
+        assertEquals("0038", secondExpenditure.getExpenditureItemCode()); // 支出項目コード（ガス代）
         assertNull(secondExpenditure.getEventCode()); // イベントコード（DBでnull→nullが設定される）
         assertEquals("ガス代(無駄遣いB)", secondExpenditure.getExpenditureName()); // 支出名
-        assertEquals("2", secondExpenditure.getExpenditureKubun()); // 支出区分：無駄遣いB
+        assertEquals("2", secondExpenditure.getExpenditureCategory()); // 支出区分：無駄遣いB
         assertEquals("ガス代支払詳細", secondExpenditure.getExpenditureDetailContext()); // 支出詳細
         assertNull(secondExpenditure.getSiharaiDate()); // 支払日：DBでnull→nullが設定される
         assertEquals(new BigDecimal("10000.00"), secondExpenditure.getExpenditureKingaku()); // 支払金額
@@ -751,10 +751,10 @@ class IncomeAndExpenditureInitIntegrationTest {
         assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_LOAD, thirdExpenditure.getDataType()); // データタイプ：DBロード
         assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, thirdExpenditure.getAction()); // アクション：更新なし
         assertEquals("003", thirdExpenditure.getExpenditureCode()); // 支出コード
-        assertEquals("0040", thirdExpenditure.getSisyutuItemCode()); // 支出項目コード（水道代）
+        assertEquals("0040", thirdExpenditure.getExpenditureItemCode()); // 支出項目コード（水道代）
         assertNull(thirdExpenditure.getEventCode()); // イベントコード（DBでnull→nullが設定される）
         assertEquals("水道代", thirdExpenditure.getExpenditureName()); // 支出名
-        assertEquals("1", thirdExpenditure.getExpenditureKubun()); // 支出区分：無駄遣いなし
+        assertEquals("1", thirdExpenditure.getExpenditureCategory()); // 支出区分：無駄遣いなし
         assertEquals("水道代支払", thirdExpenditure.getExpenditureDetailContext()); // 支出詳細
         assertEquals("20", thirdExpenditure.getSiharaiDate()); // 支払日：20日
         assertEquals(new BigDecimal("8000.00"), thirdExpenditure.getExpenditureKingaku()); // 支払金額
@@ -915,7 +915,7 @@ class IncomeAndExpenditureInitIntegrationTest {
         assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_LOAD, incomeItem.getDataType()); // データタイプ：DBロード
         assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, incomeItem.getAction()); // アクション：更新なし
         assertEquals("01", incomeItem.getIncomeCode()); // 収入コード
-        assertEquals("1", incomeItem.getIncomeKubun()); // 収入区分：給与
+        assertEquals("1", incomeItem.getIncomeCategory()); // 収入区分：給与
         assertEquals("8月給与（支出なし確認用）", incomeItem.getIncomeDetailContext()); // 収入詳細
         assertEquals(new BigDecimal("280000.00"), incomeItem.getIncomeKingaku()); // 収入金額
 

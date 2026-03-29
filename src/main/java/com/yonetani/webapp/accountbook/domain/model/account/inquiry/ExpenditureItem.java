@@ -5,7 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/09/07 : 1.00.00  新規作成
- * 2025/12/28 : 1.00.00  ShiharaiDateをPaymentDateに置き換え
+ * 2025/12/28 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
@@ -17,11 +17,11 @@ import org.springframework.util.StringUtils;
 
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuDetailContext;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKubun;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuName;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureCode;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureName;
 import com.yonetani.webapp.accountbook.domain.type.common.DeleteFlg;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
@@ -44,7 +44,7 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -60,17 +60,17 @@ public class ExpenditureItem {
 	// 対象月
 	private final TargetMonth targetMonth;
 	// 支出コード
-	private final SisyutuCode sisyutuCode;
+	private final ExpenditureCode expenditureCode;
 	// 支出項目コード
-	private final SisyutuItemCode sisyutuItemCode;
+	private final ExpenditureItemCode expenditureItemCode;
 	// イベントコード
 	private final EventCode eventCode;
 	// 支出名称
-	private final SisyutuName sisyutuName;
+	private final ExpenditureName expenditureName;
 	// 支出区分
-	private final SisyutuKubun sisyutuKubun;
+	private final ExpenditureCategory expenditureCategory;
 	// 支出詳細
-	private final SisyutuDetailContext sisyutuDetailContext;
+	private final ExpenditureDetailContext expenditureDetailContext;
 	// 支払日
 	private final PaymentDate paymentDate;
 	// 支出予定金額
@@ -87,12 +87,12 @@ public class ExpenditureItem {
 	 * @param userId ユーザID
 	 * @param targetYear 対象年
 	 * @param targetMonth 対象月
-	 * @param sisyutuCode 支出コード
-	 * @param sisyutuItemCode 支出項目コード
+	 * @param expenditureCode 支出コード
+	 * @param expenditureItemCode 支出項目コード
 	 * @param eventCode イベントコード
-	 * @param sisyutuName 支出名称
-	 * @param sisyutuKubun 支出区分
-	 * @param sisyutuDetailContext 支出詳細
+	 * @param expenditureName 支出名称
+	 * @param expenditureCategory 支出区分
+	 * @param expenditureDetailContext 支出詳細
 	 * @param paymentDate 支払日
 	 * @param expectedExpenditureAmount 支出予定金額
 	 * @param expenditureAmount 支出金額
@@ -104,12 +104,12 @@ public class ExpenditureItem {
 			String userId,
 			String targetYear,
 			String targetMonth,
-			String sisyutuCode,
-			String sisyutuItemCode,
+			String expenditureCode,
+			String expenditureItemCode,
 			String eventCode,
-			String sisyutuName,
-			String sisyutuKubun,
-			String sisyutuDetailContext,
+			String expenditureName,
+			String expenditureCategory,
+			String expenditureDetailContext,
 			LocalDate paymentDate,
 			BigDecimal expectedExpenditureAmount,
 			BigDecimal expenditureAmount,
@@ -126,12 +126,12 @@ public class ExpenditureItem {
 				UserId.from(userId),
 				TargetYear.from(targetYear),
 				TargetMonth.from(targetMonth),
-				SisyutuCode.from(sisyutuCode),
-				SisyutuItemCode.from(sisyutuItemCode),
+				ExpenditureCode.from(expenditureCode),
+				ExpenditureItemCode.from(expenditureItemCode),
 				eventCodeVal,
-				SisyutuName.from(sisyutuName),
-				SisyutuKubun.from(sisyutuKubun),
-				SisyutuDetailContext.from(sisyutuDetailContext),
+				ExpenditureName.from(expenditureName),
+				ExpenditureCategory.from(expenditureCategory),
+				ExpenditureDetailContext.from(expenditureDetailContext),
 				PaymentDate.from(paymentDate),
 				ExpectedExpenditureAmount.from(expectedExpenditureAmount),
 				ExpenditureAmount.from(expenditureAmount),
@@ -152,7 +152,7 @@ public class ExpenditureItem {
 	 *
 	 */
 	public static ExpenditureItem createExpenditureItem(boolean initFlg, UserId userId, TargetYearMonth yearMonthDomain,
-			SisyutuCode expenditureCode, ExpenditureRegistItem expenditureData) {
+			ExpenditureCode expenditureCode, ExpenditureRegistItem expenditureData) {
 		
 		// 支出予定金額：対象月の新規登録時のみ、支出金額の設定値を支出予定金額として設定。対象月の更新時は新規追加時を含めすべて0を設定
 		BigDecimal expectedExpenditureAmount = (initFlg) ? expenditureData.getExpenditureKingaku() : ExpectedExpenditureAmount.ZERO.getValue();
@@ -170,13 +170,13 @@ public class ExpenditureItem {
 				// 支出コード
 				expenditureCode.getValue(),
 				// 支出項目コード
-				expenditureData.getSisyutuItemCode(),
+				expenditureData.getExpenditureItemCode(),
 				// イベントコード
 				expenditureData.getEventCode(),
 				// 支出名称
 				expenditureData.getExpenditureName(),
 				// 支出区分
-				expenditureData.getExpenditureKubun(),
+				expenditureData.getExpenditureCategory(),
 				// 支出詳細
 				expenditureData.getExpenditureDetailContext(),
 				// 支払日
@@ -207,17 +207,17 @@ public class ExpenditureItem {
 				// 対象月
 				targetMonth.getValue(),
 				// 支出コード
-				sisyutuCode.getValue(),
+				expenditureCode.getValue(),
 				// 支出項目コード
-				sisyutuItemCode.getValue(),
+				expenditureItemCode.getValue(),
 				// イベントコード
 				eventCode.getValue(),
 				// 支出名称
-				sisyutuName.getValue(),
+				expenditureName.getValue(),
 				// 支出区分
-				sisyutuKubun.getValue(),
+				expenditureCategory.getValue(),
 				// 支出詳細
-				sisyutuDetailContext.getValue(),
+				expenditureDetailContext.getValue(),
 				// 支払日
 				paymentDate.getValue(),
 				// 支出予定金額
@@ -247,17 +247,17 @@ public class ExpenditureItem {
 				// 対象月
 				targetMonth.getValue(),
 				// 支出コード
-				sisyutuCode.getValue(),
+				expenditureCode.getValue(),
 				// 支出項目コード
-				sisyutuItemCode.getValue(),
+				expenditureItemCode.getValue(),
 				// イベントコード
 				eventCode.getValue(),
 				// 支出名称
-				sisyutuName.getValue(),
+				expenditureName.getValue(),
 				// 支出区分
-				sisyutuKubun.getValue(),
+				expenditureCategory.getValue(),
 				// 支出詳細
-				sisyutuDetailContext.getValue(),
+				expenditureDetailContext.getValue(),
 				// 支払日
 				paymentDate.getValue(),
 				// 支出予定金額

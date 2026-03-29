@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/11/23 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
@@ -23,7 +24,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.Shoppi
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodBTaxExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCTaxExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenses;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodTaxExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentTaxExpenses;
@@ -52,7 +53,7 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -79,7 +80,7 @@ public class ShoppingRegist {
 	
 	// 登録データ(金額)
 	// 食料品(必須)金額
-	private final ShoppingFoodExpenses shoppingFoodExpenses;
+	private final ShoppingFoodExpenditureAmount shoppingFoodExpenditureAmount;
 	// 消費税:食料品(必須)金額
 	private final ShoppingFoodTaxExpenses shoppingFoodTaxExpenses;
 	// 食料品B(無駄遣い)金額
@@ -130,7 +131,7 @@ public class ShoppingRegist {
 	 * @param shopCode 店舗コード
 	 * @param shoppingDate 買い物日
 	 * @param shoppingRemarks 備考
-	 * @param shoppingFoodExpenses 食料品(必須)金額
+	 * @param shoppingFoodExpenditureAmount 食料品(必須)金額
 	 * @param shoppingFoodTaxExpenses 消費税:食料品(必須)金額
 	 * @param shoppingFoodBExpenses 食料品B(無駄遣い)金額
 	 * @param shoppingFoodBTaxExpenses 消費税:食料品B(無駄遣い)金額
@@ -161,7 +162,7 @@ public class ShoppingRegist {
 			ShopCode shopCode,
 			ShoppingDate shoppingDate,
 			ShoppingRemarks shoppingRemarks,
-			ShoppingFoodExpenses shoppingFoodExpenses,
+			ShoppingFoodExpenditureAmount shoppingFoodExpenditureAmount,
 			ShoppingFoodTaxExpenses shoppingFoodTaxExpenses,
 			ShoppingFoodBExpenses shoppingFoodBExpenses,
 			ShoppingFoodBTaxExpenses shoppingFoodBTaxExpenses,
@@ -190,7 +191,7 @@ public class ShoppingRegist {
 				shopCode,
 				shoppingDate,
 				shoppingRemarks,
-				shoppingFoodExpenses,
+				shoppingFoodExpenditureAmount,
 				shoppingFoodTaxExpenses,
 				shoppingFoodBExpenses,
 				shoppingFoodBTaxExpenses,
@@ -242,7 +243,7 @@ public class ShoppingRegist {
 				// 備考
 				ShoppingRemarks.from(inputForm.getShoppingRemarks()),
 				// 食料品(必須)金額
-				ShoppingFoodExpenses.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingFoodExpenses())),
+				ShoppingFoodExpenditureAmount.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingFoodExpenses())),
 				// 消費税:食料品(必須)金額
 				ShoppingFoodTaxExpenses.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingFoodTaxExpenses())),
 				// 食料品B(無駄遣い)金額

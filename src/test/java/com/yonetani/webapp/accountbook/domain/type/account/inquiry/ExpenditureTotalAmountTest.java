@@ -26,7 +26,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @DisplayName("支出金額合計(ExpenditureTotalAmount)のテスト")

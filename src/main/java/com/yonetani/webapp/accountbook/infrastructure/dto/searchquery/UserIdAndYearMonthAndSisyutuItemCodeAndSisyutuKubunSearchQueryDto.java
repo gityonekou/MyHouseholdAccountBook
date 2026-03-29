@@ -10,11 +10,12 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2025/01/01 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.searchquery;
 
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubun;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureItemCodeAndExpenditureCategory;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,7 +33,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -57,7 +58,7 @@ public class UserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubunSearchQueryDto {
 	 * @return テーブルの検索条件：ユーザID、対象年、対象月、支出項目コード、支出区分
 	 *
 	 */
-	public static UserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubunSearchQueryDto from(SearchQueryUserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubun search) {
+	public static UserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubunSearchQueryDto from(SearchQueryUserIdAndYearMonthAndExpenditureItemCodeAndExpenditureCategory search) {
 		return new UserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubunSearchQueryDto(
 				// 検索条件:ユーザID
 				search.getUserId().toString(),
@@ -66,8 +67,8 @@ public class UserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubunSearchQueryDto {
 				// 検索条件:対象月
 				search.getYearMonth().getMonth(),
 				// 検索条件:支出項目コード
-				search.getSisyutuItemCode().getValue(),
+				search.getExpenditureItemCode().getValue(),
 				// 検索条件:支出区分
-				search.getSisyutuKubun().getValue());
+				search.getExpenditureCategory().getValue());
 	}
 }

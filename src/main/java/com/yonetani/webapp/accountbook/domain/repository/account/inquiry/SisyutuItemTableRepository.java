@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/01/10 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.repository.account.inquiry;
@@ -13,8 +14,8 @@ package com.yonetani.webapp.accountbook.domain.repository.account.inquiry;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemSortBetweenAB;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemSortOrderBetweenAB;
 
 /**
  *<pre>
@@ -24,7 +25,7 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 public interface SisyutuItemTableRepository {
@@ -87,7 +88,7 @@ public interface SisyutuItemTableRepository {
 	 * @return 支出項目情報のリスト
 	 *
 	 */
-	SisyutuItemInquiryList findByIdAndSisyutuItemSortBetween(SearchQueryUserIdAndSisyutuItemSortBetweenAB from);
+	SisyutuItemInquiryList findByIdAndSisyutuItemSortBetween(SearchQueryUserIdAndExpenditureItemSortOrderBetweenAB from);
 	
 	/**
 	 *<pre>
@@ -97,7 +98,7 @@ public interface SisyutuItemTableRepository {
 	 * @return 支出項目情報
 	 *
 	 */
-	SisyutuItem findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search);
+	SisyutuItem findByIdAndSisyutuItemCode(SearchQueryUserIdAndExpenditureItemCode search);
 	
 	/**
 	 *<pre>
@@ -107,7 +108,7 @@ public interface SisyutuItemTableRepository {
 	 * @return 親の支出項目に属する支出項目の名称一覧
 	 *
 	 */
-	SisyutuItemInquiryList searchParentMemberSisyutuItemList(SearchQueryUserIdAndSisyutuItemCode search);
+	SisyutuItemInquiryList searchParentMemberSisyutuItemList(SearchQueryUserIdAndExpenditureItemCode search);
 
 	/**
 	 *<pre>

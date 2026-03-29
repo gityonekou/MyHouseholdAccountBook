@@ -71,7 +71,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @SpringBootTest
@@ -472,10 +472,10 @@ class ExpenditureRegistIntegrationTest {
         assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, addedItem.getDataType());
         assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, addedItem.getAction());
         assertEquals(17, addedItem.getExpenditureCode().length()); // 自動生成された支出コード(yyyyMMddHHmmssSSS形式=17桁)
-        assertEquals("0061", addedItem.getSisyutuItemCode());
+        assertEquals("0061", addedItem.getExpenditureItemCode());
         assertEquals("0001", addedItem.getEventCode()); // イベントコードが設定されていること
         assertEquals("新規追加テスト支出", addedItem.getExpenditureName());
-        assertEquals("1", addedItem.getExpenditureKubun());
+        assertEquals("1", addedItem.getExpenditureCategory());
         assertEquals("新規追加テスト詳細", addedItem.getExpenditureDetailContext());
         assertEquals("28", addedItem.getSiharaiDate()); // 日のみ
         assertEquals(new BigDecimal("7500.00"), addedItem.getExpenditureKingaku());
@@ -530,7 +530,7 @@ class ExpenditureRegistIntegrationTest {
         ExpenditureRegistItem updatedItem = resultList.get(0);
         assertEquals("20260125120000001", updatedItem.getExpenditureCode());
         assertEquals("更新後テスト電気代", updatedItem.getExpenditureName());
-        assertEquals("2", updatedItem.getExpenditureKubun());
+        assertEquals("2", updatedItem.getExpenditureCategory());
         assertEquals("更新後テスト詳細", updatedItem.getExpenditureDetailContext());
         assertEquals("30", updatedItem.getSiharaiDate());
         assertEquals(new BigDecimal("6000.00"), updatedItem.getExpenditureKingaku());

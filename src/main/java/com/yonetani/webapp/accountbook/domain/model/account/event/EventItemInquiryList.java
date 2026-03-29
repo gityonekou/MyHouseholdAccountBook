@@ -20,7 +20,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventDate;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventName;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemName;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemName;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -35,7 +35,7 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -60,7 +60,7 @@ public class EventItemInquiryList {
 		// イベントコード
 		private final EventCode eventCode;
 		// 支出項目名
-		private final SisyutuItemName sisyutuItemName;
+		private final ExpenditureItemName sisyutuItemName;
 		// イベント名
 		private final EventName eventName;
 		// イベント内容詳細
@@ -87,7 +87,7 @@ public class EventItemInquiryList {
 				LocalDate eventStartDate, LocalDate eventEndDate) {
 			return new EventInquiryItem(
 					EventCode.from(eventCode),
-					SisyutuItemName.from(sisyutuItemName),
+					ExpenditureItemName.from(sisyutuItemName),
 					EventName.from(eventName),
 					EventDetailContext.from(eventDetailContext),
 					EventDate.from(eventStartDate),

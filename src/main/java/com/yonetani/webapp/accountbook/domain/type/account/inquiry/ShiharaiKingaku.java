@@ -24,7 +24,7 @@ import lombok.EqualsAndHashCode;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @EqualsAndHashCode(callSuper = true)

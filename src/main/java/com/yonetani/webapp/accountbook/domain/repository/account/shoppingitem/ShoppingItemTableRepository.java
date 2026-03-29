@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/04/29 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.repository.account.shoppingitem;
@@ -14,9 +15,9 @@ import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.Shoppin
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryShoppingItemInfoSearchCondition;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemJanCode;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 
 /**
  *<pre>
@@ -26,7 +27,7 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 public interface ShoppingItemTableRepository {
@@ -70,7 +71,7 @@ public interface ShoppingItemTableRepository {
 	 * @return 商品情報の検索結果
 	 *
 	 */
-	ShoppingItemInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search);
+	ShoppingItemInquiryList findByIdAndExpenditureItemCode(SearchQueryUserIdAndExpenditureItemCode search);
 	
 	/**
 	 *<pre>

@@ -32,6 +32,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/06/16 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.account.regist;
@@ -98,7 +99,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Controller
@@ -106,7 +107,7 @@ import lombok.extern.log4j.Log4j2;
 @RequestMapping("/myhacbook/accountregist/incomeandexpenditure/")
 @RequiredArgsConstructor
 public class IncomeAndExpenditureRegistController {
-	// UseCase
+	// 収支登録画面初期表示UseCase
 	private final IncomeAndExpenditureInitUseCase usecase;
 	// 支出項目選択UseCase
 	private final ExpenditureItemSelectUseCase expenditureItemSelectUseCase;

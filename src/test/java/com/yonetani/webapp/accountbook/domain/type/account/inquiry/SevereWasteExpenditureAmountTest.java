@@ -1,11 +1,11 @@
 /**
- * SevereWasteExpenditure(無駄遣い（重度）支出金額)のテストクラスです。
+ * SevereWasteExpenditureAmount(無駄遣い（重度）支出金額)のテストクラスです。
  *
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  コメントなど
  * 2025/12/23 : 1.00.00  新規作成
- * 2025/12/28 : 1.01.00  クラス名変更(SisyutuKingakuCTest → SevereWasteExpenditureTest)
+ * 2025/12/28 : 1.01.00  クラス名変更(SisyutuKingakuCTest → SevereWasteExpenditureAmountTest)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
@@ -22,22 +22,22 @@ import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 
 /**
  *<pre>
- * SevereWasteExpenditure(無駄遣い（重度）支出金額)のテストクラスです。
+ * SevereWasteExpenditureAmount(無駄遣い（重度）支出金額)のテストクラスです。
  *
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
-@DisplayName("無駄遣い（重度）支出金額(SevereWasteExpenditure)のテスト")
-class SevereWasteExpenditureTest {
+@DisplayName("無駄遣い（重度）支出金額(SevereWasteExpenditureAmount)のテスト")
+class SevereWasteExpenditureAmountTest {
 
 	@Test
 	@DisplayName("正常系：正の金額で生成できる")
 	void testFrom_正常系_正の金額() {
 		// 実行
-		SevereWasteExpenditure amount = SevereWasteExpenditure.from(new BigDecimal("10000.00"));
+		SevereWasteExpenditureAmount amount = SevereWasteExpenditureAmount.from(new BigDecimal("10000.00"));
 
 		// 検証
 		assertNotNull(amount);
@@ -50,7 +50,7 @@ class SevereWasteExpenditureTest {
 	@DisplayName("正常系：null値で生成できる")
 	void testFrom_正常系_null値() {
 		// 実行
-		SevereWasteExpenditure amount = SevereWasteExpenditure.from(null);
+		SevereWasteExpenditureAmount amount = SevereWasteExpenditureAmount.from(null);
 
 		// 検証
 		assertNotNull(amount);
@@ -64,9 +64,9 @@ class SevereWasteExpenditureTest {
 	@DisplayName("正常系：ZERO定数が使用できる")
 	void testZERO定数() {
 		// 検証
-		assertNotNull(SevereWasteExpenditure.ZERO);
-		assertTrue(SevereWasteExpenditure.ZERO.isZero());
-		assertEquals(BigDecimal.ZERO.setScale(2), SevereWasteExpenditure.ZERO.getValue());
+		assertNotNull(SevereWasteExpenditureAmount.ZERO);
+		assertTrue(SevereWasteExpenditureAmount.ZERO.isZero());
+		assertEquals(BigDecimal.ZERO.setScale(2), SevereWasteExpenditureAmount.ZERO.getValue());
 	}
 
 	@Test
@@ -75,7 +75,7 @@ class SevereWasteExpenditureTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> SevereWasteExpenditure.from(new BigDecimal("-1000.00"))
+			() -> SevereWasteExpenditureAmount.from(new BigDecimal("-1000.00"))
 		);
 		assertTrue(exception.getMessage().contains("無駄遣い（重度）支出金額"));
 		assertTrue(exception.getMessage().contains("マイナス"));
@@ -87,7 +87,7 @@ class SevereWasteExpenditureTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> SevereWasteExpenditure.from(new BigDecimal("10000"))
+			() -> SevereWasteExpenditureAmount.from(new BigDecimal("10000"))
 		);
 		assertTrue(exception.getMessage().contains("無駄遣い（重度）支出金額"));
 		assertTrue(exception.getMessage().contains("スケール"));
@@ -97,11 +97,11 @@ class SevereWasteExpenditureTest {
 	@DisplayName("正常系：加算が正しく動作する")
 	void testAdd_正常系() {
 		// 準備
-		SevereWasteExpenditure amount1 = SevereWasteExpenditure.from(new BigDecimal("10000.00"));
-		SevereWasteExpenditure amount2 = SevereWasteExpenditure.from(new BigDecimal("5000.00"));
+		SevereWasteExpenditureAmount amount1 = SevereWasteExpenditureAmount.from(new BigDecimal("10000.00"));
+		SevereWasteExpenditureAmount amount2 = SevereWasteExpenditureAmount.from(new BigDecimal("5000.00"));
 
 		// 実行
-		SevereWasteExpenditure result = amount1.add(amount2);
+		SevereWasteExpenditureAmount result = amount1.add(amount2);
 
 		// 検証
 		assertEquals(new BigDecimal("15000.00"), result.getValue());
@@ -112,11 +112,11 @@ class SevereWasteExpenditureTest {
 	@DisplayName("正常系：null値との加算")
 	void testAdd_正常系_null値() {
 		// 準備
-		SevereWasteExpenditure amount1 = SevereWasteExpenditure.from(new BigDecimal("10000.00"));
-		SevereWasteExpenditure amount2 = SevereWasteExpenditure.from(null);
+		SevereWasteExpenditureAmount amount1 = SevereWasteExpenditureAmount.from(new BigDecimal("10000.00"));
+		SevereWasteExpenditureAmount amount2 = SevereWasteExpenditureAmount.from(null);
 
 		// 実行
-		SevereWasteExpenditure result = amount1.add(amount2);
+		SevereWasteExpenditureAmount result = amount1.add(amount2);
 
 		// 検証（null as zero扱い）
 		assertEquals(new BigDecimal("10000.00"), result.getValue());
@@ -126,11 +126,11 @@ class SevereWasteExpenditureTest {
 	@DisplayName("正常系：減算が正しく動作する")
 	void testSubtract_正常系() {
 		// 準備
-		SevereWasteExpenditure amount1 = SevereWasteExpenditure.from(new BigDecimal("10000.00"));
-		SevereWasteExpenditure amount2 = SevereWasteExpenditure.from(new BigDecimal("3000.00"));
+		SevereWasteExpenditureAmount amount1 = SevereWasteExpenditureAmount.from(new BigDecimal("10000.00"));
+		SevereWasteExpenditureAmount amount2 = SevereWasteExpenditureAmount.from(new BigDecimal("3000.00"));
 
 		// 実行
-		SevereWasteExpenditure result = amount1.subtract(amount2);
+		SevereWasteExpenditureAmount result = amount1.subtract(amount2);
 
 		// 検証
 		assertEquals(new BigDecimal("7000.00"), result.getValue());
@@ -141,8 +141,8 @@ class SevereWasteExpenditureTest {
 	@DisplayName("異常系：null値からの減算で例外が発生する")
 	void testSubtract_異常系_null値から減算() {
 		// 準備
-		SevereWasteExpenditure amount1 = SevereWasteExpenditure.from(null);
-		SevereWasteExpenditure amount2 = SevereWasteExpenditure.from(new BigDecimal("3000.00"));
+		SevereWasteExpenditureAmount amount1 = SevereWasteExpenditureAmount.from(null);
+		SevereWasteExpenditureAmount amount2 = SevereWasteExpenditureAmount.from(new BigDecimal("3000.00"));
 
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
@@ -156,11 +156,11 @@ class SevereWasteExpenditureTest {
 	@DisplayName("正常系：null値を減算する")
 	void testSubtract_正常系_null値を減算() {
 		// 準備
-		SevereWasteExpenditure amount1 = SevereWasteExpenditure.from(new BigDecimal("10000.00"));
-		SevereWasteExpenditure amount2 = SevereWasteExpenditure.from(null);
+		SevereWasteExpenditureAmount amount1 = SevereWasteExpenditureAmount.from(new BigDecimal("10000.00"));
+		SevereWasteExpenditureAmount amount2 = SevereWasteExpenditureAmount.from(null);
 
 		// 実行
-		SevereWasteExpenditure result = amount1.subtract(amount2);
+		SevereWasteExpenditureAmount result = amount1.subtract(amount2);
 
 		// 検証（null as zero扱い）
 		assertEquals(new BigDecimal("10000.00"), result.getValue());
@@ -170,7 +170,7 @@ class SevereWasteExpenditureTest {
 	@DisplayName("正常系：getPercentageが正しく割合を計算する")
 	void testGetPercentage_正常系() {
 		// 準備
-		SevereWasteExpenditure severeWaste = SevereWasteExpenditure.from(new BigDecimal("3000.00"));
+		SevereWasteExpenditureAmount severeWaste = SevereWasteExpenditureAmount.from(new BigDecimal("3000.00"));
 		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("10000.00"));
 
 		// 実行
@@ -184,7 +184,7 @@ class SevereWasteExpenditureTest {
 	@DisplayName("正常系：getPercentageで四捨五入が正しく動作する")
 	void testGetPercentage_正常系_四捨五入() {
 		// 準備
-		SevereWasteExpenditure severeWaste = SevereWasteExpenditure.from(new BigDecimal("3333.00"));
+		SevereWasteExpenditureAmount severeWaste = SevereWasteExpenditureAmount.from(new BigDecimal("3333.00"));
 		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("10000.00"));
 
 		// 実行
@@ -198,7 +198,7 @@ class SevereWasteExpenditureTest {
 	@DisplayName("正常系：getPercentageでnull値は空文字列を返す")
 	void testGetPercentage_正常系_null値() {
 		// 準備
-		SevereWasteExpenditure severeWaste = SevereWasteExpenditure.from(null);
+		SevereWasteExpenditureAmount severeWaste = SevereWasteExpenditureAmount.from(null);
 		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("10000.00"));
 
 		// 実行
@@ -212,7 +212,7 @@ class SevereWasteExpenditureTest {
 	@DisplayName("正常系：getPercentageで0円は空文字列を返す")
 	void testGetPercentage_正常系_0円() {
 		// 準備
-		SevereWasteExpenditure severeWaste = SevereWasteExpenditure.ZERO;
+		SevereWasteExpenditureAmount severeWaste = SevereWasteExpenditureAmount.ZERO;
 		ExpenditureAmount expenditure = ExpenditureAmount.from(new BigDecimal("10000.00"));
 
 		// 実行
@@ -226,7 +226,7 @@ class SevereWasteExpenditureTest {
 	@DisplayName("異常系：getPercentageで支出金額がnullの場合は例外")
 	void testGetPercentage_異常系_支出金額null() {
 		// 準備
-		SevereWasteExpenditure severeWaste = SevereWasteExpenditure.from(new BigDecimal("3000.00"));
+		SevereWasteExpenditureAmount severeWaste = SevereWasteExpenditureAmount.from(new BigDecimal("3000.00"));
 
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(

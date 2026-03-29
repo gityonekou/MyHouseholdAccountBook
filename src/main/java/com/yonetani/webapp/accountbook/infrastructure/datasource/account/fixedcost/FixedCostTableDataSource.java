@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/06/04 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.fixedcost;
@@ -18,9 +19,9 @@ import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCost;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostShiharaiTukiList;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostInquiryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostReadWriteDto;
@@ -39,7 +40,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Repository
@@ -115,7 +116,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public FixedCostInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search) {
+	public FixedCostInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndExpenditureItemCode search) {
 		// 検索結果を取得
 		List<FixedCostInquiryReadDto> searchResult = mapper.findByIdAndSisyutuItemCode(
 				UserIdAndSisyutuItemCodeSearchQueryDto.from(search));
@@ -161,7 +162,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int countBySisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search) {
+	public int countBySisyutuItemCode(SearchQueryUserIdAndExpenditureItemCode search) {
 		// ユーザID、支出項目コードで検索し、登録されている固定費情報の件数を返す
 		return mapper.countBySisyutuItemCode(UserIdAndSisyutuItemCodeSearchQueryDto.from(search));
 	}

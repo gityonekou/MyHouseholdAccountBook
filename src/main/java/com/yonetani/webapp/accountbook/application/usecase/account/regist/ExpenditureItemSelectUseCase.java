@@ -4,7 +4,7 @@
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  コメントなど
- * 2026/02/25 : 1.00.00  新規作成（IncomeAndExpenditureRegistUseCaseからの分離）
+ * 2026/02/25 : 1.00.00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.regist;
@@ -16,9 +16,9 @@ import org.springframework.util.StringUtils;
 
 import com.yonetani.webapp.accountbook.common.component.SisyutuItemComponent;
 import com.yonetani.webapp.accountbook.domain.model.account.event.EventItemInquiryList;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.event.EventItemTableRepository;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.ExpenditureSelectItemForm;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.ExpenditureItemSelectResponse;
@@ -36,7 +36,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Service
@@ -83,7 +83,7 @@ public class ExpenditureItemSelectUseCase {
 		// ドメインタイプ:ユーザID
 		UserId userId = UserId.from(user.getUserId());
 		// ドメインタイプ:支出項目コード
-		SisyutuItemCode sisyutuItemCode = SisyutuItemCode.from(sisyutuItemCodeStr);
+		ExpenditureItemCode sisyutuItemCode = ExpenditureItemCode.from(sisyutuItemCodeStr);
 
 		// レスポンス
 		ExpenditureItemSelectResponse response = ExpenditureItemSelectResponse.getInstance();
@@ -91,7 +91,7 @@ public class ExpenditureItemSelectUseCase {
 		sisyutuItemComponent.setSisyutuItemList(userId, response);
 		// 支出項目詳細内容を設定(支出項目選択画面からの支出項目選択なので、対象の支出項目がない場合:null)チェックは不要とする
 		response.setSisyutuItemDetailContext(
-				sisyutuItemComponent.getSisyutuItem(userId, sisyutuItemCode).getSisyutuItemDetailContext().getValue());
+				sisyutuItemComponent.getSisyutuItem(userId, sisyutuItemCode).getExpenditureItemDetailContext().getValue());
 		// 支出項目コードに対応する支出項目名(＞で区切った値)を設定
 		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(userId, sisyutuItemCode));
 
@@ -101,7 +101,7 @@ public class ExpenditureItemSelectUseCase {
 
 		// イベント支出項目でイベントが登録されている場合、対応するイベント一覧を取得し選択プルダウンリストとしてレスポンスに設定
 		EventItemInquiryList inquiryList = eventRepository.findByIdAndSisyutuItemCode(
-				SearchQueryUserIdAndSisyutuItemCode.from(userId, sisyutuItemCode));
+				SearchQueryUserIdAndExpenditureItemCode.from(userId, sisyutuItemCode));
 		if(!inquiryList.isEmpty()) {
 			// 検索結果ありの場合、イベント情報選択のプルダウンリストをレスポンスに設定
 			response.addEventSelectList(inquiryList.getValues().stream().map(domain -> {

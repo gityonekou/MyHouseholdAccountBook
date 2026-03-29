@@ -8,6 +8,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/08/16 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
@@ -29,8 +30,8 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndEventCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.event.EventItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemSort;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemSortOrder;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.EventInfoForm;
@@ -51,7 +52,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Service
@@ -92,7 +93,7 @@ public class EventInfoManageUseCase {
 		// ドメインタイプ:ユーザID
 		UserId userId = UserId.from(user.getUserId());
 		// ドメインタイプ:支出項目コード
-		SisyutuItemCode sisyutuItemCode = SisyutuItemCode.from(sisyutuItemCodeStr);
+		ExpenditureItemCode sisyutuItemCode = ExpenditureItemCode.from(sisyutuItemCodeStr);
 		
 		// 選択した支出項目コードに対応する支出項目情報を取得
 		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(userId, sisyutuItemCode);
@@ -106,9 +107,9 @@ public class EventInfoManageUseCase {
 		// 支出項目コードに対応する支出項目名(＞で区切った値)を設定
 		inputForm.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(userId, sisyutuItemCode));
 		// イベント名:支出項目名を仮設定
-		inputForm.setEventName(sisyutuItem.getSisyutuItemName().getValue());
+		inputForm.setEventName(sisyutuItem.getExpenditureItemName().getValue());
 		// イベント内容詳細(任意入力項目):支出項目詳細内容を仮設定
-		inputForm.setEventDetailContext(sisyutuItem.getSisyutuItemDetailContext().getValue());
+		inputForm.setEventDetailContext(sisyutuItem.getExpenditureItemDetailContext().getValue());
 		
 		// 画面表示情報を生成して返却
 		return createEventInfoManageResponse(userId, inputForm);
@@ -145,9 +146,9 @@ public class EventInfoManageUseCase {
 		// イベントコード
 		inputForm.setEventCode(eventItem.getEventCode().getValue());
 		// 支出項目コード
-		inputForm.setSisyutuItemCode(eventItem.getSisyutuItemCode().getValue());
+		inputForm.setSisyutuItemCode(eventItem.getExpenditureItemCode().getValue());
 		// 支出項目名(＞で区切った値)
-		inputForm.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(userId, eventItem.getSisyutuItemCode()));
+		inputForm.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(userId, eventItem.getExpenditureItemCode()));
 		// イベント名
 		inputForm.setEventName(eventItem.getEventName().getValue());
 		// イベント内容詳細(任意入力項目)
@@ -344,9 +345,9 @@ public class EventInfoManageUseCase {
 				// ログインユーザ情報
 				userId,
 				// 検索条件:支出項目表示順A：支出項目(イベント)の表示順:0603000000
-				SisyutuItemSort.from(MyHouseholdAccountBookContent.SISYUTU_ITEM_EVENT_SORT_VALUE),
+				ExpenditureItemSortOrder.from(MyHouseholdAccountBookContent.SISYUTU_ITEM_EVENT_SORT_VALUE),
 				// 検索条件:支出項目表示順B：ベントに属する支出項目の最大値:0603999999
-				SisyutuItemSort.from(MyHouseholdAccountBookContent.SISYUTU_ITEM_EVENT_SORT_MAX_VALUE),
+				ExpenditureItemSortOrder.from(MyHouseholdAccountBookContent.SISYUTU_ITEM_EVENT_SORT_MAX_VALUE),
 				// 画面表示情報
 				response);
 		

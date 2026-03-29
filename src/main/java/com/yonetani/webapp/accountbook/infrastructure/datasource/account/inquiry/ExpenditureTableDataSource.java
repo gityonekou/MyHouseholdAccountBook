@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/09/08 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.inquiry;
@@ -18,9 +19,9 @@ import org.springframework.stereotype.Repository;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuCode;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuItemCode;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubun;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureItemCodeAndExpenditureCategory;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureTotalAmount;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.ExpenditureReadWriteDto;
@@ -39,7 +40,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Repository
@@ -80,7 +81,7 @@ public class ExpenditureTableDataSource implements ExpenditureTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ExpenditureItem findByUniqueKey(SearchQueryUserIdAndYearMonthAndSisyutuCode searchQuery) {
+	public ExpenditureItem findByUniqueKey(SearchQueryUserIdAndYearMonthAndExpenditureCode searchQuery) {
 		// 検索結果を取得
 		ExpenditureReadWriteDto searchResult = mapper.findByUniqueKey(
 				UserIdAndYearMonthAndSisyutuCodeSearchQueryDto.from(searchQuery));
@@ -114,7 +115,7 @@ public class ExpenditureTableDataSource implements ExpenditureTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ExpenditureItemInquiryList findById(SearchQueryUserIdAndYearMonthAndSisyutuItemCode searchQuery) {
+	public ExpenditureItemInquiryList findById(SearchQueryUserIdAndYearMonthAndExpenditureItemCode searchQuery) {
 		// 検索結果を取得
 		List<ExpenditureReadWriteDto> searchResult = mapper.findByIdAndSisyutuItemCode(UserIdAndYearMonthAndSisyutuItemCodeSearchQueryDto.from(searchQuery));
 		if(searchResult == null) {
@@ -132,7 +133,7 @@ public class ExpenditureTableDataSource implements ExpenditureTableRepository {
 	 */
 	@Override
 	public ExpenditureItemInquiryList findById(
-			SearchQueryUserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubun searchQuery) {
+			SearchQueryUserIdAndYearMonthAndExpenditureItemCodeAndExpenditureCategory searchQuery) {
 		// 検索結果を取得
 		List<ExpenditureReadWriteDto> searchResult = mapper.findByIdAndSisyutuItemCodeAndSisyutuKubun(UserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubunSearchQueryDto.from(searchQuery));
 		if(searchResult == null) {

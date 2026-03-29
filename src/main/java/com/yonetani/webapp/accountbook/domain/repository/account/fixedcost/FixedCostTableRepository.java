@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/06/04 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.repository.account.fixedcost;
@@ -14,9 +15,9 @@ import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCost;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostShiharaiTukiList;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 
 /**
  *<pre>
@@ -26,7 +27,7 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 public interface FixedCostTableRepository {
@@ -89,7 +90,7 @@ public interface FixedCostTableRepository {
 	 * @return 固定費一覧情報の検索結果
 	 *
 	 */
-	FixedCostInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search);
+	FixedCostInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndExpenditureItemCode search);
 	
 	/**
 	 *<pre>
@@ -119,6 +120,6 @@ public interface FixedCostTableRepository {
 	 * @return 指定条件に該当するデータの件数
 	 *
 	 */
-	int countBySisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search);
+	int countBySisyutuItemCode(SearchQueryUserIdAndExpenditureItemCode search);
 	
 }

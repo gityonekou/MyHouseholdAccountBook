@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/09/08 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry;
@@ -24,7 +25,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -64,11 +65,11 @@ public class IncomeReadWriteDto {
 				// 対象月
 				domain.getTargetMonth().getValue(),
 				// 収入コード
-				domain.getSyuunyuuCode().getValue(),
+				domain.getIncomeCode().getValue(),
 				// 収入区分
-				domain.getSyuunyuuKubun().getValue(),
+				domain.getIncomeCategory().getValue(),
 				// 収入詳細
-				domain.getSyuunyuuDetailContext().getValue(),
+				domain.getIncomeDetailContext().getValue(),
 				// 収入金額
 				domain.getIncomeAmount().getValue(),
 				// 削除フラグ

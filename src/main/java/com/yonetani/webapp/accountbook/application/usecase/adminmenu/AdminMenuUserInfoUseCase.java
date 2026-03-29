@@ -8,6 +8,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2023/11/11 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.adminmenu;
@@ -56,7 +57,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Service
@@ -183,12 +184,12 @@ public class AdminMenuUserInfoUseCase {
 						// 登録する支出項目テーブル情報を生成(更新不可フラグはデフォルトで不可:falseを設定)
 						SisyutuItem addData = SisyutuItem.from(
 							accountBookUser.getUserId().getValue(),
-							baseData.getSisyutuItemCode().getValue(),
-							baseData.getSisyutuItemName().getValue(), 
-							baseData.getSisyutuItemDetailContext().getValue(),
-							baseData.getParentSisyutuItemCode().getValue(),
-							baseData.getSisyutuItemLevel().toString(),
-							baseData.getSisyutuItemSort().getValue(),
+							baseData.getExpenditureItemCode().getValue(),
+							baseData.getExpenditureItemName().getValue(), 
+							baseData.getExpenditureItemDetailContext().getValue(),
+							baseData.getParentExpenditureItemCode().getValue(),
+							baseData.getExpenditureItemLevel().toString(),
+							baseData.getExpenditureItemSortOrder().getValue(),
 							false);
 						// データを登録
 						int addCount = sisyutuItemTableRepository.add(addData);
@@ -269,12 +270,12 @@ public class AdminMenuUserInfoUseCase {
 				// 登録する支出項目テーブル情報を生成(更新不可フラグはデフォルトで不可:falseを設定)
 				SisyutuItem addData = SisyutuItem.from(
 					"koukiyonetani",
-					baseData.getSisyutuItemCode().getValue(),
-					baseData.getSisyutuItemName().getValue(), 
-					baseData.getSisyutuItemDetailContext().getValue(),
-					baseData.getParentSisyutuItemCode().getValue(),
-					baseData.getSisyutuItemLevel().toString(),
-					baseData.getSisyutuItemSort().getValue(),
+					baseData.getExpenditureItemCode().getValue(),
+					baseData.getExpenditureItemName().getValue(), 
+					baseData.getExpenditureItemDetailContext().getValue(),
+					baseData.getParentExpenditureItemCode().getValue(),
+					baseData.getExpenditureItemLevel().toString(),
+					baseData.getExpenditureItemSortOrder().getValue(),
 					false);
 				// データを登録
 				int addCount = sisyutuItemTableRepository.add(addData);

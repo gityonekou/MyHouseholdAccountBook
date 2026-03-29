@@ -4,7 +4,7 @@
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  コメントなど
- * 2026/01/04 : 1.00.00  新規作成
+ * 2026/01/04 : 1.00.00  新規作成(リファクタリング対応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
@@ -24,7 +24,7 @@ import lombok.Getter;
  *<pre>
  * 「無駄遣い支出金額合計」項目の値を表すドメインタイプです。
  *
- * TotalWasteExpenditure（月単位の無駄遣い合計支出金額）を集計した年間合計値を表します。
+ * TotalWasteExpenditureAmount（月単位の無駄遣い合計支出金額）を集計した年間合計値を表します。
  * 無駄遣い（軽度）支出金額と無駄遣い（重度）支出金額の合計値を内訳として保持します。
  * 年間収支明細照会などで使用されます。
  *
@@ -39,24 +39,24 @@ import lombok.Getter;
 public class WasteExpenditureTotalAmount extends NullableMoney {
 
 	// 無駄遣い（軽度）支出金額の合計値
-	private final MinorWasteExpenditure minorWasteExpenditure;
+	private final MinorWasteExpenditureAmount minorWasteExpenditureAmount;
 	// 無駄遣い（重度）支出金額の合計値
-	private final SevereWasteExpenditure severeWasteExpenditure;
+	private final SevereWasteExpenditureAmount severeWasteExpenditureAmount;
 	/** 値が0の「無駄遣い支出金額合計」項目の値 */
 	public static final WasteExpenditureTotalAmount ZERO = WasteExpenditureTotalAmount.from(
-			MinorWasteExpenditure.ZERO,
-			SevereWasteExpenditure.ZERO);
+			MinorWasteExpenditureAmount.ZERO,
+			SevereWasteExpenditureAmount.ZERO);
 
 	/**
 	 * コンストラクタ
 	 * @param value 無駄遣い（軽度）支出金額と無駄遣い（重度）支出金額の合計値
-	 * @param minorWasteExpenditure 無駄遣い（軽度）支出金額の合計値
-	 * @param severeWasteExpenditure 無駄遣い（重度）支出金額の合計値
+	 * @param minorWasteExpenditureAmount 無駄遣い（軽度）支出金額の合計値
+	 * @param severeWasteExpenditureAmount 無駄遣い（重度）支出金額の合計値
 	 */
-	private WasteExpenditureTotalAmount(BigDecimal value, MinorWasteExpenditure minorWasteExpenditure, SevereWasteExpenditure severeWasteExpenditure) {
+	private WasteExpenditureTotalAmount(BigDecimal value, MinorWasteExpenditureAmount minorWasteExpenditureAmount, SevereWasteExpenditureAmount severeWasteExpenditureAmount) {
 		super(value);
-		this.minorWasteExpenditure = minorWasteExpenditure;
-		this.severeWasteExpenditure = severeWasteExpenditure;
+		this.minorWasteExpenditureAmount = minorWasteExpenditureAmount;
+		this.severeWasteExpenditureAmount = severeWasteExpenditureAmount;
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class WasteExpenditureTotalAmount extends NullableMoney {
 	 * @return 「無駄遣い支出金額合計」項目ドメインタイプ
 	 *
 	 */
-	public static WasteExpenditureTotalAmount from(MinorWasteExpenditure minor, SevereWasteExpenditure severe) {
+	public static WasteExpenditureTotalAmount from(MinorWasteExpenditureAmount minor, SevereWasteExpenditureAmount severe) {
 
 		// ガード節(無駄遣い（軽度）支出金額がnull)
 		if (minor == null) {
@@ -109,19 +109,19 @@ public class WasteExpenditureTotalAmount extends NullableMoney {
 	 * @return 加算した無駄遣い支出金額合計の値(this + addValue)
 	 *
 	 */
-	public WasteExpenditureTotalAmount add(TotalWasteExpenditure addValue) {
+	public WasteExpenditureTotalAmount add(TotalWasteExpenditureAmount addValue) {
 		if(this.getValue() == null) {
 			// thisの値がnullの場合、addValueから新しいWasteExpenditureTotalAmountを生成
 			if(addValue == null || addValue.getValue() == null) {
 				return this;
 			}
-			return WasteExpenditureTotalAmount.from(addValue.getMinorWasteExpenditure(), addValue.getSevereWasteExpenditure());
+			return WasteExpenditureTotalAmount.from(addValue.getMinorWasteExpenditureAmount(), addValue.getSevereWasteExpenditureAmount());
 		}
 		if(addValue == null || addValue.getValue() == null) {
 			return this;
 		}
-		MinorWasteExpenditure addMinor = minorWasteExpenditure.add(addValue.getMinorWasteExpenditure());
-		SevereWasteExpenditure addSevere = severeWasteExpenditure.add(addValue.getSevereWasteExpenditure());
+		MinorWasteExpenditureAmount addMinor = minorWasteExpenditureAmount.add(addValue.getMinorWasteExpenditureAmount());
+		SevereWasteExpenditureAmount addSevere = severeWasteExpenditureAmount.add(addValue.getSevereWasteExpenditureAmount());
 		return WasteExpenditureTotalAmount.from(addMinor, addSevere);
 	}
 
@@ -167,17 +167,17 @@ public class WasteExpenditureTotalAmount extends NullableMoney {
 	 */
 	public String getMinorWasteExpenditurePercentage() {
 		// 無駄遣い支出金額合計の値がnullまたは無駄遣い（軽度）支出金額の値がnullの場合、0を返却
-		if(getValue() == null || minorWasteExpenditure.getValue() == null) {
+		if(getValue() == null || minorWasteExpenditureAmount.getValue() == null) {
 			return "0";
 		}
 
 		// 無駄遣い（軽度）支出金額の値が0の場合、0を返却
-		if(MinorWasteExpenditure.ZERO.getValue().compareTo(minorWasteExpenditure.getValue()) >= 0) {
+		if(MinorWasteExpenditureAmount.ZERO.getValue().compareTo(minorWasteExpenditureAmount.getValue()) >= 0) {
 			return "0";
 		}
 
 		// 無駄遣い（軽度）支出金額の割合=無駄遣い（軽度）支出金額/無駄遣い支出金額合計 * 100(四捨五入)
-		BigDecimal pt = minorWasteExpenditure.getValue().divide(getValue(), 2, RoundingMode.HALF_UP).multiply(DomainCommonUtils.ONE_HUNDRED_BIGDECIMAL);
+		BigDecimal pt = minorWasteExpenditureAmount.getValue().divide(getValue(), 2, RoundingMode.HALF_UP).multiply(DomainCommonUtils.ONE_HUNDRED_BIGDECIMAL);
 
 		// スケール0で四捨五入した文字列を返却
 		return pt.setScale(0, RoundingMode.HALF_UP).toPlainString();

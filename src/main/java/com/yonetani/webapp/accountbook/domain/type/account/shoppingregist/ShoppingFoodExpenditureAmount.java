@@ -26,13 +26,13 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @EqualsAndHashCode
-public class ShoppingFoodExpenses {
+public class ShoppingFoodExpenditureAmount {
 	// 食料品(必須)金額
 	private final BigDecimal value;
 	
@@ -51,11 +51,11 @@ public class ShoppingFoodExpenses {
 	 * @return 「食料品(必須)金額」項目ドメインタイプ
 	 *
 	 */
-	public static ShoppingFoodExpenses from(BigDecimal price) {
+	public static ShoppingFoodExpenditureAmount from(BigDecimal price) {
 		
 		// 非ガード(食料品(必須)金額がnull値の場合、値nullの「食料品(必須)金額」項目ドメインタイプを生成
 		if (price == null) {
-			return new ShoppingFoodExpenses(null);
+			return new ShoppingFoodExpenditureAmount(null);
 		}
 		// ガード節(食料品(必須)金額がマイナス値)
 		if (BigDecimal.ZERO.compareTo(price) > 0) {
@@ -67,7 +67,7 @@ public class ShoppingFoodExpenses {
 		}
 		
 		// 食料品(必須)金額項目ドメインタイプを生成
-		return new ShoppingFoodExpenses(price);
+		return new ShoppingFoodExpenditureAmount(price);
 		
 	}
 	
@@ -79,15 +79,15 @@ public class ShoppingFoodExpenses {
 	 * @return 加算した食料品(必須)金額の値(this + addValue)
 	 *
 	 */
-	public ShoppingFoodExpenses add(ShoppingFoodExpenses addValue) {
+	public ShoppingFoodExpenditureAmount add(ShoppingFoodExpenditureAmount addValue) {
 		if(this.value == null) {
 			// addValueがnullの場合はnullポを投げる
-			return new ShoppingFoodExpenses(addValue.getValue());
+			return new ShoppingFoodExpenditureAmount(addValue.getValue());
 		}
 		if(addValue.getValue() == null) {
-			return new ShoppingFoodExpenses(this.value);
+			return new ShoppingFoodExpenditureAmount(this.value);
 		}
-		return new ShoppingFoodExpenses(this.value.add(addValue.getValue()));
+		return new ShoppingFoodExpenditureAmount(this.value.add(addValue.getValue()));
 	}
 	
 	/**

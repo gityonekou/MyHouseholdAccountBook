@@ -104,7 +104,7 @@ public class RegularIncomeAmount extends Money {
 
 		// 収入区分が「積立からの取崩し(3)」の場合、
 		// 積立金取崩し金額の収支登録情報(セッション情報)となるので値0の通常収入金額を生成して返却
-		if(Objects.equals(income.getIncomeKubun(),
+		if(Objects.equals(income.getIncomeCategory(),
 				MyHouseholdAccountBookContent.INCOME_KUBUN_WITHDREW_SELECTED_VALUE)) {
 			return ZERO;
 		}

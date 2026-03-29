@@ -19,7 +19,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.event.EventItemInqui
 import com.yonetani.webapp.accountbook.domain.model.account.event.EventItemInquiryList.EventInquiryItem;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndEventCode;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.event.EventItemTableRepository;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.event.EventItemInquiryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.event.EventItemReadWriteDto;
@@ -95,7 +95,7 @@ public class EventItemTableDataSource implements EventItemTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public EventItemInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search) {
+	public EventItemInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndExpenditureItemCode search) {
 		// 検索結果を取得
 		List<EventItemInquiryReadDto> searchResult = mapper.findByIdAndSisyutuItemCode(
 				UserIdAndSisyutuItemCodeSearchQueryDto.from(search));

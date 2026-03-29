@@ -46,7 +46,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Service
@@ -232,15 +232,15 @@ public class AccountMonthInquiryUseCase {
 		// 返却するリストを不変オブジェクトに変換する
 		return resultList.getValues().stream().map(domain ->
 		AccountMonthInquiryResponse.ExpenditureListItem.form(
-				domain.getSisyutuItemLevel().getValue(),
-				domain.getSisyutuItemName().getValue(),
+				domain.getExpenditureItemLevel().getValue(),
+				domain.getExpenditureItemName().getValue(),
 				domain.getExpenditureAmount().toFormatString(),
-				domain.getMinorWasteExpenditure().toFormatString(),
-				domain.getMinorWasteExpenditure().getPercentage(domain.getExpenditureAmount()),
-				domain.getSevereWasteExpenditure().toFormatString(),
-				domain.getSevereWasteExpenditure().getPercentage(domain.getExpenditureAmount()),
-				domain.getTotalWasteExpenditure().toFormatString(),
-				domain.getTotalWasteExpenditure().getPercentage(domain.getExpenditureAmount()),
+				domain.getMinorWasteExpenditureAmount().toFormatString(),
+				domain.getMinorWasteExpenditureAmount().getPercentage(domain.getExpenditureAmount()),
+				domain.getSevereWasteExpenditureAmount().toFormatString(),
+				domain.getSevereWasteExpenditureAmount().getPercentage(domain.getExpenditureAmount()),
+				domain.getTotalWasteExpenditureAmount().toFormatString(),
+				domain.getTotalWasteExpenditureAmount().getPercentage(domain.getExpenditureAmount()),
 				domain.getPaymentDate().toDisplayString())).collect(Collectors.toUnmodifiableList());
 	}	
 }

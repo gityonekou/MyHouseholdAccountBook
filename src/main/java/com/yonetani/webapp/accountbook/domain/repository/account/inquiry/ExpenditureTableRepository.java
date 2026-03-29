@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/09/07 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.repository.account.inquiry;
@@ -12,9 +13,9 @@ package com.yonetani.webapp.accountbook.domain.repository.account.inquiry;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuCode;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuItemCode;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubun;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureItemCodeAndExpenditureCategory;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureTotalAmount;
 
 /**
@@ -24,7 +25,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureTo
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 public interface ExpenditureTableRepository {
@@ -70,7 +71,7 @@ public interface ExpenditureTableRepository {
 	 * @return 支出情報
 	 *
 	 */
-	ExpenditureItem findByUniqueKey(SearchQueryUserIdAndYearMonthAndSisyutuCode searchQuery);
+	ExpenditureItem findByUniqueKey(SearchQueryUserIdAndYearMonthAndExpenditureCode searchQuery);
 	
 	/**
 	 *<pre>
@@ -90,7 +91,7 @@ public interface ExpenditureTableRepository {
 	 * @return 支出情報のリスト
 	 *
 	 */
-	ExpenditureItemInquiryList findById(SearchQueryUserIdAndYearMonthAndSisyutuItemCode searchQuery);
+	ExpenditureItemInquiryList findById(SearchQueryUserIdAndYearMonthAndExpenditureItemCode searchQuery);
 	
 	/**
 	 *<pre>
@@ -100,7 +101,7 @@ public interface ExpenditureTableRepository {
 	 * @return 支出情報のリスト
 	 *
 	 */
-	ExpenditureItemInquiryList findById(SearchQueryUserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubun searchQuery);
+	ExpenditureItemInquiryList findById(SearchQueryUserIdAndYearMonthAndExpenditureItemCodeAndExpenditureCategory searchQuery);
 	
 	/**
 	 *<pre>

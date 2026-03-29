@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/06/23 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.session;
@@ -25,7 +26,7 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -43,7 +44,7 @@ public class IncomeRegistItem implements Serializable {
 	// 収入コード(仮登録用収入コード)
 	private final String incomeCode;
 	// 収入区分
-	private final String incomeKubun;
+	private final String incomeCategory;
 	// 収入詳細
 	private final String incomeDetailContext;
 	// 収入金額
@@ -56,7 +57,7 @@ public class IncomeRegistItem implements Serializable {
 	 * @param dataType データタイプ(新規 or ロード)
 	 * @param action アクション(追加／更新／削除)
 	 * @param incomeCode 収入コード(仮登録用収入コード)
-	 * @param incomeKubun 収入区分
+	 * @param incomeCategory 収入区分
 	 * @param incomeDetailContext 収入詳細
 	 * @param incomeKingaku 収入金額
 	 * @return 収入登録情報
@@ -66,9 +67,9 @@ public class IncomeRegistItem implements Serializable {
 			String dataType,
 			String action,
 			String incomeCode,
-			String incomeKubun,
+			String incomeCategory,
 			String incomeDetailContext,
 			BigDecimal incomeKingaku) {
-		return new IncomeRegistItem(dataType, action, incomeCode, incomeKubun, incomeDetailContext, incomeKingaku.setScale(2));
+		return new IncomeRegistItem(dataType, action, incomeCode, incomeCategory, incomeDetailContext, incomeKingaku.setScale(2));
 	}
 }

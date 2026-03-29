@@ -9,11 +9,12 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/10/13 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.searchquery;
 
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureItemCode;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,7 +31,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -53,7 +54,7 @@ public class UserIdAndYearMonthAndSisyutuItemCodeSearchQueryDto {
 	 * @return テーブルの検索条件：ユーザID、対象年、対象月、支出項目コード
 	 *
 	 */
-	public static UserIdAndYearMonthAndSisyutuItemCodeSearchQueryDto from(SearchQueryUserIdAndYearMonthAndSisyutuItemCode search) {
+	public static UserIdAndYearMonthAndSisyutuItemCodeSearchQueryDto from(SearchQueryUserIdAndYearMonthAndExpenditureItemCode search) {
 		return new UserIdAndYearMonthAndSisyutuItemCodeSearchQueryDto(
 				// 検索条件:ユーザID
 				search.getUserId().toString(),
@@ -62,6 +63,6 @@ public class UserIdAndYearMonthAndSisyutuItemCodeSearchQueryDto {
 				// 検索条件:対象月
 				search.getYearMonth().getMonth(),
 				// 検索条件:支出項目コード
-				search.getSisyutuItemCode().getValue());
+				search.getExpenditureItemCode().getValue());
 	}
 }

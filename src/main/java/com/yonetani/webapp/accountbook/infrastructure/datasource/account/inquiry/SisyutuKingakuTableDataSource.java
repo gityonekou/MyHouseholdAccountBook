@@ -7,6 +7,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2023/09/30 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.inquiry;
@@ -24,7 +25,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuKinga
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuKingakuItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndSisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.AccountYearMeisaiInquiryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.IncomeAndExpenditureReadWriteDto;
@@ -47,7 +48,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Repository
@@ -81,7 +82,7 @@ public class SisyutuKingakuTableDataSource implements SisyutuKingakuTableReposit
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SisyutuKingakuItem findByUniqueKey(SearchQueryUserIdAndYearMonthAndSisyutuItemCode search) {
+	public SisyutuKingakuItem findByUniqueKey(SearchQueryUserIdAndYearMonthAndExpenditureItemCode search) {
 		// 検索結果を取得
 		SisyutuKingakuReadWriteDto searchResult = sisyutuKingakuTableMapper.findByUniqueKey(
 				UserIdAndYearMonthAndSisyutuItemCodeSearchQueryDto.from(search));

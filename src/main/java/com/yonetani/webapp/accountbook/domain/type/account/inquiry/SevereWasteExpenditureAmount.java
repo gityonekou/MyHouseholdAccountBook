@@ -1,6 +1,6 @@
 /**
  * 「無駄遣い（重度）支出金額」項目の値を表すドメインタイプです。
- * リファクタリングにより、クラス名変更しました(SisyutuKingakuC → SevereWasteExpenditure)
+ * リファクタリングにより、クラス名変更しました(SisyutuKingakuC → SevereWasteExpenditureAmount)
  *
  *------------------------------------------------
  * 更新履歴
@@ -34,16 +34,16 @@ import lombok.EqualsAndHashCode;
  *
  */
 @EqualsAndHashCode(callSuper = true)
-public class SevereWasteExpenditure extends NullableMoney {
+public class SevereWasteExpenditureAmount extends NullableMoney {
 
 	/** 値が0の「無駄遣い（重度）支出金額」項目の値 */
-	public static final SevereWasteExpenditure ZERO = SevereWasteExpenditure.from(NullableMoney.NULLABLE_MONEY_ZERO);
+	public static final SevereWasteExpenditureAmount ZERO = SevereWasteExpenditureAmount.from(NullableMoney.NULLABLE_MONEY_ZERO);
 
 	/**
 	 * コンストラクタ
 	 * @param value 無駄遣い（重度）支出金額
 	 */
-	private SevereWasteExpenditure(BigDecimal value) {
+	private SevereWasteExpenditureAmount(BigDecimal value) {
 		super(value);
 	}
 
@@ -62,13 +62,13 @@ public class SevereWasteExpenditure extends NullableMoney {
 	 * @return 「無駄遣い（重度）支出金額」項目ドメインタイプ
 	 *
 	 */
-	public static SevereWasteExpenditure from(BigDecimal amount) {
+	public static SevereWasteExpenditureAmount from(BigDecimal amount) {
 		
 		// 基底クラスのバリデーションを実行（null許容、スケール2、マイナス値チェック）
 		validate(amount, "無駄遣い（重度）支出金額");
 		
 		// 無駄遣い（重度）支出金額項目ドメインタイプを生成
-		return new SevereWasteExpenditure(amount);
+		return new SevereWasteExpenditureAmount(amount);
 	}
 
 	/**
@@ -79,8 +79,8 @@ public class SevereWasteExpenditure extends NullableMoney {
 	 * @return 加算した無駄遣い（重度）支出金額の値(this + addValue)
 	 *
 	 */
-	public SevereWasteExpenditure add(SevereWasteExpenditure addValue) {
-		return SevereWasteExpenditure.from(super.add(addValue));
+	public SevereWasteExpenditureAmount add(SevereWasteExpenditureAmount addValue) {
+		return SevereWasteExpenditureAmount.from(super.add(addValue));
 	}
 
 	/**
@@ -91,8 +91,8 @@ public class SevereWasteExpenditure extends NullableMoney {
 	 * @return 減算した無駄遣い（重度）支出金額の値(this - subtractValue)
 	 *
 	 */
-	public SevereWasteExpenditure subtract(SevereWasteExpenditure subtractValue) {
-		return SevereWasteExpenditure.from(super.subtract(subtractValue));
+	public SevereWasteExpenditureAmount subtract(SevereWasteExpenditureAmount subtractValue) {
+		return SevereWasteExpenditureAmount.from(super.subtract(subtractValue));
 	}
 
 	/**

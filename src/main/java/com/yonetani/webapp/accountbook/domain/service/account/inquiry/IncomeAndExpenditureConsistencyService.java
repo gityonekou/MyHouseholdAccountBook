@@ -19,9 +19,9 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExp
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
-import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalAvailableFunds;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 
 import lombok.RequiredArgsConstructor;
 
@@ -51,7 +51,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Service

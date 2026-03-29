@@ -77,7 +77,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @SpringBootTest

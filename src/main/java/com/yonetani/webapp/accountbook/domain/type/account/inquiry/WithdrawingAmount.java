@@ -93,7 +93,7 @@ public class WithdrawingAmount extends NullableMoney {
 		}
 		
 		// 収入区分が「積立からの取崩し(3)」の場合、収支登録情報(セッション情報)の収入金額から「積立金取崩金額」項目の値を生成して返却
-		if(Objects.equals(income.getIncomeKubun(), MyHouseholdAccountBookContent.INCOME_KUBUN_WITHDREW_SELECTED_VALUE)) {
+		if(Objects.equals(income.getIncomeCategory(), MyHouseholdAccountBookContent.INCOME_KUBUN_WITHDREW_SELECTED_VALUE)) {
 			return new WithdrawingAmount(income.getIncomeKingaku());
 		}
 		

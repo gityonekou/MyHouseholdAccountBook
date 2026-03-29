@@ -4,7 +4,7 @@
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  コメントなど
- * 2025/11/25 : 1.00.00  新規作成
+ * 2025/11/25 : 1.00.00  新規作成(リファクタリング対応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
@@ -24,7 +24,7 @@ import lombok.EqualsAndHashCode;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @EqualsAndHashCode(callSuper = true)

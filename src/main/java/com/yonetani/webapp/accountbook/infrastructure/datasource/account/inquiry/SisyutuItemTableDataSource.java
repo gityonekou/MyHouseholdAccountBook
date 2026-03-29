@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/01/10 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.inquiry;
@@ -17,8 +18,8 @@ import org.springframework.stereotype.Repository;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemSortBetweenAB;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemSortOrderBetweenAB;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuItemTableRepository;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.SisyutuItemReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndSisyutuItemCodeSearchQueryDto;
@@ -35,7 +36,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Repository
@@ -102,7 +103,7 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SisyutuItemInquiryList findByIdAndSisyutuItemSortBetween(SearchQueryUserIdAndSisyutuItemSortBetweenAB search) {
+	public SisyutuItemInquiryList findByIdAndSisyutuItemSortBetween(SearchQueryUserIdAndExpenditureItemSortOrderBetweenAB search) {
 		// 検索結果を取得
 		List<SisyutuItemReadWriteDto> searchResult = mapper.findByIdAndSisyutuItemSortBetween(
 				UserIdAndSisyutuItemSortBetweenABSearchQueryDto.from(search));
@@ -120,7 +121,7 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SisyutuItem findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search) {
+	public SisyutuItem findByIdAndSisyutuItemCode(SearchQueryUserIdAndExpenditureItemCode search) {
 		// 検索結果を取得
 		SisyutuItemReadWriteDto searchResult = mapper.findByIdAndSisyutuItemCode(UserIdAndSisyutuItemCodeSearchQueryDto.from(search));
 		if(searchResult == null) {
@@ -136,7 +137,7 @@ public class SisyutuItemTableDataSource implements SisyutuItemTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SisyutuItemInquiryList searchParentMemberSisyutuItemList(SearchQueryUserIdAndSisyutuItemCode search) {
+	public SisyutuItemInquiryList searchParentMemberSisyutuItemList(SearchQueryUserIdAndExpenditureItemCode search) {
 		// 検索結果を取得
 		List<SisyutuItemReadWriteDto> searchResult = mapper.searchParentSisyutuItemMemberNameList(
 				UserIdAndSisyutuItemCodeSearchQueryDto.from(search));

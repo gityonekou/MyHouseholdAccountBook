@@ -5,17 +5,18 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/01/10 : 1.00.00  新規作成
+ * 2025/12/28 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
 
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.EnableUpdateFlg;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ParentSisyutuItemCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemDetailContext;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemLevel;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemName;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemSort;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemLevel;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemName;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemSortOrder;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ParentExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
 import lombok.AccessLevel;
@@ -31,7 +32,7 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -42,17 +43,17 @@ public class SisyutuItem {
 	// ユーザID
 	private final UserId userId;
 	// 支出項目コード
-	private final SisyutuItemCode sisyutuItemCode;
+	private final ExpenditureItemCode expenditureItemCode;
 	// 支出項目名
-	private final SisyutuItemName sisyutuItemName;
+	private final ExpenditureItemName expenditureItemName;
 	// 支出項目詳細内容
-	private final SisyutuItemDetailContext sisyutuItemDetailContext;
+	private final ExpenditureItemDetailContext expenditureItemDetailContext;
 	// 親支出項目コード
-	private final ParentSisyutuItemCode parentSisyutuItemCode;
+	private final ParentExpenditureItemCode parentExpenditureItemCode;
 	// 支出項目レベル(1～5)
-	private final SisyutuItemLevel sisyutuItemLevel;
+	private final ExpenditureItemLevel expenditureItemLevel;
 	// 支出項目表示順
-	private final SisyutuItemSort sisyutuItemSort;
+	private final ExpenditureItemSortOrder expenditureItemSortOrder;
 	// 更新可否フラグ
 	private final EnableUpdateFlg enableUpdateFlg;
 	
@@ -61,33 +62,33 @@ public class SisyutuItem {
 	 * 引数の値から支出項目テーブル情報を表すドメインモデルを生成して返します。
 	 *</pre>
 	 * @param userId ユーザID
-	 * @param sisyutuItemCode 支出項目コード
-	 * @param sisyutuItemName 支出項目名
-	 * @param sisyutuItemDetailContext 支出項目詳細内容
-	 * @param parentSisyutuItemCode 親支出項目コード
-	 * @param sisyutuItemLevel 支出項目レベル(1～5)
-	 * @param sisyutuItemSort 支出項目表示順
+	 * @param expenditureItemCode 支出項目コード
+	 * @param expenditureItemName 支出項目名
+	 * @param expenditureItemDetailContext 支出項目詳細内容
+	 * @param parentExpenditureItemCode 親支出項目コード
+	 * @param expenditureItemLevel 支出項目レベル(1～5)
+	 * @param expenditureItemSortOrder 支出項目表示順
 	 * @param enableUpdateFlg 更新可否フラグ
 	 * @return 支出項目テーブル情報を表すドメインモデル
 	 *
 	 */
 	public static SisyutuItem from(
 			String userId,
-			String sisyutuItemCode,
-			String sisyutuItemName,
-			String sisyutuItemDetailContext,
-			String parentSisyutuItemCode,
-			String sisyutuItemLevel,
-			String sisyutuItemSort,
+			String expenditureItemCode,
+			String expenditureItemName,
+			String expenditureItemDetailContext,
+			String parentExpenditureItemCode,
+			String expenditureItemLevel,
+			String expenditureItemSortOrder,
 			boolean enableUpdateFlg) {
 		return new SisyutuItem(
 				UserId.from(userId),
-				SisyutuItemCode.from(sisyutuItemCode),
-				SisyutuItemName.from(sisyutuItemName),
-				SisyutuItemDetailContext.from(sisyutuItemDetailContext),
-				ParentSisyutuItemCode.from(parentSisyutuItemCode),
-				SisyutuItemLevel.from(sisyutuItemLevel),
-				SisyutuItemSort.from(sisyutuItemSort),
+				ExpenditureItemCode.from(expenditureItemCode),
+				ExpenditureItemName.from(expenditureItemName),
+				ExpenditureItemDetailContext.from(expenditureItemDetailContext),
+				ParentExpenditureItemCode.from(parentExpenditureItemCode),
+				ExpenditureItemLevel.from(expenditureItemLevel),
+				ExpenditureItemSortOrder.from(expenditureItemSortOrder),
 				EnableUpdateFlg.from(enableUpdateFlg));
 		
 	}

@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/09/08 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry;
@@ -25,7 +26,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -75,17 +76,17 @@ public class ExpenditureReadWriteDto {
 				// 対象月
 				domain.getTargetMonth().getValue(),
 				// 支出コード
-				domain.getSisyutuCode().getValue(),
+				domain.getExpenditureCode().getValue(),
 				// 支出項目コード
-				domain.getSisyutuItemCode().getValue(),
+				domain.getExpenditureItemCode().getValue(),
 				// イベントコード
 				domain.getEventCode().getValue(),
 				// 支出名称
-				domain.getSisyutuName().getValue(),
+				domain.getExpenditureName().getValue(),
 				// 支出区分
-				domain.getSisyutuKubun().getValue(),
+				domain.getExpenditureCategory().getValue(),
 				// 支出詳細
-				domain.getSisyutuDetailContext().getValue(),
+				domain.getExpenditureDetailContext().getValue(),
 				// 支払日
 				domain.getPaymentDate().getValue(),
 				// 支出予定金額

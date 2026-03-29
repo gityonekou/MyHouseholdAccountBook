@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/06/07 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.fixedcost;
@@ -23,8 +24,8 @@ import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostNa
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiDay;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiTuki;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiTukiOptionalContext;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemName;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ShiharaiKingaku;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemName;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 
 import lombok.AccessLevel;
@@ -40,7 +41,7 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -69,7 +70,7 @@ public class FixedCostInquiryList {
 		// 固定費内容詳細(支払内容詳細)
 		private final FixedCostDetailContext fixedCostDetailContext;
 		// 支出項目名
-		private final SisyutuItemName sisyutuItemName;
+		private final ExpenditureItemName sisyutuItemName;
 		// 固定費支払月(支払月)
 		private final FixedCostShiharaiTuki fixedCostShiharaiTuki;
 		// 固定費支払月任意詳細
@@ -108,7 +109,7 @@ public class FixedCostInquiryList {
 					FixedCostCode.from(fixedCostCode),
 					FixedCostName.from(fixedCostName),
 					FixedCostDetailContext.from(fixedCostDetailContext),
-					SisyutuItemName.from(sisyutuItemName),
+					ExpenditureItemName.from(sisyutuItemName),
 					FixedCostShiharaiTuki.from(fixedCostShiharaiTuki),
 					FixedCostShiharaiTukiOptionalContext.from(fixedCostShiharaiTukiOptionalContext),
 					FixedCostShiharaiDay.from(fixedCostShiharaiDay),

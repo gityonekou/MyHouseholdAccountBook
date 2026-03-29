@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/08/18 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.repository.account.event;
@@ -14,7 +15,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.event.EventItem;
 import com.yonetani.webapp.accountbook.domain.model.account.event.EventItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndEventCode;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
 
 /**
  *<pre>
@@ -24,7 +25,7 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 public interface EventItemTableRepository {
@@ -80,7 +81,7 @@ public interface EventItemTableRepository {
 	 * @return イベント情報のリスト
 	 *
 	 */
-	EventItemInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search);
+	EventItemInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndExpenditureItemCode search);
 	
 	/**
 	 *<pre>

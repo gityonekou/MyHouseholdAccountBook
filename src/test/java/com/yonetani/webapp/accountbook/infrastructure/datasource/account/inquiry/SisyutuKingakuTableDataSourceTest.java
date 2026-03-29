@@ -52,7 +52,7 @@ import com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry.Sis
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 // MyBatis関連のコンフィグレーションをインジェクションします

@@ -67,7 +67,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @SpringBootTest
@@ -333,7 +333,7 @@ class IncomeRegistIntegrationTest {
         assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, addedItem.getDataType());
         assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, addedItem.getAction());
         assertEquals(17, addedItem.getIncomeCode().length()); // 自動生成された収入コード(yyyyMMddHHmmssSSS形式=17桁)
-        assertEquals("3", addedItem.getIncomeKubun());
+        assertEquals("3", addedItem.getIncomeCategory());
         assertEquals("新規追加テスト詳細", addedItem.getIncomeDetailContext());
         assertEquals(new BigDecimal("50000.00"), addedItem.getIncomeKingaku());
 
@@ -380,7 +380,7 @@ class IncomeRegistIntegrationTest {
         // Then: 更新された収入情報を確認
         IncomeRegistItem updatedItem = resultList.get(0);
         assertEquals("20260125120000001", updatedItem.getIncomeCode());
-        assertEquals("2", updatedItem.getIncomeKubun()); // 収入区分が"1"→"2"に更新されていること
+        assertEquals("2", updatedItem.getIncomeCategory()); // 収入区分が"1"→"2"に更新されていること
         assertEquals("更新後のテスト詳細", updatedItem.getIncomeDetailContext());
         assertEquals(new BigDecimal("350000.00"), updatedItem.getIncomeKingaku());
 

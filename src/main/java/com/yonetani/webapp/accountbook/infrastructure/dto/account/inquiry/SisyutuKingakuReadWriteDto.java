@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -71,17 +71,17 @@ public class SisyutuKingakuReadWriteDto {
 				// 対象月
 				domain.getTargetMonth().getValue(),
 				// 支出項目コード
-				domain.getSisyutuItemCode().getValue(),
+				domain.getExpenditureItemCode().getValue(),
 				// 親支出項目コード
-				domain.getParentSisyutuItemCode().getValue(),
+				domain.getParentExpenditureItemCode().getValue(),
 				// 支出予定金額
 				domain.getExpectedExpenditureAmount().getValue(),
 				// 支出金額
 				domain.getExpenditureAmount().getValue(),
 				// 無駄遣い（軽度）支出金額
-				domain.getMinorWasteExpenditure().getValue(),
+				domain.getMinorWasteExpenditureAmount().getValue(),
 				// 無駄遣い（重度）支出金額
-				domain.getSevereWasteExpenditure().getValue(),
+				domain.getSevereWasteExpenditureAmount().getValue(),
 				// 支出支払日
 				domain.getPaymentDate().getValue());
 	}

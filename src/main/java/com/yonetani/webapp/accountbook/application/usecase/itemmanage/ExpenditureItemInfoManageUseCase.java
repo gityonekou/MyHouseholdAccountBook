@@ -11,6 +11,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2023/10/29 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
@@ -29,9 +30,9 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuItemTableRepository;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ExpenditureItemInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
@@ -57,7 +58,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Service
@@ -102,11 +103,11 @@ public class ExpenditureItemInfoManageUseCase {
 		// ドメインタイプ:ユーザID
 		UserId userId = UserId.from(user.getUserId());
 		// ドメインタイプ:支出項目コード
-		SisyutuItemCode sisyutuItemCode = SisyutuItemCode.from(sisyutuItemCodeStr);
+		ExpenditureItemCode sisyutuItemCode = ExpenditureItemCode.from(sisyutuItemCodeStr);
 		
 		// 支出項目コードに対応する支出項目情報を取得
 		SisyutuItem sisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
-				SearchQueryUserIdAndSisyutuItemCode.from(userId, sisyutuItemCode));
+				SearchQueryUserIdAndExpenditureItemCode.from(userId, sisyutuItemCode));
 		if(sisyutuItem == null) {
 			// 選択した支出項目コードに対応する支出項目情報が存在しない場合エラー画面に遷移
 			throw new MyHouseholdAccountBookRuntimeException("更新対象の支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" + sisyutuItemCode);
@@ -121,28 +122,28 @@ public class ExpenditureItemInfoManageUseCase {
 				= ExpenditureItemInfoManageActSelectResponse.getInstance(
 					ExpenditureItemInfoManageActSelectResponse.SelectExpenditureItemInfo.from(
 						// 支出項目コード
-						sisyutuItem.getSisyutuItemCode().getValue(),
+						sisyutuItem.getExpenditureItemCode().getValue(),
 						// 支出項目名
-						sisyutuItem.getSisyutuItemName().getValue(),
+						sisyutuItem.getExpenditureItemName().getValue(),
 						// 支出項目詳細内容
-						sisyutuItem.getSisyutuItemDetailContext().getValue(),
+						sisyutuItem.getExpenditureItemDetailContext().getValue(),
 						// 親の支出項目名称(各、親を＞区切りで表した文字列を設定)
 						parentSisyutuItemName,
 						// 支出項目レベル(1～5)
-						sisyutuItem.getSisyutuItemLevel().getValue(),
+						sisyutuItem.getExpenditureItemLevel().getValue(),
 						// 更新可否フラグ
 						sisyutuItem.getEnableUpdateFlg().getValue()));
 			
 			/* 親の支出項目に属する支出項目一覧を設定 */
 			// 支出項目レベルが2以上の場合に親の支出項目に属する支出項目一覧を取得する
-			if(sisyutuItem.getSisyutuItemLevel().getValue() >= 2) {
+			if(sisyutuItem.getExpenditureItemLevel().getValue() >= 2) {
 				// 親の支出項目に属する支出項目一覧を取得
 				SisyutuItemInquiryList sisyutuItemNameList = sisyutuItemRepository.searchParentMemberSisyutuItemList(
-						SearchQueryUserIdAndSisyutuItemCode.from(userId, SisyutuItemCode.from(sisyutuItem.getParentSisyutuItemCode())));
+						SearchQueryUserIdAndExpenditureItemCode.from(userId, ExpenditureItemCode.from(sisyutuItem.getParentExpenditureItemCode())));
 				// 親の支出項目に属する支出項目情報から名称を取得し、名称一覧をレスポンスに設定
 				if(!sisyutuItemNameList.isEmpty()) {
 					response.addParentSisyutuItemMemberNameList(sisyutuItemNameList.getValues().stream().map(
-							domain -> domain.getSisyutuItemName().getValue()).collect(Collectors.toUnmodifiableList()));
+							domain -> domain.getExpenditureItemName().getValue()).collect(Collectors.toUnmodifiableList()));
 				}
 			}
 			
@@ -166,7 +167,7 @@ public class ExpenditureItemInfoManageUseCase {
 		// ドメインタイプ:ユーザID
 		UserId userId = UserId.from(user.getUserId());
 		// ドメインタイプ:支出項目コード
-		SisyutuItemCode sisyutuItemCode = SisyutuItemCode.from(sisyutuItemCodeStr);
+		ExpenditureItemCode sisyutuItemCode = ExpenditureItemCode.from(sisyutuItemCodeStr);
 		
 		// ユーザIDに対応する支出項目一覧情報設定
 		ExpenditureItemInfoManageUpdateResponse response = ExpenditureItemInfoManageUpdateResponse.getInstance();
@@ -176,7 +177,7 @@ public class ExpenditureItemInfoManageUseCase {
 		
 		// 支出項目コードに対応する支出項目情報(親となる支出項目情報)を取得
 		SisyutuItem parentSisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
-				SearchQueryUserIdAndSisyutuItemCode.from(userId, sisyutuItemCode));
+				SearchQueryUserIdAndExpenditureItemCode.from(userId, sisyutuItemCode));
 		if(parentSisyutuItem == null) {
 			// 選択した支出項目コードに対応する支出項目情報が存在しない場合エラーを設定;
 			throw new MyHouseholdAccountBookRuntimeException("選択した親の支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" + sisyutuItemCode);
@@ -193,11 +194,11 @@ public class ExpenditureItemInfoManageUseCase {
 					// 支出項目詳細内容
 					null,
 					// 親支出項目コード:親の支出項目コードを設定
-					parentSisyutuItem.getSisyutuItemCode().getValue(),
+					parentSisyutuItem.getExpenditureItemCode().getValue(),
 					// 支出項目レベル(1～5):親の支出項目レベル+1を設定
-					String.valueOf(parentSisyutuItem.getSisyutuItemLevel().getValue() + 1),
+					String.valueOf(parentSisyutuItem.getExpenditureItemLevel().getValue() + 1),
 					// 支出項目表示順:親の支出項目表示順を設定
-					parentSisyutuItem.getSisyutuItemSort().getValue(),
+					parentSisyutuItem.getExpenditureItemSortOrder().getValue(),
 					// 更新可否フラグ
 					true);
 			
@@ -242,7 +243,7 @@ public class ExpenditureItemInfoManageUseCase {
 		// ドメインタイプ:ユーザID
 		UserId userId = UserId.from(user.getUserId());
 		// ドメインタイプ:支出項目コード
-		SisyutuItemCode sisyutuItemCode = SisyutuItemCode.from(sisyutuItemCodeStr);
+		ExpenditureItemCode sisyutuItemCode = ExpenditureItemCode.from(sisyutuItemCodeStr);
 		
 		// ユーザIDに対応する支出項目一覧情報設定
 		ExpenditureItemInfoManageUpdateResponse response = ExpenditureItemInfoManageUpdateResponse.getInstance();
@@ -252,7 +253,7 @@ public class ExpenditureItemInfoManageUseCase {
 		
 		// 支出項目コードに対応する支出項目情報を取得
 		SisyutuItem sisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
-				SearchQueryUserIdAndSisyutuItemCode.from(userId, sisyutuItemCode));
+				SearchQueryUserIdAndExpenditureItemCode.from(userId, sisyutuItemCode));
 		if(sisyutuItem == null) {
 			// 選択した支出項目コードに対応する支出項目情報が存在しない場合エラーを設定
 			throw new MyHouseholdAccountBookRuntimeException("更新対象の支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" + sisyutuItemCode);
@@ -337,7 +338,7 @@ public class ExpenditureItemInfoManageUseCase {
 		
 		// 親の支出項目に属する支出項目一覧を取得
 		SisyutuItemInquiryList parentMemberList = sisyutuItemRepository.searchParentMemberSisyutuItemList(
-				SearchQueryUserIdAndSisyutuItemCode.from(userId, SisyutuItemCode.from(inputForm.getParentSisyutuItemCode())));
+				SearchQueryUserIdAndExpenditureItemCode.from(userId, ExpenditureItemCode.from(inputForm.getParentSisyutuItemCode())));
 		
 		// 新規登録の場合
 		if(Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
@@ -353,7 +354,7 @@ public class ExpenditureItemInfoManageUseCase {
 			}
 			
 			// +1した値を4桁で0パディングして支出項目コードに設定
-			inputForm.setSisyutuItemCode(SisyutuItemCode.getNewCode(count));
+			inputForm.setSisyutuItemCode(ExpenditureItemCode.getNewCode(count));
 			
 			/* 支出項目情報を新規追加する */ 
 			// 新規追加する支出項目情報(ドメイン)を生成
@@ -370,11 +371,11 @@ public class ExpenditureItemInfoManageUseCase {
 				// 対象のデータ抽出式(Predicateの合成述語を使えばもっときれいにかける。ここでは、割愛するか)
 				Predicate<SisyutuItem> func = domain -> {
 					// その他項目(99)は対象外
-					if(isCheckOtherItem(domain.getSisyutuItemSort().getValue(), domain.getSisyutuItemLevel().getValue())) {
+					if(isCheckOtherItem(domain.getExpenditureItemSortOrder().getValue(), domain.getExpenditureItemLevel().getValue())) {
 						return false;
 					}
 					// 親に属する支出項目の表示順＞＝新規追加する項目の表示順の場合、表示順変更対象のデータに追加
-					if(domain.getSisyutuItemSort().getValue().compareTo(inputForm.getSisyutuItemSort()) >= 0) {
+					if(domain.getExpenditureItemSortOrder().getValue().compareTo(inputForm.getSisyutuItemSort()) >= 0) {
 						return true;
 					}
 					// 上記以外はすべて対象外
@@ -386,7 +387,7 @@ public class ExpenditureItemInfoManageUseCase {
 			}
 			
 			// 完了メッセージ
-			response.addMessage("新規支出項目を追加しました。[code:" + addData.getSisyutuItemCode() + "]" + addData.getSisyutuItemName());
+			response.addMessage("新規支出項目を追加しました。[code:" + addData.getExpenditureItemCode() + "]" + addData.getExpenditureItemName());
 					
 		// 更新の場合
 		} else if (Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
@@ -415,27 +416,27 @@ public class ExpenditureItemInfoManageUseCase {
 				// 親に属する子のリスト設定数分繰り返す
 				for(SisyutuItem item : parentMemberList.getValues()) {
 					// DBの支出項目コードと入力フォームの支出項目コードが等しい場合、かつ、支出項目表示順の値の変更されている場合
-					if(item.getSisyutuItemCode().getValue().equals(inputForm.getSisyutuItemCode())) {
-						if(!item.getSisyutuItemSort().getValue().equals(inputForm.getSisyutuItemSort())) {
+					if(item.getExpenditureItemCode().getValue().equals(inputForm.getSisyutuItemCode())) {
+						if(!item.getExpenditureItemSortOrder().getValue().equals(inputForm.getSisyutuItemSort())) {
 							// 前の支出項目表示順の値を設定
-							sortBeforeValue = item.getSisyutuItemSort().getValue();
+							sortBeforeValue = item.getExpenditureItemSortOrder().getValue();
 							
 							/* 変更後の支出項目に属する子のソート順を変更する */
 							// 親の支出項目に属する支出項目一覧を取得
 							SisyutuItemInquiryList upateItemParentMemberList = sisyutuItemRepository.searchParentMemberSisyutuItemList(
-									SearchQueryUserIdAndSisyutuItemCode.from(updateData.getUserId(), updateData.getSisyutuItemCode()));
+									SearchQueryUserIdAndExpenditureItemCode.from(updateData.getUserId(), updateData.getExpenditureItemCode()));
 							// 親の支出項目に属する支出項目情報から名称を取得し、名称一覧をレスポンスに設定
 							if(!upateItemParentMemberList.isEmpty()) {
 								
 								// 更新する支出項目の支出項目レベルの値
-								int sisyutuItemLevel = updateData.getSisyutuItemLevel().getValue();
+								int sisyutuItemLevel = updateData.getExpenditureItemLevel().getValue();
 								// 支出項目表示順から指定の支出項目レベルの位置の値を取得した値
-								String sortItemValue = getSortValueFromLevel(updateData.getSisyutuItemSort().getValue(), updateData.getSisyutuItemLevel().getValue());
+								String sortItemValue = getSortValueFromLevel(updateData.getExpenditureItemSortOrder().getValue(), updateData.getExpenditureItemLevel().getValue());
 								
 								// 指定した支出項目レベルの位置の表示順の値を更新する支出項目情報の表示順の値と同じ値に更新して新たな支出項目更新データを生成
 								List<SisyutuItem> updateValueList = upateItemParentMemberList.getValues().stream().map(domain -> {
 									// 新規登録する支出項目の表示順の値を作成
-									String updSortVal = replaceSisyutuItemSort(domain.getSisyutuItemSort().getValue(), sisyutuItemLevel, sortItemValue);
+									String updSortVal = replaceSisyutuItemSort(domain.getExpenditureItemSortOrder().getValue(), sisyutuItemLevel, sortItemValue);
 									// 表示順を更新した支出項目情報を設定
 									return createSisyutuItemFromSisyutuItemSort(domain, updSortVal);
 								}).toList();
@@ -465,8 +466,8 @@ public class ExpenditureItemInfoManageUseCase {
 					// 対象のデータ抽出式
 					Predicate<SisyutuItem> func = domain -> {
 						// 変更前の表示順の次の表示順の項目から変更後の表示順の項目までが表示順変更対象のデータ
-						if(domain.getSisyutuItemSort().getValue().compareTo(unmodifiableSortBeforeValue) > 0
-								&& domain.getSisyutuItemSort().getValue().compareTo(inputForm.getSisyutuItemSort()) <= 0) {
+						if(domain.getExpenditureItemSortOrder().getValue().compareTo(unmodifiableSortBeforeValue) > 0
+								&& domain.getExpenditureItemSortOrder().getValue().compareTo(inputForm.getSisyutuItemSort()) <= 0) {
 							return true;
 						}
 						// 上記以外はすべて対象外
@@ -480,8 +481,8 @@ public class ExpenditureItemInfoManageUseCase {
 					// 対象のデータ抽出式
 					Predicate<SisyutuItem> func = domain -> {
 						// 変更後の表示順の値の項目から変更前の表示順の一つ前の項目までが表示順変更対象のデータ
-						if(domain.getSisyutuItemSort().getValue().compareTo(inputForm.getSisyutuItemSort()) >= 0
-								&& domain.getSisyutuItemSort().getValue().compareTo(unmodifiableSortBeforeValue) < 0) {
+						if(domain.getExpenditureItemSortOrder().getValue().compareTo(inputForm.getSisyutuItemSort()) >= 0
+								&& domain.getExpenditureItemSortOrder().getValue().compareTo(unmodifiableSortBeforeValue) < 0) {
 							return true;
 						}
 						// 上記以外はすべて対象外
@@ -492,7 +493,7 @@ public class ExpenditureItemInfoManageUseCase {
 			}
 			
 			// 完了メッセージ
-			response.addMessage("支出項目を更新しました。[code:" + updateData.getSisyutuItemCode() + "]" + updateData.getSisyutuItemName());
+			response.addMessage("支出項目を更新しました。[code:" + updateData.getExpenditureItemCode() + "]" + updateData.getExpenditureItemName());
 			
 		// 新規登録・更新アクション以外の場合
 		} else {
@@ -550,11 +551,11 @@ public class ExpenditureItemInfoManageUseCase {
 			// ここでは単純なリストを設定し、画面表示のための親子関係への再設定はプレゼン層で行う
 			response.addSisyutuItemResponseList(sisyutuItemSearchResult.getValues().stream().map(domain -> 
 			AbstractExpenditureItemInfoManageResponse.SisyutuItemInfo.from(
-					domain.getSisyutuItemCode().getValue(),
-					domain.getSisyutuItemName().getValue(),
-					domain.getSisyutuItemDetailContext().getValue(),
-					domain.getParentSisyutuItemCode().getValue(),
-					domain.getSisyutuItemLevel().toString(),
+					domain.getExpenditureItemCode().getValue(),
+					domain.getExpenditureItemName().getValue(),
+					domain.getExpenditureItemDetailContext().getValue(),
+					domain.getParentExpenditureItemCode().getValue(),
+					domain.getExpenditureItemLevel().toString(),
 					domain.getEnableUpdateFlg().getValue())
 			).collect(Collectors.toUnmodifiableList()));
 		}
@@ -589,22 +590,22 @@ public class ExpenditureItemInfoManageUseCase {
 		/* 親に属する子のリストを作成し、表示順選択リストに設定 */
 		// 支出項目レベルが2以上の場合に親の支出項目に属する支出項目一覧を取得する
 		List<OptionItem> optionList = new ArrayList<>();
-		if(sisyutuItem.getSisyutuItemLevel().getValue() >= 2) {
+		if(sisyutuItem.getExpenditureItemLevel().getValue() >= 2) {
 			// 親の支出項目に属する支出項目一覧を取得
 			SisyutuItemInquiryList sisyutuItemNameList = sisyutuItemRepository.searchParentMemberSisyutuItemList(
-					SearchQueryUserIdAndSisyutuItemCode.from(userId, SisyutuItemCode.from(sisyutuItem.getParentSisyutuItemCode())));
+					SearchQueryUserIdAndExpenditureItemCode.from(userId, ExpenditureItemCode.from(sisyutuItem.getParentExpenditureItemCode())));
 			// 親の支出項目に属する支出項目一覧から表示順リストを作成
 			if(!sisyutuItemNameList.isEmpty()) {
 				// 新規追加の場合、最後に新規追加用の項目を追加するので変更不可のリストではなく変更可のリストを作成する
 				sisyutuItemNameList.getValues().forEach(domain -> {
 					
 					// その他項目(99)の場合、選択不可項目として表示順リスト項目に追加
-					if(isCheckOtherItem(domain.getSisyutuItemSort().getValue(), domain.getSisyutuItemLevel().getValue())) {
+					if(isCheckOtherItem(domain.getExpenditureItemSortOrder().getValue(), domain.getExpenditureItemLevel().getValue())) {
 						optionList.add(OptionItem.from(
 								// 選択時の値:表示順
-								domain.getSisyutuItemSort().getValue(),
+								domain.getExpenditureItemSortOrder().getValue(),
 								// 選択ボックスの表示値
-								domain.getSisyutuItemName().getValue(),
+								domain.getExpenditureItemName().getValue(),
 								// 選択不可:disabled
 								true));
 					
@@ -612,15 +613,15 @@ public class ExpenditureItemInfoManageUseCase {
 					} else {
 						optionList.add(OptionItem.from(
 							// 選択時の値:表示順
-							domain.getSisyutuItemSort().getValue(),
+							domain.getExpenditureItemSortOrder().getValue(),
 							// 選択ボックスの表示値:「支出項目名」と入れ替え"
-							"「" + domain.getSisyutuItemName().getValue() + "」の位置に移動"));
+							"「" + domain.getExpenditureItemName().getValue() + "」の位置に移動"));
 					}
 				});
 			}
 		// 支出項目レベルが1の場合は自分自身の支出項目名と表示順を設定
 		} else {
-			optionList.add(OptionItem.from(sisyutuItem.getSisyutuItemSort().getValue(), sisyutuItem.getSisyutuItemName().getValue()));
+			optionList.add(OptionItem.from(sisyutuItem.getExpenditureItemSortOrder().getValue(), sisyutuItem.getExpenditureItemName().getValue()));
 		}
 		
 		return optionList;
@@ -638,14 +639,14 @@ public class ExpenditureItemInfoManageUseCase {
 	private String getParentSisyutuItemName(UserId userId, SisyutuItem sisyutuItem) {
 		
 		// 入力支出項目情報チェック(支出項目がレベル1の場合は、親が存在しないので空文字列を返す
-		if(sisyutuItem.getSisyutuItemLevel().getValue() <= 1) {
+		if(sisyutuItem.getExpenditureItemLevel().getValue() <= 1) {
 			return "";
 		}
 		
 		List<String> parentSisyutuItemNameList = new ArrayList<String>();
 		// 支出項目コード
-		String sisyutuItemCode = sisyutuItem.getSisyutuItemCode().getValue();
-		String parentSisyutuItemCode = sisyutuItem.getParentSisyutuItemCode().getValue();
+		String sisyutuItemCode = sisyutuItem.getExpenditureItemCode().getValue();
+		String parentSisyutuItemCode = sisyutuItem.getParentExpenditureItemCode().getValue();
 		// 親の支出項目レベル
 		int parentSisyutuItemLevel = 0;
 		
@@ -655,17 +656,17 @@ public class ExpenditureItemInfoManageUseCase {
 		do {
 			// 親支出項目コードに対応する支出項目情報を取得
 			SisyutuItem parentSisyutuItem = sisyutuItemRepository.findByIdAndSisyutuItemCode(
-					SearchQueryUserIdAndSisyutuItemCode.from(userId, SisyutuItemCode.from(parentSisyutuItemCode)));
+					SearchQueryUserIdAndExpenditureItemCode.from(userId, ExpenditureItemCode.from(parentSisyutuItemCode)));
 			if(parentSisyutuItem == null) {
 				throw new MyHouseholdAccountBookRuntimeException("更新対象の支出項目情報が属する親の支出項目情報が存在しません。管理者に問い合わせてください。sisyutuItemCode:" 
 						+ sisyutuItemCode + ", [sisyutuItemCodeの値からさかのぼって調査必要です]:[存在しない親コード=parentSisyutuItemCode:" + parentSisyutuItemCode + "]");
 			} else {
-				parentSisyutuItemNameList.add(parentSisyutuItem.getSisyutuItemName().getValue());
+				parentSisyutuItemNameList.add(parentSisyutuItem.getExpenditureItemName().getValue());
 			}
 			// 取得対象の親の支出項目コードを再設定
-			parentSisyutuItemCode = parentSisyutuItem.getParentSisyutuItemCode().getValue();
+			parentSisyutuItemCode = parentSisyutuItem.getParentExpenditureItemCode().getValue();
 			// 親の支出項目レベルを設定
-			parentSisyutuItemLevel = parentSisyutuItem.getSisyutuItemLevel().getValue();
+			parentSisyutuItemLevel = parentSisyutuItem.getExpenditureItemLevel().getValue();
 			
 		} while(parentSisyutuItemLevel > 1 && parentSisyutuItemNameList.size() < 6);
 		
@@ -701,17 +702,17 @@ public class ExpenditureItemInfoManageUseCase {
 		// アクション(追加/更新)
 		form.setAction(action);
 		// 支出項目コード
-		form.setSisyutuItemCode(sisyutuItem.getSisyutuItemCode().getValue());
+		form.setSisyutuItemCode(sisyutuItem.getExpenditureItemCode().getValue());
 		// 支出項目名
-		form.setSisyutuItemName(sisyutuItem.getSisyutuItemName().getValue());
+		form.setSisyutuItemName(sisyutuItem.getExpenditureItemName().getValue());
 		//　支出項目詳細内容
-		form.setSisyutuItemDetailContext(sisyutuItem.getSisyutuItemDetailContext().getValue());
+		form.setSisyutuItemDetailContext(sisyutuItem.getExpenditureItemDetailContext().getValue());
 		// 親の支出項目コード
-		form.setParentSisyutuItemCode(sisyutuItem.getParentSisyutuItemCode().getValue());
+		form.setParentSisyutuItemCode(sisyutuItem.getParentExpenditureItemCode().getValue());
 		// 支出項目レベル
-		form.setSisyutuItemLevel(sisyutuItem.getSisyutuItemLevel().toString());
+		form.setSisyutuItemLevel(sisyutuItem.getExpenditureItemLevel().toString());
 		// 支出項目表示順
-		form.setSisyutuItemSort(sisyutuItem.getSisyutuItemSort().getValue());
+		form.setSisyutuItemSort(sisyutuItem.getExpenditureItemSortOrder().getValue());
 		// 更新可否フラグ
 		form.setEnableUpdateFlg(sisyutuItem.getEnableUpdateFlg().getValue());
 		
@@ -761,15 +762,15 @@ public class ExpenditureItemInfoManageUseCase {
 				// ユーザID
 				sisyutuItem.getUserId().getValue(),
 				// 支出項目コード
-				sisyutuItem.getSisyutuItemCode().getValue(),
+				sisyutuItem.getExpenditureItemCode().getValue(),
 				// 支出項目名
-				sisyutuItem.getSisyutuItemName().getValue(),
+				sisyutuItem.getExpenditureItemName().getValue(),
 				// 支出項目詳細内容
-				sisyutuItem.getSisyutuItemDetailContext().getValue(),
+				sisyutuItem.getExpenditureItemDetailContext().getValue(),
 				// 親支出項目コード
-				sisyutuItem.getParentSisyutuItemCode().getValue(),
+				sisyutuItem.getParentExpenditureItemCode().getValue(),
 				// 支出項目レベル(1～5)
-				sisyutuItem.getSisyutuItemLevel().toString(),
+				sisyutuItem.getExpenditureItemLevel().toString(),
 				// 支出項目表示順
 				sisyutuItemSort,
 				// 更新可否フラグ
@@ -858,16 +859,16 @@ public class ExpenditureItemInfoManageUseCase {
 		// 表示順選択リストが空でない、かつ、一番最後の項目がその他項目の場合
 		if(optionList.size() != 0
 				&& isCheckOtherItem(optionList.get(optionList.size() - 1).getValue(),
-						addSisyutuItem.getSisyutuItemLevel().getValue())) {
+						addSisyutuItem.getExpenditureItemLevel().getValue())) {
 			// 一番最後の項目を取り出し、表示順選択リストから削除する
 			otherItem = optionList.remove(optionList.size() - 1);
 		}
 		// 新規登録する支出項目の表示順の値を作成
 		String sortVal = replaceSisyutuItemSort(
 				// 支出項目表示順
-				addSisyutuItem.getSisyutuItemSort().getValue(),
+				addSisyutuItem.getExpenditureItemSortOrder().getValue(),
 				// 支出項目レベル
-				addSisyutuItem.getSisyutuItemLevel().getValue(),
+				addSisyutuItem.getExpenditureItemLevel().getValue(),
 				// レベルの位置の変換文字列=親に属する支出項目の件数+1(2桁の0パディングした値)
 				String.format("%02d", optionList.size() + 1));
 		
@@ -898,9 +899,9 @@ public class ExpenditureItemInfoManageUseCase {
 			// 新しい表示順でデータを生成
 			.map(domain -> {
 				// 現在の表示順の値
-				String sisyutuItemSort = domain.getSisyutuItemSort().getValue();
+				String sisyutuItemSort = domain.getExpenditureItemSortOrder().getValue();
 				// 現在の支出項目レベルの値
-				int sisyutuItemLevel = domain.getSisyutuItemLevel().getValue();
+				int sisyutuItemLevel = domain.getExpenditureItemLevel().getValue();
 				// 現在の表示順の値を指定した増減値の値で更新して新しい表示順に設定
 				int newSortIntVal = Integer.parseInt(getSortValueFromLevel(sisyutuItemSort, sisyutuItemLevel)) + addValue;
 				// 新規登録する支出項目の表示順の値を作成
@@ -915,9 +916,9 @@ public class ExpenditureItemInfoManageUseCase {
 			// 表示順更新対象の支出項目情報
 			updItem,
 			// 表示順更新対象の支出項目レベル
-			updItem.getSisyutuItemLevel().getValue(),
+			updItem.getExpenditureItemLevel().getValue(),
 			// 支出項目表示順から指定の支出項目レベルの位置の値を取得した値
-			getSortValueFromLevel(updItem.getSisyutuItemSort().getValue(), updItem.getSisyutuItemLevel().getValue())));
+			getSortValueFromLevel(updItem.getExpenditureItemSortOrder().getValue(), updItem.getExpenditureItemLevel().getValue())));
 	}
 	
 	/**
@@ -941,19 +942,19 @@ public class ExpenditureItemInfoManageUseCase {
 		/* 支出項目レベルが5より小さい(親となっている支出項目の可能性がある場合、支出項目コードの値を親の支出項目コード
 		   として検索し、親に属する子の支出項目情報の表示順の値を再起して更新する */
 		// 支出項目レベルが5以下の場合、子の支出項目は存在しないので呼び出し元に戻る
-		if(updItem.getSisyutuItemLevel().getValue() >= 5) {
+		if(updItem.getExpenditureItemLevel().getValue() >= 5) {
 			return;
 		}
 		
 		// 親の支出項目に属する支出項目一覧を取得
 		SisyutuItemInquiryList parentMemberList = sisyutuItemRepository.searchParentMemberSisyutuItemList(
-				SearchQueryUserIdAndSisyutuItemCode.from(updItem.getUserId(), updItem.getSisyutuItemCode()));
+				SearchQueryUserIdAndExpenditureItemCode.from(updItem.getUserId(), updItem.getExpenditureItemCode()));
 		// 親の支出項目に属する支出項目情報から名称を取得し、名称一覧をレスポンスに設定
 		if(!parentMemberList.isEmpty()) {
 			// 指定した支出項目レベルの位置の表示順の値を更新して新たな支出項目更新データを生成
 			List<SisyutuItem> updateValueList = parentMemberList.getValues().stream().map(domain -> {
 				// 新規登録する支出項目の表示順の値を作成
-				String updSortVal = replaceSisyutuItemSort(domain.getSisyutuItemSort().getValue(), sisyutuItemLevel, value);
+				String updSortVal = replaceSisyutuItemSort(domain.getExpenditureItemSortOrder().getValue(), sisyutuItemLevel, value);
 				// 表示順を更新した支出項目情報を設定
 				return createSisyutuItemFromSisyutuItemSort(domain, updSortVal);
 			}).toList();

@@ -5,7 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/10/08 : 1.00.00  新規作成
- * 2025/12/28 : 1.00.00  SisyutuShiharaiDateをPaymentDateに置き換え
+ * 2025/12/28 : 1.00.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
@@ -14,10 +14,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.MinorWasteExpenditure;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ParentSisyutuItemCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SevereWasteExpenditure;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.MinorWasteExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ParentExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SevereWasteExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
@@ -37,7 +37,7 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -45,7 +45,7 @@ import lombok.ToString;
 @ToString
 @EqualsAndHashCode
 public class SisyutuKingakuItem {
-
+	
 	// ユーザID
 	private final UserId userId;
 	// 対象年
@@ -53,17 +53,17 @@ public class SisyutuKingakuItem {
 	// 対象月
 	private final TargetMonth targetMonth;
 	// 支出項目コード
-	private final SisyutuItemCode sisyutuItemCode;
+	private final ExpenditureItemCode expenditureItemCode;
 	// 親支出項目コード
-	private final ParentSisyutuItemCode parentSisyutuItemCode;
+	private final ParentExpenditureItemCode parentExpenditureItemCode;
 	// 支出予定金額
 	private final ExpectedExpenditureAmount expectedExpenditureAmount;
 	// 支出金額
 	private final ExpenditureAmount expenditureAmount;
 	// 無駄遣い（軽度）支出金額
-	private final MinorWasteExpenditure minorWasteExpenditure;
+	private final MinorWasteExpenditureAmount minorWasteExpenditureAmount;
 	// 無駄遣い（重度）支出金額
-	private final SevereWasteExpenditure severeWasteExpenditure;
+	private final SevereWasteExpenditureAmount severeWasteExpenditureAmount;
 	// 支出支払日
 	private final PaymentDate paymentDate;
 	
@@ -74,12 +74,12 @@ public class SisyutuKingakuItem {
 	 * @param userId ユーザID
 	 * @param targetYear 対象年
 	 * @param targetMonth 対象月
-	 * @param sisyutuItemCode 支出項目コード
-	 * @param parentSisyutuItemCode 親支出項目コード
+	 * @param expenditureItemCode 支出項目コード
+	 * @param parentExpenditureItemCode 親支出項目コード
 	 * @param expectedExpenditureAmount 支出予定金額
 	 * @param expenditureAmount 支出金額
-	 * @param minorWasteExpenditure 無駄遣い（軽度）支出金額
-	 * @param severeWasteExpenditure 無駄遣い（重度）支出金額
+	 * @param minorWasteExpenditureAmount 無駄遣い（軽度）支出金額
+	 * @param severeWasteExpenditureAmount 無駄遣い（重度）支出金額
 	 * @param paymentDate 支出支払日
 	 * @return 支出金額テーブル情報を表すドメインモデル
 	 *
@@ -88,24 +88,24 @@ public class SisyutuKingakuItem {
 			String userId,
 			String targetYear,
 			String targetMonth,
-			String sisyutuItemCode,
-			String parentSisyutuItemCode,
+			String expenditureItemCode,
+			String parentExpenditureItemCode,
 			BigDecimal expectedExpenditureAmount,
 			BigDecimal expenditureAmount,
-			BigDecimal minorWasteExpenditure,
-			BigDecimal severeWasteExpenditure,
+			BigDecimal minorWasteExpenditureAmount,
+			BigDecimal severeWasteExpenditureAmount,
 			LocalDate paymentDate) {
 		// 支出金額テーブル情報ドメインモデルを生成して返却
 		return new SisyutuKingakuItem(
 				UserId.from(userId),
 				TargetYear.from(targetYear),
 				TargetMonth.from(targetMonth),
-				SisyutuItemCode.from(sisyutuItemCode),
-				ParentSisyutuItemCode.from(parentSisyutuItemCode),
+				ExpenditureItemCode.from(expenditureItemCode),
+				ParentExpenditureItemCode.from(parentExpenditureItemCode),
 				ExpectedExpenditureAmount.from(expectedExpenditureAmount),
 				ExpenditureAmount.from(expenditureAmount),
-				MinorWasteExpenditure.from(minorWasteExpenditure),
-				SevereWasteExpenditure.from(severeWasteExpenditure),
+				MinorWasteExpenditureAmount.from(minorWasteExpenditureAmount),
+				SevereWasteExpenditureAmount.from(severeWasteExpenditureAmount),
 				PaymentDate.from(paymentDate));
 		
 	}
