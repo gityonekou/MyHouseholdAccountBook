@@ -711,7 +711,7 @@ public class ShoppingItemInfoManageUseCase {
 				// 基準店舗名
 				domain.getStandardShopName().getValue(),
 				// 基準価格
-				domain.getStandardPrice().toString());
+				domain.getStandardPrice().toFormatString());
 		}).collect(Collectors.toUnmodifiableList());
 	}
 	

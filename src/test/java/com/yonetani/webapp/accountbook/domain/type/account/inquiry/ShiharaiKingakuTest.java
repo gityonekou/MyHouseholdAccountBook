@@ -88,4 +88,21 @@ class ShiharaiKingakuTest {
 		assertTrue(exception.getMessage().contains("支払金額"));
 		assertTrue(exception.getMessage().contains("スケール"));
 	}
+	
+	@Test
+	@DisplayName("正常系：加算が正しく動作する")
+	void testAdd_正常系() {
+		// 準備
+		ShiharaiKingaku amount1 = ShiharaiKingaku.from(new BigDecimal("10000.00"));
+		ShiharaiKingaku amount2 = ShiharaiKingaku.from(new BigDecimal("5000.00"));
+
+		// 実行
+		ShiharaiKingaku result = amount1.add(amount2);
+
+		// 検証
+		assertEquals(new BigDecimal("15000.00"), result.getValue());
+		// 元のオブジェクトは変更されていないことを確認（不変性）
+		assertEquals(new BigDecimal("10000.00"), amount1.getValue());
+		assertEquals(new BigDecimal("5000.00"), amount2.getValue());
+	}
 }

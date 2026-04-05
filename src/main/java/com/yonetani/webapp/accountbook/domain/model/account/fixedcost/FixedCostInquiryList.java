@@ -26,7 +26,6 @@ import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostSh
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiTukiOptionalContext;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemName;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ShiharaiKingaku;
-import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -144,9 +143,9 @@ public class FixedCostInquiryList {
 		} else {
 			/* 各種合計値を計算 */
 			// 奇数月合計
-			BigDecimal oddMonthGoukeiWk = BigDecimal.ZERO;
+			ShiharaiKingaku oddMonthGoukeiWk = ShiharaiKingaku.ZERO;
 			// 偶数月合計
-			BigDecimal anEvenMonthGoukeiWk = BigDecimal.ZERO;
+			ShiharaiKingaku anEvenMonthGoukeiWk = ShiharaiKingaku.ZERO;
 			// 固定費支払月（毎月、奇数月、偶数月、任意）の値に応じて固定費一覧明細リスト情報のリストの件数分
 			// 支払金額の値を奇数月合計、偶数月合計の値に加算
 			for(FixedCostInquiryItem item : values) {
@@ -156,27 +155,27 @@ public class FixedCostInquiryList {
 						MyHouseholdAccountBookContent.SHIHARAI_TUKI_EVERY_SELECTED_VALUE)
 					|| Objects.equals(item.getFixedCostShiharaiTuki().getValue(),
 							MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE)) {
-					oddMonthGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(oddMonthGoukeiWk, item.getShiharaiKingaku().getValue());
-					anEvenMonthGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(anEvenMonthGoukeiWk, item.getShiharaiKingaku().getValue());
+					oddMonthGoukeiWk = oddMonthGoukeiWk.add(item.getShiharaiKingaku());
+					anEvenMonthGoukeiWk = anEvenMonthGoukeiWk.add(item.getShiharaiKingaku());
 					
 				// 支払月が奇数月の場合、奇数月を加算
 				} else if(Objects.equals(item.getFixedCostShiharaiTuki().getValue(),
 						MyHouseholdAccountBookContent.SHIHARAI_TUKI_ODD_SELECTED_VALUE)) {
-					oddMonthGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(oddMonthGoukeiWk, item.getShiharaiKingaku().getValue());
+					oddMonthGoukeiWk = oddMonthGoukeiWk.add(item.getShiharaiKingaku());
 					
 				// 支払月が偶数月の場合、偶数月を加算
 				} else if(Objects.equals(item.getFixedCostShiharaiTuki().getValue(),
 						MyHouseholdAccountBookContent.SHIHARAI_TUKI_AN_EVEN_SELECTED_VALUE)) {
-					anEvenMonthGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(anEvenMonthGoukeiWk, item.getShiharaiKingaku().getValue());
+					anEvenMonthGoukeiWk = anEvenMonthGoukeiWk.add(item.getShiharaiKingaku());
 				}
 			}
 			return new FixedCostInquiryList(
 					// 固定費一覧明細情報のリスト
 					values,
 					// 奇数月合計
-					ShiharaiKingaku.from(oddMonthGoukeiWk),
+					oddMonthGoukeiWk,
 					// 偶数月合計
-					ShiharaiKingaku.from(anEvenMonthGoukeiWk));
+					anEvenMonthGoukeiWk);
 		}
 	}
 	

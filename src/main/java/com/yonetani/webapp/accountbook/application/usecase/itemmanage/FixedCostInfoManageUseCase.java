@@ -514,9 +514,9 @@ public class FixedCostInfoManageUseCase {
 			// 固定費一覧情報をレスポンスに設定
 			response.addFixedCostItemList(createFixedCostItemList(searchResult));
 			// 奇数月合計の値を設定
-			response.setOddMonthGoukei(searchResult.getOddMonthGoukei().toString());
+			response.setOddMonthGoukei(searchResult.getOddMonthGoukei().toFormatString());
 			// 偶数月合計の値を設定
-			response.setAnEvenMonthGoukei(searchResult.getAnEvenMonthGoukei().toString());
+			response.setAnEvenMonthGoukei(searchResult.getAnEvenMonthGoukei().toFormatString());
 		}
 	}
 	

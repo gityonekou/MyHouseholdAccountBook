@@ -69,4 +69,16 @@ public class ShiharaiKingaku extends Money {
 		
 		return new ShiharaiKingaku(kingaku);
 	}
+	
+	/**
+	 *<pre>
+	 * 支払金額の値を指定した支払金額の値で加算(this + addValue)した値を返します。
+	 *</pre>
+	 * @param addValue 加算する支払金額の値
+	 * @return 加算した支払金額の値(this + addValue)
+	 *
+	 */
+	public ShiharaiKingaku add(ShiharaiKingaku addValue) {
+		return ShiharaiKingaku.from(super.add(addValue));
+	}
 }
