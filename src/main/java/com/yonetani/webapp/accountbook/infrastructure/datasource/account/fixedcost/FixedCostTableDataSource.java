@@ -21,7 +21,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostL
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostCode;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostShiharaiTukiList;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostTargetPaymentMonthList;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostInquiryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostReadWriteDto;
@@ -134,7 +134,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public FixedCostList findByIdAndFixedCostShiharaiTukiList(SearchQueryUserIdAndFixedCostShiharaiTukiList search) {
+	public FixedCostList findByIdAndFixedCostShiharaiTukiList(SearchQueryUserIdAndFixedCostTargetPaymentMonthList search) {
 		// 検索結果を取得
 		List<FixedCostReadWriteDto> searchResult = mapper.findByIdAndFixedCostShiharaiTukiList(
 				UserIdAndFixedCostShiharaiTukiListSearchQueryDto.from(search));
@@ -218,17 +218,17 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 				// 固定費内容詳細(支払内容詳細)
 				data.getFixedCostDetailContext().getValue(),
 				// 支出項目コード
-				data.getSisyutuItemCode().getValue(),
+				data.getExpenditureItemCode().getValue(),
 				// 固定費区分
 				data.getFixedCostKubun().getValue(),
 				// 固定費支払月(支払月)
-				data.getFixedCostShiharaiTuki().getValue(),
+				data.getFixedCostTargetPaymentMonth().getValue(),
 				// 固定費支払月任意詳細
-				data.getFixedCostShiharaiTukiOptionalContext().getValue(),
+				data.getFixedCostTargetPaymentMonthOptionalContext().getValue(),
 				// 固定費支払日(支払日)
-				data.getFixedCostShiharaiDay().getValue(),
+				data.getFixedCostPaymentDay().getValue(),
 				// 支払金額
-				data.getShiharaiKingaku().getValue());
+				data.getFixedCostPaymentAmount().getValue());
 	}
 	
 	/**

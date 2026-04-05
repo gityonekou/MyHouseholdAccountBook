@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/06/03 : 1.00.00  新規作成
+ * 2026/04/05 : 1.01.00  クラス名をFixedCostShiharaiTukiOptionalContextからFixedCostTargetPaymentMonthOptionalContextにリネーム
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.fixedcost;
@@ -21,13 +22,13 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @EqualsAndHashCode
-public class FixedCostShiharaiTukiOptionalContext {
+public class FixedCostTargetPaymentMonthOptionalContext {
 	// 固定費支払月任意詳細
 	private final String value;
 	
@@ -39,8 +40,8 @@ public class FixedCostShiharaiTukiOptionalContext {
 	 * @return 「固定費支払月任意詳細」項目ドメインタイプ
 	 *
 	 */
-	public static FixedCostShiharaiTukiOptionalContext from(String optionalContext) {
-		return new FixedCostShiharaiTukiOptionalContext(optionalContext);
+	public static FixedCostTargetPaymentMonthOptionalContext from(String optionalContext) {
+		return new FixedCostTargetPaymentMonthOptionalContext(optionalContext);
 	}
 
 	/**

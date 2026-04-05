@@ -30,13 +30,13 @@ import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostL
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.common.CodeAndValuePair;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostShiharaiTukiList;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostTargetPaymentMonthList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
 import com.yonetani.webapp.accountbook.domain.service.account.regist.TemporaryCodeGenerator;
-import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiTuki;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonth;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureCategory;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
@@ -132,11 +132,11 @@ public class IncomeAndExpenditureInitUseCase {
 
 		// 指定月に一致する固定費情報を取得
 		FixedCostList searchResult = fixedCostRepository.findByIdAndFixedCostShiharaiTukiList(
-				SearchQueryUserIdAndFixedCostShiharaiTukiList.from(
+				SearchQueryUserIdAndFixedCostTargetPaymentMonthList.from(
 						// ユーザID
 						userId,
 						// 固定費支払月(リスト値)
-						shiharaiTukiList.stream().map(item -> FixedCostShiharaiTuki.from(item)).collect(Collectors.toUnmodifiableList())));
+						shiharaiTukiList.stream().map(item -> FixedCostTargetPaymentMonth.from(item)).collect(Collectors.toUnmodifiableList())));
 
 		if(searchResult.isEmpty()) {
 			// 登録済み固定費情報が0件の場合、メッセージを設定
@@ -163,7 +163,7 @@ public class IncomeAndExpenditureInitUseCase {
 							// 支出コード(仮登録用支出コード:yyyyMMddHHmmss999)
 							String.format("%s%03d", nowTimeStr, count.getAndIncrement()),
 							// 支出項目コード
-							domain.getSisyutuItemCode().getValue(),
+							domain.getExpenditureItemCode().getValue(),
 							// イベントコード:固定費からは登録不可:値設定が必要な場合は収支登録画面で設定する
 							"",
 							// 支出名
@@ -173,9 +173,9 @@ public class IncomeAndExpenditureInitUseCase {
 							// 支出詳細
 							domain.getExpenditureDetailContext(),
 							// 支払日
-							domain.getFixedCostShiharaiDay().getShiharaiDayValue(targetYearMonth),
+							domain.getFixedCostPaymentDay().getShiharaiDayValue(targetYearMonth),
 							// 支払金額
-							domain.getShiharaiKingaku().getValue(),
+							domain.getFixedCostPaymentAmount().getValue(),
 							// 支払金額の0円開始設定フラグ
 							domain.getFixedCostKubun().isClearStart()
 						)).collect(Collectors.toList());

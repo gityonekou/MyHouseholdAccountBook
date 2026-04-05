@@ -17,7 +17,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostL
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostCode;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostShiharaiTukiList;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostTargetPaymentMonthList;
 
 /**
  *<pre>
@@ -100,7 +100,7 @@ public interface FixedCostTableRepository {
 	 * @return る固定費情報のリスト
 	 *
 	 */
-	FixedCostList findByIdAndFixedCostShiharaiTukiList(SearchQueryUserIdAndFixedCostShiharaiTukiList search);
+	FixedCostList findByIdAndFixedCostShiharaiTukiList(SearchQueryUserIdAndFixedCostTargetPaymentMonthList search);
 	
 	/**
 	 *<pre>

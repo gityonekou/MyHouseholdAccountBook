@@ -9,6 +9,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/06/13 : 1.00.00  新規作成
+ * 2026/04/05 : 1.01.00  クラス名をFixedCostShiharaiDayからFixedCostPaymentDayにリネーム
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.fixedcost;
@@ -36,13 +37,13 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @EqualsAndHashCode
-public class FixedCostShiharaiDay {
+public class FixedCostPaymentDay {
 	// 固定費支払日(支払日)
 	private final String value;
 	
@@ -54,8 +55,8 @@ public class FixedCostShiharaiDay {
 	 * @return 「固定費支払日(支払日)」項目ドメインタイプ
 	 *
 	 */
-	public static FixedCostShiharaiDay from(String value) {
-		return new FixedCostShiharaiDay(value);
+	public static FixedCostPaymentDay from(String value) {
+		return new FixedCostPaymentDay(value);
 	}
 
 	/**

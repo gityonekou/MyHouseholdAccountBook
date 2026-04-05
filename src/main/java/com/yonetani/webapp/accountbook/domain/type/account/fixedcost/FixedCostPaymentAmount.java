@@ -6,9 +6,10 @@
  * 日付       : version  コメントなど
  * 2024/06/03 : 1.00.00  新規作成
  * 2025/12/21 : 1.01.00  リファクタリング対応(DDD適応)
+ * 2026/04/05 : 1.02.00  クラス名をShiharaiKingakuからFixedCostPaymentAmountにリネーム
  *
  */
-package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
+package com.yonetani.webapp.accountbook.domain.type.account.fixedcost;
 
 import java.math.BigDecimal;
 
@@ -28,16 +29,16 @@ import lombok.EqualsAndHashCode;
  *
  */
 @EqualsAndHashCode(callSuper = true)
-public class ShiharaiKingaku extends Money {
+public class FixedCostPaymentAmount extends Money {
 	
 	/** 値が0の「支払金額」項目の値 */
-	public static final ShiharaiKingaku ZERO = ShiharaiKingaku.from(Money.MONEY_ZERO);
+	public static final FixedCostPaymentAmount ZERO = FixedCostPaymentAmount.from(Money.MONEY_ZERO);
 	
 	/**
 	 * コンストラクタ
 	 * @param value 支払金額
 	 */
-	private ShiharaiKingaku(BigDecimal value) {
+	private FixedCostPaymentAmount(BigDecimal value) {
 		super(value);
 	}
 	
@@ -55,7 +56,7 @@ public class ShiharaiKingaku extends Money {
 	 * @return 「支払金額」項目ドメインタイプ
 	 *
 	 */
-	public static ShiharaiKingaku from(BigDecimal kingaku) {
+	public static FixedCostPaymentAmount from(BigDecimal kingaku) {
 		
 		// 基底クラスのバリデーションを実行（null非許容、スケール2チェック）
 		validate(kingaku, "支払金額");
@@ -67,18 +68,6 @@ public class ShiharaiKingaku extends Money {
 					kingaku.intValue()));
 		}
 		
-		return new ShiharaiKingaku(kingaku);
-	}
-	
-	/**
-	 *<pre>
-	 * 支払金額の値を指定した支払金額の値で加算(this + addValue)した値を返します。
-	 *</pre>
-	 * @param addValue 加算する支払金額の値
-	 * @return 加算した支払金額の値(this + addValue)
-	 *
-	 */
-	public ShiharaiKingaku add(ShiharaiKingaku addValue) {
-		return ShiharaiKingaku.from(super.add(addValue));
+		return new FixedCostPaymentAmount(kingaku);
 	}
 }

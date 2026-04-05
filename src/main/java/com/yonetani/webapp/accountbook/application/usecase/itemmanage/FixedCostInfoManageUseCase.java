@@ -136,17 +136,17 @@ public class FixedCostInfoManageUseCase {
 				// コード区分：固定費支払月
 				MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_TUKI,
 				// 固定費支払月
-				searchResult.getFixedCostShiharaiTuki().getValue());
+				searchResult.getFixedCostTargetPaymentMonth().getValue());
 		// 固定費支払月の値が「その他任意」の場合、支払月詳細の値に「"(" ＋ 「固定費支払月任意詳細」＋")"」を追加
 		if(Objects.equals(
 				// 固定費支払月の値
-				searchResult.getFixedCostShiharaiTuki().getValue(),
+				searchResult.getFixedCostTargetPaymentMonth().getValue(),
 				// コード区分：固定費支払月：その他任意(40)
 				MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE
 			)) {
 			// 支払月詳細の値 =「固定費支払月の値をコード変換した値」＋"(" ＋ 「固定費支払月任意詳細」＋")"
 			//shiharaiTukiDetailContext += "(" + null + ")";
-			shiharaiTukiDetailContext += "(" + searchResult.getFixedCostShiharaiTukiOptionalContext().getValue() + ")";
+			shiharaiTukiDetailContext += "(" + searchResult.getFixedCostTargetPaymentMonthOptionalContext().getValue() + ")";
 		}
 		/* 固定費支払日区分、固定費支払日の値をもとに支払日詳細を設定 */
 		/* レスポンスの生成 */
@@ -156,7 +156,7 @@ public class FixedCostInfoManageUseCase {
 						// 固定費コード
 						searchResult.getFixedCostCode().getValue(),
 						// 支出項目名(＞で区切った値)
-						sisyutuItemComponent.getSisyutuItemName(userId, searchResult.getSisyutuItemCode()),
+						sisyutuItemComponent.getSisyutuItemName(userId, searchResult.getExpenditureItemCode()),
 						// 支払名
 						searchResult.getFixedCostName().getValue(),
 						// 支払内容詳細
@@ -168,9 +168,9 @@ public class FixedCostInfoManageUseCase {
 								// コード区分：固定費支払日
 								MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_DAY,
 								// 固定費支払月
-								searchResult.getFixedCostShiharaiDay().getValue()),
+								searchResult.getFixedCostPaymentDay().getValue()),
 						// 支払金額
-						searchResult.getShiharaiKingaku().toFormatString()));
+						searchResult.getFixedCostPaymentAmount().toFormatString()));
 		// 固定費一覧をレスポンスに設定
 		setFixedCostItemList(userId, response);
 		
@@ -313,7 +313,7 @@ public class FixedCostInfoManageUseCase {
 		// 固定費コード
 		updateForm.setFixedCostCode(searchResult.getFixedCostCode().getValue());
 		// 属する支出項目コード
-		updateForm.setSisyutuItemCode(searchResult.getSisyutuItemCode().getValue());
+		updateForm.setSisyutuItemCode(searchResult.getExpenditureItemCode().getValue());
 		// 固定費名(支払名)
 		updateForm.setFixedCostName(searchResult.getFixedCostName().getValue());
 		// 固定費内容詳細(支払内容詳細)
@@ -321,13 +321,13 @@ public class FixedCostInfoManageUseCase {
 		// 固定費区分
 		updateForm.setFixedCostKubun(searchResult.getFixedCostKubun().getValue());
 		// 支払月
-		updateForm.setShiharaiTuki(searchResult.getFixedCostShiharaiTuki().getValue());
+		updateForm.setShiharaiTuki(searchResult.getFixedCostTargetPaymentMonth().getValue());
 		// 支払月任意詳細
-		updateForm.setShiharaiTukiOptionalContext(searchResult.getFixedCostShiharaiTukiOptionalContext().getValue());
+		updateForm.setShiharaiTukiOptionalContext(searchResult.getFixedCostTargetPaymentMonthOptionalContext().getValue());
 		// 支払日
-		updateForm.setShiharaiDay(searchResult.getFixedCostShiharaiDay().getValue());
+		updateForm.setShiharaiDay(searchResult.getFixedCostPaymentDay().getValue());
 		// 支払金額
-		updateForm.setShiharaiKingaku(DomainCommonUtils.convertInteger(searchResult.getShiharaiKingaku().getValue()));
+		updateForm.setShiharaiKingaku(DomainCommonUtils.convertInteger(searchResult.getFixedCostPaymentAmount().getValue()));
 		
 		// 支払い月選択ボックス、支出項目名をレスポンスに設定し返却
 		return getUpdateResponse(userId, updateForm);
@@ -622,7 +622,7 @@ public class FixedCostInfoManageUseCase {
 				// 固定費コード
 				domain.getFixedCostCode().getValue(),
 				// 支出項目名
-				domain.getSisyutuItemName().getValue(),
+				domain.getExpenditureItemName().getValue(),
 				// 支払名：固定費名を設定を設定
 				domain.getFixedCostName().getValue(),
 				// 支払月：固定費支払月の値をコード変換して設定
@@ -630,17 +630,17 @@ public class FixedCostInfoManageUseCase {
 						// コード区分：固定費支払月
 						MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_TUKI,
 						// 固定費支払月
-						domain.getFixedCostShiharaiTuki().getValue()),
+						domain.getFixedCostTargetPaymentMonth().getValue()),
 				// 支払日
 				codeTableItem.getCodeValue(
 						// コード区分：固定費支払日
 						MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_DAY,
-						// 固定費支払月
-						domain.getFixedCostShiharaiDay().getValue()),
+						// 固定費支払日
+						domain.getFixedCostPaymentDay().getValue()),
 				// 支払金額
-				domain.getShiharaiKingaku().toFormatString(),
+				domain.getFixedCostPaymentAmount().toFormatString(),
 				// その他任意詳細：固定費支払月任意詳細
-				domain.getFixedCostShiharaiTukiOptionalContext().getValue())
+				domain.getFixedCostTargetPaymentMonthOptionalContext().getValue())
 		).collect(Collectors.toUnmodifiableList());
 	}
 }

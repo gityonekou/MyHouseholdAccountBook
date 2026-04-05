@@ -1,13 +1,13 @@
 /**
- * ShiharaiKingaku(支払金額)のテストクラスです。
+ * FixedCostPaymentTotalAmount(支払金額合計)のテストクラスです。
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2025/12/23 : 1.00.00  新規作成
+ * 日付       : version     コメントなど
+ * 2026/04/05 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
+package com.yonetani.webapp.accountbook.domain.type.account.fixedcost;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,7 +20,7 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
 
 /**
  *<pre>
- * ShiharaiKingaku(支払金額)のテストクラスです。
+ * FixedCostPaymentTotalAmount(支払金額合計)のテストクラスです。
  *
  *</pre>
  *
@@ -28,14 +28,14 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
  * @since 家計簿アプリ(1.00)
  *
  */
-@DisplayName("支払金額(ShiharaiKingaku)のテスト")
-class ShiharaiKingakuTest {
+@DisplayName("支払金額合計(FixedCostPaymentTotalAmount)のテスト")
+class FixedCostPaymentTotalAmountTest {
 
 	@Test
 	@DisplayName("正常系：正の金額で生成できる")
 	void testFrom_正常系_正の金額() {
 		// 実行
-		ShiharaiKingaku amount = ShiharaiKingaku.from(new BigDecimal("10000.00"));
+		FixedCostPaymentTotalAmount amount = FixedCostPaymentTotalAmount.from(new BigDecimal("10000.00"));
 
 		// 検証
 		assertNotNull(amount);
@@ -48,9 +48,9 @@ class ShiharaiKingakuTest {
 	@DisplayName("正常系：ZERO定数が使用できる")
 	void testZERO定数() {
 		// 検証
-		assertNotNull(ShiharaiKingaku.ZERO);
-		assertTrue(ShiharaiKingaku.ZERO.isZero());
-		assertEquals(BigDecimal.ZERO.setScale(2), ShiharaiKingaku.ZERO.getValue());
+		assertNotNull(FixedCostPaymentTotalAmount.ZERO);
+		assertTrue(FixedCostPaymentTotalAmount.ZERO.isZero());
+		assertEquals(BigDecimal.ZERO.setScale(2), FixedCostPaymentTotalAmount.ZERO.getValue());
 	}
 
 	@Test
@@ -59,9 +59,9 @@ class ShiharaiKingakuTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> ShiharaiKingaku.from((BigDecimal)null)
+			() -> FixedCostPaymentTotalAmount.from((BigDecimal)null)
 		);
-		assertTrue(exception.getMessage().contains("支払金額"));
+		assertTrue(exception.getMessage().contains("支払金額合計"));
 		assertTrue(exception.getMessage().contains("null"));
 	}
 
@@ -71,9 +71,9 @@ class ShiharaiKingakuTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> ShiharaiKingaku.from(new BigDecimal("-1000.00"))
+			() -> FixedCostPaymentTotalAmount.from(new BigDecimal("-1000.00"))
 		);
-		assertTrue(exception.getMessage().contains("支払金額"));
+		assertTrue(exception.getMessage().contains("支払金額合計"));
 		assertTrue(exception.getMessage().contains("マイナス"));
 	}
 
@@ -83,21 +83,21 @@ class ShiharaiKingakuTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> ShiharaiKingaku.from(new BigDecimal("10000"))
+			() -> FixedCostPaymentTotalAmount.from(new BigDecimal("10000"))
 		);
-		assertTrue(exception.getMessage().contains("支払金額"));
+		assertTrue(exception.getMessage().contains("支払金額合計"));
 		assertTrue(exception.getMessage().contains("スケール"));
 	}
-	
+
 	@Test
 	@DisplayName("正常系：加算が正しく動作する")
 	void testAdd_正常系() {
 		// 準備
-		ShiharaiKingaku amount1 = ShiharaiKingaku.from(new BigDecimal("10000.00"));
-		ShiharaiKingaku amount2 = ShiharaiKingaku.from(new BigDecimal("5000.00"));
+		FixedCostPaymentTotalAmount amount1 = FixedCostPaymentTotalAmount.from(new BigDecimal("10000.00"));
+		FixedCostPaymentAmount amount2 = FixedCostPaymentAmount.from(new BigDecimal("5000.00"));
 
 		// 実行
-		ShiharaiKingaku result = amount1.add(amount2);
+		FixedCostPaymentTotalAmount result = amount1.add(amount2);
 
 		// 検証
 		assertEquals(new BigDecimal("15000.00"), result.getValue());
@@ -105,4 +105,5 @@ class ShiharaiKingakuTest {
 		assertEquals(new BigDecimal("10000.00"), amount1.getValue());
 		assertEquals(new BigDecimal("5000.00"), amount2.getValue());
 	}
+
 }
