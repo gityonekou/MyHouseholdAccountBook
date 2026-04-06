@@ -32,9 +32,9 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
 class FixedCostPaymentAmountTest {
 
 	@Test
-	@DisplayName("正常系：正の金額で生成できる")
-	void testFrom_正常系_正の金額() {
-		// 実行
+	@DisplayName("正常系：BigDecimalの正の金額で生成できる")
+	void testFrom_正常系_正の金額_BigDecimal() {
+		// 実行(BigDecimal)
 		FixedCostPaymentAmount amount = FixedCostPaymentAmount.from(new BigDecimal("10000.00"));
 
 		// 検証
@@ -45,6 +45,19 @@ class FixedCostPaymentAmountTest {
 	}
 
 	@Test
+	@DisplayName("正常系：Integerの正の金額で生成できる")
+	void testFrom_正常系_正の金額_Integer() {
+		// 実行(BigDecimal)
+		FixedCostPaymentAmount amount = FixedCostPaymentAmount.from(10000);
+
+		// 検証
+		assertNotNull(amount);
+		assertEquals(new BigDecimal("10000.00"), amount.getValue());
+		assertEquals("10000.00", amount.toString());
+		assertEquals("10,000円", amount.toFormatString());
+	}
+	
+	@Test
 	@DisplayName("正常系：ZERO定数が使用できる")
 	void testZERO定数() {
 		// 検証
@@ -54,8 +67,8 @@ class FixedCostPaymentAmountTest {
 	}
 
 	@Test
-	@DisplayName("異常系：null値で例外が発生する")
-	void testFrom_異常系_null値() {
+	@DisplayName("異常系：(BigDecimal)null値で例外が発生する")
+	void testFrom_異常系_BigDecimal_null値() {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
@@ -66,8 +79,20 @@ class FixedCostPaymentAmountTest {
 	}
 
 	@Test
-	@DisplayName("異常系：負の金額で例外が発生する")
-	void testFrom_異常系_負の金額() {
+	@DisplayName("異常系：(Integer)null値で例外が発生する")
+	void testFrom_異常系_Integer_null値() {
+		// 実行 & 検証
+		MyHouseholdAccountBookRuntimeException exception = assertThrows(
+			MyHouseholdAccountBookRuntimeException.class,
+			() -> FixedCostPaymentAmount.from((Integer)null)
+		);
+		assertTrue(exception.getMessage().contains("支払金額"));
+		assertTrue(exception.getMessage().contains("null"));
+	}
+	
+	@Test
+	@DisplayName("異常系：BigDecimalの負の金額で例外が発生する")
+	void testFrom_異常系_負の金額_BigDecimal() {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
@@ -77,6 +102,18 @@ class FixedCostPaymentAmountTest {
 		assertTrue(exception.getMessage().contains("マイナス"));
 	}
 
+	@Test
+	@DisplayName("異常系：Integerの負の金額で例外が発生する")
+	void testFrom_異常系_負の金額_Integer() {
+		// 実行 & 検証
+		MyHouseholdAccountBookRuntimeException exception = assertThrows(
+			MyHouseholdAccountBookRuntimeException.class,
+			() -> FixedCostPaymentAmount.from(-1000)
+		);
+		assertTrue(exception.getMessage().contains("支払金額"));
+		assertTrue(exception.getMessage().contains("マイナス"));
+	}
+	
 	@Test
 	@DisplayName("異常系：スケール値が2以外で例外が発生する")
 	void testFrom_異常系_スケール値不正() {

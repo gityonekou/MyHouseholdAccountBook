@@ -12,6 +12,8 @@ package com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppi
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +42,6 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureIt
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemJanCode;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
-import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.shoppingitem.ShoppingItemTableMapper;
 
 /**
@@ -468,19 +469,19 @@ class ShoppingItemTableDataSourceTest {
 		switch (type) {
 			case 1:
 				// 基準価格(BigDecimal)はDBの該当項目の小数点以下桁数のスケールに合わせる
-				data = ShoppingItem.from("TEST-USER-ID", "00001", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100);
+				data = ShoppingItem.from("TEST-USER-ID", "00001", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", "0010", "会社名１", "010", bigDecimalValue(1180), 110, "01", 1100);
 				break;
 			case 2:
 				// 基準価格(BigDecimal)はDBの該当項目の小数点以下桁数のスケールに合わせる
-				data = ShoppingItem.from("TEST-USER-ID", "00002", "商品区分名２", "商品名２", "商品詳細２", "1234567890200", "0020", "会社名２", "020", DomainCommonUtils.convertKingakuBigDecimal(1280), 120, "02", 1200);
+				data = ShoppingItem.from("TEST-USER-ID", "00002", "商品区分名２", "商品名２", "商品詳細２", "1234567890200", "0020", "会社名２", "020", bigDecimalValue(1280), 120, "02", 1200);
 				break;
 			case 3:
 				// 基準価格(BigDecimal)はDBの該当項目の小数点以下桁数のスケールに合わせる
-				data = ShoppingItem.from("TEST-USER-ID", "00003", "商品区分名３", "商品名３", "商品詳細３", "1234567890300", "0030", "会社名３", "030", DomainCommonUtils.convertKingakuBigDecimal(1380), 130, "03", 1300);
+				data = ShoppingItem.from("TEST-USER-ID", "00003", "商品区分名３", "商品名３", "商品詳細３", "1234567890300", "0030", "会社名３", "030", bigDecimalValue(1380), 130, "03", 1300);
 				break;
 			case 4:
 				// 基準価格(BigDecimal)はDBの該当項目の小数点以下桁数のスケールに合わせる
-				data = ShoppingItem.from("TEST-USER-ID", "00004", "商品区分名４", "商品名４", "商品詳細４", "1234567890400", "0040", "会社名４", "040", DomainCommonUtils.convertKingakuBigDecimal(1480), 140, "04", 1400);
+				data = ShoppingItem.from("TEST-USER-ID", "00004", "商品区分名４", "商品名４", "商品詳細４", "1234567890400", "0040", "会社名４", "040", bigDecimalValue(1480), 140, "04", 1400);
 				break;
 			case 5:
 				// 新規登録用null可データ
@@ -492,23 +493,23 @@ class ShoppingItemTableDataSourceTest {
 				break;
 			case 102:
 				// null不可データ(商品区分名)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", null, "商品名１", "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100);
+				data = ShoppingItem.from("TEST-USER-ID", "00999", null, "商品名１", "商品詳細１", "1234567890100", "0010", "会社名１", "010", bigDecimalValue(1180), 110, "01", 1100);
 				break;
 			case 103:
 				// null不可データ(商品名)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", null, "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100);
+				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", null, "商品詳細１", "1234567890100", "0010", "会社名１", "010", bigDecimalValue(1180), 110, "01", 1100);
 				break;
 			case 104:
 				// null不可データ(商品JANコード)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", null, "0010", "会社名１", "010", DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100);
+				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", null, "0010", "会社名１", "010", bigDecimalValue(1180), 110, "01", 1100);
 				break;
 			case 105:
 				// null不可データ(支出項目コード)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", null, "会社名１", "010", DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100);
+				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", null, "会社名１", "010", bigDecimalValue(1180), 110, "01", 1100);
 				break;
 			case 106:
 				// null不可データ(会社名)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", "0010", null, "010", DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100);
+				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", "0010", null, "010", bigDecimalValue(1180), 110, "01", 1100);
 				break;
 			default:
 		}
@@ -529,42 +530,42 @@ class ShoppingItemTableDataSourceTest {
 		List<ShoppingItemInquiryItem> dataList = new ArrayList<>();
 		switch(type) {
 			case 1:
-				dataList.add(ShoppingItemInquiryItem.from("00006", "商品区分名６", "商品名６", "商品詳細６", "1334567890101", "税金支払い", "会社名６", null, DomainCommonUtils.convertKingakuBigDecimal(1183), 660, "06", 6600));
+				dataList.add(ShoppingItemInquiryItem.from("00006", "商品区分名６", "商品名６", "商品詳細６", "1334567890101", "税金支払い", "会社名６", null, bigDecimalValue(1183), 660, "06", 6600));
 				break;
 			case 2:
 				dataList.add(ShoppingItemInquiryItem.from("00002", "商品区分名２NULL", "商品名２NULL", null, "1234567890200", "飲食日用品", "会社名２NULL", null, null, null, null, null));
 				break;
 			case 3:
-				dataList.add(ShoppingItemInquiryItem.from("00007", "商品区分名７", "商品名７", "商品詳細７", "1234567890700", "イデコ", "会社名７", "テスト店舗２", DomainCommonUtils.convertKingakuBigDecimal(2470), 770, "07", 7700));
+				dataList.add(ShoppingItemInquiryItem.from("00007", "商品区分名７", "商品名７", "商品詳細７", "1234567890700", "イデコ", "会社名７", "テスト店舗２", bigDecimalValue(2470), 770, "07", 7700));
 				break;
 			case 4:
 				// 商品コードの降順で表示
-				dataList.add(ShoppingItemInquiryItem.from("00005", "商品区分名１", "商品名１－２", "商品詳細１－２", "2234567890100", "その他", "会社名１", "テスト店舗１０", DomainCommonUtils.convertKingakuBigDecimal(1182), 111, "05", 1110));
-				dataList.add(ShoppingItemInquiryItem.from("00001", "商品区分名１", "商品名１－１", "商品詳細１－１", "1234567890100", "その他", "会社名１", null, DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100));
+				dataList.add(ShoppingItemInquiryItem.from("00005", "商品区分名１", "商品名１－２", "商品詳細１－２", "2234567890100", "その他", "会社名１", "テスト店舗１０", bigDecimalValue(1182), 111, "05", 1110));
+				dataList.add(ShoppingItemInquiryItem.from("00001", "商品区分名１", "商品名１－１", "商品詳細１－１", "1234567890100", "その他", "会社名１", null, bigDecimalValue(1180), 110, "01", 1100));
 				break;
 			case 5:
 				// 商品コードの降順で表示
-				dataList.add(ShoppingItemInquiryItem.from("00009", "商品区分名９", "商品名９", "商品詳細９", "1234567891900", "食費", "会社名９", "テスト店舗３０", DomainCommonUtils.convertKingakuBigDecimal(3090), 990, "99", 9900));
-				dataList.add(ShoppingItemInquiryItem.from("00008", "商品区分名８", "商品名８", "商品詳細８", "1234567891800", "食費", "会社名８", "テスト店舗２", DomainCommonUtils.convertKingakuBigDecimal(3080), 880, "08", 8800));
+				dataList.add(ShoppingItemInquiryItem.from("00009", "商品区分名９", "商品名９", "商品詳細９", "1234567891900", "食費", "会社名９", "テスト店舗３０", bigDecimalValue(3090), 990, "99", 9900));
+				dataList.add(ShoppingItemInquiryItem.from("00008", "商品区分名８", "商品名８", "商品詳細８", "1234567891800", "食費", "会社名８", "テスト店舗２", bigDecimalValue(3080), 880, "08", 8800));
 				break;
 			case 101:
-				dataList.add(ShoppingItemInquiryItem.from("00004", "商品区分名４", "商品名４", "商品詳細４", "1234567890400", "税金支払い", "会社名４", null, DomainCommonUtils.convertKingakuBigDecimal(1480), 140, "04", 1400));
+				dataList.add(ShoppingItemInquiryItem.from("00004", "商品区分名４", "商品名４", "商品詳細４", "1234567890400", "税金支払い", "会社名４", null, bigDecimalValue(1480), 140, "04", 1400));
 				break;
 			case 102:
 				dataList.add(ShoppingItemInquiryItem.from("00006", "商品区分名６NULL", "商品名６NULL", null, "1234567890600", "飲食日用品", "会社名６NULL", null, null, null, null, null));
 				break;
 			case 103:
-				dataList.add(ShoppingItemInquiryItem.from("00007", "商品区分名７", "商品名７", "商品詳細７", "1234567890700", "イデコ", "会社名７", "テスト店舗２", DomainCommonUtils.convertKingakuBigDecimal(1780), 170, "07", 1700));
+				dataList.add(ShoppingItemInquiryItem.from("00007", "商品区分名７", "商品名７", "商品詳細７", "1234567890700", "イデコ", "会社名７", "テスト店舗２", bigDecimalValue(1780), 170, "07", 1700));
 				break;
 			case 104:
 				// 商品コードの降順で表示
-				dataList.add(ShoppingItemInquiryItem.from("00009", "商品区分名９", "商品名９", "商品詳細９", "1234567890800", "税金支払い", "会社名９", "テスト店舗３０", DomainCommonUtils.convertKingakuBigDecimal(1990), 190, "99", 1900));
-				dataList.add(ShoppingItemInquiryItem.from("00008", "商品区分名８", "商品名８", "商品詳細８", "1234567890800", "食費", "会社名８", null, DomainCommonUtils.convertKingakuBigDecimal(1880), 180, "08", 1800));
+				dataList.add(ShoppingItemInquiryItem.from("00009", "商品区分名９", "商品名９", "商品詳細９", "1234567890800", "税金支払い", "会社名９", "テスト店舗３０", bigDecimalValue(1990), 190, "99", 1900));
+				dataList.add(ShoppingItemInquiryItem.from("00008", "商品区分名８", "商品名８", "商品詳細８", "1234567890800", "食費", "会社名８", null, bigDecimalValue(1880), 180, "08", 1800));
 				break;
 			case 105:
 				// 商品コードの降順で表示
-				dataList.add(ShoppingItemInquiryItem.from("00005", "商品区分名１", "商品名１－２", "商品詳細１－２", "1234567890100", "その他", "会社名１", "テスト店舗１０", DomainCommonUtils.convertKingakuBigDecimal(1580), 115, "05", 1155));
-				dataList.add(ShoppingItemInquiryItem.from("00001", "商品区分名１", "商品名１－１", "商品詳細１－１", "1234567890100", "その他", "会社名１", "テスト店舗２", DomainCommonUtils.convertKingakuBigDecimal(1180), 112, "02", 1122));
+				dataList.add(ShoppingItemInquiryItem.from("00005", "商品区分名１", "商品名１－２", "商品詳細１－２", "1234567890100", "その他", "会社名１", "テスト店舗１０", bigDecimalValue(1580), 115, "05", 1155));
+				dataList.add(ShoppingItemInquiryItem.from("00001", "商品区分名１", "商品名１－１", "商品詳細１－１", "1234567890100", "その他", "会社名１", "テスト店舗２", bigDecimalValue(1180), 112, "02", 1122));
 				break;
 			default:
 		}
@@ -621,5 +622,31 @@ class ShoppingItemTableDataSourceTest {
 	 */
 	private SearchQueryUserIdAndShoppingItemJanCode createSearchQueryUserIdAndShoppingItemJanCode(String userId, String shoppingItemJanCode) {
 		return SearchQueryUserIdAndShoppingItemJanCode.from(UserId.from(userId), ShoppingItemJanCode.from(shoppingItemJanCode));
+	}
+	
+	
+		/**
+	 *<pre>
+	 * 引数で指定した金額(整数)の値をBigDecimalに変換して返します。値がnullの場合、nullを返却します。
+	 * BigDecimalのスケール値は金額関連のDB項目のデフォルト値(2)が設定されます。
+	 *</pre>
+	 * @param kingaku BigDecimalに変換する金額の値(整数値)
+	 * @return 引数の値をBigDecimalに変換した値
+	 *
+	 */
+	private BigDecimal bigDecimalValue(Integer kingaku) {
+		// 値がnullの場合、nullを返します。
+		if(kingaku == null) {
+			return null;
+		}
+		// 整数の値に指定したスケール分0を追加
+		String numStr = kingaku.toString() + ".00";
+		
+		// 整数の値を文字列変換
+		BigDecimal bigVal = new BigDecimal(numStr.toString());
+		// スケールを設定(小数点以下切り上げ)
+		bigVal.setScale(2, RoundingMode.HALF_UP);
+		
+		return bigVal;
 	}
 }

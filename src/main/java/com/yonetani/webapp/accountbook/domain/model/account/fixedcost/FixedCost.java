@@ -110,6 +110,48 @@ public class FixedCost {
 	
 	/**
 	 *<pre>
+	 * 引数の値から固定費情報を表すドメインモデルを生成して返します。
+	 * 入力フォームからドメインを生成する際にこのメソッドを使用することを想定しています。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param fixedCostCode 固定費コード
+	 * @param fixedCostName 固定費名(支払名)
+	 * @param fixedCostDetailContext 固定費内容詳細(支払内容詳細)
+	 * @param expenditureItemCode 支出項目コード
+	 * @param fixedCostKubun 固定費区分
+	 * @param fixedCostTargetPaymentMonth 固定費支払月(支払月)
+	 * @param fixedCostTargetPaymentMonthOptionalContext 固定費支払月任意詳細
+	 * @param fixedCostPaymentDay 固定費支払日(支払日)
+	 * @param fixedCostPaymentAmount 支払金額
+	 * @return 固定費情報を表すドメインモデル
+	 *
+	 */
+	public static FixedCost from(
+			String userId,
+			String fixedCostCode,
+			String fixedCostName,
+			String fixedCostDetailContext,
+			String expenditureItemCode,
+			String fixedCostKubun,
+			String fixedCostTargetPaymentMonth,
+			String fixedCostTargetPaymentMonthOptionalContext,
+			String fixedCostPaymentDay,
+			Integer fixedCostPaymentAmount) {
+		return new FixedCost(
+				UserId.from(userId),
+				FixedCostCode.from(fixedCostCode),
+				FixedCostName.from(fixedCostName),
+				FixedCostDetailContext.from(fixedCostDetailContext),
+				ExpenditureItemCode.from(expenditureItemCode),
+				FixedCostKubun.from(fixedCostKubun),
+				FixedCostTargetPaymentMonth.from(fixedCostTargetPaymentMonth),
+				FixedCostTargetPaymentMonthOptionalContext.from(fixedCostTargetPaymentMonthOptionalContext),
+				FixedCostPaymentDay.from(fixedCostPaymentDay),
+				FixedCostPaymentAmount.from(fixedCostPaymentAmount));
+	}
+	
+	/**
+	 *<pre>
 	 * 「固定費内容詳細(支払内容詳細)」項目と「固定費支払月任意詳細」項目の値から支出詳細の表示値を作成して返します。
 	 * 
 	 * 固定費内容詳細(支払内容詳細)項目、固定費支払月任意詳細のどちらかに値が設定されている場合、その値を返します。

@@ -40,7 +40,6 @@ import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.Fixed
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
-import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractFixedCostItemListResponse;
@@ -327,8 +326,7 @@ public class FixedCostInfoManageUseCase {
 		// 支払日
 		updateForm.setShiharaiDay(searchResult.getFixedCostPaymentDay().getValue());
 		// 支払金額
-		updateForm.setShiharaiKingaku(DomainCommonUtils.convertInteger(searchResult.getFixedCostPaymentAmount().getValue()));
-		
+		updateForm.setShiharaiKingaku(searchResult.getFixedCostPaymentAmount().toIntegerValue());
 		// 支払い月選択ボックス、支出項目名をレスポンスに設定し返却
 		return getUpdateResponse(userId, updateForm);
 	}
@@ -605,7 +603,7 @@ public class FixedCostInfoManageUseCase {
 				// 固定費支払日(支払日)
 				inputForm.getShiharaiDay(),
 				// 支払金額
-				DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShiharaiKingaku()));
+				inputForm.getShiharaiKingaku());
 	}
 	
 	/**

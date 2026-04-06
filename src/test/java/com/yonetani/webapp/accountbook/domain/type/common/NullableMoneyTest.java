@@ -457,12 +457,12 @@ class NullableMoneyTest {
 		TestNullableMoney amount4 = TestNullableMoney.from(null);
 
 		// 検証（スケール0で四捨五入）
-		assertEquals(12346L, amount1.toIntegerValue());
-		assertEquals(12345L, amount2.toIntegerValue()); // 0.44 -> 切り捨て
-		assertEquals(12346L, amount3.toIntegerValue()); // 0.50 -> 切り上げ
-		assertEquals(0L, amount4.toIntegerValue()); // null値は0
+		assertEquals(Integer.valueOf(12346), amount1.toIntegerValue());
+		assertEquals(Integer.valueOf(12345), amount2.toIntegerValue()); // 0.44 -> 切り捨て
+		assertEquals(Integer.valueOf(12345), amount3.toIntegerValue()); // 0.50 -> 切り捨て
+		assertEquals(Integer.valueOf(0), amount4.toIntegerValue()); // null値は0
 	}
-
+	
 	@Test
 	@DisplayName("正常系：toIntegerString")
 	void testToIntegerString() {
