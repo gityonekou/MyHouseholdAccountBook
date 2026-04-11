@@ -8,7 +8,7 @@
  * 2024/07/06 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.presentation.request.account.inquiry;
+package com.yonetani.webapp.accountbook.presentation.request.account.regist;
 
 import java.util.Objects;
 

@@ -8,7 +8,7 @@
  * 2026/01/25 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.application.usecase.account.regist;
+package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,9 +25,10 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure.IncomeRegistUseCase;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.IncomeItemForm;
+import com.yonetani.webapp.accountbook.presentation.request.account.regist.IncomeItemForm;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.IncomeAndExpenditureRegistResponse;
 import com.yonetani.webapp.accountbook.presentation.session.ExpenditureRegistItem;
 import com.yonetani.webapp.accountbook.presentation.session.IncomeRegistItem;

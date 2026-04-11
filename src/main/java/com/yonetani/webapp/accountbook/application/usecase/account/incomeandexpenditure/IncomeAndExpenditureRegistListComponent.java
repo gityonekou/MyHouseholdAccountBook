@@ -9,7 +9,7 @@
  * 2026/02/28 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.common.component;
+package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -21,6 +21,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import com.yonetani.webapp.accountbook.application.usecase.common.CodeTableItemComponent;
+import com.yonetani.webapp.accountbook.application.usecase.common.ExpenditureItemInfoComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
@@ -57,7 +59,7 @@ public class IncomeAndExpenditureRegistListComponent {
 	// コードテーブル
 	private final CodeTableItemComponent codeTableItem;
 	// 支出項目情報取得コンポーネント
-	private final SisyutuItemComponent sisyutuItemComponent;
+	private final ExpenditureItemInfoComponent expenditureItemInfoComponent;
 
 	/**
 	 *<pre>
@@ -147,7 +149,7 @@ public class IncomeAndExpenditureRegistListComponent {
 				expenditureNameBuff.append(session.getExpenditureName());
 
 				// 支出項目コードに対応する支出項目情報を取得
-				SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(userId, ExpenditureItemCode.from(session.getExpenditureItemCode()));
+				SisyutuItem sisyutuItem = expenditureItemInfoComponent.getSisyutuItem(userId, ExpenditureItemCode.from(session.getExpenditureItemCode()));
 				if(sisyutuItem == null) {
 					throw new MyHouseholdAccountBookRuntimeException(
 							"支出項目コードに対応する支出項目情報が存在しません。管理者に問い合わせてください。[sisyutuItemCode=" + session.getExpenditureItemCode() + "]");

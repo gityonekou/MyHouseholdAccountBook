@@ -7,7 +7,7 @@
  * 2024/01/20 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.common.component;
+package com.yonetani.webapp.accountbook.application.usecase.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;

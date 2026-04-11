@@ -38,7 +38,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.TotalP
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
-import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.SimpleShoppingRegistInfoForm;
+import com.yonetani.webapp.accountbook.presentation.request.account.regist.SimpleShoppingRegistInfoForm;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;

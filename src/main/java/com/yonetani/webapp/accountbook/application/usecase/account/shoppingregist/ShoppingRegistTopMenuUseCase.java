@@ -7,11 +7,12 @@
  * 2024/11/03 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.application.usecase.account.regist;
+package com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist;
 
 import org.springframework.stereotype.Service;
 
-import com.yonetani.webapp.accountbook.common.component.AccountBookUserInquiryUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.account.component.ShoppingRegistExpenditureItemComponent;
+import com.yonetani.webapp.accountbook.application.usecase.common.AccountBookUserInquiryUseCase;
 import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
@@ -44,7 +45,7 @@ public class ShoppingRegistTopMenuUseCase {
 	// 簡易タイプ買い物リスト取得コンポーネント
 	private final SimpleShoppingRegistListComponent simpleShoppingRegistListComponent;
 	// 買い物登録時の支出項目に対応する支出テーブル情報と支出金額テーブル情報にアクセスするコンポーネント
-	private final ShoppingRegistExpenditureAndSisyutuKingakuComponent checkComponent;
+	private final ShoppingRegistExpenditureItemComponent checkComponent;
 	
 	/**
 	 *<pre>

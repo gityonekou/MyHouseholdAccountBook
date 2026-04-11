@@ -7,20 +7,20 @@
  * 2026/02/25 : 1.00.00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
  *
  */
-package com.yonetani.webapp.accountbook.application.usecase.account.regist;
+package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
 
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.yonetani.webapp.accountbook.common.component.SisyutuItemComponent;
+import com.yonetani.webapp.accountbook.application.usecase.common.ExpenditureItemInfoComponent;
 import com.yonetani.webapp.accountbook.domain.model.account.event.EventItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.event.EventItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
-import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.ExpenditureSelectItemForm;
+import com.yonetani.webapp.accountbook.presentation.request.account.regist.ExpenditureSelectItemForm;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.ExpenditureItemSelectResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
@@ -45,7 +45,7 @@ import lombok.extern.log4j.Log4j2;
 public class ExpenditureItemSelectUseCase {
 
 	// 支出項目情報取得コンポーネント
-	private final SisyutuItemComponent sisyutuItemComponent;
+	private final ExpenditureItemInfoComponent expenditureItemInfoComponent;
 	// イベントテーブル:EVENT_ITEM_TABLEリポジトリー
 	private final EventItemTableRepository eventRepository;
 
@@ -63,7 +63,7 @@ public class ExpenditureItemSelectUseCase {
 		// レスポンス
 		ExpenditureItemSelectResponse response = ExpenditureItemSelectResponse.getInstance();
 		// 支出項目一覧をすべて取得
-		sisyutuItemComponent.setSisyutuItemList(UserId.from(user.getUserId()), response);
+		expenditureItemInfoComponent.setSisyutuItemList(UserId.from(user.getUserId()), response);
 
 		return response;
 	}
@@ -88,12 +88,12 @@ public class ExpenditureItemSelectUseCase {
 		// レスポンス
 		ExpenditureItemSelectResponse response = ExpenditureItemSelectResponse.getInstance();
 		// 支出項目一覧をすべて取得
-		sisyutuItemComponent.setSisyutuItemList(userId, response);
+		expenditureItemInfoComponent.setSisyutuItemList(userId, response);
 		// 支出項目詳細内容を設定(支出項目選択画面からの支出項目選択なので、対象の支出項目がない場合:null)チェックは不要とする
 		response.setSisyutuItemDetailContext(
-				sisyutuItemComponent.getSisyutuItem(userId, sisyutuItemCode).getExpenditureItemDetailContext().getValue());
+				expenditureItemInfoComponent.getSisyutuItem(userId, sisyutuItemCode).getExpenditureItemDetailContext().getValue());
 		// 支出項目コードに対応する支出項目名(＞で区切った値)を設定
-		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(userId, sisyutuItemCode));
+		response.setSisyutuItemName(expenditureItemInfoComponent.getSisyutuItemName(userId, sisyutuItemCode));
 
 		// 選択した支出項目のフォームデータを作成
 		ExpenditureSelectItemForm selectForm = new ExpenditureSelectItemForm();

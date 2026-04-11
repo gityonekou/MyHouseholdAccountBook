@@ -26,8 +26,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yonetani.webapp.accountbook.common.component.CodeTableItemComponent;
-import com.yonetani.webapp.accountbook.common.component.SisyutuItemComponent;
+import com.yonetani.webapp.accountbook.application.usecase.common.CodeTableItemComponent;
+import com.yonetani.webapp.accountbook.application.usecase.common.ExpenditureItemInfoComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCost;
@@ -78,7 +78,7 @@ import lombok.extern.log4j.Log4j2;
 public class FixedCostInfoManageUseCase {
 	
 	// 支出項目情報取得コンポーネント
-	private final SisyutuItemComponent sisyutuItemComponent;
+	private final ExpenditureItemInfoComponent expenditureItemInfoComponent;
 	// コードテーブル
 	private final CodeTableItemComponent codeTableItem;
 	// 固定費テーブル:FIXED_COST_TABLEリポジトリー
@@ -155,7 +155,7 @@ public class FixedCostInfoManageUseCase {
 						// 固定費コード
 						searchResult.getFixedCostCode().getValue(),
 						// 支出項目名(＞で区切った値)
-						sisyutuItemComponent.getSisyutuItemName(userId, searchResult.getExpenditureItemCode()),
+						expenditureItemInfoComponent.getSisyutuItemName(userId, searchResult.getExpenditureItemCode()),
 						// 支払名
 						searchResult.getFixedCostName().getValue(),
 						// 支払内容詳細
@@ -487,7 +487,7 @@ public class FixedCostInfoManageUseCase {
 		// レスポンスを生成
 		FixedCostInfoManageInitResponse response = FixedCostInfoManageInitResponse.getInstance(registeredFlg);
 		// 支出項目一覧をレスポンスに設定
-		sisyutuItemComponent.setSisyutuItemList(userId, response);
+		expenditureItemInfoComponent.setSisyutuItemList(userId, response);
 		// 固定費一覧をレスポンスに設定
 		setFixedCostItemList(userId, response);
 		
@@ -567,7 +567,7 @@ public class FixedCostInfoManageUseCase {
 					OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList()));
 		
 		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
-		response.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(userId, ExpenditureItemCode.from(inputForm.getSisyutuItemCode())));
+		response.setSisyutuItemName(expenditureItemInfoComponent.getSisyutuItemName(userId, ExpenditureItemCode.from(inputForm.getSisyutuItemCode())));
 		
 		return response;
 		

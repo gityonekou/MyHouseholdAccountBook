@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yonetani.webapp.accountbook.common.component.SisyutuItemComponent;
+import com.yonetani.webapp.accountbook.application.usecase.common.ExpenditureItemInfoComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.event.EventItem;
@@ -61,7 +61,7 @@ import lombok.extern.log4j.Log4j2;
 public class EventInfoManageUseCase {
 	
 	// 支出項目情報取得コンポーネント
-	private final SisyutuItemComponent sisyutuItemComponent;
+	private final ExpenditureItemInfoComponent expenditureItemInfoComponent;
 	// イベント情報取得リポジトリー
 	private final EventItemTableRepository eventRepository;
 	/**
@@ -96,7 +96,7 @@ public class EventInfoManageUseCase {
 		ExpenditureItemCode sisyutuItemCode = ExpenditureItemCode.from(sisyutuItemCodeStr);
 		
 		// 選択した支出項目コードに対応する支出項目情報を取得
-		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(userId, sisyutuItemCode);
+		SisyutuItem sisyutuItem = expenditureItemInfoComponent.getSisyutuItem(userId, sisyutuItemCode);
 			
 		// イベント情報入力フォームを生成
 		EventInfoForm inputForm = new EventInfoForm();
@@ -105,7 +105,7 @@ public class EventInfoManageUseCase {
 		// 支出項目コード
 		inputForm.setSisyutuItemCode(sisyutuItemCode.getValue());
 		// 支出項目コードに対応する支出項目名(＞で区切った値)を設定
-		inputForm.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(userId, sisyutuItemCode));
+		inputForm.setSisyutuItemName(expenditureItemInfoComponent.getSisyutuItemName(userId, sisyutuItemCode));
 		// イベント名:支出項目名を仮設定
 		inputForm.setEventName(sisyutuItem.getExpenditureItemName().getValue());
 		// イベント内容詳細(任意入力項目):支出項目詳細内容を仮設定
@@ -148,7 +148,7 @@ public class EventInfoManageUseCase {
 		// 支出項目コード
 		inputForm.setSisyutuItemCode(eventItem.getExpenditureItemCode().getValue());
 		// 支出項目名(＞で区切った値)
-		inputForm.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(userId, eventItem.getExpenditureItemCode()));
+		inputForm.setSisyutuItemName(expenditureItemInfoComponent.getSisyutuItemName(userId, eventItem.getExpenditureItemCode()));
 		// イベント名
 		inputForm.setEventName(eventItem.getEventName().getValue());
 		// イベント内容詳細(任意入力項目)
@@ -341,7 +341,7 @@ public class EventInfoManageUseCase {
 		}
 		
 		// イベント費(0059)に属する支出項目一覧をすべて取得
-		sisyutuItemComponent.setSisyutuItemList(
+		expenditureItemInfoComponent.setSisyutuItemList(
 				// ログインユーザ情報
 				userId,
 				// 検索条件:支出項目表示順A：支出項目(イベント)の表示順:0603000000

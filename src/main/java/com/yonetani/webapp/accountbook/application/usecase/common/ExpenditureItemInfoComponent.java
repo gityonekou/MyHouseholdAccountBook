@@ -1,5 +1,5 @@
 /**
- * 支出項目情報に関するコンポーネントです。
+ * 支出項目情報を取得するコンポーネントクラスです。
  *
  *------------------------------------------------
  * 更新履歴
@@ -8,7 +8,7 @@
  * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
-package com.yonetani.webapp.accountbook.common.component;
+package com.yonetani.webapp.accountbook.application.usecase.common;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ import lombok.extern.log4j.Log4j2;
 
 /**
  *<pre>
- * 支出項目情報に関するコンポーネントです。
+ * 支出項目情報を取得するコンポーネントクラスです。
  *
  *</pre>
  *
@@ -44,7 +44,7 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @Log4j2
 @RequiredArgsConstructor
-public class SisyutuItemComponent {
+public class ExpenditureItemInfoComponent {
 
 	// 支出項目テーブル:SISYUTU_ITEM_TABLE参照リポジトリー
 	private final SisyutuItemTableRepository sisyutuItemRepository;

@@ -8,7 +8,7 @@
  * 2023/10/14 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.common.component;
+package com.yonetani.webapp.accountbook.application.usecase.common;
 
 import org.springframework.stereotype.Component;
 

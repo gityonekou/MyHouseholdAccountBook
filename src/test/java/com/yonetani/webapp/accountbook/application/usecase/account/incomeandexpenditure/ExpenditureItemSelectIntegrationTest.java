@@ -22,7 +22,7 @@
  * </pre>
  *
  */
-package com.yonetani.webapp.accountbook.application.usecase.account.regist;
+package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -35,6 +35,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure.ExpenditureItemSelectUseCase;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.ExpenditureItemSelectResponse;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 

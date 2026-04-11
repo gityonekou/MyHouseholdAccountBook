@@ -1,6 +1,9 @@
 /**
- * 買い物登録時、必須の支出項目に対応する支出テーブル情報と支出金額テーブル情報が登録されているかどうかのチェックと該当支出項目に対応する情報取得を行うコンポーネントです。
- *
+ * 買い物登録時の必須支出項目をまとめたコンポーネントクラスです。
+ * 以下機能を提供します。
+ * ・買い物リストの支出項目に対応する支出テーブル情報と支出金額テーブル情報が登録されてるかどうかをチェックし、NGの項目に対応するエラーメッセージを返す機能
+ * ・必須支出項目に対応する支出テーブル情報を取得して返す機能
+ * 
  * [対象の支出項目]
  * ・支出項目コード:飲食(0051)＋支出区分(無駄使いなし)
  * ・支出項目コード:飲食(0051)＋支出区分(無駄遣いB)
@@ -18,7 +21,7 @@
  * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
-package com.yonetani.webapp.accountbook.application.usecase.account.regist;
+package com.yonetani.webapp.accountbook.application.usecase.account.component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,7 +51,11 @@ import lombok.extern.log4j.Log4j2;
 
 /**
  *<pre>
- * 買い物登録時、必須の支出項目に対応する支出テーブル情報と支出金額テーブル情報が登録されているかどうかのチェックと該当支出項目に対応する情報取得を行うコンポーネントです。
+ * 買い物登録時の必須支出項目をまとめたコンポーネントクラスです。
+ * 以下機能を提供します。
+ * ・買い物リストの支出項目に対応する支出テーブル情報と支出金額テーブル情報が登録されてるかどうかをチェックし、NGの項目に対応するエラーメッセージを返す機能
+ * ・必須支出項目に対応する支出テーブル情報を取得して返す機能
+ * 
  * [対象の支出項目]
  * ・支出項目コード:飲食(0051)＋支出区分(無駄使いなし)
  * ・支出項目コード:飲食(0051)＋支出区分(無駄遣いB)
@@ -68,7 +75,7 @@ import lombok.extern.log4j.Log4j2;
 @Component
 @Log4j2
 @RequiredArgsConstructor
-public class ShoppingRegistExpenditureAndSisyutuKingakuComponent {
+public class ShoppingRegistExpenditureItemComponent {
 	// 定数:飲食の支出項目コード
 	private final ExpenditureItemCode foodItemCode = ExpenditureItemCode.from(MyHouseholdAccountBookContent.SISYUTU_ITEM_CODE_INSYOKU_VALUE);
 	// 定数:一人プチ贅沢・外食の支出項目コード

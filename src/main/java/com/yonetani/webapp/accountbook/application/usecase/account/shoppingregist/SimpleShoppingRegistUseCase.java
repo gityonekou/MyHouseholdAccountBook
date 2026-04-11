@@ -8,7 +8,7 @@
  * 2025/12/28 : 1.01.00  リファクタリング対応（DDD適応) 
  *
  */
-package com.yonetani.webapp.accountbook.application.usecase.account.regist;
+package com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,13 +19,14 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yonetani.webapp.accountbook.common.component.CodeTableItemComponent;
-import com.yonetani.webapp.accountbook.common.component.SisyutuKingakuItemHolderComponent;
+import com.yonetani.webapp.accountbook.application.usecase.account.component.ExpenditureAmountItemHolderComponent;
+import com.yonetani.webapp.accountbook.application.usecase.account.component.ShoppingRegistExpenditureItemComponent;
+import com.yonetani.webapp.accountbook.application.usecase.common.CodeTableItemComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureAmountItemHolder;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureItem;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuKingakuItemHolder;
 import com.yonetani.webapp.accountbook.domain.model.account.shop.ShopInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.BeforeAndAfterShoppingSisyutuKingakuData;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.MinorWasteShoppingFood;
@@ -54,7 +55,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
-import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.SimpleShoppingRegistInfoForm;
+import com.yonetani.webapp.accountbook.presentation.request.account.regist.SimpleShoppingRegistInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.ShoppingRegistRedirectResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.SimpleShoppingRegistResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
@@ -92,11 +93,11 @@ public class SimpleShoppingRegistUseCase {
 	// 支出金額テーブル:SISYUTU_KINGAKU_TABLEポジトリー
 	private final SisyutuKingakuTableRepository sisyutuKingakuTableRepository;
 	// 支出金額テーブル情報保持ホルダー生成用コンポーネント
-	private final SisyutuKingakuItemHolderComponent sisyutuKingakuItemHolderComponent;
+	private final ExpenditureAmountItemHolderComponent expenditureAmountItemHolderComponent;
 	// 収支テーブル:INCOME_AND_EXPENDITURE_TABLEリポジトリー
 	private final IncomeAndExpenditureTableRepository incomeAndExpenditureRepository;
-	// 買い物登録時の支出項目に対応する支出テーブル情報と支出金額テーブル情報にアクセスするコンポーネント
-	private final ShoppingRegistExpenditureAndSisyutuKingakuComponent expenditureAndSisyutuKingakuComponent;
+	// 買い物登録時の必須支出項目をまとめたコンポーネント
+	private final ShoppingRegistExpenditureItemComponent expenditureAndSisyutuKingakuComponent;
 	
 	/**
 	 *<pre>
@@ -309,7 +310,7 @@ public class SimpleShoppingRegistUseCase {
 		SearchQueryUserIdAndYearMonth searchYearMonth = SearchQueryUserIdAndYearMonth.from(userId, targetYearMonth);
 		
 		// 対象年月の支出金額テーブル情報を保持したホルダーを生成
-		SisyutuKingakuItemHolder sisyutuKingakuItemHolder = sisyutuKingakuItemHolderComponent.build(searchYearMonth);
+		ExpenditureAmountItemHolder expenditureAmountItemHolder = expenditureAmountItemHolderComponent.build(searchYearMonth);
 		
 		// 収支テーブル情報を取得
 		IncomeAndExpenditureItem beforeSyuusiData = incomeAndExpenditureRepository.select(searchYearMonth);
@@ -358,7 +359,7 @@ public class SimpleShoppingRegistUseCase {
 				// 更新対象の支出テーブル情報に追加
 				updExpenditureItemList.add(updFoodExpenditureItem);
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
-				sisyutuKingakuItemHolder.update(beforeFoodItem, updFoodExpenditureItem);
+				expenditureAmountItemHolder.update(beforeFoodItem, updFoodExpenditureItem);
 			}
 			couponResidualValue = food.getResidualCouponPrice();
 			
@@ -370,7 +371,7 @@ public class SimpleShoppingRegistUseCase {
 				// 更新対象の支出テーブル情報に追加
 				updExpenditureItemList.add(updFoodBExpenditureItem);
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
-				sisyutuKingakuItemHolder.update(beforeFoodBItem, updFoodBExpenditureItem);
+				expenditureAmountItemHolder.update(beforeFoodBItem, updFoodBExpenditureItem);
 			}
 			couponResidualValue = foodB.getResidualCouponPrice();
 			
@@ -382,7 +383,7 @@ public class SimpleShoppingRegistUseCase {
 				// 更新対象の支出テーブル情報に追加
 				updExpenditureItemList.add(updFoodCExpenditureItem);
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
-				sisyutuKingakuItemHolder.update(beforeFoodCItem, updFoodCExpenditureItem);
+				expenditureAmountItemHolder.update(beforeFoodCItem, updFoodCExpenditureItem);
 				
 			}
 			couponResidualValue = foodC.getResidualCouponPrice();
@@ -395,7 +396,7 @@ public class SimpleShoppingRegistUseCase {
 				// 更新対象の支出テーブル情報に追加
 				updExpenditureItemList.add(updDineOutExpenditureItem);
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
-				sisyutuKingakuItemHolder.update(beforeDineOutItem, updDineOutExpenditureItem);
+				expenditureAmountItemHolder.update(beforeDineOutItem, updDineOutExpenditureItem);
 				
 			}
 			couponResidualValue = dineOut.getResidualCouponPrice();
@@ -408,7 +409,7 @@ public class SimpleShoppingRegistUseCase {
 				// 更新対象の支出テーブル情報に追加
 				updExpenditureItemList.add(updConsumerGoodsExpenditureItem);
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
-				sisyutuKingakuItemHolder.update(beforeConsumerGoodsItem, updConsumerGoodsExpenditureItem);
+				expenditureAmountItemHolder.update(beforeConsumerGoodsItem, updConsumerGoodsExpenditureItem);
 				
 			}
 			couponResidualValue = consumerGoods.getResidualCouponPrice();
@@ -421,7 +422,7 @@ public class SimpleShoppingRegistUseCase {
 				// 更新対象の支出テーブル情報に追加
 				updExpenditureItemList.add(updClothesExpenditureItem);
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
-				sisyutuKingakuItemHolder.update(beforeClothesItem, updClothesExpenditureItem);
+				expenditureAmountItemHolder.update(beforeClothesItem, updClothesExpenditureItem);
 			}	
 			couponResidualValue = clothes.getResidualCouponPrice();
 			
@@ -433,7 +434,7 @@ public class SimpleShoppingRegistUseCase {
 				// 更新対象の支出テーブル情報に追加
 				updExpenditureItemList.add(updWorkExpenditureItem);
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
-				sisyutuKingakuItemHolder.update(beforeWorkItem, updWorkExpenditureItem);
+				expenditureAmountItemHolder.update(beforeWorkItem, updWorkExpenditureItem);
 			}
 			couponResidualValue = work.getResidualCouponPrice();
 			
@@ -445,7 +446,7 @@ public class SimpleShoppingRegistUseCase {
 				// 更新対象の支出テーブル情報に追加
 				updExpenditureItemList.add(updHouseEquipmentExpenditureItem);
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
-				sisyutuKingakuItemHolder.update(beforeHouseEquipmentItem, updHouseEquipmentExpenditureItem);
+				expenditureAmountItemHolder.update(beforeHouseEquipmentItem, updHouseEquipmentExpenditureItem);
 			}
 			couponResidualValue = houseEquipment.getResidualCouponPrice();
 			
@@ -504,7 +505,7 @@ public class SimpleShoppingRegistUseCase {
 				// 更新対象の支出テーブル情報に追加
 				updExpenditureItemList.add(updFood.getUpdExpenditureItem());
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
-				sisyutuKingakuItemHolder.update(beforeFoodItem, updFood.getUpdExpenditureItem());
+				expenditureAmountItemHolder.update(beforeFoodItem, updFood.getUpdExpenditureItem());
 			}
 			
 			// 飲食(無駄遣いB)
@@ -523,7 +524,7 @@ public class SimpleShoppingRegistUseCase {
 				// 更新対象の支出テーブル情報に追加
 				updExpenditureItemList.add(updFoodB.getUpdExpenditureItem());
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
-				sisyutuKingakuItemHolder.update(beforeFoodBItem, updFoodB.getUpdExpenditureItem());
+				expenditureAmountItemHolder.update(beforeFoodBItem, updFoodB.getUpdExpenditureItem());
 			}
 			
 			// 飲食(無駄遣いC)
@@ -542,7 +543,7 @@ public class SimpleShoppingRegistUseCase {
 				// 更新対象の支出テーブル情報に追加
 				updExpenditureItemList.add(updFoodC.getUpdExpenditureItem());
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
-				sisyutuKingakuItemHolder.update(beforeFoodCItem, updFoodC.getUpdExpenditureItem());
+				expenditureAmountItemHolder.update(beforeFoodCItem, updFoodC.getUpdExpenditureItem());
 			}
 			
 			// 外食
@@ -561,7 +562,7 @@ public class SimpleShoppingRegistUseCase {
 				// 更新対象の支出テーブル情報に追加
 				updExpenditureItemList.add(updDineOut.getUpdExpenditureItem());
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
-				sisyutuKingakuItemHolder.update(beforeDineOutItem, updDineOut.getUpdExpenditureItem());
+				expenditureAmountItemHolder.update(beforeDineOutItem, updDineOut.getUpdExpenditureItem());
 			}
 			
 			// 日用消耗品
@@ -580,7 +581,7 @@ public class SimpleShoppingRegistUseCase {
 				// 更新対象の支出テーブル情報に追加
 				updExpenditureItemList.add(updConsumerGoods.getUpdExpenditureItem());
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
-				sisyutuKingakuItemHolder.update(beforeConsumerGoodsItem, updConsumerGoods.getUpdExpenditureItem());
+				expenditureAmountItemHolder.update(beforeConsumerGoodsItem, updConsumerGoods.getUpdExpenditureItem());
 			}
 			
 			// 被服費
@@ -599,7 +600,7 @@ public class SimpleShoppingRegistUseCase {
 				// 更新対象の支出テーブル情報に追加
 				updExpenditureItemList.add(updClothes.getUpdExpenditureItem());
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
-				sisyutuKingakuItemHolder.update(beforeClothesItem, updClothes.getUpdExpenditureItem());
+				expenditureAmountItemHolder.update(beforeClothesItem, updClothes.getUpdExpenditureItem());
 			}
 			
 			// 仕事
@@ -618,7 +619,7 @@ public class SimpleShoppingRegistUseCase {
 				// 更新対象の支出テーブル情報に追加
 				updExpenditureItemList.add(updWork.getUpdExpenditureItem());
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
-				sisyutuKingakuItemHolder.update(beforeWorkItem, updWork.getUpdExpenditureItem());
+				expenditureAmountItemHolder.update(beforeWorkItem, updWork.getUpdExpenditureItem());
 			}
 			
 			// 住居設備
@@ -637,7 +638,7 @@ public class SimpleShoppingRegistUseCase {
 				// 更新対象の支出テーブル情報に追加
 				updExpenditureItemList.add(updHouseEquipment.getUpdExpenditureItem());
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
-				sisyutuKingakuItemHolder.update(beforeHouseEquipmentItem, updHouseEquipment.getUpdExpenditureItem());
+				expenditureAmountItemHolder.update(beforeHouseEquipmentItem, updHouseEquipment.getUpdExpenditureItem());
 			}
 			
 			// 更新前・更新後の合計金額差額を収支テーブルの支出金額の値に反映
@@ -668,7 +669,7 @@ public class SimpleShoppingRegistUseCase {
 		}
 		
 		// ホルダーから新規追加データの支出金額テーブル情報を取得し対象件数分データを追加
-		sisyutuKingakuItemHolder.getAddList().forEach(addData -> {
+		expenditureAmountItemHolder.getAddList().forEach(addData -> {
 			// 支出金額テーブルに登録
 			int addCount = sisyutuKingakuTableRepository.add(addData);
 			// 追加件数が1件以上の場合、業務エラー
@@ -677,7 +678,7 @@ public class SimpleShoppingRegistUseCase {
 			}
 		});
 		// ホルダーから更新データの支出金額テーブル情報を取得し対象件数分データを更新
-		sisyutuKingakuItemHolder.getUpdateList().forEach(updData -> {
+		expenditureAmountItemHolder.getUpdateList().forEach(updData -> {
 			// 支出金額テーブルを更新
 			int updCount = sisyutuKingakuTableRepository.update(updData);
 			// 更新件数が1件以上の場合、業務エラー

@@ -14,7 +14,7 @@ package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
 
 import org.springframework.stereotype.Service;
 
-import com.yonetani.webapp.accountbook.common.component.AccountBookUserInquiryUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.common.AccountBookUserInquiryUseCase;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.common.AccountBookUser;

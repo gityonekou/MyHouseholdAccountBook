@@ -1,0 +1,62 @@
+/**
+ * ExpenditureAmountItemHolderクラス（ドメインクラス）を生成するためのコンポーネントクラスです。
+ * 指定した年月で支出金額テーブル情報を検索し、検索結果（支出金額テーブル情報）をもとにドメインのホルダークラス(ExpenditureAmountItemHolder)を生成します。
+ *
+ *------------------------------------------------
+ * 更新履歴
+ * 日付       : version  コメントなど
+ * 2024/10/14 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
+ *
+ */
+package com.yonetani.webapp.accountbook.application.usecase.account.component;
+
+import org.springframework.stereotype.Component;
+
+import com.yonetani.webapp.accountbook.application.usecase.common.ExpenditureItemInfoComponent;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureAmountItemHolder;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuKingakuItemInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
+import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+
+/**
+ *<pre>
+ * ExpenditureAmountItemHolderクラス（ドメインクラス）を生成するためのコンポーネントクラスです。
+ * 指定した年月で支出金額テーブル情報を検索し、検索結果（支出金額テーブル情報）をもとにドメインのホルダークラス(ExpenditureAmountItemHolder)を生成します。
+ * 
+ *</pre>
+ *
+ * @author ：Kouki Yonetani
+ * @since 家計簿アプリ(1.00)
+ *
+ */
+@Component
+@Log4j2
+@RequiredArgsConstructor
+public class ExpenditureAmountItemHolderComponent {
+	
+	// 支出金額テーブル:SISYUTU_KINGAKU_TABLEポジトリー
+	private final SisyutuKingakuTableRepository sisyutuKingakuTableRepository;
+	// 支出項目情報取得コンポーネント
+	private final ExpenditureItemInfoComponent expenditureItemInfoComponent;
+	
+	/**
+	 *<pre>
+	 * 指定した検索条件をもとに、ホルダークラス(ExpenditureAmountItemHolder)を生成して返します。
+	 *</pre>
+	 * @param search 検索条件(ユーザID, 年月)
+	 * @return 支出金額テーブル情報を格納したホルダークラス(ExpenditureAmountItemHolder)
+	 *
+	 */
+	public ExpenditureAmountItemHolder build(SearchQueryUserIdAndYearMonth search) {
+		log.debug("road:search="+ search);
+		
+		// 指定された検索条件をもとに支出金額テーブルを検索
+		SisyutuKingakuItemInquiryList searchResult = sisyutuKingakuTableRepository.findById(search);
+		// 検索結果をもとに支出金額テーブル情報を格納したホルダークラス(ExpenditureAmountItemHolder)を生成して返却
+		return ExpenditureAmountItemHolder.from(searchResult.getValues(), expenditureItemInfoComponent);
+	}
+}

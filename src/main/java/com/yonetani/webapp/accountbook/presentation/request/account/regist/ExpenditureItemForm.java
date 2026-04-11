@@ -8,7 +8,7 @@
  * 2024/07/07 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.presentation.request.account.inquiry;
+package com.yonetani.webapp.accountbook.presentation.request.account.regist;
 
 import java.time.LocalDate;
 

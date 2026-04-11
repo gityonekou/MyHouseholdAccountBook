@@ -18,8 +18,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.ExpenditureItemForm;
-import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.IncomeItemForm;
+import com.yonetani.webapp.accountbook.presentation.request.account.regist.ExpenditureItemForm;
+import com.yonetani.webapp.accountbook.presentation.request.account.regist.IncomeItemForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.session.ExpenditureRegistItem;

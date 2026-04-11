@@ -7,7 +7,7 @@
  * 2024/11/03 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.application.usecase.account.regist;
+package com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist;
 
 import org.springframework.stereotype.Service;
 

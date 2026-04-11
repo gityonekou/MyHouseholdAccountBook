@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.yonetani.webapp.accountbook.application.usecase.account.regist.ShoppingRegistTopMenuUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist.ShoppingRegistTopMenuUseCase;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
 import lombok.RequiredArgsConstructor;

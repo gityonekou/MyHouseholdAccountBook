@@ -44,11 +44,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yonetani.webapp.accountbook.application.usecase.account.regist.ExpenditureItemSelectUseCase;
-import com.yonetani.webapp.accountbook.application.usecase.account.regist.ExpenditureRegistUseCase;
-import com.yonetani.webapp.accountbook.application.usecase.account.regist.IncomeAndExpenditureInitUseCase;
-import com.yonetani.webapp.accountbook.application.usecase.account.regist.IncomeAndExpenditureRegistConfirmUseCase;
-import com.yonetani.webapp.accountbook.application.usecase.account.regist.IncomeRegistUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure.ExpenditureItemSelectUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure.ExpenditureRegistUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure.IncomeAndExpenditureInitUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure.IncomeAndExpenditureRegistConfirmUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure.IncomeRegistUseCase;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.presentation.controller.MyHouseholdAccountBookControllerAdvice;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;

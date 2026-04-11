@@ -10,7 +10,7 @@
  * 2026/02/26 : 1.00.00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
  *
  */
-package com.yonetani.webapp.accountbook.application.usecase.account.regist;
+package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
 
 import java.util.List;
 import java.util.Objects;
@@ -19,14 +19,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import com.yonetani.webapp.accountbook.common.component.IncomeAndExpenditureRegistListComponent;
-import com.yonetani.webapp.accountbook.common.component.SisyutuKingakuItemHolderComponent;
+import com.yonetani.webapp.accountbook.application.usecase.account.component.ShoppingRegistExpenditureItemComponent;
+import com.yonetani.webapp.accountbook.application.usecase.account.component.ExpenditureAmountItemHolderComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeItem;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuKingakuItemHolder;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureAmountItemHolder;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
@@ -78,9 +78,9 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 	// 支出金額テーブル:SISYUTU_KINGAKU_TABLEポジトリー
 	private final SisyutuKingakuTableRepository sisyutuKingakuTableRepository;
 	// 支出金額テーブル情報保持ホルダー生成用コンポーネント
-	private final SisyutuKingakuItemHolderComponent sisyutuKingakuItemHolderComponent;
+	private final ExpenditureAmountItemHolderComponent expenditureAmountItemHolderComponent;
 	// 買い物登録時の支出項目に対応する支出テーブル情報と支出金額テーブル情報にアクセスするコンポーネント
-	private final ShoppingRegistExpenditureAndSisyutuKingakuComponent checkComponent;
+	private final ShoppingRegistExpenditureItemComponent checkComponent;
 
 	/**
 	 *<pre>
@@ -171,11 +171,11 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 		// ② 収入レコード処理
 		IncomeProcessResult incomeResult = processIncomeRegistration(userId, targetYearMonth, incomeRegistItemList, incomeDataCount);
 		// ③ 支出レコード処理(支出金額テーブル情報保持ホルダーを生成し渡す)
-		SisyutuKingakuItemHolder sisyutuKingakuItemHolder = sisyutuKingakuItemHolderComponent.build(search);
-		ExpenditureProcessResult expenditureResult = processExpenditureRegistration(userId, targetYearMonth, expenditureRegistItemList, initFlg, expenditureDataCount, sisyutuKingakuItemHolder);
+		ExpenditureAmountItemHolder expenditureAmountItemHolder = expenditureAmountItemHolderComponent.build(search);
+		ExpenditureProcessResult expenditureResult = processExpenditureRegistration(userId, targetYearMonth, expenditureRegistItemList, initFlg, expenditureDataCount, expenditureAmountItemHolder);
 		// ④ 支出情報更新ありの場合、支出金額テーブルを更新
 		if(expenditureResult.updateFlg) {
-			updateSisyutuKingakuTable(sisyutuKingakuItemHolder);
+			updateSisyutuKingakuTable(expenditureAmountItemHolder);
 		}
 		// ⑤ 収入情報、支出情報更新ありの場合、収支テーブルを更新しメッセージを設定
 		updateIncomeAndExpenditureAndSetMessage(userId, targetYearMonth, initFlg, incomeResult, expenditureResult, response);
@@ -316,7 +316,7 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 	 * @param expenditureRegistItemList セッションに設定されている支出情報のリスト
 	 * @param initFlg 初期登録かどうかのフラグ
 	 * @param expenditureDataCount 現在の支出テーブル情報登録件数
-	 * @param sisyutuKingakuItemHolder 支出金額テーブル情報保持ホルダー(呼び出し元で生成済)
+	 * @param expenditureAmountItemHolder 支出金額テーブル情報保持ホルダー(呼び出し元で生成済)
 	 * @return 支出処理結果
 	 *
 	 */
@@ -326,7 +326,7 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 			List<ExpenditureRegistItem> expenditureRegistItemList,
 			boolean initFlg,
 			int expenditureDataCount,
-			SisyutuKingakuItemHolder sisyutuKingakuItemHolder) {
+			ExpenditureAmountItemHolder expenditureAmountItemHolder) {
 		// 支出情報更新ありの場合、支出テーブルを更新
 		boolean expenditureUpdateFlg = false;
 		// 支出予定金額
@@ -369,7 +369,7 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 				expenditureAmount = expenditureAmount.add(addExpenditureData.getExpenditureAmount());
 
 				// 支出金額テーブル情報に追加
-				sisyutuKingakuItemHolder.add(addExpenditureData);
+				expenditureAmountItemHolder.add(addExpenditureData);
 				// 支出情報更新あり
 				expenditureUpdateFlg = true;
 
@@ -409,7 +409,7 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 					expenditureAmount = expenditureAmount.add(updExpenditureData.getExpenditureAmount());
 
 					// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
-					sisyutuKingakuItemHolder.update(beforeExpenditureData, updExpenditureData);
+					expenditureAmountItemHolder.update(beforeExpenditureData, updExpenditureData);
 
 					// 支出情報更新あり
 					expenditureUpdateFlg = true;
@@ -444,7 +444,7 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 					}
 
 					// 削除前の支出情報をもとに、対象の支出金額テーブル情報の情報を更新
-					sisyutuKingakuItemHolder.delete(beforeExpenditureData);
+					expenditureAmountItemHolder.delete(beforeExpenditureData);
 
 					// 支出情報更新あり
 					expenditureUpdateFlg = true;
@@ -467,12 +467,12 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 	 *<pre>
 	 * 支出金額テーブルを更新します。
 	 *</pre>
-	 * @param sisyutuKingakuItemHolder 支出金額テーブル情報保持ホルダー
+	 * @param expenditureAmountItemHolder 支出金額テーブル情報保持ホルダー
 	 *
 	 */
-	private void updateSisyutuKingakuTable(SisyutuKingakuItemHolder sisyutuKingakuItemHolder) {
+	private void updateSisyutuKingakuTable(ExpenditureAmountItemHolder expenditureAmountItemHolder) {
 		// ホルダーから新規追加データのリストを取得し対象件数分データを追加
-		sisyutuKingakuItemHolder.getAddList().forEach(addData -> {
+		expenditureAmountItemHolder.getAddList().forEach(addData -> {
 			// 支出金額テーブルに登録
 			int addCount = sisyutuKingakuTableRepository.add(addData);
 			// 追加件数が1件以上の場合、業務エラー
@@ -481,7 +481,7 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 			}
 		});
 		// ホルダーから更新データのリストを取得し対象件数分データを更新
-		sisyutuKingakuItemHolder.getUpdateList().forEach(updData -> {
+		expenditureAmountItemHolder.getUpdateList().forEach(updData -> {
 			// 支出金額テーブルを更新
 			int updCount = sisyutuKingakuTableRepository.update(updData);
 			// 更新件数が1件以上の場合、業務エラー

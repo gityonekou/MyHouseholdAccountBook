@@ -8,7 +8,7 @@
  * 2026/02/26 : 1.00.00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
  *
  */
-package com.yonetani.webapp.accountbook.application.usecase.account.regist;
+package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,9 +20,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.yonetani.webapp.accountbook.common.component.CodeTableItemComponent;
-import com.yonetani.webapp.accountbook.common.component.IncomeAndExpenditureRegistListComponent;
-import com.yonetani.webapp.accountbook.common.component.SisyutuItemComponent;
+import com.yonetani.webapp.accountbook.application.usecase.common.CodeTableItemComponent;
+import com.yonetani.webapp.accountbook.application.usecase.common.ExpenditureItemInfoComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.event.EventItem;
@@ -35,8 +34,8 @@ import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
-import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.ExpenditureItemForm;
-import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.ExpenditureSelectItemForm;
+import com.yonetani.webapp.accountbook.presentation.request.account.regist.ExpenditureItemForm;
+import com.yonetani.webapp.accountbook.presentation.request.account.regist.ExpenditureSelectItemForm;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.IncomeAndExpenditureRegistResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.session.ExpenditureRegistItem;
@@ -65,7 +64,7 @@ public class ExpenditureRegistUseCase {
 	// コードテーブル
 	private final CodeTableItemComponent codeTableItem;
 	// 支出項目情報取得コンポーネント
-	private final SisyutuItemComponent sisyutuItemComponent;
+	private final ExpenditureItemInfoComponent expenditureItemInfoComponent;
 	// 収支登録画面 収入・支出一覧情報生成コンポーネント
 	private final IncomeAndExpenditureRegistListComponent registListComponent;
 	// イベントテーブル:EVENT_ITEM_TABLEリポジトリー
@@ -384,7 +383,7 @@ public class ExpenditureRegistUseCase {
 							+ inputForm.getEventCode() + "]");
 		}
 		// 選択した支出項目コードに対応する支出項目情報を取得(支出項目選択画面からの遷移の場合、nullチェックは不要とする)
-		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(userId, ExpenditureItemCode.from(inputForm.getSisyutuItemCode()));
+		SisyutuItem sisyutuItem = expenditureItemInfoComponent.getSisyutuItem(userId, ExpenditureItemCode.from(inputForm.getSisyutuItemCode()));
 
 		// 新規支出情報入力フォームを生成
 		ExpenditureItemForm expenditureItemForm = new ExpenditureItemForm();
@@ -496,7 +495,7 @@ public class ExpenditureRegistUseCase {
 
 		// 支出項目名を取得(＞で区切った値)
 		StringBuilder sisyutuItemNameBuff = new StringBuilder();
-		sisyutuItemNameBuff.append(sisyutuItemComponent.getSisyutuItemName(userId, sisyutuItemCode));
+		sisyutuItemNameBuff.append(expenditureItemInfoComponent.getSisyutuItemName(userId, sisyutuItemCode));
 
 		// イベントコードが指定されている場合、イベント名を設定
 		if(eventCode != null) {

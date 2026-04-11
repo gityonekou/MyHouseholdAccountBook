@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.yonetani.webapp.accountbook.common.component.SisyutuItemComponent;
+import com.yonetani.webapp.accountbook.application.usecase.common.ExpenditureItemInfoComponent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureCategory;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
@@ -46,7 +46,7 @@ import lombok.extern.log4j.Log4j2;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Log4j2
-public class SisyutuKingakuItemHolder {
+public class ExpenditureAmountItemHolder {
 	/** 更新なし */
 	private static int STATUS_NON_UPDATE = 0;
 	/** 新規追加 */
@@ -197,7 +197,7 @@ public class SisyutuKingakuItemHolder {
 	}
 	
 	// 支出項目情報取得コンポーネント
-	private final SisyutuItemComponent sisyutuItemComponent;
+	private final ExpenditureItemInfoComponent expenditureItemInfoComponent;
 	// 支出金額テーブルのデータを格納したマップ
 	private Map<ExpenditureItemCode, SisyutuKingakuItemData> sisyutuKingakuItemMap = new HashMap<ExpenditureItemCode, SisyutuKingakuItemData>();
 	
@@ -206,13 +206,13 @@ public class SisyutuKingakuItemHolder {
 	 * 支出金額テーブル情報のリストをもとに、ホールドクラスを生成して返します。
 	 *</pre>
 	 * @param itemList ホールドに格納する支出金額テーブル情報のリスト
-	 * @param sisyutuItemComponent 支出項目テーブル検索用コンポーネント
+	 * @param expenditureItemInfoComponent 支出項目テーブル検索用コンポーネント
 	 * @return 支出金額テーブル情報を格納したホルダー
 	 *
 	 */
-	public static SisyutuKingakuItemHolder from(List<SisyutuKingakuItem> itemList, SisyutuItemComponent sisyutuItemComponent) {
+	public static ExpenditureAmountItemHolder from(List<SisyutuKingakuItem> itemList, ExpenditureItemInfoComponent expenditureItemInfoComponent) {
 		// ホルダーを新規作成
-		SisyutuKingakuItemHolder holder = new SisyutuKingakuItemHolder(sisyutuItemComponent);
+		ExpenditureAmountItemHolder holder = new ExpenditureAmountItemHolder(expenditureItemInfoComponent);
 		// 支出金額テーブル情報のリスト件数分繰り返し
 		itemList.forEach(inputData -> {
 			// 支出金額テーブル情報のデータをもとに内部保持用データを作成
@@ -252,7 +252,7 @@ public class SisyutuKingakuItemHolder {
 	public void update(ExpenditureItem beforeData, ExpenditureItem updExpData) {
 		
 		// 支出項目コードに対応する支出項目情報を取得
-		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(
+		SisyutuItem sisyutuItem = expenditureItemInfoComponent.getSisyutuItem(
 				// ユーザID
 				updExpData.getUserId(),
 				// 支出項目コード
@@ -281,7 +281,7 @@ public class SisyutuKingakuItemHolder {
 	public void delete(ExpenditureItem deleteData) {
 		
 		// 支出項目コードに対応する支出項目情報を取得
-		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(deleteData.getUserId(), deleteData.getExpenditureItemCode());
+		SisyutuItem sisyutuItem = expenditureItemInfoComponent.getSisyutuItem(deleteData.getUserId(), deleteData.getExpenditureItemCode());
 		
 		// 支出テーブル情報から更新対象の支出金額テーブル情報を作成
 		SisyutuKingakuItem deleteItem = createSisyutuKingakuItem(sisyutuItem, deleteData);
@@ -341,7 +341,7 @@ public class SisyutuKingakuItemHolder {
 	private void addItemMap(ExpenditureItemCode sisyutuItemCode, ExpenditureItem addExpenditureData) {
 		
 		// 支出項目コードに対応する支出項目情報を取得
-		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(
+		SisyutuItem sisyutuItem = expenditureItemInfoComponent.getSisyutuItem(
 				// ユーザID
 				addExpenditureData.getUserId(),
 				// 支出項目コード
@@ -483,7 +483,7 @@ public class SisyutuKingakuItemHolder {
 		sisyutuKingakuItemMap.put(sisyutuItemCode, updateData);
 		
 		// 支出項目コードに対応する支出項目情報を取得
-		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(beforeItem.getUserId(), sisyutuItemCode);
+		SisyutuItem sisyutuItem = expenditureItemInfoComponent.getSisyutuItem(beforeItem.getUserId(), sisyutuItemCode);
 		// 親の支出項目コード == 支出項目コードの場合、再帰終了
 		if(sisyutuItem.getParentExpenditureItemCode().getValue().equals(
 				sisyutuItem.getExpenditureItemCode().getValue())) {
@@ -550,7 +550,7 @@ public class SisyutuKingakuItemHolder {
 		sisyutuKingakuItemMap.put(sisyutuItemCode, subtractData);
 		
 		// 支出項目コードに対応する支出項目情報を取得
-		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(subtractItem.getUserId(), sisyutuItemCode);
+		SisyutuItem sisyutuItem = expenditureItemInfoComponent.getSisyutuItem(subtractItem.getUserId(), sisyutuItemCode);
 		// 親の支出項目コード == 支出項目コードの場合、再帰終了
 		if(sisyutuItem.getParentExpenditureItemCode().getValue().equals(
 				sisyutuItem.getExpenditureItemCode().getValue())) {
