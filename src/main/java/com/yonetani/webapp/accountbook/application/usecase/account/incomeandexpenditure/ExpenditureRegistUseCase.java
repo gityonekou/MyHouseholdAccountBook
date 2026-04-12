@@ -25,7 +25,7 @@ import com.yonetani.webapp.accountbook.application.usecase.common.ExpenditureIte
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.event.EventItem;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditureinfo.ExpenditureItemInfo;
 import com.yonetani.webapp.accountbook.domain.model.common.CodeAndValuePair;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndEventCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.event.EventItemTableRepository;
@@ -383,7 +383,7 @@ public class ExpenditureRegistUseCase {
 							+ inputForm.getEventCode() + "]");
 		}
 		// 選択した支出項目コードに対応する支出項目情報を取得(支出項目選択画面からの遷移の場合、nullチェックは不要とする)
-		SisyutuItem sisyutuItem = expenditureItemInfoComponent.getSisyutuItem(userId, ExpenditureItemCode.from(inputForm.getSisyutuItemCode()));
+		ExpenditureItemInfo expenditureItemInfo = expenditureItemInfoComponent.getExpenditureItemInfo(userId, ExpenditureItemCode.from(inputForm.getSisyutuItemCode()));
 
 		// 新規支出情報入力フォームを生成
 		ExpenditureItemForm expenditureItemForm = new ExpenditureItemForm();
@@ -399,9 +399,9 @@ public class ExpenditureRegistUseCase {
 		// イベントコード
 		expenditureItemForm.setEventCode(inputForm.getEventCode());
 		// 支出名
-		expenditureItemForm.setExpenditureName(sisyutuItem.getExpenditureItemName().getValue());
+		expenditureItemForm.setExpenditureName(expenditureItemInfo.getExpenditureItemName().getValue());
 		// 支出詳細
-		expenditureItemForm.setExpenditureDetailContext(sisyutuItem.getExpenditureItemDetailContext().getValue());
+		expenditureItemForm.setExpenditureDetailContext(expenditureItemInfo.getExpenditureItemDetailContext().getValue());
 		// 支払金額の0円開始設定フラグ
 		expenditureItemForm.setClearStartFlg(false);
 
@@ -485,22 +485,22 @@ public class ExpenditureRegistUseCase {
 	 *<pre>
 	 * 画面表示する支出項目名(支出項目名(＞で区切った値)＋イベント名)の値を取得します。
 	 *</pre>
-	 * @param user ログインユーザ情報
-	 * @param sisyutuItemCode 支出項目コード
+	 * @param userId ログインユーザID
+	 * @param expenditureItemCode 支出項目コード
 	 * @param eventCode イベントコード
 	 * @return 支出項目名(支出項目名＋イベント名)
 	 *
 	 */
-	private String getSisyutuItemNameStr(UserId userId, ExpenditureItemCode sisyutuItemCode, EventCode eventCode) {
+	private String getSisyutuItemNameStr(UserId userId, ExpenditureItemCode expenditureItemCode, EventCode eventCode) {
 
 		// 支出項目名を取得(＞で区切った値)
 		StringBuilder sisyutuItemNameBuff = new StringBuilder();
-		sisyutuItemNameBuff.append(expenditureItemInfoComponent.getSisyutuItemName(userId, sisyutuItemCode));
+		sisyutuItemNameBuff.append(expenditureItemInfoComponent.getExpenditureItemName(userId, expenditureItemCode));
 
 		// イベントコードが指定されている場合、イベント名を設定
 		if(eventCode != null) {
 			// イベントコードに対応するイベント情報を取得
-			EventItem eventItem = eventRepository.findByIdAndEventCode(SearchQueryUserIdAndEventCode.from(
+			EventItem eventItem = eventRepository.findByPrimaryKey(SearchQueryUserIdAndEventCode.from(
 					userId, eventCode));
 			// イベントコードに対応するイベント情報がない場合、エラー
 			if(eventItem == null) {

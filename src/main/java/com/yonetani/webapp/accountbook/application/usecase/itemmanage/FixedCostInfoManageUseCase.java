@@ -124,7 +124,7 @@ public class FixedCostInfoManageUseCase {
 		FixedCostCode fixedCostCode = FixedCostCode.from(fixedCostCodeStr);
 		
 		/* 固定費コードに対応する固定費情報を取得 */
-		FixedCost searchResult = fixedCostRepository.findByIdAndFixedCostCode(
+		FixedCost searchResult = fixedCostRepository.findByPrimaryKey(
 				SearchQueryUserIdAndFixedCostCode.from(userId, fixedCostCode));
 		if(searchResult == null) {
 			throw new MyHouseholdAccountBookRuntimeException("選択した固定費が固定費テーブル:FIXED_COST_TABLEに存在しません。管理者に問い合わせてください。[fixedCostCode=" + fixedCostCode + "]");
@@ -155,7 +155,7 @@ public class FixedCostInfoManageUseCase {
 						// 固定費コード
 						searchResult.getFixedCostCode().getValue(),
 						// 支出項目名(＞で区切った値)
-						expenditureItemInfoComponent.getSisyutuItemName(userId, searchResult.getExpenditureItemCode()),
+						expenditureItemInfoComponent.getExpenditureItemName(userId, searchResult.getExpenditureItemCode()),
 						// 支払名
 						searchResult.getFixedCostName().getValue(),
 						// 支払内容詳細
@@ -194,11 +194,11 @@ public class FixedCostInfoManageUseCase {
 		// ドメインタイプ:ユーザID
 		UserId userId = UserId.from(user.getUserId());
 		// ドメインタイプ:支出項目コード
-		ExpenditureItemCode sisyutuItemCode = ExpenditureItemCode.from(sisyutuItemCodeStr);
+		ExpenditureItemCode expenditureItemCode = ExpenditureItemCode.from(sisyutuItemCodeStr);
 		
 		// 支出項目コードに属する固定費の件数が0件の場合faseを返却、1件以上の場合はtrueを返却
-		if(fixedCostRepository.countBySisyutuItemCode(
-				SearchQueryUserIdAndExpenditureItemCode.from(userId, sisyutuItemCode)) == 0) {
+		if(fixedCostRepository.countByExpenditureItemCode(
+				SearchQueryUserIdAndExpenditureItemCode.from(userId, expenditureItemCode)) == 0) {
 			return false;
 		} else {
 			return true;
@@ -226,17 +226,17 @@ public class FixedCostInfoManageUseCase {
 		// ドメインタイプ:ユーザID
 		UserId userId = UserId.from(user.getUserId());
 		// ドメインタイプ:支出項目コード
-		ExpenditureItemCode sisyutuItemCode = ExpenditureItemCode.from(sisyutuItemCodeStr);
+		ExpenditureItemCode expenditureItemCode = ExpenditureItemCode.from(sisyutuItemCodeStr);
 		
 		// 情報管理(固定費)初期表示画面の表示情報を取得
 		FixedCostInfoManageInitResponse response = getInitResponse(userId, true);
 		
 		// 選択した支出項目コード情報を設定
-		response.setSisyutuItemCodeInfo(SisyutuItemCodeInfo.from(sisyutuItemCode.getValue()));
+		response.setSisyutuItemCodeInfo(SisyutuItemCodeInfo.from(expenditureItemCode.getValue()));
 		
 		// 既に登録済みの支出項目の固定費一覧を取得
-		FixedCostInquiryList searchResult = fixedCostRepository.findByIdAndSisyutuItemCode(
-				SearchQueryUserIdAndExpenditureItemCode.from(userId, sisyutuItemCode));
+		FixedCostInquiryList searchResult = fixedCostRepository.findByExpenditureItemCode(
+				SearchQueryUserIdAndExpenditureItemCode.from(userId, expenditureItemCode));
 		if(searchResult.isEmpty()) {
 			// 登録済み固定費情報が0件の場合、メッセージを設定(削除設定した場合、可能性はあるのでエラーとせず、
 			// このまま処理続行(新規に固定費登録画面に遷移・固定費情報の登録可能）
@@ -299,7 +299,7 @@ public class FixedCostInfoManageUseCase {
 		FixedCostCode fixedCostCode = FixedCostCode.from(fixedCostCodeStr);
 		
 		// 固定費コードに対応する固定費情報を取得
-		FixedCost searchResult = fixedCostRepository.findByIdAndFixedCostCode(
+		FixedCost searchResult = fixedCostRepository.findByPrimaryKey(
 				SearchQueryUserIdAndFixedCostCode.from(userId, fixedCostCode));
 		if(searchResult == null) {
 			throw new MyHouseholdAccountBookRuntimeException("選択した固定費が固定費テーブル:FIXED_COST_TABLEに存在しません。管理者に問い合わせてください。[fixedCostCode=" + fixedCostCode + "]");
@@ -354,7 +354,7 @@ public class FixedCostInfoManageUseCase {
 		FixedCostCode fixedCostCode = FixedCostCode.from(fixedCostCodeStr);
 		
 		// 固定費コードに対応する固定費情報を取得
-		FixedCost deleteData = fixedCostRepository.findByIdAndFixedCostCode(
+		FixedCost deleteData = fixedCostRepository.findByPrimaryKey(
 				SearchQueryUserIdAndFixedCostCode.from(userId, fixedCostCode));
 		if(deleteData == null) {
 			throw new MyHouseholdAccountBookRuntimeException("削除対象の固定費が固定費テーブル:FIXED_COST_TABLEに存在しません。管理者に問い合わせてください。[fixedCostCode=" + fixedCostCode + "]");
@@ -424,7 +424,7 @@ public class FixedCostInfoManageUseCase {
 		if(Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
 			
 			// 新規採番する固定費コードの値を取得
-			int count = fixedCostRepository.countById(SearchQueryUserId.from(userId));
+			int count = fixedCostRepository.countByUserId(SearchQueryUserId.from(userId));
 			count++;
 			if(count > 9999) {
 				response.addErrorMessage("固定費情報は9999件以上登録できません。管理者に問い合わせてください。");
@@ -487,7 +487,7 @@ public class FixedCostInfoManageUseCase {
 		// レスポンスを生成
 		FixedCostInfoManageInitResponse response = FixedCostInfoManageInitResponse.getInstance(registeredFlg);
 		// 支出項目一覧をレスポンスに設定
-		expenditureItemInfoComponent.setSisyutuItemList(userId, response);
+		expenditureItemInfoComponent.setSisyutuItemResponseList(userId, response);
 		// 固定費一覧をレスポンスに設定
 		setFixedCostItemList(userId, response);
 		
@@ -504,7 +504,7 @@ public class FixedCostInfoManageUseCase {
 	 */
 	private void setFixedCostItemList(UserId userId, AbstractFixedCostItemListResponse response) {
 		// 固定費一覧を取得
-		FixedCostInquiryList searchResult = fixedCostRepository.findById(SearchQueryUserId.from(userId));
+		FixedCostInquiryList searchResult = fixedCostRepository.findByUserId(SearchQueryUserId.from(userId));
 		if(searchResult.isEmpty()) {
 			// 登録済み固定費情報が0件の場合、メッセージを設定
 			response.addMessage("登録済み固定費情報が0件です。");
@@ -567,7 +567,7 @@ public class FixedCostInfoManageUseCase {
 					OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList()));
 		
 		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
-		response.setSisyutuItemName(expenditureItemInfoComponent.getSisyutuItemName(userId, ExpenditureItemCode.from(inputForm.getSisyutuItemCode())));
+		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, ExpenditureItemCode.from(inputForm.getSisyutuItemCode())));
 		
 		return response;
 		

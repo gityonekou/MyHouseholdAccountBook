@@ -18,12 +18,12 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.yonetani.webapp.accountbook.application.usecase.common.AccountBookUserInquiryUseCase;
+import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureItemList;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.service.account.inquiry.IncomeAndExpenditureConsistencyService;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
@@ -181,7 +181,7 @@ public class AccountMonthInquiryUseCase {
 
 		// ユーザID,対象年月を検索条件にドメインデータを取得
 		AccountMonthInquiryExpenditureItemList expenditureList = sisyutuRepository.select(searchCondition);
-		IncomeAndExpenditure incomeAndExpenditure = syuusiRepository.findByUserIdAndYearMonth(searchCondition);
+		IncomeAndExpenditure incomeAndExpenditure = syuusiRepository.findByPrimaryKey(searchCondition);
 		
 		// データ存在の整合性検証(収支データなし&支出金額データありの場合はエラー)
 		consistencyService.validateDataExistence(incomeAndExpenditure, expenditureList, searchCondition);

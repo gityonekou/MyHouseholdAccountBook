@@ -27,8 +27,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuKingakuItem;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureAmountItem;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.infrastructure.datasource.account.expenditure.SisyutuKingakuTableDataSource;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry.IncomeAndExpenditureTableMapper;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry.SisyutuKingakuTableMapper;
 
@@ -88,14 +89,14 @@ class SisyutuKingakuTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.inquiry.SisyutuKingakuTableDataSource#add(com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuKingakuItem)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.expenditure.SisyutuKingakuTableDataSource#add(com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureAmountItem)} のためのテスト・メソッド。
 	 */
 	@Test
 	@DisplayName("add:支出金額テーブルへの新規登録テスト(全カラム確認)")
 	void testAdd() {
 		/* 全項目の登録チェック */
 		// テストデータ：全項目あり(SISYUTU_KINGAKU_B, SISYUTU_KINGAKU_C, SISYUTU_SIHARAI_DATEあり)
-		SisyutuKingakuItem addData = SisyutuKingakuItem.from(
+		ExpenditureAmountItem addData = ExpenditureAmountItem.from(
 				"TEST-USER-ID", "2025", "12", "0001", "0000",
 				new BigDecimal("50000.00"), new BigDecimal("45000.00"),
 				new BigDecimal("5000.00"), new BigDecimal("3000.00"),
@@ -125,7 +126,7 @@ class SisyutuKingakuTableDataSourceTest {
 				"同じデータを登録した場合、一意制約違反となること");
 
 		/* null可項目の登録チェック(SISYUTU_KINGAKU_B=null, SISYUTU_KINGAKU_C=null, SISYUTU_SIHARAI_DATE=null) */
-		SisyutuKingakuItem addNullData = SisyutuKingakuItem.from(
+		ExpenditureAmountItem addNullData = ExpenditureAmountItem.from(
 				"TEST-USER-ID", "2025", "12", "0002", "0000",
 				new BigDecimal("30000.00"), new BigDecimal("28000.00"),
 				null, null, null);
@@ -148,7 +149,7 @@ class SisyutuKingakuTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.inquiry.SisyutuKingakuTableDataSource#update(com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuKingakuItem)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.expenditure.SisyutuKingakuTableDataSource#update(com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureAmountItem)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(value = "SisyutuKingakuTableDataSourceUpdateTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -163,7 +164,7 @@ class SisyutuKingakuTableDataSourceTest {
 
 		// 更新データ：SISYUTU_KINGAKU, SISYUTU_KINGAKU_B, SISYUTU_KINGAKU_C, SISYUTU_SIHARAI_DATEを変更
 		// 意図的にSISYUTU_YOTEI_KINGAKUとPARENT_SISYUTU_ITEM_CODEに別の値をセット(更新されないことを確認)
-		SisyutuKingakuItem updateData = SisyutuKingakuItem.from(
+		ExpenditureAmountItem updateData = ExpenditureAmountItem.from(
 				"TEST-USER-ID", "2025", "12", "0001", "9999",
 				new BigDecimal("99999.00"), new BigDecimal("48000.00"),
 				new BigDecimal("6000.00"), new BigDecimal("2000.00"),
@@ -188,14 +189,14 @@ class SisyutuKingakuTableDataSourceTest {
 				"親支出項目コード(PARENT_SISYUTU_ITEM_CODE)が更新されていないこと");
 
 		/* 対象データなしの場合、0件が返ること */
-		SisyutuKingakuItem notFoundData = SisyutuKingakuItem.from(
+		ExpenditureAmountItem notFoundData = ExpenditureAmountItem.from(
 				"TEST-USER-ID", "2025", "12", "9999", "0000",
 				new BigDecimal("0.00"), new BigDecimal("0.00"),
 				null, null, null);
 		assertEquals(0, repository.update(notFoundData), "対象データなしの場合、0件であること");
 
 		/* null可項目の更新チェック(SISYUTU_KINGAKU_B=null, SISYUTU_KINGAKU_C=null, SISYUTU_SIHARAI_DATE=null) */
-		SisyutuKingakuItem updateNullData = SisyutuKingakuItem.from(
+		ExpenditureAmountItem updateNullData = ExpenditureAmountItem.from(
 				"TEST-USER-ID", "2025", "12", "0001", "9999",
 				new BigDecimal("99999.00"), new BigDecimal("42000.00"),
 				null, null, null);

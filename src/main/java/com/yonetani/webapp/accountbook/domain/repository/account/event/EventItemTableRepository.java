@@ -71,7 +71,7 @@ public interface EventItemTableRepository {
 	 * @return イベント情報のリスト
 	 *
 	 */
-	EventItemInquiryList findById(SearchQueryUserId userId);
+	EventItemInquiryList findByUserId(SearchQueryUserId userId);
 	
 	/**
 	 *<pre>
@@ -81,17 +81,17 @@ public interface EventItemTableRepository {
 	 * @return イベント情報のリスト
 	 *
 	 */
-	EventItemInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndExpenditureItemCode search);
+	EventItemInquiryList findByUserIdAndExpenditureItemCode(SearchQueryUserIdAndExpenditureItemCode search);
 	
 	/**
 	 *<pre>
-	 * ユーザID、イベントコードに対応するイベント情報を取得します。
+	 * イベントテーブル:EVENT_ITEM_TABLEの主キー（ユーザID、イベントコード）でイベントテーブルを検索し、結果を取得します。
 	 *</pre>
 	 * @param search 検索対象のユーザID、イベントコード
 	 * @return イベント情報
 	 *
 	 */
-	EventItem findByIdAndEventCode(SearchQueryUserIdAndEventCode search);
+	EventItem findByPrimaryKey(SearchQueryUserIdAndEventCode search);
 	
 	/**
 	 *<pre>
@@ -101,5 +101,5 @@ public interface EventItemTableRepository {
 	 * @return 指定条件に該当するデータの件数
 	 *
 	 */
-	int countById(SearchQueryUserId userId);
+	int countByUserId(SearchQueryUserId userId);
 }

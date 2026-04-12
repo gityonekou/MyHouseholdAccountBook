@@ -122,7 +122,7 @@ public class ShoppingItemInfoManageUseCase {
 		ShoppingItemInfoManageInitResponse response = ShoppingItemInfoManageInitResponse.getInstance();
 		
 		// 支出項目：飲食日用品から、日用消耗品と飲食の項目をすべて取得(表示順から取得する)
-		expenditureItemInfoComponent.setSisyutuItemList(
+		expenditureItemInfoComponent.setSisyutuItemResponseList(
 				// ログインユーザ情報
 				UserId.from(user.getUserId()),
 				// 検索条件:支出項目表示順A：日用消耗品の表示順の値:0501000000 (変更不可の値なので固定値)
@@ -209,7 +209,7 @@ public class ShoppingItemInfoManageUseCase {
 						// 商品JANコード
 						searchResult.getShoppingItemJanCode().getValue(),
 						// 支出項目名(＞で区切った値)
-						expenditureItemInfoComponent.getSisyutuItemName(userId, searchResult.getExpenditureItemCode()),
+						expenditureItemInfoComponent.getExpenditureItemName(userId, searchResult.getExpenditureItemCode()),
 						// 会社名
 						searchResult.getCompanyName().getValue()));
 		
@@ -285,7 +285,7 @@ public class ShoppingItemInfoManageUseCase {
 		// 基準店舗選択ボックス表示情報を設定したレスポンスを生成
 		ShoppingItemInfoManageUpdateResponse response = createShoppingItemInfoManageUpdateResponse(userId, addItemForm);
 		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
-		response.setSisyutuItemName(expenditureItemInfoComponent.getSisyutuItemName(userId, sisyutuItemCode));
+		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, sisyutuItemCode));
 		
 		return response;
 	}
@@ -354,7 +354,7 @@ public class ShoppingItemInfoManageUseCase {
 		// 基準店舗選択ボックス表示情報を設定したレスポンスを生成
 		ShoppingItemInfoManageUpdateResponse response = createShoppingItemInfoManageUpdateResponse(userId, addItemForm);
 		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
-		response.setSisyutuItemName(expenditureItemInfoComponent.getSisyutuItemName(userId, searchResult.getExpenditureItemCode()));
+		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, searchResult.getExpenditureItemCode()));
 		
 		// コピーした情報を新規登録する旨をメッセージ表示
 		response.addMessage("「コピーして商品を新規追加」が選択されています。");
@@ -420,7 +420,7 @@ public class ShoppingItemInfoManageUseCase {
 		// 基準店舗選択ボックス表示情報を設定したレスポンスを生成
 		ShoppingItemInfoManageUpdateResponse response = createShoppingItemInfoManageUpdateResponse(userId, updateItemForm);
 		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
-		response.setSisyutuItemName(expenditureItemInfoComponent.getSisyutuItemName(userId, searchResult.getExpenditureItemCode()));
+		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, searchResult.getExpenditureItemCode()));
 		
 		return response;
 	}
@@ -542,7 +542,7 @@ public class ShoppingItemInfoManageUseCase {
 		// 基準店舗選択ボックス表示情報を設定したレスポンスを生成
 		ShoppingItemInfoManageUpdateResponse response = createShoppingItemInfoManageUpdateResponse(userId, inputForm);
 		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
-		response.setSisyutuItemName(expenditureItemInfoComponent.getSisyutuItemName(userId, sisyutuItemCode));
+		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, sisyutuItemCode));
 		
 		return response;
 	}
@@ -840,7 +840,7 @@ public class ShoppingItemInfoManageUseCase {
 	 */
 	private void execActSearchSisyutuItem(UserId userId, ExpenditureItemCode sisyutuItemCode, AbstractShoppingItemInfoManageSearchResponse response) {
 		// 選択した支出項目名を取得(＞で区切った値)
-		String sisyutuItemName = expenditureItemInfoComponent.getSisyutuItemName(userId, sisyutuItemCode);
+		String sisyutuItemName = expenditureItemInfoComponent.getExpenditureItemName(userId, sisyutuItemCode);
 		
 		// 指定した支出項目コードに属する商品一覧を取得
 		ShoppingItemInquiryList searchResult = shoppingItemRepository.findByIdAndExpenditureItemCode(

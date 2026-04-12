@@ -10,7 +10,7 @@
  */
 package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
 
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 
 import lombok.AccessLevel;

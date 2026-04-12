@@ -63,7 +63,7 @@ public class ExpenditureItemSelectUseCase {
 		// レスポンス
 		ExpenditureItemSelectResponse response = ExpenditureItemSelectResponse.getInstance();
 		// 支出項目一覧をすべて取得
-		expenditureItemInfoComponent.setSisyutuItemList(UserId.from(user.getUserId()), response);
+		expenditureItemInfoComponent.setSisyutuItemResponseList(UserId.from(user.getUserId()), response);
 
 		return response;
 	}
@@ -83,25 +83,25 @@ public class ExpenditureItemSelectUseCase {
 		// ドメインタイプ:ユーザID
 		UserId userId = UserId.from(user.getUserId());
 		// ドメインタイプ:支出項目コード
-		ExpenditureItemCode sisyutuItemCode = ExpenditureItemCode.from(sisyutuItemCodeStr);
+		ExpenditureItemCode expenditureItemCode = ExpenditureItemCode.from(sisyutuItemCodeStr);
 
 		// レスポンス
 		ExpenditureItemSelectResponse response = ExpenditureItemSelectResponse.getInstance();
 		// 支出項目一覧をすべて取得
-		expenditureItemInfoComponent.setSisyutuItemList(userId, response);
+		expenditureItemInfoComponent.setSisyutuItemResponseList(userId, response);
 		// 支出項目詳細内容を設定(支出項目選択画面からの支出項目選択なので、対象の支出項目がない場合:null)チェックは不要とする
 		response.setSisyutuItemDetailContext(
-				expenditureItemInfoComponent.getSisyutuItem(userId, sisyutuItemCode).getExpenditureItemDetailContext().getValue());
+				expenditureItemInfoComponent.getExpenditureItemInfo(userId, expenditureItemCode).getExpenditureItemDetailContext().getValue());
 		// 支出項目コードに対応する支出項目名(＞で区切った値)を設定
-		response.setSisyutuItemName(expenditureItemInfoComponent.getSisyutuItemName(userId, sisyutuItemCode));
+		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, expenditureItemCode));
 
 		// 選択した支出項目のフォームデータを作成
 		ExpenditureSelectItemForm selectForm = new ExpenditureSelectItemForm();
-		selectForm.setSisyutuItemCode(sisyutuItemCode.getValue());
+		selectForm.setSisyutuItemCode(expenditureItemCode.getValue());
 
 		// イベント支出項目でイベントが登録されている場合、対応するイベント一覧を取得し選択プルダウンリストとしてレスポンスに設定
-		EventItemInquiryList inquiryList = eventRepository.findByIdAndSisyutuItemCode(
-				SearchQueryUserIdAndExpenditureItemCode.from(userId, sisyutuItemCode));
+		EventItemInquiryList inquiryList = eventRepository.findByUserIdAndExpenditureItemCode(
+				SearchQueryUserIdAndExpenditureItemCode.from(userId, expenditureItemCode));
 		if(!inquiryList.isEmpty()) {
 			// 検索結果ありの場合、イベント情報選択のプルダウンリストをレスポンスに設定
 			response.addEventSelectList(inquiryList.getValues().stream().map(domain -> {

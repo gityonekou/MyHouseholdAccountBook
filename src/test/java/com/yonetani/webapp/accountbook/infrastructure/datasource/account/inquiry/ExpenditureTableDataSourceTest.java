@@ -27,8 +27,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.infrastructure.datasource.account.expenditure.ExpenditureTableDataSource;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry.ExpenditureTableMapper;
 
 /**
@@ -86,7 +87,7 @@ class ExpenditureTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.inquiry.ExpenditureTableDataSource#add(com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.expenditure.ExpenditureTableDataSource#add(com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem)} のためのテスト・メソッド。
 	 */
 	@Test
 	@DisplayName("add:支出テーブルへの新規登録テスト(全カラム確認)")
@@ -149,7 +150,7 @@ class ExpenditureTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.inquiry.ExpenditureTableDataSource#update(com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.expenditure.ExpenditureTableDataSource#update(com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(value = "ExpenditureTableDataSourceUpdateTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -219,7 +220,7 @@ class ExpenditureTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.inquiry.ExpenditureTableDataSource#delete(com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.expenditure.ExpenditureTableDataSource#delete(com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(value = "ExpenditureTableDataSourceDeleteTest.sql", config = @SqlConfig(encoding = "UTF-8"))

@@ -33,13 +33,13 @@ import org.springframework.util.StringUtils;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItemInquiryList;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuKingakuItem;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItemInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureAmountItem;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureItemCodeAndExpenditureCategory;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.SisyutuKingakuTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureCategory;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
@@ -111,88 +111,88 @@ public class ShoppingRegistExpenditureItemComponent {
 		// 簡易タイプ買い物リストの項目に対応する支出テーブル情報と支出金額テーブル情報を取得
 		// 支出テーブル情報には外食、仕事のデータ登録なしでOK。データがある場合でも値の更新は不要
 		// 飲食(無駄遣いなし)
-		ExpenditureItemInquiryList beforeFoodList = expenditureRepository.findById(
+		ExpenditureItemInquiryList beforeFoodList = expenditureRepository.findByExpenditureItemCodeAndCategory(
 				SearchQueryUserIdAndYearMonthAndExpenditureItemCodeAndExpenditureCategory.from(userId, targetYearMonth, foodItemCode, ExpenditureCategory.NON_WASTED));
 		if(!beforeFoodList.isOne()) {
 			// エラーメッセージを追加
 			responseMessage.add("飲食(無駄づかいなし)に対応する支出情報が登録されていないか複数登録されています。支出登録画面で飲食(無駄使いなし)の支出情報を登録してから再度実行してください。");
 		}
 		// 飲食(無駄遣いB)
-		ExpenditureItemInquiryList beforeFoodBList = expenditureRepository.findById(
+		ExpenditureItemInquiryList beforeFoodBList = expenditureRepository.findByExpenditureItemCodeAndCategory(
 				SearchQueryUserIdAndYearMonthAndExpenditureItemCodeAndExpenditureCategory.from(userId, targetYearMonth, foodItemCode, ExpenditureCategory.WASTED_B));
 		if(!beforeFoodBList.isOne() ) {
 			// エラーメッセージを追加
 			responseMessage.add("飲食(無駄遣いB)に対応する支出情報が登録されていないか複数登録されています。支出登録画面で飲食(無駄遣いB)の支出情報を登録してから再度実行してください。");
 		}
 		// 飲食(無駄使いC)
-		ExpenditureItemInquiryList beforeFoodCList = expenditureRepository.findById(
+		ExpenditureItemInquiryList beforeFoodCList = expenditureRepository.findByExpenditureItemCodeAndCategory(
 				SearchQueryUserIdAndYearMonthAndExpenditureItemCodeAndExpenditureCategory.from(userId, targetYearMonth, foodItemCode, ExpenditureCategory.WASTED_C));
 		if(!beforeFoodCList.isOne()) {
 			// エラーメッセージを追加
 			responseMessage.add("飲食(無駄使いC)に対応する支出情報が登録されていないか複数登録されています。支出登録画面で飲食(無駄使いC)の支出情報を登録してから再度実行してください。");
 		}
 		// 支出金額テーブル情報(飲食)
-		SisyutuKingakuItem beforeFood = sisyutuKingakuTableRepository.findByUniqueKey(SearchQueryUserIdAndYearMonthAndExpenditureItemCode.from(userId, targetYearMonth, foodItemCode));
+		ExpenditureAmountItem beforeFood = sisyutuKingakuTableRepository.findByPrimaryKey(SearchQueryUserIdAndYearMonthAndExpenditureItemCode.from(userId, targetYearMonth, foodItemCode));
 		if(beforeFood == null) {
 			throw new MyHouseholdAccountBookRuntimeException("支出金額テーブル情報(飲食)が登録されていません。管理者に問い合わせてください。[userId=" + userId.getValue() + "][targetYearMonth:" + targetYearMonth.getValue() + "]");
 		}
 		
 		// 一人プチ贅沢・外食
 		SearchQueryUserIdAndYearMonthAndExpenditureItemCode searchDineOut = SearchQueryUserIdAndYearMonthAndExpenditureItemCode.from(userId, targetYearMonth, dineOutItemCode);
-		ExpenditureItemInquiryList beforeDineOutList = expenditureRepository.findById(searchDineOut);
+		ExpenditureItemInquiryList beforeDineOutList = expenditureRepository.findByExpenditureItemCode(searchDineOut);
 		if(!beforeDineOutList.isOne()) {
 			// エラーメッセージを追加
 			responseMessage.add("一人プチ贅沢・外食に対応する支出情報が登録されていないか複数登録されています。支出登録画面で一人プチ贅沢・外食の支出情報を登録してから再度実行してください。");
 		}
-		SisyutuKingakuItem beforeDineOut = sisyutuKingakuTableRepository.findByUniqueKey(searchDineOut);
+		ExpenditureAmountItem beforeDineOut = sisyutuKingakuTableRepository.findByPrimaryKey(searchDineOut);
 		if(beforeDineOut == null) {
 			throw new MyHouseholdAccountBookRuntimeException("支出金額テーブル情報(一人プチ贅沢・外食)が登録されていません。管理者に問い合わせてください。[userId=" + userId.getValue() + "][targetYearMonth:" + targetYearMonth.getValue() + "]");
 		}
 		
 		// 日用消耗品
 		SearchQueryUserIdAndYearMonthAndExpenditureItemCode searchConsumerGoods = SearchQueryUserIdAndYearMonthAndExpenditureItemCode.from(userId, targetYearMonth, consumerGoodsItemCode);
-		ExpenditureItemInquiryList beforeConsumerGoodsList = expenditureRepository.findById(searchConsumerGoods);
+		ExpenditureItemInquiryList beforeConsumerGoodsList = expenditureRepository.findByExpenditureItemCode(searchConsumerGoods);
 		if(!beforeConsumerGoodsList.isOne()) {
 			// エラーメッセージを追加
 			responseMessage.add("日用消耗品に対応する支出情報が登録されていないか複数登録されています。支出登録画面で日用消耗品の支出情報を登録してから再度実行してください。");
 		}
-		SisyutuKingakuItem beforeConsumerGoods = sisyutuKingakuTableRepository.findByUniqueKey(searchConsumerGoods);
+		ExpenditureAmountItem beforeConsumerGoods = sisyutuKingakuTableRepository.findByPrimaryKey(searchConsumerGoods);
 		if(beforeConsumerGoods == null) {
 			throw new MyHouseholdAccountBookRuntimeException("支出金額テーブル情報(日用消耗品)が登録されていません。管理者に問い合わせてください。[userId=" + userId.getValue() + "][targetYearMonth:" + targetYearMonth.getValue() + "]");
 		}
 		
 		// 被服費
 		SearchQueryUserIdAndYearMonthAndExpenditureItemCode searchClothes = SearchQueryUserIdAndYearMonthAndExpenditureItemCode.from(userId, targetYearMonth, clothesItemCode);
-		ExpenditureItemInquiryList beforeClothesList = expenditureRepository.findById(searchClothes);
+		ExpenditureItemInquiryList beforeClothesList = expenditureRepository.findByExpenditureItemCode(searchClothes);
 		if(!beforeClothesList.isOne()) {
 			// エラーメッセージを追加
 			responseMessage.add("被服費に対応する支出情報が登録されていないか複数登録されています。支出登録画面で被服費の支出情報を登録してから再度実行してください。");
 		}
-		SisyutuKingakuItem beforeClothes = sisyutuKingakuTableRepository.findByUniqueKey(searchClothes);
+		ExpenditureAmountItem beforeClothes = sisyutuKingakuTableRepository.findByPrimaryKey(searchClothes);
 		if(beforeClothes == null) {
 			throw new MyHouseholdAccountBookRuntimeException("支出金額テーブル情報(被服費)が登録されていません。管理者に問い合わせてください。[userId=" + userId.getValue() + "][targetYearMonth:" + targetYearMonth.getValue() + "]");
 		}
 		
 		// 仕事(流動経費)
 		SearchQueryUserIdAndYearMonthAndExpenditureItemCode searchWork = SearchQueryUserIdAndYearMonthAndExpenditureItemCode.from(userId, targetYearMonth, workItemCode);
-		ExpenditureItemInquiryList beforeWorkList = expenditureRepository.findById(searchWork);
+		ExpenditureItemInquiryList beforeWorkList = expenditureRepository.findByExpenditureItemCode(searchWork);
 		if(!beforeWorkList.isOne()) {
 			// エラーメッセージを追加
 			responseMessage.add("仕事(流動経費)に対応する支出情報が登録されていないか複数登録されています。支出登録画面で仕事(流動経費)の支出情報を登録してから再度実行してください。");
 		}
-		SisyutuKingakuItem beforeWork = sisyutuKingakuTableRepository.findByUniqueKey(searchWork);
+		ExpenditureAmountItem beforeWork = sisyutuKingakuTableRepository.findByPrimaryKey(searchWork);
 		if(beforeWork == null) {
 			throw new MyHouseholdAccountBookRuntimeException("支出金額テーブル情報(仕事(流動経費))が登録されていません。管理者に問い合わせてください。[userId=" + userId.getValue() + "][targetYearMonth:" + targetYearMonth.getValue() + "]");
 		}
 		
 		// 住居設備
 		SearchQueryUserIdAndYearMonthAndExpenditureItemCode searchHouseEquipment = SearchQueryUserIdAndYearMonthAndExpenditureItemCode.from(userId, targetYearMonth, houseEquipmentItemCode);
-		ExpenditureItemInquiryList beforeHouseEquipmentList = expenditureRepository.findById(searchHouseEquipment);
+		ExpenditureItemInquiryList beforeHouseEquipmentList = expenditureRepository.findByExpenditureItemCode(searchHouseEquipment);
 		if(!beforeHouseEquipmentList.isOne()) {
 			// エラーメッセージを追加
 			responseMessage.add("住居設備に対応する支出情報が登録されていないか複数登録されています。支出登録画面で住居設備の支出情報を登録してから再度実行してください。");
 		}
-		SisyutuKingakuItem beforeHouseEquipment = sisyutuKingakuTableRepository.findByUniqueKey(searchHouseEquipment);
+		ExpenditureAmountItem beforeHouseEquipment = sisyutuKingakuTableRepository.findByPrimaryKey(searchHouseEquipment);
 		if(beforeHouseEquipment == null) {
 			throw new MyHouseholdAccountBookRuntimeException("支出金額テーブル情報(住居設備)が登録されていません。管理者に問い合わせてください。[userId=" + userId.getValue() + "][targetYearMonth:" + targetYearMonth.getValue() + "]");
 		}
@@ -279,7 +279,7 @@ public class ShoppingRegistExpenditureItemComponent {
 	public ExpenditureItem getFoodExpenditureItem(UserId userId, TargetYearMonth targetYearMonth) {
 		log.debug("getFoodExpenditureItem:userid=" + userId.getValue() + ",targetYearMonth=" + targetYearMonth.getValue());
 		// 飲食(無駄づかいなし)
-		ExpenditureItemInquiryList beforeList = expenditureRepository.findById(
+		ExpenditureItemInquiryList beforeList = expenditureRepository.findByExpenditureItemCodeAndCategory(
 				SearchQueryUserIdAndYearMonthAndExpenditureItemCodeAndExpenditureCategory.from(userId, targetYearMonth, foodItemCode, ExpenditureCategory.NON_WASTED));
 		if(!beforeList.isOne()) {
 			throw new MyHouseholdAccountBookRuntimeException("飲食(無駄づかいなし)に対応する支出情報が登録されていないか複数登録されています。支出登録画面で飲食(無駄使いなし)の支出情報を再登録してから再度実行してください。[userId=" + userId.getValue() + "][targetYearMonth:" + targetYearMonth.getValue() + "]");
@@ -300,7 +300,7 @@ public class ShoppingRegistExpenditureItemComponent {
 	public ExpenditureItem getFoodBExpenditureItem(UserId userId, TargetYearMonth targetYearMonth) {
 		log.debug("getFoodBExpenditureItem:userid=" + userId.getValue() + ",targetYearMonth=" + targetYearMonth.getValue());
 		// 飲食(無駄遣いB)
-		ExpenditureItemInquiryList beforeList = expenditureRepository.findById(
+		ExpenditureItemInquiryList beforeList = expenditureRepository.findByExpenditureItemCodeAndCategory(
 				SearchQueryUserIdAndYearMonthAndExpenditureItemCodeAndExpenditureCategory.from(userId, targetYearMonth, foodItemCode, ExpenditureCategory.WASTED_B));
 		if(!beforeList.isOne()) {
 			throw new MyHouseholdAccountBookRuntimeException("飲食(無駄遣いB)に対応する支出情報が登録されていないか複数登録されています。支出登録画面で飲食(無駄遣いB)の支出情報を再登録してから再度実行してください。[userId=" + userId.getValue() + "][targetYearMonth:" + targetYearMonth.getValue() + "]");
@@ -321,7 +321,7 @@ public class ShoppingRegistExpenditureItemComponent {
 	public ExpenditureItem getFoodCExpenditureItem(UserId userId, TargetYearMonth targetYearMonth) {
 		log.debug("getFoodCExpenditureItem:userid=" + userId.getValue() + ",targetYearMonth=" + targetYearMonth.getValue());
 		// 飲食(無駄遣いC)
-		ExpenditureItemInquiryList beforeList = expenditureRepository.findById(
+		ExpenditureItemInquiryList beforeList = expenditureRepository.findByExpenditureItemCodeAndCategory(
 				SearchQueryUserIdAndYearMonthAndExpenditureItemCodeAndExpenditureCategory.from(userId, targetYearMonth, foodItemCode, ExpenditureCategory.WASTED_C));
 		if(!beforeList.isOne()) {
 			throw new MyHouseholdAccountBookRuntimeException("飲食(無駄遣いC)に対応する支出情報が登録されていないか複数登録されています。支出登録画面で飲食(無駄遣いC)の支出情報を再登録してから再度実行してください。[userId=" + userId.getValue() + "][targetYearMonth:" + targetYearMonth.getValue() + "]");
@@ -342,7 +342,7 @@ public class ShoppingRegistExpenditureItemComponent {
 	public ExpenditureItem getDineOutExpenditureItem(UserId userId, TargetYearMonth targetYearMonth) {
 		log.debug("getDineOutExpenditureItem:userid=" + userId.getValue() + ",targetYearMonth=" + targetYearMonth.getValue());
 		// 一人プチ贅沢・外食
-		ExpenditureItemInquiryList beforeList = expenditureRepository.findById(SearchQueryUserIdAndYearMonthAndExpenditureItemCode.from(userId, targetYearMonth, dineOutItemCode));
+		ExpenditureItemInquiryList beforeList = expenditureRepository.findByExpenditureItemCode(SearchQueryUserIdAndYearMonthAndExpenditureItemCode.from(userId, targetYearMonth, dineOutItemCode));
 		if(!beforeList.isOne()) {
 			throw new MyHouseholdAccountBookRuntimeException("一人プチ贅沢・外食に対応する支出情報が登録されていないか複数登録されています。支出登録画面で一人プチ贅沢・外食の支出情報を再登録してから再度実行してください。[userId=" + userId.getValue() + "][targetYearMonth:" + targetYearMonth.getValue() + "]");
 		}
@@ -362,7 +362,7 @@ public class ShoppingRegistExpenditureItemComponent {
 	public ExpenditureItem getConsumerGoodsExpenditureItem(UserId userId, TargetYearMonth targetYearMonth) {
 		log.debug("getConsumerGoodsExpenditureItem:userid=" + userId.getValue() + ",targetYearMonth=" + targetYearMonth.getValue());
 		// 日用消耗品
-		ExpenditureItemInquiryList beforeList = expenditureRepository.findById(SearchQueryUserIdAndYearMonthAndExpenditureItemCode.from(userId, targetYearMonth, consumerGoodsItemCode));
+		ExpenditureItemInquiryList beforeList = expenditureRepository.findByExpenditureItemCode(SearchQueryUserIdAndYearMonthAndExpenditureItemCode.from(userId, targetYearMonth, consumerGoodsItemCode));
 		if(!beforeList.isOne()) {
 			throw new MyHouseholdAccountBookRuntimeException("日用消耗品に対応する支出情報が登録されていないか複数登録されています。支出登録画面で日用消耗品の支出情報を再登録してから再度実行してください。[userId=" + userId.getValue() + "][targetYearMonth:" + targetYearMonth.getValue() + "]");
 		}
@@ -382,7 +382,7 @@ public class ShoppingRegistExpenditureItemComponent {
 	public ExpenditureItem getClothesExpenditureItem(UserId userId, TargetYearMonth targetYearMonth) {
 		log.debug("getClothesExpenditureItem:userid=" + userId.getValue() + ",targetYearMonth=" + targetYearMonth.getValue());
 		// 被服費
-		ExpenditureItemInquiryList beforeList = expenditureRepository.findById(SearchQueryUserIdAndYearMonthAndExpenditureItemCode.from(userId, targetYearMonth, clothesItemCode));
+		ExpenditureItemInquiryList beforeList = expenditureRepository.findByExpenditureItemCode(SearchQueryUserIdAndYearMonthAndExpenditureItemCode.from(userId, targetYearMonth, clothesItemCode));
 		if(!beforeList.isOne()) {
 			throw new MyHouseholdAccountBookRuntimeException("被服費に対応する支出情報が登録されていないか複数登録されています。支出登録画面で被服費の支出情報を再登録してから再度実行してください。[userId=" + userId.getValue() + "][targetYearMonth:" + targetYearMonth.getValue() + "]");
 		}
@@ -402,7 +402,7 @@ public class ShoppingRegistExpenditureItemComponent {
 	public ExpenditureItem getWorkExpenditureItem(UserId userId, TargetYearMonth targetYearMonth) {
 		log.debug("getWorkExpenditureItem:userid=" + userId.getValue() + ",targetYearMonth=" + targetYearMonth.getValue());
 		// 仕事(流動経費)
-		ExpenditureItemInquiryList beforeList = expenditureRepository.findById(SearchQueryUserIdAndYearMonthAndExpenditureItemCode.from(userId, targetYearMonth, workItemCode));
+		ExpenditureItemInquiryList beforeList = expenditureRepository.findByExpenditureItemCode(SearchQueryUserIdAndYearMonthAndExpenditureItemCode.from(userId, targetYearMonth, workItemCode));
 		if(!beforeList.isOne()) {
 			throw new MyHouseholdAccountBookRuntimeException("仕事(流動経費)に対応する支出情報が登録されていないか複数登録されています。支出登録画面で仕事(流動経費)の支出情報を再登録してから再度実行してください。[userId=" + userId.getValue() + "][targetYearMonth:" + targetYearMonth.getValue() + "]");
 		}
@@ -422,7 +422,7 @@ public class ShoppingRegistExpenditureItemComponent {
 	public ExpenditureItem getHouseEquipmentExpenditureItem(UserId userId, TargetYearMonth targetYearMonth) {
 		log.debug("getHouseEquipmentExpenditureItem:userid=" + userId.getValue() + ",targetYearMonth=" + targetYearMonth.getValue());
 		// 住居設備
-		ExpenditureItemInquiryList beforeList = expenditureRepository.findById(SearchQueryUserIdAndYearMonthAndExpenditureItemCode.from(userId, targetYearMonth, houseEquipmentItemCode));
+		ExpenditureItemInquiryList beforeList = expenditureRepository.findByExpenditureItemCode(SearchQueryUserIdAndYearMonthAndExpenditureItemCode.from(userId, targetYearMonth, houseEquipmentItemCode));
 		if(!beforeList.isOne()) {
 			throw new MyHouseholdAccountBookRuntimeException("住居設備に対応する支出情報が登録されていないか複数登録されています。支出登録画面で住居設備の支出情報を再登録してから再度実行してください。[userId=" + userId.getValue() + "][targetYearMonth:" + targetYearMonth.getValue() + "]");
 		}

@@ -25,7 +25,7 @@ import com.yonetani.webapp.accountbook.application.usecase.common.CodeTableItemC
 import com.yonetani.webapp.accountbook.application.usecase.common.ExpenditureItemInfoComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditureinfo.ExpenditureItemInfo;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureCategory;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
@@ -149,8 +149,8 @@ public class IncomeAndExpenditureRegistListComponent {
 				expenditureNameBuff.append(session.getExpenditureName());
 
 				// 支出項目コードに対応する支出項目情報を取得
-				SisyutuItem sisyutuItem = expenditureItemInfoComponent.getSisyutuItem(userId, ExpenditureItemCode.from(session.getExpenditureItemCode()));
-				if(sisyutuItem == null) {
+				ExpenditureItemInfo expenditureItemInfo = expenditureItemInfoComponent.getExpenditureItemInfo(userId, ExpenditureItemCode.from(session.getExpenditureItemCode()));
+				if(expenditureItemInfo == null) {
 					throw new MyHouseholdAccountBookRuntimeException(
 							"支出項目コードに対応する支出項目情報が存在しません。管理者に問い合わせてください。[sisyutuItemCode=" + session.getExpenditureItemCode() + "]");
 				}
@@ -158,7 +158,7 @@ public class IncomeAndExpenditureRegistListComponent {
 				/* セッションの支出情報から画面表示データを作成 */
 				expenditureList.add(ExpenditureListItem.from(
 						// 支出項目名(＞で区切らない値)を設定
-						sisyutuItem.getExpenditureItemName().getValue(),
+						expenditureItemInfo.getExpenditureItemName().getValue(),
 						// 支出コード(仮登録用支出コード)
 						session.getExpenditureCode(),
 						// 支出名と支出区分

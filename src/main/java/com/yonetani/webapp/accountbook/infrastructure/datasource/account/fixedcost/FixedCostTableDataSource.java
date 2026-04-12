@@ -81,7 +81,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public FixedCost findByIdAndFixedCostCode(SearchQueryUserIdAndFixedCostCode search) {
+	public FixedCost findByPrimaryKey(SearchQueryUserIdAndFixedCostCode search) {
 		// 検索結果を取得
 		FixedCostReadWriteDto searchResult = mapper.findByIdAndFixedCostCode(
 				UserIdAndFixedCostCodeSearchQueryDto.from(search));
@@ -98,7 +98,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public FixedCostInquiryList findById(SearchQueryUserId userId) {
+	public FixedCostInquiryList findByUserId(SearchQueryUserId userId) {
 		// 検索結果を取得
 		List<FixedCostInquiryReadDto> searchResult = mapper.findById(
 				UserIdSearchQueryDto.from(userId));
@@ -116,7 +116,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public FixedCostInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndExpenditureItemCode search) {
+	public FixedCostInquiryList findByExpenditureItemCode(SearchQueryUserIdAndExpenditureItemCode search) {
 		// 検索結果を取得
 		List<FixedCostInquiryReadDto> searchResult = mapper.findByIdAndSisyutuItemCode(
 				UserIdAndSisyutuItemCodeSearchQueryDto.from(search));
@@ -134,7 +134,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public FixedCostList findByIdAndFixedCostShiharaiTukiList(SearchQueryUserIdAndFixedCostTargetPaymentMonthList search) {
+	public FixedCostList findByFixedCostTargetPaymentMonthList(SearchQueryUserIdAndFixedCostTargetPaymentMonthList search) {
 		// 検索結果を取得
 		List<FixedCostReadWriteDto> searchResult = mapper.findByIdAndFixedCostShiharaiTukiList(
 				UserIdAndFixedCostShiharaiTukiListSearchQueryDto.from(search));
@@ -153,7 +153,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int countById(SearchQueryUserId userId) {
+	public int countByUserId(SearchQueryUserId userId) {
 		// ユーザIDで検索し、登録されている固定費情報の件数を返す
 		return mapper.countById(UserIdSearchQueryDto.from(userId));
 	}
@@ -162,7 +162,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int countBySisyutuItemCode(SearchQueryUserIdAndExpenditureItemCode search) {
+	public int countByExpenditureItemCode(SearchQueryUserIdAndExpenditureItemCode search) {
 		// ユーザID、支出項目コードで検索し、登録されている固定費情報の件数を返す
 		return mapper.countBySisyutuItemCode(UserIdAndSisyutuItemCodeSearchQueryDto.from(search));
 	}

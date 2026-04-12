@@ -55,7 +55,7 @@ public class SimpleShoppingRegistListComponent {
 		log.debug("setSimpleShoppingRegistList:userid="+ search.getUserId().getValue() + ",yearMonth=" + search.getYearMonth().getValue());
 		
 		// 対象月の登録されている買い物情報を取得
-		SimpleShoppingRegistItemInquiryList resultList = shoppingRegistRepository.findById(search);
+		SimpleShoppingRegistItemInquiryList resultList = shoppingRegistRepository.findBy(search);
 		if(resultList.isEmpty()) {
 			// 登録済み買い物情報が0件の場合、メッセージを設定
 			response.addMessage("登録済みの買い物情報は0件です。");

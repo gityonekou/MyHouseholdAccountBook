@@ -104,7 +104,7 @@ public class ShoppingRegistTableDataSource implements ShoppingRegistTableReposit
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ShoppingRegist findByUniqueKey(SearchQueryUserIdAndYearMonthAndShoppingRegistCode search) {
+	public ShoppingRegist findByPrimaryKey(SearchQueryUserIdAndYearMonthAndShoppingRegistCode search) {
 		// 検索結果を取得
 		ShoppingRegistReadWriteDto searchResult = mapper.findByUniqueKey(
 				UserIdAndYearMonthAndShoppingRegistCodeSearchQueryDto.from(search));
@@ -121,7 +121,7 @@ public class ShoppingRegistTableDataSource implements ShoppingRegistTableReposit
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SimpleShoppingRegistItemInquiryList findById(SearchQueryUserIdAndYearMonth search) {
+	public SimpleShoppingRegistItemInquiryList findBy(SearchQueryUserIdAndYearMonth search) {
 		// 検索結果を取得
 		List<SimpleShoppingRegistItemReadDto> searchResult = mapper.findById(UserIdAndYearMonthSearchQueryDto.from(search));
 		if(searchResult == null) {
@@ -138,7 +138,7 @@ public class ShoppingRegistTableDataSource implements ShoppingRegistTableReposit
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int countById(SearchQueryUserIdAndYearMonth search) {
+	public int countBy(SearchQueryUserIdAndYearMonth search) {
 		// 検索条件に一致する買い物登録情報の件数を返します。
 		return mapper.countById(UserIdAndYearMonthSearchQueryDto.from(search));
 	}

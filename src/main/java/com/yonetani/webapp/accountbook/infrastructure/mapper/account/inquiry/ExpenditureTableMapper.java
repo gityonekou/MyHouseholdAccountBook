@@ -18,7 +18,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.ExpenditureReadWriteDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.account.expenditure.ExpenditureReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthAndSisyutuCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubunSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthAndSisyutuItemCodeSearchQueryDto;

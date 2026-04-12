@@ -61,16 +61,16 @@ import org.springframework.transaction.annotation.Transactional;
 import com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure.IncomeAndExpenditureRegistConfirmUseCase;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItemInquiryList;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureItem;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuKingakuItem;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItemInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureAmountItem;
+import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureItemCode;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
@@ -535,11 +535,11 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 
 		// Then: INCOME_TABLE検証（3件INSERT：kubun=1/2/3）
 		SearchQueryUserIdAndYearMonth searchQuery = createSearchQuery("202512");
-		int incomeCount = incomeRepository.countById(searchQuery);
+		int incomeCount = incomeRepository.countBy(searchQuery);
 		assertEquals(3, incomeCount, "INCOME_TABLEに3件登録されていること(kubun=1/2/3)");
 
 		// Then: EXPENDITURE_TABLE検証（9件INSERT: clearStartFlg=false×8、clearStartFlg=true×1）
-		int expenditureCount = expenditureRepository.countById(searchQuery);
+		int expenditureCount = expenditureRepository.countBy(searchQuery);
 		assertEquals(9, expenditureCount, "EXPENDITURE_TABLEに9件登録されていること(clearStartFlg=false×8+true×1)");
 
 		// Then: INCOME_AND_EXPENDITURE_TABLE検証
@@ -566,7 +566,7 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 		// Then: EXPENDITURE_TABLE直接確認（代表的なclearStartFlgパターン）
 		// clearStartFlg=true パターン: EXPENDITURE_ESTIMATE_KINGAKU=入力値、EXPENDITURE_KINGAKU=0円
 		// ※0037は1件のみのため isOne() で確認
-		ExpenditureItemInquiryList expList0037 = expenditureRepository.findById(
+		ExpenditureItemInquiryList expList0037 = expenditureRepository.findByExpenditureItemCode(
 				createExpenditureAmountSearchQuery("202512", "0037"));
 		assertTrue(expList0037.isOne(), "0037(電気代)のEXPENDITURE_TABLEが1件存在すること");
 		ExpenditureItem expItem0037 = expList0037.getValues().get(0);
@@ -576,7 +576,7 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 				"0037:EXPENDITURE_KINGAKU=0(clearStartFlg=true:0円開始)");
 
 		// clearStartFlg=false パターン(代表: 0052一人プチ贅沢外食): EXPENDITURE_ESTIMATE_KINGAKU=EXPENDITURE_KINGAKU=入力値
-		ExpenditureItemInquiryList expList0052 = expenditureRepository.findById(
+		ExpenditureItemInquiryList expList0052 = expenditureRepository.findByExpenditureItemCode(
 				createExpenditureAmountSearchQuery("202512", "0052"));
 		assertTrue(expList0052.isOne(), "0052(一人プチ贅沢外食)のEXPENDITURE_TABLEが1件存在すること");
 		ExpenditureItem expItem0052 = expList0052.getValues().get(0);
@@ -588,7 +588,7 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 		// Then: SISYUTU_KINGAKU_TABLE検証
 		// 0051(食費): 3件登録(kubun=1:10000, kubun=2:2000, kubun=3:1000)の集計確認
 		// YOTEI=13000(新規登録のためYOTEI=支出金額)、SIHARAI_DATE=MAX(05,05,05)=2025-12-05
-		SisyutuKingakuItem item0051 = sisyutuKingakuTableRepository.findByUniqueKey(
+		ExpenditureAmountItem item0051 = sisyutuKingakuTableRepository.findByPrimaryKey(
 				createExpenditureAmountSearchQuery("202512", "0051"));
 		assertNotNull(item0051, "0051(食費)の支出金額テーブルが登録されていること");
 		assertEquals(new BigDecimal("13000.00"), item0051.getExpenditureAmount().getValue(),
@@ -604,7 +604,7 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 
 		// 0049(飲食日用品, Level1): 0051+0052+0050の親Level1集計値の伝搬確認
 		// YOTEI=21000、SIHARAI_DATE=MAX(0051:12-05, 0052:12-10, 0050:12-15)=2025-12-15
-		SisyutuKingakuItem item0049 = sisyutuKingakuTableRepository.findByUniqueKey(
+		ExpenditureAmountItem item0049 = sisyutuKingakuTableRepository.findByPrimaryKey(
 				createExpenditureAmountSearchQuery("202512", "0049"));
 		assertNotNull(item0049, "0049(飲食日用品)の支出金額テーブルが登録されていること");
 		assertEquals(new BigDecimal("21000.00"), item0049.getExpenditureAmount().getValue(),
@@ -621,7 +621,7 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 		// 0037(電気代, Level3, parent=0036): clearStartFlg=true 12,000円
 		// YOTEI=12000(新規登録: YOTEI=入力値)、KINGAKU=0(clearStartFlg=true:0円開始)
 		// SIHARAI_DATE=2025-12-15(siharaiDate="15")
-		SisyutuKingakuItem item0037 = sisyutuKingakuTableRepository.findByUniqueKey(
+		ExpenditureAmountItem item0037 = sisyutuKingakuTableRepository.findByPrimaryKey(
 				createExpenditureAmountSearchQuery("202512", "0037"));
 		assertNotNull(item0037, "0037(電気代)の支出金額テーブルが登録されていること");
 		assertEquals(new BigDecimal("12000.00"), item0037.getExpectedExpenditureAmount().getValue(),
@@ -679,18 +679,18 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 
 		// Then: INCOME_TABLE検証（元4件 + ADD1件 = 5件、DELETE_FLGフィルタなし）
 		SearchQueryUserIdAndYearMonth searchQuery = createSearchQuery("202511");
-		int incomeCount = incomeRepository.countById(searchQuery);
+		int incomeCount = incomeRepository.countBy(searchQuery);
 		assertEquals(5, incomeCount, "INCOME_TABLEが5件であること（4件既存＋1件ADD）");
 
 		// Then: EXPENDITURE_TABLE検証（元14件 + ADD2件 = 16件、DELETE_FLGフィルタなし）
-		int expenditureCount = expenditureRepository.countById(searchQuery);
+		int expenditureCount = expenditureRepository.countBy(searchQuery);
 		assertEquals(16, expenditureCount, "EXPENDITURE_TABLEが16件であること（14件既存＋2件ADD）");
 
 		// Then: EXPENDITURE_TABLE直接確認（更新月の新規ADDパターン: YOTEI=0、KINGAKU=入力値）
 		// 更新月の新規ADDはinitFlg=false → EXPENDITURE_ESTIMATE_KINGAKU=0
 		// clearStartFlg=false → EXPENDITURE_KINGAKU=入力値
 		// 0040(水道代): ADD 8,000
-		ExpenditureItemInquiryList expList0040 = expenditureRepository.findById(
+		ExpenditureItemInquiryList expList0040 = expenditureRepository.findByExpenditureItemCode(
 				createExpenditureAmountSearchQuery("202511", "0040"));
 		assertTrue(expList0040.isOne(), "0040(水道代)のEXPENDITURE_TABLEが1件存在すること");
 		ExpenditureItem expItem0040 = expList0040.getValues().get(0);
@@ -699,7 +699,7 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 		assertEquals(new BigDecimal("8000.00"), expItem0040.getExpenditureAmount().getValue(),
 				"0040:EXPENDITURE_KINGAKU=8000(clearStartFlg=false:入力値)");
 		// 0059(趣味娯楽その他B): ADD 1,000
-		ExpenditureItemInquiryList expList0059 = expenditureRepository.findById(
+		ExpenditureItemInquiryList expList0059 = expenditureRepository.findByExpenditureItemCode(
 				createExpenditureAmountSearchQuery("202511", "0059"));
 		assertTrue(expList0059.isOne(), "0059(趣味娯楽その他B)のEXPENDITURE_TABLEが1件存在すること");
 		ExpenditureItem expItem0059 = expList0059.getValues().get(0);
@@ -731,7 +731,7 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 
 		// 0037(電気代, Level3): UPDATE 12,000→15,000 siharaiDate=2025-11-30
 		// YOTEI=12,000(更新操作では変更なし), SIHARAI_DATE=MAX(2025-11-30, 2025-11-30)=2025-11-30
-		SisyutuKingakuItem item0037 = sisyutuKingakuTableRepository.findByUniqueKey(
+		ExpenditureAmountItem item0037 = sisyutuKingakuTableRepository.findByPrimaryKey(
 				createExpenditureAmountSearchQuery("202511", "0037"));
 		assertNotNull(item0037, "0037(電気代)の支出金額テーブルが存在すること");
 		assertEquals(new BigDecimal("15000.00"), item0037.getExpenditureAmount().getValue(),
@@ -743,7 +743,7 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 
 		// 0038(ガス代, Level3): DELETE 10,000→0
 		// YOTEI=10,000(削除操作では変更なし), SIHARAI_DATE=null(削除操作では変更なし)
-		SisyutuKingakuItem item0038 = sisyutuKingakuTableRepository.findByUniqueKey(
+		ExpenditureAmountItem item0038 = sisyutuKingakuTableRepository.findByPrimaryKey(
 				createExpenditureAmountSearchQuery("202511", "0038"));
 		assertNotNull(item0038, "0038(ガス代)の支出金額テーブルが存在すること");
 		assertEquals(new BigDecimal("0.00"), item0038.getExpenditureAmount().getValue(),
@@ -755,7 +755,7 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 
 		// 0040(水道代, Level3): 新規ADD 8,000 siharaiDate=2025-11-20
 		// YOTEI=0(更新月の新規ADDはinitFlg=false → YOTEI=0)
-		SisyutuKingakuItem item0040 = sisyutuKingakuTableRepository.findByUniqueKey(
+		ExpenditureAmountItem item0040 = sisyutuKingakuTableRepository.findByPrimaryKey(
 				createExpenditureAmountSearchQuery("202511", "0040"));
 		assertNotNull(item0040, "0040(水道代)の支出金額テーブルが新規追加されていること");
 		assertEquals(new BigDecimal("8000.00"), item0040.getExpenditureAmount().getValue(),
@@ -769,7 +769,7 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 		// KINGAKU: 22000(初期) +3000(0037 UPDATE) -10000(0038 DELETE) +8000(0040 ADD) = 23000
 		// YOTEI: 22000(更新・削除・追加操作では変更なし)
 		// SIHARAI_DATE: MAX(null初期, 2025-11-30 from 0037 UPDATE, null from 0038 DELETE, 2025-11-20 from 0040 ADD) = 2025-11-30
-		SisyutuKingakuItem item0036 = sisyutuKingakuTableRepository.findByUniqueKey(
+		ExpenditureAmountItem item0036 = sisyutuKingakuTableRepository.findByPrimaryKey(
 				createExpenditureAmountSearchQuery("202511", "0036"));
 		assertNotNull(item0036, "0036(水光熱通費)の支出金額テーブルが存在すること");
 		assertEquals(new BigDecimal("23000.00"), item0036.getExpenditureAmount().getValue(),
@@ -784,7 +784,7 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 		// KINGAKU_B: 5000(初期) +0(NON_UPDATE:011) +2000(UPDATE:012) = 7000
 		// YOTEI: 5000(更新操作で変更なし)
 		// SIHARAI_DATE: MAX(null初期, null from 011 NON_UPDATE, 2025-11-25 from 012 UPDATE) = 2025-11-25
-		SisyutuKingakuItem item0056 = sisyutuKingakuTableRepository.findByUniqueKey(
+		ExpenditureAmountItem item0056 = sisyutuKingakuTableRepository.findByPrimaryKey(
 				createExpenditureAmountSearchQuery("202511", "0056"));
 		assertNotNull(item0056, "0056(交際費)の支出金額テーブルが存在すること");
 		assertEquals(new BigDecimal("7000.00"), item0056.getExpenditureAmount().getValue(),
@@ -808,7 +808,7 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 		//   → 2025-11-01
 		// ※注意: UPDATE/DELETE処理ではcreateExpenditureItemでPaymentDate.from(yearMonth,day)を
 		//   呼ぶため、空文字列は不可。"01"等の有効な2桁日付が必要。
-		SisyutuKingakuItem item0057 = sisyutuKingakuTableRepository.findByUniqueKey(
+		ExpenditureAmountItem item0057 = sisyutuKingakuTableRepository.findByPrimaryKey(
 				createExpenditureAmountSearchQuery("202511", "0057"));
 		assertNotNull(item0057, "0057(趣味娯楽費)の支出金額テーブルが存在すること");
 		assertEquals(new BigDecimal("500.00"), item0057.getExpenditureAmount().getValue(),
@@ -825,7 +825,7 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 		// 0059(趣味娯楽その他, Level2, parent=0055): 新規ADD 1,000 kubun=2 siharaiDate=2025-11-10
 		// YOTEI=0(更新月の新規ADDはinitFlg=false)
 		// ※ADD処理もPaymentDate.from(yearMonth,day)を呼ぶため空文字列は不可。"10"を設定。
-		SisyutuKingakuItem item0059 = sisyutuKingakuTableRepository.findByUniqueKey(
+		ExpenditureAmountItem item0059 = sisyutuKingakuTableRepository.findByPrimaryKey(
 				createExpenditureAmountSearchQuery("202511", "0059"));
 		assertNotNull(item0059, "0059(趣味娯楽その他)の支出金額テーブルが新規追加されていること");
 		assertEquals(new BigDecimal("1000.00"), item0059.getExpenditureAmount().getValue(),
@@ -846,7 +846,7 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 		// KINGAKU_C: 3500(初期) -3000(0057 UPDATE減額+DELETE) = 500
 		// YOTEI: 8500(更新・削除操作で変更なし)
 		// SIHARAI_DATE: MAX(null初期, 2025-11-25 from 0056, null from 0057, null from 0059) = 2025-11-25
-		SisyutuKingakuItem item0055 = sisyutuKingakuTableRepository.findByUniqueKey(
+		ExpenditureAmountItem item0055 = sisyutuKingakuTableRepository.findByPrimaryKey(
 				createExpenditureAmountSearchQuery("202511", "0055"));
 		assertNotNull(item0055, "0055(趣味娯楽)の支出金額テーブルが存在すること");
 		assertEquals(new BigDecimal("8500.00"), item0055.getExpenditureAmount().getValue(),

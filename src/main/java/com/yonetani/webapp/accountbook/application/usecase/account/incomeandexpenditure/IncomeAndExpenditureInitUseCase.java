@@ -26,15 +26,15 @@ import com.yonetani.webapp.accountbook.application.usecase.account.component.Sho
 import com.yonetani.webapp.accountbook.application.usecase.common.CodeTableItemComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostList;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItemInquiryList;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeItemInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.account.income.IncomeItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.common.CodeAndValuePair;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostTargetPaymentMonthList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTableRepository;
 import com.yonetani.webapp.accountbook.domain.service.account.regist.TemporaryCodeGenerator;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonth;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureCategory;
@@ -131,7 +131,7 @@ public class IncomeAndExpenditureInitUseCase {
 		shiharaiTukiList.add(MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE);
 
 		// 指定月に一致する固定費情報を取得
-		FixedCostList searchResult = fixedCostRepository.findByIdAndFixedCostShiharaiTukiList(
+		FixedCostList searchResult = fixedCostRepository.findByFixedCostTargetPaymentMonthList(
 				SearchQueryUserIdAndFixedCostTargetPaymentMonthList.from(
 						// ユーザID
 						userId,
@@ -219,7 +219,7 @@ public class IncomeAndExpenditureInitUseCase {
 		// 対象年月検索条件
 		SearchQueryUserIdAndYearMonth search = SearchQueryUserIdAndYearMonth.from(userId, targetYearMonth);
 		// 収入テーブルから対象年月の収入情報を取得
-		IncomeItemInquiryList incomeList = incomeRepository.findById(search);
+		IncomeItemInquiryList incomeList = incomeRepository.findBy(search);
 		// 収入情報が未登録の場合、予期しないエラー(登録必須のためエラーとする必要あり)
 		if(incomeList.isEmpty()) {
 			throw new MyHouseholdAccountBookRuntimeException("更新対象の収入情報が収入テーブルに存在しません。管理者に問い合わせてください。[search=" + search + "]");
@@ -246,7 +246,7 @@ public class IncomeAndExpenditureInitUseCase {
 
 		// 支出テーブルから対象年月の支出情報を取得
 		// (過去データの場合、現在の必須データが未登録の場合ありのため、0件チェックを含めた整合性チェックは不要)
-		ExpenditureItemInquiryList expenditureList = expenditureRepository.findById(search);
+		ExpenditureItemInquiryList expenditureList = expenditureRepository.findBy(search);
 		// 支出テーブルから取得した支出情報をセッションの支出登録情報に変換
 		// 注意：セッション情報のリストは編集可とする必要があるので、可変リストで作成する必要あり
 		List<ExpenditureRegistItem> expenditureRegistItemList = expenditureList.getValues().stream().map(

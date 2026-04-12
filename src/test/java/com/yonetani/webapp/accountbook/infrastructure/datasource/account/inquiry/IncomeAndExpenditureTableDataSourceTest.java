@@ -26,8 +26,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureItem;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.infrastructure.datasource.account.incomeandexpenditure.IncomeAndExpenditureTableDataSource;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry.IncomeAndExpenditureTableMapper;
 
 /**
@@ -82,7 +83,7 @@ class IncomeAndExpenditureTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.inquiry.IncomeAndExpenditureTableDataSource#add(com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureItem)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.incomeandexpenditure.IncomeAndExpenditureTableDataSource#add(com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditureItem)} のためのテスト・メソッド。
 	 */
 	@Test
 	@DisplayName("add:収支テーブルへの新規登録テスト(全カラム確認)")
@@ -141,7 +142,7 @@ class IncomeAndExpenditureTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.inquiry.IncomeAndExpenditureTableDataSource#update(com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureItem)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.incomeandexpenditure.IncomeAndExpenditureTableDataSource#update(com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditureItem)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(value = "IncomeAndExpenditureTableDataSourceUpdateTest.sql", config = @SqlConfig(encoding = "UTF-8"))

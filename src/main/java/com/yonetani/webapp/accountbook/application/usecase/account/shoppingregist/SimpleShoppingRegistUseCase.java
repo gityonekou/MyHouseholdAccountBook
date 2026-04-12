@@ -24,9 +24,9 @@ import com.yonetani.webapp.accountbook.application.usecase.account.component.Sho
 import com.yonetani.webapp.accountbook.application.usecase.common.CodeTableItemComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureAmountItemHolder;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureAmountItemHolder;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.account.shop.ShopInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.BeforeAndAfterShoppingSisyutuKingakuData;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.MinorWasteShoppingFood;
@@ -42,9 +42,9 @@ import com.yonetani.webapp.accountbook.domain.model.common.CodeAndValuePair;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopKubunCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndShoppingRegistCode;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.shoppingregist.ShoppingRegistTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureTotalAmount;
@@ -158,7 +158,7 @@ public class SimpleShoppingRegistUseCase {
 		ShoppingRegistCode domainShoppingRegistCode = ShoppingRegistCode.from(shoppingRegistCode);
 		
 		// 登録されている買い物情報を取得
-		ShoppingRegist result = shoppingRegistRepository.findByUniqueKey(
+		ShoppingRegist result = shoppingRegistRepository.findByPrimaryKey(
 				SearchQueryUserIdAndYearMonthAndShoppingRegistCode.from(userId, domainTargetYearMonth, domainShoppingRegistCode));
 		// 選択した買い物登録コードに対応するデータなしの場合、予期しないエラーとする
 		if(result == null) {
@@ -324,7 +324,7 @@ public class SimpleShoppingRegistUseCase {
 		if(Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
 
 			// 新規採番する買い物登録コードの値を取得
-			int count = shoppingRegistRepository.countById(searchYearMonth);
+			int count = shoppingRegistRepository.countBy(searchYearMonth);
 			count++;
 			if(count > 999) {
 				// レスポンスを生成してエラーメッセージを追加
@@ -465,7 +465,7 @@ public class SimpleShoppingRegistUseCase {
 			ShoppingRegistCode domainShoppingRegistCode = ShoppingRegistCode.from(inputForm.getShoppingRegistCode());
 			
 			// 更新対象のデータを取得(更新前と更新後の差額計算用)
-			ShoppingRegist beforeData = shoppingRegistRepository.findByUniqueKey(
+			ShoppingRegist beforeData = shoppingRegistRepository.findByPrimaryKey(
 					SearchQueryUserIdAndYearMonthAndShoppingRegistCode.from(userId, domainTargetYearMonth, domainShoppingRegistCode));
 			// 買い物登録コードに対応するデータなしの場合、予期しないエラーとする
 			if(beforeData == null) {
@@ -695,7 +695,7 @@ public class SimpleShoppingRegistUseCase {
 				throw new MyHouseholdAccountBookRuntimeException("収支テーブル:INCOME_AND_EXPENDITURE_TABLEへの更新件数が不正でした。[件数=" + updCount + "][update data:" + updSyuusiData + "]");
 			}
 			// 支出テーブルから対象月の支出金額合計値を取得
-			ExpenditureTotalAmount expenditureKingakuTotalAmount = expenditureRepository.sumExpenditureKingaku(searchYearMonth);
+			ExpenditureTotalAmount expenditureKingakuTotalAmount = expenditureRepository.getExpenditureTotalAmount(searchYearMonth);
 			// 収支テーブルの支出金額の値と対象月の支出テーブルの支出金額合計値が一致するかを確認
 			ExpenditureTotalAmount chkExpenditureKingaku = ExpenditureTotalAmount.from(updSyuusiData.getExpenditureAmount().getValue());
 			if(!chkExpenditureKingaku.equals(expenditureKingakuTotalAmount)) {

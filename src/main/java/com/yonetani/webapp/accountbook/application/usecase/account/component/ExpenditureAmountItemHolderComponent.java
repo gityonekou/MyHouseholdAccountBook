@@ -14,10 +14,10 @@ package com.yonetani.webapp.accountbook.application.usecase.account.component;
 import org.springframework.stereotype.Component;
 
 import com.yonetani.webapp.accountbook.application.usecase.common.ExpenditureItemInfoComponent;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureAmountItemHolder;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuKingakuItemInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureAmountItemHolder;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureAmountItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.SisyutuKingakuTableRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -55,7 +55,7 @@ public class ExpenditureAmountItemHolderComponent {
 		log.debug("road:search="+ search);
 		
 		// 指定された検索条件をもとに支出金額テーブルを検索
-		SisyutuKingakuItemInquiryList searchResult = sisyutuKingakuTableRepository.findById(search);
+		ExpenditureAmountItemInquiryList searchResult = sisyutuKingakuTableRepository.findBy(search);
 		// 検索結果をもとに支出金額テーブル情報を格納したホルダークラス(ExpenditureAmountItemHolder)を生成して返却
 		return ExpenditureAmountItemHolder.from(searchResult.getValues(), expenditureItemInfoComponent);
 	}

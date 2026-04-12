@@ -22,14 +22,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.yonetani.webapp.accountbook.domain.exception.DataInconsistencyException;
 import com.yonetani.webapp.accountbook.domain.exception.ExpenditureAmountInconsistencyException;
 import com.yonetani.webapp.accountbook.domain.exception.IncomeAmountInconsistencyException;
+import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureItemList;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalAvailableFunds;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
@@ -75,14 +76,14 @@ class IncomeAndExpenditureConsistencyServiceTest {
 		);
 
 		// モック設定：収入テーブルの合計も400,000
-		when(incomeRepository.sumIncomeKingaku(searchCondition))
+		when(incomeRepository.getTotalAvailableFunds(searchCondition))
 			.thenReturn(TotalAvailableFunds.from(new BigDecimal("400000.00")));
 
 		// 実行 & 検証（例外がスローされないことを確認）
 		assertDoesNotThrow(() -> service.validateIncomeConsistency(aggregate, searchCondition));
 
 		// モックの呼び出し確認
-		verify(incomeRepository, times(1)).sumIncomeKingaku(searchCondition);
+		verify(incomeRepository, times(1)).getTotalAvailableFunds(searchCondition);
 	}
 
 	@Test
@@ -103,7 +104,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 		);
 
 		// モック設定：収入テーブルの合計は420,000（不整合）
-		when(incomeRepository.sumIncomeKingaku(searchCondition))
+		when(incomeRepository.getTotalAvailableFunds(searchCondition))
 			.thenReturn(TotalAvailableFunds.from(new BigDecimal("420000.00")));
 
 		// 実行 & 検証
@@ -119,7 +120,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 		assertTrue(exception.getMessage().contains("420000.00"));  // actual
 
 		// モックの呼び出し確認
-		verify(incomeRepository, times(1)).sumIncomeKingaku(searchCondition);
+		verify(incomeRepository, times(1)).getTotalAvailableFunds(searchCondition);
 	}
 
 	@Test
@@ -138,14 +139,14 @@ class IncomeAndExpenditureConsistencyServiceTest {
 		);
 
 		// モック設定：支出テーブルの合計も280,000
-		when(expenditureRepository.sumExpenditureKingaku(searchCondition))
+		when(expenditureRepository.getExpenditureTotalAmount(searchCondition))
 			.thenReturn(ExpenditureTotalAmount.from(new BigDecimal("280000.00")));
 
 		// 実行 & 検証（例外がスローされないことを確認）
 		assertDoesNotThrow(() -> service.validateExpenditureConsistency(aggregate, searchCondition));
 
 		// モックの呼び出し確認
-		verify(expenditureRepository, times(1)).sumExpenditureKingaku(searchCondition);
+		verify(expenditureRepository, times(1)).getExpenditureTotalAmount(searchCondition);
 	}
 
 	@Test
@@ -164,7 +165,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 		);
 
 		// モック設定：支出テーブルの合計は300,000（不整合）
-		when(expenditureRepository.sumExpenditureKingaku(searchCondition))
+		when(expenditureRepository.getExpenditureTotalAmount(searchCondition))
 			.thenReturn(ExpenditureTotalAmount.from(new BigDecimal("300000.00")));
 
 		// 実行 & 検証
@@ -180,7 +181,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 		assertTrue(exception.getMessage().contains("300000.00"));  // actual
 
 		// モックの呼び出し確認
-		verify(expenditureRepository, times(1)).sumExpenditureKingaku(searchCondition);
+		verify(expenditureRepository, times(1)).getExpenditureTotalAmount(searchCondition);
 	}
 
 	@Test
@@ -216,9 +217,9 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			SearchQueryUserIdAndYearMonth.from(userId, yearMonth);
 
 		// 収支集約：データあり
-		RegularIncomeAmount income = RegularIncomeAmount.from(new BigDecimal("350000.00"));
+		BalanceAmount balamce = BalanceAmount.from(new BigDecimal("350000.00"));
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.reconstruct(
-			userId, yearMonth, income, null, null, null, null
+			userId, yearMonth, null, null, null, null, balamce
 		);
 
 		// 支出リスト：データあり（モックで作成）
@@ -304,17 +305,17 @@ class IncomeAndExpenditureConsistencyServiceTest {
 		);
 
 		// モック設定
-		when(incomeRepository.sumIncomeKingaku(searchCondition))
+		when(incomeRepository.getTotalAvailableFunds(searchCondition))
 			.thenReturn(TotalAvailableFunds.from(new BigDecimal("400000.00")));
-		when(expenditureRepository.sumExpenditureKingaku(searchCondition))
+		when(expenditureRepository.getExpenditureTotalAmount(searchCondition))
 			.thenReturn(ExpenditureTotalAmount.from(new BigDecimal("280000.00")));
 
 		// 実行 & 検証（例外がスローされないことを確認）
 		assertDoesNotThrow(() -> service.validateAll(aggregate, searchCondition));
 
 		// モックの呼び出し確認
-		verify(incomeRepository, times(1)).sumIncomeKingaku(searchCondition);
-		verify(expenditureRepository, times(1)).sumExpenditureKingaku(searchCondition);
+		verify(incomeRepository, times(1)).getTotalAvailableFunds(searchCondition);
+		verify(expenditureRepository, times(1)).getExpenditureTotalAmount(searchCondition);
 	}
 
 	@Test
@@ -336,7 +337,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 		);
 
 		// モック設定：収入が不整合
-		when(incomeRepository.sumIncomeKingaku(searchCondition))
+		when(incomeRepository.getTotalAvailableFunds(searchCondition))
 			.thenReturn(TotalAvailableFunds.from(new BigDecimal("420000.00")));
 
 		// 実行 & 検証
@@ -345,8 +346,8 @@ class IncomeAndExpenditureConsistencyServiceTest {
 		);
 
 		// 収入チェックで失敗するため、支出チェックは呼ばれない
-		verify(incomeRepository, times(1)).sumIncomeKingaku(searchCondition);
-		verify(expenditureRepository, never()).sumExpenditureKingaku(searchCondition);
+		verify(incomeRepository, times(1)).getTotalAvailableFunds(searchCondition);
+		verify(expenditureRepository, never()).getExpenditureTotalAmount(searchCondition);
 	}
 
 	@Test
@@ -368,9 +369,9 @@ class IncomeAndExpenditureConsistencyServiceTest {
 		);
 
 		// モック設定：収入は一致、支出が不整合
-		when(incomeRepository.sumIncomeKingaku(searchCondition))
+		when(incomeRepository.getTotalAvailableFunds(searchCondition))
 			.thenReturn(TotalAvailableFunds.from(new BigDecimal("400000.00")));
-		when(expenditureRepository.sumExpenditureKingaku(searchCondition))
+		when(expenditureRepository.getExpenditureTotalAmount(searchCondition))
 			.thenReturn(ExpenditureTotalAmount.from(new BigDecimal("300000.00")));
 
 		// 実行 & 検証
@@ -379,7 +380,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 		);
 
 		// 両方のチェックが呼ばれる
-		verify(incomeRepository, times(1)).sumIncomeKingaku(searchCondition);
-		verify(expenditureRepository, times(1)).sumExpenditureKingaku(searchCondition);
+		verify(incomeRepository, times(1)).getTotalAvailableFunds(searchCondition);
+		verify(expenditureRepository, times(1)).getExpenditureTotalAmount(searchCondition);
 	}
 }

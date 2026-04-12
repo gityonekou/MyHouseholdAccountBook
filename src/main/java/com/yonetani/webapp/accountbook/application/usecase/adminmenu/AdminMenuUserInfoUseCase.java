@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookException;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditureinfo.ExpenditureItemInfo;
 import com.yonetani.webapp.accountbook.domain.model.account.shop.Shop;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.AdminMenuUserInfo;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.AdminMenuUserInfoItemList;
@@ -30,7 +30,7 @@ import com.yonetani.webapp.accountbook.domain.model.adminmenu.ShopBaseList;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.SisyutuItemBaseList;
 import com.yonetani.webapp.accountbook.domain.model.common.AccountBookUser;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuItemTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditureinfo.SisyutuItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.AdminMenuUserInfoRepository;
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.ShopBaseTableRepository;
@@ -182,7 +182,7 @@ public class AdminMenuUserInfoUseCase {
 				
 				sisyutuItemBaseList.getValues().forEach(baseData -> {
 						// 登録する支出項目テーブル情報を生成(更新不可フラグはデフォルトで不可:falseを設定)
-						SisyutuItem addData = SisyutuItem.from(
+						ExpenditureItemInfo addData = ExpenditureItemInfo.from(
 							accountBookUser.getUserId().getValue(),
 							baseData.getExpenditureItemCode().getValue(),
 							baseData.getExpenditureItemName().getValue(), 
@@ -268,7 +268,7 @@ public class AdminMenuUserInfoUseCase {
 		
 		sisyutuItemBaseList.getValues().forEach(baseData -> {
 				// 登録する支出項目テーブル情報を生成(更新不可フラグはデフォルトで不可:falseを設定)
-				SisyutuItem addData = SisyutuItem.from(
+				ExpenditureItemInfo addData = ExpenditureItemInfo.from(
 					"koukiyonetani",
 					baseData.getExpenditureItemCode().getValue(),
 					baseData.getExpenditureItemName().getValue(), 

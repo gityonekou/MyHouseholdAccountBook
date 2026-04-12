@@ -23,16 +23,16 @@ import com.yonetani.webapp.accountbook.application.usecase.account.component.Sho
 import com.yonetani.webapp.accountbook.application.usecase.account.component.ExpenditureAmountItemHolderComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureItem;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeItem;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureAmountItemHolder;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureAmountItemHolder;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.model.account.income.IncomeItem;
+import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureCode;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.IncomeCode;
@@ -161,12 +161,12 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 		// 検索条件(ユーザID、年月度(YYYYMM))
 		SearchQueryUserIdAndYearMonth search = SearchQueryUserIdAndYearMonth.from(userId, targetYearMonth);
 		// 現在の収入テーブル情報登録件数を取得
-		int incomeDataCount = incomeRepository.countById(search);
+		int incomeDataCount = incomeRepository.countBy(search);
 		// 初期登録かどうかのフラグ　(収支登録確認画面からの遷移:true／各月の収支画面の更新ボタン押下からの遷移：false)
 		// ・初期の場合は必ず収入テーブル情報登録件数が0件となるので、0件の場合は初期登録と判断
 		boolean initFlg = (incomeDataCount == 0) ? true : false;
 		// 現在の支出テーブル情報登録件数を取得
-		int expenditureDataCount = expenditureRepository.countById(search);
+		int expenditureDataCount = expenditureRepository.countBy(search);
 
 		// ② 収入レコード処理
 		IncomeProcessResult incomeResult = processIncomeRegistration(userId, targetYearMonth, incomeRegistItemList, incomeDataCount);
@@ -383,7 +383,7 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 					ExpenditureCode sisyutuCode = ExpenditureCode.from(expenditureRegistData.getExpenditureCode());
 					// 更新前の支出登録情報を取得(更新後-更新前の値を計算用)
 					// 値が取れない場合は該当データの更新でエラーとなるのでここではnull判定しない
-					ExpenditureItem beforeExpenditureData = expenditureRepository.findByUniqueKey(
+					ExpenditureItem beforeExpenditureData = expenditureRepository.findByPrimaryKey(
 							SearchQueryUserIdAndYearMonthAndExpenditureCode.from(userId, targetYearMonth, sisyutuCode));
 
 					// セッションの支出登録情報から支出テーブル情報(ドメイン)を生成
@@ -421,7 +421,7 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 					ExpenditureCode sisyutuCode = ExpenditureCode.from(expenditureRegistData.getExpenditureCode());
 					// 削除前の支出登録情報を取得(更新後-更新前の値を計算用)
 					// 値が取れない場合は該当データの論理削除でエラーとなるのでここではnull判定しない
-					ExpenditureItem beforeExpenditureData = expenditureRepository.findByUniqueKey(
+					ExpenditureItem beforeExpenditureData = expenditureRepository.findByPrimaryKey(
 							SearchQueryUserIdAndYearMonthAndExpenditureCode.from(userId, targetYearMonth, sisyutuCode));
 
 					// セッションの支出登録情報から支出テーブル情報(ドメイン)を生成

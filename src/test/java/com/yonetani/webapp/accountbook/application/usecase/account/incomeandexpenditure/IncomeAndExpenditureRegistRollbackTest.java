@@ -59,9 +59,9 @@ import com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpe
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.session.ExpenditureRegistItem;
@@ -195,9 +195,9 @@ class IncomeAndExpenditureRegistRollbackTest {
 		// ※ incomeAndExpenditureRepository.select() はレコードなしでも fromEmpty()(全フィールドnull)を返すため、
 		//   assertNull(select()) ではなく getUserId()==null でレコード未登録を確認する
 		SearchQueryUserIdAndYearMonth searchQuery = createSearchQuery("202512");
-		assertEquals(0, incomeRepository.countById(searchQuery),
+		assertEquals(0, incomeRepository.countBy(searchQuery),
 				"例外発生前に挿入された収入3件がロールバックされ、INCOME_TABLEが0件であること");
-		assertEquals(0, expenditureRepository.countById(searchQuery),
+		assertEquals(0, expenditureRepository.countBy(searchQuery),
 				"EXPENDITURE_TABLEも0件であること（例外は収入INSERT後に発生するため元々0件だが念のため確認）");
 		assertNull(incomeAndExpenditureRepository.select(searchQuery).getUserId(),
 				"INCOME_AND_EXPENDITURE_TABLEも登録されていないこと（userId=nullでレコードなしを確認）");
@@ -265,9 +265,9 @@ class IncomeAndExpenditureRegistRollbackTest {
 		// ※ incomeAndExpenditureRepository.select() はレコードなしでも fromEmpty()(全フィールドnull)を返すため、
 		//   assertNull(select()) ではなく getUserId()==null でレコード未登録を確認する
 		SearchQueryUserIdAndYearMonth searchQuery = createSearchQuery("202512");
-		assertEquals(0, incomeRepository.countById(searchQuery),
+		assertEquals(0, incomeRepository.countBy(searchQuery),
 				"例外発生前に挿入された収入3件がロールバックされ、INCOME_TABLEが0件であること");
-		assertEquals(0, expenditureRepository.countById(searchQuery),
+		assertEquals(0, expenditureRepository.countBy(searchQuery),
 				"例外発生前に挿入された支出7件がロールバックされ、EXPENDITURE_TABLEが0件であること");
 		assertNull(incomeAndExpenditureRepository.select(searchQuery).getUserId(),
 				"INCOME_AND_EXPENDITURE_TABLEも登録されていないこと（userId=nullでレコードなしを確認）");

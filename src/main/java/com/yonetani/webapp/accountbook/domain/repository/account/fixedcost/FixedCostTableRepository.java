@@ -64,13 +64,13 @@ public interface FixedCostTableRepository {
 	
 	/**
 	 *<pre>
-	 * ユーザIDと指定の固定費コードに対応する固定費情報を取得します。
+	 * 固定費テーブル:FIXED_COST_TABLEの主キー（ユーザID, 固定費コード）で固定費テーブルを検索し、結果を取得します。
 	 *</pre>
 	 * @param search 検索対象のユーザID、固定費コード
 	 * @return 固定費情報
 	 *
 	 */
-	FixedCost findByIdAndFixedCostCode(SearchQueryUserIdAndFixedCostCode search);
+	FixedCost findByPrimaryKey(SearchQueryUserIdAndFixedCostCode search);
 	
 	/**
 	 *<pre>
@@ -80,7 +80,7 @@ public interface FixedCostTableRepository {
 	 * @return 固定費一覧情報の検索結果
 	 *
 	 */
-	FixedCostInquiryList findById(SearchQueryUserId userId);
+	FixedCostInquiryList findByUserId(SearchQueryUserId userId);
 	
 	/**
 	 *<pre>
@@ -90,7 +90,7 @@ public interface FixedCostTableRepository {
 	 * @return 固定費一覧情報の検索結果
 	 *
 	 */
-	FixedCostInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndExpenditureItemCode search);
+	FixedCostInquiryList findByExpenditureItemCode(SearchQueryUserIdAndExpenditureItemCode search);
 	
 	/**
 	 *<pre>
@@ -100,7 +100,7 @@ public interface FixedCostTableRepository {
 	 * @return る固定費情報のリスト
 	 *
 	 */
-	FixedCostList findByIdAndFixedCostShiharaiTukiList(SearchQueryUserIdAndFixedCostTargetPaymentMonthList search);
+	FixedCostList findByFixedCostTargetPaymentMonthList(SearchQueryUserIdAndFixedCostTargetPaymentMonthList search);
 	
 	/**
 	 *<pre>
@@ -110,7 +110,7 @@ public interface FixedCostTableRepository {
 	 * @return 指定条件に該当するデータの件数
 	 *
 	 */
-	int countById(SearchQueryUserId userId);
+	int countByUserId(SearchQueryUserId userId);
 
 	/**
 	 *<pre>
@@ -120,6 +120,6 @@ public interface FixedCostTableRepository {
 	 * @return 指定条件に該当するデータの件数
 	 *
 	 */
-	int countBySisyutuItemCode(SearchQueryUserIdAndExpenditureItemCode search);
+	int countByExpenditureItemCode(SearchQueryUserIdAndExpenditureItemCode search);
 	
 }

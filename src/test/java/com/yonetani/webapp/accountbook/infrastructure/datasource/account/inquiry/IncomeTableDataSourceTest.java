@@ -26,8 +26,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeItem;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
+import com.yonetani.webapp.accountbook.domain.model.account.income.IncomeItem;
+import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTableRepository;
+import com.yonetani.webapp.accountbook.infrastructure.datasource.account.income.IncomeTableDataSource;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry.IncomeTableMapper;
 
 /**
@@ -82,7 +83,7 @@ class IncomeTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.inquiry.IncomeTableDataSource#add(com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeItem)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.income.IncomeTableDataSource#add(com.yonetani.webapp.accountbook.domain.model.account.income.IncomeItem)} のためのテスト・メソッド。
 	 */
 	@Test
 	@DisplayName("add:収入テーブルへの新規登録テスト(全カラム確認)")
@@ -136,7 +137,7 @@ class IncomeTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.inquiry.IncomeTableDataSource#update(com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeItem)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.income.IncomeTableDataSource#update(com.yonetani.webapp.accountbook.domain.model.account.income.IncomeItem)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(value = "IncomeTableDataSourceUpdateTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -189,7 +190,7 @@ class IncomeTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.inquiry.IncomeTableDataSource#delete(com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeItem)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.income.IncomeTableDataSource#delete(com.yonetani.webapp.accountbook.domain.model.account.income.IncomeItem)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(value = "IncomeTableDataSourceDeleteTest.sql", config = @SqlConfig(encoding = "UTF-8"))
