@@ -8,7 +8,7 @@
  * 2024/02/12 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
+package com.yonetani.webapp.accountbook.domain.type.common;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;

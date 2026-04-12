@@ -8,7 +8,7 @@
  * 2026/03/15 : 1.01.00  クラス名をSisyutuDetailContextからExpenditureDetailContextにリネーム
  *
  */
-package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
+package com.yonetani.webapp.accountbook.domain.type.account.expenditure;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;

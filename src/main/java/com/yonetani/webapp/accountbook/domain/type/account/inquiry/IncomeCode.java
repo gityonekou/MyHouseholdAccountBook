@@ -10,14 +10,10 @@
  */
 package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
 
-import org.springframework.util.StringUtils;
-
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.common.Identifier;
 
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  *<pre>
@@ -29,14 +25,20 @@ import lombok.RequiredArgsConstructor;
  * @since 家計簿アプリ(1.00)
  *
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-@EqualsAndHashCode
-public class IncomeCode {
-
-	// 収入コード
-	private final String value;
-
+@EqualsAndHashCode(callSuper = true)
+public class IncomeCode extends Identifier {
+	
+	/**
+	 *<pre>
+	 * コンストラクタ（privateでファクトリメソッド経由のみ生成可能）
+	 *</pre>
+	 * @param value 収入コード
+	 *
+	 */
+	private IncomeCode(String value) {
+		super(value);
+	}
+	
 	/**
 	 *<pre>
 	 * 「収入コード」項目の値を表すドメインタイプを生成します。
@@ -52,10 +54,9 @@ public class IncomeCode {
 	 *
 	 */
 	public static IncomeCode from(String code) {
-		// ガード節(空文字列)
-		if(!StringUtils.hasLength(code)) {
-			throw new MyHouseholdAccountBookRuntimeException("「収入コード」項目の設定値が空文字列です。管理者に問い合わせてください。");
-		}
+		// 基本検証（null、空文字）
+		Identifier.validate(code, "収入コード");
+		
 		// ガード節(長さが2桁でない)
 		if(code.length() != 2) {
 			throw new MyHouseholdAccountBookRuntimeException("「収入コード」項目の設定値が不正です。管理者に問い合わせてください。[incomeCode=" + code + "]");
@@ -79,7 +80,7 @@ public class IncomeCode {
 	 *
 	 */
 	public static IncomeCode from(int count) {
-		return new IncomeCode(String.format("%02d", count));
+		return IncomeCode.from(String.format("%02d", count));
 	}
 
 	/**
@@ -92,13 +93,5 @@ public class IncomeCode {
 	 */
 	public static String getNewCode(int count) {
 		return IncomeCode.from(count).getValue();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		return value;
 	}
 }

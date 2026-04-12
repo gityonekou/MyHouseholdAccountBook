@@ -15,13 +15,13 @@ import java.time.LocalDate;
 
 import org.springframework.util.StringUtils;
 
-import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureEventCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureName;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureCategory;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureName;
 import com.yonetani.webapp.accountbook.domain.type.common.DeleteFlg;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
@@ -64,7 +64,7 @@ public class ExpenditureItem {
 	// 支出項目コード
 	private final ExpenditureItemCode expenditureItemCode;
 	// イベントコード
-	private final EventCode eventCode;
+	private final ExpenditureEventCode expenditureEventCode;
 	// 支出名称
 	private final ExpenditureName expenditureName;
 	// 支出区分
@@ -89,7 +89,7 @@ public class ExpenditureItem {
 	 * @param targetMonth 対象月
 	 * @param expenditureCode 支出コード
 	 * @param expenditureItemCode 支出項目コード
-	 * @param eventCode イベントコード
+	 * @param expenditureEventCode イベントコード
 	 * @param expenditureName 支出名称
 	 * @param expenditureCategory 支出区分
 	 * @param expenditureDetailContext 支出詳細
@@ -106,7 +106,7 @@ public class ExpenditureItem {
 			String targetMonth,
 			String expenditureCode,
 			String expenditureItemCode,
-			String eventCode,
+			String expenditureEventCode,
 			String expenditureName,
 			String expenditureCategory,
 			String expenditureDetailContext,
@@ -115,11 +115,11 @@ public class ExpenditureItem {
 			BigDecimal expenditureAmount,
 			boolean deleteFlg) {
 		// イベントコードがnullの場合、null値のイベントコードを生成
-		EventCode eventCodeVal = null;
-		if(StringUtils.hasLength(eventCode)) {
-			eventCodeVal = EventCode.from(eventCode);
+		ExpenditureEventCode eventCodeVal = null;
+		if(StringUtils.hasLength(expenditureEventCode)) {
+			eventCodeVal = ExpenditureEventCode.from(expenditureEventCode);
 		} else {
-			eventCodeVal = EventCode.NUL_EVENT_CODE;
+			eventCodeVal = ExpenditureEventCode.NULL;
 		}
 		// 支出テーブル情報を表すドメインモデルを生成して返却
 		return new ExpenditureItem(
@@ -211,7 +211,7 @@ public class ExpenditureItem {
 				// 支出項目コード
 				expenditureItemCode.getValue(),
 				// イベントコード
-				eventCode.getValue(),
+				expenditureEventCode.getValue(),
 				// 支出名称
 				expenditureName.getValue(),
 				// 支出区分
@@ -251,7 +251,7 @@ public class ExpenditureItem {
 				// 支出項目コード
 				expenditureItemCode.getValue(),
 				// イベントコード
-				eventCode.getValue(),
+				expenditureEventCode.getValue(),
 				// 支出名称
 				expenditureName.getValue(),
 				// 支出区分

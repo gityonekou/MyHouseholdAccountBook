@@ -80,7 +80,7 @@ public class ExpenditureReadWriteDto {
 				// 支出項目コード
 				domain.getExpenditureItemCode().getValue(),
 				// イベントコード
-				domain.getEventCode().getValue(),
+				domain.getExpenditureEventCode().getValue(),
 				// 支出名称
 				domain.getExpenditureName().getValue(),
 				// 支出区分

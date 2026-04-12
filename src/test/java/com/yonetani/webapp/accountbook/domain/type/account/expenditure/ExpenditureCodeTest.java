@@ -7,7 +7,7 @@
  * 2026/03/15 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
+package com.yonetani.webapp.accountbook.domain.type.account.expenditure;
 
 import static org.junit.jupiter.api.Assertions.*;
 

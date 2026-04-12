@@ -9,7 +9,7 @@
  * 2026/03/15 : 1.02.00  クラス名をSisyutuKubunからExpenditureCategoryにリネーム
  *
  */
-package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
+package com.yonetani.webapp.accountbook.domain.type.account.expenditure;
 
 import org.springframework.util.StringUtils;
 

@@ -13,7 +13,7 @@
  */
 package com.yonetani.webapp.accountbook.domain.model.searchquery;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCode;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 

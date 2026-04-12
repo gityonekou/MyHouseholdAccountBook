@@ -8,16 +8,12 @@
  * 2026/03/15 : 1.01.00  クラス名をSisyutuCodeからExpenditureCodeにリネーム
  *
  */
-package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
-
-import org.springframework.util.StringUtils;
+package com.yonetani.webapp.accountbook.domain.type.account.expenditure;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.common.Identifier;
 
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  *<pre>
@@ -29,14 +25,20 @@ import lombok.RequiredArgsConstructor;
  * @since 家計簿アプリ(1.00)
  *
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-@EqualsAndHashCode
-public class ExpenditureCode {
-
-	// 支出コード
-	private final String value;
-
+@EqualsAndHashCode(callSuper = true)
+public class ExpenditureCode extends Identifier {
+	
+	/**
+	 *<pre>
+	 * コンストラクタ（privateでファクトリメソッド経由のみ生成可能）
+	 *</pre>
+	 * @param value 支出コード
+	 *
+	 */
+	private ExpenditureCode(String value) {
+		super(value);
+	}
+	
 	/**
 	 *<pre>
 	 * 「支出コード」項目の値を表すドメインタイプを生成します。
@@ -53,11 +55,10 @@ public class ExpenditureCode {
 	 *
 	 */
 	public static ExpenditureCode from(String code) {
-
-		// ガード節(空文字列)
-		if(!StringUtils.hasLength(code)) {
-			throw new MyHouseholdAccountBookRuntimeException("「支出コード」項目の設定値が空文字列です。管理者に問い合わせてください。");
-		}
+		
+		// 基本検証（null、空文字）
+		Identifier.validate(code, "支出コード");
+		
 		// ガード節(長さが3桁でない)
 		if(code.length() != 3) {
 			throw new MyHouseholdAccountBookRuntimeException("「支出コード」項目の設定値が不正です。管理者に問い合わせてください。[expenditureCode=" + code + "]");
@@ -81,7 +82,7 @@ public class ExpenditureCode {
 	 *
 	 */
 	public static ExpenditureCode from(int count) {
-		return new ExpenditureCode(String.format("%03d", count));
+		return ExpenditureCode.from(String.format("%03d", count));
 	}
 
 	/**
@@ -94,13 +95,5 @@ public class ExpenditureCode {
 	 */
 	public static String getNewCode(int count) {
 		return ExpenditureCode.from(count).getValue();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		return value;
 	}
 }

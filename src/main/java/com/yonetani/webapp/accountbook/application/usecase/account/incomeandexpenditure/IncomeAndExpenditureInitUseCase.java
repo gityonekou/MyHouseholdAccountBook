@@ -36,8 +36,8 @@ import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.Exp
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTableRepository;
 import com.yonetani.webapp.accountbook.domain.service.account.regist.TemporaryCodeGenerator;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCategory;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonth;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureCategory;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.request.account.regist.IncomeItemForm;
@@ -260,7 +260,7 @@ public class IncomeAndExpenditureInitUseCase {
 						// 支出項目コード
 						domain.getExpenditureItemCode().getValue(),
 						// イベントコード
-						domain.getEventCode().getValue(),
+						domain.getExpenditureEventCode().getValue(),
 						// 支出名
 						domain.getExpenditureName().getValue(),
 						// 支出区分

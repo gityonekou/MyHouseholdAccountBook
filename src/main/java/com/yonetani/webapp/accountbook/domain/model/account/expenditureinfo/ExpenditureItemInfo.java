@@ -10,13 +10,13 @@
  */
 package com.yonetani.webapp.accountbook.domain.model.account.expenditureinfo;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.EnableUpdateFlg;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemLevel;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemName;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemSortOrder;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ParentExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.common.EnableUpdateFlg;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
 import lombok.AccessLevel;
