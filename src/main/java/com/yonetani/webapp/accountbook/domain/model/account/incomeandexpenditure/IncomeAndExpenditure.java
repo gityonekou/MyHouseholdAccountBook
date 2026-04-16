@@ -5,13 +5,16 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2025/12/05 : 1.00.00  新規作成
+ * 2026/04/16 : 1.02.00  IncomeAndExpenditureItemを統合（登録・更新機能を追加）
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 
 import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.TotalAvailableFunds;
 import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.WithdrawingAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
@@ -24,6 +27,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 /**
  *<pre>
@@ -31,24 +35,13 @@ import lombok.RequiredArgsConstructor;
  *
  * [責務]
  * ・収支情報の一貫性を保証
- * ・整合性検証のためのデータ提供
  * ・照会機能における収支情報の表現
+ * ・登録・更新機能における収支テーブルへの操作
+ * ・収支金額の計算（利用可能資金合計・収支金額）
  *
  * [設計方針]
  * ・不変性：すべてのフィールドをfinalにし、生成後は変更不可
- * ・自己完結性：収支金額の計算ロジックを内部に持つ（Phase 3以降で実装予定）
  * ・整合性保証：コンストラクタで不正な状態を拒否
- *
- * [Phase 2の責務範囲]
- * ・照会機能専用のドメインモデル
- * ・データベースから取得した値をそのまま保持
- * ・金額計算は行わない（既にDBで計算済みの値を使用）
- * ・整合性検証のためのヘルパーメソッドを提供
- *
- * [Phase 3以降の拡張計画]
- * ・登録・更新機能のサポート
- * ・金額計算ロジックの実装
- * ・IncomeAndExpenditureItemの統合
  *
  *</pre>
  *
@@ -58,6 +51,7 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@ToString
 @EqualsAndHashCode
 public class IncomeAndExpenditure {
 
@@ -75,21 +69,44 @@ public class IncomeAndExpenditure {
 	private final ExpenditureAmount expenditureAmount;
 	// 収支金額
 	private final BalanceAmount balanceAmount;
-	
+
+	/**
+	 *<pre>
+	 * 引数の値から収支テーブル情報のドメインモデルを生成して返します。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param targetYear 対象年
+	 * @param targetMonth 対象月
+	 * @param regularIncomeAmount 収入金額(積立金取崩金額以外の収入金額)
+	 * @param withdrawingAmount 積立金取崩金額
+	 * @param expectedExpenditureAmount 支出予定金額
+	 * @param expenditureAmount 支出金額
+	 * @param balanceAmount 収支金額
+	 * @return 収支集約
+	 *
+	 */
+	public static IncomeAndExpenditure from(
+			String userId,
+			String targetYear,
+			String targetMonth,
+			BigDecimal regularIncomeAmount,
+			BigDecimal withdrawingAmount,
+			BigDecimal expectedExpenditureAmount,
+			BigDecimal expenditureAmount,
+			BigDecimal balanceAmount) {
+		return new IncomeAndExpenditure(
+				UserId.from(userId),
+				TargetYearMonth.from(targetYear, targetMonth),
+				RegularIncomeAmount.from(regularIncomeAmount),
+				WithdrawingAmount.from(withdrawingAmount),
+				ExpectedExpenditureAmount.from(expectedExpenditureAmount),
+				ExpenditureAmount.from(expenditureAmount),
+				BalanceAmount.from(balanceAmount));
+	}
+
 	/**
 	 *<pre>
 	 * データベースから取得した収支データを再構成して集約を生成します。
-	 *
-	 * [使用箇所]
-	 * ・照会機能でデータベースから収支情報を取得した際に使用
-	 * ・リポジトリ層からドメイン層へのデータ変換
-	 *
-	 * [不変条件]
-	 * ・userIdとtargetYearMonthは必須（null不可）
-	 * ・金額項目はnullを許可（データなしの場合）
-	 *
-	 * [注意事項]
-	 * ・データベースに保存されている値をそのまま設定
 	 *</pre>
 	 * @param userId ユーザID
 	 * @param targetYearMonth 対象年月
@@ -127,15 +144,7 @@ public class IncomeAndExpenditure {
 
 	/**
 	 *<pre>
-	 * 空の収支集約を生成します。
-	 *
-	 * [使用箇所]
-	 * ・指定年月のデータが存在しない場合
-	 * ・データなし状態を表現する必要がある場合
-	 *
-	 * [注意事項]
-	 * ・isEmpty()がtrueを返す状態
-	 * ・すべての金額フィールドがnull
+	 * 空の収支集約を生成します（データなし状態）。
 	 *</pre>
 	 * @param userId ユーザID
 	 * @param targetYearMonth 対象年月
@@ -160,19 +169,109 @@ public class IncomeAndExpenditure {
 
 	/**
 	 *<pre>
+	 * すべての項目が未設定の空の収支集約を生成します。
+	 *</pre>
+	 * @return 空の収支集約
+	 *
+	 */
+	public static IncomeAndExpenditure fromEmpty() {
+		return new IncomeAndExpenditure(null, null, null, null, null, null, null);
+	}
+
+	/**
+	 *<pre>
+	 * 対象月の収支テーブル情報を新規追加する場合の収支集約を生成して返します。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param yearMonth 対象年月(ドメイン)
+	 * @param regularIncomeAmount 対象月の収入金額(積立金取崩金額以外の収入金額)
+	 * @param withdrawingAmount 対象月の積立金取崩金額
+	 * @param expectedExpenditureAmount 対象月の支出予定金額
+	 * @param expenditureAmount 対象月の支出金額
+	 * @return 収支集約
+	 *
+	 */
+	public static IncomeAndExpenditure createForAdd(
+			UserId userId,
+			TargetYearMonth yearMonth,
+			RegularIncomeAmount regularIncomeAmount,
+			WithdrawingAmount withdrawingAmount,
+			ExpectedExpenditureAmount expectedExpenditureAmount,
+			ExpenditureAmount expenditureAmount) {
+
+		// 利用可能資金合計を計算
+		TotalAvailableFunds availableFunds = TotalAvailableFunds.from(regularIncomeAmount, withdrawingAmount);
+		// 収支金額 = 利用可能資金合計 - 支出金額
+		BalanceAmount balance = BalanceAmount.calculate(availableFunds, expenditureAmount);
+
+		return IncomeAndExpenditure.from(
+				// ユーザID
+				userId.getValue(),
+				// 対象年
+				yearMonth.getYear(),
+				// 対象月
+				yearMonth.getMonth(),
+				// 収入金額(積立金取崩金額以外の収入金額)
+				regularIncomeAmount.getValue(),
+				// 積立金取崩金額
+				withdrawingAmount.getValue(),
+				// 支出予定金額
+				expectedExpenditureAmount.getValue(),
+				// 支出金額
+				expenditureAmount.getValue(),
+				// 収支金額
+				balance.getValue());
+	}
+
+	/**
+	 *<pre>
+	 * 収支テーブルを更新する場合の収支集約を生成して返します。
+	 *
+	 * 注意：支出予定金額は新規登録以降は更新不可となるため、引数には含めていません。
+	 * (支出予定金額は0円で設定され、DB更新時に該当項目を更新しません)
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param yearMonth 対象年月(ドメイン)
+	 * @param regularIncomeAmount 対象月の収入金額(積立金取崩金額以外の収入金額)
+	 * @param withdrawingAmount 対象月の積立金取崩金額
+	 * @param expenditureAmount 対象月の支出金額
+	 * @return 収支集約
+	 *
+	 */
+	public static IncomeAndExpenditure createForUpdate(
+			UserId userId,
+			TargetYearMonth yearMonth,
+			RegularIncomeAmount regularIncomeAmount,
+			WithdrawingAmount withdrawingAmount,
+			ExpenditureAmount expenditureAmount) {
+
+		// 利用可能資金合計を計算
+		TotalAvailableFunds availableFunds = TotalAvailableFunds.from(regularIncomeAmount, withdrawingAmount);
+		// 収支金額 = 利用可能資金合計 - 支出金額
+		BalanceAmount balance = BalanceAmount.calculate(availableFunds, expenditureAmount);
+
+		return IncomeAndExpenditure.from(
+				// ユーザID
+				userId.getValue(),
+				// 対象年
+				yearMonth.getYear(),
+				// 対象月
+				yearMonth.getMonth(),
+				// 収入金額(積立金取崩金額以外の収入金額)
+				regularIncomeAmount.getValue(),
+				// 積立金取崩金額
+				withdrawingAmount.getValue(),
+				// 支出予定金額
+				ExpectedExpenditureTotalAmount.ZERO.getValue(),
+				// 支出金額
+				expenditureAmount.getValue(),
+				// 収支金額
+				balance.getValue());
+	}
+
+	/**
+	 *<pre>
 	 * 利用可能資金合計を取得します（通常収入 + 積立取崩）。
-	 *
-	 * [使用箇所]
-	 * ・整合性検証サービスで使用
-	 * ・収入テーブルの合計金額との比較に使用
-	 *
-	 * [計算ロジック]
-	 * ・通常収入金額 + 積立取崩金額
-	 * ・nullの場合は0として扱う
-	 *
-	 * [Phase 2の仕様]
-	 * ・データベースから取得した値を使用して計算
-	 * ・整合性検証の期待値として使用
 	 *</pre>
 	 * @return 利用可能資金合計（通常収入 + 積立取崩）
 	 *
@@ -185,14 +284,83 @@ public class IncomeAndExpenditure {
 
 	/**
 	 *<pre>
+	 * 支出金額を加算した収支集約を返します。
+	 *</pre>
+	 * @param addValue 加算する支出金額
+	 * @return 支出金額を加算した収支集約
+	 *
+	 */
+	public IncomeAndExpenditure addExpenditureAmount(ExpenditureAmount addValue) {
+
+		// 新しい支出金額
+		ExpenditureAmount updExpenditureAmount = expenditureAmount.add(addValue);
+
+		// 利用可能資金合計を計算
+		TotalAvailableFunds availableFunds = TotalAvailableFunds.from(regularIncomeAmount, withdrawingAmount);
+
+		// 収支金額を計算
+		BalanceAmount balance = BalanceAmount.calculate(availableFunds, updExpenditureAmount);
+
+		return IncomeAndExpenditure.from(
+				// ユーザID
+				userId.getValue(),
+				// 対象年
+				targetYearMonth.getYear(),
+				// 対象月
+				targetYearMonth.getMonth(),
+				// 収入金額(積立金取崩金額以外の収入金額)
+				regularIncomeAmount.getValue(),
+				// 積立金取崩金額
+				withdrawingAmount.getValue(),
+				// 支出予定金額
+				expectedExpenditureAmount.getValue(),
+				// 支出金額
+				updExpenditureAmount.getValue(),
+				// 収支金額
+				balance.getValue());
+	}
+
+	/**
+	 *<pre>
+	 * 支出金額を減算した収支集約を返します。
+	 *</pre>
+	 * @param subtractValue 減算する支出金額
+	 * @return 支出金額を減算した収支集約
+	 *
+	 */
+	public IncomeAndExpenditure subtractExpenditureAmount(ExpenditureAmount subtractValue) {
+
+		// 新しい支出金額
+		ExpenditureAmount updExpenditureAmount = expenditureAmount.subtract(subtractValue);
+
+		// 利用可能資金合計を計算
+		TotalAvailableFunds availableFunds = TotalAvailableFunds.from(regularIncomeAmount, withdrawingAmount);
+
+		// 収支金額を計算
+		BalanceAmount balance = BalanceAmount.calculate(availableFunds, updExpenditureAmount);
+
+		return IncomeAndExpenditure.from(
+				// ユーザID
+				userId.getValue(),
+				// 対象年
+				targetYearMonth.getYear(),
+				// 対象月
+				targetYearMonth.getMonth(),
+				// 収入金額(積立金取崩金額以外の収入金額)
+				regularIncomeAmount.getValue(),
+				// 積立金取崩金額
+				withdrawingAmount.getValue(),
+				// 支出予定金額
+				expectedExpenditureAmount.getValue(),
+				// 支出金額
+				updExpenditureAmount.getValue(),
+				// 収支金額
+				balance.getValue());
+	}
+
+	/**
+	 *<pre>
 	 * データが存在するかどうかを判定します。
-	 *
-	 * [判定基準]
-	 * ・収支金額がnullでない場合、データありと判定
-	 *
-	 * [使用箇所]
-	 * ・ユースケース層でデータ存在チェックに使用
-	 * ・画面表示の分岐判定に使用
 	 *</pre>
 	 * @return データが存在する場合はtrue、存在しない場合はfalse
 	 *
@@ -204,12 +372,6 @@ public class IncomeAndExpenditure {
 	/**
 	 *<pre>
 	 * データが空かどうかを判定します。
-	 *
-	 * [判定基準]
-	 * ・isDataExists()の否定
-	 *
-	 * [使用箇所]
-	 * ・ユースケース層でデータなしチェックに使用
 	 *</pre>
 	 * @return データが空の場合はtrue、データがある場合はfalse
 	 *

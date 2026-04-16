@@ -12,7 +12,7 @@ package com.yonetani.webapp.accountbook.infrastructure.dto.account.incomeandexpe
 
 import java.math.BigDecimal;
 
-import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -56,7 +56,7 @@ public class IncomeAndExpenditureReadWriteDto {
 	 * @return 収支テーブル:INCOME_AND_EXPENDITURE_TABLE読込・出力情報
 	 *
 	 */
-	public static IncomeAndExpenditureReadWriteDto from(IncomeAndExpenditureItem domain) {
+	public static IncomeAndExpenditureReadWriteDto from(IncomeAndExpenditure domain) {
 		return new IncomeAndExpenditureReadWriteDto(
 				// ユーザID
 				domain.getUserId().getValue(),

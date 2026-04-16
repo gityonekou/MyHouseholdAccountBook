@@ -6,6 +6,7 @@
  * 日付       : version  コメントなど
  * 2023/10/12 : 1.00.00  新規作成
  * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
+ * 2026/04/16 : 1.02.00  IncomeAndExpenditureItem統合に伴う修正
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.incomeandexpenditure;
@@ -17,17 +18,9 @@ import org.springframework.stereotype.Repository;
 
 import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditureInquiryList;
-import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
-import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.WithdrawingAmount;
-import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
-import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
-import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
-import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.incomeandexpenditure.IncomeAndExpenditureReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearSearchQueryDto;
@@ -51,25 +44,25 @@ public class IncomeAndExpenditureTableDataSource implements IncomeAndExpenditure
 
 	// マッパー
 	private final IncomeAndExpenditureTableMapper mapper;
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int add(IncomeAndExpenditureItem data) {
+	public int add(IncomeAndExpenditure data) {
 		// 収支テーブル情報を収支テーブルに出力
 		return mapper.insert(IncomeAndExpenditureReadWriteDto.from(data));
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int update(IncomeAndExpenditureItem data) {
+	public int update(IncomeAndExpenditure data) {
 		// 収支テーブル:INCOME_AND_EXPENDITURE_TABLEを更新
 		return mapper.update(IncomeAndExpenditureReadWriteDto.from(data));
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -79,24 +72,9 @@ public class IncomeAndExpenditureTableDataSource implements IncomeAndExpenditure
 		List<IncomeAndExpenditureReadWriteDto> result = mapper.selectUserIdAndYear(
 				UserIdAndYearSearchQueryDto.from(searchQuery));
 		// 検索結果をドメインモデルに変換して返却
-		return IncomeAndExpenditureInquiryList.from(result.stream().map(dto ->	 createIncomeAndExpenditureItem(dto))
-					.collect(Collectors.toUnmodifiableList()));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public IncomeAndExpenditureItem select(SearchQueryUserIdAndYearMonth searchQuery) {
-		// 検索結果を取得
-		IncomeAndExpenditureReadWriteDto result = mapper.selectUserIdAndYearMonth(
-				UserIdAndYearMonthSearchQueryDto.from(searchQuery));
-		// 検索結果をドメインモデルに変換して返却
-		if(result != null) {
-			return createIncomeAndExpenditureItem(result);
-		} else {
-			return IncomeAndExpenditureItem.fromEmpty();
-		}
+		return IncomeAndExpenditureInquiryList.from(result.stream()
+				.map(dto -> createIncomeAndExpenditure(dto))
+				.collect(Collectors.toUnmodifiableList()));
 	}
 
 	/**
@@ -108,29 +86,25 @@ public class IncomeAndExpenditureTableDataSource implements IncomeAndExpenditure
 		IncomeAndExpenditureReadWriteDto result = mapper.selectUserIdAndYearMonth(
 				UserIdAndYearMonthSearchQueryDto.from(searchQuery));
 
-		// ユーザIDと対象年月を取得（searchQueryから既に値オブジェクトとして取得できる）
-		UserId userId = searchQuery.getUserId();
-		TargetYearMonth targetYearMonth = searchQuery.getYearMonth();
-
-		// 検索結果をIncomeAndExpenditure集約に変換して返却
+		// 検索結果をドメインモデルに変換して返却
 		if(result != null) {
-			return createIncomeAndExpenditure(result, userId, targetYearMonth);
+			return createIncomeAndExpenditure(result);
 		} else {
 			// データなしの場合は空の集約を返す
-			return IncomeAndExpenditure.empty(userId, targetYearMonth);
+			return IncomeAndExpenditure.empty(searchQuery.getUserId(), searchQuery.getYearMonth());
 		}
 	}
 
 	/**
 	 *<pre>
-	 * 引数で指定した収支テーブル:INCOME_AND_EXPENDITURE_TABLEテーブルの各項目のDTOから収支テーブル情報ドメインモデルを生成して返します。
+	 * 収支テーブルDTOから収支集約を生成して返します。
 	 *</pre>
-	 * @param dto 収支テーブル:INCOME_AND_EXPENDITURE_TABLEテーブルの各項目のDTO
-	 * @return 収支テーブル情報ドメインモデル
+	 * @param dto 収支テーブルDTO
+	 * @return 収支集約
 	 *
 	 */
-	private IncomeAndExpenditureItem createIncomeAndExpenditureItem(IncomeAndExpenditureReadWriteDto dto) {
-		return IncomeAndExpenditureItem.from(
+	private IncomeAndExpenditure createIncomeAndExpenditure(IncomeAndExpenditureReadWriteDto dto) {
+		return IncomeAndExpenditure.from(
 				// ユーザID
 				dto.getUserId(),
 				// 対象年
@@ -145,45 +119,7 @@ public class IncomeAndExpenditureTableDataSource implements IncomeAndExpenditure
 				dto.getExpenditureEstimateKingaku(),
 				// 支出金額
 				dto.getExpenditureKingaku(),
-				// 収支
-				dto.getIncomeAndExpenditureKingaku());
-	}
-
-	/**
-	 *<pre>
-	 * 引数で指定した収支テーブル:INCOME_AND_EXPENDITURE_TABLEテーブルの各項目のDTOから収支集約を生成して返します。
-	 *
-	 * [Phase 2で追加]
-	 * ・照会機能のリファクタリングで使用
-	 * ・DTOからIncomeAndExpenditure集約を生成
-	 *
-	 *</pre>
-	 * @param dto 収支テーブル:INCOME_AND_EXPENDITURE_TABLEテーブルの各項目のDTO
-	 * @param userId ユーザID
-	 * @param targetYearMonth 対象年月
-	 * @return 収支集約
-	 *
-	 */
-	private IncomeAndExpenditure createIncomeAndExpenditure(
-			IncomeAndExpenditureReadWriteDto dto,
-			UserId userId,
-			TargetYearMonth targetYearMonth) {
-
-		return IncomeAndExpenditure.reconstruct(
-				// ユーザID
-				userId,
-				// 対象年月
-				targetYearMonth,
-				// 収入金額
-				RegularIncomeAmount.from(dto.getIncomeKingaku()),
-				// 積立金取崩金額
-				WithdrawingAmount.from(dto.getWithdrewKingaku()),
-				// 支出予定金額
-				ExpectedExpenditureAmount.from(dto.getExpenditureEstimateKingaku()),
-				// 支出金額
-				ExpenditureAmount.from(dto.getExpenditureKingaku()),
 				// 収支金額
-				BalanceAmount.from(dto.getIncomeAndExpenditureKingaku())
-		);
+				dto.getIncomeAndExpenditureKingaku());
 	}
 }

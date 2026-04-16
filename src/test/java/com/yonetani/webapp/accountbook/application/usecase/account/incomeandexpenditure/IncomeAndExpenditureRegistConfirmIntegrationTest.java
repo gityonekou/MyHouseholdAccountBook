@@ -63,7 +63,7 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
 import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureAmountItem;
 import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItemInquiryList;
-import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
@@ -542,7 +542,7 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 		assertEquals(9, expenditureCount, "EXPENDITURE_TABLEに9件登録されていること(clearStartFlg=false×8+true×1)");
 
 		// Then: INCOME_AND_EXPENDITURE_TABLE検証
-		IncomeAndExpenditureItem syuusiItem = incomeAndExpenditureRepository.select(searchQuery);
+		IncomeAndExpenditure syuusiItem = incomeAndExpenditureRepository.findByPrimaryKey(searchQuery);
 		assertNotNull(syuusiItem, "INCOME_AND_EXPENDITURE_TABLEに1件登録されていること");
 		// 通常収入金額 = 350,000(kubun=1) + 30,000(kubun=2) = 380,000（kubun=3は含まない）
 		assertEquals(new BigDecimal("380000.00"), syuusiItem.getRegularIncomeAmount().getValue(),
@@ -708,7 +708,7 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 				"0059:EXPENDITURE_KINGAKU=1000(clearStartFlg=false:入力値)");
 
 		// Then: INCOME_AND_EXPENDITURE_TABLE検証
-		IncomeAndExpenditureItem syuusiItem = incomeAndExpenditureRepository.select(searchQuery);
+		IncomeAndExpenditure syuusiItem = incomeAndExpenditureRepository.findByPrimaryKey(searchQuery);
 		assertNotNull(syuusiItem);
 		// 通常収入金額 = NON_UPDATE(01:350,000) + UPDATE(03:積立取崩→副業 25,000) = 375,000
 		assertEquals(new BigDecimal("375000.00"), syuusiItem.getRegularIncomeAmount().getValue(),

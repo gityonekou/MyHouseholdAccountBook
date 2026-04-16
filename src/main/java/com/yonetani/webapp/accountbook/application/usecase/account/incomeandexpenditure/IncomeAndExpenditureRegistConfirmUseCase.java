@@ -26,7 +26,7 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
 import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureAmountItemHolder;
 import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.account.income.IncomeItem;
-import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
@@ -519,7 +519,7 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 			if(initFlg) {
 
 				// 収支テーブル情報を作成
-				IncomeAndExpenditureItem addSyuusiData = IncomeAndExpenditureItem.createAddTypeIncomeAndExpenditureItem(
+				IncomeAndExpenditure addSyuusiData = IncomeAndExpenditure.createForAdd(
 						// ユーザID
 						userId,
 						// 対象年月
@@ -543,7 +543,7 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 			} else {
 
 				// 収支テーブル情報を作成
-				IncomeAndExpenditureItem updSyuusiData = IncomeAndExpenditureItem.createUpdTypeIncomeAndExpenditureItem(
+				IncomeAndExpenditure updSyuusiData = IncomeAndExpenditure.createForUpdate(
 						// ユーザID
 						userId,
 						// 対象年月

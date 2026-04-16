@@ -26,7 +26,7 @@ import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookCont
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureAmountItemHolder;
 import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem;
-import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.account.shop.ShopInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.BeforeAndAfterShoppingSisyutuKingakuData;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.MinorWasteShoppingFood;
@@ -313,9 +313,9 @@ public class SimpleShoppingRegistUseCase {
 		ExpenditureAmountItemHolder expenditureAmountItemHolder = expenditureAmountItemHolderComponent.build(searchYearMonth);
 		
 		// 収支テーブル情報を取得
-		IncomeAndExpenditureItem beforeSyuusiData = incomeAndExpenditureRepository.select(searchYearMonth);
+		IncomeAndExpenditure beforeSyuusiData = incomeAndExpenditureRepository.findByPrimaryKey(searchYearMonth);
 		// 収支テーブル更新情報		
-		IncomeAndExpenditureItem updSyuusiData = null;
+		IncomeAndExpenditure updSyuusiData = null;
 		
 		// レスポンスを生成
 		SimpleShoppingRegistResponse response = SimpleShoppingRegistResponse.getRedirectInstance(inputForm.getTargetYearMonth());
@@ -451,7 +451,7 @@ public class SimpleShoppingRegistUseCase {
 			couponResidualValue = houseEquipment.getResidualCouponPrice();
 			
 			// 収支テーブル情報に合計値を設定し更新情報とする
-			updSyuusiData = beforeSyuusiData.addSisyutuKingaku(ExpenditureAmount.from(addData.getShoppingTotalAmount().getValue()));
+			updSyuusiData = beforeSyuusiData.addExpenditureAmount(ExpenditureAmount.from(addData.getShoppingTotalAmount().getValue()));
 			
 			// 完了メッセージ
 			response.addMessage("買い物情報を新規登録しました。[code:" + addData.getShoppingRegistCode() + "]");
@@ -646,10 +646,10 @@ public class SimpleShoppingRegistUseCase {
 			// 支出金額増減値
 			ExpenditureAmount zougenti = ExpenditureAmount.from(beforeData.getShoppingTotalAmount().getValue().subtract(updData.getShoppingTotalAmount().getValue()).abs());
 			if(comp > 0) {
-				updSyuusiData = beforeSyuusiData.subtractSisyutuKingaku(zougenti);
+				updSyuusiData = beforeSyuusiData.subtractExpenditureAmount(zougenti);
 			}
 			if(comp < 0) {
-				updSyuusiData = beforeSyuusiData.addSisyutuKingaku(zougenti);
+				updSyuusiData = beforeSyuusiData.addExpenditureAmount(zougenti);
 			}
 			
 			// 完了メッセージ

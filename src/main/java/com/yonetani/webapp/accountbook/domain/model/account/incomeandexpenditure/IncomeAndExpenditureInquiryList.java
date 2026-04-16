@@ -43,7 +43,7 @@ import lombok.RequiredArgsConstructor;
 public class IncomeAndExpenditureInquiryList {
 	
 	// 年間収支(マージ)情報のリスト
-	private final List<IncomeAndExpenditureItem> values;
+	private final List<IncomeAndExpenditure> values;
 	
 	// 収入金額合計(積立金取崩金額以外の収入金額合計)
 	private final RegularIncomeTotalAmount regularIncomeTotalAmount;
@@ -64,7 +64,7 @@ public class IncomeAndExpenditureInquiryList {
 	 * @return 明細リストの値を表すドメインモデル
 	 *
 	 */
-	public static IncomeAndExpenditureInquiryList from(List<IncomeAndExpenditureItem> values) {
+	public static IncomeAndExpenditureInquiryList from(List<IncomeAndExpenditure> values) {
 		if(CollectionUtils.isEmpty(values)) {
 			return new IncomeAndExpenditureInquiryList(
 					Collections.emptyList(),
@@ -81,7 +81,7 @@ public class IncomeAndExpenditureInquiryList {
 			ExpenditureTotalAmount expenditureAmountGoukei = ExpenditureTotalAmount.ZERO;
 			BalanceTotalAmount balanceAmountGoukei = BalanceTotalAmount.ZERO;
 
-			for(IncomeAndExpenditureItem item : values) {
+			for(IncomeAndExpenditure item : values) {
 				regularIncomeAmountGoukei = regularIncomeAmountGoukei.add(item.getRegularIncomeAmount());
 				withdrewAmountGoukei = withdrewAmountGoukei.add(item.getWithdrawingAmount());
 				sisyutuYoteiKingakuGoukei = sisyutuYoteiKingakuGoukei.add(item.getExpectedExpenditureAmount());

@@ -26,7 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 
-import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.incomeandexpenditure.IncomeAndExpenditureTableMapper;
 
@@ -82,7 +82,7 @@ class IncomeAndExpenditureTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.incomeandexpenditure.IncomeAndExpenditureTableDataSource#add(com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditureItem)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.incomeandexpenditure.IncomeAndExpenditureTableDataSource#add(com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure)} のためのテスト・メソッド。
 	 */
 	@Test
 	@DisplayName("add:収支テーブルへの新規登録テスト(全カラム確認)")
@@ -90,7 +90,7 @@ class IncomeAndExpenditureTableDataSourceTest {
 		/* 全項目の登録チェック */
 		// テストデータ：全項目あり(WITHDREW_KINGAKU=15000:取崩しあり)
 		// 収支金額 = (380000 + 15000) - 38000 = 357000
-		IncomeAndExpenditureItem addData = IncomeAndExpenditureItem.from(
+		IncomeAndExpenditure addData = IncomeAndExpenditure.from(
 				"TEST-USER-ID", "2025", "12",
 				new BigDecimal("380000.00"), new BigDecimal("15000.00"),
 				new BigDecimal("50000.00"), new BigDecimal("38000.00"),
@@ -119,7 +119,7 @@ class IncomeAndExpenditureTableDataSourceTest {
 
 		/* null可項目の登録チェック(WITHDREW_KINGAKU=null:取崩しなし) */
 		// 収支金額 = 250000 - 30000 = 220000
-		IncomeAndExpenditureItem addNullData = IncomeAndExpenditureItem.from(
+		IncomeAndExpenditure addNullData = IncomeAndExpenditure.from(
 				"TEST-USER-ID", "2025", "11",
 				new BigDecimal("250000.00"), null,
 				new BigDecimal("40000.00"), new BigDecimal("30000.00"),
@@ -141,7 +141,7 @@ class IncomeAndExpenditureTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.incomeandexpenditure.IncomeAndExpenditureTableDataSource#update(com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditureItem)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.incomeandexpenditure.IncomeAndExpenditureTableDataSource#update(com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(value = "IncomeAndExpenditureTableDataSourceUpdateTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -157,7 +157,7 @@ class IncomeAndExpenditureTableDataSourceTest {
 		// 更新データ：INCOME_KINGAKU, WITHDREW_KINGAKU, EXPENDITURE_KINGAKU, INCOME_AND_EXPENDITURE_KINGAKUを変更
 		// 意図的にEXPENDITURE_ESTIMATE_KINGAKUに別の値をセット(更新されないことを確認)
 		// 収支金額 = (375000 + 55000) - 69500 = 360500
-		IncomeAndExpenditureItem updateData = IncomeAndExpenditureItem.from(
+		IncomeAndExpenditure updateData = IncomeAndExpenditure.from(
 				"TEST-USER-ID", "2025", "12",
 				new BigDecimal("375000.00"), new BigDecimal("55000.00"),
 				new BigDecimal("99999.00"), new BigDecimal("69500.00"),
@@ -180,7 +180,7 @@ class IncomeAndExpenditureTableDataSourceTest {
 				"支出予定金額(EXPENDITURE_ESTIMATE_KINGAKU)が更新されていないこと");
 
 		/* 対象データなしの場合、0件が返ること */
-		IncomeAndExpenditureItem notFoundData = IncomeAndExpenditureItem.from(
+		IncomeAndExpenditure notFoundData = IncomeAndExpenditure.from(
 				"TEST-USER-ID", "2025", "01",
 				new BigDecimal("0.00"), null,
 				new BigDecimal("0.00"), new BigDecimal("0.00"),
@@ -189,7 +189,7 @@ class IncomeAndExpenditureTableDataSourceTest {
 
 		/* null可項目の更新チェック(WITHDREW_KINGAKU=nullに更新) */
 		// 収支金額 = 350000 - 40000 = 310000
-		IncomeAndExpenditureItem updateNullData = IncomeAndExpenditureItem.from(
+		IncomeAndExpenditure updateNullData = IncomeAndExpenditure.from(
 				"TEST-USER-ID", "2025", "12",
 				new BigDecimal("350000.00"), null,
 				new BigDecimal("99999.00"), new BigDecimal("40000.00"),

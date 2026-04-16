@@ -191,15 +191,13 @@ class IncomeAndExpenditureRegistRollbackTest {
 		});
 
 		// Then: ロールバック確認（例外発生前に挿入された収入3件が取り消されていること）
-		// ※ incomeAndExpenditureRepository.select() はレコードなしでも fromEmpty()(全フィールドnull)を返すため、
-		//   assertNull(select()) ではなく getUserId()==null でレコード未登録を確認する
 		SearchQueryUserIdAndYearMonth searchQuery = createSearchQuery("202512");
 		assertEquals(0, incomeRepository.countBy(searchQuery),
 				"例外発生前に挿入された収入3件がロールバックされ、INCOME_TABLEが0件であること");
 		assertEquals(0, expenditureRepository.countBy(searchQuery),
 				"EXPENDITURE_TABLEも0件であること（例外は収入INSERT後に発生するため元々0件だが念のため確認）");
-		assertNull(incomeAndExpenditureRepository.select(searchQuery).getUserId(),
-				"INCOME_AND_EXPENDITURE_TABLEも登録されていないこと（userId=nullでレコードなしを確認）");
+		assertTrue(incomeAndExpenditureRepository.findByPrimaryKey(searchQuery).isEmpty(),
+				"INCOME_AND_EXPENDITURE_TABLEも登録されていないこと");
 	}
 
 	/**
@@ -261,14 +259,12 @@ class IncomeAndExpenditureRegistRollbackTest {
 		});
 
 		// Then: ロールバック確認（全件INSERT後の例外でも全データが取り消されていること）
-		// ※ incomeAndExpenditureRepository.select() はレコードなしでも fromEmpty()(全フィールドnull)を返すため、
-		//   assertNull(select()) ではなく getUserId()==null でレコード未登録を確認する
 		SearchQueryUserIdAndYearMonth searchQuery = createSearchQuery("202512");
 		assertEquals(0, incomeRepository.countBy(searchQuery),
 				"例外発生前に挿入された収入3件がロールバックされ、INCOME_TABLEが0件であること");
 		assertEquals(0, expenditureRepository.countBy(searchQuery),
 				"例外発生前に挿入された支出7件がロールバックされ、EXPENDITURE_TABLEが0件であること");
-		assertNull(incomeAndExpenditureRepository.select(searchQuery).getUserId(),
-				"INCOME_AND_EXPENDITURE_TABLEも登録されていないこと（userId=nullでレコードなしを確認）");
+		assertTrue(incomeAndExpenditureRepository.findByPrimaryKey(searchQuery).isEmpty(),
+				"INCOME_AND_EXPENDITURE_TABLEも登録されていないこと");
 	}
 }
