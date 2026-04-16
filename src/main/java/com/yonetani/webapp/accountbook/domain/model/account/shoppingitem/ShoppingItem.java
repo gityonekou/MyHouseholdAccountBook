@@ -12,7 +12,7 @@ package com.yonetani.webapp.accountbook.domain.model.account.shoppingitem;
 
 import java.math.BigDecimal;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCalories;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCapacity;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCapacityUnit;

@@ -13,7 +13,7 @@ package com.yonetani.webapp.accountbook.domain.repository.account.income;
 import com.yonetani.webapp.accountbook.domain.model.account.income.IncomeItem;
 import com.yonetani.webapp.accountbook.domain.model.account.income.IncomeItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalAvailableFunds;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.TotalAvailableFunds;
 
 /**
  *<pre>

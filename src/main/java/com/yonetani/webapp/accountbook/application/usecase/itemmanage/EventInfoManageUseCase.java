@@ -30,8 +30,8 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndEventCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.event.EventItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemSortOrder;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemSortOrder;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.EventInfoForm;

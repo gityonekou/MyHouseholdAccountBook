@@ -13,7 +13,7 @@
  */
 package com.yonetani.webapp.accountbook.domain.model.searchquery;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemSortOrder;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemSortOrder;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
 import lombok.AccessLevel;

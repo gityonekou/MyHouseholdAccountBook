@@ -21,8 +21,8 @@ import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.WithdrawingAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
@@ -31,7 +31,7 @@ import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.incomeandexpenditure.IncomeAndExpenditureReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearSearchQueryDto;
-import com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry.IncomeAndExpenditureTableMapper;
+import com.yonetani.webapp.accountbook.infrastructure.mapper.account.incomeandexpenditure.IncomeAndExpenditureTableMapper;
 
 import lombok.RequiredArgsConstructor;
 

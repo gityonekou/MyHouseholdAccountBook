@@ -25,7 +25,7 @@ import com.yonetani.webapp.accountbook.infrastructure.dto.account.expenditureinf
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndSisyutuItemCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndSisyutuItemSortBetweenABSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSearchQueryDto;
-import com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry.SisyutuItemTableMapper;
+import com.yonetani.webapp.accountbook.infrastructure.mapper.account.expenditureinfo.SisyutuItemTableMapper;
 
 import lombok.RequiredArgsConstructor;
 

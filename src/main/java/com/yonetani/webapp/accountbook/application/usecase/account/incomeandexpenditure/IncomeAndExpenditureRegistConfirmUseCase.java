@@ -34,9 +34,9 @@ import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.Sis
 import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.IncomeCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeCode;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.WithdrawingAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;

@@ -19,8 +19,8 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonth
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTableRepository;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalAvailableFunds;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpenditureTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.TotalAvailableFunds;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 
 import lombok.RequiredArgsConstructor;

@@ -18,7 +18,7 @@ import com.yonetani.webapp.accountbook.application.usecase.common.ExpenditureIte
 import com.yonetani.webapp.accountbook.domain.model.account.event.EventItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.event.EventItemTableRepository;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.request.account.regist.ExpenditureSelectItemForm;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.ExpenditureItemSelectResponse;

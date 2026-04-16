@@ -17,11 +17,11 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.BalanceTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.RegularIncomeTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.BalanceTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpenditureTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.RegularIncomeTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.WithdrawingTotalAmount;
 
 import lombok.AccessLevel;
 import lombok.Getter;

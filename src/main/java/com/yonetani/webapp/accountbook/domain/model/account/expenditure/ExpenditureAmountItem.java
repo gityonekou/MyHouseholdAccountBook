@@ -13,11 +13,11 @@ package com.yonetani.webapp.accountbook.domain.model.account.expenditure;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.MinorWasteExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ParentExpenditureItemCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SevereWasteExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ParentExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.MinorWasteExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.SevereWasteExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;

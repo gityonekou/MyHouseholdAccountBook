@@ -13,7 +13,7 @@ package com.yonetani.webapp.accountbook.domain.type.common;
 
 import java.math.BigDecimal;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalAvailableFunds;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.TotalAvailableFunds;
 
 import lombok.EqualsAndHashCode;
 

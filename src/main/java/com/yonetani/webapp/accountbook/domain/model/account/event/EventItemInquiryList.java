@@ -20,7 +20,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventDate;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventName;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemName;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemName;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;

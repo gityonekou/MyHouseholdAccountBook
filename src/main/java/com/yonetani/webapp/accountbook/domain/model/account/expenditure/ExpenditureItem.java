@@ -13,15 +13,13 @@ package com.yonetani.webapp.accountbook.domain.model.account.expenditure;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import org.springframework.util.StringUtils;
-
 import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCategory;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCode;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureEventCode;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureName;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpectedExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.DeleteFlg;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
@@ -114,13 +112,7 @@ public class ExpenditureItem {
 			BigDecimal expectedExpenditureAmount,
 			BigDecimal expenditureAmount,
 			boolean deleteFlg) {
-		// イベントコードがnullの場合、null値のイベントコードを生成
-		ExpenditureEventCode eventCodeVal = null;
-		if(StringUtils.hasLength(expenditureEventCode)) {
-			eventCodeVal = ExpenditureEventCode.from(expenditureEventCode);
-		} else {
-			eventCodeVal = ExpenditureEventCode.NULL;
-		}
+		
 		// 支出テーブル情報を表すドメインモデルを生成して返却
 		return new ExpenditureItem(
 				UserId.from(userId),
@@ -128,7 +120,7 @@ public class ExpenditureItem {
 				TargetMonth.from(targetMonth),
 				ExpenditureCode.from(expenditureCode),
 				ExpenditureItemCode.from(expenditureItemCode),
-				eventCodeVal,
+				ExpenditureEventCode.from(expenditureEventCode),
 				ExpenditureName.from(expenditureName),
 				ExpenditureCategory.from(expenditureCategory),
 				ExpenditureDetailContext.from(expenditureDetailContext),

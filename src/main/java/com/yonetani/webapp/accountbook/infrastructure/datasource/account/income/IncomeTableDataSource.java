@@ -19,10 +19,10 @@ import com.yonetani.webapp.accountbook.domain.model.account.income.IncomeItem;
 import com.yonetani.webapp.accountbook.domain.model.account.income.IncomeItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTableRepository;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalAvailableFunds;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.TotalAvailableFunds;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.income.IncomeReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthSearchQueryDto;
-import com.yonetani.webapp.accountbook.infrastructure.mapper.account.inquiry.IncomeTableMapper;
+import com.yonetani.webapp.accountbook.infrastructure.mapper.account.income.IncomeTableMapper;
 
 import lombok.RequiredArgsConstructor;
 

@@ -10,12 +10,12 @@
  */
 package com.yonetani.webapp.accountbook.domain.model.adminmenu;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemDetailContext;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemLevel;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemName;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemSortOrder;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ParentExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemLevel;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemName;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemSortOrder;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ParentExpenditureItemCode;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;

@@ -12,9 +12,9 @@ package com.yonetani.webapp.accountbook.domain.model.account.income;
 
 import java.math.BigDecimal;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.IncomeCategory;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.IncomeCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.IncomeDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeCode;
+import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.common.DeleteFlg;
 import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;

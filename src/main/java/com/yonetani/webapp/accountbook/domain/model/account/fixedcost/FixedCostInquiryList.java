@@ -18,6 +18,7 @@ import java.util.Objects;
 import org.springframework.util.CollectionUtils;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemName;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostName;
@@ -26,7 +27,6 @@ import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPa
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonth;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonthOptionalContext;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemName;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;

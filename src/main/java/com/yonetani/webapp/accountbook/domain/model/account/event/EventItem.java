@@ -17,7 +17,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.event.EventDate;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventExitFlg;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventName;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
 import lombok.AccessLevel;

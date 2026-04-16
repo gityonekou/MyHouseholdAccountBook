@@ -17,21 +17,21 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.BalanceTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.BalanceTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpenditureTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.MinorWasteExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.RegularIncomeTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.SevereWasteExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.WithdrawingAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.WithdrawingTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.InsyokuNitiyouhinKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.IruiJyuukyoSetubiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.JigyouKeihiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.KoteiHikazeiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.KoteiKazeiKingaku;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.MinorWasteExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.RegularIncomeTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SevereWasteExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyumiGotakuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalWasteExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WasteExpenditureTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;

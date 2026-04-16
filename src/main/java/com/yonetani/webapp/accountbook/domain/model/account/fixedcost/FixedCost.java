@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 
 import org.springframework.util.StringUtils;
 
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostKubun;
@@ -22,7 +23,6 @@ import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPa
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentDay;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonth;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonthOptionalContext;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
 import lombok.AccessLevel;

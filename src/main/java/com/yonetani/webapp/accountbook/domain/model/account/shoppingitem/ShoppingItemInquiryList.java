@@ -16,7 +16,7 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureItemName;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemName;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCalories;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCapacity;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCapacityUnit;
