@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/11/23 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingregist;
@@ -40,7 +41,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.Shoppi
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCTaxExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenses;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodTaxExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentExpenses;
@@ -71,7 +72,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Repository
@@ -103,7 +104,7 @@ public class ShoppingRegistTableDataSource implements ShoppingRegistTableReposit
 	 * {@inheritDoc}
 	 */
 	@Override
-	public ShoppingRegist findByUniqueKey(SearchQueryUserIdAndYearMonthAndShoppingRegistCode search) {
+	public ShoppingRegist findByPrimaryKey(SearchQueryUserIdAndYearMonthAndShoppingRegistCode search) {
 		// 検索結果を取得
 		ShoppingRegistReadWriteDto searchResult = mapper.findByUniqueKey(
 				UserIdAndYearMonthAndShoppingRegistCodeSearchQueryDto.from(search));
@@ -120,7 +121,7 @@ public class ShoppingRegistTableDataSource implements ShoppingRegistTableReposit
 	 * {@inheritDoc}
 	 */
 	@Override
-	public SimpleShoppingRegistItemInquiryList findById(SearchQueryUserIdAndYearMonth search) {
+	public SimpleShoppingRegistItemInquiryList findBy(SearchQueryUserIdAndYearMonth search) {
 		// 検索結果を取得
 		List<SimpleShoppingRegistItemReadDto> searchResult = mapper.findById(UserIdAndYearMonthSearchQueryDto.from(search));
 		if(searchResult == null) {
@@ -137,7 +138,7 @@ public class ShoppingRegistTableDataSource implements ShoppingRegistTableReposit
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int countById(SearchQueryUserIdAndYearMonth search) {
+	public int countBy(SearchQueryUserIdAndYearMonth search) {
 		// 検索条件に一致する買い物登録情報の件数を返します。
 		return mapper.countById(UserIdAndYearMonthSearchQueryDto.from(search));
 	}
@@ -169,7 +170,7 @@ public class ShoppingRegistTableDataSource implements ShoppingRegistTableReposit
 				// 備考
 				ShoppingRemarks.from(dto.getShoppingRemarks()),
 				// 食料品(必須)金額
-				ShoppingFoodExpenses.from(dto.getShoppingFoodExpenses()),
+				ShoppingFoodExpenditureAmount.from(dto.getShoppingFoodExpenses()),
 				// 消費税:食料品(必須)金額
 				ShoppingFoodTaxExpenses.from(dto.getShoppingFoodTaxExpenses()),
 				// 食料品B(無駄遣い)金額
@@ -233,7 +234,7 @@ public class ShoppingRegistTableDataSource implements ShoppingRegistTableReposit
 				// 食料品(必須)
 				ShoppingFoodItem.from(
 						// 食料品(必須)金額
-						ShoppingFoodExpenses.from(dto.getShoppingFoodExpenses()),
+						ShoppingFoodExpenditureAmount.from(dto.getShoppingFoodExpenses()),
 						// 消費税:食料品(必須)金額
 						ShoppingFoodTaxExpenses.from(dto.getShoppingFoodTaxExpenses())),
 				// 食料品B(無駄遣い)

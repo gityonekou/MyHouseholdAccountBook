@@ -20,7 +20,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventDate;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventName;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemName;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemName;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -35,7 +35,7 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -60,7 +60,7 @@ public class EventItemInquiryList {
 		// イベントコード
 		private final EventCode eventCode;
 		// 支出項目名
-		private final SisyutuItemName sisyutuItemName;
+		private final ExpenditureItemName expenditureItemName;
 		// イベント名
 		private final EventName eventName;
 		// イベント内容詳細
@@ -75,7 +75,7 @@ public class EventItemInquiryList {
 		 * 引数の値からイベント一覧明細情報を表すドメインモデルを生成して返します。
 		 *</pre>
 		 * @param eventCode イベントコード
-		 * @param sisyutuItemName 支出項目名
+		 * @param expenditureItemName 支出項目名
 		 * @param eventName イベント名
 		 * @param eventDetailContext イベント内容詳細
 		 * @param eventStartDate イベント開始日
@@ -83,11 +83,11 @@ public class EventItemInquiryList {
 		 * @return イベント一覧明細情報を表すドメインモデル
 		 *
 		 */
-		public static EventInquiryItem from(String eventCode, String sisyutuItemName, String eventName, String eventDetailContext,
+		public static EventInquiryItem from(String eventCode, String expenditureItemName, String eventName, String eventDetailContext,
 				LocalDate eventStartDate, LocalDate eventEndDate) {
 			return new EventInquiryItem(
 					EventCode.from(eventCode),
-					SisyutuItemName.from(sisyutuItemName),
+					ExpenditureItemName.from(expenditureItemName),
 					EventName.from(eventName),
 					EventDetailContext.from(eventDetailContext),
 					EventDate.from(eventStartDate),

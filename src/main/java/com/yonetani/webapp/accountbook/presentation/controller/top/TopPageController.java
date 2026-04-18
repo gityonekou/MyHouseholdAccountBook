@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.yonetani.webapp.accountbook.common.component.AccountBookUserInquiryUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.common.AccountBookUserInquiryUseCase;
 import com.yonetani.webapp.accountbook.domain.model.common.AccountBookUser;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.response.top.TopPageResponse;

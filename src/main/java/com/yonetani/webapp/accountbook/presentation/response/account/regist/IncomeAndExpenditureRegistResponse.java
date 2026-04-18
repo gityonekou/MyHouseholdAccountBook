@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/06/23 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.regist;
@@ -17,8 +18,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.ExpenditureItemForm;
-import com.yonetani.webapp.accountbook.presentation.request.account.inquiry.IncomeItemForm;
+import com.yonetani.webapp.accountbook.presentation.request.account.regist.ExpenditureItemForm;
+import com.yonetani.webapp.accountbook.presentation.request.account.regist.IncomeItemForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.session.ExpenditureRegistItem;
@@ -37,20 +38,24 @@ import lombok.Setter;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class IncomeAndExpenditureRegistResponse extends AbstractIncomeAndExpenditureRegistResponse {
-	
+
 	// 収入情報入力フォーム
+	@Getter
 	private final IncomeItemForm incomeItemForm;
 	// 収入区分選択ボックス
+	@Getter
 	private final SelectViewItem incomeKubunSelectList;
-	
+
 	// 支出情報入力フォーム
+	@Getter
 	private final ExpenditureItemForm expenditureItemForm;
 	// 支出区分選択ボックス
+	@Getter
 	private final SelectViewItem expenditureKubunSelectList;
 	
 	// セッション管理する収入登録情報のリストです。

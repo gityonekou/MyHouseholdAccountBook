@@ -26,7 +26,7 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @DisplayName("金額基底クラス(Money)のテスト")
@@ -300,7 +300,7 @@ class MoneyTest {
 	}
 
 	@Test
-	@DisplayName("正常系：toIntegerValueは整数値を返す")
+	@DisplayName("正常系：toIntegerValueは整数値(Integer型)を返す")
 	void testToIntegerValue() {
 		// 準備
 		TestMoney amount1 = TestMoney.from(new BigDecimal("12345.67"));
@@ -309,12 +309,12 @@ class MoneyTest {
 		TestMoney amount4 = TestMoney.from(new BigDecimal("-12345.50"));
 
 		// 検証（スケール0で四捨五入）
-		assertEquals(12346L, amount1.toIntegerValue());
-		assertEquals(-12346L, amount2.toIntegerValue());
-		assertEquals(12345L, amount3.toIntegerValue()); // 0.44 -> 切り捨て
-		assertEquals(-12346L, amount4.toIntegerValue()); // -0.50 -> 切り上げ
+		assertEquals(Integer.valueOf(12346), amount1.toIntegerValue());
+		assertEquals(Integer.valueOf(-12346), amount2.toIntegerValue());
+		assertEquals(Integer.valueOf(12345), amount3.toIntegerValue()); // 0.44 -> 切り捨て
+		assertEquals(Integer.valueOf(-12345), amount4.toIntegerValue()); // -0.50 -> 切り捨て
 	}
-
+	
 	@Test
 	@DisplayName("正常系：toIntegerStringは整数の文字列を返す")
 	void testToIntegerString() {

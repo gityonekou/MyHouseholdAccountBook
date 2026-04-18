@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2025/01/03 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
@@ -13,10 +14,10 @@ package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
 import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsTaxExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -31,7 +32,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -61,7 +62,7 @@ public class ShoppingConsumerGoods {
 	 * @param expenses 「日用品金額」項目の値
 	 * @param taxExpenses 「消費税:日用品金額」項目の値
 	 * @param couponPrice クーポン金額
-	 * @return 「食料品B(必須)」項目ドメイン
+	 * @return 「日用品」項目ドメイン
 	 *
 	 */
 	public static ShoppingConsumerGoods from(ShoppingConsumerGoodsExpenses expenses, ShoppingConsumerGoodsTaxExpenses taxExpenses, ShoppingCouponPrice couponPrice) {
@@ -122,7 +123,7 @@ public class ShoppingConsumerGoods {
 	 * @return 支出金額がゼロの場合はfalse、それ以外の場合はtrueとなります。
 	 *
 	 */
-	public boolean hasSisyutuKingaku() {
+	public boolean hasExpenditureAmount() {
 		return !value.equals(ExpenditureAmount.ZERO);
 	}
 }

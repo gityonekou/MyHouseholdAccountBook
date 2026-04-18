@@ -14,14 +14,14 @@ import org.springframework.stereotype.Service;
 import com.yonetani.webapp.accountbook.domain.exception.DataInconsistencyException;
 import com.yonetani.webapp.accountbook.domain.exception.ExpenditureAmountInconsistencyException;
 import com.yonetani.webapp.accountbook.domain.exception.IncomeAmountInconsistencyException;
+import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureItemList;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.ExpenditureTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpenditureTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.TotalAvailableFunds;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalAvailableFunds;
 
 import lombok.RequiredArgsConstructor;
 
@@ -51,7 +51,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Service
@@ -96,7 +96,7 @@ public class IncomeAndExpenditureConsistencyService {
 
 		// 収入テーブルから利用可能資金合計を取得
 		TotalAvailableFunds actualTotal =
-			incomeRepository.sumIncomeKingaku(searchCondition);
+			incomeRepository.getTotalAvailableFunds(searchCondition);
 
 		// 収支集約から期待値を取得（通常収入 + 積立取崩）
 		TotalAvailableFunds expectedTotal = aggregate.getTotalIncome();
@@ -147,7 +147,7 @@ public class IncomeAndExpenditureConsistencyService {
 
 		// 支出テーブルから合計金額を取得
 		ExpenditureTotalAmount actualTotal =
-			expenditureRepository.sumExpenditureKingaku(searchCondition);
+			expenditureRepository.getExpenditureTotalAmount(searchCondition);
 
 		// 収支集約から期待値を取得
 		ExpenditureAmount expectedAmount = aggregate.getExpenditureAmount();

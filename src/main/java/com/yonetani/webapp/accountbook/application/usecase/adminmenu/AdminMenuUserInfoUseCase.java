@@ -8,6 +8,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2023/11/11 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.adminmenu;
@@ -21,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookException;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditureinfo.ExpenditureItemInfo;
 import com.yonetani.webapp.accountbook.domain.model.account.shop.Shop;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.AdminMenuUserInfo;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.AdminMenuUserInfoItemList;
@@ -29,7 +30,7 @@ import com.yonetani.webapp.accountbook.domain.model.adminmenu.ShopBaseList;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.SisyutuItemBaseList;
 import com.yonetani.webapp.accountbook.domain.model.common.AccountBookUser;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuItemTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditureinfo.SisyutuItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.AdminMenuUserInfoRepository;
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.ShopBaseTableRepository;
@@ -56,7 +57,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Service
@@ -181,14 +182,14 @@ public class AdminMenuUserInfoUseCase {
 				
 				sisyutuItemBaseList.getValues().forEach(baseData -> {
 						// 登録する支出項目テーブル情報を生成(更新不可フラグはデフォルトで不可:falseを設定)
-						SisyutuItem addData = SisyutuItem.from(
+						ExpenditureItemInfo addData = ExpenditureItemInfo.from(
 							accountBookUser.getUserId().getValue(),
-							baseData.getSisyutuItemCode().getValue(),
-							baseData.getSisyutuItemName().getValue(), 
-							baseData.getSisyutuItemDetailContext().getValue(),
-							baseData.getParentSisyutuItemCode().getValue(),
-							baseData.getSisyutuItemLevel().toString(),
-							baseData.getSisyutuItemSort().getValue(),
+							baseData.getExpenditureItemCode().getValue(),
+							baseData.getExpenditureItemName().getValue(), 
+							baseData.getExpenditureItemDetailContext().getValue(),
+							baseData.getParentExpenditureItemCode().getValue(),
+							baseData.getExpenditureItemLevel().toString(),
+							baseData.getExpenditureItemSortOrder().getValue(),
 							false);
 						// データを登録
 						int addCount = sisyutuItemTableRepository.add(addData);
@@ -267,14 +268,14 @@ public class AdminMenuUserInfoUseCase {
 		
 		sisyutuItemBaseList.getValues().forEach(baseData -> {
 				// 登録する支出項目テーブル情報を生成(更新不可フラグはデフォルトで不可:falseを設定)
-				SisyutuItem addData = SisyutuItem.from(
+				ExpenditureItemInfo addData = ExpenditureItemInfo.from(
 					"koukiyonetani",
-					baseData.getSisyutuItemCode().getValue(),
-					baseData.getSisyutuItemName().getValue(), 
-					baseData.getSisyutuItemDetailContext().getValue(),
-					baseData.getParentSisyutuItemCode().getValue(),
-					baseData.getSisyutuItemLevel().toString(),
-					baseData.getSisyutuItemSort().getValue(),
+					baseData.getExpenditureItemCode().getValue(),
+					baseData.getExpenditureItemName().getValue(), 
+					baseData.getExpenditureItemDetailContext().getValue(),
+					baseData.getParentExpenditureItemCode().getValue(),
+					baseData.getExpenditureItemLevel().toString(),
+					baseData.getExpenditureItemSortOrder().getValue(),
 					false);
 				// データを登録
 				int addCount = sisyutuItemTableRepository.add(addData);

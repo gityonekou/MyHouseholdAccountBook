@@ -17,21 +17,21 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.BalanceTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ExpenditureTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.BalanceTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpenditureTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.MinorWasteExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.RegularIncomeTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.SevereWasteExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.WithdrawingAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.WithdrawingTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.InsyokuNitiyouhinKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.IruiJyuukyoSetubiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.JigyouKeihiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.KoteiHikazeiKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.KoteiKazeiKingaku;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.MinorWasteExpenditure;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.RegularIncomeTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SevereWasteExpenditure;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyumiGotakuKingaku;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalWasteExpenditure;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalWasteExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WasteExpenditureTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrawingTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
@@ -52,7 +52,7 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -92,7 +92,7 @@ public class AccountYearMeisaiInquiryList {
 		// 趣味娯楽
 		private final SyumiGotakuKingaku syumiGotakuKingaku;
 		// 無駄遣い合計支出金額
-		private final TotalWasteExpenditure totalWasteExpenditure;
+		private final TotalWasteExpenditureAmount totalWasteExpenditureAmount;
 		// 支出金額
 		private final ExpenditureAmount expenditureAmount;
 		// 収支金額
@@ -111,8 +111,8 @@ public class AccountYearMeisaiInquiryList {
 		 * @param iruiJyuukyoSetubiKingaku 衣類住居設備
 		 * @param insyokuNitiyouhinKingaku 飲食日用品
 		 * @param syumiGotakuKingaku 趣味娯楽
-		 * @param minorWasteExpenditure 無駄遣い（軽度）支出金額
-		 * @param severeWasteExpenditure 無駄遣い（重度）支出金額
+		 * @param minorWasteExpenditureAmount 無駄遣い（軽度）支出金額
+		 * @param severeWasteExpenditureAmount 無駄遣い（重度）支出金額
 		 * @param expenditureAmount 支出金額
 		 * @param balanceAmount 収支金額
 		 * @return 年間収支(明細)情報のドメインモデル
@@ -128,8 +128,8 @@ public class AccountYearMeisaiInquiryList {
 				BigDecimal iruiJyuukyoSetubiKingaku,
 				BigDecimal insyokuNitiyouhinKingaku,
 				BigDecimal syumiGotakuKingaku,
-				BigDecimal minorWasteExpenditure,
-				BigDecimal severeWasteExpenditure,
+				BigDecimal minorWasteExpenditureAmount,
+				BigDecimal severeWasteExpenditureAmount,
 				BigDecimal expenditureAmount,
 				BigDecimal balanceAmount
 				) {
@@ -143,7 +143,7 @@ public class AccountYearMeisaiInquiryList {
 					IruiJyuukyoSetubiKingaku.from(iruiJyuukyoSetubiKingaku),
 					InsyokuNitiyouhinKingaku.from(insyokuNitiyouhinKingaku),
 					SyumiGotakuKingaku.from(syumiGotakuKingaku),
-					TotalWasteExpenditure.from(MinorWasteExpenditure.from(minorWasteExpenditure), SevereWasteExpenditure.from(severeWasteExpenditure)),
+					TotalWasteExpenditureAmount.from(MinorWasteExpenditureAmount.from(minorWasteExpenditureAmount), SevereWasteExpenditureAmount.from(severeWasteExpenditureAmount)),
 					ExpenditureAmount.from(expenditureAmount),
 					BalanceAmount.from(balanceAmount));
 		}
@@ -232,7 +232,7 @@ public class AccountYearMeisaiInquiryList {
 				iruiJyuukyoSetubiKingakuGoukei = DomainCommonUtils.addBigDecimalNullSafe(iruiJyuukyoSetubiKingakuGoukei, item.getIruiJyuukyoSetubiKingaku().getValue());
 				insyokuNitiyouhinKingakuGoukei = DomainCommonUtils.addBigDecimalNullSafe(insyokuNitiyouhinKingakuGoukei, item.getInsyokuNitiyouhinKingaku().getValue());
 				syumiGotakuKingakuGoukei = DomainCommonUtils.addBigDecimalNullSafe(syumiGotakuKingakuGoukei, item.getSyumiGotakuKingaku().getValue());
-				wasteExpenditureTotalAmountGoukei = wasteExpenditureTotalAmountGoukei.add(item.getTotalWasteExpenditure());
+				wasteExpenditureTotalAmountGoukei = wasteExpenditureTotalAmountGoukei.add(item.getTotalWasteExpenditureAmount());
 				expenditureAmountGoukei = expenditureAmountGoukei.add(item.getExpenditureAmount());
 				balanceAmountGoukei = balanceAmountGoukei.add(item.getBalanceAmount());
 			}

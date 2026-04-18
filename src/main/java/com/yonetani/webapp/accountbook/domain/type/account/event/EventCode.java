@@ -5,18 +5,15 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/08/18 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.event;
 
-import org.springframework.util.StringUtils;
-
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.common.Identifier;
 
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  *<pre>
@@ -25,18 +22,22 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-@EqualsAndHashCode
-public class EventCode {
-	// イベントコード
-	private final String value;
+@EqualsAndHashCode(callSuper = true)
+public class EventCode extends Identifier {
 	
-	/** null値のイベントコード */
-	public static final EventCode NUL_EVENT_CODE = EventCode.forNullEventCode();
+	/**
+	 *<pre>
+	 * コンストラクタ（privateでファクトリメソッド経由のみ生成可能）
+	 *</pre>
+	 * @param value イベントコード
+	 *
+	 */
+	private EventCode(String value) {
+		super(value);
+	}
 	
 	/**
 	 *<pre>
@@ -54,10 +55,9 @@ public class EventCode {
 	 */
 	public static EventCode from(String code) {
 		
-		// ガード節(空文字列)
-		if(!StringUtils.hasLength(code)) {
-			throw new MyHouseholdAccountBookRuntimeException("「イベントコード」項目の設定値が空文字列です。管理者に問い合わせてください。");
-		}
+		// 基本検証（null、空文字）
+		Identifier.validate(code, "イベントコード");
+		
 		// ガード節(長さが4桁でない)
 		if(code.length() != 4) {
 			throw new MyHouseholdAccountBookRuntimeException("「イベントコード」項目の設定値が不正です。管理者に問い合わせてください。[eventCode=" + code + "]");
@@ -74,17 +74,6 @@ public class EventCode {
 	
 	/**
 	 *<pre>
-	 * null値のイベントコード項目を生成します。
-	 *</pre>
-	 * @return
-	 *
-	 */
-	private static EventCode forNullEventCode() {
-		return new EventCode(null);
-	}
-	
-	/**
-	 *<pre>
 	 * 新規発番するイベントコードの値(数値)をもとに、「イベントコード」項目の値を表すドメインタイプを生成します。
 	 *</pre>
 	 * @param count 新規発番するイベントコードの値(数値)
@@ -92,7 +81,7 @@ public class EventCode {
 	 *
 	 */
 	public static EventCode from(int count) {
-		return new EventCode(String.format("%04d", count));
+		return EventCode.from(String.format("%04d", count));
 	}
 	
 	/**
@@ -105,13 +94,5 @@ public class EventCode {
 	 */
 	public static String getNewCode(int count) {
 		return EventCode.from(count).getValue();
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		return value;
 	}
 }

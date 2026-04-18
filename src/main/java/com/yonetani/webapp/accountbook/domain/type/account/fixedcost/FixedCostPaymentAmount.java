@@ -1,0 +1,116 @@
+/**
+ * 「支払金額」項目の値を表すドメインタイプです
+ *
+ *------------------------------------------------
+ * 更新履歴
+ * 日付       : version  コメントなど
+ * 2024/06/03 : 1.00.00  新規作成
+ * 2025/12/21 : 1.01.00  リファクタリング対応(DDD適応)
+ * 2026/04/05 : 1.02.00  クラス名をShiharaiKingakuからFixedCostPaymentAmountにリネーム
+ *
+ */
+package com.yonetani.webapp.accountbook.domain.type.account.fixedcost;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.common.Money;
+
+import lombok.EqualsAndHashCode;
+
+/**
+ *<pre>
+ * 「支払金額」項目の値を表すドメインタイプです
+ *
+ *</pre>
+ *
+ * @author ：Kouki Yonetani
+ * @since 家計簿アプリ(1.00)
+ *
+ */
+@EqualsAndHashCode(callSuper = true)
+public class FixedCostPaymentAmount extends Money {
+	
+	/** 値が0の「支払金額」項目の値 */
+	public static final FixedCostPaymentAmount ZERO = FixedCostPaymentAmount.from(Money.MONEY_ZERO);
+	
+	/**
+	 * コンストラクタ
+	 * @param value 支払金額
+	 */
+	private FixedCostPaymentAmount(BigDecimal value) {
+		super(value);
+	}
+	
+	/**
+	 *<pre>
+	 * 「支払金額」項目の値を表すドメインタイプを生成します。
+	 *
+	 * [ガード節]
+	 * ・null値
+	 * ・マイナス値
+	 * ・スケール値が2以外
+	 *
+	 *</pre>
+	 * @param kingaku 支払金額
+	 * @return 「支払金額」項目ドメインタイプ
+	 *
+	 */
+	public static FixedCostPaymentAmount from(BigDecimal kingaku) {
+		
+		// 基底クラスのバリデーションを実行（null非許容、スケール2チェック）
+		validate(kingaku, "支払金額");
+		
+		// ガード節(マイナス値) - 支払金額は0以上である必要がある
+		if(BigDecimal.ZERO.compareTo(kingaku) > 0) {
+			throw new MyHouseholdAccountBookRuntimeException(
+				String.format("「支払金額」項目の設定値がマイナスです。管理者に問い合わせてください。[value=%d]",
+					kingaku.intValue()));
+		}
+		
+		return new FixedCostPaymentAmount(kingaku);
+	}
+	
+	/**
+	 *<pre>
+	 * 「支払金額」項目の値を表すドメインタイプを生成します。
+	 *
+	 * [ガード節]
+	 * ・null値
+	 * その他ガード節についてはfrom(BigDecimal)メソッドに委譲しているため、from(BigDecimal)メソッドのガード節を参照
+	 *
+	 *</pre>
+	 * @param kingaku 支払金額
+	 * @return 「支払金額」項目ドメインタイプ
+	 *
+	 */
+	public static FixedCostPaymentAmount from(Integer kingaku) {
+		
+		// ガード節(null値) - 支払金額はnullであってはならない
+		if(kingaku == null) {
+			throw new MyHouseholdAccountBookRuntimeException(
+				String.format("「支払金額」項目の設定値がnullです。管理者に問い合わせてください。[value=null]"));
+		}
+		
+		// 整数の値に指定したスケール分0を追加
+		String numStr = kingaku.toString() + ".00";
+		
+		// 整数の値を文字列変換
+		BigDecimal bigVal = new BigDecimal(numStr.toString());
+		// スケールを2に設定、小数点以下は切り捨て（HALF_DOWN）で丸める(0.5以上は切り上げ、0.5未満は切り捨て)
+		bigVal.setScale(2, RoundingMode.HALF_DOWN);
+		
+		// 基底クラスのバリデーションを実行（null非許容、スケール2チェック）
+		validate(bigVal, "支払金額");
+		
+		// ガード節(マイナス値) - 支払金額は0以上である必要がある
+		if(BigDecimal.ZERO.compareTo(bigVal) > 0) {
+			throw new MyHouseholdAccountBookRuntimeException(
+				String.format("「支払金額」項目の設定値がマイナスです。管理者に問い合わせてください。[value=%d]",
+					kingaku.intValue()));
+		}
+		
+		return new FixedCostPaymentAmount(bigVal);
+	}
+}

@@ -17,7 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalAvailableFunds;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.TotalAvailableFunds;
 
 /**
  *<pre>
@@ -26,7 +26,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalAvailabl
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @DisplayName("収支金額(BalanceAmount)のテスト")

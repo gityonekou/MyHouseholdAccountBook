@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditureInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountYearMeisaiInquiryList;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
@@ -47,7 +47,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Service
@@ -214,8 +214,8 @@ public class AccountYearInquiryUseCase {
 					domain.getIruiJyuukyoSetubiKingaku().toString(),
 					domain.getInsyokuNitiyouhinKingaku().toString(),
 					domain.getSyumiGotakuKingaku().toString(),
-					domain.getTotalWasteExpenditure().toFormatString(),
-					domain.getTotalWasteExpenditure().getMinorWasteExpenditurePercentage(),
+					domain.getTotalWasteExpenditureAmount().toFormatString(),
+					domain.getTotalWasteExpenditureAmount().getMinorWasteExpenditurePercentage(),
 					domain.getExpenditureAmount().toFormatString(),
 					domain.getBalanceAmount().toFormatString())
 		).collect(Collectors.toUnmodifiableList());

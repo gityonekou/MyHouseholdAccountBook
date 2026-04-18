@@ -166,20 +166,25 @@ public abstract class Money {
 
 	/**
 	 *<pre>
-	 * 画面表示・入力用に整数値を取得します。
-	 * スケール0で四捨五入した整数値を返却します。
+	 * 画面表示・入力用に整数値(Integer型)を取得します。
+	 * スケール0で小数点以下切り捨てした整数値(Integer型)を返却します。
 	 *
 	 * [使用例]
 	 * - 画面の入力フィールドへの初期値設定
 	 * - 整数での計算が必要な場合
 	 *</pre>
-	 * @return 整数値（long型）
+	 * @return 整数値(Integer型)
 	 *
 	 */
-	public long toIntegerValue() {
-		return this.value.setScale(0, RoundingMode.HALF_UP).longValue();
+	public Integer toIntegerValue() {
+		
+		// スケールを0に設定、小数点以下は切り捨て（HALF_DOWN）で丸める(0.5以上は切り上げ、0.5未満は切り捨て)
+		BigDecimal convertValue = this.value.setScale(0, RoundingMode.HALF_DOWN);
+		
+		// 整数値に変換して返却
+		return Integer.valueOf(convertValue.intValueExact());
 	}
-
+	
 	/**
 	 *<pre>
 	 * 画面入力用に整数の文字列を取得します。

@@ -17,13 +17,13 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.yonetani.webapp.accountbook.common.component.AccountBookUserInquiryUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.common.AccountBookUserInquiryUseCase;
+import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureItemList;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.service.account.inquiry.IncomeAndExpenditureConsistencyService;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
@@ -46,7 +46,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Service
@@ -181,7 +181,7 @@ public class AccountMonthInquiryUseCase {
 
 		// ユーザID,対象年月を検索条件にドメインデータを取得
 		AccountMonthInquiryExpenditureItemList expenditureList = sisyutuRepository.select(searchCondition);
-		IncomeAndExpenditure incomeAndExpenditure = syuusiRepository.findByUserIdAndYearMonth(searchCondition);
+		IncomeAndExpenditure incomeAndExpenditure = syuusiRepository.findByPrimaryKey(searchCondition);
 		
 		// データ存在の整合性検証(収支データなし&支出金額データありの場合はエラー)
 		consistencyService.validateDataExistence(incomeAndExpenditure, expenditureList, searchCondition);
@@ -232,15 +232,15 @@ public class AccountMonthInquiryUseCase {
 		// 返却するリストを不変オブジェクトに変換する
 		return resultList.getValues().stream().map(domain ->
 		AccountMonthInquiryResponse.ExpenditureListItem.form(
-				domain.getSisyutuItemLevel().getValue(),
-				domain.getSisyutuItemName().getValue(),
+				domain.getExpenditureItemLevel().getValue(),
+				domain.getExpenditureItemName().getValue(),
 				domain.getExpenditureAmount().toFormatString(),
-				domain.getMinorWasteExpenditure().toFormatString(),
-				domain.getMinorWasteExpenditure().getPercentage(domain.getExpenditureAmount()),
-				domain.getSevereWasteExpenditure().toFormatString(),
-				domain.getSevereWasteExpenditure().getPercentage(domain.getExpenditureAmount()),
-				domain.getTotalWasteExpenditure().toFormatString(),
-				domain.getTotalWasteExpenditure().getPercentage(domain.getExpenditureAmount()),
+				domain.getMinorWasteExpenditureAmount().toFormatString(),
+				domain.getMinorWasteExpenditureAmount().getPercentage(domain.getExpenditureAmount()),
+				domain.getSevereWasteExpenditureAmount().toFormatString(),
+				domain.getSevereWasteExpenditureAmount().getPercentage(domain.getExpenditureAmount()),
+				domain.getTotalWasteExpenditureAmount().toFormatString(),
+				domain.getTotalWasteExpenditureAmount().getPercentage(domain.getExpenditureAmount()),
 				domain.getPaymentDate().toDisplayString())).collect(Collectors.toUnmodifiableList());
 	}	
 }

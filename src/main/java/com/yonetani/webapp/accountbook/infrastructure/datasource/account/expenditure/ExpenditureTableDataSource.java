@@ -1,0 +1,210 @@
+/**
+ * ExpenditureTableRepository(支出テーブルのデータを登録・更新・参照する)を実装したデータソースです。
+ *
+ *------------------------------------------------
+ * 更新履歴
+ * 日付       : version  コメントなど
+ * 2024/09/08 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
+ *
+ */
+package com.yonetani.webapp.accountbook.infrastructure.datasource.account.expenditure;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Repository;
+
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItemInquiryList;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureItemCodeAndExpenditureCategory;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpenditureTotalAmount;
+import com.yonetani.webapp.accountbook.infrastructure.dto.account.expenditure.ExpenditureReadWriteDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthAndSisyutuCodeSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubunSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthAndSisyutuItemCodeSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthSearchQueryDto;
+import com.yonetani.webapp.accountbook.infrastructure.mapper.account.expenditure.ExpenditureTableMapper;
+
+import lombok.RequiredArgsConstructor;
+
+/**
+ *<pre>
+ * ExpenditureTableRepository(支出テーブルのデータを登録・更新・参照する)を実装したデータソースです。
+ *
+ *</pre>
+ *
+ * @author ：Kouki Yonetani
+ * @since 家計簿アプリ(1.00)
+ *
+ */
+@Repository
+@RequiredArgsConstructor
+public class ExpenditureTableDataSource implements ExpenditureTableRepository {
+	
+	// マッパー
+	private final ExpenditureTableMapper mapper;
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int add(ExpenditureItem data) {
+		// 支出情報を支出テーブルに出力
+		return mapper.insert(ExpenditureReadWriteDto.from(data));
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int update(ExpenditureItem data) {
+		// 支出テーブル:EXPENDITURE_TABLEを更新
+		return mapper.update(ExpenditureReadWriteDto.from(data));
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int delete(ExpenditureItem data) {
+		// 支出テーブル:EXPENDITURE_TABLEから指定の支出情報を論理削除
+		return mapper.delete(ExpenditureReadWriteDto.from(data));
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ExpenditureItem findByPrimaryKey(SearchQueryUserIdAndYearMonthAndExpenditureCode searchQuery) {
+		// 検索結果を取得
+		ExpenditureReadWriteDto searchResult = mapper.findByUniqueKey(
+				UserIdAndYearMonthAndSisyutuCodeSearchQueryDto.from(searchQuery));
+		if(searchResult == null) {
+			// 検索結果なしの場合、nullを返却
+			return null;
+		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
+			return createExpenditureItem(searchResult);
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ExpenditureItemInquiryList findBy(SearchQueryUserIdAndYearMonth searchQuery) {
+		// 検索結果を取得
+		List<ExpenditureReadWriteDto> searchResult = mapper.findById(UserIdAndYearMonthSearchQueryDto.from(searchQuery));
+		if(searchResult == null) {
+			// 検索結果なしの場合、0件データを返却
+			return ExpenditureItemInquiryList.from(null);
+		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
+			return ExpenditureItemInquiryList.from(searchResult.stream().map(dto -> createExpenditureItem(dto))
+					.collect(Collectors.toUnmodifiableList()));
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ExpenditureItemInquiryList findByExpenditureItemCode(SearchQueryUserIdAndYearMonthAndExpenditureItemCode searchQuery) {
+		// 検索結果を取得
+		List<ExpenditureReadWriteDto> searchResult = mapper.findByIdAndSisyutuItemCode(UserIdAndYearMonthAndSisyutuItemCodeSearchQueryDto.from(searchQuery));
+		if(searchResult == null) {
+			// 検索結果なしの場合、0件データを返却
+			return ExpenditureItemInquiryList.from(null);
+		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
+			return ExpenditureItemInquiryList.from(searchResult.stream().map(dto -> createExpenditureItem(dto))
+					.collect(Collectors.toUnmodifiableList()));
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ExpenditureItemInquiryList findByExpenditureItemCodeAndCategory(
+			SearchQueryUserIdAndYearMonthAndExpenditureItemCodeAndExpenditureCategory searchQuery) {
+		// 検索結果を取得
+		List<ExpenditureReadWriteDto> searchResult = mapper.findByIdAndSisyutuItemCodeAndSisyutuKubun(UserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubunSearchQueryDto.from(searchQuery));
+		if(searchResult == null) {
+			// 検索結果なしの場合、0件データを返却
+			return ExpenditureItemInquiryList.from(null);
+		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
+			return ExpenditureItemInquiryList.from(searchResult.stream().map(dto -> createExpenditureItem(dto))
+					.collect(Collectors.toUnmodifiableList()));
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int countBy(SearchQueryUserIdAndYearMonth searchQuery) {
+		// ユーザID、対象年月に対応する収入情報の件数を返します。
+		return mapper.countById(UserIdAndYearMonthSearchQueryDto.from(searchQuery));
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ExpenditureTotalAmount getExpenditureTotalAmount(SearchQueryUserIdAndYearMonth searchQuery) {
+		// ユーザID、対象年月に対応する支出金額合計値を取得し合計金額(ドメイン)に変換して返します。
+		// 値がnull(対象月の支出情報なし)の場合、0の値を返します。
+		BigDecimal totalAmount = mapper.sumExpenditureKingaku(UserIdAndYearMonthSearchQueryDto.from(searchQuery));
+		if(totalAmount == null) {
+			return ExpenditureTotalAmount.ZERO;
+		} else {
+			return ExpenditureTotalAmount.from(totalAmount);
+		}
+	}
+	
+	/**
+	 *<pre>
+	 * 引数で指定した支出テーブル:EXPENDITURE_TABLE読込・出力情報から支出テーブル情報ドメインモデルを生成して返します。
+	 *</pre>
+	 * @param dto 支出テーブル:EXPENDITURE_TABLE読込・出力情報
+	 * @return 支出テーブル情報ドメインモデル
+	 *
+	 */
+	private ExpenditureItem createExpenditureItem(ExpenditureReadWriteDto dto) {
+		return ExpenditureItem.from(
+				// ユーザID
+				dto.getUserId(),
+				// 対象年
+				dto.getTargetYear(),
+				// 対象月
+				dto.getTargetMonth(),
+				// 支出コード
+				dto.getSisyutuCode(),
+				// 支出項目コード
+				dto.getSisyutuItemCode(),
+				// イベントコード
+				dto.getEventCode(),
+				// 支出名称
+				dto.getSisyutuName(),
+				// 支出区分
+				dto.getSisyutuKubun(),
+				// 支出詳細
+				dto.getSisyutuDetailContext(),
+				// 支払日
+				dto.getShiharaiDate(),
+				// 支出予定金額
+				dto.getSisyutuYoteiKingaku(),
+				// 支出金額
+				dto.getSisyutuKingaku(),
+				// 削除フラグ
+				dto.isDeleteFlg());
+	}
+}

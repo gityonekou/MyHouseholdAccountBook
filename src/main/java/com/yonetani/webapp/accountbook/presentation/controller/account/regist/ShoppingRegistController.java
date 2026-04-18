@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.yonetani.webapp.accountbook.application.usecase.account.regist.ShoppingRegistUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist.ShoppingRegistUseCase;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
 import lombok.RequiredArgsConstructor;

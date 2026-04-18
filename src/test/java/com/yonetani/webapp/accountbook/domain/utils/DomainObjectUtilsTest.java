@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,7 +21,7 @@ import org.junit.jupiter.api.Test;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
 class DomainObjectUtilsTest {

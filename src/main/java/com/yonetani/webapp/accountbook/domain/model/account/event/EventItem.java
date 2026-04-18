@@ -17,7 +17,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.event.EventDate;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventExitFlg;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventName;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
 import lombok.AccessLevel;
@@ -33,7 +33,7 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -46,7 +46,7 @@ public class EventItem {
 	// イベントコード
 	private final EventCode eventCode;
 	// 支出項目コード
-	private final SisyutuItemCode sisyutuItemCode;
+	private final ExpenditureItemCode expenditureItemCode;
 	// イベント名
 	private final EventName eventName;
 	// イベント内容詳細
@@ -64,7 +64,7 @@ public class EventItem {
 	 *</pre>
 	 * @param userId ユーザID
 	 * @param eventCode イベントコード
-	 * @param sisyutuItemCode 支出項目コード
+	 * @param expenditureItemCode 支出項目コード
 	 * @param eventName イベント名
 	 * @param eventDetailContext イベント内容詳細
 	 * @param eventStartDate イベント開始日
@@ -73,12 +73,12 @@ public class EventItem {
 	 * @return イベントテーブル情報を表すドメインモデル
 	 *
 	 */
-	public static EventItem from(String userId, String eventCode, String sisyutuItemCode, String eventName, String eventDetailContext,
+	public static EventItem from(String userId, String eventCode, String expenditureItemCode, String eventName, String eventDetailContext,
 			LocalDate eventStartDate, LocalDate eventEndDate, boolean eventExitFlg) {
 		return new EventItem(
 				UserId.from(userId),
 				EventCode.from(eventCode),
-				SisyutuItemCode.from(sisyutuItemCode),
+				ExpenditureItemCode.from(expenditureItemCode),
 				EventName.from(eventName),
 				EventDetailContext.from(eventDetailContext),
 				EventDate.from(eventStartDate),
