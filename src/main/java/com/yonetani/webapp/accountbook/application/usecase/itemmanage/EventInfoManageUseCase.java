@@ -8,6 +8,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/08/16 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
@@ -19,18 +20,18 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yonetani.webapp.accountbook.common.component.SisyutuItemComponent;
+import com.yonetani.webapp.accountbook.application.usecase.common.ExpenditureItemInfoComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.event.EventItem;
 import com.yonetani.webapp.accountbook.domain.model.account.event.EventItemInquiryList;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.SisyutuItem;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditureinfo.ExpenditureItemInfo;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndEventCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.event.EventItemTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemSort;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemSortOrder;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.EventInfoForm;
@@ -51,7 +52,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Service
@@ -60,7 +61,7 @@ import lombok.extern.log4j.Log4j2;
 public class EventInfoManageUseCase {
 	
 	// 支出項目情報取得コンポーネント
-	private final SisyutuItemComponent sisyutuItemComponent;
+	private final ExpenditureItemInfoComponent expenditureItemInfoComponent;
 	// イベント情報取得リポジトリー
 	private final EventItemTableRepository eventRepository;
 	/**
@@ -92,23 +93,23 @@ public class EventInfoManageUseCase {
 		// ドメインタイプ:ユーザID
 		UserId userId = UserId.from(user.getUserId());
 		// ドメインタイプ:支出項目コード
-		SisyutuItemCode sisyutuItemCode = SisyutuItemCode.from(sisyutuItemCodeStr);
+		ExpenditureItemCode expenditureItemCode = ExpenditureItemCode.from(sisyutuItemCodeStr);
 		
 		// 選択した支出項目コードに対応する支出項目情報を取得
-		SisyutuItem sisyutuItem = sisyutuItemComponent.getSisyutuItem(userId, sisyutuItemCode);
+		ExpenditureItemInfo expenditureItemInfo = expenditureItemInfoComponent.getExpenditureItemInfo(userId, expenditureItemCode);
 			
 		// イベント情報入力フォームを生成
 		EventInfoForm inputForm = new EventInfoForm();
 		// アクション：新規登録
 		inputForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_ADD);
 		// 支出項目コード
-		inputForm.setSisyutuItemCode(sisyutuItemCode.getValue());
+		inputForm.setSisyutuItemCode(expenditureItemCode.getValue());
 		// 支出項目コードに対応する支出項目名(＞で区切った値)を設定
-		inputForm.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(userId, sisyutuItemCode));
+		inputForm.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, expenditureItemCode));
 		// イベント名:支出項目名を仮設定
-		inputForm.setEventName(sisyutuItem.getSisyutuItemName().getValue());
+		inputForm.setEventName(expenditureItemInfo.getExpenditureItemName().getValue());
 		// イベント内容詳細(任意入力項目):支出項目詳細内容を仮設定
-		inputForm.setEventDetailContext(sisyutuItem.getSisyutuItemDetailContext().getValue());
+		inputForm.setEventDetailContext(expenditureItemInfo.getExpenditureItemDetailContext().getValue());
 		
 		// 画面表示情報を生成して返却
 		return createEventInfoManageResponse(userId, inputForm);
@@ -133,7 +134,7 @@ public class EventInfoManageUseCase {
 		EventCode eventCode = EventCode.from(eventCodeStr);
 		
 		// イベントコードに対応するイベント情報を取得
-		EventItem eventItem = eventRepository.findByIdAndEventCode(SearchQueryUserIdAndEventCode.from(userId, eventCode));
+		EventItem eventItem = eventRepository.findByPrimaryKey(SearchQueryUserIdAndEventCode.from(userId, eventCode));
 		// イベントコードに対応するイベント情報がない場合、エラー
 		if(eventItem == null) {
 			throw new MyHouseholdAccountBookRuntimeException("更新対象のイベント情報が存在しません。管理者に問い合わせてください。eventCode:" + eventCode);
@@ -145,9 +146,9 @@ public class EventInfoManageUseCase {
 		// イベントコード
 		inputForm.setEventCode(eventItem.getEventCode().getValue());
 		// 支出項目コード
-		inputForm.setSisyutuItemCode(eventItem.getSisyutuItemCode().getValue());
+		inputForm.setSisyutuItemCode(eventItem.getExpenditureItemCode().getValue());
 		// 支出項目名(＞で区切った値)
-		inputForm.setSisyutuItemName(sisyutuItemComponent.getSisyutuItemName(userId, eventItem.getSisyutuItemCode()));
+		inputForm.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, eventItem.getExpenditureItemCode()));
 		// イベント名
 		inputForm.setEventName(eventItem.getEventName().getValue());
 		// イベント内容詳細(任意入力項目)
@@ -196,7 +197,7 @@ public class EventInfoManageUseCase {
 		// 新規登録の場合
 		if(Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
 			// 新規採番するイベントコードの値を取得
-			int count = eventRepository.countById(SearchQueryUserId.from(userId));
+			int count = eventRepository.countByUserId(SearchQueryUserId.from(userId));
 			count++;
 			if(count > 9999) {
 				response.addErrorMessage("イベント情報は9999件以上登録できません。管理者に問い合わせてください。");
@@ -263,7 +264,7 @@ public class EventInfoManageUseCase {
 		EventCode eventCode = EventCode.from(eventCodeStr);
 		
 		// イベントコードに対応するイベント情報を取得
-		EventItem deleteData = eventRepository.findByIdAndEventCode(SearchQueryUserIdAndEventCode.from(userId, eventCode));
+		EventItem deleteData = eventRepository.findByPrimaryKey(SearchQueryUserIdAndEventCode.from(userId, eventCode));
 		if(deleteData == null) {
 			throw new MyHouseholdAccountBookRuntimeException("削除対象のイベント情報がイベントテーブル:EVENT_ITEM_TABLEに存在しません。管理者に問い合わせてください。[eventCode=" + eventCode + "]");
 		}
@@ -314,7 +315,7 @@ public class EventInfoManageUseCase {
 		EventInfoManageResponse response = null;
 
 		// 現在有効な(開催終了ステータスとなっていない)イベントの一覧を取得
-		EventItemInquiryList inquiryList = eventRepository.findById(SearchQueryUserId.from(userId));
+		EventItemInquiryList inquiryList = eventRepository.findByUserId(SearchQueryUserId.from(userId));
 		if(inquiryList.isEmpty()) {
 			response = EventInfoManageResponse.getInstance(null, inputForm);
 			if(msgFlg) {
@@ -326,7 +327,7 @@ public class EventInfoManageUseCase {
 							// イベントコード
 							domain.getEventCode().getValue(),
 							// 支出項目名
-							domain.getSisyutuItemName().getValue(),
+							domain.getExpenditureItemName().getValue(),
 							// イベント名
 							domain.getEventName().getValue(),
 							// イベント内容詳細(任意入力)
@@ -340,13 +341,13 @@ public class EventInfoManageUseCase {
 		}
 		
 		// イベント費(0059)に属する支出項目一覧をすべて取得
-		sisyutuItemComponent.setSisyutuItemList(
+		expenditureItemInfoComponent.setSisyutuItemResponseList(
 				// ログインユーザ情報
 				userId,
 				// 検索条件:支出項目表示順A：支出項目(イベント)の表示順:0603000000
-				SisyutuItemSort.from(MyHouseholdAccountBookContent.SISYUTU_ITEM_EVENT_SORT_VALUE),
+				ExpenditureItemSortOrder.from(MyHouseholdAccountBookContent.SISYUTU_ITEM_EVENT_SORT_VALUE),
 				// 検索条件:支出項目表示順B：ベントに属する支出項目の最大値:0603999999
-				SisyutuItemSort.from(MyHouseholdAccountBookContent.SISYUTU_ITEM_EVENT_SORT_MAX_VALUE),
+				ExpenditureItemSortOrder.from(MyHouseholdAccountBookContent.SISYUTU_ITEM_EVENT_SORT_MAX_VALUE),
 				// 画面表示情報
 				response);
 		

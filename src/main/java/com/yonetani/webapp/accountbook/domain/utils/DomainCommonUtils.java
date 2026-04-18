@@ -173,38 +173,6 @@ public class DomainCommonUtils {
 	
 	/**
 	 *<pre>
-	 * 引数で指定した整数値をBigDecimalに変換して返します。値がnullの場合、nullを返却します。
-	 * 指定したスケールで小数点以下切り上げを実施します。
-	 *</pre>
-	 * @param value BigDecimalに変換する整数値
-	 * @param scale 小数点以下桁数
-	 * @return 引数の値をBigDecimalに変換した値
-	 *
-	 */
-	public static BigDecimal convertBigDecimal(Integer value, int scale) {
-		// 値がnullの場合、nullを返します。
-		if(value == null) {
-			return null;
-		}
-		// 整数の値に指定したスケール分0を追加
-		StringBuilder numBuff = new StringBuilder(value.toString());
-		if(scale > 0) {
-			numBuff.append(".");
-			for(int i = 0; i < scale; i++) {
-				numBuff.append("0");
-			}
-		}
-		
-		// 整数の値を文字列変換
-		BigDecimal bigVal = new BigDecimal(numBuff.toString());
-		// スケールを設定(小数点以下切り上げ)
-		bigVal.setScale(scale, RoundingMode.HALF_UP);
-		
-		return bigVal;
-	}
-	
-	/**
-	 *<pre>
 	 * 引数で指定したBigDecimalの値をIntegerに変換して返します。値がnullの場合、nullを返却します。
 	 * 小数点以下は切り捨てて、整数値に変換した値を返します。
 	 * 

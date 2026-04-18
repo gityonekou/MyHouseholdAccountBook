@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2025/01/03 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
@@ -13,10 +14,10 @@ package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
 import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesTaxExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -31,7 +32,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -39,7 +40,7 @@ import lombok.RequiredArgsConstructor;
 @EqualsAndHashCode
 public class ShoppingClothes {
 	// 衣料品(私服)金額
-	private final SisyutuKingaku value;
+	private final ExpenditureAmount value;
 	// 残クーポン額
 	private final ShoppingCouponPrice residualCouponPrice;
 	
@@ -61,7 +62,7 @@ public class ShoppingClothes {
 	 * @param expenses 「衣料品(私服)金額」項目の値
 	 * @param taxExpenses 「消費税:衣料品(私服)金額」項目の値
 	 * @param couponPrice クーポン金額
-	 * @return 「食料品B(必須)」項目ドメイン
+	 * @return 「衣料品(私服)」項目ドメイン
 	 *
 	 */
 	public static ShoppingClothes from(ShoppingClothesExpenses expenses, ShoppingClothesTaxExpenses taxExpenses, ShoppingCouponPrice couponPrice) {
@@ -84,7 +85,7 @@ public class ShoppingClothes {
 		
 		// 衣料品(私服)金額がnull値の場合、null値を持った「衣料品(私服)」項目を生成
 		if(expenses.getValue() == null) {
-			return new ShoppingClothes(SisyutuKingaku.ZERO, couponPrice);
+			return new ShoppingClothes(ExpenditureAmount.ZERO, couponPrice);
 		}
 		
 		// 衣料品(私服)金額を計算
@@ -92,7 +93,7 @@ public class ShoppingClothes {
 		
 		// クーポン指定なしなら割引適応なしで衣料品(私服)を生成
 		if(couponPrice.getValue() == null) {
-			return new ShoppingClothes(SisyutuKingaku.from(clothesValue), ShoppingCouponPrice.from(null));
+			return new ShoppingClothes(ExpenditureAmount.from(clothesValue), ShoppingCouponPrice.from(null));
 		}
 		
 		// 衣料品(私服)金額からクーポン金額を割引
@@ -101,14 +102,14 @@ public class ShoppingClothes {
 		// 割引後の金額がマイナス値)：衣料品(私服)金額は割引適応でなし。残クーポン値は衣料品(私服)金額の値(マイナス値)
 		int compareToValue = BigDecimal.ZERO.compareTo(discountValue);
 		if (compareToValue > 0) {
-			return new ShoppingClothes(SisyutuKingaku.ZERO, ShoppingCouponPrice.from(discountValue));
+			return new ShoppingClothes(ExpenditureAmount.ZERO, ShoppingCouponPrice.from(discountValue));
 		}
 		// 割引後の金額が0)：衣料品(私服)金額は割引適応でなし。残クーポン値もなし
 		if (compareToValue == 0) {
-			return new ShoppingClothes(SisyutuKingaku.ZERO, ShoppingCouponPrice.from(null));
+			return new ShoppingClothes(ExpenditureAmount.ZERO, ShoppingCouponPrice.from(null));
 		}
 		// 割引後の金額が0より大きい)：衣料品(私服)金額は割引適応後の値。残クーポン値はなし
-		return new ShoppingClothes(SisyutuKingaku.from(discountValue), ShoppingCouponPrice.from(null));
+		return new ShoppingClothes(ExpenditureAmount.from(discountValue), ShoppingCouponPrice.from(null));
 		
 	}
 	
@@ -122,7 +123,7 @@ public class ShoppingClothes {
 	 * @return 支出金額がゼロの場合はfalse、それ以外の場合はtrueとなります。
 	 *
 	 */
-	public boolean hasSisyutuKingaku() {
-		return !value.equals(SisyutuKingaku.ZERO);
+	public boolean hasExpenditureAmount() {
+		return !value.equals(ExpenditureAmount.ZERO);
 	}
 }

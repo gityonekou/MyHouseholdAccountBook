@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/01/03 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.adminmenu;
@@ -29,7 +30,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Repository
@@ -45,12 +46,12 @@ public class SisyutuItemBaseTableDataSource implements SisyutuItemBaseTableRepos
 	public int add(SisyutuItemBase data) {
 		// 支出項目テーブル(BASE):SISYUTU_ITEM_BASE_TABLEにデータを追加
 		return sisyutuItemBaseTableMapper.insert(SisyutuItemBaseTableReadWriteDto.from(
-				data.getSisyutuItemCode().getValue(),
-				data.getSisyutuItemName().getValue(),
-				data.getSisyutuItemDetailContext().getValue(),
-				data.getParentSisyutuItemCode().getValue(),
-				data.getSisyutuItemLevel().toString(),
-				data.getSisyutuItemSort().getValue()
+				data.getExpenditureItemCode().getValue(),
+				data.getExpenditureItemName().getValue(),
+				data.getExpenditureItemDetailContext().getValue(),
+				data.getParentExpenditureItemCode().getValue(),
+				data.getExpenditureItemLevel().toString(),
+				data.getExpenditureItemSortOrder().getValue()
 				));
 	}
 

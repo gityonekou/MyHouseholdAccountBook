@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/07/09 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.session;
@@ -25,7 +26,7 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -43,13 +44,13 @@ public class ExpenditureRegistItem implements Serializable {
 	// 支出コード(仮登録用支出コード)
 	private final String expenditureCode;
 	// 支出項目コード
-	private final String sisyutuItemCode;
+	private final String expenditureItemCode;
 	// イベントコード
 	private final String eventCode;
 	// 支出名
 	private final String expenditureName;
 	// 支出区分
-	private final String expenditureKubun;
+	private final String expenditureCategory;
 	// 支出詳細
 	private final String expenditureDetailContext;
 	// 支払日(DD)
@@ -66,10 +67,10 @@ public class ExpenditureRegistItem implements Serializable {
 	 * @param dataType データタイプ(新規 or ロード)
 	 * @param action アクション(追加／更新／削除)
 	 * @param expenditureCode 支出コード(仮登録用支出コード)
-	 * @param sisyutuItemCode 支出項目コード
+	 * @param expenditureItemCode 支出項目コード
 	 * @param eventCode イベントコード
 	 * @param expenditureName 支出名
-	 * @param expenditureKubun 支出区分
+	 * @param expenditureCategory 支出区分
 	 * @param expenditureDetailContext 支出詳細
 	 * @param siharaiDate 支払日(DD)
 	 * @param expenditureKingaku 支払金額
@@ -81,15 +82,15 @@ public class ExpenditureRegistItem implements Serializable {
 			String dataType,
 			String action,
 			String expenditureCode,
-			String sisyutuItemCode,
+			String expenditureItemCode,
 			String eventCode,
 			String expenditureName,
-			String expenditureKubun,
+			String expenditureCategory,
 			String expenditureDetailContext,
 			String siharaiDate,
 			BigDecimal expenditureKingaku,
 			boolean clearStartFlg) {
-		return new ExpenditureRegistItem(dataType, action, expenditureCode, sisyutuItemCode, eventCode, expenditureName, 
-				expenditureKubun, expenditureDetailContext, siharaiDate, expenditureKingaku.setScale(2), clearStartFlg);
+		return new ExpenditureRegistItem(dataType, action, expenditureCode, expenditureItemCode, eventCode, expenditureName, 
+				expenditureCategory, expenditureDetailContext, siharaiDate, expenditureKingaku.setScale(2), clearStartFlg);
 	}
 }

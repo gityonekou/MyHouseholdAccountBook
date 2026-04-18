@@ -14,7 +14,7 @@ package com.yonetani.webapp.accountbook.infrastructure.dto.searchquery;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostShiharaiTukiList;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostTargetPaymentMonthList;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -48,12 +48,12 @@ public class UserIdAndFixedCostShiharaiTukiListSearchQueryDto {
 	 * @return テーブルの検索条件：ユーザID、固定費支払月のリスト
 	 *
 	 */
-	public static UserIdAndFixedCostShiharaiTukiListSearchQueryDto from(SearchQueryUserIdAndFixedCostShiharaiTukiList search) {
+	public static UserIdAndFixedCostShiharaiTukiListSearchQueryDto from(SearchQueryUserIdAndFixedCostTargetPaymentMonthList search) {
 		return new UserIdAndFixedCostShiharaiTukiListSearchQueryDto(
 				// 検索条件:ユーザID
 				search.getUserId().getValue(),
 				// 検索条件:固定費支払月のリスト
-				search.getFixedCostShiharaiTukiList().stream().map(
+				search.getFixedCostTargetPaymentMonthList().stream().map(
 						model -> model.getValue()).collect(Collectors.toUnmodifiableList()));
 	}
 }

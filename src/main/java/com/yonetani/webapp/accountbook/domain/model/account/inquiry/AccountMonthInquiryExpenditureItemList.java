@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2023/09/30 : 1.00.00  新規作成
+ * 2025/12/28 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
@@ -16,14 +17,14 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ShiharaiDate;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemLevel;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemName;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuB;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuBC;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuC;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemLevel;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemName;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.MinorWasteExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.SevereWasteExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalWasteExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -38,7 +39,7 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -61,57 +62,59 @@ public class AccountMonthInquiryExpenditureItemList {
 	@EqualsAndHashCode
 	public static class ExpenditureListItem {
 		// 支出項目コード
-		private final SisyutuItemCode sisyutuItemCode;
+		private final ExpenditureItemCode expenditureItemCode;
 		// 支出項目名
-		private final SisyutuItemName sisyutuItemName;
+		private final ExpenditureItemName expenditureItemName;
 		// 支出項目レベル(1～5)
-		private final SisyutuItemLevel sisyutuItemLevel;
+		private final ExpenditureItemLevel expenditureItemLevel;
 		// 支出金額
-		private final SisyutuKingaku sisyutuKingaku;
-		// 支出金額B
-		private final SisyutuKingakuB sisyutuKingakuB;
-		// 支出金額C
-		private final SisyutuKingakuC sisyutuKingakuC;
-		// 支出金額BとCの合計値
-		private final SisyutuKingakuBC sisyutuKingakuBC;
+		private final ExpenditureAmount expenditureAmount;
+		// 無駄遣い（軽度）支出金額
+		private final MinorWasteExpenditureAmount minorWasteExpenditureAmount;
+		// 無駄遣い（重度）支出金額
+		private final SevereWasteExpenditureAmount severeWasteExpenditureAmount;
+		// 無駄遣い合計支出金額
+		private final TotalWasteExpenditureAmount totalWasteExpenditureAmount;
 		// 支払日
-		private final ShiharaiDate shiharaiDate;
+		private final PaymentDate paymentDate;
 		
 		/**
 		 *<pre>
 		 * 引数の値から月毎の支出金額情報明細ドメインモデルを生成して返します。
 		 *</pre>
-		 * @param sisyutuItemCode 支出項目コード
-		 * @param sisyutuItemName 支出項目名
-		 * @param sisyutuItemLevel 支出項目レベル(1～5)
-		 * @param sisyutuKingaku 支出金額
-		 * @param sisyutuKingakuB 支出金額B
-		 * @param sisyutuKingakuC 支出金額C
-		 * @param siharaiDate 支払日
+		 * @param expenditureItemCode 支出項目コード
+		 * @param expenditureItemName 支出項目名
+		 * @param expenditureItemLevel 支出項目レベル(1～5)
+		 * @param expenditureAmount 支出金額
+		 * @param minorWasteExpenditureAmount 無駄遣い（軽度）支出金額
+		 * @param severeWasteExpenditureAmount 無駄遣い（重度）支出金額
+		 * @param paymentDate 支払日
 		 * @return 月毎の支出項目明細
 		 *
 		 */
 		public static ExpenditureListItem from(
-					String sisyutuItemCode,
-					String sisyutuItemName,
-					String sisyutuItemLevel,
-					BigDecimal sisyutuKingaku,
-					BigDecimal sisyutuKingakuB,
-					BigDecimal sisyutuKingakuC,
-					LocalDate siharaiDate
+					String expenditureItemCode,
+					String expenditureItemName,
+					String expenditureItemLevel,
+					BigDecimal expenditureAmount,
+					BigDecimal minorWasteExpenditureAmount,
+					BigDecimal severeWasteExpenditureAmount,
+					LocalDate paymentDate
 				) {
-			SisyutuKingakuB kinbakuB = SisyutuKingakuB.from(sisyutuKingakuB);
-			SisyutuKingakuC kinbakuC = SisyutuKingakuC.from(sisyutuKingakuC);
-			SisyutuKingakuBC kinbakuBC = SisyutuKingakuBC.from(kinbakuB, kinbakuC);
+			// 無駄遣い合計支出金額生成用に無駄遣い（軽度）支出金額のドメインオブジェクトを生成
+			MinorWasteExpenditureAmount minor = MinorWasteExpenditureAmount.from(minorWasteExpenditureAmount);
+			// 無駄遣い合計支出金額生成用に無駄遣い（重度）支出金額のドメインオブジェクトを生成
+			SevereWasteExpenditureAmount severe = SevereWasteExpenditureAmount.from(severeWasteExpenditureAmount);
+			// 月毎の支出項目明細ドメインモデルを生成して返す
 			return new ExpenditureListItem(
-					SisyutuItemCode.from(sisyutuItemCode),
-					SisyutuItemName.from(sisyutuItemName),
-					SisyutuItemLevel.from(sisyutuItemLevel),
-					SisyutuKingaku.from(sisyutuKingaku),
-					kinbakuB,
-					kinbakuC,
-					kinbakuBC,
-					ShiharaiDate.from(siharaiDate));
+					ExpenditureItemCode.from(expenditureItemCode),
+					ExpenditureItemName.from(expenditureItemName),
+					ExpenditureItemLevel.from(expenditureItemLevel),
+					ExpenditureAmount.from(expenditureAmount),
+					minor,
+					severe,
+					TotalWasteExpenditureAmount.from(minor, severe),
+					PaymentDate.from(paymentDate));
 		}
 	}
 	

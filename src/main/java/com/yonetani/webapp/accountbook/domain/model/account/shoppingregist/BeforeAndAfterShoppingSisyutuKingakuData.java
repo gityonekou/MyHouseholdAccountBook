@@ -5,12 +5,13 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2025/01/03 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
 
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.ExpenditureItem;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -24,7 +25,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -40,7 +41,7 @@ public class BeforeAndAfterShoppingSisyutuKingakuData {
 	// 支出金額の増減フラグ
 	private final int sisyutuKingakuFlg;
 	// 支出金額増減値
-	private final SisyutuKingaku sisyutuKingaku;
+	private final ExpenditureAmount expenditureAmount;
 	// 支出金額の増減値で更新した支出テーブル情報
 	private final ExpenditureItem updExpenditureItem;
 	
@@ -53,7 +54,7 @@ public class BeforeAndAfterShoppingSisyutuKingakuData {
 	 * @return 更新前から更新後の変化の値(各種増減値)を格納した支出金額情報
 	 *
 	 */
-	public static BeforeAndAfterShoppingSisyutuKingakuData from(SisyutuKingaku before, SisyutuKingaku after, ExpenditureItem updExpenditureItem) {
+	public static BeforeAndAfterShoppingSisyutuKingakuData from(ExpenditureAmount before, ExpenditureAmount after, ExpenditureItem updExpenditureItem) {
 		// 支出金額を加算するか減算するかのフラグ(前＞後なら減算,等しいなら更新なし、前＜後なら加算) 非null項目なのでnullチェック不要
 		int sisyutuFlg = FLG_NON_UPDATE;
 		int comp = before.getValue().compareTo(after.getValue());
@@ -64,7 +65,7 @@ public class BeforeAndAfterShoppingSisyutuKingakuData {
 			sisyutuFlg = FLG_ADD;
 		}
 		// 支出金額増減値
-		SisyutuKingaku zougenti = SisyutuKingaku.from(before.getValue().subtract(after.getValue()).abs());
+		ExpenditureAmount zougenti = ExpenditureAmount.from(before.getValue().subtract(after.getValue()).abs());
 		
 		// 支出金額増の場合
 		if(sisyutuFlg == FLG_ADD) {
