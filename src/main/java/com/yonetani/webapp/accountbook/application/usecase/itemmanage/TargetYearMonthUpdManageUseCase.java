@@ -14,13 +14,13 @@ package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
 
 import org.springframework.stereotype.Service;
 
-import com.yonetani.webapp.accountbook.common.component.AccountBookUserInquiryUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.common.AccountBookUserInquiryUseCase;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.model.account.inquiry.IncomeAndExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.common.AccountBookUser;
 import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
-import com.yonetani.webapp.accountbook.domain.repository.account.inquiry.IncomeAndExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.common.AccountBookUserRepository;
 import com.yonetani.webapp.accountbook.domain.type.common.NextTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
@@ -80,7 +80,7 @@ public class TargetYearMonthUpdManageUseCase {
 		// 検索条件(ユーザID、年月(YYYYMM))をドメインオブジェクトに変換
 		SearchQueryUserIdAndYearMonth inquiryModel = SearchQueryUserIdAndYearMonth.from(userId, targetYearMonth);
 		// ユーザID,現在の対象年月を条件に該当月の収支金額を取得
-		IncomeAndExpenditureItem sisyutuResult = syuusiRepository.select(inquiryModel);
+		IncomeAndExpenditure sisyutuResult = syuusiRepository.findByPrimaryKey(inquiryModel);
 		if(sisyutuResult.isEmpty()) {
 			// 現在の対象年月に対応する収支情報が未登録の場合、対象年月更新不可の画面表示情報を生成して返却
 			TargetYearMonthUpdManageResponse response = TargetYearMonthUpdManageResponse.getUpdateFailInstance();
@@ -120,7 +120,7 @@ public class TargetYearMonthUpdManageUseCase {
 		// 検索条件(ユーザID、年月(YYYYMM))をドメインオブジェクトに変換
 		SearchQueryUserIdAndYearMonth inquiryModel = SearchQueryUserIdAndYearMonth.from(userId, targetYearMonth);
 		// ユーザID,現在の対象年月を条件に該当月の収支金額を取得
-		IncomeAndExpenditureItem sisyutuResult = syuusiRepository.select(inquiryModel);
+		IncomeAndExpenditure sisyutuResult = syuusiRepository.findByPrimaryKey(inquiryModel);
 		if(sisyutuResult.isEmpty()) {
 			throw new MyHouseholdAccountBookRuntimeException("現在の対象年月に対応する収支情報が収支テーブル:INCOME_AND_EXPENDITURE_TABLEに存在しません。管理者に問い合わせてください。[対象年月=" + targetYearMonth.getValue() + "]");
 		}

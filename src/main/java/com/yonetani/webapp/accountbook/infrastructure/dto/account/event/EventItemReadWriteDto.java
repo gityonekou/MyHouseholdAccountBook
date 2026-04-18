@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/08/19 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.account.event;
@@ -24,7 +25,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -62,7 +63,7 @@ public class EventItemReadWriteDto {
 				// イベントコード
 				domain.getEventCode().getValue(),
 				// 支出項目コード
-				domain.getSisyutuItemCode().getValue(),
+				domain.getExpenditureItemCode().getValue(),
 				// イベント名
 				domain.getEventName().getValue(),
 				// イベント内容詳細

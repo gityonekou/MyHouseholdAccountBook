@@ -38,7 +38,7 @@ public class ShoppingFoodItem {
 	// 食料品(必須)金額
 	private final BigDecimal value;
 	// 「食料品(必須)金額」項目
-	private final ShoppingFoodExpenses shoppingFoodExpenses;
+	private final ShoppingFoodExpenditureAmount shoppingFoodExpenditureAmount;
 	// 「消費税:食料品(必須)金額」項目
 	private final ShoppingFoodTaxExpenses shoppingFoodTaxExpenses;
 	
@@ -54,35 +54,35 @@ public class ShoppingFoodItem {
 	 * ・「消費税:食料品(必須)金額」項目がnull
 	 * ・消費税:食料品(必須)金額の値ありの場合で、食料品(必須)金額がnull値の場合
 	 *</pre>
-	 * @param expenses 「食料品(必須)金額」項目の値
-	 * @param taxExpenses 「消費税:食料品(必須)金額」項目の値
+	 * @param amount 「食料品(必須)金額」項目の値
+	 * @param taxAmount 「消費税:食料品(必須)金額」項目の値
 	 * @return 「食料品(必須)」項目ドメインタイプ
 	 *
 	 */
-	public static ShoppingFoodItem from(ShoppingFoodExpenses expenses, ShoppingFoodTaxExpenses taxExpenses) {
+	public static ShoppingFoodItem from(ShoppingFoodExpenditureAmount amount, ShoppingFoodTaxExpenses taxAmount) {
 		// ガード節(「食料品(必須)金額」項目がnull)
-		if(expenses == null) {
+		if(amount == null) {
 			throw new MyHouseholdAccountBookRuntimeException("「食料品(必須)金額」項目にnullが指定されました。管理者に問い合わせてください。");
 		}
 		// ガード節(「消費税:食料品(必須)金額」項目がnull)
-		if(taxExpenses == null) {
+		if(taxAmount == null) {
 			throw new MyHouseholdAccountBookRuntimeException("「消費税:食料品(必須)金額」項目にnullが指定されました。管理者に問い合わせてください。");
 		}
 		// ガード節(消費税:食料品(必須)金額の値ありの場合で、食料品(必須)金額がnull値)
-		if(expenses.getValue() == null && taxExpenses.getValue() != null) {
-			throw new MyHouseholdAccountBookRuntimeException("「食料品(必須)」項目の設定値が不正です。管理者に問い合わせてください。[expensesValue=null][taxExpensesValue=" + taxExpenses.toString() + "]");
+		if(amount.getValue() == null && taxAmount.getValue() != null) {
+			throw new MyHouseholdAccountBookRuntimeException("「食料品(必須)」項目の設定値が不正です。管理者に問い合わせてください。[amountValue=null][taxAmountValue=" + taxAmount.toString() + "]");
 		}
 		
 		// 食料品(必須)金額がnull値の場合、null値を持った「食料品(必須)」項目を生成
-		if(expenses.getValue() == null) {
-			return new ShoppingFoodItem(null, expenses, ShoppingFoodTaxExpenses.from(null));
+		if(amount.getValue() == null) {
+			return new ShoppingFoodItem(null, amount, ShoppingFoodTaxExpenses.from(null));
 		}
 		// 消費税:食料品(必須)金額がnull値の場合、食料品(必須)金額の値で「食料品(必須)」項目を生成
-		if(taxExpenses.getValue() == null) {
-			return new ShoppingFoodItem(expenses.getValue(), expenses, taxExpenses);
+		if(taxAmount.getValue() == null) {
+			return new ShoppingFoodItem(amount.getValue(), amount, taxAmount);
 		}
 		// 食料品(必須)金額と消費税:食料品(必須)金額を加算した値で「食料品(必須)」項目を生成
-		return new ShoppingFoodItem(expenses.getValue().add(taxExpenses.getValue()), expenses, taxExpenses);
+		return new ShoppingFoodItem(amount.getValue().add(taxAmount.getValue()), amount, taxAmount);
 	}
 	
 	/**
@@ -93,7 +93,7 @@ public class ShoppingFoodItem {
 	 *
 	 */
 	public static ShoppingFoodItem nullValue() {
-		return ShoppingFoodItem.from(ShoppingFoodExpenses.from(null), ShoppingFoodTaxExpenses.from(null));
+		return ShoppingFoodItem.from(ShoppingFoodExpenditureAmount.from(null), ShoppingFoodTaxExpenses.from(null));
 	}
 	
 	/**
@@ -108,15 +108,15 @@ public class ShoppingFoodItem {
 		if(this.value == null) {
 			// addValueがnullの場合はnullポを投げる
 			return ShoppingFoodItem.from(
-					addValue.getShoppingFoodExpenses(),
+					addValue.getShoppingFoodExpenditureAmount(),
 					addValue.getShoppingFoodTaxExpenses());
 		}
 		if(addValue.getValue() == null) {
-			return ShoppingFoodItem.from(this.shoppingFoodExpenses, this.shoppingFoodTaxExpenses);
+			return ShoppingFoodItem.from(this.shoppingFoodExpenditureAmount, this.shoppingFoodTaxExpenses);
 		}
 		//valueの値と各ドメインを足した値が等しいことのチェックは不要でよいか（現在のコンストラクタで比較可能か？？)
 		return ShoppingFoodItem.from(
-				this.shoppingFoodExpenses.add(addValue.getShoppingFoodExpenses()),
+				this.shoppingFoodExpenditureAmount.add(addValue.getShoppingFoodExpenditureAmount()),
 				this.shoppingFoodTaxExpenses.add(addValue.getShoppingFoodTaxExpenses()));
 	}
 	

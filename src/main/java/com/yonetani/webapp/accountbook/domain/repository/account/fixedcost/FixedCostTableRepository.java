@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/06/04 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.repository.account.fixedcost;
@@ -14,9 +15,9 @@ import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCost;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostCode;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostShiharaiTukiList;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostTargetPaymentMonthList;
 
 /**
  *<pre>
@@ -26,7 +27,7 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 public interface FixedCostTableRepository {
@@ -63,13 +64,13 @@ public interface FixedCostTableRepository {
 	
 	/**
 	 *<pre>
-	 * ユーザIDと指定の固定費コードに対応する固定費情報を取得します。
+	 * 固定費テーブル:FIXED_COST_TABLEの主キー（ユーザID, 固定費コード）で固定費テーブルを検索し、結果を取得します。
 	 *</pre>
 	 * @param search 検索対象のユーザID、固定費コード
 	 * @return 固定費情報
 	 *
 	 */
-	FixedCost findByIdAndFixedCostCode(SearchQueryUserIdAndFixedCostCode search);
+	FixedCost findByPrimaryKey(SearchQueryUserIdAndFixedCostCode search);
 	
 	/**
 	 *<pre>
@@ -79,7 +80,7 @@ public interface FixedCostTableRepository {
 	 * @return 固定費一覧情報の検索結果
 	 *
 	 */
-	FixedCostInquiryList findById(SearchQueryUserId userId);
+	FixedCostInquiryList findByUserId(SearchQueryUserId userId);
 	
 	/**
 	 *<pre>
@@ -89,7 +90,7 @@ public interface FixedCostTableRepository {
 	 * @return 固定費一覧情報の検索結果
 	 *
 	 */
-	FixedCostInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search);
+	FixedCostInquiryList findByExpenditureItemCode(SearchQueryUserIdAndExpenditureItemCode search);
 	
 	/**
 	 *<pre>
@@ -99,7 +100,7 @@ public interface FixedCostTableRepository {
 	 * @return る固定費情報のリスト
 	 *
 	 */
-	FixedCostList findByIdAndFixedCostShiharaiTukiList(SearchQueryUserIdAndFixedCostShiharaiTukiList search);
+	FixedCostList findByFixedCostTargetPaymentMonthList(SearchQueryUserIdAndFixedCostTargetPaymentMonthList search);
 	
 	/**
 	 *<pre>
@@ -109,7 +110,7 @@ public interface FixedCostTableRepository {
 	 * @return 指定条件に該当するデータの件数
 	 *
 	 */
-	int countById(SearchQueryUserId userId);
+	int countByUserId(SearchQueryUserId userId);
 
 	/**
 	 *<pre>
@@ -119,6 +120,6 @@ public interface FixedCostTableRepository {
 	 * @return 指定条件に該当するデータの件数
 	 *
 	 */
-	int countBySisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search);
+	int countByExpenditureItemCode(SearchQueryUserIdAndExpenditureItemCode search);
 	
 }

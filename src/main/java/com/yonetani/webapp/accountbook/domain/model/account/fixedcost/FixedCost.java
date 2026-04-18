@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/05/27 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.fixedcost;
@@ -13,15 +14,15 @@ import java.math.BigDecimal;
 
 import org.springframework.util.StringUtils;
 
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostKubun;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostName;
-import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiDay;
-import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiTuki;
-import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostShiharaiTukiOptionalContext;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.ShiharaiKingaku;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentDay;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonth;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonthOptionalContext;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
 import lombok.AccessLevel;
@@ -37,7 +38,7 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -54,17 +55,17 @@ public class FixedCost {
 	// 固定費内容詳細(支払内容詳細)
 	private final FixedCostDetailContext fixedCostDetailContext;
 	// 支出項目コード
-	private final SisyutuItemCode sisyutuItemCode;
+	private final ExpenditureItemCode expenditureItemCode;
 	// 固定費区分
 	private final FixedCostKubun fixedCostKubun;
 	// 固定費支払月(支払月)
-	private final FixedCostShiharaiTuki fixedCostShiharaiTuki;
+	private final FixedCostTargetPaymentMonth fixedCostTargetPaymentMonth;
 	// 固定費支払月任意詳細
-	private final FixedCostShiharaiTukiOptionalContext fixedCostShiharaiTukiOptionalContext;
+	private final FixedCostTargetPaymentMonthOptionalContext fixedCostTargetPaymentMonthOptionalContext;
 	// 固定費支払日(支払日)
-	private final FixedCostShiharaiDay fixedCostShiharaiDay;
+	private final FixedCostPaymentDay fixedCostPaymentDay;
 	// 支払金額
-	private final ShiharaiKingaku shiharaiKingaku;
+	private final FixedCostPaymentAmount fixedCostPaymentAmount;
 	
 	/**
 	 *<pre>
@@ -74,12 +75,12 @@ public class FixedCost {
 	 * @param fixedCostCode 固定費コード
 	 * @param fixedCostName 固定費名(支払名)
 	 * @param fixedCostDetailContext 固定費内容詳細(支払内容詳細)
-	 * @param sisyutuItemCode 支出項目コード
+	 * @param expenditureItemCode 支出項目コード
 	 * @param fixedCostKubun 固定費区分
-	 * @param fixedCostShiharaiTuki 固定費支払月(支払月)
-	 * @param fixedCostShiharaiTukiOptionalContext 固定費支払月任意詳細
-	 * @param fixedCostShiharaiDay 固定費支払日(支払日)
-	 * @param shiharaiKingaku 支払金額
+	 * @param fixedCostTargetPaymentMonth 固定費支払月(支払月)
+	 * @param fixedCostTargetPaymentMonthOptionalContext 固定費支払月任意詳細
+	 * @param fixedCostPaymentDay 固定費支払日(支払日)
+	 * @param fixedCostPaymentAmount 支払金額
 	 * @return 固定費情報を表すドメインモデル
 	 *
 	 */
@@ -88,23 +89,65 @@ public class FixedCost {
 			String fixedCostCode,
 			String fixedCostName,
 			String fixedCostDetailContext,
-			String sisyutuItemCode,
+			String expenditureItemCode,
 			String fixedCostKubun,
-			String fixedCostShiharaiTuki,
-			String fixedCostShiharaiTukiOptionalContext,
-			String fixedCostShiharaiDay,
-			BigDecimal shiharaiKingaku) {
+			String fixedCostTargetPaymentMonth,
+			String fixedCostTargetPaymentMonthOptionalContext,
+			String fixedCostPaymentDay,
+			BigDecimal fixedCostPaymentAmount) {
 		return new FixedCost(
 				UserId.from(userId),
 				FixedCostCode.from(fixedCostCode),
 				FixedCostName.from(fixedCostName),
 				FixedCostDetailContext.from(fixedCostDetailContext),
-				SisyutuItemCode.from(sisyutuItemCode),
+				ExpenditureItemCode.from(expenditureItemCode),
 				FixedCostKubun.from(fixedCostKubun),
-				FixedCostShiharaiTuki.from(fixedCostShiharaiTuki),
-				FixedCostShiharaiTukiOptionalContext.from(fixedCostShiharaiTukiOptionalContext),
-				FixedCostShiharaiDay.from(fixedCostShiharaiDay),
-				ShiharaiKingaku.from(shiharaiKingaku));
+				FixedCostTargetPaymentMonth.from(fixedCostTargetPaymentMonth),
+				FixedCostTargetPaymentMonthOptionalContext.from(fixedCostTargetPaymentMonthOptionalContext),
+				FixedCostPaymentDay.from(fixedCostPaymentDay),
+				FixedCostPaymentAmount.from(fixedCostPaymentAmount));
+	}
+	
+	/**
+	 *<pre>
+	 * 引数の値から固定費情報を表すドメインモデルを生成して返します。
+	 * 入力フォームからドメインを生成する際にこのメソッドを使用することを想定しています。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param fixedCostCode 固定費コード
+	 * @param fixedCostName 固定費名(支払名)
+	 * @param fixedCostDetailContext 固定費内容詳細(支払内容詳細)
+	 * @param expenditureItemCode 支出項目コード
+	 * @param fixedCostKubun 固定費区分
+	 * @param fixedCostTargetPaymentMonth 固定費支払月(支払月)
+	 * @param fixedCostTargetPaymentMonthOptionalContext 固定費支払月任意詳細
+	 * @param fixedCostPaymentDay 固定費支払日(支払日)
+	 * @param fixedCostPaymentAmount 支払金額
+	 * @return 固定費情報を表すドメインモデル
+	 *
+	 */
+	public static FixedCost from(
+			String userId,
+			String fixedCostCode,
+			String fixedCostName,
+			String fixedCostDetailContext,
+			String expenditureItemCode,
+			String fixedCostKubun,
+			String fixedCostTargetPaymentMonth,
+			String fixedCostTargetPaymentMonthOptionalContext,
+			String fixedCostPaymentDay,
+			Integer fixedCostPaymentAmount) {
+		return new FixedCost(
+				UserId.from(userId),
+				FixedCostCode.from(fixedCostCode),
+				FixedCostName.from(fixedCostName),
+				FixedCostDetailContext.from(fixedCostDetailContext),
+				ExpenditureItemCode.from(expenditureItemCode),
+				FixedCostKubun.from(fixedCostKubun),
+				FixedCostTargetPaymentMonth.from(fixedCostTargetPaymentMonth),
+				FixedCostTargetPaymentMonthOptionalContext.from(fixedCostTargetPaymentMonthOptionalContext),
+				FixedCostPaymentDay.from(fixedCostPaymentDay),
+				FixedCostPaymentAmount.from(fixedCostPaymentAmount));
 	}
 	
 	/**
@@ -124,12 +167,12 @@ public class FixedCost {
 			buff.append(fixedCostDetailContext.getValue());
 		}
 		// 固定費支払月任意詳細の値が設定されている場合、支出詳細の表示値に追加
-		if(StringUtils.hasLength(fixedCostShiharaiTukiOptionalContext.getValue())) {
+		if(StringUtils.hasLength(fixedCostTargetPaymentMonthOptionalContext.getValue())) {
 			// 固定費内容詳細(支払内容詳細)の値が設定済みの場合、区切り文字(/)を追加
 			if(buff.length() > 0) {
 				buff.append('/');
 			}
-			buff.append(fixedCostShiharaiTukiOptionalContext.getValue());
+			buff.append(fixedCostTargetPaymentMonthOptionalContext.getValue());
 		}
 		return buff.toString();
 	}

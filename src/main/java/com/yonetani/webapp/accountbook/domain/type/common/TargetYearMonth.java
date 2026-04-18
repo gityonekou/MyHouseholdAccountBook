@@ -79,6 +79,40 @@ public class TargetYearMonth {
 	
 	/**
 	 *<pre>
+	 * 「年月」項目の値を表すドメインタイプを生成します。
+	 * 
+	 * [ガード節]
+	 * ・空文字列
+	 * ・長さが6桁以外
+	 * ・年項目、月項目に変換できない
+	 * 
+	 *</pre>
+	 * @param year 対象年(YYYY)
+	 * @param month 対象月(MM)
+	 * @return 「年月」項目ドメインタイプ
+	 *
+	 */
+	public static TargetYearMonth from(String year, String month){
+		// 年項目
+		TargetYear yearIns = TargetYear.from(year);
+		// 月項目
+		TargetMonth monthIns = TargetMonth.from(month);
+		// 年月文字列
+		String yearMonth = yearIns.getValue() + monthIns.getValue();
+		
+		// カレンダーの日付として有効かどうか(対象年月の値に01日を付けて、日付として有効かチェックする(01日なので、厳密チェックは不要となる)
+		try {
+			LocalDate.parse(yearMonth + "01", MyHouseholdAccountBookContent.DATE_TIME_FORMATTER);
+		} catch (DateTimeParseException ex) {
+			throw new MyHouseholdAccountBookRuntimeException("「年月」項目の設定値が不正です。管理者に問い合わせてください。[yearMonth=" + yearMonth + "]");
+		}
+
+		// 「年月」項目ドメインタイプを返却
+		return new TargetYearMonth(yearMonth, yearIns, monthIns);
+	}
+	
+	/**
+	 *<pre>
 	 * パッケージしている年(YYYY)の値を文字列で返します。
 	 *</pre>
 	 * @return 年(YYYY)の値

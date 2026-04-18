@@ -5,11 +5,13 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/11/24 : 1.00.00  新規作成
+ * 2025/12/21 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.shoppingregist;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
@@ -29,13 +31,15 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @EqualsAndHashCode
 public class ShoppingDate {
+	// yyyy/MM/dd形式のフォーマッター
+	private static final DateTimeFormatter YYYY_SP_MM_SP_DD_FORMAT = DateTimeFormatter.ofPattern("yyyy/MM/dd");
 	// 買い物日
 	private final LocalDate value;
 	
@@ -79,10 +83,22 @@ public class ShoppingDate {
 	}
 	
 	/**
+	 *<pre>
+	 * 日付を表示用形式（yyyy/MM/dd）の文字列で取得します。
+	 *</pre>
+	 * @return yyyy/MM/dd形式の文字列
+	 *
+	 */
+	public String toDisplayString() {
+		return this.value.format(YYYY_SP_MM_SP_DD_FORMAT);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String toString() {
-		return DomainCommonUtils.formatyyyySPMMSPdd(value);
+		// ISO-8601形式（yyyy-MM-dd）で返却（デバッグ用）
+		return this.value.toString();
 	}
 }

@@ -12,6 +12,8 @@ package com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppi
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,20 +28,20 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
 
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItem;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItemInquiryList.ShoppingItemInquiryItem;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemJanCode;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.shoppingitem.ShoppingItemTableRepository;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemJanCode;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
-import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.shoppingitem.ShoppingItemTableMapper;
 
 /**
@@ -50,7 +52,7 @@ import com.yonetani.webapp.accountbook.infrastructure.mapper.account.shoppingite
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 // MyBatis関連のコンフィグレーションをインジェクションします
@@ -60,7 +62,7 @@ import com.yonetani.webapp.accountbook.infrastructure.mapper.account.shoppingite
 // @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 
 // SpringBootアプリケーション設定ファイルにapplication-test.ymlを設定
-@ActiveProfiles("test")
+@ActiveProfiles("unit-test")
 class ShoppingItemTableDataSourceTest {
 	
 	// ShoppingItemTableRepository
@@ -122,7 +124,7 @@ class ShoppingItemTableDataSourceTest {
 		assertEquals(expectedData.getShoppingItemName().toString(), actualDataMap.get("SHOPPING_ITEM_NAME"), "登録データの商品名(SHOPPING_ITEM_NAME)が正しいこと");
 		assertEquals(expectedData.getShoppingItemDetailContext().toString(), actualDataMap.get("SHOPPING_ITEM_DETAIL_CONTEXT"), "登録データの商品詳細(SHOPPING_ITEM_DETAIL_CONTEXT)が正しいこと");
 		assertEquals(expectedData.getShoppingItemJanCode().toString(), actualDataMap.get("SHOPPING_ITEM_JAN_CODE"), "登録データの商品JANコード(SHOPPING_ITEM_JAN_CODE)が正しいこと");
-		assertEquals(expectedData.getSisyutuItemCode().toString(), actualDataMap.get("SISYUTU_ITEM_CODE"), "登録データの支出項目コード(SISYUTU_ITEM_CODE)が正しいこと");
+		assertEquals(expectedData.getExpenditureItemCode().toString(), actualDataMap.get("SISYUTU_ITEM_CODE"), "登録データの支出項目コード(SISYUTU_ITEM_CODE)が正しいこと");
 		assertEquals(expectedData.getCompanyName().toString(), actualDataMap.get("COMPANY_NAME"), "登録データの会社名(COMPANY_NAME)が正しいこと");
 		assertEquals(expectedData.getShopCode().toString(), actualDataMap.get("STANDARD_SHOP_CODE"), "登録データの基準店舗コード(STANDARD_SHOP_CODE)が正しいこと");
 		assertEquals(expectedData.getStandardPrice().getValue(), actualDataMap.get("STANDARD_PRICE"), "登録データの基準価格(STANDARD_PRICE)が正しいこと");
@@ -153,7 +155,7 @@ class ShoppingItemTableDataSourceTest {
 		assertEquals(expectedNullData.getShoppingItemName().toString(), actualNullDataMap.get("SHOPPING_ITEM_NAME"), "登録データの商品名(SHOPPING_ITEM_NAME)が正しいこと");
 		assertNull(actualNullDataMap.get("SHOPPING_ITEM_DETAIL_CONTEXT"), "登録データの商品詳細(SHOPPING_ITEM_DETAIL_CONTEXT)がNULLであること");
 		assertEquals(expectedNullData.getShoppingItemJanCode().toString(), actualNullDataMap.get("SHOPPING_ITEM_JAN_CODE"), "登録データの商品JANコード(SHOPPING_ITEM_JAN_CODE)が正しいこと");
-		assertEquals(expectedNullData.getSisyutuItemCode().toString(), actualNullDataMap.get("SISYUTU_ITEM_CODE"), "登録データの支出項目コード(SISYUTU_ITEM_CODE)が正しいこと");
+		assertEquals(expectedNullData.getExpenditureItemCode().toString(), actualNullDataMap.get("SISYUTU_ITEM_CODE"), "登録データの支出項目コード(SISYUTU_ITEM_CODE)が正しいこと");
 		assertEquals(expectedNullData.getCompanyName().toString(), actualNullDataMap.get("COMPANY_NAME"), "登録データの会社名(COMPANY_NAME)が正しいこと");
 		assertNull(actualNullDataMap.get("STANDARD_SHOP_CODE"), "登録データの基準店舗コード(STANDARD_SHOP_CODE)がNULLであること");
 		assertNull(actualNullDataMap.get("STANDARD_PRICE"), "登録データの基準価格(STANDARD_PRICE)がNULLであること");
@@ -174,13 +176,13 @@ class ShoppingItemTableDataSourceTest {
 	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingitem.ShoppingItemTableDataSource#update(com.yonetani.webapp.accountbook.domain.model.account.shoppingitem.ShoppingItem)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ShoppingItemTableDataSourceUpdateTest.sql")
+	@Sql(value = "ShoppingItemTableDataSourceUpdateTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testUpdate() {
 		/* 全項目の更新チェック */
 		// テストデータ2を読み込み、ShoppingItemの各パラメータに設定
 		ShoppingItem expectedData = getTestShoppingItemData(2);
 		// 更新前の支出項目コードを取得
-		String expectedSisyutuItemCode = jdbcTemplate.queryForObject(
+		String expectedExpenditureItemCode = jdbcTemplate.queryForObject(
 				// 商品テーブル検索SQL(unique data)
 				"SELECT SISYUTU_ITEM_CODE FROM SHOPPING_ITEM_TABLE WHERE USER_ID=? AND SHOPPING_ITEM_CODE=?",
 				// 取得クラス
@@ -213,7 +215,7 @@ class ShoppingItemTableDataSourceTest {
 		// 更新データと等しいこと：商品JANコード
 		assertEquals(expectedData.getShoppingItemJanCode().toString(), actualDataMap.get("SHOPPING_ITEM_JAN_CODE"), "商品JANコード(SHOPPING_ITEM_JAN_CODE)の更新後の値が正しいこと");
 		// 更新されないこと：支出項目コード
-		assertEquals(expectedSisyutuItemCode, actualDataMap.get("SISYUTU_ITEM_CODE"), "更新データの支出項目コード(SISYUTU_ITEM_CODE)が正しいこと");
+		assertEquals(expectedExpenditureItemCode, actualDataMap.get("SISYUTU_ITEM_CODE"), "更新データの支出項目コード(SISYUTU_ITEM_CODE)が正しいこと");
 		// 更新データと等しいこと：会社名
 		assertEquals(expectedData.getCompanyName().toString(), actualDataMap.get("COMPANY_NAME"), "会社名(COMPANY_NAME)の更新後の値が正しいこと");
 		// 更新データと等しいこと：基準店舗コード
@@ -258,7 +260,7 @@ class ShoppingItemTableDataSourceTest {
 		// 更新データと等しいこと：商品JANコード
 		assertEquals(expectedNullData.getShoppingItemJanCode().toString(), actualNullDataMap.get("SHOPPING_ITEM_JAN_CODE"), "商品JANコード(SHOPPING_ITEM_JAN_CODE)の更新後の値が正しいこと");
 		// 更新されないこと：支出項目コード
-		assertEquals(expectedSisyutuItemCode, actualNullDataMap.get("SISYUTU_ITEM_CODE"), "更新データの支出項目コード(SISYUTU_ITEM_CODE)が正しいこと");
+		assertEquals(expectedExpenditureItemCode, actualNullDataMap.get("SISYUTU_ITEM_CODE"), "更新データの支出項目コード(SISYUTU_ITEM_CODE)が正しいこと");
 		// 更新データと等しいこと：会社名
 		assertEquals(expectedNullData.getCompanyName().toString(), actualNullDataMap.get("COMPANY_NAME"), "会社名(COMPANY_NAME)の更新後の値が正しいこと");
 		// 基準店舗コードの値がnullであること
@@ -277,7 +279,7 @@ class ShoppingItemTableDataSourceTest {
 	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingitem.ShoppingItemTableDataSource#findByIdAndShoppingItemCode(com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemCode)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ShoppingItemTableDataSourceFindByIdAndShoppingItemCodeTest.sql")
+	@Sql(value = "ShoppingItemTableDataSourceFindByIdAndShoppingItemCodeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testFindByIdAndShoppingItemCode() {
 		/* 全項目の取得チェック */
 		// 期待値
@@ -293,7 +295,7 @@ class ShoppingItemTableDataSourceTest {
 		assertEquals(expectedData.getShoppingItemName(), actualData.getShoppingItemName(), "商品名が等しいこと");
 		assertEquals(expectedData.getShoppingItemDetailContext(), actualData.getShoppingItemDetailContext(), "商品詳細が等しいこと");
 		assertEquals(expectedData.getShoppingItemJanCode(), actualData.getShoppingItemJanCode(), "商品JANコードが等しいこと");
-		assertEquals(expectedData.getSisyutuItemCode(), actualData.getSisyutuItemCode(), "支出項目コードが等しいこと");
+		assertEquals(expectedData.getExpenditureItemCode(), actualData.getExpenditureItemCode(), "支出項目コードが等しいこと");
 		assertEquals(expectedData.getCompanyName(), actualData.getCompanyName(), "会社名が等しいこと");
 		assertEquals(expectedData.getShopCode(), actualData.getShopCode(), "基準店舗コードが等しいこと");
 		assertEquals(expectedData.getStandardPrice(), actualData.getStandardPrice(), "基準価格が等しいこと");
@@ -324,7 +326,7 @@ class ShoppingItemTableDataSourceTest {
 		assertEquals(expectedNullData.getShoppingItemName(), actualNullData.getShoppingItemName(), "商品名が等しいこと");
 		assertNull(actualNullData.getShoppingItemDetailContext().toString(), "商品詳細の値がnullであること");
 		assertEquals(expectedNullData.getShoppingItemJanCode(), actualNullData.getShoppingItemJanCode(), "商品JANコードが等しいこと");
-		assertEquals(expectedNullData.getSisyutuItemCode(), actualNullData.getSisyutuItemCode(), "支出項目コードが等しいこと");
+		assertEquals(expectedNullData.getExpenditureItemCode(), actualNullData.getExpenditureItemCode(), "支出項目コードが等しいこと");
 		assertEquals(expectedNullData.getCompanyName(), actualNullData.getCompanyName(), "会社名が等しいこと");
 		assertNull(actualNullData.getShopCode().toString(), "基準店舗コードの値がnullであること");
 		assertNull(actualNullData.getStandardPrice().getValue(), "基準価格の値がnullであること");
@@ -335,44 +337,44 @@ class ShoppingItemTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingitem.ShoppingItemTableDataSource#findByIdAndSisyutuItemCode(com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingitem.ShoppingItemTableDataSource#findByIdAndExpenditureItemCode(com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ShoppingItemTableDataSourceFindByIdAndSisyutuItemCodeTest.sql")
-	void testFindByIdAndSisyutuItemCode() {
+	@Sql(value = "ShoppingItemTableDataSourceFindByIdAndExpenditureCodeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
+	void testFindByIdAndExpenditureItemCode() {
 		/* 対象データなしの場合、0件となること(支出項目コード) */
-		ShoppingItemInquiryList actualNotFound = repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID", "0040"));
+		ShoppingItemInquiryList actualNotFound = repository.findByIdAndExpenditureItemCode(createSearchQueryUserIdAndExpenditureItemCode("TEST-USER-ID", "0040"));
 		assertTrue(actualNotFound.isEmpty(), "対象データなしの場合0件となること(支出項目コード)");
 		assertEquals(0, actualNotFound.getValues().size(), "対象データなしの場合0件となること(支出項目コード)");
 		assertEquals("商品検索結果:0件", actualNotFound.toString(), "対象データなし(toStringチェック)");
 		/* 対象データなしの場合、0件となること(ユーザID) */
-		assertTrue(repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID_NOT_FOUND", "0010")).isEmpty(),
+		assertTrue(repository.findByIdAndExpenditureItemCode(createSearchQueryUserIdAndExpenditureItemCode("TEST-USER-ID_NOT_FOUND", "0010")).isEmpty(),
 				"対象データなしの場合0件となること(ユーザID)");
 		/* 対象データなしの場合、0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:ユーザID)) */
-		assertTrue(repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID2", "0010")).isEmpty(),
+		assertTrue(repository.findByIdAndExpenditureItemCode(createSearchQueryUserIdAndExpenditureItemCode("TEST-USER-ID2", "0010")).isEmpty(),
 				"対象データなしの場合0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:ユーザID))");
 		/* 対象データなしの場合、0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:支出項目コード)) */
-		assertTrue(repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID", "0030")).isEmpty(),
+		assertTrue(repository.findByIdAndExpenditureItemCode(createSearchQueryUserIdAndExpenditureItemCode("TEST-USER-ID", "0030")).isEmpty(),
 				"対象データなしの場合0件となること(支出項目コードに対応する支出項目名なし(支出項目テーブル:支出項目コード))");
 		/* 対象データ1件(店舗コードに対応する店舗名なし) */
-		ShoppingItemInquiryList actual1 = repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID", "0011"));
+		ShoppingItemInquiryList actual1 = repository.findByIdAndExpenditureItemCode(createSearchQueryUserIdAndExpenditureItemCode("TEST-USER-ID", "0011"));
 		assertEquals(1, actual1.getValues().size(), "対象データ1件(店舗コードに対応する店舗名なし)");
 		assertIterableEquals(getTestShoppingItemInquiryItemListData(1), actual1.getValues(), "検索結果が正しいこと:対象データ1件(店舗コードに対応する店舗名なし)");
 		/* 対象データ1件(NULL値項目) */
-		ShoppingItemInquiryList actual2 = repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID", "0020"));
+		ShoppingItemInquiryList actual2 = repository.findByIdAndExpenditureItemCode(createSearchQueryUserIdAndExpenditureItemCode("TEST-USER-ID", "0020"));
 		assertEquals(1, actual2.getValues().size(), "対象データ1件(NULL値項目)");
 		assertIterableEquals(getTestShoppingItemInquiryItemListData(2), actual2.getValues(), "検索結果が正しいこと:対象データ1件(NULL値項目)");
 		/* 対象データ1件(全項目) */
-		ShoppingItemInquiryList actual3 = repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID", "0017"));
+		ShoppingItemInquiryList actual3 = repository.findByIdAndExpenditureItemCode(createSearchQueryUserIdAndExpenditureItemCode("TEST-USER-ID", "0017"));
 		assertEquals(1, actual3.getValues().size(), "対象データ1件(全項目)");
 		assertIterableEquals(getTestShoppingItemInquiryItemListData(3), actual3.getValues(), "検索結果が正しいこと:対象データ1件(全項目)");
 //		assertEquals(getToStringStr(2), actual3.toString(), "対象データ1件(全項目)");
 		/* 対象データ2件(店舗コードに対応する店舗名なし(店舗名なし商品コード:00001、全項目商品コード:00005) 商品コードの降順で表示 */
-		ShoppingItemInquiryList actual4 = repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID", "0010"));
+		ShoppingItemInquiryList actual4 = repository.findByIdAndExpenditureItemCode(createSearchQueryUserIdAndExpenditureItemCode("TEST-USER-ID", "0010"));
 		assertEquals(2, actual4.getValues().size(), "対象データ2件(店舗コードに対応する店舗名なし(1件)、全項目1件)");
 		assertIterableEquals(getTestShoppingItemInquiryItemListData(4), actual4.getValues(), "検索結果とソート結果が正しいこと:対象データ2件(店舗コードに対応する店舗名なし(1件)、全項目1件)");
 		/* 対象データ2件(全項目2件) 商品コードの降順で表示 */
-		ShoppingItemInquiryList actual5 = repository.findByIdAndSisyutuItemCode(createSearchQueryUserIdAndSisyutuItemCode("TEST-USER-ID", "0023"));
+		ShoppingItemInquiryList actual5 = repository.findByIdAndExpenditureItemCode(createSearchQueryUserIdAndExpenditureItemCode("TEST-USER-ID", "0023"));
 		assertEquals(2, actual5.getValues().size(), "対象データ2件(全項目2件)");
 		assertIterableEquals(getTestShoppingItemInquiryItemListData(5), actual5.getValues(), "検索結果とソート結果が正しいこと:対象データ2件(全項目2件)");
 	}
@@ -381,7 +383,7 @@ class ShoppingItemTableDataSourceTest {
 	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingitem.ShoppingItemTableDataSource#findByIdAndShoppingItemJanCode(com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemJanCode)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ShoppingItemTableDataSourceFindByIdAndShoppingItemJanCodeTest.sql")
+	@Sql(value = "ShoppingItemTableDataSourceFindByIdAndShoppingItemJanCodeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testFindByIdAndShoppingItemJanCode() {
 		/* 対象データなしの場合、0件となること(商品JANコード) */
 		assertTrue(repository.findByIdAndShoppingItemJanCode(createSearchQueryUserIdAndShoppingItemJanCode("TEST-USER-ID", "9999999999999")).isEmpty(),
@@ -429,7 +431,7 @@ class ShoppingItemTableDataSourceTest {
 	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingitem.ShoppingItemTableDataSource#countById(com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ShoppingItemTableDataSourceCountByIdTest.sql")
+	@Sql(value = "ShoppingItemTableDataSourceCountByIdTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testCountById() {
 		/* 対象データなしの場合、0件となること */
 		assertEquals(0, repository.countById(createSearchQueryUserId("TEST-USER-ID_NOT_FOUND")), "対象データなしの場合、0件となること");
@@ -441,7 +443,7 @@ class ShoppingItemTableDataSourceTest {
 	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingitem.ShoppingItemTableDataSource#countByIdAndShoppingItemJanCode(com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShoppingItemJanCode)} のためのテスト・メソッド。
 	 */
 	@Test
-	@Sql("ShoppingItemTableDataSourceCountByIdAndShoppingItemJanCodeTest.sql")
+	@Sql(value = "ShoppingItemTableDataSourceCountByIdAndShoppingItemJanCodeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testCountByIdAndShoppingItemJanCode() {
 		/* 対象データなしの場合、0件となること(ユーザID) */
 		assertEquals(0, repository.countByIdAndShoppingItemJanCode(createSearchQueryUserIdAndShoppingItemJanCode("TEST-USER-ID_NOT_FOUND", "1234567890100")), "対象データなしの場合、0件となること(ユーザID)");
@@ -467,19 +469,19 @@ class ShoppingItemTableDataSourceTest {
 		switch (type) {
 			case 1:
 				// 基準価格(BigDecimal)はDBの該当項目の小数点以下桁数のスケールに合わせる
-				data = ShoppingItem.from("TEST-USER-ID", "00001", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100);
+				data = ShoppingItem.from("TEST-USER-ID", "00001", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", "0010", "会社名１", "010", bigDecimalValue(1180), 110, "01", 1100);
 				break;
 			case 2:
 				// 基準価格(BigDecimal)はDBの該当項目の小数点以下桁数のスケールに合わせる
-				data = ShoppingItem.from("TEST-USER-ID", "00002", "商品区分名２", "商品名２", "商品詳細２", "1234567890200", "0020", "会社名２", "020", DomainCommonUtils.convertKingakuBigDecimal(1280), 120, "02", 1200);
+				data = ShoppingItem.from("TEST-USER-ID", "00002", "商品区分名２", "商品名２", "商品詳細２", "1234567890200", "0020", "会社名２", "020", bigDecimalValue(1280), 120, "02", 1200);
 				break;
 			case 3:
 				// 基準価格(BigDecimal)はDBの該当項目の小数点以下桁数のスケールに合わせる
-				data = ShoppingItem.from("TEST-USER-ID", "00003", "商品区分名３", "商品名３", "商品詳細３", "1234567890300", "0030", "会社名３", "030", DomainCommonUtils.convertKingakuBigDecimal(1380), 130, "03", 1300);
+				data = ShoppingItem.from("TEST-USER-ID", "00003", "商品区分名３", "商品名３", "商品詳細３", "1234567890300", "0030", "会社名３", "030", bigDecimalValue(1380), 130, "03", 1300);
 				break;
 			case 4:
 				// 基準価格(BigDecimal)はDBの該当項目の小数点以下桁数のスケールに合わせる
-				data = ShoppingItem.from("TEST-USER-ID", "00004", "商品区分名４", "商品名４", "商品詳細４", "1234567890400", "0040", "会社名４", "040", DomainCommonUtils.convertKingakuBigDecimal(1480), 140, "04", 1400);
+				data = ShoppingItem.from("TEST-USER-ID", "00004", "商品区分名４", "商品名４", "商品詳細４", "1234567890400", "0040", "会社名４", "040", bigDecimalValue(1480), 140, "04", 1400);
 				break;
 			case 5:
 				// 新規登録用null可データ
@@ -491,23 +493,23 @@ class ShoppingItemTableDataSourceTest {
 				break;
 			case 102:
 				// null不可データ(商品区分名)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", null, "商品名１", "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100);
+				data = ShoppingItem.from("TEST-USER-ID", "00999", null, "商品名１", "商品詳細１", "1234567890100", "0010", "会社名１", "010", bigDecimalValue(1180), 110, "01", 1100);
 				break;
 			case 103:
 				// null不可データ(商品名)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", null, "商品詳細１", "1234567890100", "0010", "会社名１", "010", DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100);
+				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", null, "商品詳細１", "1234567890100", "0010", "会社名１", "010", bigDecimalValue(1180), 110, "01", 1100);
 				break;
 			case 104:
 				// null不可データ(商品JANコード)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", null, "0010", "会社名１", "010", DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100);
+				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", null, "0010", "会社名１", "010", bigDecimalValue(1180), 110, "01", 1100);
 				break;
 			case 105:
 				// null不可データ(支出項目コード)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", null, "会社名１", "010", DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100);
+				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", null, "会社名１", "010", bigDecimalValue(1180), 110, "01", 1100);
 				break;
 			case 106:
 				// null不可データ(会社名)
-				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", "0010", null, "010", DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100);
+				data = ShoppingItem.from("TEST-USER-ID", "00999", "商品区分名１", "商品名１", "商品詳細１", "1234567890100", "0010", null, "010", bigDecimalValue(1180), 110, "01", 1100);
 				break;
 			default:
 		}
@@ -528,70 +530,47 @@ class ShoppingItemTableDataSourceTest {
 		List<ShoppingItemInquiryItem> dataList = new ArrayList<>();
 		switch(type) {
 			case 1:
-				dataList.add(ShoppingItemInquiryItem.from("00006", "商品区分名６", "商品名６", "商品詳細６", "1334567890101", "税金支払い", "会社名６", null, DomainCommonUtils.convertKingakuBigDecimal(1183), 660, "06", 6600));
+				dataList.add(ShoppingItemInquiryItem.from("00006", "商品区分名６", "商品名６", "商品詳細６", "1334567890101", "税金支払い", "会社名６", null, bigDecimalValue(1183), 660, "06", 6600));
 				break;
 			case 2:
 				dataList.add(ShoppingItemInquiryItem.from("00002", "商品区分名２NULL", "商品名２NULL", null, "1234567890200", "飲食日用品", "会社名２NULL", null, null, null, null, null));
 				break;
 			case 3:
-				dataList.add(ShoppingItemInquiryItem.from("00007", "商品区分名７", "商品名７", "商品詳細７", "1234567890700", "イデコ", "会社名７", "テスト店舗２", DomainCommonUtils.convertKingakuBigDecimal(2470), 770, "07", 7700));
+				dataList.add(ShoppingItemInquiryItem.from("00007", "商品区分名７", "商品名７", "商品詳細７", "1234567890700", "イデコ", "会社名７", "テスト店舗２", bigDecimalValue(2470), 770, "07", 7700));
 				break;
 			case 4:
 				// 商品コードの降順で表示
-				dataList.add(ShoppingItemInquiryItem.from("00005", "商品区分名１", "商品名１－２", "商品詳細１－２", "2234567890100", "その他", "会社名１", "テスト店舗１０", DomainCommonUtils.convertKingakuBigDecimal(1182), 111, "05", 1110));
-				dataList.add(ShoppingItemInquiryItem.from("00001", "商品区分名１", "商品名１－１", "商品詳細１－１", "1234567890100", "その他", "会社名１", null, DomainCommonUtils.convertKingakuBigDecimal(1180), 110, "01", 1100));
+				dataList.add(ShoppingItemInquiryItem.from("00005", "商品区分名１", "商品名１－２", "商品詳細１－２", "2234567890100", "その他", "会社名１", "テスト店舗１０", bigDecimalValue(1182), 111, "05", 1110));
+				dataList.add(ShoppingItemInquiryItem.from("00001", "商品区分名１", "商品名１－１", "商品詳細１－１", "1234567890100", "その他", "会社名１", null, bigDecimalValue(1180), 110, "01", 1100));
 				break;
 			case 5:
 				// 商品コードの降順で表示
-				dataList.add(ShoppingItemInquiryItem.from("00009", "商品区分名９", "商品名９", "商品詳細９", "1234567891900", "食費", "会社名９", "テスト店舗３０", DomainCommonUtils.convertKingakuBigDecimal(3090), 990, "99", 9900));
-				dataList.add(ShoppingItemInquiryItem.from("00008", "商品区分名８", "商品名８", "商品詳細８", "1234567891800", "食費", "会社名８", "テスト店舗２", DomainCommonUtils.convertKingakuBigDecimal(3080), 880, "08", 8800));
+				dataList.add(ShoppingItemInquiryItem.from("00009", "商品区分名９", "商品名９", "商品詳細９", "1234567891900", "食費", "会社名９", "テスト店舗３０", bigDecimalValue(3090), 990, "99", 9900));
+				dataList.add(ShoppingItemInquiryItem.from("00008", "商品区分名８", "商品名８", "商品詳細８", "1234567891800", "食費", "会社名８", "テスト店舗２", bigDecimalValue(3080), 880, "08", 8800));
 				break;
 			case 101:
-				dataList.add(ShoppingItemInquiryItem.from("00004", "商品区分名４", "商品名４", "商品詳細４", "1234567890400", "税金支払い", "会社名４", null, DomainCommonUtils.convertKingakuBigDecimal(1480), 140, "04", 1400));
+				dataList.add(ShoppingItemInquiryItem.from("00004", "商品区分名４", "商品名４", "商品詳細４", "1234567890400", "税金支払い", "会社名４", null, bigDecimalValue(1480), 140, "04", 1400));
 				break;
 			case 102:
 				dataList.add(ShoppingItemInquiryItem.from("00006", "商品区分名６NULL", "商品名６NULL", null, "1234567890600", "飲食日用品", "会社名６NULL", null, null, null, null, null));
 				break;
 			case 103:
-				dataList.add(ShoppingItemInquiryItem.from("00007", "商品区分名７", "商品名７", "商品詳細７", "1234567890700", "イデコ", "会社名７", "テスト店舗２", DomainCommonUtils.convertKingakuBigDecimal(1780), 170, "07", 1700));
+				dataList.add(ShoppingItemInquiryItem.from("00007", "商品区分名７", "商品名７", "商品詳細７", "1234567890700", "イデコ", "会社名７", "テスト店舗２", bigDecimalValue(1780), 170, "07", 1700));
 				break;
 			case 104:
 				// 商品コードの降順で表示
-				dataList.add(ShoppingItemInquiryItem.from("00009", "商品区分名９", "商品名９", "商品詳細９", "1234567890800", "税金支払い", "会社名９", "テスト店舗３０", DomainCommonUtils.convertKingakuBigDecimal(1990), 190, "99", 1900));
-				dataList.add(ShoppingItemInquiryItem.from("00008", "商品区分名８", "商品名８", "商品詳細８", "1234567890800", "食費", "会社名８", null, DomainCommonUtils.convertKingakuBigDecimal(1880), 180, "08", 1800));
+				dataList.add(ShoppingItemInquiryItem.from("00009", "商品区分名９", "商品名９", "商品詳細９", "1234567890800", "税金支払い", "会社名９", "テスト店舗３０", bigDecimalValue(1990), 190, "99", 1900));
+				dataList.add(ShoppingItemInquiryItem.from("00008", "商品区分名８", "商品名８", "商品詳細８", "1234567890800", "食費", "会社名８", null, bigDecimalValue(1880), 180, "08", 1800));
 				break;
 			case 105:
 				// 商品コードの降順で表示
-				dataList.add(ShoppingItemInquiryItem.from("00005", "商品区分名１", "商品名１－２", "商品詳細１－２", "1234567890100", "その他", "会社名１", "テスト店舗１０", DomainCommonUtils.convertKingakuBigDecimal(1580), 115, "05", 1155));
-				dataList.add(ShoppingItemInquiryItem.from("00001", "商品区分名１", "商品名１－１", "商品詳細１－１", "1234567890100", "その他", "会社名１", "テスト店舗２", DomainCommonUtils.convertKingakuBigDecimal(1180), 112, "02", 1122));
+				dataList.add(ShoppingItemInquiryItem.from("00005", "商品区分名１", "商品名１－２", "商品詳細１－２", "1234567890100", "その他", "会社名１", "テスト店舗１０", bigDecimalValue(1580), 115, "05", 1155));
+				dataList.add(ShoppingItemInquiryItem.from("00001", "商品区分名１", "商品名１－１", "商品詳細１－１", "1234567890100", "その他", "会社名１", "テスト店舗２", bigDecimalValue(1180), 112, "02", 1122));
 				break;
 			default:
 		}
 		
 		return dataList;
-	}
-	
-	/**
-	 *<pre>
-	 * ShoppingItemのtoStringメソッドで返される文字列を固定文字列として返します。
-	 *</pre>
-	 * @return ShoppingItemの文字列の値
-	 *
-	 */
-	private String getToStringStr(int type) {
-		// TODO:本来は期待値はテキストファイルのデータを取得したいところだが、固定でも別にいいような気もするし、どうするか
-		String str = null;
-		switch(type) {
-			case 1:
-				str = "ShoppingItem(userId=TEST-USER-ID, shoppingItemCode=00001, shoppingItemKubunName=商品区分名１, shoppingItemName=商品名１, shoppingItemDetailContext=商品詳細１, shoppingItemJanCode=1234567890100, sisyutuItemCode=0010, companyName=会社名１, shopCode=010, standardPrice=1,180円, shoppingItemCapacity=110, shoppingItemCapacityUnit=01, shoppingItemCalories=1100)";
-				break;
-			case 2:
-				str = "商品検索結果:1件:[[0][ShoppingItemInquiryList.ShoppingItemInquiryItem(shoppingItemCode=00007, shoppingItemKubunName=商品区分名７, shoppingItemName=商品名７, shoppingItemDetailContext=商品詳細７, shoppingItemJanCode=1234567890700, sisyutuItemName=イデコ, companyName=会社名７, standardShopName=テスト店舗２, standardPrice=2,470円, shoppingItemCapacity=770, shoppingItemCapacityUnit=07, shoppingItemCalories=7700)]]";
-				break;
-			default:
-		}
-		
-		return str;
 	}
 	
 	/**
@@ -608,15 +587,15 @@ class ShoppingItemTableDataSourceTest {
 	
 	/**
 	 *<pre>
-	 * 引数の値からSearchQueryUserIdAndSisyutuItemCodeを生成して返します。
+	 * 引数の値からSearchQueryUserIdAndExpenditureItemCodeを生成して返します。
 	 *</pre>
 	 * @param userId ユーザID
-	 * @param sisyutuItemCode 支出項目コード
-	 * @return 検索条件ドメイン(SearchQueryUserIdAndSisyutuItemCode)
+	 * @param expenditureItemCode 支出項目コード
+	 * @return 検索条件ドメイン(SearchQueryUserIdAndExpenditureItemCode)
 	 *
 	 */
-	private SearchQueryUserIdAndSisyutuItemCode createSearchQueryUserIdAndSisyutuItemCode(String userId, String sisyutuItemCode) {
-		return SearchQueryUserIdAndSisyutuItemCode.from(UserId.from(userId), SisyutuItemCode.from(sisyutuItemCode));
+	private SearchQueryUserIdAndExpenditureItemCode createSearchQueryUserIdAndExpenditureItemCode(String userId, String expenditureItemCode) {
+		return SearchQueryUserIdAndExpenditureItemCode.from(UserId.from(userId), ExpenditureItemCode.from(expenditureItemCode));
 	}
 	
 	/**
@@ -643,5 +622,31 @@ class ShoppingItemTableDataSourceTest {
 	 */
 	private SearchQueryUserIdAndShoppingItemJanCode createSearchQueryUserIdAndShoppingItemJanCode(String userId, String shoppingItemJanCode) {
 		return SearchQueryUserIdAndShoppingItemJanCode.from(UserId.from(userId), ShoppingItemJanCode.from(shoppingItemJanCode));
+	}
+	
+	
+		/**
+	 *<pre>
+	 * 引数で指定した金額(整数)の値をBigDecimalに変換して返します。値がnullの場合、nullを返却します。
+	 * BigDecimalのスケール値は金額関連のDB項目のデフォルト値(2)が設定されます。
+	 *</pre>
+	 * @param kingaku BigDecimalに変換する金額の値(整数値)
+	 * @return 引数の値をBigDecimalに変換した値
+	 *
+	 */
+	private BigDecimal bigDecimalValue(Integer kingaku) {
+		// 値がnullの場合、nullを返します。
+		if(kingaku == null) {
+			return null;
+		}
+		// 整数の値に指定したスケール分0を追加
+		String numStr = kingaku.toString() + ".00";
+		
+		// 整数の値を文字列変換
+		BigDecimal bigVal = new BigDecimal(numStr.toString());
+		// スケールを設定(小数点以下切り上げ)
+		bigVal.setScale(2, RoundingMode.HALF_UP);
+		
+		return bigVal;
 	}
 }

@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/11/23 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.repository.account.shoppingregist;
@@ -21,7 +22,7 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 public interface ShoppingRegistTableRepository {
@@ -49,13 +50,14 @@ public interface ShoppingRegistTableRepository {
 	
 	/**
 	 *<pre>
-	 * 検索条件(ユニークキー)に一致する買い物登録情報を取得します。
+	 * 買い物登録情報テーブル:SHOPPING_REGIST_TABLEの主キー（ユーザID, 年月,買い物登録コード）で買い物登録情報テーブルを検索し、
+	 * 結果を取得します。
 	 *</pre>
 	 * @param search 検索条件(ユーザID, 年月 ,買い物登録コード)
 	 * @return 買い物登録情報
 	 *
 	 */
-	ShoppingRegist findByUniqueKey(SearchQueryUserIdAndYearMonthAndShoppingRegistCode search);
+	ShoppingRegist findByPrimaryKey(SearchQueryUserIdAndYearMonthAndShoppingRegistCode search);
 	
 	/**
 	 *<pre>
@@ -65,7 +67,7 @@ public interface ShoppingRegistTableRepository {
 	 * @return 買い物登録情報の検索結果
 	 *
 	 */
-	SimpleShoppingRegistItemInquiryList findById(SearchQueryUserIdAndYearMonth search);
+	SimpleShoppingRegistItemInquiryList findBy(SearchQueryUserIdAndYearMonth search);
 	
 	/**
 	 *<pre>
@@ -75,6 +77,6 @@ public interface ShoppingRegistTableRepository {
 	 * @return 指定条件に該当するデータの件数
 	 *
 	 */
-	int countById(SearchQueryUserIdAndYearMonth search);
+	int countBy(SearchQueryUserIdAndYearMonth search);
 	
 }

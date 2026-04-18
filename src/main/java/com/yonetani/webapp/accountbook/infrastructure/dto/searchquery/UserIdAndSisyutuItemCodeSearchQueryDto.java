@@ -7,11 +7,12 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/02/23 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.searchquery;
 
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -26,7 +27,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -45,11 +46,11 @@ public class UserIdAndSisyutuItemCodeSearchQueryDto {
 	 * @return テーブルの検索条件：ユーザID、支出項目コード
 	 *
 	 */
-	public static UserIdAndSisyutuItemCodeSearchQueryDto from(SearchQueryUserIdAndSisyutuItemCode search) {
+	public static UserIdAndSisyutuItemCodeSearchQueryDto from(SearchQueryUserIdAndExpenditureItemCode search) {
 		return new UserIdAndSisyutuItemCodeSearchQueryDto(
 				// 検索条件:ユーザID
 				search.getUserId().getValue(),
 				// 検索条件:支出項目コード
-				search.getSisyutuItemCode().getValue());
+				search.getExpenditureItemCode().getValue());
 	}
 }

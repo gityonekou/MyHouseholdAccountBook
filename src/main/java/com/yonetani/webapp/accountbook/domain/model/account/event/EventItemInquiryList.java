@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/08/18 : 1.00.00  新規作成
+ * 2025/12/28 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.event;
@@ -16,11 +17,10 @@ import java.util.List;
 import org.springframework.util.CollectionUtils;
 
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
+import com.yonetani.webapp.accountbook.domain.type.account.event.EventDate;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventDetailContext;
-import com.yonetani.webapp.accountbook.domain.type.account.event.EventEndDate;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventName;
-import com.yonetani.webapp.accountbook.domain.type.account.event.EventStartDate;
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemName;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemName;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -35,7 +35,7 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -60,22 +60,22 @@ public class EventItemInquiryList {
 		// イベントコード
 		private final EventCode eventCode;
 		// 支出項目名
-		private final SisyutuItemName sisyutuItemName;
+		private final ExpenditureItemName expenditureItemName;
 		// イベント名
 		private final EventName eventName;
 		// イベント内容詳細
 		private final EventDetailContext eventDetailContext;
 		// イベント開始日
-		private final EventStartDate eventStartDate;
+		private final EventDate eventStartDate;
 		// イベント終了日
-		private final EventEndDate eventEndDate;
+		private final EventDate eventEndDate;
 		
 		/**
 		 *<pre>
 		 * 引数の値からイベント一覧明細情報を表すドメインモデルを生成して返します。
 		 *</pre>
 		 * @param eventCode イベントコード
-		 * @param sisyutuItemName 支出項目名
+		 * @param expenditureItemName 支出項目名
 		 * @param eventName イベント名
 		 * @param eventDetailContext イベント内容詳細
 		 * @param eventStartDate イベント開始日
@@ -83,15 +83,15 @@ public class EventItemInquiryList {
 		 * @return イベント一覧明細情報を表すドメインモデル
 		 *
 		 */
-		public static EventInquiryItem from(String eventCode, String sisyutuItemName, String eventName, String eventDetailContext,
+		public static EventInquiryItem from(String eventCode, String expenditureItemName, String eventName, String eventDetailContext,
 				LocalDate eventStartDate, LocalDate eventEndDate) {
 			return new EventInquiryItem(
 					EventCode.from(eventCode),
-					SisyutuItemName.from(sisyutuItemName),
+					ExpenditureItemName.from(expenditureItemName),
 					EventName.from(eventName),
 					EventDetailContext.from(eventDetailContext),
-					EventStartDate.from(eventStartDate),
-					EventEndDate.from(eventEndDate)
+					EventDate.from(eventStartDate),
+					EventDate.from(eventEndDate)
 					);
 		}
 	}

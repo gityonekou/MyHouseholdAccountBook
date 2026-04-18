@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/06/04 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.fixedcost;
@@ -18,9 +19,9 @@ import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCost;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostCode;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostShiharaiTukiList;
-import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndSisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostTargetPaymentMonthList;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostInquiryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostReadWriteDto;
@@ -39,7 +40,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Repository
@@ -80,7 +81,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public FixedCost findByIdAndFixedCostCode(SearchQueryUserIdAndFixedCostCode search) {
+	public FixedCost findByPrimaryKey(SearchQueryUserIdAndFixedCostCode search) {
 		// 検索結果を取得
 		FixedCostReadWriteDto searchResult = mapper.findByIdAndFixedCostCode(
 				UserIdAndFixedCostCodeSearchQueryDto.from(search));
@@ -97,7 +98,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public FixedCostInquiryList findById(SearchQueryUserId userId) {
+	public FixedCostInquiryList findByUserId(SearchQueryUserId userId) {
 		// 検索結果を取得
 		List<FixedCostInquiryReadDto> searchResult = mapper.findById(
 				UserIdSearchQueryDto.from(userId));
@@ -115,7 +116,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public FixedCostInquiryList findByIdAndSisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search) {
+	public FixedCostInquiryList findByExpenditureItemCode(SearchQueryUserIdAndExpenditureItemCode search) {
 		// 検索結果を取得
 		List<FixedCostInquiryReadDto> searchResult = mapper.findByIdAndSisyutuItemCode(
 				UserIdAndSisyutuItemCodeSearchQueryDto.from(search));
@@ -133,7 +134,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public FixedCostList findByIdAndFixedCostShiharaiTukiList(SearchQueryUserIdAndFixedCostShiharaiTukiList search) {
+	public FixedCostList findByFixedCostTargetPaymentMonthList(SearchQueryUserIdAndFixedCostTargetPaymentMonthList search) {
 		// 検索結果を取得
 		List<FixedCostReadWriteDto> searchResult = mapper.findByIdAndFixedCostShiharaiTukiList(
 				UserIdAndFixedCostShiharaiTukiListSearchQueryDto.from(search));
@@ -152,7 +153,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int countById(SearchQueryUserId userId) {
+	public int countByUserId(SearchQueryUserId userId) {
 		// ユーザIDで検索し、登録されている固定費情報の件数を返す
 		return mapper.countById(UserIdSearchQueryDto.from(userId));
 	}
@@ -161,7 +162,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public int countBySisyutuItemCode(SearchQueryUserIdAndSisyutuItemCode search) {
+	public int countByExpenditureItemCode(SearchQueryUserIdAndExpenditureItemCode search) {
 		// ユーザID、支出項目コードで検索し、登録されている固定費情報の件数を返す
 		return mapper.countBySisyutuItemCode(UserIdAndSisyutuItemCodeSearchQueryDto.from(search));
 	}
@@ -217,17 +218,17 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 				// 固定費内容詳細(支払内容詳細)
 				data.getFixedCostDetailContext().getValue(),
 				// 支出項目コード
-				data.getSisyutuItemCode().getValue(),
+				data.getExpenditureItemCode().getValue(),
 				// 固定費区分
 				data.getFixedCostKubun().getValue(),
 				// 固定費支払月(支払月)
-				data.getFixedCostShiharaiTuki().getValue(),
+				data.getFixedCostTargetPaymentMonth().getValue(),
 				// 固定費支払月任意詳細
-				data.getFixedCostShiharaiTukiOptionalContext().getValue(),
+				data.getFixedCostTargetPaymentMonthOptionalContext().getValue(),
 				// 固定費支払日(支払日)
-				data.getFixedCostShiharaiDay().getValue(),
+				data.getFixedCostPaymentDay().getValue(),
 				// 支払金額
-				data.getShiharaiKingaku().getValue());
+				data.getFixedCostPaymentAmount().getValue());
 	}
 	
 	/**

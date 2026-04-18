@@ -5,13 +5,14 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/04/29 : 1.00.00  新規作成
+ * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.shoppingitem;
 
 import java.math.BigDecimal;
 
-import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCalories;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCapacity;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingitem.ShoppingItemCapacityUnit;
@@ -38,7 +39,7 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -59,7 +60,7 @@ public class ShoppingItem {
 	// 商品JANコード(13桁 or 8桁 or ISBNコード:10桁)
 	private final ShoppingItemJanCode shoppingItemJanCode;
 	// 支出項目コード
-	private final SisyutuItemCode sisyutuItemCode;
+	private final ExpenditureItemCode expenditureItemCode;
 	// 会社名
 	private final ShoppingItemCompanyName companyName;
 	// 基準店舗コード
@@ -83,7 +84,7 @@ public class ShoppingItem {
 	 * @param shoppingItemName 商品名
 	 * @param shoppingItemDetailContext 商品詳細
 	 * @param shoppingItemJanCode 商品JANコード
-	 * @param sisyutuItemCode 支出項目コード
+	 * @param expenditureItemCode 支出項目コード
 	 * @param companyName 会社名
 	 * @param shopCode 基準店舗コード
 	 * @param standardPrice 基準価格
@@ -100,7 +101,7 @@ public class ShoppingItem {
 			String shoppingItemName,
 			String shoppingItemDetailContext,
 			String shoppingItemJanCode,
-			String sisyutuItemCode,
+			String expenditureItemCode,
 			String companyName,
 			String shopCode,
 			BigDecimal standardPrice,
@@ -115,7 +116,7 @@ public class ShoppingItem {
 				ShoppingItemName.from(shoppingItemName),
 				ShoppingItemDetailContext.from(shoppingItemDetailContext),
 				ShoppingItemJanCode.from(shoppingItemJanCode),
-				SisyutuItemCode.from(sisyutuItemCode),
+				ExpenditureItemCode.from(expenditureItemCode),
 				ShoppingItemCompanyName.from(companyName),
 				ShoppingItemStandardShopCode.from(shopCode),
 				ShoppingItemStandardPrice.from(standardPrice),
