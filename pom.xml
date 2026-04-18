@@ -10,10 +10,10 @@
 	</parent>
 	<groupId>com.yonetani.webapp</groupId>
 	<artifactId>MyHouseholdAccountBook</artifactId>
-	<version>1.0.0-dev</version>
+	<version>1.00</version>
 	<packaging>jar</packaging>
 	<name>MyHouseholdAccountBook</name>
-	<description>マイ家計簿です(1.0.0-dev版 - DDDリファクタリング中)</description>
+	<description>マイ家計簿です(1.00版)</description>
 	<properties>
 		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -158,80 +158,10 @@
 						<goals>
 							<goal>report</goal>
 						</goals>
-					</execution>
+						</execution>
 				</executions>
 			</plugin>
 		</plugins>
 	</build>
-
-	<!-- Phase別テスト実行プロファイル -->
-	<profiles>
-		<!-- Phase 1/2: ドメイン層のテストのみ実行 -->
-		<profile>
-			<id>domain-test</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<includes>
-								<!-- ドメイン層のテストのみ実行 -->
-								<include>**/domain/**/*Test.java</include>
-							</includes>
-							<excludes>
-								<!-- 問題のあるテストを除外する場合はここに追加 -->
-							</excludes>
-						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
-						<configuration>
-							<includes>
-								<!-- ドメイン層のみカバレッジ測定 -->
-								<include>**/domain/**</include>
-							</includes>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<!-- Phase 1のテストのみ実行 -->
-		<profile>
-			<id>phase1-test</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<includes>
-								<include>**/domain/type/**/*Test.java</include>
-								<include>**/domain/exception/**/*Test.java</include>
-								<include>**/domain/utils/**/*Test.java</include>
-							</includes>
-							<excludes>
-								<!-- Phase 1以前の問題のあるテストを除外 -->
-								<exclude>**/domain/type/account/shop/ShopCodeTest.java</exclude>
-							</excludes>
-						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>org.jacoco</groupId>
-						<artifactId>jacoco-maven-plugin</artifactId>
-						<configuration>
-							<includes>
-								<include>**/domain/type/**</include>
-								<include>**/domain/exception/**</include>
-								<include>**/domain/utils/**</include>
-							</includes>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
 </project>
