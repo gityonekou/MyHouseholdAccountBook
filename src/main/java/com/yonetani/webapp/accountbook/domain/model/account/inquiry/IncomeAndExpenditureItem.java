@@ -18,6 +18,8 @@ import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiK
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingaku;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuusiKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
@@ -53,6 +55,8 @@ public class IncomeAndExpenditureItem {
 	private final TargetMonth targetMonth;
 	// 収入金額
 	private final SyuunyuuKingaku syuunyuuKingaku;
+	// 積立金取崩金額
+	private final WithdrewKingaku withdrewKingaku;
 	// 支出予定金額
 	private final SisyutuYoteiKingaku sisyutuYoteiKingaku;
 	// 支出金額
@@ -68,6 +72,7 @@ public class IncomeAndExpenditureItem {
 	 * @param targetYear 対象年
 	 * @param targetMonth 対象月
 	 * @param syuunyuuKingaku 収入金額
+	 * @param withdrewKingaku 積立金取崩金額
 	 * @param sisyutuYoteiKingaku 支出予定金額
 	 * @param sisyutuKingaku 支出金額
 	 * @param syuusiKingaku 収支金額
@@ -79,6 +84,7 @@ public class IncomeAndExpenditureItem {
 			String targetYear,
 			String targetMonth,
 			BigDecimal syuunyuuKingaku,
+			BigDecimal withdrewKingaku,
 			BigDecimal sisyutuYoteiKingaku,
 			BigDecimal sisyutuKingaku,
 			BigDecimal syuusiKingaku) {
@@ -87,6 +93,7 @@ public class IncomeAndExpenditureItem {
 				TargetYear.from(targetYear),
 				TargetMonth.from(targetMonth),
 				SyuunyuuKingaku.from(syuunyuuKingaku),
+				WithdrewKingaku.from(withdrewKingaku),
 				SisyutuYoteiKingaku.from(sisyutuYoteiKingaku),
 				SisyutuKingaku.from(sisyutuKingaku),
 				SyuusiKingaku.from(syuusiKingaku));
@@ -100,7 +107,7 @@ public class IncomeAndExpenditureItem {
 	 *
 	 */
 	public static IncomeAndExpenditureItem fromEmpty() {
-		return new IncomeAndExpenditureItem(null, null, null, null, null, null, null);
+		return new IncomeAndExpenditureItem(null, null, null, null, null, null, null, null);
 	}
 	
 	/**
@@ -110,6 +117,7 @@ public class IncomeAndExpenditureItem {
 	 * @param userId ユーザID
 	 * @param yearMonthDomain 対象年月(ドメイン)
 	 * @param incomeKingakuTotalAmount 対象月の収入金額合計
+	 * @param withdrewKingakuTotalAmount 対象月の積立金取崩金額合計
 	 * @param sisyutuYoteiKingakuTotalAmount 対象月の支出予定金額合計
 	 * @param sisyutuKingakuTotalAmount 対象月の支出金額合計
 	 * @return 収支テーブル情報(ドメイン)
@@ -119,11 +127,14 @@ public class IncomeAndExpenditureItem {
 			UserId userId,
 			TargetYearMonth yearMonthDomain,
 			SyuunyuuKingakuTotalAmount incomeKingakuTotalAmount,
+			WithdrewKingakuTotalAmount withdrewKingakuTotalAmount,
 			SisyutuYoteiKingakuTotalAmount sisyutuYoteiKingakuTotalAmount,
 			SisyutuKingakuTotalAmount sisyutuKingakuTotalAmount) {
 		
-		// 収支金額(収入金額合計 - 支出金額合計)
-		BigDecimal syuusiKingaku = incomeKingakuTotalAmount.getValue().subtract(sisyutuKingakuTotalAmount.getValue());
+		// 入り方金額 = 収入金額合計 + 積立金取崩金額合計
+		BigDecimal incomingAmount = incomeKingakuTotalAmount.getValue().add(withdrewKingakuTotalAmount.getNullSafeValue());
+		// 収支金額 = 入り方金額 - 支出金額合計
+		BigDecimal syuusiKingaku = incomingAmount.subtract(sisyutuKingakuTotalAmount.getValue());
 		
 		// 支出テーブル情報(ドメイン)を生成して返却
 		return IncomeAndExpenditureItem.from(
@@ -135,6 +146,8 @@ public class IncomeAndExpenditureItem {
 				yearMonthDomain.getMonth(),
 				// 収入金額
 				incomeKingakuTotalAmount.getValue(),
+				// 積立金取崩金額
+				withdrewKingakuTotalAmount.getValue(),
 				// 支出予定金額
 				sisyutuYoteiKingakuTotalAmount.getValue(),
 				// 支出金額
@@ -150,6 +163,7 @@ public class IncomeAndExpenditureItem {
 	 * @param userId ユーザID
 	 * @param yearMonthDomain 対象年月(ドメイン)
 	 * @param incomeKingakuTotalAmount 対象月の収入金額合計
+	 * @param withdrewKingakuTotalAmount 対象月の積立金取崩金額合計
 	 * @param expenditureKingakuTotalAmount 対象月の支出金額合計
 	 * @return 収支テーブル情報(ドメイン)
 	 *
@@ -158,10 +172,13 @@ public class IncomeAndExpenditureItem {
 			UserId userId,
 			TargetYearMonth yearMonthDomain,
 			SyuunyuuKingakuTotalAmount incomeKingakuTotalAmount,
+			WithdrewKingakuTotalAmount withdrewKingakuTotalAmount,
 			SisyutuKingakuTotalAmount expenditureKingakuTotalAmount) {
 		
-		// 収支金額(収入金額合計 - 支出金額合計)
-		BigDecimal syuusiKingaku = incomeKingakuTotalAmount.getValue().subtract(expenditureKingakuTotalAmount.getValue());
+		// 入り方金額 = 収入金額合計 + 積立金取崩金額合計
+		BigDecimal incomingAmount = incomeKingakuTotalAmount.getValue().add(withdrewKingakuTotalAmount.getNullSafeValue());
+		// 収支金額 = 入り方金額 - 支出金額合計
+		BigDecimal syuusiKingaku = incomingAmount.subtract(expenditureKingakuTotalAmount.getValue());
 		
 		// 支出テーブル情報(ドメイン)を生成して返却
 		return IncomeAndExpenditureItem.from(
@@ -173,6 +190,8 @@ public class IncomeAndExpenditureItem {
 				yearMonthDomain.getMonth(),
 				// 収入金額
 				incomeKingakuTotalAmount.getValue(),
+				// 積立金取崩金額
+				withdrewKingakuTotalAmount.getValue(),
 				// 支出予定金額
 				SisyutuYoteiKingakuTotalAmount.ZERO.getValue(),
 				// 支出金額
@@ -208,8 +227,10 @@ public class IncomeAndExpenditureItem {
 		
 		// 新しい支出金額
 		SisyutuKingaku addSisyutuKingaku = sisyutuKingaku.add(addValue);
-		// 新しい収支金額(収入金額 - 支出金額)
-		BigDecimal syuusiKingaku = syuunyuuKingaku.getValue().subtract(addSisyutuKingaku.getValue());
+		// 入り方金額 = 収入金額 + 積立金取崩金額
+		BigDecimal incomingAmount = syuunyuuKingaku.getValue().add(withdrewKingaku.getNullSafeValue());
+		// 新しい収支金額(入り方金額 - 支出金額合計)
+		BigDecimal syuusiKingaku = incomingAmount.subtract(addSisyutuKingaku.getValue());
 		
 		// 支出テーブル情報(ドメイン)を生成して返却
 		return IncomeAndExpenditureItem.from(
@@ -221,6 +242,8 @@ public class IncomeAndExpenditureItem {
 				targetMonth.getValue(),
 				// 収入金額
 				syuunyuuKingaku.getValue(),
+				// 積立金取崩金額
+				withdrewKingaku.getValue(),
 				// 支出予定金額
 				sisyutuYoteiKingaku.getValue(),
 				// 支出金額
@@ -241,8 +264,10 @@ public class IncomeAndExpenditureItem {
 		
 		// 新しい支出金額
 		SisyutuKingaku subtractSisyutuKingaku = sisyutuKingaku.subtract(subtractValue);
-		// 新しい収支金額(収入金額 - 支出金額)
-		BigDecimal syuusiKingaku = syuunyuuKingaku.getValue().subtract(subtractSisyutuKingaku.getValue());
+		// 入り方金額 = 収入金額 + 積立金取崩金額
+		BigDecimal incomingAmount = syuunyuuKingaku.getValue().add(withdrewKingaku.getNullSafeValue());
+		// 新しい収支金額(入り方金額 - 支出金額)
+		BigDecimal syuusiKingaku = incomingAmount.subtract(subtractSisyutuKingaku.getValue());
 		
 		// 支出テーブル情報(ドメイン)を生成して返却
 		return IncomeAndExpenditureItem.from(
@@ -254,6 +279,8 @@ public class IncomeAndExpenditureItem {
 				targetMonth.getValue(),
 				// 収入金額
 				syuunyuuKingaku.getValue(),
+				// 積立金取崩金額
+				withdrewKingaku.getValue(),
 				// 支出予定金額
 				sisyutuYoteiKingaku.getValue(),
 				// 支出金額

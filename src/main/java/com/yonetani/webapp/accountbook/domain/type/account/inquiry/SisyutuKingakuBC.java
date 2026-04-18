@@ -36,8 +36,14 @@ import lombok.RequiredArgsConstructor;
 public class SisyutuKingakuBC {
 	// 支出金額Bと支出金額Cの合計値
 	private final BigDecimal value;
+	// 支出金額Bの値
+	private final SisyutuKingakuB sisyutuKingakuB;
+	// 支出金額Cの値
+	private final SisyutuKingakuC sisyutuKingakuC;
 	// 値が0の「支出金額BC」項目の値
-	public static final BigDecimal ZERO = BigDecimal.ZERO.setScale(2);
+	public static final SisyutuKingakuBC ZERO = SisyutuKingakuBC.from(
+			SisyutuKingakuB.from(BigDecimal.ZERO.setScale(2)),
+			SisyutuKingakuC.from(BigDecimal.ZERO.setScale(2)));
 	
 	/**
 	 *<pre>
@@ -65,20 +71,41 @@ public class SisyutuKingakuBC {
 		}
 		// 支出金額Bの設定値がnullの場合、支出金額Cの値を設定
 		if(kingakuB.getValue() == null) {
-			return new SisyutuKingakuBC(kingakuC.getValue());
+			return new SisyutuKingakuBC(kingakuC.getValue(), kingakuB, kingakuC);
 		}
 		// 支出金額Cの設定値がnullでない場合、支出金額Bと支出金額Cの合計値を設定
 		if(kingakuC.getValue() != null) {
-			return new SisyutuKingakuBC(kingakuB.getValue().add(kingakuC.getValue()));
+			return new SisyutuKingakuBC(kingakuB.getValue().add(kingakuC.getValue()), kingakuB, kingakuC);
 		}
-		// 支出金額B項目ドメインタイプを生成
-		return new SisyutuKingakuBC(kingakuB.getValue());
+		// 支出金額Bの値で支出金額BCドメインタイプを生成
+		return new SisyutuKingakuBC(kingakuB.getValue(), kingakuB, kingakuC);
 		
 	}
 	
 	/**
 	 *<pre>
-	 * 支出金額Bの値をカンマ編集した文字列を返却
+	 * 支出金額BCの値を指定した支出金額BCの値で加算(this + addValue)した値を返します。
+	 *</pre>
+	 * @param addValue 加算する支出金額BCの値
+	 * 
+	 * @return 加算した支出金額BCの値(this + addValue)
+	 *
+	 */
+	public SisyutuKingakuBC add(SisyutuKingakuBC addValue) {
+		if(this.value == null) {
+			return addValue;
+		}
+		if(addValue.getValue() == null) {
+			return this;
+		}
+		SisyutuKingakuB addB = sisyutuKingakuB.add(addValue.getSisyutuKingakuB());
+		SisyutuKingakuC addC = sisyutuKingakuC.add(addValue.getSisyutuKingakuC());
+		return SisyutuKingakuBC.from(addB, addC);
+	}
+	
+	/**
+	 *<pre>
+	 * 支出金額BCの値をカンマ編集した文字列を返却
 	 *</pre>
 	 * @return 支出金額Bの値をカンマ編集した文字列
 	 *
@@ -90,14 +117,14 @@ public class SisyutuKingakuBC {
 	
 	/**
 	 *<pre>
-	 * 支出金額Bの値が支出金額の何パーセントかを取得。小数点以下0桁で四捨五入
-	 * 値がnull(支払金額B項目の値なし)の場合、空文字列を返却
+	 * 支出金額BCの値が支出金額の何パーセントかを取得。小数点以下0桁で四捨五入
+	 * 値がnull(支払金額BC項目の値なし)の場合、空文字列を返却
 	 * 
 	 * [ガード節]
 	 * ・引数で指定した支出金額がnull値
 	 * 
 	 *</pre>
-	 * @param sisyutuKingaku 支出金額Bの割合算出用の支出金額の値
+	 * @param sisyutuKingaku 支出金額BCの割合算出用の支出金額の値
 	 * @return 支出金額Bの割合(文字列)
 	 *
 	 */
@@ -106,13 +133,42 @@ public class SisyutuKingakuBC {
 		if(sisyutuKingaku == null) {
 			throw new MyHouseholdAccountBookRuntimeException("支出金額がnull値です。管理者に問い合わせてください。[sisyutuKingaku=null]");
 		}
-		// 支出金額Bの値がnullか0の場合、空文字列を返却
-		if(value == null || ZERO.compareTo(value) >= 0) {
+		// 支出金額BCの値がnullか0の場合、空文字列を返却
+		if(value == null || ZERO.getValue().compareTo(value) >= 0) {
 			return "";
 		}
 		
 		// 支出金額BCの割合=支出金額BC/支出金額 * 100(四捨五入)
 		BigDecimal pt = value.divide(sisyutuKingaku.getValue(), 2, RoundingMode.HALF_UP).multiply(DomainCommonUtils.ONE_HUNDRED_BIGDECIMAL);
+		// スケール0で四捨五入した文字列を返却
+		return pt.setScale(0, RoundingMode.HALF_UP).toPlainString();
+	}
+	
+	/**
+	 *<pre>
+	 * 支出金額BCのうち、支出金額Bの金額の割合が何パーセントかを取得。小数点以下0桁で四捨五入
+	 * 値がnull(支払金額BC項目の値なし)の場合、空文字列を返却
+	 * 
+	 * [ガード節]
+	 * ・引数で指定した支出金額がnull値
+	 * 
+	 *</pre>
+	 * @param sisyutuKingaku 支出金額BCの割合算出用の支出金額の値
+	 * @return 支出金額Bの割合(文字列)
+	 *
+	 */
+	public String getSisyutuKingakuBPercentage() {
+		// 支出金額BCの値がnullか支出金額Bの値がnull場合、0を返却
+		if(value == null || sisyutuKingakuB.getValue() == null) {
+			return "0";
+		}
+		// 支出金額Bの値が0の場合、0を返却(
+		if(SisyutuKingakuB.ZERO.getValue().compareTo(sisyutuKingakuB.getValue()) >= 0) {
+			return "0";
+		}
+		
+		// 支出金額Bの割合=支出金額B/支出金額BC * 100(四捨五入)
+		BigDecimal pt = sisyutuKingakuB.getValue().divide(value, 2, RoundingMode.HALF_UP).multiply(DomainCommonUtils.ONE_HUNDRED_BIGDECIMAL);
 		// スケール0で四捨五入した文字列を返却
 		return pt.setScale(0, RoundingMode.HALF_UP).toPlainString();
 	}

@@ -10,9 +10,12 @@
 package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
+import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
+import com.yonetani.webapp.accountbook.presentation.session.IncomeRegistItem;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -35,6 +38,8 @@ import lombok.RequiredArgsConstructor;
 public class SyuunyuuKingaku {
 	// 収入金額
 	private final BigDecimal value;
+	// 値が0の「収入金額」項目の値
+	public static final SyuunyuuKingaku ZERO = SyuunyuuKingaku.from(BigDecimal.ZERO.setScale(2));
 	
 	/**
 	 *<pre>
@@ -65,6 +70,30 @@ public class SyuunyuuKingaku {
 		
 		// 「収入金額」項目の値を生成して返却
 		return new SyuunyuuKingaku(syuunyuuKingaku);
+	}
+	
+	/**
+	 *<pre>
+	 * 収支登録情報(セッション情報)の値から「収入金額」項目の値を表すドメインタイプを生成します
+	 * 
+	 * [ガード節]
+	 * ・null値
+	 *</pre>
+	 * @param income 収支登録情報(セッション情報)
+	 * @return 「収入金額」項目ドメインタイプ
+	 *
+	 */
+	public static SyuunyuuKingaku from(IncomeRegistItem income) {
+		// ガード節(null)
+		if(income == null) {
+			throw new MyHouseholdAccountBookRuntimeException("収支登録情報(セッション情報)の設定値がnullです。管理者に問い合わせてください。");
+		}
+		// 収入区分が「積立からの取崩し(3)」の場合、積立金取崩し金額の収支登録情報(セッション情報)となるので値0の収入金額を生成して返却
+		if(Objects.equals(income.getIncomeKubun(), MyHouseholdAccountBookContent.INCOME_KUBUN_WITHDREW_SELECTED_VALUE)) {
+			return ZERO;
+		}
+		// 収支登録情報(セッション情報)の収入金額から「収入金額」項目の値を生成して返却
+		return new SyuunyuuKingaku(income.getIncomeKingaku());
 	}
 	
 	/**

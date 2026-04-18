@@ -10,17 +10,21 @@
  */
 package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SisyutuYoteiKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuunyuuKingakuTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuusiKingaku;
-import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyuusiKingakuTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WithdrewKingakuTotalAmount;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -46,6 +50,8 @@ public class IncomeAndExpenditureInquiryList {
 	
 	// 収入金額合計
 	private final SyuunyuuKingaku syuunyuuKingakuGoukei;
+	// 積立金取崩金額
+	private final WithdrewKingaku withdrewKingakuGoukei;
 	// 支出予定金額合計
 	private final SisyutuYoteiKingaku sisyutuYoteiKingakuGoukei;
 	// 支出金額合計
@@ -65,28 +71,33 @@ public class IncomeAndExpenditureInquiryList {
 		if(CollectionUtils.isEmpty(values)) {
 			return new IncomeAndExpenditureInquiryList(
 					Collections.emptyList(),
-					SyuunyuuKingaku.from(BigDecimal.ZERO),
-					SisyutuYoteiKingaku.from(BigDecimal.ZERO),
-					SisyutuKingaku.from(BigDecimal.ZERO),
-					SyuusiKingaku.from(BigDecimal.ZERO));
+					SyuunyuuKingaku.ZERO,
+					WithdrewKingaku.NULL,
+					SisyutuYoteiKingaku.ZERO,
+					SisyutuKingaku.ZERO,
+					SyuusiKingaku.ZERO);
 		} else {
 			// 各種合計値を計算
-			BigDecimal syuunyuuKingakuGoukeiWk = BigDecimal.ZERO;
-			BigDecimal sisyutuYoteiKingakuGoukeiWk = BigDecimal.ZERO;
-			BigDecimal sisyutuKingakuGoukeiWk = BigDecimal.ZERO;
-			BigDecimal syuusiKingakuGoukeiWk = BigDecimal.ZERO;
+			SyuunyuuKingakuTotalAmount syuunyuuKingakuGoukei = SyuunyuuKingakuTotalAmount.ZERO;
+			WithdrewKingakuTotalAmount withdrewKingakuGoukei = WithdrewKingakuTotalAmount.NULL;
+			SisyutuYoteiKingakuTotalAmount sisyutuYoteiKingakuGoukei = SisyutuYoteiKingakuTotalAmount.ZERO;
+			SisyutuKingakuTotalAmount sisyutuKingakuGoukei = SisyutuKingakuTotalAmount.ZERO;
+			SyuusiKingakuTotalAmount syuusiKingakuGoukei = SyuusiKingakuTotalAmount.ZERO;
+			
 			for(IncomeAndExpenditureItem item : values) {
-				syuunyuuKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(syuunyuuKingakuGoukeiWk, item.getSyuunyuuKingaku().getValue());
-				sisyutuYoteiKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(sisyutuYoteiKingakuGoukeiWk, item.getSisyutuYoteiKingaku().getValue());
-				sisyutuKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(sisyutuKingakuGoukeiWk, item.getSisyutuKingaku().getValue());
-				syuusiKingakuGoukeiWk = DomainCommonUtils.addBigDecimalNullSafe(syuusiKingakuGoukeiWk, item.getSyuusiKingaku().getValue());
+				syuunyuuKingakuGoukei = syuunyuuKingakuGoukei.add(item.getSyuunyuuKingaku());
+				withdrewKingakuGoukei = withdrewKingakuGoukei.add(item.getWithdrewKingaku());
+				sisyutuYoteiKingakuGoukei = sisyutuYoteiKingakuGoukei.add(item.getSisyutuYoteiKingaku());
+				sisyutuKingakuGoukei = sisyutuKingakuGoukei.add(item.getSisyutuKingaku());
+				syuusiKingakuGoukei = syuusiKingakuGoukei.add(item.getSyuusiKingaku());
 			}
 			return new IncomeAndExpenditureInquiryList(
 					values,
-					SyuunyuuKingaku.from(syuunyuuKingakuGoukeiWk),
-					SisyutuYoteiKingaku.from(sisyutuYoteiKingakuGoukeiWk),
-					SisyutuKingaku.from(sisyutuKingakuGoukeiWk),
-					SyuusiKingaku.from(syuusiKingakuGoukeiWk));
+					SyuunyuuKingaku.from(syuunyuuKingakuGoukei.getValue()),
+					WithdrewKingaku.from(withdrewKingakuGoukei.getValue()),
+					SisyutuYoteiKingaku.from(sisyutuYoteiKingakuGoukei.getValue()),
+					SisyutuKingaku.from(sisyutuKingakuGoukei.getValue()),
+					SyuusiKingaku.from(syuusiKingakuGoukei.getValue()));
 		}
 	}
 	/**
@@ -95,7 +106,7 @@ public class IncomeAndExpenditureInquiryList {
 	@Override
 	public String toString() {
 		if(values.size() > 0) {
-			StringBuilder buff = new StringBuilder((values.size() + 2) * 110);
+			StringBuilder buff = new StringBuilder((values.size() + 2) * 130);
 			buff.append("収支情報の明細リスト:")
 			.append(values.size())
 			.append("件:");
@@ -108,6 +119,8 @@ public class IncomeAndExpenditureInquiryList {
 			}
 			buff.append("[[合計][syuunyuuKingakuGoukei:")
 			.append(syuunyuuKingakuGoukei)
+			.append(",withdrewKingakuGoukei:")
+			.append(withdrewKingakuGoukei)
 			.append(",sisyutuYoteiKingakuGoukei:")
 			.append(sisyutuYoteiKingakuGoukei)
 			.append(",sisyutuKingakuGoukei:")

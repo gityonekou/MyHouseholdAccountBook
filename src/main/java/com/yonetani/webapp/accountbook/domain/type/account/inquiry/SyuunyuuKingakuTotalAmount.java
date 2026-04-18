@@ -1,5 +1,6 @@
 /**
  * 「収入金額合計」項目の値を表すドメインタイプです。
+ * 「収入金額」項目と「積立金取崩金額」項目の合算値が「収入金額合計」項目の値となります。
  *
  *------------------------------------------------
  * 更新履歴
@@ -36,7 +37,7 @@ public class SyuunyuuKingakuTotalAmount {
 	
 	// 収入金額合計
 	private final BigDecimal value;
-
+	
 	// 値が0の「収入金額合計」項目の値
 	public static final SyuunyuuKingakuTotalAmount ZERO = SyuunyuuKingakuTotalAmount.from(BigDecimal.ZERO.setScale(2));
 	

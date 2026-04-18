@@ -9,6 +9,10 @@
  */
 package com.yonetani.webapp.accountbook.domain.type.account.shop;
 
+import org.springframework.util.StringUtils;
+
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -34,12 +38,19 @@ public class ShopName {
 	/**
 	 *<pre>
 	 * 「店舗名」項目の値を表すドメインタイプを生成します。
+	 * 
+	 * [ガード節]
+	 * ・空文字列
 	 *</pre>
 	 * @param name 店舗名
 	 * @return 「店舗名」項目ドメインタイプ
 	 *
 	 */
 	public static ShopName from(String name) {
+		// ガード節(空文字列)
+		if(!StringUtils.hasLength(name)) {
+			throw new MyHouseholdAccountBookRuntimeException("「店舗名」項目の設定値が空文字列です。管理者に問い合わせてください。");
+		}
 		return new ShopName(name);
 	}
 	

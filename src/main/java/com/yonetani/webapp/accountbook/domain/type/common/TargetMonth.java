@@ -53,7 +53,7 @@ public class TargetMonth {
 		if(!StringUtils.hasLength(month)) {
 			throw new MyHouseholdAccountBookRuntimeException("「月」項目の設定値が空文字列です。管理者に問い合わせてください。");
 		}
-		// ガード節(長さが4桁以外)
+		// ガード節(長さが2桁以外)
 		if(month.length() != 2) {
 			throw new MyHouseholdAccountBookRuntimeException("「月」項目の設定値が不正です。管理者に問い合わせてください。[month=" + month + "]");
 		}

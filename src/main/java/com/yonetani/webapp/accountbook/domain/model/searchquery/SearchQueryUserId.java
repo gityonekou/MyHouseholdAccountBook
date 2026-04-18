@@ -13,6 +13,7 @@ package com.yonetani.webapp.accountbook.domain.model.searchquery;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
@@ -31,6 +32,7 @@ import lombok.ToString;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @ToString
+@EqualsAndHashCode
 public class SearchQueryUserId {
 	// ユーザID
 	private final UserId userId;

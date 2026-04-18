@@ -125,6 +125,9 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 	// 収入金額
 	@Setter
 	private String syuunyuuKingaku;
+	// 積立金取崩金額
+	@Setter
+	private String withdrewKingaku;
 	// 支出金額
 	@Setter
 	private String sisyutuKingaku;
@@ -179,6 +182,8 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 			modelAndView.addObject("syuunyuuKingaku", syuunyuuKingaku);
 			// 支出金額
 			modelAndView.addObject("sisyutuKingaku", sisyutuKingaku);
+			// 積立金取崩金額
+			modelAndView.addObject("withdrewKingaku", withdrewKingaku);
 			// 支出予定金額
 			modelAndView.addObject("sisyutuYoteiKingaku", sisyutuYoteiKingaku);
 			// 収支金額

@@ -108,6 +108,8 @@ public class IncomeAndExpenditureTableDataSource implements IncomeAndExpenditure
 				dto.getTargetMonth(),
 				// 収入金額
 				dto.getIncomeKingaku(),
+				// 積立金取崩金額
+				dto.getWithdrewKingaku(),
 				// 支出予定金額
 				dto.getExpenditureEstimateKingaku(),
 				// 支出金額

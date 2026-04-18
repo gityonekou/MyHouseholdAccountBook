@@ -38,6 +38,8 @@ public class IncomeAndExpenditureReadWriteDto {
 	private final String targetMonth;
 	// 収入金額
 	private final BigDecimal incomeKingaku;
+	// 積立金取崩金額
+	private final BigDecimal withdrewKingaku;
 	// 支出予定金額
 	private final BigDecimal expenditureEstimateKingaku;
 	// 支出金額
@@ -63,6 +65,8 @@ public class IncomeAndExpenditureReadWriteDto {
 				domain.getTargetMonth().getValue(),
 				// 収入金額
 				domain.getSyuunyuuKingaku().getValue(),
+				// 積立金取崩金額
+				domain.getWithdrewKingaku().getValue(),
 				// 支出予定金額
 				domain.getSisyutuYoteiKingaku().getValue(),
 				// 支出金額
