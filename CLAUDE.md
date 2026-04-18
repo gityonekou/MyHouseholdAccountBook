@@ -14,12 +14,6 @@ MyHouseholdAccountBook is a personal household account book web application buil
 # Run all tests
 mvn clean test
 
-# Run domain layer tests only
-mvn clean test -Pdomain-test
-
-# Run phase1 tests only
-mvn clean test -Pphase1-test
-
 # Run a single test class
 mvn test -Dtest=ClassName
 
@@ -93,27 +87,24 @@ class SomeIntegrationTest {
 - Master data codes 0001-0060 are fixed and cannot be deleted/updated
 - Test SQL files are placed alongside test classes in resources
 
-## Current Refactoring (Phase 5)
+## Refactoring History
 
-The project is in Phase 5: Refactoring `IncomeAndExpenditureRegistUseCase` into 5 smaller UseCases:
+Phase 1-5 refactoring (DDD準拠リファクタリング) is complete. Documents are archived in `docs/archive/income-expenditure-refactoring/`.
+
+**Phase 5 completed**: `IncomeAndExpenditureRegistUseCase` was split into 5 UseCases:
 1. `IncomeAndExpenditureInitUseCase` - Screen initialization
 2. `IncomeRegistUseCase` - Income session operations
 3. `ExpenditureRegistUseCase` - Expenditure session operations
 4. `ExpenditureItemSelectUseCase` - Item selection screen
 5. `IncomeAndExpenditureRegistConfirmUseCase` - Registration confirmation/DB update
 
-See `docs/Phase5_計画書.md` for detailed refactoring plan.
-
 ## Documentation
 
-- `docs/Phase5_計画書.md` - Current refactoring plan
-- `docs/Phase5_Step1_詳細設計書.md` - Detailed design
-- `docs/Phase5_Step2_結合テスト作成計画書.md` - Integration test plan
-- `docs/Phase5_パッケージリファクタリング設計書.md` - Package refactoring design (new package structure, class migration mapping, rename list)
 - `docs/test-data-design-rules.md` - Test data conventions
 - `docs/integration-test-guidelines.md` - UseCase integration test detailed guidelines (response verification, assertion rules, session/DB patterns)
 - `docs/DDD設計_金額クラス統合判断基準.md` - Money class design decisions
-- `07_テスト方針書.md` - Project-wide test strategy (coverage targets, naming conventions, quality standards)
+- `docs/specifications/07_テスト方針書.md` - Project-wide test strategy (coverage targets, naming conventions, quality standards)
+- `docs/archive/income-expenditure-refactoring/` - Archived Phase 1-5 refactoring documents
 
 ## Japanese Conventions
 
