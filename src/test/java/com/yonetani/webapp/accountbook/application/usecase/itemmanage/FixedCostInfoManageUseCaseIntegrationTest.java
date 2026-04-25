@@ -23,7 +23,7 @@
  * ⑤ 正常系：登録済み判定_登録なし(0035:自由用途積立金)（hasFixedCostInfoBySisyutuItem）
  * ⑥ 正常系：登録済み初期表示_0030の固定費1件（readRegisteredFixedCostInfoBySisyutuItem）
  * ⑦ 正常系：追加画面_0035の支出項目情報設定（readAddFixedCostInfoBySisyutuItem）
- * ⑧ 正常系：更新画面_固定費0001の値設定（readUpdateFixedCostInfo）
+ * ⑧ 正常系：更新画面_固定費0004の値設定（支払月任意詳細含む）（readUpdateFixedCostInfo）
  * ⑨ 異常系：更新画面_存在しない固定費コード（readUpdateFixedCostInfo）
  * ⑩ 正常系：バリデーションエラー時画面表示（readUpdateBindingErrorSetInfo）
  *
