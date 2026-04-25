@@ -5,14 +5,14 @@
  * ・情報管理(固定費)初期表示画面:
  * ・情報管理(固定費)処理選択画面
  * ・情報管理(固定費)更新画面(追加・更新)
- * 
+ *
  * 画面遷移
  * ・トップメニューからの遷移(初期表示)(GET)→情報管理(固定費)初期表示画面
  * ・初期表示画面で固定費一覧から対象の明細を選択(GET)→情報管理(固定費)処理選択画面
  * ・初期表示画面で追加対象の支出項目選択時(GET)
  *   →選択した支出項目に対応する固定費が未登録の場合：情報管理(固定費)更新画面(追加)
  *   →選択した支出項目の固定費が既に登録済みの場合：初期表示画面でメッセージ確認(OK/NGで対応する画面に遷移)
- *   　→OK:情報管理(固定費)更新画面(追加)
+ *   　→OK:情報管理(固定費)更新画面(追加)　POSTで要求
  *   　→NG:初期表示画面
  * ・情報管理(固定費)処理選択画面で更新ボタン押下(POST)→情報管理(固定費)更新画面(更新)
  * ・情報管理(固定費)処理選択画面でキャンセルボタン押下(POST)→初期表示画面
@@ -26,6 +26,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/05/13 : 1.00.00  新規作成
+ * 2026/04/19 : 1.01.00  リファクタリング対応(更新系UseCase分離)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.itemmanage;
@@ -42,6 +43,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.FixedCostInfoManageUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.itemmanage.FixedCostRegistConfirmUseCase;
+import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
@@ -85,8 +88,10 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @RequiredArgsConstructor
 public class FixedCostInfoManageController {
-	// UseCase
+	// UseCase(参照系)
 	private final FixedCostInfoManageUseCase usecase;
+	// UseCase(更新系)
+	private final FixedCostRegistConfirmUseCase registConfirmUseCase;
 	// ログインユーザセッションBean
 	private final LoginUserSession loginUserSession;
 	
@@ -220,7 +225,7 @@ public class FixedCostInfoManageController {
 	public ModelAndView postDelete(@RequestParam("fixedCostCode") String fixedCostCode, RedirectAttributes redirectAttributes) {
 		log.debug("postDelete: fixedCostCode=" + fixedCostCode);
 		// 画面表示情報を取得
-		return this.usecase.execDelete(loginUserSession.getLoginUserInfo(), fixedCostCode).buildRedirect(redirectAttributes);
+		return this.registConfirmUseCase.execDelete(loginUserSession.getLoginUserInfo(), fixedCostCode).buildRedirect(redirectAttributes);
 	}
 	
 	/**
@@ -269,7 +274,11 @@ public class FixedCostInfoManageController {
 		// チェック結果OKの場合
 		} else {
 			// actionに従い、処理を実行
-			return this.usecase.execAction(loginUserSession.getLoginUserInfo(), inputForm).buildRedirect(redirectAttributes);
+			if(MyHouseholdAccountBookContent.ACTION_TYPE_ADD.equals(inputForm.getAction())) {
+				return this.registConfirmUseCase.execAdd(loginUserSession.getLoginUserInfo(), inputForm).buildRedirect(redirectAttributes);
+			} else {
+				return this.registConfirmUseCase.execUpdate(loginUserSession.getLoginUserInfo(), inputForm).buildRedirect(redirectAttributes);
+			}
 		}
 	}
 	

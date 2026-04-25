@@ -1,0 +1,289 @@
+/**
+ * 固定費情報登録・更新・削除処理ユースケースです。
+ * ・指定した固定費情報の削除処理
+ * ・固定費情報追加処理
+ * ・固定費情報更新処理
+ *
+ *------------------------------------------------
+ * 更新履歴
+ * 日付       : version  コメントなど
+ * 2026/04/19 : 1.01.00  新規作成（リファクタリング対応 FixedCostInfoManageUseCaseからの分離）
+ *
+ */
+package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.yonetani.webapp.accountbook.application.usecase.common.CodeTableItemComponent;
+import com.yonetani.webapp.accountbook.application.usecase.common.ExpenditureItemInfoComponent;
+import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
+import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCost;
+import com.yonetani.webapp.accountbook.domain.model.common.CodeAndValuePair;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
+import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostCode;
+import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
+import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostInfoUpdateForm;
+import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageActSelectResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageUpdateResponse;
+import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+
+/**
+ *<pre>
+ * 固定費情報登録・更新・削除処理ユースケースです。
+ * ・指定した固定費情報の削除処理
+ * ・固定費情報追加処理
+ * ・固定費情報更新処理
+ *
+ *</pre>
+ *
+ * @author ：Kouki Yonetani
+ * @since 家計簿アプリ(1.01)
+ *
+ */
+@Service
+@Log4j2
+@RequiredArgsConstructor
+public class FixedCostRegistConfirmUseCase {
+
+	// 支出項目情報取得コンポーネント
+	private final ExpenditureItemInfoComponent expenditureItemInfoComponent;
+	// コードテーブル
+	private final CodeTableItemComponent codeTableItem;
+	// 固定費テーブル:FIXED_COST_TABLEリポジトリー
+	private final FixedCostTableRepository fixedCostRepository;
+
+	/**
+	 *<pre>
+	 * 指定した固定費情報の削除処理
+	 *
+	 * 指定した固定費情報を削除します。削除は論理削除となります。
+	 * 処理結果は情報管理(固定費)処理選択画面に設定し、完了時は情報管理(固定費)初期表示画面にリダイレクトを設定します。
+	 * エラー時は情報管理(固定費)処理選択画面に遷移します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param fixedCostCodeStr 削除対象の固定費コード
+	 * @return 情報管理(固定費)処理選択画面の表示情報
+	 *
+	 */
+	@Transactional
+	public FixedCostInfoManageActSelectResponse execDelete(LoginUserInfo user, String fixedCostCodeStr) {
+		log.debug("execDelete:userid=" + user.getUserId() + ",fixedCostCode=" + fixedCostCodeStr);
+
+		// ドメインタイプ:ユーザID
+		UserId userId = UserId.from(user.getUserId());
+		// ドメインタイプ:固定費コード
+		FixedCostCode fixedCostCode = FixedCostCode.from(fixedCostCodeStr);
+
+		// 固定費コードに対応する固定費情報を取得
+		FixedCost deleteData = fixedCostRepository.findByPrimaryKey(
+				SearchQueryUserIdAndFixedCostCode.from(userId, fixedCostCode));
+		if(deleteData == null) {
+			throw new MyHouseholdAccountBookRuntimeException("削除対象の固定費が固定費テーブル:FIXED_COST_TABLEに存在しません。管理者に問い合わせてください。[fixedCostCode=" + fixedCostCode + "]");
+		}
+
+		// 削除処理を実行
+		int deleteCount = fixedCostRepository.delete(deleteData);
+		// 削除件数が1件以外の場合、業務エラー
+		if(deleteCount != 1) {
+			throw new MyHouseholdAccountBookRuntimeException("固定費テーブル:FIXED_COST_TABLEへの削除件数が不正でした。[件数=" + deleteCount + "][delete data:" + deleteData + "]");
+		}
+		// レスポンスを生成(エラー時はエラー画面に遷移するので固定費情報は使用しない:nullを指定)
+		FixedCostInfoManageActSelectResponse response = FixedCostInfoManageActSelectResponse.getInstance(null);
+
+		// トランザクション完了
+		response.setTransactionSuccessFull();
+
+		// 完了メッセージ
+		response.addMessage("指定の固定費を削除しました。[code:" + deleteData.getFixedCostCode() + "]" + deleteData.getFixedCostName());
+
+		return response;
+	}
+
+	/**
+	 *<pre>
+	 * 固定費情報追加処理
+	 *
+	 * 固定費情報入力フォームの入力値に従い、固定費情報を新規登録します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param inputForm 固定費情報入力フォームの入力値（actionはADDであること）
+	 * @return 情報管理(固定費)更新画面の表示情報
+	 *
+	 */
+	@Transactional
+	public FixedCostInfoManageUpdateResponse execAdd(LoginUserInfo user, FixedCostInfoUpdateForm inputForm) {
+		log.debug("execAdd:userid=" + user.getUserId() + ",inputForm=" + inputForm);
+
+		// ドメインタイプ:ユーザID
+		UserId userId = UserId.from(user.getUserId());
+
+		// レスポンスを取得
+		FixedCostInfoManageUpdateResponse response = getUpdateResponse(userId, inputForm);
+
+		// 新規採番する固定費コードの値を取得
+		int count = fixedCostRepository.countByUserId(SearchQueryUserId.from(userId));
+		count++;
+		if(count > 9999) {
+			response.addErrorMessage("固定費情報は9999件以上登録できません。管理者に問い合わせてください。");
+			return response;
+		}
+
+		// 固定費コードを入力フォームに設定
+		inputForm.setFixedCostCode(FixedCostCode.getNewCode(count));
+
+		// 追加する固定費情報
+		FixedCost addData = createFixedCost(user.getUserId(), inputForm);
+
+		// 固定費テーブルに登録
+		int addCount = fixedCostRepository.add(addData);
+		// 追加件数が1件以外の場合、業務エラー
+		if(addCount != 1) {
+			throw new MyHouseholdAccountBookRuntimeException("固定費テーブル:FIXED_COST_TABLEへの追加件数が不正でした。[件数=" + addCount + "][add data:" + addData + "]");
+		}
+
+		// 完了メッセージ
+		response.addMessage("新規固定費を追加しました。[code:" + addData.getFixedCostCode() + "]" + addData.getFixedCostName());
+
+		// トランザクション完了
+		response.setTransactionSuccessFull();
+
+		return response;
+	}
+
+	/**
+	 *<pre>
+	 * 固定費情報更新処理
+	 *
+	 * 固定費情報入力フォームの入力値に従い、固定費情報を更新します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param inputForm 固定費情報入力フォームの入力値（actionはUPDATEであること）
+	 * @return 情報管理(固定費)更新画面の表示情報
+	 *
+	 */
+	@Transactional
+	public FixedCostInfoManageUpdateResponse execUpdate(LoginUserInfo user, FixedCostInfoUpdateForm inputForm) {
+		log.debug("execUpdate:userid=" + user.getUserId() + ",inputForm=" + inputForm);
+
+		// ドメインタイプ:ユーザID
+		UserId userId = UserId.from(user.getUserId());
+
+		// レスポンスを取得
+		FixedCostInfoManageUpdateResponse response = getUpdateResponse(userId, inputForm);
+
+		// 更新する固定費情報
+		FixedCost updateData = createFixedCost(user.getUserId(), inputForm);
+
+		// 固定費テーブルを更新(支出項目コードは更新対象外項目なので注意)
+		int updateCount = fixedCostRepository.update(updateData);
+		// 更新件数が1件以外の場合、業務エラー
+		if(updateCount != 1) {
+			throw new MyHouseholdAccountBookRuntimeException("固定費テーブル:FIXED_COST_TABLEへの更新件数が不正でした。[件数=" + updateCount + "][update data:" + updateData + "]");
+		}
+
+		// 完了メッセージ
+		response.addMessage("固定費を更新しました。[code:" + updateData.getFixedCostCode() + "]" + updateData.getFixedCostName());
+
+		// トランザクション完了
+		response.setTransactionSuccessFull();
+
+		return response;
+	}
+
+	/**
+	 *<pre>
+	 * 情報管理(固定費)更新画面の表示情報を取得します。
+	 *</pre>
+	 * @param userId 取得対象のユーザID
+	 * @param inputForm 固定費情報が格納されたフォームデータ
+	 * @return 情報管理(固定費)更新画面表示情報
+	 *
+	 */
+	private FixedCostInfoManageUpdateResponse getUpdateResponse(UserId userId, FixedCostInfoUpdateForm inputForm) {
+
+		// コードテーブル情報から固定費区分選択ボックスの表示情報を取得
+		List<CodeAndValuePair> fixedCostKubunList = codeTableItem.getCodeValues(MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_KUBUN);
+		if(fixedCostKubunList == null) {
+			throw new MyHouseholdAccountBookRuntimeException("コード定義ファイルに「固定費区分情報："
+					+ MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_KUBUN + "」が登録されていません。管理者に問い合わせてください");
+		}
+
+		// コードテーブル情報から支払月選択ボックスの表示情報を取得
+		List<CodeAndValuePair> shiharaiTukiList = codeTableItem.getCodeValues(MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_TUKI);
+		if(shiharaiTukiList == null) {
+			throw new MyHouseholdAccountBookRuntimeException("コード定義ファイルに「固定費支払月情報："
+					+ MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_TUKI + "」が登録されていません。管理者に問い合わせてください");
+		}
+
+		// コードテーブル情報から支払日選択ボックスの表示情報を取得
+		List<CodeAndValuePair> shiharaiDayList = codeTableItem.getCodeValues(MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_DAY);
+		if(shiharaiDayList == null) {
+			throw new MyHouseholdAccountBookRuntimeException("コード定義ファイルに「固定費支払日情報："
+					+ MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_DAY + "」が登録されていません。管理者に問い合わせてください");
+		}
+
+		// レスポンスを生成
+		FixedCostInfoManageUpdateResponse response = FixedCostInfoManageUpdateResponse.getInstance(
+				// 固定費情報入力フォーム
+				inputForm,
+				// 固定費区分の表示情報リスト(不変リスト)
+				fixedCostKubunList.stream().map(pair ->
+					OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toUnmodifiableList()),
+				// 支払月選択ボックスの表示情報リスト(可変リスト)
+				shiharaiTukiList.stream().map(pair ->
+					OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList()),
+				// 支払日選択ボックスの表示情報リスト(可変リスト)
+				shiharaiDayList.stream().map(pair ->
+					OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList()));
+
+		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
+		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, ExpenditureItemCode.from(inputForm.getSisyutuItemCode())));
+
+		return response;
+	}
+
+	/**
+	 *<pre>
+	 * 引数のフォームデータから固定費情報(ドメイン)を生成して返します。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param inputForm フォームデータ
+	 * @return 固定費情報(ドメイン)
+	 *
+	 */
+	private FixedCost createFixedCost(String userId, FixedCostInfoUpdateForm inputForm) {
+		return FixedCost.from(
+				// ユーザID
+				userId,
+				// 固定費コード
+				inputForm.getFixedCostCode(),
+				// 固定費名(支払名)
+				inputForm.getFixedCostName(),
+				// 固定費内容詳細(支払内容詳細)
+				inputForm.getFixedCostDetailContext(),
+				// 支出項目コード
+				inputForm.getSisyutuItemCode(),
+				// 固定費区分
+				inputForm.getFixedCostKubun(),
+				// 固定費支払月(支払月)
+				inputForm.getShiharaiTuki(),
+				// 固定費支払月任意詳細
+				inputForm.getShiharaiTukiOptionalContext(),
+				// 固定費支払日(支払日)
+				inputForm.getShiharaiDay(),
+				// 支払金額
+				inputForm.getShiharaiKingaku());
+	}
+}

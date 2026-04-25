@@ -22,6 +22,7 @@ import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
@@ -39,14 +40,19 @@ import lombok.Setter;
 public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 	
 	// 固定費情報が格納されたフォームデータです。
+	@Getter
 	private final FixedCostInfoUpdateForm fixedCostInfoUpdateForm;
 	// 固定費区分選択ボックス
+	@Getter
 	private final SelectViewItem fixedCostKubunSelectList;
 	// 支払月選択ボックス
+	@Getter
 	private final SelectViewItem shiharaiTukiSelectList;
 	// 支払日選択ボックス
+	@Getter
 	private final SelectViewItem shiharaiDaySelectList;
 	// 支出項目名
+	@Getter
 	@Setter
 	private String sisyutuItemName;
 	
