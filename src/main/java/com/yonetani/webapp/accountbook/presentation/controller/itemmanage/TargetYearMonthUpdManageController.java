@@ -4,7 +4,7 @@
  *------------------------------------------------
  * 更新履歴
  * 日付       : version     コメントなど
- * 2025/01/13 : 1.01.00(A)  新規作成
+ * 2025/01/13 : 1.00.00(A)  新規作成
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.itemmanage;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.yonetani.webapp.accountbook.application.usecase.itemmanage.TargetYearMonthUpdManageUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.itemmanage.accountingperiodupdate.TargetYearMonthUpdManageUseCase;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.01.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Controller

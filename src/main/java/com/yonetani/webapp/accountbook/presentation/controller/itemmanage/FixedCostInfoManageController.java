@@ -42,8 +42,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.yonetani.webapp.accountbook.application.usecase.itemmanage.FixedCostInfoManageUseCase;
-import com.yonetani.webapp.accountbook.application.usecase.itemmanage.FixedCostRegistConfirmUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostInquiryUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostRegistConfirmUseCase;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
@@ -80,7 +80,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Controller
@@ -89,7 +89,7 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class FixedCostInfoManageController {
 	// UseCase(参照系)
-	private final FixedCostInfoManageUseCase usecase;
+	private final FixedCostInquiryUseCase inquiryUseCase;
 	// UseCase(更新系)
 	private final FixedCostRegistConfirmUseCase registConfirmUseCase;
 	// ログインユーザセッションBean
@@ -108,7 +108,7 @@ public class FixedCostInfoManageController {
 		log.debug("getInitLoad:");
 		
 		// 画面表示データ読込
-		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo())
+		return this.inquiryUseCase.readInitInfo(loginUserSession.getLoginUserInfo())
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
@@ -129,7 +129,7 @@ public class FixedCostInfoManageController {
 		log.debug("getActSelect: fixedCostCode=" + fixedCostCode);
 		
 		// 画面表示情報を取得
-		return this.usecase.readActSelectItemInfo(loginUserSession.getLoginUserInfo(), fixedCostCode)
+		return this.inquiryUseCase.readActSelectItemInfo(loginUserSession.getLoginUserInfo(), fixedCostCode)
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
@@ -151,9 +151,9 @@ public class FixedCostInfoManageController {
 		log.debug("getAddLoad: sisyutuItemCode=" + sisyutuItemCode);
 		
 		// 固定費が登録済みかどうかを判定
-		if(this.usecase.hasFixedCostInfoBySisyutuItem(loginUserSession.getLoginUserInfo(), sisyutuItemCode)) {
+		if(this.inquiryUseCase.hasFixedCostInfoBySisyutuItem(loginUserSession.getLoginUserInfo(), sisyutuItemCode)) {
 			// 固定費が登録済みの場合、初期画面に遷移
-			return this.usecase.readRegisteredFixedCostInfoBySisyutuItem(loginUserSession.getLoginUserInfo(), sisyutuItemCode)
+			return this.inquiryUseCase.readRegisteredFixedCostInfoBySisyutuItem(loginUserSession.getLoginUserInfo(), sisyutuItemCode)
 			// レスポンスにログインユーザ名を設定
 			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 			// レスポンスからModelAndViewを生成
@@ -161,7 +161,7 @@ public class FixedCostInfoManageController {
 			
 		} else {
 			// 固定費が未登録の場合、情報管理(固定費)更新画面に遷移
-			return this.usecase.readAddFixedCostInfoBySisyutuItem(loginUserSession.getLoginUserInfo(), sisyutuItemCode)
+			return this.inquiryUseCase.readAddFixedCostInfoBySisyutuItem(loginUserSession.getLoginUserInfo(), sisyutuItemCode)
 					// レスポンスにログインユーザ名を設定
 					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 					// レスポンスからModelAndViewを生成
@@ -184,7 +184,7 @@ public class FixedCostInfoManageController {
 	public ModelAndView postActionAddLoad(@RequestParam("sisyutuItemCode") String sisyutuItemCode) {
 		log.debug("postActionAddLoad: sisyutuItemCode=" + sisyutuItemCode);
 		// 画面表示情報を取得
-		return this.usecase.readAddFixedCostInfoBySisyutuItem(loginUserSession.getLoginUserInfo(), sisyutuItemCode)
+		return this.inquiryUseCase.readAddFixedCostInfoBySisyutuItem(loginUserSession.getLoginUserInfo(), sisyutuItemCode)
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
@@ -204,7 +204,7 @@ public class FixedCostInfoManageController {
 	public ModelAndView postActionUpdateLoad(@RequestParam("fixedCostCode") String fixedCostCode) {
 		log.debug("postActionUpdateLoad: fixedCostCode=" + fixedCostCode);
 		// 画面表示情報を取得
-		return this.usecase.readUpdateFixedCostInfo(loginUserSession.getLoginUserInfo(), fixedCostCode)
+		return this.inquiryUseCase.readUpdateFixedCostInfo(loginUserSession.getLoginUserInfo(), fixedCostCode)
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
@@ -240,7 +240,7 @@ public class FixedCostInfoManageController {
 	public ModelAndView postActionCancel() {
 		log.debug("postActionCancel:");
 		// 画面表示データ読込
-		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo())
+		return this.inquiryUseCase.readInitInfo(loginUserSession.getLoginUserInfo())
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
@@ -265,7 +265,7 @@ public class FixedCostInfoManageController {
 		// チェック結果エラーの場合
 		if(bindingResult.hasErrors()) {
 			// 初期表示情報を取得し、入力チェックエラーを設定
-			return this.usecase.readUpdateBindingErrorSetInfo(loginUserSession.getLoginUserInfo(), inputForm)
+			return this.inquiryUseCase.readUpdateBindingErrorSetInfo(loginUserSession.getLoginUserInfo(), inputForm)
 					// レスポンスにログインユーザ名を設定
 					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 					// レスポンスからModelAndViewを生成
@@ -294,7 +294,7 @@ public class FixedCostInfoManageController {
 	public ModelAndView updateComplete(@ModelAttribute CompleteRedirectMessages redirectMessages) {
 		log.debug("updateComplete: input=" + redirectMessages);
 		// 画面表示情報を取得
-		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo())
+		return this.inquiryUseCase.readInitInfo(loginUserSession.getLoginUserInfo())
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成

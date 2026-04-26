@@ -76,7 +76,17 @@ class FixedCostTableDataSourceTest {
 	}
 
 	/**
-	 * {@link FixedCostTableDataSource#add(FixedCost)} のためのテスト・メソッド。
+	 *<pre>
+	 * テストadd：固定費テーブルへの新規登録テスト
+	 *
+	 * 【検証内容】
+	 * ・全11カラム（USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT,
+	 *   SISYUTU_ITEM_CODE, FIXED_COST_KUBUN, FIXED_COST_SHIHARAI_TUKI,
+	 *   FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT, FIXED_COST_SHIHARAI_DAY,
+	 *   SHIHARAI_KINGAKU, DELETE_FLG）が正しく登録されること
+	 * ・同一キーで重複登録した場合、DuplicateKeyExceptionが発生すること
+	 * ・null可項目（FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT）にnullが正しく登録されること
+	 *</pre>
 	 */
 	@Test
 	@DisplayName("add:固定費テーブルへの新規登録テスト(全カラム確認)")
@@ -127,7 +137,17 @@ class FixedCostTableDataSourceTest {
 	}
 
 	/**
-	 * {@link FixedCostTableDataSource#update(FixedCost)} のためのテスト・メソッド。
+	 *<pre>
+	 * テストupdate：固定費テーブルの更新テスト
+	 *
+	 * 【検証内容】
+	 * ・更新対象の7カラム（FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, FIXED_COST_KUBUN,
+	 *   FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT,
+	 *   FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU）が正しく更新されること
+	 * ・非更新カラム（SISYUTU_ITEM_CODE）が更新されないこと（意図的に別値を渡して確認）
+	 * ・対象データなしの場合に0件が返ること
+	 * ・null可項目（FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT）をnullに更新できること
+	 *</pre>
 	 */
 	@Test
 	@Sql(value = "FixedCostTableDataSourceUpdateTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -188,7 +208,16 @@ class FixedCostTableDataSourceTest {
 	}
 
 	/**
-	 * {@link FixedCostTableDataSource#delete(FixedCost)} のためのテスト・メソッド。
+	 *<pre>
+	 * テストdelete：固定費テーブルの論理削除テスト
+	 *
+	 * 【検証内容】
+	 * ・DELETE_FLGがTRUEに更新されること
+	 * ・論理削除のため他のカラム（FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, SISYUTU_ITEM_CODE,
+	 *   FIXED_COST_KUBUN, FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT,
+	 *   FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU）が変更されないこと
+	 * ・対象データなしの場合に0件が返ること
+	 *</pre>
 	 */
 	@Test
 	@Sql(value = "FixedCostTableDataSourceDeleteTest.sql", config = @SqlConfig(encoding = "UTF-8"))

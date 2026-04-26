@@ -27,7 +27,7 @@
  * 2026/04/19 : 1.01.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
+package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -67,7 +67,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 @Transactional
 @Sql(scripts = {
 	"/sql/initsql/schema_test.sql",
-	"/com/yonetani/webapp/accountbook/application/usecase/itemmanage/FixedCostInfoManageIntegrationTest.sql"
+	"/com/yonetani/webapp/accountbook/application/usecase/itemmanage/fixedcost/FixedCostInquiryIntegrationTest.sql"
 }, config = @SqlConfig(encoding = "UTF-8"))
 @DisplayName("固定費情報登録・更新・削除処理ユースケースのUseCaseテスト（統合テスト）")
 class FixedCostRegistConfirmUseCaseIntegrationTest {
@@ -83,6 +83,18 @@ class FixedCostRegistConfirmUseCaseIntegrationTest {
 
 	// ========== execDelete ==========
 
+	/**
+	 *<pre>
+	 * テスト①：正常系：execDelete_固定費0003(国民年金保険)の論理削除
+	 *
+	 * 【検証内容】
+	 * ・削除前にDELETE_FLG=falseであること
+	 * ・論理削除後もレコードが存在すること（物理削除でないこと）
+	 * ・DELETE_FLG=trueに更新されること
+	 * ・他の固定費(0001, 0002)のDELETE_FLGが変わらないこと
+	 * ・完了メッセージが「指定の固定費を削除しました。[code:0003]国民年金保険」であること
+	 *</pre>
+	 */
 	@Test
 	@DisplayName("① execDelete_固定費0003を論理削除")
 	void testExecDelete_success() {
@@ -109,6 +121,14 @@ class FixedCostRegistConfirmUseCaseIntegrationTest {
 		assertEquals(Boolean.FALSE, isDeleted("user01", "0002"), "0002のDELETE_FLGが変わらないこと");
 	}
 
+	/**
+	 *<pre>
+	 * テスト②：異常系：execDelete_存在しない固定費コードで例外
+	 *
+	 * 【検証内容】
+	 * ・存在しない固定費コード("9999")を指定した場合、MyHouseholdAccountBookRuntimeExceptionが発生すること
+	 *</pre>
+	 */
 	@Test
 	@DisplayName("② execDelete_存在しない固定費コードで例外")
 	void testExecDelete_notFound() {
@@ -119,6 +139,18 @@ class FixedCostRegistConfirmUseCaseIntegrationTest {
 
 	// ========== execAdd ==========
 
+	/**
+	 *<pre>
+	 * テスト③：正常系：execAdd_新規固定費(支出項目コード=0035:自由用途積立金)を追加
+	 *
+	 * 【検証内容】
+	 * ・追加前のユーザ固定費件数が4件であること
+	 * ・追加後のユーザ固定費件数が5件になること
+	 * ・固定費コードが自動採番(countByUserId+1の4桁ゼロ埋め)で「0005」になること
+	 * ・追加されたレコードの各フィールド（支払名・支払月・支払日・支払金額・DELETE_FLG）が正しいこと
+	 * ・完了メッセージが「新規固定費を追加しました。[code:0005]自由用途積立」であること
+	 *</pre>
+	 */
 	@Test
 	@DisplayName("③ execAdd_新規固定費(0035:自由用途積立金)を追加")
 	void testExecAdd_success() {
@@ -166,6 +198,18 @@ class FixedCostRegistConfirmUseCaseIntegrationTest {
 
 	// ========== execUpdate ==========
 
+	/**
+	 *<pre>
+	 * テスト⑤：正常系：execUpdate_固定費0002(電気代概算)の更新
+	 *
+	 * 【検証内容】
+	 * ・更新前の固定費名が「電気代概算」、支払金額が12,000円であること
+	 * ・更新後の固定費名が「電気代(更新後)」、支払金額が15,000円に更新されること
+	 * ・固定費区分が更新されること
+	 * ・総件数が4件のまま変わらないこと（更新は既存レコードへの上書き）
+	 * ・完了メッセージが「固定費を更新しました。[code:0002]電気代(更新後)」であること
+	 *</pre>
+	 */
 	@Test
 	@DisplayName("⑤ execUpdate_固定費0002(電気代概算)を更新")
 	void testExecUpdate_success() {
@@ -209,6 +253,14 @@ class FixedCostRegistConfirmUseCaseIntegrationTest {
 		assertEquals(4, countAllFixedCost("user01"), "更新後も4件のままであること");
 	}
 
+	/**
+	 *<pre>
+	 * テスト⑥：異常系：execUpdate_存在しない固定費コードで例外
+	 *
+	 * 【検証内容】
+	 * ・存在しない固定費コード("9999")を指定した場合、MyHouseholdAccountBookRuntimeExceptionが発生すること
+	 *</pre>
+	 */
 	@Test
 	@DisplayName("⑥ execUpdate_存在しない固定費コードで例外")
 	void testExecUpdate_notFound() {

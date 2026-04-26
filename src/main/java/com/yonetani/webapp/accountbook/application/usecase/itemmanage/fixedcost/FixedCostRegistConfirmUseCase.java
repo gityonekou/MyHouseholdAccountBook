@@ -7,10 +7,10 @@
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  コメントなど
- * 2026/04/19 : 1.01.00  新規作成（リファクタリング対応 FixedCostInfoManageUseCaseからの分離）
+ * 2026/04/19 : 1.01.00  新規作成（リファクタリング対応 FixedCostInfoManageUseCaseから更新系の処理を分離）
  *
  */
-package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
+package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
 
 import java.util.List;
 import java.util.stream.Collectors;

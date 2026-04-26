@@ -2,7 +2,7 @@
  * 固定費情報管理ユースケース（参照系）の統合テストクラスです。
  *
  * <pre>
- * FixedCostInfoManageUseCase の以下メソッドをテストします。
+ * FixedCostInquiryUseCase の以下メソッドをテストします。
  *
  * [対象メソッド]
  * 1. readInitInfo                       - 固定費一覧初期表示
@@ -38,7 +38,7 @@
  * 2026/04/19 : 1.01.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
+package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -77,19 +77,31 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 @Transactional
 @Sql(scripts = {
 	"/sql/initsql/schema_test.sql",
-	"/com/yonetani/webapp/accountbook/application/usecase/itemmanage/FixedCostInfoManageIntegrationTest.sql"
+	"/com/yonetani/webapp/accountbook/application/usecase/itemmanage/fixedcost/FixedCostInquiryIntegrationTest.sql"
 }, config = @SqlConfig(encoding = "UTF-8"))
 @DisplayName("固定費情報管理ユースケース（参照系）のUseCaseテスト（統合テスト）")
-class FixedCostInfoManageUseCaseIntegrationTest {
+class FixedCostInquiryUseCaseIntegrationTest {
 
 	@Autowired
-	private FixedCostInfoManageUseCase useCase;
+	private FixedCostInquiryUseCase useCase;
 
 	// テスト用ログインユーザ
 	private final LoginUserInfo TEST_USER = LoginUserInfo.from("user01", "テストユーザ01");
 
 	// ========== readInitInfo ==========
 
+	/**
+	 *<pre>
+	 * テスト⓪：正常系：readInitInfo_固定費0件・支出項目0件（未登録ユーザ）
+	 *
+	 * 【検証内容】
+	 * ・user02（支出項目・固定費ともに未登録）での初期表示
+	 * ・支出項目一覧が0件で取得されること
+	 * ・固定費一覧が0件で取得されること
+	 * ・奇数月・偶数月合計がnullであること（0件の場合は合計非表示）
+	 * ・支出項目0件メッセージ・固定費0件メッセージが設定されること
+	 *</pre>
+	 */
 	@Test
 	@DisplayName("⓪ readInitInfo_固定費0件（固定費未登録ユーザ）、支出項目一覧0件（支出項目未登録ユーザ）")
 	void testReadInitInfo_0件() {
@@ -120,6 +132,19 @@ class FixedCostInfoManageUseCaseIntegrationTest {
 				"固定費0件メッセージが含まれること");
 	}
 
+	/**
+	 *<pre>
+	 * テスト①：正常系：readInitInfo_固定費4件一覧表示・支出項目ツリー6件表示
+	 *
+	 * 【検証内容】
+	 * ・支出項目一覧トップレベル（Level1）が6件（SISYUTU_ITEM_SORT昇順）で取得されること
+	 * ・固定費4件がSISYUTU_ITEM_SORTの昇順で取得されること
+	 *   DB取得順: 国民年金保険(0003) → 家賃(0001) → 電気代概算(0002) → その他任意テスト(0004)
+	 * ・各固定費の全フィールド（支払名・支払月・支払日・金額）が正しく設定されること
+	 * ・奇数月合計: 98,590円、偶数月合計: 82,000円
+	 *   ※TUKI='40'(その他任意)は毎月扱い（奇偶両月に加算）
+	 *</pre>
+	 */
 	@Test
 	@DisplayName("① readInitInfo_固定費4件一覧表示、支出項目ツリーレベル1階層6件表示）")
 	void testReadInitInfo_4件() {
@@ -184,6 +209,16 @@ class FixedCostInfoManageUseCaseIntegrationTest {
 
 	// ========== readActSelectItemInfo ==========
 
+	/**
+	 *<pre>
+	 * テスト②：正常系：readActSelectItemInfo_固定費0001(家賃)の詳細表示
+	 *
+	 * 【検証内容】
+	 * ・固定費コード・支払名・支払内容詳細・支払月詳細・支払日・支払金額が正しく設定されること
+	 * ・支出項目名が「固定費(課税)＞地代家賃＞家賃」の3階層表示で設定されること
+	 * ・固定費一覧が4件で取得されること
+	 *</pre>
+	 */
 	@Test
 	@DisplayName("② readActSelectItemInfo_固定費0001(家賃)の詳細表示")
 	void testReadActSelectItemInfo_0001() {
@@ -207,6 +242,16 @@ class FixedCostInfoManageUseCaseIntegrationTest {
 		assertEquals(4, fixedCostItemList.size(), "固定費一覧が4件であること");
 	}
 
+	/**
+	 *<pre>
+	 * テスト②′：正常系：readActSelectItemInfo_固定費0004(その他任意)_支払月任意コンテキスト付加確認
+	 *
+	 * 【検証内容】
+	 * ・TUKI='40'(その他任意)の場合、支払月詳細に「その他任意(任意コンテキスト)」形式で付加されること
+	 * ・支出項目名が「固定費(課税)＞水光熱通費＞ガス代」の3階層表示で設定されること
+	 * ・固定費一覧が4件で取得されること
+	 *</pre>
+	 */
 	@Test
 	@DisplayName("readActSelectItemInfo_固定費0004(その他任意)_支払月任意コンテキスト付加を確認")
 	void testReadActSelectItemInfo_0004_その他任意() {
@@ -232,6 +277,14 @@ class FixedCostInfoManageUseCaseIntegrationTest {
 		assertEquals(4, fixedCostItemList.size(), "固定費一覧が4件であること");
 	}
 
+	/**
+	 *<pre>
+	 * テスト③：異常系：readActSelectItemInfo_存在しない固定費コードで例外
+	 *
+	 * 【検証内容】
+	 * ・存在しない固定費コード("9999")を指定した場合、MyHouseholdAccountBookRuntimeExceptionが発生すること
+	 *</pre>
+	 */
 	@Test
 	@DisplayName("③ readActSelectItemInfo_存在しない固定費コードで例外")
 	void testReadActSelectItemInfo_notFound() {
@@ -242,6 +295,14 @@ class FixedCostInfoManageUseCaseIntegrationTest {
 
 	// ========== hasFixedCostInfoBySisyutuItem ==========
 
+	/**
+	 *<pre>
+	 * テスト④：正常系：hasFixedCostInfoBySisyutuItem_登録あり(0030:家賃)
+	 *
+	 * 【検証内容】
+	 * ・支出項目コード=0030(家賃)に固定費が登録済みのため、trueが返ること
+	 *</pre>
+	 */
 	@Test
 	@DisplayName("④ hasFixedCostInfoBySisyutuItem_登録あり(0030:家賃)")
 	void testHasFixedCostInfoBySisyutuItem_true() {
@@ -249,6 +310,14 @@ class FixedCostInfoManageUseCaseIntegrationTest {
 				"0030(家賃)に固定費が登録済みであること");
 	}
 
+	/**
+	 *<pre>
+	 * テスト⑤：正常系：hasFixedCostInfoBySisyutuItem_登録なし(0035:自由用途積立金)
+	 *
+	 * 【検証内容】
+	 * ・支出項目コード=0035(自由用途積立金)に固定費が未登録のため、falseが返ること
+	 *</pre>
+	 */
 	@Test
 	@DisplayName("⑤ hasFixedCostInfoBySisyutuItem_登録なし(0035:自由用途積立金)")
 	void testHasFixedCostInfoBySisyutuItem_false() {
@@ -258,6 +327,17 @@ class FixedCostInfoManageUseCaseIntegrationTest {
 
 	// ========== readRegisteredFixedCostInfoBySisyutuItem ==========
 
+	/**
+	 *<pre>
+	 * テスト⑥：正常系：readRegisteredFixedCostInfoBySisyutuItem_0030の固定費1件
+	 *
+	 * 【検証内容】
+	 * ・支出項目コード=0030(家賃)に登録済みの固定費が1件取得されること
+	 * ・登録済み固定費の固定費コードが0001であること
+	 * ・登録済みフラグがtrueであること
+	 * ・支出項目コード情報がnullでないこと
+	 *</pre>
+	 */
 	@Test
 	@DisplayName("⑥ readRegisteredFixedCostInfoBySisyutuItem_0030の固定費1件")
 	void testReadRegisteredFixedCostInfoBySisyutuItem() {
@@ -279,6 +359,17 @@ class FixedCostInfoManageUseCaseIntegrationTest {
 
 	// ========== readAddFixedCostInfoBySisyutuItem ==========
 
+	/**
+	 *<pre>
+	 * テスト⑦：正常系：readAddFixedCostInfoBySisyutuItem_0035の支出項目情報設定
+	 *
+	 * 【検証内容】
+	 * ・支出項目コード=0035(自由用途積立金)の追加画面用フォームが生成されること
+	 * ・アクション=ADD、支出項目コード=0035、固定費区分デフォルト値(支払金額確定)が設定されること
+	 * ・支出項目名が「固定費(課税)＞積立金＞自由用途積立金」で設定されること
+	 * ・固定費区分・支払月・支払日の選択ボックスが設定されること
+	 *</pre>
+	 */
 	@Test
 	@DisplayName("⑦ readAddFixedCostInfoBySisyutuItem_0035の支出項目情報設定")
 	void testReadAddFixedCostInfoBySisyutuItem() {
@@ -305,6 +396,16 @@ class FixedCostInfoManageUseCaseIntegrationTest {
 
 	// ========== readUpdateFixedCostInfo ==========
 
+	/**
+	 *<pre>
+	 * テスト⑧：正常系：readUpdateFixedCostInfo_固定費0004の値設定（支払月任意詳細含む）
+	 *
+	 * 【検証内容】
+	 * ・固定費コード=0004の全フォームフィールドが正しく設定されること
+	 * ・アクション=UPDATE、支払月=40(その他任意)、支払月任意詳細が設定されること
+	 * ・TUKI='40'(その他任意)のデータで支払月任意詳細の読み込みが正しく動作することを確認
+	 *</pre>
+	 */
 	@Test
 	@DisplayName("⑧ readUpdateFixedCostInfo_固定費0004の値設定（支払月任意詳細含む）")
 	void testReadUpdateFixedCostInfo_0004() {
@@ -326,6 +427,14 @@ class FixedCostInfoManageUseCaseIntegrationTest {
 		assertEquals(Integer.valueOf(10000), form.getShiharaiKingaku(), "支払金額が10000であること");
 	}
 
+	/**
+	 *<pre>
+	 * テスト⑨：異常系：readUpdateFixedCostInfo_存在しない固定費コードで例外
+	 *
+	 * 【検証内容】
+	 * ・存在しない固定費コード("9999")を指定した場合、MyHouseholdAccountBookRuntimeExceptionが発生すること
+	 *</pre>
+	 */
 	@Test
 	@DisplayName("⑨ readUpdateFixedCostInfo_存在しない固定費コードで例外")
 	void testReadUpdateFixedCostInfo_notFound() {
@@ -336,6 +445,16 @@ class FixedCostInfoManageUseCaseIntegrationTest {
 
 	// ========== readUpdateBindingErrorSetInfo ==========
 
+	/**
+	 *<pre>
+	 * テスト⑩：正常系：readUpdateBindingErrorSetInfo_バリデーションエラー時の画面再表示
+	 *
+	 * 【検証内容】
+	 * ・バリデーションエラー時にフォームの入力値が維持されて画面が再表示されること
+	 * ・固定費名などのフォームフィールドがそのまま返されること
+	 * ・固定費区分・支払月・支払日の選択ボックスが設定されること
+	 *</pre>
+	 */
 	@Test
 	@DisplayName("⑩ readUpdateBindingErrorSetInfo_エラーフォームの画面表示")
 	void testReadUpdateBindingErrorSetInfo() {

@@ -13,10 +13,10 @@
  * 日付       : version  コメントなど
  * 2024/05/19 : 1.00.00  新規作成
  * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
- * 2026/04/19 : 1.01.01  リファクタリング対応(更新系をFixedCostRegistConfirmUseCaseに分離)
+ * 2026/04/19 : 1.01.01  リファクタリング対応(FixedCostInfoManageUseCaseから参照系の処理を分離し、クラス名をFixedCostInquiryUseCase にリネーム)
  *
  */
-package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
+package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
 
 import java.util.List;
 import java.util.Objects;
@@ -71,7 +71,7 @@ import lombok.extern.log4j.Log4j2;
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class FixedCostInfoManageUseCase {
+public class FixedCostInquiryUseCase {
 	
 	// 支出項目情報取得コンポーネント
 	private final ExpenditureItemInfoComponent expenditureItemInfoComponent;
