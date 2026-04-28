@@ -82,7 +82,15 @@ class IncomeTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.income.IncomeTableDataSource#add(com.yonetani.webapp.accountbook.domain.model.account.income.IncomeItem)} のためのテスト・メソッド。
+	 *<pre>
+	 * テストadd：収入テーブルへの新規登録テスト
+	 *
+	 * 【検証内容】
+	 * ・全8カラム（USER_ID, TARGET_YEAR, TARGET_MONTH, INCOME_CODE, INCOME_KUBUN,
+	 *   INCOME_DETAIL_CONTEXT, INCOME_KINGAKU, DELETE_FLG）が正しく登録されること
+	 * ・同一キーで重複登録した場合、DuplicateKeyExceptionが発生すること
+	 * ・null可項目（INCOME_DETAIL_CONTEXT）にnullが正しく登録されること
+	 *</pre>
 	 */
 	@Test
 	@DisplayName("add:収入テーブルへの新規登録テスト(全カラム確認)")
@@ -136,7 +144,15 @@ class IncomeTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.income.IncomeTableDataSource#update(com.yonetani.webapp.accountbook.domain.model.account.income.IncomeItem)} のためのテスト・メソッド。
+	 *<pre>
+	 * テストupdate：収入テーブルの更新テスト
+	 *
+	 * 【検証内容】
+	 * ・更新対象の3カラム（INCOME_KUBUN, INCOME_DETAIL_CONTEXT, INCOME_KINGAKU）が正しく更新されること
+	 * ・非更新カラム（USER_ID, TARGET_YEAR, TARGET_MONTH, INCOME_CODE）がPKのため変更されないこと
+	 * ・対象データなしの場合に0件が返ること
+	 * ・null可項目（INCOME_DETAIL_CONTEXT）をnullに更新できること
+	 *</pre>
 	 */
 	@Test
 	@Sql(value = "IncomeTableDataSourceUpdateTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -189,7 +205,14 @@ class IncomeTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.income.IncomeTableDataSource#delete(com.yonetani.webapp.accountbook.domain.model.account.income.IncomeItem)} のためのテスト・メソッド。
+	 *<pre>
+	 * テストdelete：収入テーブルの論理削除テスト
+	 *
+	 * 【検証内容】
+	 * ・DELETE_FLGがTRUEに更新されること
+	 * ・論理削除のため他のカラム（INCOME_KUBUN, INCOME_DETAIL_CONTEXT, INCOME_KINGAKU）が変更されないこと
+	 * ・対象データなしの場合に0件が返ること
+	 *</pre>
 	 */
 	@Test
 	@Sql(value = "IncomeTableDataSourceDeleteTest.sql", config = @SqlConfig(encoding = "UTF-8"))
