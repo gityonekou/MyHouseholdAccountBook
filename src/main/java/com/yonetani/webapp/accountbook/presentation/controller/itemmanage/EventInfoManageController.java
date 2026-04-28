@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.yonetani.webapp.accountbook.application.usecase.itemmanage.EventInfoManageUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.itemmanage.event.EventInfoManageUseCase;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.EventInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
@@ -43,7 +43,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Controller

@@ -11,7 +11,7 @@
  * 2025/01/19 : 2.00.00(B)  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
+package com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.*;
@@ -126,7 +126,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	/**
 	 * 情報管理(お店)画面表示情報取得のインテグレーションテストです。
 	 * ユーザIDに対応する店情報なし(検索結果なし)時の結果情報が想定通りかをテストします。
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryNotFoundTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -171,7 +171,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	/**
 	 * 情報管理(お店)画面表示情報取得のインテグレーションテストです。
 	 * ユーザIDに対応する店情報1件(変更可能分1件、変更不可分0件)時の結果情報が想定通りかをテストします。
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultOneTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -197,7 +197,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	/**
 	 * 情報管理(お店)画面表示情報取得のインテグレーションテストです。
 	 * ユーザIDに対応する店情報1件(変更可能分0件、変更不可分1件)時の結果情報が想定通りかをテストします。
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryNonEditResultOneTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -223,7 +223,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	/**
 	 * 情報管理(お店)画面表示情報取得のインテグレーションテストです。
 	 * ユーザIDに対応する店情報6件(変更可能分3件、変更不可分3件)時の結果情報が想定通りかをテストします。
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -250,7 +250,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * 指定したユーザIDと店舗に応じた情報管理(お店)画面の表示情報取得のインテグレーションテストです。
 	 * 指定した店舗情報の情報がメッセージとフォームデータに設定されているかをテストします。
 	 * 
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, java.lang.String)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, java.lang.String)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -281,7 +281,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * 指定したユーザIDと店舗に応じた情報管理(お店)画面の表示情報取得のインテグレーションテストです。
 	 * 指定した店舗情報が存在しない場合、例外となることをテストします。
 	 * 
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, java.lang.String)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, java.lang.String)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -301,7 +301,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * バリデーションチェックエラー時のレスポンス情報確認
 	 * 画面表示情報の妥当性確認はコントローラーのテストで行う(トランザクションが完了となっていないことの確認のみここで行う)
 	 * 
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readUpdateBindingErrorSetInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#readUpdateBindingErrorSetInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -321,7 +321,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * 新規追加データが登録されることを確認します。
 	 * 0件→1件
 	 * 表示順入力なし
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryNotFoundTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -359,7 +359,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * 0件→1件
 	 * 表示順入力(002)→DBの格納値は001
 	 * 
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryNonEditResultOneTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -392,7 +392,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * 
 	 * 表示順入力(なし)→DBの格納値は004
 	 * 
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -428,7 +428,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * 
 	 * 表示順入力(001)→DBの格納値は001、変更可能分データの表示順がインクリメントされていること
 	 * 
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -464,7 +464,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * 表示順入力(002)→DBの格納値は002、変更可能分データのうち、先頭のデータの表示順は変更されず、
 	 * 2件目以降の表示順がインクリメントされていること
 	 * 
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -499,7 +499,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * 
 	 * 表示順入力(004)→DBの格納値は004
 	 * 
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -532,7 +532,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * 
 	 * 表示順入力(005)→DBの格納値は004
 	 * 
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -561,7 +561,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	/**
 	 * 更新データが登録されることを確認します。
 	 * (更新項目：店舗区分、店舗名、表示順の変更なし)
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -616,7 +616,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * 更新データが登録されることを確認します。
 	 * (更新項目：表示順(002)→(001))
 	 * (※変更前の店舗コード001の表示順が002に更新されていること)
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -663,7 +663,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * 表示順の更新結果が正しいことを確認します。
 	 * (更新項目：表示順(002)→(003))
 	 * (変更前の店舗コード003の表示順が002に更新されていること)
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -696,7 +696,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * 表示順の更新結果が正しいことを確認します。
 	 * (更新項目：表示順(002)→(004) :DB格納値は003であること)
 	 * (変更前の店舗コード003の表示順が002に更新されていること)
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -729,7 +729,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * 表示順の更新結果が正しいことを確認します。
 	 * (更新項目：表示順(002)→(null) :DB格納値は003であること)
 	 * (変更前の店舗コード003の表示順が002に更新されていること)
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -761,7 +761,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	/**
 	 * 表示順の更新結果が正しいことを確認します。
 	 * (店舗コード001の表示順を003に変更。002と003のデータの表示順が-1されていること)
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -789,7 +789,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	/**
 	 * 表示順の更新結果が正しいことを確認します。
 	 * (店舗コード003の表示順を001に変更。001と002のデータの表示順が+1されていること)
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -818,7 +818,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	/**
 	 * 更新の場合、店舗情報の表示順(更新比較用)の値が未設定の場合予期しないエラーとなること
 	 * 
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -842,7 +842,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	/**
 	 * アクションの設定値が新規追加・更新以外の場合予期しないエラーとなること
 	 * 
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))

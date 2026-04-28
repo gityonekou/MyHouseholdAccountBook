@@ -8,7 +8,7 @@
  * 2025/02/11 : 2.00.00(B)  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
+package com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop;
 
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.jupiter.api.Assertions.*;
@@ -77,7 +77,7 @@ class ShopInfoManageUseCaseUnitTest {
 	 * コードテーブルに店舗区分情報なしの場合
 	 * (検索条件に対応する店情報1件あり)
 	 * 
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
 	 * 
 	 */
 	@Test
@@ -97,7 +97,7 @@ class ShopInfoManageUseCaseUnitTest {
 	/**
 	 * コードテーブルに店舗区分情報1件の場合
 	 * 
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
 	 * 
 	 */
 	@Test
@@ -123,7 +123,7 @@ class ShopInfoManageUseCaseUnitTest {
 	/**
 	 * コードテーブルに店舗区分情報3件の場合
 	 * 
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#readShopInfo(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo)} のためのテスト・メソッド。
 	 * 
 	 */
 	@Test
@@ -150,7 +150,7 @@ class ShopInfoManageUseCaseUnitTest {
 	
 	/**
 	 * 現在の900番以下のデータ件数が899件の場合、エラーとなることを確認(新規追加時はインクリメントされて900件で比較されるのでエラーとする)
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	void testExecAddTypeCount899Action() {
@@ -173,7 +173,7 @@ class ShopInfoManageUseCaseUnitTest {
 	
 	/**
 	 * 現在の900番以下のデータ件数が900件の場合、エラーとなることを確認(新規追加時)
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	void testExecAddTypeCount900Action() {
@@ -198,7 +198,7 @@ class ShopInfoManageUseCaseUnitTest {
 	 * 現在の900番以下のデータ件数が898件の場合、トランザクションが完了となることを確認(新規追加時)
 	 * sortList.isEmpty()の結果が空の場合に既存の店舗データの表示順更新が呼ばれないことを確認。
 	 * 
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	void testExecAddTypeCount898Action() {
@@ -241,7 +241,7 @@ class ShopInfoManageUseCaseUnitTest {
 	
 	/**
 	 * 新規データの追加結果が0件の場合、業務エラーとなることを確認
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	void testExecAddTypeAddResultZeroAction() {
@@ -267,7 +267,7 @@ class ShopInfoManageUseCaseUnitTest {
 	
 	/**
 	 * 現在の900番以下のデータ件数が900件の場合、エラーとなることを確認(更新時)
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	void testExecUpdTypeCount900Action() {
@@ -289,7 +289,7 @@ class ShopInfoManageUseCaseUnitTest {
 	
 	/**
 	 * 現在の900番以下のデータ件数が901件の場合、エラーとなることを確認(更新時)
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	void testExecUpdTypeCount901Action() {
@@ -313,7 +313,7 @@ class ShopInfoManageUseCaseUnitTest {
 	 * 現在の900番以下のデータ件数が899件の場合、トランザクションが完了となることを確認(更新時)
 	 * 旧表示順＞新表示順の場合のsortList.isEmpty()の結果が空の場合に既存の店舗データの表示順更新が呼ばれないことを確認。
 	 * 
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	void testExecUpdTypeCount899ShopSortDownAction() {
@@ -362,7 +362,7 @@ class ShopInfoManageUseCaseUnitTest {
 	 * 現在の900番以下のデータ件数が899件の場合、トランザクションが完了となることを確認(更新時)
 	 * 旧表示順＜新表示順の場合のsortList.isEmpty()の結果が空の場合に既存の店舗データの表示順更新が呼ばれないことを確認。
 	 * 
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	void testExecUpdTypeCount899ShopSortUpAction() {
@@ -411,7 +411,7 @@ class ShopInfoManageUseCaseUnitTest {
 	/**
 	 * 店舗情報の更新結果が0件の場合、業務エラーとなることを確認
 	 * 旧表示順＜新表示順の条件を設定
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	void testExecUpdTypeUpdateResultZeroAction() {
@@ -448,7 +448,7 @@ class ShopInfoManageUseCaseUnitTest {
 	/**
 	 * 既存データのソート順の更新結果が0件の場合、業務エラーとなることを確認
 	 * 旧表示順のデータ取得は「旧表示順＞新表示順」でテストデータを設定する
-	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
+	 * {@link com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop.ShopInfoManageUseCase#execAction(com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo, com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm)} のためのテスト・メソッド。
 	 */
 	@Test
 	void testExecUpdateShopSortResultZeroAction() {

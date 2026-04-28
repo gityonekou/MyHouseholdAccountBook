@@ -86,7 +86,16 @@ class ExpenditureTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.expenditure.ExpenditureTableDataSource#add(com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem)} のためのテスト・メソッド。
+	 *<pre>
+	 * テストadd：支出テーブルへの新規登録テスト
+	 *
+	 * 【検証内容】
+	 * ・全13カラム（USER_ID, TARGET_YEAR, TARGET_MONTH, EXPENDITURE_CODE, SISYUTU_ITEM_CODE,
+	 *   EVENT_CODE, EXPENDITURE_NAME, EXPENDITURE_KUBUN, EXPENDITURE_DETAIL_CONTEXT,
+	 *   SIHARAI_DATE, EXPENDITURE_ESTIMATE_KINGAKU, EXPENDITURE_KINGAKU, DELETE_FLG）が正しく登録されること
+	 * ・同一キーで重複登録した場合、DuplicateKeyExceptionが発生すること
+	 * ・null可項目（EVENT_CODE, EXPENDITURE_DETAIL_CONTEXT, SIHARAI_DATE）にnullが正しく登録されること
+	 *</pre>
 	 */
 	@Test
 	@DisplayName("add:支出テーブルへの新規登録テスト(全カラム確認)")
@@ -149,7 +158,17 @@ class ExpenditureTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.expenditure.ExpenditureTableDataSource#update(com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem)} のためのテスト・メソッド。
+	 *<pre>
+	 * テストupdate：支出テーブルの更新テスト
+	 *
+	 * 【検証内容】
+	 * ・更新対象の5カラム（EXPENDITURE_NAME, EXPENDITURE_KUBUN, EXPENDITURE_DETAIL_CONTEXT,
+	 *   SIHARAI_DATE, EXPENDITURE_KINGAKU）が正しく更新されること
+	 * ・非更新カラム（SISYUTU_ITEM_CODE, EVENT_CODE, EXPENDITURE_ESTIMATE_KINGAKU）が更新されないこと
+	 *   （意図的に別値を渡して確認）
+	 * ・対象データなしの場合に0件が返ること
+	 * ・null可項目（EXPENDITURE_DETAIL_CONTEXT, SIHARAI_DATE）をnullに更新できること
+	 *</pre>
 	 */
 	@Test
 	@Sql(value = "ExpenditureTableDataSourceUpdateTest.sql", config = @SqlConfig(encoding = "UTF-8"))
@@ -219,7 +238,15 @@ class ExpenditureTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.expenditure.ExpenditureTableDataSource#delete(com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem)} のためのテスト・メソッド。
+	 *<pre>
+	 * テストdelete：支出テーブルの論理削除テスト
+	 *
+	 * 【検証内容】
+	 * ・DELETE_FLGがTRUEに更新されること
+	 * ・論理削除のため他のカラム（EXPENDITURE_NAME, EXPENDITURE_KUBUN, EXPENDITURE_DETAIL_CONTEXT,
+	 *   EXPENDITURE_ESTIMATE_KINGAKU, EXPENDITURE_KINGAKU）が変更されないこと
+	 * ・対象データなしの場合に0件が返ること
+	 *</pre>
 	 */
 	@Test
 	@Sql(value = "ExpenditureTableDataSourceDeleteTest.sql", config = @SqlConfig(encoding = "UTF-8"))

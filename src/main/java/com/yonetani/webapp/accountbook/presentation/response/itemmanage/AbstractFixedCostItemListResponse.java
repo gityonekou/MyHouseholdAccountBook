@@ -97,11 +97,14 @@ public abstract class AbstractFixedCostItemListResponse extends AbstractExpendit
 	}
 	
 	// 固定費一覧情報
+	@Getter
 	private List<FixedCostItem> fixedCostItemList = new ArrayList<>();
 	// 奇数月合計
+	@Getter
 	@Setter
 	private String oddMonthGoukei;
 	// 偶数月合計
+	@Getter
 	@Setter
 	private String anEvenMonthGoukei;
 	

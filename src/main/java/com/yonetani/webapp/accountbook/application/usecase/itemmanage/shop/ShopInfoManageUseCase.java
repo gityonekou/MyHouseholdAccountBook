@@ -10,7 +10,7 @@
  * 2023/10/29 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
+package com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop;
 
 import java.util.ArrayList;
 import java.util.List;
