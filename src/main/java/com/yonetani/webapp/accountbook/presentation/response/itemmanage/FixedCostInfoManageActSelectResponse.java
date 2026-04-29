@@ -83,6 +83,7 @@ public class FixedCostInfoManageActSelectResponse extends AbstractFixedCostItemL
 	}
 	
 	// 選択した商品の情報
+	@Getter
 	private final SelectFixedCostInfo fixedCostInfo;
 	
 	/**

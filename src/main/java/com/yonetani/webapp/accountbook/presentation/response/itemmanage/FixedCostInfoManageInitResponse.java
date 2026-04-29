@@ -69,14 +69,17 @@ public class FixedCostInfoManageInitResponse extends AbstractFixedCostItemListRe
 	}
 	
 	// 登録済み表示エリアを表示するかどうかのフラグ
+	@Getter
 	private final boolean registeredFlg;
-	
+
 	// 選択した支出項目コード
+	@Getter
 	@Setter
 	private SisyutuItemCodeInfo sisyutuItemCodeInfo;
-	
+
 	// 既に登録済みの支出項目の固定費一覧
-	private List<FixedCostItem> registeredFixedCostInfoList = new ArrayList<>(); 
+	@Getter
+	private List<FixedCostItem> registeredFixedCostInfoList = new ArrayList<>();
 	
 	/**
 	 *<pre>

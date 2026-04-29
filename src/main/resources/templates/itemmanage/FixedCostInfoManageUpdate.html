@@ -76,7 +76,8 @@
  					</div>
 				</div>
 				<div class="mb-3">
-					<button class="btn btn-primary" type="submit">登録</button>
+					<button class="btn btn-primary" name="actionAdd" type="submit" th:if="*{#strings.equals(action, 'add')}">登録</button>
+					<button class="btn btn-primary" name="actionUpdate" type="submit" th:if="*{#strings.equals(action, 'update')}">更新</button>
 					<input type="hidden" th:field="*{action}" />
 					<input type="hidden" th:field="*{fixedCostCode}" />
 					<input type="hidden" th:field="*{sisyutuItemCode}" />

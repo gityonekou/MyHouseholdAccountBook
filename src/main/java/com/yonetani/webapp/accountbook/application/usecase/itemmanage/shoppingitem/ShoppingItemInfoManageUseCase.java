@@ -18,7 +18,7 @@
  * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
-package com.yonetani.webapp.accountbook.application.usecase.itemmanage;
+package com.yonetani.webapp.accountbook.application.usecase.itemmanage.shoppingitem;
 
 import java.util.Arrays;
 import java.util.List;

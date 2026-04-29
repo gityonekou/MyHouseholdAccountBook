@@ -384,9 +384,12 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 	/**
 	 *<pre>
 	 * 【異常系】POST /myhacbook/accountregist/incomeandexpenditure/incomeupdate/ (actionUpdate)
-	 * 収入登録_バリデーションエラー
-	 * - 必須項目(incomeKubun)が未入力の場合、収支登録画面に入力エラーが表示される
-	 * - リダイレクトされずに収支登録画面が表示される
+	 * 
+	 * 【検証内容】
+	 * ・incomeKubunを空で送信した場合、バリデーションエラーが発生すること
+	 * ・HTTPステータスが200で収支登録画面に戻ること
+	 * ・ビュー名が「account/regist/IncomeAndExpenditureRegist」であること
+	 * ・IncomeItemFormのincomeKubunフィールドにエラーが設定されること
 	 *</pre>
 	 */
 	@Test
@@ -401,9 +404,38 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 				.with(csrf()))
 			// リダイレクトされず、収支登録画面が表示される
 			.andExpect(status().isOk())
-			.andExpect(view().name("account/regist/IncomeAndExpenditureRegist"));
+			.andExpect(view().name("account/regist/IncomeAndExpenditureRegist"))
+			.andExpect(model().attributeHasFieldErrors("incomeItemForm", "incomeKubun"));
 	}
 
+	/**
+	 *<pre>
+	 * 【異常系】POST /myhacbook/accountregist/incomeandexpenditure/incomeupdate/ (actionUpdate)
+	 * 
+	 * 【検証内容】
+	 * ・収入区分='9'(その他任意)を選択し、収入詳細を空で送信した場合、相関バリデーションエラーが発生すること
+	 * ・IncomeItemFormの@AssertTrue isNeedCheckIncomeDetailContext()が機能すること
+	 * ・HTTPステータスが200で更新画面に戻ること
+	 * ・IncomeItemFormのneedCheckIncomeDetailContextフィールドにエラーが設定されること
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("異常系：収入登録_相関チェック(収入区分でその他任意選択の場合必須、収入詳細は必須)エラー_画面再表示")
+	public void testPostIncomeUpdate_ValidationError_incomeDetailContext() throws Exception {
+		// 収入区分(必須)が未入力のフォームデータでPOST
+		mockMvc.perform(post("/myhacbook/accountregist/incomeandexpenditure/incomeupdate/")
+				.param("actionUpdate", "")
+				.param("incomeKubun", "9")        // 必須: 収入区分(その他任意)
+				.param("incomeKingaku", "300000") // 必須: 収入金額(0以上)
+				// incomeDetailContext 未送信 → @AssertTrueのisNeedCheckIncomeDetailContext()でエラー
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			// リダイレクトされず、収支登録画面が表示される
+			.andExpect(status().isOk())
+			.andExpect(view().name("account/regist/IncomeAndExpenditureRegist"))
+			.andExpect(model().attributeHasFieldErrors("incomeItemForm", "needCheckIncomeDetailContext"));
+	}
+	
 	/**
 	 *<pre>
 	 * 【正常系】POST /myhacbook/accountregist/incomeandexpenditure/incomeupdate/ (actionDelete)
@@ -516,6 +548,7 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 	 * 【異常系】POST /myhacbook/accountregist/incomeandexpenditure/expenditureupdate/ (actionUpdate)
 	 * 支出登録_バリデーションエラー
 	 * - 必須項目(expenditureName)が未入力の場合、収支登録画面に入力エラーが表示される
+	 * - ExpenditureItemFormのexpenditureNameフィールドにエラーが設定されること
 	 *</pre>
 	 */
 	@Test
@@ -531,7 +564,8 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 				.with(user("user01").password("password").roles("USER"))
 				.with(csrf()))
 			.andExpect(status().isOk())
-			.andExpect(view().name("account/regist/IncomeAndExpenditureRegist"));
+			.andExpect(view().name("account/regist/IncomeAndExpenditureRegist"))
+			.andExpect(model().attributeHasFieldErrors("expenditureItemForm", "expenditureName"));
 	}
 
 	/**
