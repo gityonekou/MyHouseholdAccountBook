@@ -17,8 +17,8 @@
  * ⑥  正常系：POST /updateload/ actionUpdate 更新画面(更新)へ
  * ⑦  正常系：POST /updateload/ actionCancel 初期表示画面へ戻る
  * ⑧  正常系：POST /delete/ 固定費0003を削除してリダイレクト
- * ⑨  異常系：POST /update/ fixedCostName空→@NotBlankバリデーションエラー
- * ⑩  異常系：POST /update/ shiharaiTuki='40'+shiharaiTukiOptionalContext空→相関バリデーションエラー
+ * ⑨  異常系：POST /update/ fixedCostName空→@NotBlankバリデーションエラー（新規追加時でバリデーション確認）
+ * ⑩  異常系：POST /update/ shiharaiTuki='40'+shiharaiTukiOptionalContext空→相関バリデーションエラー（更新時でバリデーション確認）
  * ⑪  正常系：POST /update/ action=add 新規追加してリダイレクト
  * ⑫  正常系：POST /update/ action=update 更新してリダイレクト
  * ⑬  正常系：GET /updateComplete/ 完了後の初期表示
@@ -337,9 +337,10 @@ public class FixedCostInfoManageControllerIntegrationTest {
 
 	/**
 	 *<pre>
-	 * テスト⑨：異常系：POST /update/ fixedCostName空→@NotBlankバリデーションエラー
+	 * テスト⑨：異常系：POST /update/ fixedCostName空→@NotBlankバリデーションエラー（新規追加時でバリデーション確認）
 	 *
 	 * 【検証内容】
+	 * ・要求は新規追加時のパターンで送信
 	 * ・fixedCostNameを空で送信した場合、バリデーションエラーが発生すること
 	 * ・HTTPステータスが200で更新画面に戻ること
 	 * ・ビュー名が「itemmanage/FixedCostInfoManageUpdate」であること
@@ -347,9 +348,10 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 *</pre>
 	 */
 	@Test
-	@DisplayName("異常系：POST /update/ バリデーションNG(fixedCostName空)→更新画面に戻る")
+	@DisplayName("異常系：POST /update/ action=add バリデーションNG(fixedCostName空)→更新画面に戻る")
 	void testPostUpdate_validationError() throws Exception {
 		mockMvc.perform(post("/myhacbook/managebaseinfo/fixedcostinfo/update/")
+				.param("actionAdd", "")
 				.param("action", "add")
 				.param("sisyutuItemCode", "0035")
 				// fixedCostName を空にしてバリデーションエラーを発生させる
@@ -367,9 +369,10 @@ public class FixedCostInfoManageControllerIntegrationTest {
 
 	/**
 	 *<pre>
-	 * テスト⑩：異常系：POST /update/ shiharaiTuki='40'+shiharaiTukiOptionalContext空→相関バリデーションエラー
+	 * テスト⑩：異常系：POST /update/ shiharaiTuki='40'+shiharaiTukiOptionalContext空→相関バリデーションエラー（更新時でバリデーション確認）
 	 *
 	 * 【検証内容】
+	 * ・要求は更新時のパターンで送信
 	 * ・支払月='40'(その他任意)を選択し、支払月任意詳細を空で送信した場合、相関バリデーションエラーが発生すること
 	 * ・FixedCostInfoUpdateFormの@AssertTrue isNeedCheckShiharaiTukiOptionalContext()が機能すること
 	 * ・HTTPステータスが200で更新画面に戻ること
@@ -377,10 +380,11 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 *</pre>
 	 */
 	@Test
-	@DisplayName("異常系：POST /update/ バリデーションNG(shiharaiTuki=40, OptionalContext空)→相関バリデーションエラー")
+	@DisplayName("異常系：POST /update/ action=update バリデーションNG(shiharaiTuki=40, OptionalContext空)→相関バリデーションエラー")
 	void testPostUpdate_validationError_optionalContext() throws Exception {
 		mockMvc.perform(post("/myhacbook/managebaseinfo/fixedcostinfo/update/")
-				.param("action", "add")
+				.param("actionUpdate", "")
+				.param("action", "update")
 				.param("sisyutuItemCode", "0035")
 				.param("fixedCostName", "テスト固定費")
 				.param("fixedCostKubun", "1")
@@ -414,6 +418,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	@DisplayName("正常系：POST /update/ action=add 新規追加してリダイレクト")
 	void testPostUpdate_addSuccess() throws Exception {
 		mockMvc.perform(post("/myhacbook/managebaseinfo/fixedcostinfo/update/")
+				.param("actionAdd", "")
 				.param("action", "add")
 				.param("sisyutuItemCode", "0035")
 				.param("fixedCostName", "自由用途積立")
@@ -447,6 +452,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	@DisplayName("正常系：POST /update/ action=update 更新してリダイレクト")
 	void testPostUpdate_updateSuccess() throws Exception {
 		mockMvc.perform(post("/myhacbook/managebaseinfo/fixedcostinfo/update/")
+				.param("actionUpdate", "")
 				.param("action", "update")
 				.param("fixedCostCode", "0002")
 				.param("sisyutuItemCode", "0037")

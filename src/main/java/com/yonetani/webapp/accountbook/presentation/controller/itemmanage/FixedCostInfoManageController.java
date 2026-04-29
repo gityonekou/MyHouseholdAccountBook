@@ -17,7 +17,7 @@
  * ・情報管理(固定費)処理選択画面で更新ボタン押下(POST)→情報管理(固定費)更新画面(更新)
  * ・情報管理(固定費)処理選択画面でキャンセルボタン押下(POST)→初期表示画面
  * ・情報管理(固定費)処理選択画面で削除ボタン押下(POST)→OK/キャンセル選択後、対応する処理を実行
- * ・情報管理(固定費)更新画面(追加・更新)で登録ボタン押下時(POST)
+ * ・情報管理(固定費)更新画面(追加・更新)で登録ボタン／更新ボタン押下時(POST)
  * 　→登録成功：初期表示画面
  * 　→登録失敗：情報管理(固定費)更新画面(追加・更新)
  * ・固定費情報登録・更新成功時→リダイレクト(GET)
@@ -44,7 +44,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostInquiryUseCase;
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostRegistConfirmUseCase;
-import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
@@ -249,7 +248,7 @@ public class FixedCostInfoManageController {
 	
 	/**
 	 *<pre>
-	 * 固定費情報登録・更新のPOST要求時マッピングです。
+	 * 固定費情報登録・更新のPOST要求時マッピング（新規登録）です。
 	 *</pre>
 	 * @param inputForm 入力フォーム情報
 	 * @param bindingResult フォームのバリデーションチェック結果
@@ -257,7 +256,38 @@ public class FixedCostInfoManageController {
 	 * @return 登録成功時：リダイレクト、登録失敗時:情報管理(固定費)更新画面
 	 *
 	 */
-	@PostMapping("/update/")
+	@PostMapping(value = "/update/", params = "actionAdd")
+	public ModelAndView postAdd(@ModelAttribute @Validated FixedCostInfoUpdateForm inputForm, BindingResult bindingResult,
+			RedirectAttributes redirectAttributes) {
+		log.debug("postAdd: input=" + inputForm);
+		/* 入力フィールドのバリデーションチェック結果を判定 */
+		// チェック結果エラーの場合
+		if(bindingResult.hasErrors()) {
+			// 初期表示情報を取得し、入力チェックエラーを設定
+			return this.inquiryUseCase.readUpdateBindingErrorSetInfo(loginUserSession.getLoginUserInfo(), inputForm)
+					// レスポンスにログインユーザ名を設定
+					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					// レスポンスからModelAndViewを生成
+					.build();
+			
+		// チェック結果OKの場合
+		} else {
+			// actionに従い、処理を実行
+			return this.registConfirmUseCase.execAdd(loginUserSession.getLoginUserInfo(), inputForm).buildRedirect(redirectAttributes);
+		}
+	}
+	
+	/**
+	 *<pre>
+	 * 固定費情報登録・更新のPOST要求時マッピング（更新）です。
+	 *</pre>
+	 * @param inputForm 入力フォーム情報
+	 * @param bindingResult フォームのバリデーションチェック結果
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
+	 * @return 登録成功時：リダイレクト、登録失敗時:情報管理(固定費)更新画面
+	 *
+	 */
+	@PostMapping(value = "/update/", params = "actionUpdate")
 	public ModelAndView postUpdate(@ModelAttribute @Validated FixedCostInfoUpdateForm inputForm, BindingResult bindingResult,
 			RedirectAttributes redirectAttributes) {
 		log.debug("postUpdate: input=" + inputForm);
@@ -274,11 +304,7 @@ public class FixedCostInfoManageController {
 		// チェック結果OKの場合
 		} else {
 			// actionに従い、処理を実行
-			if(MyHouseholdAccountBookContent.ACTION_TYPE_ADD.equals(inputForm.getAction())) {
-				return this.registConfirmUseCase.execAdd(loginUserSession.getLoginUserInfo(), inputForm).buildRedirect(redirectAttributes);
-			} else {
-				return this.registConfirmUseCase.execUpdate(loginUserSession.getLoginUserInfo(), inputForm).buildRedirect(redirectAttributes);
-			}
+			return this.registConfirmUseCase.execUpdate(loginUserSession.getLoginUserInfo(), inputForm).buildRedirect(redirectAttributes);
 		}
 	}
 	
