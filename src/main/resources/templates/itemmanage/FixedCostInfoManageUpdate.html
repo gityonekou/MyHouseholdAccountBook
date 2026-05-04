@@ -78,6 +78,7 @@
 				<div class="mb-3">
 					<button class="btn btn-primary" name="actionAdd" type="submit" th:if="*{#strings.equals(action, 'add')}">登録</button>
 					<button class="btn btn-primary" name="actionUpdate" type="submit" th:if="*{#strings.equals(action, 'update')}">更新</button>
+					<button class="btn btn-primary" name="actionCancel" type="submit" id="fixed-cost-update-action-cancel-btn">キャンセル</button>
 					<input type="hidden" th:field="*{action}" />
 					<input type="hidden" th:field="*{fixedCostCode}" />
 					<input type="hidden" th:field="*{sisyutuItemCode}" />
@@ -90,6 +91,8 @@
 	
 	<!--/* フッター共通jsのインクルード) */-->
 	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	<!--/* 固定費登録で使用するJavaScript */-->
+	<script type="text/javascript" th:src="@{/js/itemmanage/ManageFixedCost.js}"></script>
 	
 </body>
 </html>

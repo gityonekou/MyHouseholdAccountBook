@@ -3,11 +3,13 @@
  * ・指定した固定費情報の削除処理
  * ・固定費情報追加処理
  * ・固定費情報更新処理
+ * ・固定費情報一括更新処理
  *
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  コメントなど
  * 2026/04/19 : 1.01.00  新規作成（リファクタリング対応 FixedCostInfoManageUseCaseから更新系の処理を分離）
+ * 2026/05/01 : 1.01.01  固定費情報一括更新処理を追加
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
@@ -30,8 +32,10 @@ import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.Fixed
 import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
+import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostBulkUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostBulkUpdateResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageActSelectResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageUpdateResponse;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
@@ -45,6 +49,7 @@ import lombok.extern.log4j.Log4j2;
  * ・指定した固定費情報の削除処理
  * ・固定費情報追加処理
  * ・固定費情報更新処理
+ * ・固定費情報一括更新処理
  *
  *</pre>
  *
@@ -199,6 +204,62 @@ public class FixedCostRegistConfirmUseCase {
 		// トランザクション完了
 		response.setTransactionSuccessFull();
 
+		return response;
+	}
+
+	/**
+	 *<pre>
+	 * 固定費情報一括更新処理
+	 *
+	 * 固定費一括更新フォームの入力値に従い、チェックボックスで選択された固定費の支払日・支払金額を一括で更新します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param inputForm 固定費一括更新フォームの入力値
+	 * @return 情報管理(固定費)一括更新画面の表示情報
+	 *
+	 */
+	@Transactional
+	public FixedCostBulkUpdateResponse execBulkUpdate(LoginUserInfo user, FixedCostBulkUpdateForm inputForm) {
+		log.debug("execBulkUpdate:userid=" + user.getUserId() + ",inputForm=" + inputForm);
+
+		UserId userId = UserId.from(user.getUserId());
+
+		int totalUpdateCount = 0;
+		// チェックボックスで選択された固定費コードのリストをループして、支払日・支払金額を一括更新
+		for (String fixedCostCodeStr : inputForm.getCheckedFixedCostCodeList()) {
+			
+			// チェックボックスで選択された固定費コードのドメインタイプを生成
+			FixedCostCode fixedCostCode = FixedCostCode.from(fixedCostCodeStr);
+
+			// 更新対象の固定費情報を取得
+			FixedCost target = fixedCostRepository.findByPrimaryKey(
+					SearchQueryUserIdAndFixedCostCode.from(userId, fixedCostCode));
+			if (target == null) {
+				throw new MyHouseholdAccountBookRuntimeException(
+						"更新対象の固定費が固定費テーブル:FIXED_COST_TABLEに存在しません。管理者に問い合わせてください。[fixedCostCode=" + fixedCostCode + "]");
+			}
+
+			// 支払日・支払金額のみを差し替えた新しい固定費オブジェクトを生成
+			FixedCost updateData = target.updateBulkUpdateItem(
+					// 一括更新項目：支払日を入力フォームの値で更新
+					inputForm.getShiharaiDay(),
+					// 一括更新項目：支払金額を入力フォームの値で更新
+					inputForm.getShiharaiKingaku());
+
+			// 固定費テーブルを更新
+			int updateCount = fixedCostRepository.update(updateData);
+			if (updateCount != 1) {
+				throw new MyHouseholdAccountBookRuntimeException(
+						"固定費テーブル:FIXED_COST_TABLEへの更新件数が不正でした。[件数=" + updateCount + "][fixedCostCode=" + fixedCostCode + "]");
+			}
+			// 更新件数が1件の場合、更新成功とみなし、完了メッセージ用の件数を加算
+			totalUpdateCount++;
+		}
+		
+		// レスポンスを生成（成功時はリダイレクトするため画面表示用データは最小限）
+		FixedCostBulkUpdateResponse response = FixedCostBulkUpdateResponse.getInstance(inputForm, List.of());
+		response.addMessage("固定費を一括更新しました。[" + totalUpdateCount + "件]");
+		response.setTransactionSuccessFull();
 		return response;
 	}
 

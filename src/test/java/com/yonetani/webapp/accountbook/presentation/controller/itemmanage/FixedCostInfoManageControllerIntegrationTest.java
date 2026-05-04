@@ -13,23 +13,27 @@
  * ②  正常系：GET /select?fixedCostCode=0001 処理選択画面表示(家賃)
  * ③  正常系：GET /addload?sisyutuItemCode=0035 固定費未登録→更新画面へ
  * ④  正常系：GET /addload?sisyutuItemCode=0030 固定費登録済み→初期表示(登録済みメッセージ)
- * ⑤  正常系：POST /updateload/ actionAdd 更新画面(追加)へ
- * ⑥  正常系：POST /updateload/ actionUpdate 更新画面(更新)へ
- * ⑦  正常系：POST /updateload/ actionCancel 初期表示画面へ戻る
+ * ⑤  正常系：GET /updateload/ actionAdd 更新画面(追加)へ
+ * ⑥  正常系：GET /updateload/ actionUpdate 更新画面(更新)へ
+ * ⑦  正常系：GET /updateload/ actionCancel 初期表示画面へ戻る
  * ⑧  正常系：POST /delete/ 固定費0003を削除してリダイレクト
  * ⑨  異常系：POST /update/ fixedCostName空→@NotBlankバリデーションエラー（新規追加時でバリデーション確認）
  * ⑩  異常系：POST /update/ shiharaiTuki='40'+shiharaiTukiOptionalContext空→相関バリデーションエラー（更新時でバリデーション確認）
  * ⑪  正常系：POST /update/ action=add 新規追加してリダイレクト
  * ⑫  正常系：POST /update/ action=update 更新してリダイレクト
  * ⑬  正常系：GET /updateComplete/ 完了後の初期表示
+ * ⑭  正常系：POST /update/ actionCancel (action=add) 初期表示画面へ
+ * ⑮  正常系：POST /update/ actionCancel (action=update) 処理選択画面へ
  *
  * [テストデータ]
  * 固定費4件: 0001:家賃(0030), 0002:電気代概算(0037), 0003:国民年金保険(0015), 0004:その他任意テスト(0038)
+ * 
  * </pre>
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  コメントなど
  * 2026/04/19 : 1.01.00  新規作成
+ * 2026/05/01 : 1.01.01  テストシナリオ⑭、⑮を追加（更新画面からのキャンセル操作のパターン追加）
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.itemmanage;
@@ -230,7 +234,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 
 	/**
 	 *<pre>
-	 * テスト⑤：正常系：POST /updateload/ actionAdd→更新画面(追加)へ
+	 * テスト⑤：正常系：GET /updateload/ actionAdd→更新画面(追加)へ
 	 *
 	 * 【検証内容】
 	 * ・HTTPステータスが200であること
@@ -239,9 +243,9 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 *</pre>
 	 */
 	@Test
-	@DisplayName("正常系：POST /updateload/ actionAdd 更新画面(追加)へ")
-	void testPostActionAddLoad() throws Exception {
-		mockMvc.perform(post("/myhacbook/managebaseinfo/fixedcostinfo/updateload/")
+	@DisplayName("正常系：GET /updateload/ actionAdd 更新画面(追加)へ")
+	void testGetActionAddLoad() throws Exception {
+		mockMvc.perform(get("/myhacbook/managebaseinfo/fixedcostinfo/updateload/")
 				.param("actionAdd", "")
 				.param("sisyutuItemCode", "0030")
 				.with(user("user01").password("password").roles("USER"))
@@ -257,7 +261,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 
 	/**
 	 *<pre>
-	 * テスト⑥：正常系：POST /updateload/ actionUpdate→更新画面(更新)へ
+	 * テスト⑥：正常系：GET /updateload/ actionUpdate→更新画面(更新)へ
 	 *
 	 * 【検証内容】
 	 * ・HTTPステータスが200であること
@@ -267,9 +271,9 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 *</pre>
 	 */
 	@Test
-	@DisplayName("正常系：POST /updateload/ actionUpdate 更新画面(更新)へ")
-	void testPostActionUpdateLoad() throws Exception {
-		mockMvc.perform(post("/myhacbook/managebaseinfo/fixedcostinfo/updateload/")
+	@DisplayName("正常系：GET /updateload/ actionUpdate 更新画面(更新)へ")
+	void testGetActionUpdateLoad() throws Exception {
+		mockMvc.perform(get("/myhacbook/managebaseinfo/fixedcostinfo/updateload/")
 				.param("actionUpdate", "")
 				.param("fixedCostCode", "0001")
 				.with(user("user01").password("password").roles("USER"))
@@ -285,7 +289,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 
 	/**
 	 *<pre>
-	 * テスト⑦：正常系：POST /updateload/ actionCancel→初期表示画面へ戻る
+	 * テスト⑦：正常系：GET /updateload/ actionCancel→初期表示画面へ戻る
 	 *
 	 * 【検証内容】
 	 * ・HTTPステータスが200であること
@@ -295,9 +299,9 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 *</pre>
 	 */
 	@Test
-	@DisplayName("正常系：POST /updateload/ actionCancel 初期表示画面へ戻る")
-	void testPostActionCancel() throws Exception {
-		mockMvc.perform(post("/myhacbook/managebaseinfo/fixedcostinfo/updateload/")
+	@DisplayName("正常系：GET /updateload/ actionCancel 初期表示画面へ戻る")
+	void testGetActionCancel() throws Exception {
+		mockMvc.perform(get("/myhacbook/managebaseinfo/fixedcostinfo/updateload/")
 				.param("actionCancel", "")
 				.with(user("user01").password("password").roles("USER"))
 				.with(csrf()))
@@ -491,5 +495,61 @@ public class FixedCostInfoManageControllerIntegrationTest {
 			.andExpect(status().isOk())
 			.andExpect(view().name("itemmanage/FixedCostInfoManageInit"))
 			.andExpect(model().attribute("fixedCostItemList", hasSize(4)));
+	}
+
+	// ================================================================
+	// POST /update/ (params: actionCancel)
+	// ================================================================
+
+	/**
+	 *<pre>
+	 * テスト⑭：正常系：POST /update/ actionCancel (action=add) → 初期表示画面へ
+	 *
+	 * 【検証内容】
+	 * ・新規追加からキャンセル操作（action=add）の場合、初期表示画面に遷移すること
+	 * ・HTTPステータスが200であること
+	 * ・ビュー名が「itemmanage/FixedCostInfoManageInit」であること
+	 * ・fixedCostItemListが4件で取得されること
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("正常系：POST /update/ actionCancel (action=add) 初期表示画面へ")
+	void testPostUpdateCancel_actionAdd() throws Exception {
+		mockMvc.perform(post("/myhacbook/managebaseinfo/fixedcostinfo/update/")
+				.param("actionCancel", "")
+				.param("action", "add")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().isOk())
+			.andExpect(view().name("itemmanage/FixedCostInfoManageInit"))
+			.andExpect(model().attribute("fixedCostItemList", hasSize(4)));
+	}
+
+	/**
+	 *<pre>
+	 * テスト⑮：正常系：POST /update/ actionCancel (action=update, fixedCostCode=0001) → 処理選択画面へ
+	 *
+	 * 【検証内容】
+	 * ・更新からキャンセル操作（action=update）の場合、処理選択画面に遷移すること
+	 * ・固定費コード=0001(家賃)を指定して処理選択画面に戻ること
+	 * ・HTTPステータスが200であること
+	 * ・ビュー名が「itemmanage/FixedCostInfoManageActSelect」であること
+	 * ・fixedCostInfoがモデルに設定されること
+	 * ・固定費コード0001は0030に1件のみのためhasSiblingFixedCostがfalseであること
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("正常系：POST /update/ actionCancel (action=update, fixedCostCode=0001) 処理選択画面へ")
+	void testPostUpdateCancel_actionUpdate() throws Exception {
+		mockMvc.perform(post("/myhacbook/managebaseinfo/fixedcostinfo/update/")
+				.param("actionCancel", "")
+				.param("action", "update")
+				.param("fixedCostCode", "0001")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().isOk())
+			.andExpect(view().name("itemmanage/FixedCostInfoManageActSelect"))
+			.andExpect(model().attributeExists("fixedCostInfo"))
+			.andExpect(model().attribute("hasSiblingFixedCost", is(false)));
 	}
 }

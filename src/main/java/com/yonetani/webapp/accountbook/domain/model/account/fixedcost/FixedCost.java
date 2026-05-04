@@ -152,6 +152,29 @@ public class FixedCost {
 	
 	/**
 	 *<pre>
+	 * 一括更新項目（支払日、支払金額）の値を更新した新しい固定費情報を表すドメインモデルを生成して返します。
+	 *</pre>
+	 * @param fixedCostPaymentDay 固定費支払日(支払日)
+	 * @param fixedCostPaymentAmount 支払金額
+	 * @return 一括更新項目（支払日、支払金額）の値を更新した新しい固定費情報を表すドメインモデル
+	 *
+	 */
+	public FixedCost updateBulkUpdateItem(String fixedCostPaymentDay, Integer fixedCostPaymentAmount) {
+		return new FixedCost(
+				UserId.from(userId.getValue()),
+				FixedCostCode.from(fixedCostCode.getValue()),
+				FixedCostName.from(fixedCostName.getValue()),
+				FixedCostDetailContext.from(fixedCostDetailContext.getValue()),
+				ExpenditureItemCode.from(expenditureItemCode.getValue()),
+				FixedCostKubun.from(fixedCostKubun.getValue()),
+				FixedCostTargetPaymentMonth.from(fixedCostTargetPaymentMonth.getValue()),
+				FixedCostTargetPaymentMonthOptionalContext.from(fixedCostTargetPaymentMonthOptionalContext.getValue()),
+				FixedCostPaymentDay.from(fixedCostPaymentDay),
+				FixedCostPaymentAmount.from(fixedCostPaymentAmount));
+	}
+	
+	/**
+	 *<pre>
 	 * 「固定費内容詳細(支払内容詳細)」項目と「固定費支払月任意詳細」項目の値から支出詳細の表示値を作成して返します。
 	 * 
 	 * 固定費内容詳細(支払内容詳細)項目、固定費支払月任意詳細のどちらかに値が設定されている場合、その値を返します。

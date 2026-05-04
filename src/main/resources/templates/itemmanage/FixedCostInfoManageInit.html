@@ -41,7 +41,7 @@
 								</th:block>
 							</tbody>
 						</table>
-						<form name="FixedCostAddSelectInfo" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/fixedcostinfo/updateload/}" th:object="${sisyutuItemCodeInfo}">
+						<form name="FixedCostAddSelectInfo" class="d-flex" method="get" th:action="@{/myhacbook/managebaseinfo/fixedcostinfo/updateload/}" th:object="${sisyutuItemCodeInfo}">
 							<div class="mb-3">
 								<button class="btn btn-primary" name="actionAdd" type="submit">新規で追加</button>
 								<button class="btn btn-primary" name="actionCancel" type="submit">キャンセル</button>

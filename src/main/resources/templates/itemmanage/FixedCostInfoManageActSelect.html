@@ -26,7 +26,7 @@
 			<!-- 選択支出情報表示エリア -->
 			<div class="card-body">
 				<div class="card">
-					<form name="FixedCostActSelectInfo" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/fixedcostinfo/updateload/}" th:object="${fixedCostInfo}">
+					<form name="FixedCostActSelectInfo" class="d-flex" method="get" th:action="@{/myhacbook/managebaseinfo/fixedcostinfo/updateload/}" th:object="${fixedCostInfo}">
 					<div class="card-body">
 						<p class="h6">■選択固定費詳細■</p>
 						<div class="mb-3">
@@ -57,13 +57,52 @@
 					</div>
 					</form>
 					<!--/* 削除実行時に送信するフォーム */-->
-					<form name="FixedCostDeleteSelectInfo" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/fixedcostinfo/delete/}" th:object="${fixedCostInfo}">
-						<input type="hidden" th:field="*{fixedCostCode}" />
+					<form name="FixedCostDeleteSelectInfo" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/fixedcostinfo/delete/}">
+						<input type="hidden" th:field="${fixedCostInfo.fixedCostCode}" />
 					</form>
 				</div>
 			</div>
 			
 			
+			<!-- 同一分類の固定費一覧エリア（同一支出項目に複数固定費がある場合のみ表示） -->
+			<div class="card-body" th:if="${hasSiblingFixedCost}">
+				<div class="card">
+					<form name="FixedCostBulkUpdateLoad" method="get"
+						  th:action="@{/myhacbook/managebaseinfo/fixedcostinfo/bulkupdateload/}">
+					<div class="card-body">
+						<p class="h6">■同一分類の固定費一覧■</p>
+						<p class="card-text">以下の固定費がすべて同一の支出項目「<span th:text="${fixedCostInfo.sisyutuItemName}"></span>」に属しています。一括更新が可能です。</p>
+						<table class="table table-sm table-bordered">
+							<thead>
+								<tr class="table-secondary">
+									<th scope="col" class="w25">支払名</th>
+									<th scope="col" class="w10">支払月</th>
+									<th scope="col" class="w10">支払日</th>
+									<th scope="col" class="w10">支払金額</th>
+									<th scope="col">その他任意詳細</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="item, itemStat : ${siblingFixedCostItemList}"
+									th:classappend="${itemStat.even} ? 'table-warning'">
+									<td th:text="${item.shiharaiName}">支払名</td>
+									<td th:text="${item.shiharaiTukiDetailContext}">支払月</td>
+									<td th:text="${item.shiharaiDay}">支払日</td>
+									<td th:text="${item.shiharaiKingaku}" align="right">支払金額</td>
+									<td th:text="${item.shiharaiTukiOptionalContext}"></td>
+								</tr>
+							</tbody>
+						</table>
+						<div class="mb-3">
+							<button class="btn btn-primary" type="submit">一括更新</button>
+						</div>
+						<input type="hidden" name="baseFixedCostCode" th:value="${fixedCostInfo.fixedCostCode}" />
+					</div>
+					</form>
+				</div>
+			</div>
+
+
 			<!-- 固定費一覧表示エリア -->
 			<div class="card-body">
 				<div class="card">

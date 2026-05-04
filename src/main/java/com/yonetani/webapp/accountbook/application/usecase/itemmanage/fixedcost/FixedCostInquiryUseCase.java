@@ -14,6 +14,7 @@
  * 2024/05/19 : 1.00.00  新規作成
  * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  * 2026/04/19 : 1.01.01  リファクタリング対応(FixedCostInfoManageUseCaseから参照系の処理を分離し、クラス名をFixedCostInquiryUseCase にリネーム)
+ * 2026/05/01 : 1.01.02  固定費一括更新機能追加に伴う処理追加
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
@@ -38,11 +39,15 @@ import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.Fixed
 import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
+import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostBulkUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractFixedCostItemListResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractFixedCostItemListResponse.FixedCostItem;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostBulkUpdateResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostBulkUpdateResponse.BulkUpdateTargetItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageActSelectResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageActSelectResponse.SiblingFixedCostItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageInitResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageInitResponse.SisyutuItemCodeInfo;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageUpdateResponse;
@@ -103,8 +108,8 @@ public class FixedCostInquiryUseCase {
 	 * 情報管理(固定費)処理選択画面情報取得
 	 * 
 	 * 指定したユーザID、固定費コードに応じた情報管理(固定費)処理選択画面の表示情報を取得します。
-	 * 固定費コードをもとに固定費情報を取得し、画面表示情報に設定します。また、ユーザIDに応じた固定費一覧情報を
-	 * 取得し画面表示情報に設定します。
+	 * 選択した固定費に応じた固定費情報、及び、選択した固定費が属する支出項目コードに属する固定費情報を取得し、
+	 * 画面表示情報に設定します。また、ユーザIDに応じた固定費一覧情報を取得し画面表示情報に設定します。
 	 *</pre>
 	 * @param user ログインユーザ情報
 	 * @param fixedCostCodeStr 表示対象の固定費コード
@@ -168,6 +173,17 @@ public class FixedCostInquiryUseCase {
 		// 固定費一覧をレスポンスに設定
 		setFixedCostItemList(userId, response);
 		
+		/* 選択固定費の支出項目コードで同一支出項目に属する固定費情報を取得 */
+		// 選択固定費の支出項目コードで同一支出項目に属する固定費の件数を取得
+		int siblingCount = fixedCostRepository.countByExpenditureItemCode(
+				SearchQueryUserIdAndExpenditureItemCode.from(userId, searchResult.getExpenditureItemCode()));
+		// 2件以上の場合、兄弟固定費一覧を取得してレスポンスに設定
+		if (siblingCount >= 2) {
+			FixedCostInquiryList siblingList = fixedCostRepository.findByExpenditureItemCode(
+					SearchQueryUserIdAndExpenditureItemCode.from(userId, searchResult.getExpenditureItemCode()));
+			response.addSiblingFixedCostItemList(createSiblingFixedCostItemList(siblingList));
+		}
+
 		return response;
 	}
 	
@@ -342,10 +358,79 @@ public class FixedCostInquiryUseCase {
 	public FixedCostInfoManageUpdateResponse readUpdateBindingErrorSetInfo(LoginUserInfo user,
 			FixedCostInfoUpdateForm inputForm) {
 		log.debug("readUpdateBindingErrorSetInfo:userid=" + user.getUserId() + ",inputForm=" + inputForm);
-		
+
 		return getUpdateResponse(UserId.from(user.getUserId()), inputForm);
 	}
 
+	/**
+	 *<pre>
+	 * 情報管理(固定費)一括更新画面情報取得（初回表示）
+	 *
+	 * 基準固定費コードをもとに一括更新画面の表示情報を取得します。
+	 * フォームの初期値として基準固定費の支払日・支払金額を設定します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param fixedCostCodeStr 基準固定費コード
+	 * @return 情報管理(固定費)一括更新画面の表示情報
+	 *
+	 */
+	public FixedCostBulkUpdateResponse readBulkUpdateInfo(LoginUserInfo user, String fixedCostCodeStr) {
+		log.debug("readBulkUpdateInfo:userid=" + user.getUserId() + ",fixedCostCode=" + fixedCostCodeStr);
+
+		UserId userId = UserId.from(user.getUserId());
+		FixedCostCode fixedCostCode = FixedCostCode.from(fixedCostCodeStr);
+
+		// 基準となる固定費情報を取得（フォームの初期値として使用）
+		FixedCost baseFixedCost = fixedCostRepository.findByPrimaryKey(
+				SearchQueryUserIdAndFixedCostCode.from(userId, fixedCostCode));
+		if (baseFixedCost == null) {
+			throw new MyHouseholdAccountBookRuntimeException(
+					"選択した固定費が固定費テーブル:FIXED_COST_TABLEに存在しません。[fixedCostCode=" + fixedCostCode + "]");
+		}
+
+		// 固定費一括更新入力フォームを生成の初期値として基準固定費の支払日・支払金額を設定
+		FixedCostBulkUpdateForm form = new FixedCostBulkUpdateForm();
+		// 基準固定費コード:選択固定費の固定費コードを設定
+		form.setBaseFixedCostCode(baseFixedCost.getFixedCostCode().getValue());
+		// 支払日:選択固定費の支払日を設定
+		form.setShiharaiDay(baseFixedCost.getFixedCostPaymentDay().getValue());
+		// 支払金額:選択固定費の支払金額を設定
+		form.setShiharaiKingaku(baseFixedCost.getFixedCostPaymentAmount().toIntegerValue());
+		
+		// 選択固定費の支出項目コード、一括更新入力フォーム情報を元に画面表示情報を生成し返却
+		return getBulkUpdateResponse(userId, baseFixedCost.getExpenditureItemCode(), form);
+	}
+
+	/**
+	 *<pre>
+	 * 固定費一括更新時のパラメータチェックエラー時処理
+	 *
+	 * 情報管理(固定費)一括更新画面で更新実行時のバリデーションチェックNGとなった場合の各画面表示項目を取得します。
+	 * 送信済みの inputForm をそのまま渡すことで、ユーザーの入力状態を保持します。
+	 *</pre>
+	 * @param user ログインユーザ情報
+	 * @param inputForm 固定費一括更新フォームの入力値
+	 * @return 情報管理(固定費)一括更新画面の表示情報
+	 *
+	 */
+	public FixedCostBulkUpdateResponse readBulkUpdateBindingErrorSetInfo(LoginUserInfo user,
+			FixedCostBulkUpdateForm inputForm) {
+		log.debug("readBulkUpdateBindingErrorSetInfo:userid=" + user.getUserId());
+
+		UserId userId = UserId.from(user.getUserId());
+		FixedCostCode baseFixedCostCode = FixedCostCode.from(inputForm.getBaseFixedCostCode());
+
+		// 支出項目コードを取得するため基準固定費を検索
+		FixedCost baseFixedCost = fixedCostRepository.findByPrimaryKey(
+				SearchQueryUserIdAndFixedCostCode.from(userId, baseFixedCostCode));
+		if (baseFixedCost == null) {
+			throw new MyHouseholdAccountBookRuntimeException(
+					"選択した固定費が固定費テーブル:FIXED_COST_TABLEに存在しません。[fixedCostCode=" + baseFixedCostCode + "]");
+		}
+
+		// 送信済み inputForm(一括更新入力フォーム情報) をそのまま渡して画面表示情報を生成（チェック状態・入力値を保持）
+		return getBulkUpdateResponse(userId, baseFixedCost.getExpenditureItemCode(), inputForm);
+	}
 
 
 	/**
@@ -440,7 +525,7 @@ public class FixedCostInquiryUseCase {
 				shiharaiDayList.stream().map(pair ->
 					OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList()));
 		
-		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
+		// 支出項目名(＞で区切った値)を取得しレスポンスに設定
 		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, ExpenditureItemCode.from(inputForm.getSisyutuItemCode())));
 		
 		return response;
@@ -481,5 +566,126 @@ public class FixedCostInquiryUseCase {
 				// その他任意詳細：固定費支払月任意詳細
 				domain.getFixedCostTargetPaymentMonthOptionalContext().getValue())
 		).collect(Collectors.toUnmodifiableList());
+	}
+
+	/**
+	 *<pre>
+	 * 情報管理(固定費)一括更新画面の表示情報を取得します。
+	 *</pre>
+	 * @param userId 取得対象のユーザID
+	 * @param expenditureItemCode 支出項目コード
+	 * @param form 入力フォーム
+	 * @return 情報管理(固定費)一括更新画面表示情報
+	 *
+	 */
+	private FixedCostBulkUpdateResponse getBulkUpdateResponse(
+			UserId userId, ExpenditureItemCode expenditureItemCode, FixedCostBulkUpdateForm form) {
+
+		// 支払日選択ボックス情報を取得
+		List<CodeAndValuePair> shiharaiDayList = codeTableItem.getCodeValues(
+				MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_DAY);
+		if (shiharaiDayList == null) {
+			throw new MyHouseholdAccountBookRuntimeException(
+					"コード定義ファイルに「固定費支払日情報："
+					+ MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_DAY + "」が登録されていません。管理者に問い合わせてください");
+		}
+
+		// レスポンスを生成
+		FixedCostBulkUpdateResponse response = FixedCostBulkUpdateResponse.getInstance(
+				form,
+				shiharaiDayList.stream().map(pair ->
+					OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue()))
+					.collect(Collectors.toList()));
+
+		// 支出項目名(＞で区切った値)を取得しレスポンスに設定
+		response.setSisyutuItemName(
+				expenditureItemInfoComponent.getExpenditureItemName(userId, expenditureItemCode));
+
+		// 同一支出項目の全固定費一覧を取得して設定
+		FixedCostInquiryList siblingList = fixedCostRepository.findByExpenditureItemCode(
+				SearchQueryUserIdAndExpenditureItemCode.from(userId, expenditureItemCode));
+		response.addBulkUpdateTargetList(createBulkUpdateTargetList(siblingList));
+
+		return response;
+	}
+
+	/**
+	 *<pre>
+	 * 引数の固定費一覧情報(ドメイン)から兄弟固定費明細情報のリストを生成して返します。
+	 *</pre>
+	 * @param searchResult 固定費一覧情報(ドメイン)
+	 * @return 兄弟固定費明細情報のリスト
+	 *
+	 */
+	private List<SiblingFixedCostItem> createSiblingFixedCostItemList(FixedCostInquiryList searchResult) {
+		// 兄弟固定費明細情報のリストを生成して返却
+		return searchResult.getValues().stream().map(domain -> {
+			// 支払月任意詳細の値は固定費支払月の値の値に応じて以下値を設定
+			// ・「その他任意」の場合は「固定費支払月任意詳細」の値を設定
+			// ・「その他任意」以外の場合は空文字を設定
+			String shiharaiTukiOptionalContext = Objects.equals(
+					domain.getFixedCostTargetPaymentMonth().getValue(),
+					MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE)
+					? domain.getFixedCostTargetPaymentMonthOptionalContext().getValue()
+					: "";
+			// 兄弟固定費明細情報を生成して返却
+			return SiblingFixedCostItem.from(
+					// 固定費コード
+					domain.getFixedCostCode().getValue(),
+					// 支払名
+					domain.getFixedCostName().getValue(),
+					// 支払月：固定費支払月の値をコード変換して設定
+					codeTableItem.getCodeValue(
+							MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_TUKI,
+							domain.getFixedCostTargetPaymentMonth().getValue()),
+					// 支払月任意詳細
+					shiharaiTukiOptionalContext,
+					// 支払日：固定費支払日の値をコード変換して設定
+					codeTableItem.getCodeValue(
+							MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_DAY,
+							domain.getFixedCostPaymentDay().getValue()),
+					// 支払金額：固定費支払金額の値をフォーマットして設定
+					domain.getFixedCostPaymentAmount().toFormatString());
+		}).collect(Collectors.toUnmodifiableList());
+	}
+
+	/**
+	 *<pre>
+	 * 引数の固定費一覧情報(ドメイン)から一括更新対象固定費明細情報のリストを生成して返します。
+	 *</pre>
+	 * @param searchResult 固定費一覧情報(ドメイン)
+	 * @return 一括更新対象固定費明細情報のリスト
+	 *
+	 */
+	private List<BulkUpdateTargetItem> createBulkUpdateTargetList(FixedCostInquiryList searchResult) {
+		// 一括更新対象固定費明細情報のリストを生成して返却
+		return searchResult.getValues().stream().map(domain -> {
+			// 支払月任意詳細の値は固定費支払月の値の値に応じて以下値を設定
+			// ・「その他任意」の場合は「固定費支払月任意詳細」の値を設定
+			// ・「その他任意」以外の場合は空文字を設定
+			String shiharaiTukiOptionalContext = Objects.equals(
+					domain.getFixedCostTargetPaymentMonth().getValue(),
+					MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE)
+					? domain.getFixedCostTargetPaymentMonthOptionalContext().getValue()
+					: "";
+			// 一括更新対象固定費明細情報を生成して返却
+			return BulkUpdateTargetItem.from(
+					// 固定費コード
+					domain.getFixedCostCode().getValue(),
+					// 支払名
+					domain.getFixedCostName().getValue(),
+					// 支払月：固定費支払月の値をコード変換して設定
+					codeTableItem.getCodeValue(
+							MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_TUKI,
+							domain.getFixedCostTargetPaymentMonth().getValue()),
+					// 支払月任意詳細
+					shiharaiTukiOptionalContext,
+					// 支払日：固定費支払日の値をコード変換して設定
+					codeTableItem.getCodeValue(
+							MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_DAY,
+							domain.getFixedCostPaymentDay().getValue()),
+					// 支払金額：固定費支払金額の値をフォーマットして設定
+					domain.getFixedCostPaymentAmount().toFormatString());
+		}).collect(Collectors.toUnmodifiableList());
 	}
 }
