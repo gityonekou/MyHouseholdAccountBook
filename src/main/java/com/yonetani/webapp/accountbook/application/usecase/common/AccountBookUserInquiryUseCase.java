@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2023/10/14 : 1.00.00  新規作成
+ * 2026/05/09 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.common;
@@ -14,9 +15,9 @@ import org.springframework.stereotype.Component;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.common.AccountBookUser;
-import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.repository.common.AccountBookUserRepository;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Component
@@ -49,11 +50,11 @@ public class AccountBookUserInquiryUseCase {
 	 * @return 現在の対象年・月の値(ドメインモデル)
 	 *
 	 */
-	public NowTargetYearMonth getNowTargetYearMonth(UserId userId) {
-		log.debug("getNowTargetYearMonth: userId=" + userId);
+	public TargetYearMonth getTargetYearMonth(UserId userId) {
+		log.debug("getTargetYearMonth: userId=" + userId);
 		
 		// 指定したユーザIDに対応する現在の対象年・月の値を取得
-		NowTargetYearMonth yearMonth = userInfoSearchRepository.getNowTargetYearMonth(SearchQueryUserId.from(userId));
+		TargetYearMonth yearMonth = userInfoSearchRepository.getTargetYearMonth(SearchQueryUserId.from(userId));
 		log.debug("現在の対象年月:" + yearMonth);
 		if(yearMonth == null) {
 			throw new MyHouseholdAccountBookRuntimeException("指定ユーザIDに対応する現在の対象年・月の値が取得できませんでした。管理者に問い合わせてください。[userId=" + userId + "]");

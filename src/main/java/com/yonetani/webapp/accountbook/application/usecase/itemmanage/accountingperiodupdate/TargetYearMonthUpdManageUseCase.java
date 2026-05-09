@@ -8,6 +8,7 @@
  * 更新履歴
  * 日付       : version     コメントなど
  * 2025/01/13 : 1.00.00(A)  新規作成
+ * 2026/05/09 : 1.01.01     リファクタリング追加対応(対象年月ドメインの集約)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.accountingperiodupdate;
@@ -18,11 +19,9 @@ import com.yonetani.webapp.accountbook.application.usecase.common.AccountBookUse
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.common.AccountBookUser;
-import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.common.AccountBookUserRepository;
-import com.yonetani.webapp.accountbook.domain.type.common.NextTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.TargetYearMonthUpdManageResponse;
@@ -75,8 +74,7 @@ public class TargetYearMonthUpdManageUseCase {
 		UserId userId = UserId.from(user.getUserId());
 		
 		// ユーザIDに対応する現在の対象年月の値を取得
-		NowTargetYearMonth yearMonth = userInquiry.getNowTargetYearMonth(userId);
-		TargetYearMonth targetYearMonth = yearMonth.getYearMonth();
+		TargetYearMonth targetYearMonth = userInquiry.getTargetYearMonth(userId);
 		// 検索条件(ユーザID、年月(YYYYMM))をドメインオブジェクトに変換
 		SearchQueryUserIdAndYearMonth inquiryModel = SearchQueryUserIdAndYearMonth.from(userId, targetYearMonth);
 		// ユーザID,現在の対象年月を条件に該当月の収支金額を取得
@@ -92,12 +90,21 @@ public class TargetYearMonthUpdManageUseCase {
 			return response;
 			
 		} else {
+			// 次の対象年月の値を生成
+			TargetYearMonth nextTargetYearMonth = targetYearMonth.plusMonths(1);
+			
 			// 対象年月更新可の画面表示情報を生成して返却
 			return TargetYearMonthUpdManageResponse.getUpdateAcceptInstance(
-					// 現在の対象年月
-					targetYearMonth,
-					// 更新後の対象年月：現在の対象年月の次の月
-					NextTargetYearMonth.from(targetYearMonth));
+					// 現在の対象年月の年の値
+					targetYearMonth.getYear(),
+					// 現在の対象年月の月の値
+					targetYearMonth.getMonth(),
+					// 更新後の対象年月の年の値
+					nextTargetYearMonth.getYear(),
+					// 更新後の対象年月の月の値
+					nextTargetYearMonth.getMonth(),
+					// 更新後の対象年月
+					nextTargetYearMonth.getValue());
 		}
 	}
 
@@ -115,8 +122,7 @@ public class TargetYearMonthUpdManageUseCase {
 		UserId userId = UserId.from(user.getUserId());
 		
 		// ユーザIDに対応する現在の対象年月の値を取得
-		NowTargetYearMonth yearMonth = userInquiry.getNowTargetYearMonth(userId);
-		TargetYearMonth targetYearMonth = yearMonth.getYearMonth();
+		TargetYearMonth targetYearMonth = userInquiry.getTargetYearMonth(userId);
 		// 検索条件(ユーザID、年月(YYYYMM))をドメインオブジェクトに変換
 		SearchQueryUserIdAndYearMonth inquiryModel = SearchQueryUserIdAndYearMonth.from(userId, targetYearMonth);
 		// ユーザID,現在の対象年月を条件に該当月の収支金額を取得
@@ -125,13 +131,19 @@ public class TargetYearMonthUpdManageUseCase {
 			throw new MyHouseholdAccountBookRuntimeException("現在の対象年月に対応する収支情報が収支テーブル:INCOME_AND_EXPENDITURE_TABLEに存在しません。管理者に問い合わせてください。[対象年月=" + targetYearMonth.getValue() + "]");
 		}
 		// 更新後の対象年月：現在の対象年月の次の月
-		NextTargetYearMonth nextTargetYearMonth = NextTargetYearMonth.from(targetYearMonth);
+		TargetYearMonth nextTargetYearMonth = targetYearMonth.plusMonths(1);
 		// レスポンスを生成
 		TargetYearMonthUpdManageResponse response = TargetYearMonthUpdManageResponse.getUpdateAcceptInstance(
-				// 現在の対象年月
-				targetYearMonth,
-				// 更新後の対象年月：現在の対象年月の次の月
-				nextTargetYearMonth);
+				// 現在の対象年月の年の値
+				targetYearMonth.getYear(),
+				// 現在の対象年月の月の値
+				targetYearMonth.getMonth(),
+				// 更新後の対象年月の年の値
+				nextTargetYearMonth.getYear(),
+				// 更新後の対象年月の月の値
+				nextTargetYearMonth.getMonth(),
+				// 更新後の対象年月
+				nextTargetYearMonth.getValue());
 		
 		// 指定ユーザの家計簿利用ユーザ情報を取得
 		AccountBookUser beforeUserInfo = userInquiry.getUserInfo(userId);
@@ -140,9 +152,9 @@ public class TargetYearMonthUpdManageUseCase {
 				// ユーザID
 				beforeUserInfo.getUserId(),
 				// 対象年
-				nextTargetYearMonth.getYear(),
+				nextTargetYearMonth.getTargetYear(),
 				// 対象月
-				nextTargetYearMonth.getMonth(),
+				nextTargetYearMonth.getTargetMonth(),
 				// ユーザ名
 				beforeUserInfo.getUserName());
 		// 新しい対象年月で家計簿利用ユーザ情報を作成しデータを更新

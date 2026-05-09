@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2023/10/08 : 1.00.00  新規作成
+ * 2026/05/09 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.common;
@@ -15,11 +16,11 @@ import org.springframework.stereotype.Repository;
 
 import com.yonetani.webapp.accountbook.domain.model.common.AccountBookAllUsers;
 import com.yonetani.webapp.accountbook.domain.model.common.AccountBookUser;
-import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.repository.common.AccountBookUserRepository;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.type.common.UserName;
 import com.yonetani.webapp.accountbook.infrastructure.dto.common.AccountBookUserDto;
@@ -36,7 +37,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Repository
@@ -50,12 +51,12 @@ public class AccountBookUserDataSource implements AccountBookUserRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public NowTargetYearMonth getNowTargetYearMonth(SearchQueryUserId searchQuery) {
+	public TargetYearMonth getTargetYearMonth(SearchQueryUserId searchQuery) {
 		AccountBookUserDto result = mapper.selectUser(UserIdSearchQueryDto.from(searchQuery));
 		if(result == null) {
 			return null;
 		} else {
-			return NowTargetYearMonth.from(result.getNowTargetYear(), result.getNowTargetMonth());
+			return TargetYearMonth.from(result.getNowTargetYear(), result.getNowTargetMonth());
 		}
 	}
 	

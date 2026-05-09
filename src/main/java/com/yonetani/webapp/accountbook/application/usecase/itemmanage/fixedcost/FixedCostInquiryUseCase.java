@@ -16,6 +16,7 @@
  * 2026/04/19 : 1.01.01  リファクタリング対応(FixedCostInfoManageUseCaseから参照系の処理を分離し、クラス名をFixedCostInquiryUseCase にリネーム)
  * 2026/05/01 : 1.01.02  固定費一括更新機能追加に伴う処理追加
  * 2026/05/07 : 1.01.03  固定費合計表示変更(奇数月/偶数月合計→3か月合計)
+ * 2026/05/09 : 1.01.04  リファクタリング追加対応(対象年月ドメインの集約)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
@@ -33,7 +34,6 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCost;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.common.CodeAndValuePair;
-import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostCode;
@@ -475,21 +475,20 @@ public class FixedCostInquiryUseCase {
 			response.addMessage("登録済み固定費情報が0件です。");
 		} else {
 			// 現在の対象年月を取得し、対象月・+1か月・+2か月を算出
-			NowTargetYearMonth nowTargetYearMonth = accountBookUserRepository.getNowTargetYearMonth(
+			TargetYearMonth targetYearMonth = accountBookUserRepository.getTargetYearMonth(
 					SearchQueryUserId.from(userId));
-			TargetYearMonth ym0 = nowTargetYearMonth.getYearMonth();
-			TargetYearMonth ym1 = ym0.plusMonths(1);
-			TargetYearMonth ym2 = ym0.plusMonths(2);
+			TargetYearMonth ym1 = targetYearMonth.plusMonths(1);
+			TargetYearMonth ym2 = targetYearMonth.plusMonths(2);
 			// 固定費一覧情報をレスポンスに設定
 			response.addFixedCostItemList(createFixedCostItemList(searchResult));
 			// 対象月ラベルを設定
-			response.setTargetMonthLabel(ym0.toDisplayLabel());
+			response.setTargetMonthLabel(targetYearMonth.toDisplayLabel());
 			// 対象月+1ラベルを設定
 			response.setTargetMonthPlus1Label(ym1.toDisplayLabel());
 			// 対象月+2ラベルを設定
 			response.setTargetMonthPlus2Label(ym2.toDisplayLabel());
 			// 対象月合計を設定
-			response.setTargetMonthGoukei(searchResult.calculateMonthlyTotal(ym0).toFormatString());
+			response.setTargetMonthGoukei(searchResult.calculateMonthlyTotal(targetYearMonth).toFormatString());
 			// 対象月+1合計を設定
 			response.setTargetMonthPlus1Goukei(searchResult.calculateMonthlyTotal(ym1).toFormatString());
 			// 対象月+2合計を設定

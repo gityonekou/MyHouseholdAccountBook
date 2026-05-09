@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2023/09/24 : 1.00.00  新規作成
+ * 2026/05/07 : 1.01.00  固定費合計表示変更対応(対象年月の加算メソッドとラベル取得メソッドを追加)  
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
@@ -30,7 +31,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -41,9 +42,9 @@ public class TargetYearMonth {
 	// 年月(yyyyMM)
 	private final String value;
 	// 「年」項目の値
-	private final TargetYear year;
+	private final TargetYear targetYear;
 	// 「月」項目の値
-	private final TargetMonth month;
+	private final TargetMonth targetMonth;
 	
 	/**
 	 *<pre>
@@ -120,7 +121,7 @@ public class TargetYearMonth {
 	 *
 	 */
 	public String getYear() {
-		return year.getValue();
+		return targetYear.getValue();
 	}
 	
 	/**
@@ -131,7 +132,7 @@ public class TargetYearMonth {
 	 *
 	 */
 	public String getMonth() {
-		return month.getValue();
+		return targetMonth.getValue();
 	}
 	
 	/**
@@ -143,7 +144,7 @@ public class TargetYearMonth {
 	 *
 	 */
 	public TargetYearMonth plusMonths(int months) {
-		YearMonth ym = YearMonth.of(Integer.parseInt(year.getValue()), Integer.parseInt(month.getValue()));
+		YearMonth ym = YearMonth.of(Integer.parseInt(targetYear.getValue()), Integer.parseInt(targetMonth.getValue()));
 		YearMonth result = ym.plusMonths(months);
 		return TargetYearMonth.from(String.valueOf(result.getYear()), String.format("%02d", result.getMonthValue()));
 	}
@@ -157,7 +158,7 @@ public class TargetYearMonth {
 	 *
 	 */
 	public String toDisplayLabel() {
-		return year.getValue() + "年" + month.getValue() + "月";
+		return targetYear.getValue() + "年" + targetMonth.getValue() + "月";
 	}
 
 	@Override
