@@ -12,14 +12,15 @@
  * [テストシナリオ]
  * ① 正常系：execDelete_固定費0003を論理削除、DB確認
  * ② 異常系：execDelete_存在しない固定費コードで例外
- * ③ 正常系：execAdd_新規固定費(0035)を追加、DB確認(4件になること)
+ * ③ 正常系：execAdd_新規固定費(0035)を追加、DB確認(6件になること)
  * ④ 正常系：execAdd_上限9999件超え時のエラーメッセージ確認（countByUserId=9999を模倣はできないため件数境界のみ確認）
  * ⑤ 正常系：execUpdate_固定費0002を更新、DB確認
  * ⑥ 異常系：execUpdate_存在しない固定費コードで例外
  *
  * [テストデータ]
- * 固定費4件: 0001:家賃(0030,毎月,27日,60000), 0002:電気代概算(0037,毎月,27日,12000),
- *           0003:国民年金保険(0015,奇数月,月初,16590), 0004:その他任意テスト(0038,その他任意,27日,10000)
+ * 固定費5件: 0001:家賃(0030,毎月,27日,60000), 0002:電気代概算(0037,毎月,27日,12000),
+ *           0003:国民年金保険(0015,奇数月,月初,16590), 0004:その他任意テスト(0038,その他任意,27日,10000),
+ *           0005:電気代夏季割増(0037,偶数月,27日,8000)
  * </pre>
  *------------------------------------------------
  * 更新履歴
@@ -144,11 +145,11 @@ class FixedCostRegistConfirmUseCaseIntegrationTest {
 	 * テスト③：正常系：execAdd_新規固定費(支出項目コード=0035:自由用途積立金)を追加
 	 *
 	 * 【検証内容】
-	 * ・追加前のユーザ固定費件数が4件であること
-	 * ・追加後のユーザ固定費件数が5件になること
-	 * ・固定費コードが自動採番(countByUserId+1の4桁ゼロ埋め)で「0005」になること
+	 * ・追加前のユーザ固定費件数が5件であること
+	 * ・追加後のユーザ固定費件数が6件になること
+	 * ・固定費コードが自動採番(countByUserId+1の4桁ゼロ埋め)で「0006」になること
 	 * ・追加されたレコードの各フィールド（支払名・支払月・支払日・支払金額・DELETE_FLG）が正しいこと
-	 * ・完了メッセージが「新規固定費を追加しました。[code:0005]自由用途積立」であること
+	 * ・完了メッセージが「新規固定費を追加しました。[code:0006]自由用途積立」であること
 	 *</pre>
 	 */
 	@Test
@@ -156,8 +157,8 @@ class FixedCostRegistConfirmUseCaseIntegrationTest {
 	void testExecAdd_success() {
 		// 追加前確認: 0035に固定費がないこと
 		assertEquals(0, countFixedCostBySisyutuItem("user01", "0035"), "追加前は0035に固定費がないこと");
-		// 追加前のユーザ固定費件数: 4件
-		assertEquals(4, countAllFixedCost("user01"), "追加前は4件であること");
+		// 追加前のユーザ固定費件数: 5件
+		assertEquals(5, countAllFixedCost("user01"), "追加前は5件であること");
 
 		// フォームデータ作成
 		FixedCostInfoUpdateForm form = new FixedCostInfoUpdateForm();
@@ -178,17 +179,17 @@ class FixedCostRegistConfirmUseCaseIntegrationTest {
 		assertNotNull(response, "レスポンスがnullでないこと");
 		assertTrue(response.isTransactionSuccessFull(), "トランザクション完了フラグがtrueであること");
 		assertEquals(1, response.getMessagesList().size(), "完了メッセージが1件であること");
-		assertEquals("新規固定費を追加しました。[code:0005]自由用途積立", response.getMessagesList().get(0),
+		assertEquals("新規固定費を追加しました。[code:0006]自由用途積立", response.getMessagesList().get(0),
 				"完了メッセージが正しく設定されていること");
 
-		// DB確認: 5件になっていること
-		assertEquals(5, countAllFixedCost("user01"), "追加後は5件であること");
+		// DB確認: 6件になっていること
+		assertEquals(6, countAllFixedCost("user01"), "追加後は6件であること");
 
 		// 追加されたレコードの内容確認
 		assertEquals(1, countFixedCostBySisyutuItem("user01", "0035"), "0035の固定費が1件追加されること");
 		Map<String, Object> added = findFixedCostBySisyutuItem("user01", "0035");
 		assertNotNull(added, "追加されたレコードがnullでないこと");
-		assertEquals("0005", added.get("FIXED_COST_CODE"), "固定費コードが自動採番されること");
+		assertEquals("0006", added.get("FIXED_COST_CODE"), "固定費コードが自動採番されること");
 		assertEquals("自由用途積立", added.get("FIXED_COST_NAME"), "固定費名が設定されていること");
 		assertEquals("00", added.get("FIXED_COST_SHIHARAI_TUKI"), "支払月が設定されていること");
 		assertEquals("27", added.get("FIXED_COST_SHIHARAI_DAY"), "支払日が設定されていること");
@@ -206,7 +207,7 @@ class FixedCostRegistConfirmUseCaseIntegrationTest {
 	 * ・更新前の固定費名が「電気代概算」、支払金額が12,000円であること
 	 * ・更新後の固定費名が「電気代(更新後)」、支払金額が15,000円に更新されること
 	 * ・固定費区分が更新されること
-	 * ・総件数が4件のまま変わらないこと（更新は既存レコードへの上書き）
+	 * ・総件数が5件のまま変わらないこと（更新は既存レコードへの上書き）
 	 * ・完了メッセージが「固定費を更新しました。[code:0002]電気代(更新後)」であること
 	 *</pre>
 	 */
@@ -250,7 +251,7 @@ class FixedCostRegistConfirmUseCaseIntegrationTest {
 		assertEquals("1", after.get("FIXED_COST_KUBUN"), "固定費区分が更新されていること");
 
 		// 総件数が変わらないこと
-		assertEquals(4, countAllFixedCost("user01"), "更新後も4件のままであること");
+		assertEquals(5, countAllFixedCost("user01"), "更新後も5件のままであること");
 	}
 
 	/**

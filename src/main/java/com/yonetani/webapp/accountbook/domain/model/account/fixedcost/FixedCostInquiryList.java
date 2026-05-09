@@ -6,6 +6,7 @@
  * 日付       : version  コメントなど
  * 2024/06/07 : 1.00.00  新規作成
  * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
+ * 2026/05/07 : 1.01.01  合計フィールド廃止・calculateMonthlyTotal()メソッド追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.fixedcost;
@@ -13,7 +14,6 @@ package com.yonetani.webapp.accountbook.domain.model.account.fixedcost;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.util.CollectionUtils;
 
@@ -27,6 +27,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPa
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonth;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonthOptionalContext;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -47,7 +48,7 @@ import lombok.ToString;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class FixedCostInquiryList {
-	
+
 	/**
 	 *<pre>
 	 * 固定費一覧明細情報(ドメイン)です
@@ -79,7 +80,7 @@ public class FixedCostInquiryList {
 		private final FixedCostPaymentDay fixedCostPaymentDay;
 		// 支払金額
 		private final FixedCostPaymentAmount fixedCostPaymentAmount;
-		
+
 		/**
 		 *<pre>
 		 * 引数の値から固定費一覧明細情報を表すドメインモデルを生成して返します。
@@ -116,71 +117,67 @@ public class FixedCostInquiryList {
 					FixedCostPaymentAmount.from(fixedCostPaymentAmount));
 		}
 	}
-	
+
 	// 固定費一覧明細情報のリスト
 	private final List<FixedCostInquiryItem> values;
-	// 奇数月支払金額合計
-	private final FixedCostPaymentTotalAmount oddMonthGoukei;
-	// 偶数月支払金額合計
-	private final FixedCostPaymentTotalAmount anEvenMonthGoukei;
-	
+
 	/**
 	 *<pre>
-	 * 引数の値から固定費一覧情報の値を表すドメインモデルを生成して返します。 
+	 * 引数の値から固定費一覧情報の値を表すドメインモデルを生成して返します。
 	 *</pre>
 	 * @param values 固定費一覧明細リスト情報のリスト
 	 * @return 固定費一覧情報を表すドメインモデル
 	 *
 	 */
 	public static FixedCostInquiryList from(List<FixedCostInquiryItem> values) {
-		if(CollectionUtils.isEmpty(values)) {
-			return new FixedCostInquiryList(
-					// 固定費一覧明細情報のリスト:空
-					Collections.emptyList(),
-					// 奇数月合計=0
-					FixedCostPaymentTotalAmount.ZERO,
-					// 偶数月合計=0
-					FixedCostPaymentTotalAmount.ZERO);
+		if (CollectionUtils.isEmpty(values)) {
+			return new FixedCostInquiryList(Collections.emptyList());
 		} else {
-			/* 各種合計値を計算 */
-			// 奇数月合計
-			FixedCostPaymentTotalAmount oddMonthGoukeiWk = FixedCostPaymentTotalAmount.ZERO;
-			// 偶数月合計
-			FixedCostPaymentTotalAmount anEvenMonthGoukeiWk = FixedCostPaymentTotalAmount.ZERO;
-			
-			// 固定費支払月（毎月、奇数月、偶数月、任意）の値に応じて固定費一覧明細リスト情報のリストの件数分
-			// 支払金額の値を奇数月合計、偶数月合計の値に加算
-			for(FixedCostInquiryItem item : values) {
-				
-				// 支払月が毎月、またはその他任意の場合、奇数・偶数をそれぞれ加算
-				if(Objects.equals(item.getFixedCostTargetPaymentMonth().getValue(),
-						MyHouseholdAccountBookContent.SHIHARAI_TUKI_EVERY_SELECTED_VALUE)
-					|| Objects.equals(item.getFixedCostTargetPaymentMonth().getValue(),
-							MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE)) {
-					oddMonthGoukeiWk = oddMonthGoukeiWk.add(item.getFixedCostPaymentAmount());
-					anEvenMonthGoukeiWk = anEvenMonthGoukeiWk.add(item.getFixedCostPaymentAmount());
-					
-				// 支払月が奇数月の場合、奇数月を加算
-				} else if(Objects.equals(item.getFixedCostTargetPaymentMonth().getValue(),
-						MyHouseholdAccountBookContent.SHIHARAI_TUKI_ODD_SELECTED_VALUE)) {
-					oddMonthGoukeiWk = oddMonthGoukeiWk.add(item.getFixedCostPaymentAmount());
-					
-				// 支払月が偶数月の場合、偶数月を加算
-				} else if(Objects.equals(item.getFixedCostTargetPaymentMonth().getValue(),
-						MyHouseholdAccountBookContent.SHIHARAI_TUKI_AN_EVEN_SELECTED_VALUE)) {
-					anEvenMonthGoukeiWk = anEvenMonthGoukeiWk.add(item.getFixedCostPaymentAmount());
-				}
-			}
-			return new FixedCostInquiryList(
-					// 固定費一覧明細情報のリスト
-					values,
-					// 奇数月合計
-					oddMonthGoukeiWk,
-					// 偶数月合計
-					anEvenMonthGoukeiWk);
+			return new FixedCostInquiryList(values);
 		}
 	}
-	
+
+	/**
+	 *<pre>
+	 * 指定した対象月における固定費支払金額の合計を計算して返します。
+	 * 固定費支払月の設定値に応じて、対象月に支払いが発生するかどうかを判定して合計を算出します。
+	 *</pre>
+	 * @param targetMonth 合計を算出する対象月
+	 * @return 指定した対象月の固定費支払金額合計
+	 *
+	 */
+	public FixedCostPaymentTotalAmount calculateMonthlyTotal(TargetYearMonth targetMonth) {
+		if (CollectionUtils.isEmpty(values)) {
+			return FixedCostPaymentTotalAmount.ZERO;
+		}
+		int monthValue = Integer.parseInt(targetMonth.getMonth());
+		FixedCostPaymentTotalAmount total = FixedCostPaymentTotalAmount.ZERO;
+		for (FixedCostInquiryItem item : values) {
+			if (shouldAdd(item.getFixedCostTargetPaymentMonth().getValue(), monthValue)) {
+				total = total.add(item.getFixedCostPaymentAmount());
+			}
+		}
+		return total;
+	}
+
+	/**
+	 * 固定費支払月コードと対象月の値から、その月に支払いが発生するかどうかを返します。
+	 */
+	private static boolean shouldAdd(String shiharaiTukiCode, int monthValue) {
+		switch (shiharaiTukiCode) {
+			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_EVERY_SELECTED_VALUE:    // "00" 毎月
+			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE: // "40" その他任意
+				return true;
+			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_ODD_SELECTED_VALUE:      // "20" 奇数月
+				return monthValue % 2 == 1;
+			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_AN_EVEN_SELECTED_VALUE:  // "30" 偶数月
+				return monthValue % 2 == 0;
+			default:
+				// "01"〜"12"：特定月指定
+				return Integer.parseInt(shiharaiTukiCode) == monthValue;
+		}
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -203,7 +200,7 @@ public class FixedCostInquiryList {
 			return "固定費一覧:0件";
 		}
 	}
-	
+
 	/**
 	 *<pre>
 	 * 検索結果が設定されているかどうかを判定します。

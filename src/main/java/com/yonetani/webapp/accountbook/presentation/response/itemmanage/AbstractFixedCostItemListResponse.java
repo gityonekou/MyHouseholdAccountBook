@@ -99,29 +99,53 @@ public abstract class AbstractFixedCostItemListResponse extends AbstractExpendit
 	// 固定費一覧情報
 	@Getter
 	private List<FixedCostItem> fixedCostItemList = new ArrayList<>();
-	// 奇数月合計
+	// 対象月ラベル
 	@Getter
 	@Setter
-	private String oddMonthGoukei;
-	// 偶数月合計
+	private String targetMonthLabel;
+	// 対象月+1ラベル
 	@Getter
 	@Setter
-	private String anEvenMonthGoukei;
-	
+	private String targetMonthPlus1Label;
+	// 対象月+2ラベル
+	@Getter
+	@Setter
+	private String targetMonthPlus2Label;
+	// 対象月合計
+	@Getter
+	@Setter
+	private String targetMonthGoukei;
+	// 対象月+1合計
+	@Getter
+	@Setter
+	private String targetMonthPlus1Goukei;
+	// 対象月+2合計
+	@Getter
+	@Setter
+	private String targetMonthPlus2Goukei;
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	protected ModelAndView createModelAndView(String viewName) {
 		ModelAndView modelAndView = super.createModelAndView(viewName);
-		
+
 		// 固定費一覧情報を設定
 		modelAndView.addObject("fixedCostItemList", fixedCostItemList);
-		// 奇数月合計を設定
-		modelAndView.addObject("oddMonthGoukei", oddMonthGoukei);
-		// 偶数月合計を設定
-		modelAndView.addObject("anEvenMonthGoukei", anEvenMonthGoukei);
-		
+		// 対象月ラベルを設定
+		modelAndView.addObject("targetMonthLabel", targetMonthLabel);
+		// 対象月+1ラベルを設定
+		modelAndView.addObject("targetMonthPlus1Label", targetMonthPlus1Label);
+		// 対象月+2ラベルを設定
+		modelAndView.addObject("targetMonthPlus2Label", targetMonthPlus2Label);
+		// 対象月合計を設定
+		modelAndView.addObject("targetMonthGoukei", targetMonthGoukei);
+		// 対象月+1合計を設定
+		modelAndView.addObject("targetMonthPlus1Goukei", targetMonthPlus1Goukei);
+		// 対象月+2合計を設定
+		modelAndView.addObject("targetMonthPlus2Goukei", targetMonthPlus2Goukei);
+
 		return modelAndView;
 	}
 	
