@@ -9,7 +9,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2023/10/08 : 1.00.00  新規作成
- * 2026/05/09 : 1.01.00  リファクタリング対応(DDD適応)
+ * 2026/05/09 : 1.01.00  リファクタリング追加対応(対象年月ドメインの集約)
  *
  */
 package com.yonetani.webapp.accountbook.domain.repository.common;

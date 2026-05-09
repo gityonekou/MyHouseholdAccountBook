@@ -8,7 +8,7 @@
  * 更新履歴
  * 日付       : version     コメントなど
  * 2025/01/13 : 1.00.00(A)  新規作成
- * 2026/05/09 : 1.01.01     リファクタリング追加対応(対象年月ドメインの集約)
+ * 2026/05/09 : 1.01.00     リファクタリング追加対応(対象年月ドメインの集約)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.accountingperiodupdate;
