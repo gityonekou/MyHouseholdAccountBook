@@ -142,13 +142,13 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 *</pre>
 	 */
 	@Test
-	@DisplayName("正常系：GET /initload/ 固定費一覧4件の初期表示")
+	@DisplayName("正常系：GET /initload/ 固定費一覧5件の初期表示")
 	void testGetInitLoad() throws Exception {
 		mockMvc.perform(get("/myhacbook/managebaseinfo/fixedcostinfo/initload/")
 				.with(user("user01").password("password").roles("USER")))
 			.andExpect(status().isOk())
 			.andExpect(view().name("itemmanage/FixedCostInfoManageInit"))
-			.andExpect(model().attribute("fixedCostItemList", hasSize(4)))
+			.andExpect(model().attribute("fixedCostItemList", hasSize(5)))
 			.andExpect(model().attribute("loginUserName", is("テストユーザ01")));
 	}
 
@@ -164,7 +164,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 * ・HTTPステータスが200であること
 	 * ・ビュー名が「itemmanage/FixedCostInfoManageActSelect」であること
 	 * ・fixedCostInfoがモデルに設定されること
-	 * ・fixedCostItemListが4件で取得されること
+	 * ・fixedCostItemListが5件で取得されること
 	 *</pre>
 	 */
 	@Test
@@ -176,7 +176,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 			.andExpect(status().isOk())
 			.andExpect(view().name("itemmanage/FixedCostInfoManageActSelect"))
 			.andExpect(model().attributeExists("fixedCostInfo"))
-			.andExpect(model().attribute("fixedCostItemList", hasSize(4)));
+			.andExpect(model().attribute("fixedCostItemList", hasSize(5)));
 	}
 
 	// ================================================================
@@ -307,7 +307,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 				.with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(view().name("itemmanage/FixedCostInfoManageInit"))
-			.andExpect(model().attribute("fixedCostItemList", hasSize(4)));
+			.andExpect(model().attribute("fixedCostItemList", hasSize(5)));
 	}
 
 	// ================================================================
@@ -494,7 +494,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 				.with(user("user01").password("password").roles("USER")))
 			.andExpect(status().isOk())
 			.andExpect(view().name("itemmanage/FixedCostInfoManageInit"))
-			.andExpect(model().attribute("fixedCostItemList", hasSize(4)));
+			.andExpect(model().attribute("fixedCostItemList", hasSize(5)));
 	}
 
 	// ================================================================
@@ -509,7 +509,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 * ・新規追加からキャンセル操作（action=add）の場合、初期表示画面に遷移すること
 	 * ・HTTPステータスが200であること
 	 * ・ビュー名が「itemmanage/FixedCostInfoManageInit」であること
-	 * ・fixedCostItemListが4件で取得されること
+	 * ・fixedCostItemListが5件で取得されること
 	 *</pre>
 	 */
 	@Test
@@ -522,7 +522,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 				.with(csrf()))
 			.andExpect(status().isOk())
 			.andExpect(view().name("itemmanage/FixedCostInfoManageInit"))
-			.andExpect(model().attribute("fixedCostItemList", hasSize(4)));
+			.andExpect(model().attribute("fixedCostItemList", hasSize(5)));
 	}
 
 	/**

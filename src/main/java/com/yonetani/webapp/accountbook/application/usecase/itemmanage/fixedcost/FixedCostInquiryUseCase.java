@@ -15,6 +15,7 @@
  * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  * 2026/04/19 : 1.01.01  リファクタリング対応(FixedCostInfoManageUseCaseから参照系の処理を分離し、クラス名をFixedCostInquiryUseCase にリネーム)
  * 2026/05/01 : 1.01.02  固定費一括更新機能追加に伴う処理追加
+ * 2026/05/07 : 1.01.03  固定費合計表示変更(奇数月/偶数月合計→3か月合計)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
@@ -32,12 +33,15 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCost;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.common.CodeAndValuePair;
+import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.common.AccountBookUserRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostBulkUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostInfoUpdateForm;
@@ -84,6 +88,8 @@ public class FixedCostInquiryUseCase {
 	private final CodeTableItemComponent codeTableItem;
 	// 固定費テーブル:FIXED_COST_TABLEリポジトリー
 	private final FixedCostTableRepository fixedCostRepository;
+	// 家計簿ユーザーリポジトリー
+	private final AccountBookUserRepository accountBookUserRepository;
 	
 	/**
 	 *<pre>
@@ -468,12 +474,26 @@ public class FixedCostInquiryUseCase {
 			// 登録済み固定費情報が0件の場合、メッセージを設定
 			response.addMessage("登録済み固定費情報が0件です。");
 		} else {
+			// 現在の対象年月を取得し、対象月・+1か月・+2か月を算出
+			NowTargetYearMonth nowTargetYearMonth = accountBookUserRepository.getNowTargetYearMonth(
+					SearchQueryUserId.from(userId));
+			TargetYearMonth ym0 = nowTargetYearMonth.getYearMonth();
+			TargetYearMonth ym1 = ym0.plusMonths(1);
+			TargetYearMonth ym2 = ym0.plusMonths(2);
 			// 固定費一覧情報をレスポンスに設定
 			response.addFixedCostItemList(createFixedCostItemList(searchResult));
-			// 奇数月合計の値を設定
-			response.setOddMonthGoukei(searchResult.getOddMonthGoukei().toFormatString());
-			// 偶数月合計の値を設定
-			response.setAnEvenMonthGoukei(searchResult.getAnEvenMonthGoukei().toFormatString());
+			// 対象月ラベルを設定
+			response.setTargetMonthLabel(ym0.toDisplayLabel());
+			// 対象月+1ラベルを設定
+			response.setTargetMonthPlus1Label(ym1.toDisplayLabel());
+			// 対象月+2ラベルを設定
+			response.setTargetMonthPlus2Label(ym2.toDisplayLabel());
+			// 対象月合計を設定
+			response.setTargetMonthGoukei(searchResult.calculateMonthlyTotal(ym0).toFormatString());
+			// 対象月+1合計を設定
+			response.setTargetMonthPlus1Goukei(searchResult.calculateMonthlyTotal(ym1).toFormatString());
+			// 対象月+2合計を設定
+			response.setTargetMonthPlus2Goukei(searchResult.calculateMonthlyTotal(ym2).toFormatString());
 		}
 	}
 	

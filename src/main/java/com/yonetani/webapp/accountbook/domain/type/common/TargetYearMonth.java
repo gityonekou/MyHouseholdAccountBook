@@ -10,6 +10,7 @@
 package com.yonetani.webapp.accountbook.domain.type.common;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
 
 import org.springframework.util.StringUtils;
@@ -133,9 +134,35 @@ public class TargetYearMonth {
 		return month.getValue();
 	}
 	
+	/**
+	 *<pre>
+	 * 指定した月数後の TargetYearMonth を返します。
+	 *</pre>
+	 * @param months 加算する月数
+	 * @return 指定した月数後の TargetYearMonth
+	 *
+	 */
+	public TargetYearMonth plusMonths(int months) {
+		YearMonth ym = YearMonth.of(Integer.parseInt(year.getValue()), Integer.parseInt(month.getValue()));
+		YearMonth result = ym.plusMonths(months);
+		return TargetYearMonth.from(String.valueOf(result.getYear()), String.format("%02d", result.getMonthValue()));
+	}
+
+	/**
+	 *<pre>
+	 * "YYYY年MM月" 形式の表示ラベルを返します（月の先頭0あり）。
+	 * 例: 2025年11月、2026年01月
+	 *</pre>
+	 * @return 表示ラベル
+	 *
+	 */
+	public String toDisplayLabel() {
+		return year.getValue() + "年" + month.getValue() + "月";
+	}
+
 	@Override
 	public String toString() {
 		return value;
 	}
-	
+
 }

@@ -8,8 +8,18 @@
 --
 -- [固定費データ構成]
 -- 0001: 家賃    (0030:家賃,  区分:1=確定, 毎月(00), 27日(27), 60,000円) ← 兄弟固定費(その1)
--- 0002: 共益費  (0030:家賃,  区分:1=確定, 毎月(00), 27日(27),  8,000円) ← 兄弟固定費(その2)
+-- 0002: 共益費  (0030:家賃,  区分:1=確定, 奇数月(20), 27日(27),  8,000円) ← 兄弟固定費(その2)
 -- 0003: 電気代概算 (0037:電気代, 区分:2=予定, 毎月(00), 27日(27), 12,000円) ← 兄弟なし
+--
+-- [DB取得順] ORDER BY SISYUTU_ITEM_SORT, FIXED_COST_SHIHARAI_TUKI:
+--   index0: 0001 家賃    (sort=0303010000, TUKI=00)
+--   index1: 0002 共益費  (sort=0303010000, TUKI=20) ← 同SORTでTUKI後
+--   index2: 0003 電気代概算(sort=0306010000, TUKI=00)
+--
+-- [3か月合計] NOW_TARGET_MONTH=11 → ym0=2025/11(奇)・ym1=2025/12(偶)・ym2=2026/01(奇)
+-- 2025年11月合計: 60,000(毎月) + 8,000(奇数月) + 12,000(毎月) = 80,000円
+-- 2025年12月合計: 60,000(毎月) + 0(奇数月除外) + 12,000(毎月) = 72,000円
+-- 2026年01月合計: 60,000(毎月) + 8,000(奇数月) + 12,000(毎月) = 80,000円
 --
 -- [テスト観点]
 -- ・readActSelectItemInfo(0001): 0001,0002が同一0030に属する → hasSiblingFixedCost=true
@@ -20,6 +30,7 @@
 --
 -- [変更履歴]
 -- 2026/05/02 : 初版作成
+-- 2026/05/07 : 0002の支払月を毎月→奇数月(20)に変更（ソート検証・3か月合計検証用）
 --
 -- ========================================
 
@@ -102,5 +113,5 @@ INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, S
 -- ※ 同一SORTは FIXED_COST_CODE 昇順(H2デフォルト)
 INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, SISYUTU_ITEM_CODE, FIXED_COST_KUBUN, FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT, FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU, DELETE_FLG) VALUES
 ('user01', '0001', '家賃',    '毎月27日引き落とし', '0030', '1', '00', NULL, '27', 60000.00, false),
-('user01', '0002', '共益費',  '毎月27日引き落とし', '0030', '1', '00', NULL, '27',  8000.00, false),
+('user01', '0002', '共益費',  '奇数月27日引き落とし', '0030', '1', '20', NULL, '27',  8000.00, false),
 ('user01', '0003', '電気代概算', '概算で登録',     '0037', '2', '00', NULL, '27', 12000.00, false);

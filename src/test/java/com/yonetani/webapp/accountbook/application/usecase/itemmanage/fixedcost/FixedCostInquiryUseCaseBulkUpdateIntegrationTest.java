@@ -19,14 +19,23 @@
  *
  * [テストデータ]
  * 固定費3件:
- *   0001: 家賃   (0030:家賃, 確定, 毎月, 27日, 60,000円) ← 兄弟固定費(その1)
- *   0002: 共益費 (0030:家賃, 確定, 毎月, 27日,  8,000円) ← 兄弟固定費(その2)
- *   0003: 電気代概算 (0037:電気代, 予定, 毎月, 27日, 12,000円) ← 兄弟なし
+ *   0001: 家賃   (0030:家賃, 確定, 毎月(00), 27日, 60,000円) ← 兄弟固定費(その1)
+ *   0002: 共益費 (0030:家賃, 確定, 奇数月(20), 27日,  8,000円) ← 兄弟固定費(その2)
+ *   0003: 電気代概算 (0037:電気代, 予定, 毎月(00), 27日, 12,000円) ← 兄弟なし
+ * DB取得順(ORDER BY SISYUTU_ITEM_SORT, FIXED_COST_SHIHARAI_TUKI):
+ *   index0: 0001 家賃 (sort=0303010000, TUKI=00)
+ *   index1: 0002 共益費 (sort=0303010000, TUKI=20)
+ *   index2: 0003 電気代概算 (sort=0306010000, TUKI=00)
+ * NOW_TARGET_MONTH=11 → 3か月合計:
+ *   2025年11月: 60,000+8,000+12,000 = 80,000円
+ *   2025年12月: 60,000+0+12,000 = 72,000円
+ *   2026年01月: 60,000+8,000+12,000 = 80,000円
  * </pre>
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  コメントなど
  * 2026/05/02 : 1.01.00  新規作成
+ * 2026/05/07 : 1.01.01  0002の支払月を毎月→奇数月に変更、anyMatch→インデックスアクセスに変更、3か月合計検証追加
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
@@ -86,8 +95,11 @@ class FixedCostInquiryUseCaseBulkUpdateIntegrationTest {
 	 * 【検証内容】
 	 * ・固定費0001(家賃)と0002(共益費)が同じ支出項目コード0030に属するため
 	 *   hasSiblingFixedCost=true となること
-	 * ・siblingFixedCostItemList が2件で取得されること
+	 * ・siblingFixedCostItemList が2件でORDER BY SISYUTU_ITEM_SORT, TUKI順に取得されること
+	 *   index0: 0001 家賃 (TUKI=00)、index1: 0002 共益費 (TUKI=20)
 	 * ・兄弟固定費の内容（支払名・支払月・支払金額）が正しく設定されること
+	 * ・readActSelectItemInfo は setFixedCostItemList を呼ぶため3か月合計が設定されること
+	 *   2025年11月: 80,000円、2025年12月: 72,000円、2026年01月: 80,000円
 	 *</pre>
 	 */
 	@Test
@@ -98,37 +110,37 @@ class FixedCostInquiryUseCaseBulkUpdateIntegrationTest {
 		// hasSiblingFixedCost が true であること
 		assertTrue(response.isHasSiblingFixedCost(), "同一支出項目に2件以上の固定費があるためtrueであること");
 
-		// 兄弟固定費リストが2件であること
+		// 兄弟固定費リストが2件でソート順(ORDER BY SISYUTU_ITEM_SORT, FIXED_COST_SHIHARAI_TUKI)で取得されること
 		List<SiblingFixedCostItem> siblingList = response.getSiblingFixedCostItemList();
 		assertNotNull(siblingList, "兄弟固定費リストがnullでないこと");
 		assertEquals(2, siblingList.size(), "兄弟固定費リストが2件であること");
 
-		// 兄弟リストに 0001(家賃) と 0002(共益費) が含まれること
-		boolean has0001 = siblingList.stream().anyMatch(item -> "0001".equals(item.getFixedCostCode()));
-		boolean has0002 = siblingList.stream().anyMatch(item -> "0002".equals(item.getFixedCostCode()));
-		assertTrue(has0001, "兄弟リストに固定費コード0001(家賃)が含まれること");
-		assertTrue(has0002, "兄弟リストに固定費コード0002(共益費)が含まれること");
+		// index0: 0001 家賃 (TUKI=00)
+		SiblingFixedCostItem item0 = siblingList.get(0);
+		assertEquals("0001", item0.getFixedCostCode(), "index0の固定費コードが0001(家賃)であること");
+		assertEquals("家賃", item0.getShiharaiName(), "index0の支払名が家賃であること");
+		assertEquals("毎月", item0.getShiharaiTukiDetailContext(), "index0の支払月が毎月であること");
+		assertEquals("60,000円", item0.getShiharaiKingaku(), "index0の支払金額が60,000円であること");
+		assertEquals("", item0.getShiharaiTukiOptionalContext(), "index0の任意詳細が空であること");
 
-		// 各兄弟固定費のフィールドを確認（0001:家賃）
-		SiblingFixedCostItem item0001 = siblingList.stream()
-				.filter(item -> "0001".equals(item.getFixedCostCode()))
-				.findFirst().orElseThrow();
-		assertEquals("家賃", item0001.getShiharaiName(), "0001の支払名が家賃であること");
-		assertEquals("毎月", item0001.getShiharaiTukiDetailContext(), "0001の支払月が毎月であること");
-		assertEquals("60,000円", item0001.getShiharaiKingaku(), "0001の支払金額が60,000円であること");
-		assertEquals("", item0001.getShiharaiTukiOptionalContext(), "0001の任意詳細が空であること");
-
-		// 各兄弟固定費のフィールドを確認（0002:共益費）
-		SiblingFixedCostItem item0002 = siblingList.stream()
-				.filter(item -> "0002".equals(item.getFixedCostCode()))
-				.findFirst().orElseThrow();
-		assertEquals("共益費", item0002.getShiharaiName(), "0002の支払名が共益費であること");
-		assertEquals("毎月", item0002.getShiharaiTukiDetailContext(), "0002の支払月が毎月であること");
-		assertEquals("8,000円", item0002.getShiharaiKingaku(), "0002の支払金額が8,000円であること");
+		// index1: 0002 共益費 (TUKI=20)
+		SiblingFixedCostItem item1 = siblingList.get(1);
+		assertEquals("0002", item1.getFixedCostCode(), "index1の固定費コードが0002(共益費)であること");
+		assertEquals("共益費", item1.getShiharaiName(), "index1の支払名が共益費であること");
+		assertEquals("奇数月", item1.getShiharaiTukiDetailContext(), "index1の支払月が奇数月であること");
+		assertEquals("8,000円", item1.getShiharaiKingaku(), "index1の支払金額が8,000円であること");
 
 		// 選択固定費の情報が正しく設定されていること
 		assertEquals("0001", response.getFixedCostInfo().getFixedCostCode(),
 				"選択固定費コードが0001であること");
+
+		// 3か月合計・ラベルの確認（NOW_TARGET_MONTH=11）
+		assertEquals("2025年11月", response.getTargetMonthLabel(), "対象月ラベルが2025年11月であること");
+		assertEquals("2025年12月", response.getTargetMonthPlus1Label(), "対象月+1ラベルが2025年12月であること");
+		assertEquals("2026年01月", response.getTargetMonthPlus2Label(), "対象月+2ラベルが2026年01月であること");
+		assertEquals("80,000円", response.getTargetMonthGoukei(), "2025年11月合計が80,000円であること");
+		assertEquals("72,000円", response.getTargetMonthPlus1Goukei(), "2025年12月合計が72,000円であること");
+		assertEquals("80,000円", response.getTargetMonthPlus2Goukei(), "2026年01月合計が80,000円であること");
 	}
 
 	/**
@@ -171,7 +183,8 @@ class FixedCostInquiryUseCaseBulkUpdateIntegrationTest {
 	 * ・基準固定費コード=0001(家賃, 27日, 60,000円)を指定して一括更新画面情報を取得
 	 * ・フォームの初期値として基準固定費の支払日(27)・支払金額(60000)が設定されること
 	 * ・フォームのbaseFixedCostCodeに0001が設定されること
-	 * ・一括更新対象リストとして同一支出項目(0030)に属する2件が取得されること
+	 * ・一括更新対象リストが2件でORDER BY SISYUTU_ITEM_SORT, TUKI順に取得されること
+	 *   index0: 0001 家賃 (TUKI=00)、index1: 0002 共益費 (TUKI=20)
 	 * ・支出項目名が「固定費(課税)＞地代家賃＞家賃」で設定されること
 	 * ・支払日選択ボックスが設定されること
 	 *</pre>
@@ -189,25 +202,25 @@ class FixedCostInquiryUseCaseBulkUpdateIntegrationTest {
 		assertEquals(Integer.valueOf(60000), form.getShiharaiKingaku(),
 				"支払金額初期値が60000(基準固定費0001の値)であること");
 
-		// 一括更新対象リストが2件（0001:家賃、0002:共益費）
+		// 一括更新対象リストが2件でソート順(ORDER BY SISYUTU_ITEM_SORT, FIXED_COST_SHIHARAI_TUKI)で取得されること
 		List<BulkUpdateTargetItem> targetList = response.getBulkUpdateTargetList();
 		assertNotNull(targetList, "一括更新対象リストがnullでないこと");
 		assertEquals(2, targetList.size(), "一括更新対象リストが2件(同一0030に属する全固定費)であること");
 
-		// 対象リストに0001と0002が含まれること
-		boolean has0001 = targetList.stream().anyMatch(item -> "0001".equals(item.getFixedCostCode()));
-		boolean has0002 = targetList.stream().anyMatch(item -> "0002".equals(item.getFixedCostCode()));
-		assertTrue(has0001, "対象リストに0001(家賃)が含まれること");
-		assertTrue(has0002, "対象リストに0002(共益費)が含まれること");
+		// index0: 0001 家賃 (TUKI=00)
+		BulkUpdateTargetItem target0 = targetList.get(0);
+		assertEquals("0001", target0.getFixedCostCode(), "index0の固定費コードが0001(家賃)であること");
+		assertEquals("家賃", target0.getShiharaiName(), "index0の支払名が家賃であること");
+		assertEquals("毎月", target0.getShiharaiTukiDetailContext(), "index0の支払月が毎月であること");
+		assertEquals("27日", target0.getShiharaiDay(), "index0の支払日が27日であること");
+		assertEquals("60,000円", target0.getShiharaiKingaku(), "index0の支払金額が60,000円であること");
 
-		// 対象リストの内容確認（0001:家賃）
-		BulkUpdateTargetItem target0001 = targetList.stream()
-				.filter(item -> "0001".equals(item.getFixedCostCode()))
-				.findFirst().orElseThrow();
-		assertEquals("家賃", target0001.getShiharaiName(), "0001の支払名が家賃であること");
-		assertEquals("毎月", target0001.getShiharaiTukiDetailContext(), "0001の支払月が毎月であること");
-		assertEquals("27日", target0001.getShiharaiDay(), "0001の現在の支払日が27日であること");
-		assertEquals("60,000円", target0001.getShiharaiKingaku(), "0001の現在の支払金額が60,000円であること");
+		// index1: 0002 共益費 (TUKI=20)
+		BulkUpdateTargetItem target1 = targetList.get(1);
+		assertEquals("0002", target1.getFixedCostCode(), "index1の固定費コードが0002(共益費)であること");
+		assertEquals("共益費", target1.getShiharaiName(), "index1の支払名が共益費であること");
+		assertEquals("奇数月", target1.getShiharaiTukiDetailContext(), "index1の支払月が奇数月であること");
+		assertEquals("8,000円", target1.getShiharaiKingaku(), "index1の支払金額が8,000円であること");
 
 		// 支出項目名が階層表示で設定されていること（固定費(課税)＞地代家賃＞家賃）
 		assertEquals("固定費(課税)＞地代家賃＞家賃", response.getSisyutuItemName(),

@@ -135,13 +135,18 @@
 								</tr>
 								</th:block>
 								<tr class="table-success">
-									<td colspan="4">奇数月合計(毎月、奇数月、その他任意の合計値)</td>
-									<td th:text="${oddMonthGoukei}" align="right">奇数月合計</td>
+									<td colspan="4" th:text="${targetMonthLabel} + '合計'">対象月合計ラベル</td>
+									<td th:text="${targetMonthGoukei}" align="right">対象月合計</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td colspan="4" th:text="${targetMonthPlus1Label} + '合計'">対象月+1合計ラベル</td>
+									<td th:text="${targetMonthPlus1Goukei}" align="right">対象月+1合計</td>
 									<td></td>
 								</tr>
 								<tr class="table-success">
-									<td colspan="4">偶数月合計(毎月、偶数月、その他任意の合計値)</td>
-									<td th:text="${anEvenMonthGoukei}" align="right">偶数月合計</td>
+									<td colspan="4" th:text="${targetMonthPlus2Label} + '合計'">対象月+2合計ラベル</td>
+									<td th:text="${targetMonthPlus2Goukei}" align="right">対象月+2合計</td>
 									<td></td>
 								</tr>
 							</tbody>
