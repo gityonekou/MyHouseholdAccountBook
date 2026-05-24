@@ -178,7 +178,15 @@ public class FixedCostAnnualSummaryList {
 
 	// 固定費情報集計用の明細データのリスト
 	private final List<FixedCostAnnualSummaryItem> values;
-
+	
+	// 月別固定費合計(MonthlyRow)リスト
+	@Getter
+	private List<MonthlyRow> monthlyRows;
+	
+	// 年間固定費合計(YearlyRow)
+	@Getter
+	private YearlyRow yearlyRow;
+	
 	/**
 	 *<pre>
 	 * 引数の値から年間固定費合計データのドメインモデルを生成して返します。
@@ -188,10 +196,20 @@ public class FixedCostAnnualSummaryList {
 	 *
 	 */
 	public static FixedCostAnnualSummaryList from(List<FixedCostAnnualSummaryItem> values) {
+		// 自分自身を生成
+		FixedCostAnnualSummaryList summaryList = null;
 		if (CollectionUtils.isEmpty(values)) {
-			return new FixedCostAnnualSummaryList(new ArrayList<>());
+			summaryList = new FixedCostAnnualSummaryList(new ArrayList<>());
+		} else {
+			summaryList = new FixedCostAnnualSummaryList(values);
 		}
-		return new FixedCostAnnualSummaryList(values);
+		
+		// 月別固定費合計(MonthlyRow)リストを生成してセット
+		summaryList.buildMonthlyRows();
+		// 年間固定費合計(YearlyRow)を生成してセット
+		summaryList.buildYearlyRow(summaryList.getMonthlyRows());
+		// 生成したドメインモデルを返す
+		return summaryList;
 	}
 
 	/**
@@ -207,38 +225,15 @@ public class FixedCostAnnualSummaryList {
 
 	/**
 	 *<pre>
-	 * 月別固定費合計(MonthlyRow)リストを生成して返します。
+	 * 月別固定費合計(MonthlyRow)リストを生成してフィールドの同項目に設定します
 	 *</pre>
-	 * @return 月別固定費合計データのリスト（12件）
 	 *
 	 */
-	public List<MonthlyRow> buildMonthlyRows() {
-		List<MonthlyRow> rows = new ArrayList<>();
+	private void buildMonthlyRows() {
+		this.monthlyRows = new ArrayList<>();
 		for (int month = 1; month <= 12; month++) {
-			rows.add(buildMonthlyRow(month));
+			this.monthlyRows.add(buildMonthlyRow(month));
 		}
-		return rows;
-	}
-
-	/**
-	 *<pre>
-	 * 年間固定費合計データ(YearlyRow)を生成して返します。
-	 * 12か月分のMonthlyRowを集計し、カテゴリ別の年間合計金額を計算します。
-	 *</pre>
-	 * @return 年間固定費合計データ
-	 *
-	 */
-	public YearlyRow buildYearlyRow() {
-		Map<AnnualSummaryColumn, FixedCostPaymentTotalAmount> totals = new EnumMap<>(AnnualSummaryColumn.class);
-		for (AnnualSummaryColumn col : AnnualSummaryColumn.values()) {
-			totals.put(col, FixedCostPaymentTotalAmount.ZERO);
-		}
-		for (MonthlyRow monthlyRow : buildMonthlyRows()) {
-			for (AnnualSummaryColumn col : AnnualSummaryColumn.values()) {
-				totals.merge(col, monthlyRow.getAmount(col), FixedCostPaymentTotalAmount::add);
-			}
-		}
-		return new YearlyRow(totals);
 	}
 
 	/**
@@ -269,7 +264,28 @@ public class FixedCostAnnualSummaryList {
 		}
 		return new MonthlyRow(month, amounts);
 	}
-
+	
+	/**
+	 *<pre>
+	 * 年間固定費合計データ(YearlyRow)を生成してフィールドの同項目に設定します。
+	 * 12か月分のMonthlyRowを集計し、カテゴリ別の年間合計金額を計算します。
+	 *</pre>
+	 * @param monthlyRows 月別固定費合計データのリスト（12件）
+	 *
+	 */
+	private void buildYearlyRow(List<MonthlyRow> monthlyRows) {
+		Map<AnnualSummaryColumn, FixedCostPaymentTotalAmount> totals = new EnumMap<>(AnnualSummaryColumn.class);
+		for (AnnualSummaryColumn col : AnnualSummaryColumn.values()) {
+			totals.put(col, FixedCostPaymentTotalAmount.ZERO);
+		}
+		for (MonthlyRow monthlyRow : monthlyRows) {
+			for (AnnualSummaryColumn col : AnnualSummaryColumn.values()) {
+				totals.merge(col, monthlyRow.getAmount(col), FixedCostPaymentTotalAmount::add);
+			}
+		}
+		this.yearlyRow = new YearlyRow(totals);
+	}
+	
 	/**
 	 *<pre>
 	 * 固定費情報集計用の明細データの支出項目コード(祖先コード)から、列挙型(AnnualSummaryColumn)の列分類を判定して返します。

@@ -79,7 +79,7 @@ class FixedCostAnnualSummaryListTest {
 	@DisplayName("① 空リスト → 全月・全列ZERO")
 	void testEmpty() {
 		FixedCostAnnualSummaryList list = FixedCostAnnualSummaryList.from(Collections.emptyList());
-		List<MonthlyRow> rows = list.buildMonthlyRows();
+		List<MonthlyRow> rows = list.getMonthlyRows();
 		assertEquals(12, rows.size(), "12行生成されること");
 		for (int i = 0; i < 12; i++) {
 			MonthlyRow row = rows.get(i);
@@ -101,7 +101,7 @@ class FixedCostAnnualSummaryListTest {
 	void testColumnSeikatsuhi_level1Direct() {
 		FixedCostAnnualSummaryList list = FixedCostAnnualSummaryList.from(
 				List.of(item("00", 10000, "0023", null)));
-		MonthlyRow row = list.buildMonthlyRows().get(0); // 1月で代表
+		MonthlyRow row = list.getMonthlyRows().get(0); // 1月で代表
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.JIGYOU_KEIHI));
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.HIKOZEI));
 		assertEquals("10,000円", row.getAmount(AnnualSummaryColumn.SEIKATSUHI).toFormatString());
@@ -122,7 +122,7 @@ class FixedCostAnnualSummaryListTest {
 	void testColumnSeikatsuhi_level2Other() {
 		FixedCostAnnualSummaryList list = FixedCostAnnualSummaryList.from(
 				List.of(item("00", 10000, "0023", "0029")));
-		MonthlyRow row = list.buildMonthlyRows().get(0); // 1月で代表
+		MonthlyRow row = list.getMonthlyRows().get(0); // 1月で代表
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.JIGYOU_KEIHI));
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.HIKOZEI));
 		assertEquals("10,000円", row.getAmount(AnnualSummaryColumn.SEIKATSUHI).toFormatString());
@@ -143,7 +143,7 @@ class FixedCostAnnualSummaryListTest {
 	void testColumnTsumitateToushi() {
 		FixedCostAnnualSummaryList list = FixedCostAnnualSummaryList.from(
 				List.of(item("00", 10000, "0023", "0031")));
-		MonthlyRow row = list.buildMonthlyRows().get(0); // 1月で代表
+		MonthlyRow row = list.getMonthlyRows().get(0); // 1月で代表
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.JIGYOU_KEIHI));
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.HIKOZEI));
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.SEIKATSUHI));
@@ -164,7 +164,7 @@ class FixedCostAnnualSummaryListTest {
 	void testColumnTsumitateKin() {
 		FixedCostAnnualSummaryList list = FixedCostAnnualSummaryList.from(
 				List.of(item("00", 10000, "0023", "0033")));
-		MonthlyRow row = list.buildMonthlyRows().get(0); // 1月で代表
+		MonthlyRow row = list.getMonthlyRows().get(0); // 1月で代表
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.JIGYOU_KEIHI));
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.HIKOZEI));
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.SEIKATSUHI));
@@ -185,7 +185,7 @@ class FixedCostAnnualSummaryListTest {
 	void testColumnHikozei() {
 		FixedCostAnnualSummaryList list = FixedCostAnnualSummaryList.from(
 				List.of(item("00", 10000, "0013", null)));
-		MonthlyRow row = list.buildMonthlyRows().get(0); // 1月で代表
+		MonthlyRow row = list.getMonthlyRows().get(0); // 1月で代表
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.JIGYOU_KEIHI));
 		assertEquals("10,000円", row.getAmount(AnnualSummaryColumn.HIKOZEI).toFormatString());
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.SEIKATSUHI));
@@ -206,7 +206,7 @@ class FixedCostAnnualSummaryListTest {
 	void testColumnJigyouKeihi() {
 		FixedCostAnnualSummaryList list = FixedCostAnnualSummaryList.from(
 				List.of(item("00", 10000, "0001", null)));
-		MonthlyRow row = list.buildMonthlyRows().get(0); // 1月で代表
+		MonthlyRow row = list.getMonthlyRows().get(0); // 1月で代表
 		assertEquals("10,000円", row.getAmount(AnnualSummaryColumn.JIGYOU_KEIHI).toFormatString());
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.HIKOZEI));
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.SEIKATSUHI));
@@ -227,7 +227,7 @@ class FixedCostAnnualSummaryListTest {
 	void testColumnIruiJukyo() {
 		FixedCostAnnualSummaryList list = FixedCostAnnualSummaryList.from(
 				List.of(item("00", 10000, "0045", null)));
-		MonthlyRow row = list.buildMonthlyRows().get(0); // 1月で代表
+		MonthlyRow row = list.getMonthlyRows().get(0); // 1月で代表
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.JIGYOU_KEIHI));
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.HIKOZEI));
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.SEIKATSUHI));
@@ -248,7 +248,7 @@ class FixedCostAnnualSummaryListTest {
 	void testColumnInshoku() {
 		FixedCostAnnualSummaryList list = FixedCostAnnualSummaryList.from(
 				List.of(item("00", 10000, "0049", null)));
-		MonthlyRow row = list.buildMonthlyRows().get(0); // 1月で代表
+		MonthlyRow row = list.getMonthlyRows().get(0); // 1月で代表
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.JIGYOU_KEIHI));
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.HIKOZEI));
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.SEIKATSUHI));
@@ -269,7 +269,7 @@ class FixedCostAnnualSummaryListTest {
 	void testColumnShumi() {
 		FixedCostAnnualSummaryList list = FixedCostAnnualSummaryList.from(
 				List.of(item("00", 10000, "0056", null)));
-		MonthlyRow row = list.buildMonthlyRows().get(0); // 1月で代表
+		MonthlyRow row = list.getMonthlyRows().get(0); // 1月で代表
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.JIGYOU_KEIHI));
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.HIKOZEI));
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.SEIKATSUHI));
@@ -307,7 +307,7 @@ class FixedCostAnnualSummaryListTest {
 				item("05", 20000, "0023", "0029"),  // 5月指定
 				item("40",  1000, "0023", "0029")); // その他任意
 		FixedCostAnnualSummaryList list = FixedCostAnnualSummaryList.from(items);
-		List<MonthlyRow> rows = list.buildMonthlyRows();
+		List<MonthlyRow> rows = list.getMonthlyRows();
 
 		assertEquals("16,000円", rows.get(0).getAmount(AnnualSummaryColumn.SEIKATSUHI).toFormatString(), "1月(奇)");
 		assertEquals("14,000円", rows.get(1).getAmount(AnnualSummaryColumn.SEIKATSUHI).toFormatString(), "2月(偶)");
@@ -345,7 +345,7 @@ class FixedCostAnnualSummaryListTest {
 				item("00", 20000, "0023", "0029"), // SEIKATSUHI
 				item("00",  5000, "0013", null));  // HIKOZEI
 		FixedCostAnnualSummaryList list = FixedCostAnnualSummaryList.from(items);
-		List<MonthlyRow> rows = list.buildMonthlyRows();
+		List<MonthlyRow> rows = list.getMonthlyRows();
 
 		// 1月・6月・12月で代表検証（全12月同値）
 		for (int idx : new int[]{0, 5, 11}) {
@@ -376,7 +376,7 @@ class FixedCostAnnualSummaryListTest {
 	@DisplayName("⑬ buildYearlyRow: 空リスト → 全列ZERO・年合計ZERO")
 	void testBuildYearlyRow_empty() {
 		FixedCostAnnualSummaryList list = FixedCostAnnualSummaryList.from(Collections.emptyList());
-		YearlyRow row = list.buildYearlyRow();
+		YearlyRow row = list.getYearlyRow();
 		for (AnnualSummaryColumn col : AnnualSummaryColumn.values()) {
 			assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(col), col + " はZERO");
 		}
@@ -395,7 +395,7 @@ class FixedCostAnnualSummaryListTest {
 	void testBuildYearlyRow_monthly() {
 		FixedCostAnnualSummaryList list = FixedCostAnnualSummaryList.from(
 				List.of(item("00", 10000, "0023", "0029")));  // SEIKATSUHI, 毎月
-		YearlyRow row = list.buildYearlyRow();
+		YearlyRow row = list.getYearlyRow();
 		assertEquals("120,000円", row.getAmount(AnnualSummaryColumn.SEIKATSUHI).toFormatString(), "SEIKATSUHI年間合計");
 		assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(AnnualSummaryColumn.JIGYOU_KEIHI), "JIGYOU_KEIHI=ZERO");
 		assertEquals("120,000円", row.getYearTotal().toFormatString(), "年合計");
@@ -413,7 +413,7 @@ class FixedCostAnnualSummaryListTest {
 	void testBuildYearlyRow_oddMonth() {
 		FixedCostAnnualSummaryList list = FixedCostAnnualSummaryList.from(
 				List.of(item("20", 10000, "0013", null)));  // HIKOZEI, 奇数月
-		YearlyRow row = list.buildYearlyRow();
+		YearlyRow row = list.getYearlyRow();
 		assertEquals("60,000円", row.getAmount(AnnualSummaryColumn.HIKOZEI).toFormatString(), "HIKOZEI年間合計");
 		assertEquals("60,000円", row.getYearTotal().toFormatString(), "年合計");
 	}
@@ -430,7 +430,7 @@ class FixedCostAnnualSummaryListTest {
 	void testBuildYearlyRow_evenMonth() {
 		FixedCostAnnualSummaryList list = FixedCostAnnualSummaryList.from(
 				List.of(item("30", 5000, "0023", "0031")));  // TSUMITATE_TOUSHI, 偶数月
-		YearlyRow row = list.buildYearlyRow();
+		YearlyRow row = list.getYearlyRow();
 		assertEquals("30,000円", row.getAmount(AnnualSummaryColumn.TSUMITATE_TOUSHI).toFormatString(), "TSUMITATE_TOUSHI年間合計");
 		assertEquals("30,000円", row.getYearTotal().toFormatString(), "年合計");
 	}
@@ -447,7 +447,7 @@ class FixedCostAnnualSummaryListTest {
 	void testBuildYearlyRow_specificMonth() {
 		FixedCostAnnualSummaryList list = FixedCostAnnualSummaryList.from(
 				List.of(item("05", 20000, "0023", "0033")));  // TSUMITATE_KIN, 5月のみ
-		YearlyRow row = list.buildYearlyRow();
+		YearlyRow row = list.getYearlyRow();
 		assertEquals("20,000円", row.getAmount(AnnualSummaryColumn.TSUMITATE_KIN).toFormatString(), "TSUMITATE_KIN年間合計");
 		assertEquals("20,000円", row.getYearTotal().toFormatString(), "年合計");
 	}
@@ -471,7 +471,7 @@ class FixedCostAnnualSummaryListTest {
 				item("00", 20000, "0023", "0029"), // SEIKATSUHI,   毎月
 				item("00",  5000, "0013", null));  // HIKOZEI,       毎月
 		FixedCostAnnualSummaryList list = FixedCostAnnualSummaryList.from(items);
-		YearlyRow row = list.buildYearlyRow();
+		YearlyRow row = list.getYearlyRow();
 
 		assertEquals("120,000円", row.getAmount(AnnualSummaryColumn.JIGYOU_KEIHI).toFormatString(), "JIGYOU_KEIHI年間合計");
 		assertEquals("240,000円", row.getAmount(AnnualSummaryColumn.SEIKATSUHI).toFormatString(),   "SEIKATSUHI年間合計");

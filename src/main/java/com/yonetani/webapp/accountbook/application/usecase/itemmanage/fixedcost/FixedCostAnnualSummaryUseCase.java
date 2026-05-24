@@ -81,7 +81,7 @@ public class FixedCostAnnualSummaryUseCase {
 			response.addMessage("登録済み固定費情報が0件です。");
 		} else {
 			response.setAnnualSummaryRowList(
-					createAnnualSummaryRowList(summaryList.buildMonthlyRows(), summaryList.buildYearlyRow()));
+					createAnnualSummaryRowList(summaryList.getMonthlyRows(), summaryList.getYearlyRow()));
 		}
 		return response;
 	}

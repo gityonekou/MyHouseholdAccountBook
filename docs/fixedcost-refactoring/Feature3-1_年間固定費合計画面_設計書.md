@@ -244,7 +244,8 @@ public static class MonthlyRow {
 
 ### 4-5. `YearlyRow`（内部クラス）
 
-12か月の月別合計を集計した年間合計データ。`buildYearlyRow()` が生成して返す。
+12か月の月別合計を集計した年間合計データ。
+`from()` が内部で `buildYearlyRow()` を呼び出してフィールドに設定し、外部からは `getYearlyRow()` で取得する。
 
 ```java
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -267,8 +268,8 @@ public static class YearlyRow {
 
 > **設計ポイント（DDD境界）**: 年間合計の集計は「データをどう集約するか」というドメインロジックであるため、
 > UseCase ではなくドメイン層に配置する。UseCase は DTO 変換（`toZeroDashString()`）のみを担う。
-> `buildYearlyRow()` は内部で `buildMonthlyRows()` を呼び出すため月別行を二重計算するが、
-> 固定費データは最大数百件と少量であり、パフォーマンス上の問題はない。
+> `from()` が `buildMonthlyRows()` → `buildYearlyRow()` の順で呼び出すため二重計算はなく、
+> 集計結果は `monthlyRows` / `yearlyRow` フィールドに保持される。
 
 ### 4-6. `FixedCostAnnualSummaryList` クラス
 
@@ -278,47 +279,47 @@ public class FixedCostAnnualSummaryList {
 
     private final List<FixedCostAnnualSummaryItem> values;
 
-    public static FixedCostAnnualSummaryList from(List<FixedCostAnnualSummaryItem> values) { ... }
+    // 月別固定費合計(MonthlyRow)リスト（from() 内で設定）
+    @Getter
+    private List<MonthlyRow> monthlyRows;
+
+    // 年間固定費合計(YearlyRow)（from() 内で設定）
+    @Getter
+    private YearlyRow yearlyRow;
+
+    public static FixedCostAnnualSummaryList from(List<FixedCostAnnualSummaryItem> values) {
+        // インスタンス生成後、月別行 → 年間合計の順で集計してフィールドに設定する
+        FixedCostAnnualSummaryList summaryList = CollectionUtils.isEmpty(values)
+                ? new FixedCostAnnualSummaryList(new ArrayList<>())
+                : new FixedCostAnnualSummaryList(values);
+        summaryList.buildMonthlyRows();
+        summaryList.buildYearlyRow(summaryList.getMonthlyRows());
+        return summaryList;
+    }
 
     public boolean isEmpty() { ... }
 
-    /** 1月〜12月の MonthlyRow リストを生成して返します。 */
-    public List<MonthlyRow> buildMonthlyRows() {
-        List<MonthlyRow> rows = new ArrayList<>();
+    private void buildMonthlyRows() {
+        this.monthlyRows = new ArrayList<>();
         for (int month = 1; month <= 12; month++) {
-            rows.add(buildMonthlyRow(month));
+            this.monthlyRows.add(buildMonthlyRow(month));
         }
-        return rows;
     }
 
-    /** 12か月分の月別合計を集計した YearlyRow を生成して返します。 */
-    public YearlyRow buildYearlyRow() {
+    private void buildYearlyRow(List<MonthlyRow> monthlyRows) {
         Map<AnnualSummaryColumn, FixedCostPaymentTotalAmount> totals = new EnumMap<>(AnnualSummaryColumn.class);
         for (AnnualSummaryColumn col : AnnualSummaryColumn.values()) {
             totals.put(col, FixedCostPaymentTotalAmount.ZERO);
         }
-        for (MonthlyRow monthlyRow : buildMonthlyRows()) {
+        for (MonthlyRow monthlyRow : monthlyRows) {
             for (AnnualSummaryColumn col : AnnualSummaryColumn.values()) {
                 totals.merge(col, monthlyRow.getAmount(col), FixedCostPaymentTotalAmount::add);
             }
         }
-        return new YearlyRow(totals);
+        this.yearlyRow = new YearlyRow(totals);
     }
 
-    private MonthlyRow buildMonthlyRow(int month) {
-        Map<AnnualSummaryColumn, FixedCostPaymentTotalAmount> amounts = new EnumMap<>(AnnualSummaryColumn.class);
-        for (AnnualSummaryColumn col : AnnualSummaryColumn.values()) {
-            amounts.put(col, FixedCostPaymentTotalAmount.ZERO);
-        }
-        for (FixedCostAnnualSummaryItem item : values) {
-            if (shouldAdd(item.getFixedCostTargetPaymentMonth().getValue(), month)) {
-                AnnualSummaryColumn col = determineColumn(item);
-                amounts.merge(col, item.getFixedCostPaymentAmount().toTotalAmount(),
-                        FixedCostPaymentTotalAmount::add);
-            }
-        }
-        return new MonthlyRow(month, amounts);
-    }
+    private MonthlyRow buildMonthlyRow(int month) { ... }
 
     // FixedCostInquiryList.shouldAdd() と同一ロジック
     private static boolean shouldAdd(String shiharaiTukiCode, int monthValue) { ... }
@@ -500,7 +501,7 @@ public class FixedCostAnnualSummaryUseCase {
             response.addMessage("登録済み固定費情報が0件です。");
         } else {
             response.setAnnualSummaryRowList(
-                    createAnnualSummaryRowList(summaryList.buildMonthlyRows(), summaryList.buildYearlyRow()));
+                    createAnnualSummaryRowList(summaryList.getMonthlyRows(), summaryList.getYearlyRow()));
         }
         return response;
     }
@@ -818,3 +819,4 @@ public ModelAndView getAnnualSummary() {
 | 2026/05/17 | 初版作成 |
 | 2026/05/23 | レビュー指摘対応（Level 5対応のSQL設計変更・Money/NullableMoneyメソッド追加・targetYear削除・TargetYearMonthリポジトリメソッド修正） |
 | 2026/05/24 | DDD改善対応: `YearlyRow` 内部クラス（§4-5）・`buildYearlyRow()` メソッド（§4-6）を追加。年間合計集計ロジックを UseCase からドメイン層に移動。UseCase の `createAnnualSummaryRowList` 引数を `(List<MonthlyRow>, YearlyRow)` に変更（§7）。`FixedCostAnnualSummaryListTest` に `buildYearlyRow()` のテスト⑬〜⑱を追加（§11-1）。`FixedCostInfoManageControllerIntegrationTest` に `/annualsummary/` エンドポイントのテスト⑯ `testGetAnnualSummary` を追加（§11-4）。 |
+| 2026/05/24 | クラス設計改善: `FixedCostAnnualSummaryList` に `monthlyRows`・`yearlyRow` フィールドを追加し、`from()` 内で集計済みの値を設定して返す方式に変更（§4-6）。`buildMonthlyRows()`・`buildYearlyRow()` を private void に変更。UseCase は `getMonthlyRows()`・`getYearlyRow()` で値を取得する方式に変更（§7）。 |
