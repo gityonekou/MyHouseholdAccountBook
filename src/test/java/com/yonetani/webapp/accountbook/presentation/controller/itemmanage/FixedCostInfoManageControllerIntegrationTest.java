@@ -9,7 +9,7 @@
  * ・standaloneSetup でControllerをセットアップ
  *
  * [テストシナリオ]
- * ①  正常系：GET /initload/ 固定費一覧4件の初期表示
+ * ①  正常系：GET /initload/ 固定費一覧5件の初期表示
  * ②  正常系：GET /select?fixedCostCode=0001 処理選択画面表示(家賃)
  * ③  正常系：GET /addload?sisyutuItemCode=0035 固定費未登録→更新画面へ
  * ④  正常系：GET /addload?sisyutuItemCode=0030 固定費登録済み→初期表示(登録済みメッセージ)
@@ -24,6 +24,7 @@
  * ⑬  正常系：GET /updateComplete/ 完了後の初期表示
  * ⑭  正常系：POST /update/ actionCancel (action=add) 初期表示画面へ
  * ⑮  正常系：POST /update/ actionCancel (action=update) 処理選択画面へ
+ * ⑯  正常系：GET /annualsummary/ 年間固定費合計画面表示（13行）
  *
  * [テストデータ]
  * 固定費4件: 0001:家賃(0030), 0002:電気代概算(0037), 0003:国民年金保険(0015), 0004:その他任意テスト(0038)
@@ -34,6 +35,7 @@
  * 日付       : version  コメントなど
  * 2026/04/19 : 1.01.00  新規作成
  * 2026/05/01 : 1.01.01  テストシナリオ⑭、⑮を追加（更新画面からのキャンセル操作のパターン追加）
+ * 2026/05/24 : 1.01.02  テストシナリオ⑯を追加（年間固定費合計画面表示）
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.itemmanage;
@@ -58,6 +60,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostAnnualSummaryUseCase;
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostInquiryUseCase;
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostRegistConfirmUseCase;
 import com.yonetani.webapp.accountbook.presentation.controller.MyHouseholdAccountBookControllerAdvice;
@@ -105,6 +108,10 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	@Autowired
 	private FixedCostRegistConfirmUseCase fixedCostRegistConfirmUseCase;
 
+	// UseCase(年間固定費合計)(本物のSpring Bean)
+	@Autowired
+	private FixedCostAnnualSummaryUseCase fixedCostAnnualSummaryUseCase;
+
 	// モック:ログインユーザセッション情報
 	@Mock
 	private LoginUserSession mockLoginUserSession;
@@ -115,6 +122,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 				.standaloneSetup(new FixedCostInfoManageController(
 						fixedCostInquiryUseCase,
 						fixedCostRegistConfirmUseCase,
+						fixedCostAnnualSummaryUseCase,
 						mockLoginUserSession))
 				.setControllerAdvice(new MyHouseholdAccountBookControllerAdvice(mockLoginUserSession))
 				.build();
@@ -136,7 +144,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 *
 	 * 【検証内容】
 	 * ・HTTPステータスが200であること
-	 * ・ビュー名が「itemmanage/FixedCostInfoManageInit」であること
+	 * ・ビュー名が「itemmanage/fixedcost/FixedCostInfoManageInit」であること
 	 * ・fixedCostItemListが4件で取得されること
 	 * ・loginUserNameに「テストユーザ01」が設定されること
 	 *</pre>
@@ -147,7 +155,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 		mockMvc.perform(get("/myhacbook/managebaseinfo/fixedcostinfo/initload/")
 				.with(user("user01").password("password").roles("USER")))
 			.andExpect(status().isOk())
-			.andExpect(view().name("itemmanage/FixedCostInfoManageInit"))
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostInfoManageInit"))
 			.andExpect(model().attribute("fixedCostItemList", hasSize(5)))
 			.andExpect(model().attribute("loginUserName", is("テストユーザ01")));
 	}
@@ -162,7 +170,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 *
 	 * 【検証内容】
 	 * ・HTTPステータスが200であること
-	 * ・ビュー名が「itemmanage/FixedCostInfoManageActSelect」であること
+	 * ・ビュー名が「itemmanage/fixedcost/FixedCostInfoManageActSelect」であること
 	 * ・fixedCostInfoがモデルに設定されること
 	 * ・fixedCostItemListが5件で取得されること
 	 *</pre>
@@ -174,7 +182,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 				.param("fixedCostCode", "0001")
 				.with(user("user01").password("password").roles("USER")))
 			.andExpect(status().isOk())
-			.andExpect(view().name("itemmanage/FixedCostInfoManageActSelect"))
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostInfoManageActSelect"))
 			.andExpect(model().attributeExists("fixedCostInfo"))
 			.andExpect(model().attribute("fixedCostItemList", hasSize(5)));
 	}
@@ -190,7 +198,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 * 【検証内容】
 	 * ・HTTPステータスが200であること
 	 * ・支出項目コード=0035には固定費が未登録のため更新画面に遷移すること
-	 * ・ビュー名が「itemmanage/FixedCostInfoManageUpdate」であること
+	 * ・ビュー名が「itemmanage/fixedcost/FixedCostInfoManageUpdate」であること
 	 * ・fixedCostInfoUpdateFormがモデルに設定されること
 	 *</pre>
 	 */
@@ -201,7 +209,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 				.param("sisyutuItemCode", "0035")
 				.with(user("user01").password("password").roles("USER")))
 			.andExpect(status().isOk())
-			.andExpect(view().name("itemmanage/FixedCostInfoManageUpdate"))
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostInfoManageUpdate"))
 			.andExpect(model().attributeExists("fixedCostInfoUpdateForm"));
 	}
 
@@ -212,7 +220,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 * 【検証内容】
 	 * ・HTTPステータスが200であること
 	 * ・支出項目コード=0030(家賃)は固定費登録済みのため、初期表示画面に戻ること
-	 * ・ビュー名が「itemmanage/FixedCostInfoManageInit」であること
+	 * ・ビュー名が「itemmanage/fixedcost/FixedCostInfoManageInit」であること
 	 * ・registeredFlgがtrueで設定されること
 	 *</pre>
 	 */
@@ -223,7 +231,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 				.param("sisyutuItemCode", "0030")
 				.with(user("user01").password("password").roles("USER")))
 			.andExpect(status().isOk())
-			.andExpect(view().name("itemmanage/FixedCostInfoManageInit"))
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostInfoManageInit"))
 			// 登録済みフラグがtrue
 			.andExpect(model().attribute("registeredFlg", is(true)));
 	}
@@ -238,7 +246,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 *
 	 * 【検証内容】
 	 * ・HTTPステータスが200であること
-	 * ・ビュー名が「itemmanage/FixedCostInfoManageUpdate」であること
+	 * ・ビュー名が「itemmanage/fixedcost/FixedCostInfoManageUpdate」であること
 	 * ・fixedCostInfoUpdateFormがモデルに設定されること
 	 *</pre>
 	 */
@@ -251,7 +259,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 				.with(user("user01").password("password").roles("USER"))
 				.with(csrf()))
 			.andExpect(status().isOk())
-			.andExpect(view().name("itemmanage/FixedCostInfoManageUpdate"))
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostInfoManageUpdate"))
 			.andExpect(model().attributeExists("fixedCostInfoUpdateForm"));
 	}
 
@@ -266,7 +274,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 * 【検証内容】
 	 * ・HTTPステータスが200であること
 	 * ・fixedCostCode=0001を指定して更新画面に遷移すること
-	 * ・ビュー名が「itemmanage/FixedCostInfoManageUpdate」であること
+	 * ・ビュー名が「itemmanage/fixedcost/FixedCostInfoManageUpdate」であること
 	 * ・fixedCostInfoUpdateFormがモデルに設定されること
 	 *</pre>
 	 */
@@ -279,7 +287,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 				.with(user("user01").password("password").roles("USER"))
 				.with(csrf()))
 			.andExpect(status().isOk())
-			.andExpect(view().name("itemmanage/FixedCostInfoManageUpdate"))
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostInfoManageUpdate"))
 			.andExpect(model().attributeExists("fixedCostInfoUpdateForm"));
 	}
 
@@ -294,7 +302,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 * 【検証内容】
 	 * ・HTTPステータスが200であること
 	 * ・キャンセル操作で初期表示画面に戻ること
-	 * ・ビュー名が「itemmanage/FixedCostInfoManageInit」であること
+	 * ・ビュー名が「itemmanage/fixedcost/FixedCostInfoManageInit」であること
 	 * ・fixedCostItemListが4件で取得されること
 	 *</pre>
 	 */
@@ -306,7 +314,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 				.with(user("user01").password("password").roles("USER"))
 				.with(csrf()))
 			.andExpect(status().isOk())
-			.andExpect(view().name("itemmanage/FixedCostInfoManageInit"))
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostInfoManageInit"))
 			.andExpect(model().attribute("fixedCostItemList", hasSize(5)));
 	}
 
@@ -347,7 +355,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 * ・要求は新規追加時のパターンで送信
 	 * ・fixedCostNameを空で送信した場合、バリデーションエラーが発生すること
 	 * ・HTTPステータスが200で更新画面に戻ること
-	 * ・ビュー名が「itemmanage/FixedCostInfoManageUpdate」であること
+	 * ・ビュー名が「itemmanage/fixedcost/FixedCostInfoManageUpdate」であること
 	 * ・fixedCostInfoUpdateFormのfixedCostNameフィールドにエラーが設定されること
 	 *</pre>
 	 */
@@ -367,7 +375,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 				.with(user("user01").password("password").roles("USER"))
 				.with(csrf()))
 			.andExpect(status().isOk())
-			.andExpect(view().name("itemmanage/FixedCostInfoManageUpdate"))
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostInfoManageUpdate"))
 			.andExpect(model().attributeHasFieldErrors("fixedCostInfoUpdateForm", "fixedCostName"));
 	}
 
@@ -400,7 +408,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 				.with(user("user01").password("password").roles("USER"))
 				.with(csrf()))
 			.andExpect(status().isOk())
-			.andExpect(view().name("itemmanage/FixedCostInfoManageUpdate"))
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostInfoManageUpdate"))
 			.andExpect(model().attributeHasFieldErrors("fixedCostInfoUpdateForm", "needCheckShiharaiTukiOptionalContext"));
 	}
 
@@ -483,7 +491,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 *
 	 * 【検証内容】
 	 * ・HTTPステータスが200であること
-	 * ・ビュー名が「itemmanage/FixedCostInfoManageInit」であること
+	 * ・ビュー名が「itemmanage/fixedcost/FixedCostInfoManageInit」であること
 	 * ・fixedCostItemListが4件で取得されること
 	 *</pre>
 	 */
@@ -493,7 +501,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 		mockMvc.perform(get("/myhacbook/managebaseinfo/fixedcostinfo/updateComplete/")
 				.with(user("user01").password("password").roles("USER")))
 			.andExpect(status().isOk())
-			.andExpect(view().name("itemmanage/FixedCostInfoManageInit"))
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostInfoManageInit"))
 			.andExpect(model().attribute("fixedCostItemList", hasSize(5)));
 	}
 
@@ -508,7 +516,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 * 【検証内容】
 	 * ・新規追加からキャンセル操作（action=add）の場合、初期表示画面に遷移すること
 	 * ・HTTPステータスが200であること
-	 * ・ビュー名が「itemmanage/FixedCostInfoManageInit」であること
+	 * ・ビュー名が「itemmanage/fixedcost/FixedCostInfoManageInit」であること
 	 * ・fixedCostItemListが5件で取得されること
 	 *</pre>
 	 */
@@ -521,7 +529,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 				.with(user("user01").password("password").roles("USER"))
 				.with(csrf()))
 			.andExpect(status().isOk())
-			.andExpect(view().name("itemmanage/FixedCostInfoManageInit"))
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostInfoManageInit"))
 			.andExpect(model().attribute("fixedCostItemList", hasSize(5)));
 	}
 
@@ -533,7 +541,7 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	 * ・更新からキャンセル操作（action=update）の場合、処理選択画面に遷移すること
 	 * ・固定費コード=0001(家賃)を指定して処理選択画面に戻ること
 	 * ・HTTPステータスが200であること
-	 * ・ビュー名が「itemmanage/FixedCostInfoManageActSelect」であること
+	 * ・ビュー名が「itemmanage/fixedcost/FixedCostInfoManageActSelect」であること
 	 * ・fixedCostInfoがモデルに設定されること
 	 * ・固定費コード0001は0030に1件のみのためhasSiblingFixedCostがfalseであること
 	 *</pre>
@@ -548,8 +556,41 @@ public class FixedCostInfoManageControllerIntegrationTest {
 				.with(user("user01").password("password").roles("USER"))
 				.with(csrf()))
 			.andExpect(status().isOk())
-			.andExpect(view().name("itemmanage/FixedCostInfoManageActSelect"))
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostInfoManageActSelect"))
 			.andExpect(model().attributeExists("fixedCostInfo"))
 			.andExpect(model().attribute("hasSiblingFixedCost", is(false)));
+	}
+
+	// ================================================================
+	// GET /annualsummary/
+	// ================================================================
+
+	/**
+	 *<pre>
+	 * テスト⑯：正常系：GET /annualsummary/ 年間固定費合計画面表示
+	 *
+	 * 【検証内容】
+	 * ・HTTPステータスが200であること
+	 * ・ビュー名が「itemmanage/fixedcost/FixedCostAnnualSummary」であること
+	 * ・annualSummaryRowListが13件（12か月分のデータ行 + 合計行）で設定されること
+	 * ・targetMonthに現在対象月「11」が設定されること
+	 * ・loginUserNameに「テストユーザ01」が設定されること
+	 *
+	 * [テストデータの固定費5件と年間集計]
+	 * 0001:家賃(毎月)・0002:電気代概算(毎月)・0004:その他任意(任意) → SEIKATSUHI
+	 * 0003:国民年金保険(奇数月) → HIKOZEI
+	 * 0005:電気代夏季割増(偶数月) → SEIKATSUHI
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("正常系：GET /annualsummary/ 年間固定費合計画面表示（12か月行 + 合計行 = 13行）")
+	void testGetAnnualSummary() throws Exception {
+		mockMvc.perform(get("/myhacbook/managebaseinfo/fixedcostinfo/annualsummary/")
+				.with(user("user01").password("password").roles("USER")))
+			.andExpect(status().isOk())
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostAnnualSummary"))
+			.andExpect(model().attribute("annualSummaryRowList", hasSize(13)))
+			.andExpect(model().attribute("targetMonth", is("11")))
+			.andExpect(model().attribute("loginUserName", is("テストユーザ01")));
 	}
 }

@@ -3,8 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version     コメントなど
+ * 日付       : version  コメントなど
  * 2026/04/05 : 1.00.00  新規作成
+ * 2026/05/23 : 1.01.01  年間固定費合計画面新規追加対応
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.fixedcost;
@@ -80,6 +81,18 @@ public class FixedCostPaymentTotalAmount extends Money {
 	 *
 	 */
 	public FixedCostPaymentTotalAmount add(FixedCostPaymentAmount addValue) {
+		return new FixedCostPaymentTotalAmount(super.add(addValue));
+	}
+
+	/**
+	 *<pre>
+	 * 支払金額合計の値を指定した支払金額合計の値で加算(this + addValue)した値を返します。
+	 *</pre>
+	 * @param addValue 加算する支払金額合計の値
+	 * @return 加算した支払金額合計の値(this + addValue)
+	 *
+	 */
+	public FixedCostPaymentTotalAmount add(FixedCostPaymentTotalAmount addValue) {
 		return new FixedCostPaymentTotalAmount(super.add(addValue));
 	}
 }

@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/06/04 : 1.00.00  新規作成
+ * 2026/05/23 : 1.01.01  年間固定費合計画面新規追加対応
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.mapper.account.fixedcost;
@@ -17,6 +18,7 @@ import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostAnnualSummaryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostInquiryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndFixedCostCodeSearchQueryDto;
@@ -31,7 +33,7 @@ import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSear
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Mapper
@@ -115,6 +117,18 @@ public interface FixedCostTableMapper {
 	 */
 	@Select("sql/account/fixedcost/FixedCostTableListSelectSql01.sql")
 	public List<FixedCostReadWriteDto> findByIdAndFixedCostShiharaiTukiList(@Param("dto") UserIdAndFixedCostShiharaiTukiListSearchQueryDto search);
+	
+	/**
+	 *<pre>
+	 * 固定費テーブル:FIXED_COST_TABLE、支出項目テーブル:SISYUTU_ITEM_TABLEから指定のユーザIDを条件に
+	 * 固定費情報を Level-1・Level-2 祖先コード込みで参照します。
+	 *</pre>
+	 * @param userId 検索条件:ユーザID
+	 * @return 固定費情報参照結果のリスト
+	 *
+	 */
+	@Select("sql/account/fixedcost/FixedCostAnnualSummarySelectSql01.sql")
+	public List<FixedCostAnnualSummaryReadDto> findForAnnualSummaryById(@Param("dto") UserIdSearchQueryDto userId);
 	
 	/**
 	 *<pre>

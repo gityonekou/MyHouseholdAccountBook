@@ -6,6 +6,7 @@
  * 日付       : version  コメントなど
  * 2024/06/04 : 1.00.00  新規作成
  * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
+ * 2026/05/23 : 1.01.01  年間固定費合計画面新規追加対応
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.fixedcost;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCost;
+import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostAnnualSummaryList;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
@@ -23,6 +25,9 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostTargetPaymentMonthList;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonth;
+import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostAnnualSummaryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostInquiryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndFixedCostCodeSearchQueryDto;
@@ -153,6 +158,25 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public FixedCostAnnualSummaryList findForAnnualSummaryByUserId(SearchQueryUserId userId) {
+		// 検索結果を取得
+		List<FixedCostAnnualSummaryReadDto> searchResult = mapper.findForAnnualSummaryById(
+				UserIdSearchQueryDto.from(userId));
+		if (searchResult == null) {
+			// 検索結果なしの場合、0件データを返却
+			return FixedCostAnnualSummaryList.from(null);
+		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
+			return FixedCostAnnualSummaryList.from(searchResult.stream()
+					.map(dto -> createFixedCostAnnualSummaryItem(dto))
+					.collect(Collectors.toUnmodifiableList()));
+		}
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public int countByUserId(SearchQueryUserId userId) {
 		// ユーザIDで検索し、登録されている固定費情報の件数を返す
 		return mapper.countById(UserIdSearchQueryDto.from(userId));
@@ -169,7 +193,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	
 	/**
 	 *<pre>
-	 * 引数で指定した固定費テーブル:FIXED_COST_TABLE読込・出力情報から固定費情報ドメインモデルを生成して返します。
+	 * 引数で指定した固定費テーブル:FIXED_COST_TABLE読込・出力情報(DTO)から固定費情報ドメインモデルを生成して返します。
 	 *</pre>
 	 * @param dto 固定費テーブル:FIXED_COST_TABLE読込・出力情報
 	 * @return 固定費情報ドメインモデル
@@ -233,7 +257,7 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	
 	/**
 	 *<pre>
-	 * 引数で指定した固定費情報一覧の明細果情報から固定費一覧明細情報(ドメイン)を生成して返します。
+	 * 引数で指定した固定費情報一覧の明細果情報(DTO)から固定費一覧明細情報(ドメイン)を生成して返します。
 	 *</pre>
 	 * @param dto 固定費情報一覧の明細果情報
 	 * @return 固定費一覧明細情報(ドメイン)
@@ -257,5 +281,26 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 				dto.getFixedCostShiharaiDay(),
 				// 支払金額
 				dto.getShiharaiKingaku());
+	}
+	
+	/**
+	 *<pre>
+	 * 引数で指定した年間固定費合計画面用の固定費情報一覧の明細情報(DTO)から固定費年間合計明細データ(ドメイン)を生成して返します。
+	 *</pre>
+	 * @param dto 固定費テーブルと支出項目テーブルを結合し、Level-1・Level-2 祖先コードを含む情報を保持するDTO
+	 * @return 固定費年間合計明細データ(ドメイン)
+	 *
+	 */
+	private FixedCostAnnualSummaryList.FixedCostAnnualSummaryItem createFixedCostAnnualSummaryItem(
+			FixedCostAnnualSummaryReadDto dto) {
+		return FixedCostAnnualSummaryList.FixedCostAnnualSummaryItem.from(
+				// 支払月コード
+				FixedCostTargetPaymentMonth.from(dto.getFixedCostShiharaiTuki()),
+				// 支払金額
+				FixedCostPaymentAmount.from(dto.getShiharaiKingaku()),
+				// Level-1 祖先支出項目コード
+				dto.getLevel1SisyutuItemCode(),
+				// Level-2 祖先支出項目コード（null許容）
+				dto.getLevel2SisyutuItemCode());
 	}
 }

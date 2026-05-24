@@ -46,15 +46,15 @@ import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostBulkUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractFixedCostItemListResponse;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractFixedCostItemListResponse.FixedCostItem;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostBulkUpdateResponse;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostBulkUpdateResponse.BulkUpdateTargetItem;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageActSelectResponse;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageActSelectResponse.SiblingFixedCostItem;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageInitResponse;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageInitResponse.SisyutuItemCodeInfo;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageUpdateResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.AbstractFixedCostItemListResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostBulkUpdateResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageActSelectResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageInitResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageUpdateResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.AbstractFixedCostItemListResponse.FixedCostItem;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostBulkUpdateResponse.BulkUpdateTargetItem;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageActSelectResponse.SiblingFixedCostItem;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageInitResponse.SisyutuItemCodeInfo;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.RequiredArgsConstructor;
@@ -493,6 +493,8 @@ public class FixedCostInquiryUseCase {
 			response.setTargetMonthPlus1Goukei(searchResult.calculateMonthlyTotal(ym1).toFormatString());
 			// 対象月+2合計を設定
 			response.setTargetMonthPlus2Goukei(searchResult.calculateMonthlyTotal(ym2).toFormatString());
+			// 月別固定費一覧タブリンク用の現在対象月を設定
+			response.setTargetMonthValue(targetYearMonth.getMonth());
 		}
 	}
 	

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<style>
+.nav-tabs a.nav-link { padding: .5rem 1rem; }
+</style>
+<title>年間固定費合計</title>
+</head>
+<body>
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">年間固定費合計</h5>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
+			</div>
+
+			<!-- ===== タブナビゲーション ===== -->
+			<nav>
+				<div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+					<!-- ① 固定費管理タブ [遷移] -->
+					<a class="nav-link" th:href="@{/myhacbook/managebaseinfo/fixedcostinfo/initload/}">固定費管理</a>
+					<!-- ② 年間固定費合計タブ [現在アクティブ] -->
+					<button class="nav-link active" type="button" role="tab" aria-selected="true" disabled>年間固定費合計</button>
+					<!-- ③ 月別固定費一覧タブ [現在対象月でデフォルト遷移] -->
+					<a class="nav-link" th:href="@{/myhacbook/managebaseinfo/fixedcostinfo/monthlydetail/(month=${targetMonth})}">月別固定費一覧</a>
+				</div>
+			</nav>
+
+			<!-- 年間固定費合計テーブル表示エリア -->
+			<th:block th:if="${annualSummaryRowList != null}">
+			<div class="card-body">
+				<div class="card">
+					<div class="card-body">
+						<p class="h6">■ 年間固定費合計 ■</p>
+						<p class="card-text">
+							各月の固定費合計です。金額0の場合は「ー」を表示します。<br>
+							<span class="text-muted small">
+								※列「固定費(生活費)」= 固定費(課税)から積立(投資)・積立金を除いた値
+								（地代家賃・水光熱通費・税金支払い・保険料 など）
+							</span>
+						</p>
+						<table class="table table-sm table-bordered table-hover">
+							<thead>
+								<tr class="table-secondary">
+									<th class="w5" style="vertical-align:middle;">月</th>
+									<th class="w7 text-end" style="vertical-align:middle;">事業経費</th>
+									<th class="w7 text-end" style="vertical-align:middle;">固定費<br>(非課税)</th>
+									<th class="w8 text-end" style="vertical-align:middle;">固定費<br>(生活費)</th>
+									<th class="w7 text-end" style="vertical-align:middle;">積立<br>(投資)</th>
+									<th class="w7 text-end" style="vertical-align:middle;">積立金</th>
+									<th class="w7 text-end" style="vertical-align:middle;">衣類<br>住居設備</th>
+									<th class="w7 text-end" style="vertical-align:middle;">飲食<br>日用品</th>
+									<th class="w7 text-end" style="vertical-align:middle;">趣味<br>娯楽</th>
+									<th class="w8 text-end" style="vertical-align:middle;">月合計</th>
+									<th class="w5" style="vertical-align:middle;">詳細</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="row : ${annualSummaryRowList}"
+									th:classappend="${row.totalRow} ? 'table-success' : (${row.evenMonth} ? 'table-warning' : '')">
+									<td th:text="${row.monthLabel}">1月</td>
+									<td class="text-end" th:text="${row.jigyouKeihi}">ー</td>
+									<td class="text-end" th:text="${row.hikozei}">ー</td>
+									<td class="text-end" th:text="${row.seikatsuhi}">ー</td>
+									<td class="text-end" th:text="${row.tsumitateToushi}">ー</td>
+									<td class="text-end" th:text="${row.tsumitateKin}">ー</td>
+									<td class="text-end" th:text="${row.iruiJukyo}">ー</td>
+									<td class="text-end" th:text="${row.inshoku}">ー</td>
+									<td class="text-end" th:text="${row.shumiGoraku}">ー</td>
+									<td class="text-end"><strong th:text="${row.monthTotal}">XXX円</strong></td>
+									<td>
+										<a th:if="${!row.totalRow}"
+										   class="btn btn-sm btn-outline-primary"
+										   th:href="@{/myhacbook/managebaseinfo/fixedcostinfo/monthlydetail/(month=${row.detailMonth})}">詳細へ</a>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+			</th:block>
+		</div>
+	</div>
+
+	<!--/* フッター共通jsのインクルード */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+
+</body>
+</html>

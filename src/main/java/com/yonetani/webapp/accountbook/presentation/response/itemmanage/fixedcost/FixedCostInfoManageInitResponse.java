@@ -10,7 +10,7 @@
  * 2024/05/21 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.presentation.response.itemmanage;
+package com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ import lombok.Setter;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -46,7 +46,7 @@ public class FixedCostInfoManageInitResponse extends AbstractFixedCostItemListRe
 	 *</pre>
 	 *
 	 * @author ：Kouki Yonetani
-	 * @since 家計簿アプリ(1.00.A)
+	 * @since 家計簿アプリ(1.00)
 	 *
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -112,7 +112,7 @@ public class FixedCostInfoManageInitResponse extends AbstractFixedCostItemListRe
 	@Override
 	public ModelAndView build() {
 		// 画面表示のModelとViewを生成
-		ModelAndView modelAndView = createModelAndView("itemmanage/FixedCostInfoManageInit");
+		ModelAndView modelAndView = createModelAndView("itemmanage/fixedcost/FixedCostInfoManageInit");
 		// 登録済み表示エリアを表示するかどうかのフラグ
 		modelAndView.addObject("registeredFlg", registeredFlg);
 		// 選択した支出項目コード情報

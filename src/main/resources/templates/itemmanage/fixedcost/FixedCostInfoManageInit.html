@@ -6,6 +6,9 @@
 		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
 		crossorigin="anonymous">
 <link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<style>
+.nav-tabs a.nav-link { padding: .5rem 1rem; }
+</style>
 <title>情報管理(固定費)</title>
 </head>
 <body>
@@ -21,7 +24,19 @@
 					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
 				</th:block>
 			</div>
-			
+
+			<!-- ===== タブナビゲーション ===== -->
+			<nav>
+				<div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
+					<!-- ① 固定費管理タブ [現在アクティブ] -->
+					<button class="nav-link active" type="button" role="tab" aria-selected="true" disabled>固定費管理</button>
+					<!-- ② 年間固定費合計タブ [遷移] -->
+					<a class="nav-link" th:href="@{/myhacbook/managebaseinfo/fixedcostinfo/annualsummary/}">年間固定費合計</a>
+					<!-- ③ 月別固定費一覧タブ [現在対象月でデフォルト遷移] -->
+					<a class="nav-link" th:href="@{/myhacbook/managebaseinfo/fixedcostinfo/monthlydetail/(month=${targetMonthValue})}">月別固定費一覧</a>
+				</div>
+			</nav>
+
 			<!-- 選択支出情報表示エリア -->
 			<th:block th:if="${registeredFlg}">
 			<div class="card-body">

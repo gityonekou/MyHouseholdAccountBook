@@ -162,18 +162,31 @@ public class FixedCostInquiryList {
 
 	/**
 	 * 固定費支払月コードと対象月の値から、その月に支払いが発生するかどうかを返します。
+	 * 
+	 * @param shiharaiTukiCode 固定費支払月コード（"00"=毎月, "20"=奇数月, "30"=偶数月, "40"=任意, "01"〜"12"=特定月）
+	 * @param monthValue 対象月（1〜12）
+	 * @return 指定した月に支払いが発生する場合true、そうでない場合false
 	 */
 	private static boolean shouldAdd(String shiharaiTukiCode, int monthValue) {
+		
+		// 固定費支払月コードに応じて、対象月に支払いが発生するかどうかを判定
 		switch (shiharaiTukiCode) {
-			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_EVERY_SELECTED_VALUE:    // "00" 毎月
-			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE: // "40" その他任意
+		
+			// "00" 毎月 と "40" その他任意 は常に支払いが発生(trueを返す)
+			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_EVERY_SELECTED_VALUE:
+			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE:
 				return true;
-			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_ODD_SELECTED_VALUE:      // "20" 奇数月
+				
+			// "20" 奇数月
+			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_ODD_SELECTED_VALUE:
 				return monthValue % 2 == 1;
-			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_AN_EVEN_SELECTED_VALUE:  // "30" 偶数月
+				
+			// "30" 偶数月
+			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_AN_EVEN_SELECTED_VALUE:
 				return monthValue % 2 == 0;
+				
+			// それ以外は "01"〜"12" の特定月指定と想定し、整数値に変換して比較
 			default:
-				// "01"〜"12"：特定月指定
 				return Integer.parseInt(shiharaiTukiCode) == monthValue;
 		}
 	}
