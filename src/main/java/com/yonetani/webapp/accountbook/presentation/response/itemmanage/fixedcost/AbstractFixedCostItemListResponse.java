@@ -13,6 +13,7 @@
  * 2024/06/08 : 1.00.00  新規作成
  * 2026/05/07 : 1.01.00  固定費合計表示変更(奇数月/偶数月合計→3か月合計)
  * 2026/05/23 : 1.01.01  月別固定費一覧新規追加対応
+ * 2026/05/27 : 1.01.02  targetMonthValue フィールド削除（月別固定費一覧タブリンクをセッション管理に変更）
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost;
@@ -127,10 +128,6 @@ public abstract class AbstractFixedCostItemListResponse extends AbstractExpendit
 	@Getter
 	@Setter
 	private String targetMonthPlus2Goukei;
-	// 現在の対象月（月別固定費一覧タブリンク用、"MM"形式 例:"05"）
-	@Getter
-	@Setter
-	private String targetMonthValue;
 
 	/**
 	 * {@inheritDoc}
@@ -153,8 +150,6 @@ public abstract class AbstractFixedCostItemListResponse extends AbstractExpendit
 		modelAndView.addObject("targetMonthPlus1Goukei", targetMonthPlus1Goukei);
 		// 対象月+2合計を設定
 		modelAndView.addObject("targetMonthPlus2Goukei", targetMonthPlus2Goukei);
-		// 月別固定費一覧タブリンク用の現在対象月を設定
-		modelAndView.addObject("targetMonthValue", targetMonthValue);
 
 		return modelAndView;
 	}

@@ -20,8 +20,6 @@ import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostA
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostAnnualSummaryList.YearlyRow;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
-import com.yonetani.webapp.accountbook.domain.repository.common.AccountBookUserRepository;
-import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostAnnualSummaryResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostAnnualSummaryResponse.AnnualSummaryRowItem;
@@ -48,8 +46,6 @@ public class FixedCostAnnualSummaryUseCase {
 
 	// 固定費テーブル:FIXED_COST_TABLEリポジトリー
 	private final FixedCostTableRepository fixedCostRepository;
-	// 家計簿ユーザーリポジトリー
-	private final AccountBookUserRepository accountBookUserRepository;
 
 	/**
 	 *<pre>
@@ -65,17 +61,12 @@ public class FixedCostAnnualSummaryUseCase {
 
 		UserId userId = UserId.from(user.getUserId());
 
-		// 現在の対象年月を取得
-		TargetYearMonth targetYearMonth = accountBookUserRepository.getTargetYearMonth(
-				SearchQueryUserId.from(userId));
-
 		// 年間固定費合計データを取得
 		FixedCostAnnualSummaryList summaryList = fixedCostRepository.findForAnnualSummaryByUserId(
 				SearchQueryUserId.from(userId));
 
-		// レスポンス生成（現在対象月を月別固定費一覧タブリンク用に渡す）
-		FixedCostAnnualSummaryResponse response = FixedCostAnnualSummaryResponse.getInstance(
-				targetYearMonth.getMonth());
+		// レスポンス生成
+		FixedCostAnnualSummaryResponse response = FixedCostAnnualSummaryResponse.getInstance();
 
 		if (summaryList.isEmpty()) {
 			response.addMessage("登録済み固定費情報が0件です。");
@@ -116,7 +107,7 @@ public class FixedCostAnnualSummaryUseCase {
 	 */
 	private AnnualSummaryRowItem createDataRow(MonthlyRow row) {
 		return AnnualSummaryRowItem.createDataRow(
-				String.format("%d月", row.getMonth()),
+				String.format("%02d月", row.getMonth()),
 				row.getAmount(AnnualSummaryColumn.JIGYOU_KEIHI).toZeroDashString(),
 				row.getAmount(AnnualSummaryColumn.HIKOZEI).toZeroDashString(),
 				row.getAmount(AnnualSummaryColumn.SEIKATSUHI).toZeroDashString(),

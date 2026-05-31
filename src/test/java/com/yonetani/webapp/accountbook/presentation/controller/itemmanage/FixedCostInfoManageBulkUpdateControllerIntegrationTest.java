@@ -53,8 +53,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostAnnualSummaryUseCase;
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostInquiryUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostMonthlyDetailUseCase;
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostRegistConfirmUseCase;
 import com.yonetani.webapp.accountbook.presentation.controller.MyHouseholdAccountBookControllerAdvice;
+import com.yonetani.webapp.accountbook.presentation.session.FixedCostInfoManageSession;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
@@ -97,9 +99,17 @@ public class FixedCostInfoManageBulkUpdateControllerIntegrationTest {
 	@Autowired
 	private FixedCostAnnualSummaryUseCase fixedCostAnnualSummaryUseCase;
 
+	// UseCase(月別固定費一覧)(本物のSpring Bean)
+	@Autowired
+	private FixedCostMonthlyDetailUseCase fixedCostMonthlyDetailUseCase;
+
 	// モック:ログインユーザセッション情報
 	@Mock
 	private LoginUserSession mockLoginUserSession;
+
+	// モック:固定費情報管理セッション
+	@Mock
+	private FixedCostInfoManageSession mockFixedCostInfoManageSession;
 
 	@BeforeEach
 	void setupMockMvc() {
@@ -108,11 +118,14 @@ public class FixedCostInfoManageBulkUpdateControllerIntegrationTest {
 						fixedCostInquiryUseCase,
 						fixedCostRegistConfirmUseCase,
 						fixedCostAnnualSummaryUseCase,
-						mockLoginUserSession))
+						fixedCostMonthlyDetailUseCase,
+						mockLoginUserSession,
+						mockFixedCostInfoManageSession))
 				.setControllerAdvice(new MyHouseholdAccountBookControllerAdvice(mockLoginUserSession))
 				.build();
 
 		doReturn(createLoginUser()).when(mockLoginUserSession).getLoginUserInfo();
+		doReturn(null).when(mockFixedCostInfoManageSession).getSelectedMonth();
 	}
 
 	private LoginUserInfo createLoginUser() {

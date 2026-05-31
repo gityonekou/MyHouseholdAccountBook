@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2026/05/23 : 1.01.00  新規作成
+ * 2026/05/27 : 1.01.01  targetMonth フィールド削除（月別固定費一覧タブリンクをセッション管理に変更）
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost;
@@ -30,7 +31,6 @@ import lombok.Setter;
  * @since 家計簿アプリ(1.00)
  *
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class FixedCostAnnualSummaryResponse extends AbstractResponse {
 
 	/**
@@ -39,7 +39,7 @@ public class FixedCostAnnualSummaryResponse extends AbstractResponse {
 	@Getter
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	public static class AnnualSummaryRowItem {
-		// "1月"〜"12月"、"合計"
+		// "01月"〜"12月"、"合計"
 		private final String monthLabel;
 		// 事業経費（"ー" or "XXX円"）
 		private final String jigyouKeihi;
@@ -120,9 +120,6 @@ public class FixedCostAnnualSummaryResponse extends AbstractResponse {
 		}
 	}
 
-	// 月別固定費一覧タブリンク用の現在対象月（"MM"形式）
-	@Getter
-	private final String targetMonth;
 	// 年間固定費合計行リスト（12行 + 合計行）
 	@Getter
 	@Setter
@@ -130,14 +127,13 @@ public class FixedCostAnnualSummaryResponse extends AbstractResponse {
 
 	/**
 	 *<pre>
-	 * 引数の値からレスポンス情報を生成して返します。
+	 * レスポンス情報を生成して返します。
 	 *</pre>
-	 * @param targetMonth 現在対象月（"MM"形式）
 	 * @return 年間固定費合計画面表示情報
 	 *
 	 */
-	public static FixedCostAnnualSummaryResponse getInstance(String targetMonth) {
-		return new FixedCostAnnualSummaryResponse(targetMonth);
+	public static FixedCostAnnualSummaryResponse getInstance() {
+		return new FixedCostAnnualSummaryResponse();
 	}
 
 	/**
@@ -147,8 +143,6 @@ public class FixedCostAnnualSummaryResponse extends AbstractResponse {
 	public ModelAndView build() {
 		// 画面表示用のModelAndViewを生成して返す
 		ModelAndView modelAndView = createModelAndView("itemmanage/fixedcost/FixedCostAnnualSummary");
-		// タブリンク用の対象をModelに設定
-		modelAndView.addObject("targetMonth", targetMonth);
 		// 年間固定費合計行リストをModelに設定
 		modelAndView.addObject("annualSummaryRowList", annualSummaryRowList);
 		return modelAndView;

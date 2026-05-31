@@ -29,11 +29,11 @@
 			<nav>
 				<div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
 					<!-- ① 固定費管理タブ [遷移] -->
-					<a class="nav-link" th:href="@{/myhacbook/managebaseinfo/fixedcostinfo/initload/}">固定費管理</a>
+					<a class="nav-link" th:href="@{/myhacbook/managebaseinfo/fixedcostinfo/tabload/}">固定費管理</a>
 					<!-- ② 年間固定費合計タブ [現在アクティブ] -->
 					<button class="nav-link active" type="button" role="tab" aria-selected="true" disabled>年間固定費合計</button>
-					<!-- ③ 月別固定費一覧タブ [現在対象月でデフォルト遷移] -->
-					<a class="nav-link" th:href="@{/myhacbook/managebaseinfo/fixedcostinfo/monthlydetail/(month=${targetMonth})}">月別固定費一覧</a>
+					<!-- ③ 月別固定費一覧タブ [遷移] -->
+					<a class="nav-link" th:href="@{/myhacbook/managebaseinfo/fixedcostinfo/monthlydetail/}">月別固定費一覧</a>
 				</div>
 			</nav>
 
@@ -53,7 +53,7 @@
 						<table class="table table-sm table-bordered table-hover">
 							<thead>
 								<tr class="table-secondary">
-									<th class="w5" style="vertical-align:middle;">月</th>
+									<th class="w5" style="vertical-align:middle;">年月</th>
 									<th class="w7 text-end" style="vertical-align:middle;">事業経費</th>
 									<th class="w7 text-end" style="vertical-align:middle;">固定費<br>(非課税)</th>
 									<th class="w8 text-end" style="vertical-align:middle;">固定費<br>(生活費)</th>
@@ -69,7 +69,7 @@
 							<tbody>
 								<tr th:each="row : ${annualSummaryRowList}"
 									th:classappend="${row.totalRow} ? 'table-success' : (${row.evenMonth} ? 'table-warning' : '')">
-									<td th:text="${row.monthLabel}">1月</td>
+									<td th:text="${row.monthLabel}">01月</td>
 									<td class="text-end" th:text="${row.jigyouKeihi}">ー</td>
 									<td class="text-end" th:text="${row.hikozei}">ー</td>
 									<td class="text-end" th:text="${row.seikatsuhi}">ー</td>

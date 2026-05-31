@@ -25,6 +25,8 @@
  * ⑭  正常系：POST /update/ actionCancel (action=add) 初期表示画面へ
  * ⑮  正常系：POST /update/ actionCancel (action=update) 処理選択画面へ
  * ⑯  正常系：GET /annualsummary/ 年間固定費合計画面表示（13行）
+ * ⑰  正常系：GET /tabload/ 固定費管理タブ（他タブからの遷移）→初期表示画面（セッションはクリアしない）
+ * ⑱  正常系：GET /monthlydetail/?month=11 月別固定費一覧（11月・奇数月）4件表示
  *
  * [テストデータ]
  * 固定費4件: 0001:家賃(0030), 0002:電気代概算(0037), 0003:国民年金保険(0015), 0004:その他任意テスト(0038)
@@ -36,6 +38,7 @@
  * 2026/04/19 : 1.01.00  新規作成
  * 2026/05/01 : 1.01.01  テストシナリオ⑭、⑮を追加（更新画面からのキャンセル操作のパターン追加）
  * 2026/05/24 : 1.01.02  テストシナリオ⑯を追加（年間固定費合計画面表示）
+ * 2026/05/27 : 1.01.03  テストシナリオ⑰⑱を追加（tabload・月別固定費一覧）
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.itemmanage;
@@ -62,8 +65,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostAnnualSummaryUseCase;
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostInquiryUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostMonthlyDetailUseCase;
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostRegistConfirmUseCase;
 import com.yonetani.webapp.accountbook.presentation.controller.MyHouseholdAccountBookControllerAdvice;
+import com.yonetani.webapp.accountbook.presentation.session.FixedCostInfoManageSession;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
@@ -112,9 +117,17 @@ public class FixedCostInfoManageControllerIntegrationTest {
 	@Autowired
 	private FixedCostAnnualSummaryUseCase fixedCostAnnualSummaryUseCase;
 
+	// UseCase(月別固定費一覧)(本物のSpring Bean)
+	@Autowired
+	private FixedCostMonthlyDetailUseCase fixedCostMonthlyDetailUseCase;
+
 	// モック:ログインユーザセッション情報
 	@Mock
 	private LoginUserSession mockLoginUserSession;
+
+	// モック:固定費情報管理セッション
+	@Mock
+	private FixedCostInfoManageSession mockFixedCostInfoManageSession;
 
 	@BeforeEach
 	void setupMockMvc() {
@@ -123,11 +136,15 @@ public class FixedCostInfoManageControllerIntegrationTest {
 						fixedCostInquiryUseCase,
 						fixedCostRegistConfirmUseCase,
 						fixedCostAnnualSummaryUseCase,
-						mockLoginUserSession))
+						fixedCostMonthlyDetailUseCase,
+						mockLoginUserSession,
+						mockFixedCostInfoManageSession))
 				.setControllerAdvice(new MyHouseholdAccountBookControllerAdvice(mockLoginUserSession))
 				.build();
 
 		doReturn(createLoginUser()).when(mockLoginUserSession).getLoginUserInfo();
+		// セッションのデフォルト: selectedMonth=null（月パラメータ未指定時にDB fallback する）
+		doReturn(null).when(mockFixedCostInfoManageSession).getSelectedMonth();
 	}
 
 	private LoginUserInfo createLoginUser() {
@@ -590,7 +607,62 @@ public class FixedCostInfoManageControllerIntegrationTest {
 			.andExpect(status().isOk())
 			.andExpect(view().name("itemmanage/fixedcost/FixedCostAnnualSummary"))
 			.andExpect(model().attribute("annualSummaryRowList", hasSize(13)))
-			.andExpect(model().attribute("targetMonth", is("11")))
+			.andExpect(model().attribute("loginUserName", is("テストユーザ01")));
+	}
+
+	// ================================================================
+	// GET /tabload/
+	// ================================================================
+
+	/**
+	 *<pre>
+	 * テスト⑰：正常系：GET /tabload/ 固定費管理タブ（他タブからの遷移）
+	 *
+	 * 【検証内容】
+	 * ・HTTPステータスが200であること
+	 * ・ビュー名が「itemmanage/fixedcost/FixedCostInfoManageInit」であること
+	 * ・fixedCostItemListが5件で取得されること
+	 * ・セッションはクリアされないこと（initload と異なる点）の検証は、@Mockでの検証実現不可のため運用テストにて確認する
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("正常系：GET /tabload/ 固定費管理タブ（他タブからの遷移）")
+	void testGetTabLoad() throws Exception {
+		mockMvc.perform(get("/myhacbook/managebaseinfo/fixedcostinfo/tabload/")
+				.with(user("user01").password("password").roles("USER")))
+			.andExpect(status().isOk())
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostInfoManageInit"))
+			.andExpect(model().attribute("fixedCostItemList", hasSize(5)))
+			.andExpect(model().attribute("loginUserName", is("テストユーザ01")));
+	}
+
+	// ================================================================
+	// GET /monthlydetail/
+	// ================================================================
+
+	/**
+	 *<pre>
+	 * テスト⑱：正常系：GET /monthlydetail/?month=11 月別固定費一覧（11月・奇数月）
+	 *
+	 * 【検証内容】
+	 * ・HTTPステータスが200であること
+	 * ・ビュー名が「itemmanage/fixedcost/FixedCostMonthlyDetail」であること
+	 * ・displayMonthLabelが「11月」であること
+	 * ・fixedCostItemListが4件（奇数月対象: 0003,0001,0002,0004）
+	 * ・monthlyTotalが「98,590円」であること
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("正常系：GET /monthlydetail/?month=11 月別固定費一覧（11月・奇数月）4件表示")
+	void testGetMonthlyDetail_month11() throws Exception {
+		mockMvc.perform(get("/myhacbook/managebaseinfo/fixedcostinfo/monthlydetail/")
+				.param("month", "11")
+				.with(user("user01").password("password").roles("USER")))
+			.andExpect(status().isOk())
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostMonthlyDetail"))
+			.andExpect(model().attribute("displayMonthLabel", is("11月")))
+			.andExpect(model().attribute("fixedCostItemList", hasSize(4)))
+			.andExpect(model().attribute("monthlyTotal", is("98,590円")))
 			.andExpect(model().attribute("loginUserName", is("テストユーザ01")));
 	}
 }

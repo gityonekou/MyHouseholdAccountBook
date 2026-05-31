@@ -493,8 +493,6 @@ public class FixedCostInquiryUseCase {
 			response.setTargetMonthPlus1Goukei(searchResult.calculateMonthlyTotal(ym1).toFormatString());
 			// 対象月+2合計を設定
 			response.setTargetMonthPlus2Goukei(searchResult.calculateMonthlyTotal(ym2).toFormatString());
-			// 月別固定費一覧タブリンク用の現在対象月を設定
-			response.setTargetMonthValue(targetYearMonth.getMonth());
 		}
 	}
 	

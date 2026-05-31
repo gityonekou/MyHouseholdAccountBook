@@ -34,6 +34,13 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  *<pre>
  * 年間固定費合計ユースケースの統合テストクラスです。
  *
+ * [対象メソッド]
+ * 1. readAnnualSummaryInfo - 年間固定費合計画面の表示情報を取得する
+ *
+ * [テストシナリオ]
+ * ① 正常系：固定費0件 → メッセージが設定されること
+ * ② 正常系：固定費4件 → 12行+合計行が生成され月合計・カテゴリ別合計が正しいこと
+ *
  * [テストデータ]
  * user01: 固定費4件（全て毎月払い）
  *   0001: 家賃         → SEIKATSUHI  (80,000円/月)
@@ -95,9 +102,6 @@ class FixedCostAnnualSummaryUseCaseIntegrationTest {
 
 		// リストは設定されないこと
 		assertNull(response.getAnnualSummaryRowList(), "0件時はannualSummaryRowListがnullであること");
-
-		// targetMonthは設定されること
-		assertEquals("05", response.getTargetMonth(), "targetMonthが'05'であること");
 	}
 
 	/**
@@ -121,9 +125,6 @@ class FixedCostAnnualSummaryUseCaseIntegrationTest {
 		// メッセージなし
 		assertFalse(response.hasMessages(), "メッセージが設定されていないこと");
 
-		// targetMonth
-		assertEquals("05", response.getTargetMonth(), "targetMonthが'05'であること");
-
 		// 13行生成確認
 		List<AnnualSummaryRowItem> rows = response.getAnnualSummaryRowList();
 		assertNotNull(rows, "annualSummaryRowListがnullでないこと");
@@ -133,7 +134,7 @@ class FixedCostAnnualSummaryUseCaseIntegrationTest {
 
 		// 1月（奇数月）
 		AnnualSummaryRowItem row1 = rows.get(0);
-		assertEquals("1月",       row1.getMonthLabel(),       "1月: monthLabel");
+		assertEquals("01月",      row1.getMonthLabel(),       "1月: monthLabel");
 		assertEquals("01",        row1.getDetailMonth(),      "1月: detailMonth");
 		assertFalse(row1.isEvenMonth(),                       "1月: evenMonth=false（奇数月）");
 		assertFalse(row1.isTotalRow(),                        "1月: totalRow=false");
@@ -149,7 +150,7 @@ class FixedCostAnnualSummaryUseCaseIntegrationTest {
 
 		// 6月（偶数月）
 		AnnualSummaryRowItem row6 = rows.get(5);
-		assertEquals("6月",       row6.getMonthLabel(),       "6月: monthLabel");
+		assertEquals("06月",      row6.getMonthLabel(),       "6月: monthLabel");
 		assertEquals("06",        row6.getDetailMonth(),      "6月: detailMonth");
 		assertTrue(row6.isEvenMonth(),                        "6月: evenMonth=true（偶数月）");
 		assertFalse(row6.isTotalRow(),                        "6月: totalRow=false");

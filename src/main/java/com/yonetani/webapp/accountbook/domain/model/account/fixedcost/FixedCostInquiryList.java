@@ -14,6 +14,7 @@ package com.yonetani.webapp.accountbook.domain.model.account.fixedcost;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.util.CollectionUtils;
 
@@ -158,6 +159,24 @@ public class FixedCostInquiryList {
 			}
 		}
 		return total;
+	}
+
+	/**
+	 *<pre>
+	 * 指定した月に支払いが発生する固定費の一覧を返します。
+	 * 支払月コードに応じて対象月に支払いが発生するかどうかを判定します。
+	 *</pre>
+	 * @param monthValue 対象月（1〜12）
+	 * @return 指定月に支払いが発生する固定費一覧（DB取得順を維持）
+	 *
+	 */
+	public List<FixedCostInquiryItem> getValuesForMonth(int monthValue) {
+		if (CollectionUtils.isEmpty(values)) {
+			return Collections.emptyList();
+		}
+		return values.stream()
+				.filter(item -> shouldAdd(item.getFixedCostTargetPaymentMonth().getValue(), monthValue))
+				.collect(Collectors.toList());
 	}
 
 	/**
