@@ -350,4 +350,18 @@ class MoneyTest {
 		// 検証（同じ値なら同じハッシュコード）
 		assertEquals(amount1.hashCode(), amount2.hashCode());
 	}
+
+	@Test
+	@DisplayName("正常系：toZeroDashString - 0円の場合ダッシュを返す")
+	void testToZeroDashString_0円() {
+		// 実行 & 検証
+		assertEquals("ー", TestMoney.from(BigDecimal.ZERO.setScale(2)).toZeroDashString());
+	}
+
+	@Test
+	@DisplayName("正常系：toZeroDashString - 正の金額の場合フォーマット済み文字列を返す")
+	void testToZeroDashString_正の金額() {
+		// 実行 & 検証
+		assertEquals("10,000円", TestMoney.from(new BigDecimal("10000.00")).toZeroDashString());
+	}
 }

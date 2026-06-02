@@ -6,6 +6,7 @@
  * ・情報管理(固定費)処理選択画面
  * ・情報管理(固定費)更新画面(追加・更新)
  * ・情報管理(固定費)一括更新画面
+ * ・年間固定費合計画面
  *
  * 画面遷移
  * ・トップメニューからの遷移(初期表示)(GET)→情報管理(固定費)初期表示画面
@@ -30,6 +31,7 @@
  * 　→更新失敗：情報管理(固定費)一括更新画面
  * ・情報管理(固定費)一括更新画面でキャンセルボタン押下時(POST)→処理選択画面
  * ・固定費情報の登録・更新・一括更新・削除成功時→リダイレクト(GET)
+ * ・年間固定費合計タブ押下(GET)→年間固定費合計画面
  *
  *------------------------------------------------
  * 更新履歴
@@ -37,6 +39,8 @@
  * 2024/05/13 : 1.00.00  新規作成
  * 2026/04/19 : 1.01.00  リファクタリング対応(更新系UseCase分離)
  * 2026/05/01 : 1.01.01  一括更新機能追加
+ * 2026/05/23 : 1.01.02  年間固定費合計画面追加
+ * 2026/05/27 : 1.01.03  月別固定費一覧画面追加、tabload エンドポイント追加
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.itemmanage;
@@ -52,12 +56,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostAnnualSummaryUseCase;
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostInquiryUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostMonthlyDetailUseCase;
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostRegistConfirmUseCase;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostBulkUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostMonthlyDetailResponse;
+import com.yonetani.webapp.accountbook.presentation.session.FixedCostInfoManageSession;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
 import lombok.RequiredArgsConstructor;
@@ -103,8 +111,14 @@ public class FixedCostInfoManageController {
 	private final FixedCostInquiryUseCase inquiryUseCase;
 	// UseCase(更新系)
 	private final FixedCostRegistConfirmUseCase registConfirmUseCase;
+	// UseCase(年間固定費合計)
+	private final FixedCostAnnualSummaryUseCase annualSummaryUseCase;
+	// UseCase(月別固定費一覧)
+	private final FixedCostMonthlyDetailUseCase monthlyDetailUseCase;
 	// ログインユーザセッションBean
 	private final LoginUserSession loginUserSession;
+	// 固定費情報管理セッションBean（月別固定費一覧の前回選択月保持用）
+	private final FixedCostInfoManageSession fixedCostInfoManageSession;
 	
 	/**
 	 *<pre>
@@ -117,7 +131,8 @@ public class FixedCostInfoManageController {
 	@GetMapping("/initload/")
 	public ModelAndView getInitLoad() {
 		log.debug("getInitLoad:");
-		
+		// トップメニューからの遷移 → 月別固定費一覧の前回選択月をクリア
+		fixedCostInfoManageSession.setSelectedMonth(null);
 		// 画面表示データ読込
 		return this.inquiryUseCase.readInitInfo(loginUserSession.getLoginUserInfo())
 				// レスポンスにログインユーザ名を設定
@@ -125,7 +140,81 @@ public class FixedCostInfoManageController {
 				// レスポンスからModelAndViewを生成
 				.build();
 	}
+
+	/**
+	 *<pre>
+	 * 固定費管理タブからの遷移時のGET要求マッピングです。
+	 * 年間固定費合計・月別固定費一覧タブから固定費管理タブに戻る際に使用します。
+	 * initload と異なりセッションはクリアしません。
+	 *</pre>
+	 * @return 情報管理(固定費)初期表示画面
+	 *
+	 */
+	@GetMapping("/tabload/")
+	public ModelAndView getTabLoad() {
+		log.debug("getTabLoad:");
+		// 画面表示データ読込（セッションはクリアしない）
+		return this.inquiryUseCase.readInitInfo(loginUserSession.getLoginUserInfo())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
 	
+	/**
+	 *<pre>
+	 * 月別固定費一覧画面のGET要求マッピングです。
+	 * 表示月の決定順序: URL パラメータ month → セッション → UseCase 内で DB 取得
+	 * 表示後、表示した月をセッションに保存します。
+	 *</pre>
+	 * @param month 表示する月（"MM"形式、省略時は null）
+	 * @return 月別固定費一覧画面
+	 *
+	 */
+	@GetMapping("/monthlydetail/")
+	public ModelAndView getMonthlyDetail(@RequestParam(required = false) String month) {
+		log.debug("getMonthlyDetail: month=" + month);
+
+		// 表示月の決定: URL param → session → UseCase 内で DB 取得
+		String targetMonth = null;
+		if (month != null) {
+			targetMonth = month;
+		} else if (fixedCostInfoManageSession.getSelectedMonth() != null) {
+			targetMonth = fixedCostInfoManageSession.getSelectedMonth();
+		}
+
+		// UseCaseを呼び出し
+		FixedCostMonthlyDetailResponse response = this.monthlyDetailUseCase
+				.readMonthlyDetail(loginUserSession.getLoginUserInfo(), targetMonth);
+
+		// セッションに表示月を保存（次回タブ遷移後に同月を表示するため）
+		fixedCostInfoManageSession.setSelectedMonth(response.getCurrentMonth());
+		
+		// レスポンスにログインユーザ名を設定後、ModelAndViewを生成
+		return response
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				.build();
+	}
+
+	/**
+	 *<pre>
+	 * 年間固定費合計画面のGET要求マッピングです。
+	 *</pre>
+	 * @return 年間固定費合計画面
+	 *
+	 */
+	@GetMapping("/annualsummary/")
+	public ModelAndView getAnnualSummary() {
+		log.debug("getAnnualSummary:");
+		
+		// 画面表示情報を取得
+		return this.annualSummaryUseCase.readAnnualSummaryInfo(loginUserSession.getLoginUserInfo())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+
 	/**
 	 *<pre>
 	 * 固定費一覧から任意の明細を選択時のGET要求マッピングです。

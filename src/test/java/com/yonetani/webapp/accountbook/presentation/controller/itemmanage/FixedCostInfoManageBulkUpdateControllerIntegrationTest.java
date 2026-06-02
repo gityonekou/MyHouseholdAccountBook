@@ -51,9 +51,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostAnnualSummaryUseCase;
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostInquiryUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostMonthlyDetailUseCase;
 import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostRegistConfirmUseCase;
 import com.yonetani.webapp.accountbook.presentation.controller.MyHouseholdAccountBookControllerAdvice;
+import com.yonetani.webapp.accountbook.presentation.session.FixedCostInfoManageSession;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
@@ -92,9 +95,21 @@ public class FixedCostInfoManageBulkUpdateControllerIntegrationTest {
 	@Autowired
 	private FixedCostRegistConfirmUseCase fixedCostRegistConfirmUseCase;
 
+	// UseCase(年間固定費合計)(本物のSpring Bean)
+	@Autowired
+	private FixedCostAnnualSummaryUseCase fixedCostAnnualSummaryUseCase;
+
+	// UseCase(月別固定費一覧)(本物のSpring Bean)
+	@Autowired
+	private FixedCostMonthlyDetailUseCase fixedCostMonthlyDetailUseCase;
+
 	// モック:ログインユーザセッション情報
 	@Mock
 	private LoginUserSession mockLoginUserSession;
+
+	// モック:固定費情報管理セッション
+	@Mock
+	private FixedCostInfoManageSession mockFixedCostInfoManageSession;
 
 	@BeforeEach
 	void setupMockMvc() {
@@ -102,11 +117,15 @@ public class FixedCostInfoManageBulkUpdateControllerIntegrationTest {
 				.standaloneSetup(new FixedCostInfoManageController(
 						fixedCostInquiryUseCase,
 						fixedCostRegistConfirmUseCase,
-						mockLoginUserSession))
+						fixedCostAnnualSummaryUseCase,
+						fixedCostMonthlyDetailUseCase,
+						mockLoginUserSession,
+						mockFixedCostInfoManageSession))
 				.setControllerAdvice(new MyHouseholdAccountBookControllerAdvice(mockLoginUserSession))
 				.build();
 
 		doReturn(createLoginUser()).when(mockLoginUserSession).getLoginUserInfo();
+		doReturn(null).when(mockFixedCostInfoManageSession).getSelectedMonth();
 	}
 
 	private LoginUserInfo createLoginUser() {
@@ -123,7 +142,7 @@ public class FixedCostInfoManageBulkUpdateControllerIntegrationTest {
 	 *
 	 * 【検証内容】
 	 * ・HTTPステータスが200であること
-	 * ・ビュー名が「itemmanage/FixedCostBulkUpdate」であること
+	 * ・ビュー名が「itemmanage/fixedcost/FixedCostBulkUpdate」であること
 	 * ・fixedCostBulkUpdateFormがモデルに設定されること
 	 * ・bulkUpdateTargetListが2件（0001:家賃、0002:共益費）で取得されること
 	 * ・sisyutuItemNameが「固定費(課税)＞地代家賃＞家賃」で設定されること
@@ -137,7 +156,7 @@ public class FixedCostInfoManageBulkUpdateControllerIntegrationTest {
 				.param("baseFixedCostCode", "0001")
 				.with(user("user01").password("password").roles("USER")))
 			.andExpect(status().isOk())
-			.andExpect(view().name("itemmanage/FixedCostBulkUpdate"))
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostBulkUpdate"))
 			.andExpect(model().attributeExists("fixedCostBulkUpdateForm"))
 			.andExpect(model().attribute("bulkUpdateTargetList", hasSize(2)))
 			.andExpect(model().attribute("sisyutuItemName", is("固定費(課税)＞地代家賃＞家賃")))
@@ -155,7 +174,7 @@ public class FixedCostInfoManageBulkUpdateControllerIntegrationTest {
 	 * 【検証内容】
 	 * ・支払日を空にして送信した場合、@NotBlankバリデーションエラーが発生すること
 	 * ・HTTPステータスが200で一括更新画面に戻ること
-	 * ・ビュー名が「itemmanage/FixedCostBulkUpdate」であること
+	 * ・ビュー名が「itemmanage/fixedcost/FixedCostBulkUpdate」であること
 	 * ・fixedCostBulkUpdateFormのshiparaiDayフィールドにエラーが設定されること
 	 *</pre>
 	 */
@@ -172,7 +191,7 @@ public class FixedCostInfoManageBulkUpdateControllerIntegrationTest {
 				.with(user("user01").password("password").roles("USER"))
 				.with(csrf()))
 			.andExpect(status().isOk())
-			.andExpect(view().name("itemmanage/FixedCostBulkUpdate"))
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostBulkUpdate"))
 			.andExpect(model().attributeHasFieldErrors("fixedCostBulkUpdateForm", "shiharaiDay"));
 	}
 
@@ -183,7 +202,7 @@ public class FixedCostInfoManageBulkUpdateControllerIntegrationTest {
 	 * 【検証内容】
 	 * ・checkedFixedCostCodeListを送信しない場合、@NotEmptyバリデーションエラーが発生すること
 	 * ・HTTPステータスが200で一括更新画面に戻ること
-	 * ・ビュー名が「itemmanage/FixedCostBulkUpdate」であること
+	 * ・ビュー名が「itemmanage/fixedcost/FixedCostBulkUpdate」であること
 	 * ・fixedCostBulkUpdateFormのcheckedFixedCostCodeListフィールドにエラーが設定されること
 	 *</pre>
 	 */
@@ -199,7 +218,7 @@ public class FixedCostInfoManageBulkUpdateControllerIntegrationTest {
 				.with(user("user01").password("password").roles("USER"))
 				.with(csrf()))
 			.andExpect(status().isOk())
-			.andExpect(view().name("itemmanage/FixedCostBulkUpdate"))
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostBulkUpdate"))
 			.andExpect(model().attributeHasFieldErrors("fixedCostBulkUpdateForm", "checkedFixedCostCodeList"));
 	}
 
@@ -245,7 +264,7 @@ public class FixedCostInfoManageBulkUpdateControllerIntegrationTest {
 	 * ・一括更新画面からキャンセル操作の場合、処理選択画面に遷移すること
 	 * ・baseFixedCostCode=0001を指定して処理選択画面(家賃)に戻ること
 	 * ・HTTPステータスが200であること
-	 * ・ビュー名が「itemmanage/FixedCostInfoManageActSelect」であること
+	 * ・ビュー名が「itemmanage/fixedcost/FixedCostInfoManageActSelect」であること
 	 * ・fixedCostInfoがモデルに設定されること
 	 * ・0001と0002が同じ0030に属するため hasSiblingFixedCost=true であること
 	 *</pre>
@@ -259,7 +278,7 @@ public class FixedCostInfoManageBulkUpdateControllerIntegrationTest {
 				.with(user("user01").password("password").roles("USER"))
 				.with(csrf()))
 			.andExpect(status().isOk())
-			.andExpect(view().name("itemmanage/FixedCostInfoManageActSelect"))
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostInfoManageActSelect"))
 			.andExpect(model().attributeExists("fixedCostInfo"))
 			.andExpect(model().attribute("hasSiblingFixedCost", is(true)));
 	}

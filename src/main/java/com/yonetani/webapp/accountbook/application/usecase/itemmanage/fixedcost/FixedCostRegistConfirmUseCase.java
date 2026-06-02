@@ -35,9 +35,9 @@ import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostBulkUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostBulkUpdateResponse;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageActSelectResponse;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageUpdateResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostBulkUpdateResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageActSelectResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageUpdateResponse;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.RequiredArgsConstructor;

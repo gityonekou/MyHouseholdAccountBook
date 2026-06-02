@@ -55,10 +55,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostBulkUpdateForm;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostBulkUpdateResponse;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostBulkUpdateResponse.BulkUpdateTargetItem;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageActSelectResponse;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.FixedCostInfoManageActSelectResponse.SiblingFixedCostItem;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostBulkUpdateResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageActSelectResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostBulkUpdateResponse.BulkUpdateTargetItem;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageActSelectResponse.SiblingFixedCostItem;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 /**

@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2023/12/02 : 1.00.00  新規作成
+ * 2026/05/23 : 1.01.00  年間固定費合計画面新規追加対応
  *
  */
 package com.yonetani.webapp.accountbook.common.content;
@@ -19,7 +20,7 @@ import java.time.format.ResolverStyle;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 public class MyHouseholdAccountBookContent {
@@ -125,6 +126,24 @@ public class MyHouseholdAccountBookContent {
 	public static final String SISYUTU_ITEM_CODE_GAISYOKU_VALUE = "0052";
 	/** 支出項目コード:流動経費(0007) */
 	public static final String SISYUTU_ITEM_CODE_RYUUDOU_KEIHI_VALUE = "0007";
+
+	// ===== 年間固定費合計カテゴリ判定用 SisyutuItemCode 定数 =====
+	/** 支出項目コード(Level-1):事業経費(0001) */
+	public static final String SISYUTU_ITEM_CODE_JIGYOU_KEIHI = "0001";
+	/** 支出項目コード(Level-1):固定費(非課税)(0013) */
+	public static final String SISYUTU_ITEM_CODE_FIXED_COST_HIKOZEI = "0013";
+	/** 支出項目コード(Level-1):固定費(課税)(0023) */
+	public static final String SISYUTU_ITEM_CODE_FIXED_COST_KAZEI = "0023";
+	/** 支出項目コード(Level-1):衣類住居設備(0045) */
+	public static final String SISYUTU_ITEM_CODE_IRUI_JUKYO_SETSUBI = "0045";
+	/** 支出項目コード(Level-1):飲食日用品(0049) */
+	public static final String SISYUTU_ITEM_CODE_INSHOKU_NICHIYOHIN = "0049";
+	/** 支出項目コード(Level-1):趣味娯楽(0056) */
+	public static final String SISYUTU_ITEM_CODE_SHUMI_GORAKU = "0056";
+	/** 支出項目コード(Level-2):積立(投資)(0031) ※固定費(課税)配下 */
+	public static final String SISYUTU_ITEM_CODE_TSUMITATE_TOUSHI = "0031";
+	/** 支出項目コード(Level-2):積立金(0033) ※固定費(課税)配下 */
+	public static final String SISYUTU_ITEM_CODE_TSUMITATE_KIN = "0033";
 	
 	/** 支出項目(日用消耗品)の支出項目表示順の値 */
 	public static final String SISYUTU_ITEM_NITIYOU_SYOUMOUHIN_SORT_VALUE = "0501000000";

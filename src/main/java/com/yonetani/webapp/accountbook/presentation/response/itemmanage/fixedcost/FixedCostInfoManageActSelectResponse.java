@@ -9,7 +9,7 @@
  * 2026/05/01 : 1.01.00  同一支出項目の兄弟固定費明細情報を追加
  *
  */
-package com.yonetani.webapp.accountbook.presentation.response.itemmanage;
+package com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -184,7 +184,7 @@ public class FixedCostInfoManageActSelectResponse extends AbstractFixedCostItemL
 	@Override
 	public ModelAndView build() {
 		// 画面表示のModelとViewを生成
-		ModelAndView modelAndView = createModelAndView("itemmanage/FixedCostInfoManageActSelect");
+		ModelAndView modelAndView = createModelAndView("itemmanage/fixedcost/FixedCostInfoManageActSelect");
 		// 選択した固定費の情報を設定
 		modelAndView.addObject("fixedCostInfo", fixedCostInfo);
 		// 兄弟固定費が存在するかどうかのフラグを設定

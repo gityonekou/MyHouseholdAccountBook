@@ -7,7 +7,7 @@
  * 2024/05/22 : 1.00.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.presentation.response.itemmanage;
+package com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ import lombok.Setter;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -102,7 +102,7 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 	@Override
 	public ModelAndView build() {
 		// 画面表示のModelとViewを生成
-		ModelAndView modelAndView = createModelAndView("itemmanage/FixedCostInfoManageUpdate");
+		ModelAndView modelAndView = createModelAndView("itemmanage/fixedcost/FixedCostInfoManageUpdate");
 		// 更新商品情報入力フォーム
 		modelAndView.addObject("fixedCostInfoUpdateForm", fixedCostInfoUpdateForm);
 		// 固定費区分選択ボックス

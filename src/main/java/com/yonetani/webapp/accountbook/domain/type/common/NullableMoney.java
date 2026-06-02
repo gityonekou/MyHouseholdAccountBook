@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2025/12/22 : 1.00.00  新規作成
+ * 2026/05/23 : 1.01.01  年間固定費合計画面新規追加対応でtoZeroDashString()メソッド追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
@@ -327,6 +328,21 @@ public abstract class NullableMoney {
 		long roundedValue = value.setScale(0, RoundingMode.HALF_UP).longValue();
 		// カンマ区切り+円表記
 		return String.format("%,d円", roundedValue);
+	}
+
+	/**
+	 *<pre>
+	 * null値の場合は空文字列、0円の場合は「ー」、それ以外はフォーマット済み文字列を返却します。
+	 * null値を持つ金額項目を年間固定費合計画面等で「ー」表示する用途に使用します。
+	 *</pre>
+	 * @return null値の場合は空文字列、0円の場合"ー"、それ以外はフォーマット済み文字列（例: "10,000円"）
+	 *
+	 */
+	public String toZeroDashString() {
+		if(value == null) {
+			return "";
+		}
+		return isZero() ? "ー" : toFormatString();
 	}
 
 	/**

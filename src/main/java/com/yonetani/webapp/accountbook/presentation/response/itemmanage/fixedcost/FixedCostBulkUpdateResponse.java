@@ -7,7 +7,7 @@
  * 2026/05/01 : 1.01.00  新規作成
  *
  */
-package com.yonetani.webapp.accountbook.presentation.response.itemmanage;
+package com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -146,7 +146,7 @@ public class FixedCostBulkUpdateResponse extends AbstractResponse {
 	@Override
 	public ModelAndView build() {
 		// 画面表示のModelとViewを生成
-		ModelAndView modelAndView = createModelAndView("itemmanage/FixedCostBulkUpdate");
+		ModelAndView modelAndView = createModelAndView("itemmanage/fixedcost/FixedCostBulkUpdate");
 		// 入力フォーム
 		modelAndView.addObject("fixedCostBulkUpdateForm", fixedCostBulkUpdateForm);
 		// 支払日選択ボックス
