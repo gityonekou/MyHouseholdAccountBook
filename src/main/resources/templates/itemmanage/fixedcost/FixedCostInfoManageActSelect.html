@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<title>情報管理(固定費)</title>
+</head>
+<body>
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">情報管理(固定費)</h5>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
+			</div>
+			
+			
+			<!-- 選択支出情報表示エリア -->
+			<div class="card-body">
+				<div class="card">
+					<form name="FixedCostActSelectInfo" class="d-flex" method="get" th:action="@{/myhacbook/managebaseinfo/fixedcostinfo/updateload/}" th:object="${fixedCostInfo}">
+					<div class="card-body">
+						<p class="h6">■選択固定費詳細■</p>
+						<div class="mb-3">
+							<label class="form-label">支出項目名：<span th:text="*{sisyutuItemName}"></span></label>
+						</div>
+						<div class="mb-3">
+							<label for="name" class="form-label">支払名：<span th:text="*{shiharaiName}"></span></label>
+						</div>
+						<div class="mb-3">
+							<label for="name" class="form-label">支払内容詳細：<span th:text="*{shiharaiDetailContext}"></span></label>
+						</div>
+						<div class="mb-3">
+							<label for="name" class="form-label">支払日：<span th:text="*{shiharaiTukiDetailContext}"></span><span th:text="*{shiharaiDay}"></span></label>
+						</div>
+						<div class="mb-3">
+							<label for="name" class="form-label">支払金額：<span th:text="*{shiharaiKingaku}"></span></label>
+						</div>
+						<div class="mb-3">
+							<button class="btn btn-primary" name="actionUpdate" type="submit">更新</button>
+							<button class="btn btn-primary" name="actionCancel" type="submit">キャンセル</button>
+							<span>&emsp;</span>
+							<span>&emsp;</span>
+							<span>&emsp;</span>
+							<!--/* 削除時は確認ダイアログを表示してからOKなら削除用のフォームを実行 */-->
+							<button class="btn btn-primary" name="actionDelete" id="fixed-cost-action-delete-btn" type="button">削除</button>
+							<input type="hidden" th:field="*{fixedCostCode}" />
+						</div>
+					</div>
+					</form>
+					<!--/* 削除実行時に送信するフォーム */-->
+					<form name="FixedCostDeleteSelectInfo" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/fixedcostinfo/delete/}">
+						<input type="hidden" th:field="${fixedCostInfo.fixedCostCode}" />
+					</form>
+				</div>
+			</div>
+			
+			
+			<!-- 同一分類の固定費一覧エリア（同一支出項目に複数固定費がある場合のみ表示） -->
+			<div class="card-body" th:if="${hasSiblingFixedCost}">
+				<div class="card">
+					<form name="FixedCostBulkUpdateLoad" method="get"
+						  th:action="@{/myhacbook/managebaseinfo/fixedcostinfo/bulkupdateload/}">
+					<div class="card-body">
+						<p class="h6">■同一分類の固定費一覧■</p>
+						<p class="card-text">以下の固定費がすべて同一の支出項目「<span th:text="${fixedCostInfo.sisyutuItemName}"></span>」に属しています。一括更新が可能です。</p>
+						<table class="table table-sm table-bordered">
+							<thead>
+								<tr class="table-secondary">
+									<th scope="col" class="w25">支払名</th>
+									<th scope="col" class="w10">支払月</th>
+									<th scope="col" class="w10">支払日</th>
+									<th scope="col" class="w10">支払金額</th>
+									<th scope="col">その他任意詳細</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="item, itemStat : ${siblingFixedCostItemList}"
+									th:classappend="${itemStat.even} ? 'table-warning'">
+									<td th:text="${item.shiharaiName}">支払名</td>
+									<td th:text="${item.shiharaiTukiDetailContext}">支払月</td>
+									<td th:text="${item.shiharaiDay}">支払日</td>
+									<td th:text="${item.shiharaiKingaku}" align="right">支払金額</td>
+									<td th:text="${item.shiharaiTukiOptionalContext}"></td>
+								</tr>
+							</tbody>
+						</table>
+						<div class="mb-3">
+							<button class="btn btn-primary" type="submit">一括更新</button>
+						</div>
+						<input type="hidden" name="baseFixedCostCode" th:value="${fixedCostInfo.fixedCostCode}" />
+					</div>
+					</form>
+				</div>
+			</div>
+
+
+			<!-- 固定費一覧表示エリア -->
+			<div class="card-body">
+				<div class="card">
+					<div class="card-body">
+						<p class="h6">■登録済み固定費一覧■</p>
+						<!--/* 登録済み固定費一覧が設定されている場合のみ選択してくださいのメッセージを表示 */-->
+						<th:block th:if="${#lists.size(fixedCostItemList)} > 0">
+						<p class="card-text">更新対象の固定支出項目を選択してください。</p>
+						<table class="table table-sm table-bordered table-hover">
+							<thead>
+								<tr class="table-secondary">
+								<th scope="col" class="w20">支出項目名</th>
+								<th scope="col" class="w25">支払名</th>
+								<th scope="col" class="w10">支払月</th>
+								<th scope="col" class="w10">支払日</th>
+								<th scope="col" class="w10">支払金額</th>
+								<th scope="col">その他任意詳細</th>
+								</tr>
+							</thead>
+							<tbody>
+								<th:block th:each="item, itemStat : ${fixedCostItemList}">
+								<th:block th:if="${itemStat.odd}"><tr th:data-href="@{/myhacbook/managebaseinfo/fixedcostinfo/select(fixedCostCode=${item.fixedCostCode})}"></th:block>
+								<th:block th:if="${itemStat.even}"><tr class="table-warning" th:data-href="@{/myhacbook/managebaseinfo/fixedcostinfo/select(fixedCostCode=${item.fixedCostCode})}"></th:block>
+									<td th:text="${item.sisyutuItemName}">支出項目名</td>
+									<td th:text="${item.shiharaiName}">支払名</td>
+									<td th:text="${item.shiharaiTuki}">支払月</td>
+									<td th:text="${item.shiharaiDay}">支払日</td>
+									<td th:text="${item.shiharaiKingaku}" align="right">支払金額</td>
+									<td th:text="${item.optionalContext}">その他任意詳細</td>
+								</tr>
+								</th:block>
+								<tr class="table-success">
+									<td colspan="4" th:text="${targetMonthLabel} + '合計'">対象月合計ラベル</td>
+									<td th:text="${targetMonthGoukei}" align="right">対象月合計</td>
+									<td></td>
+								</tr>
+								<tr>
+									<td colspan="4" th:text="${targetMonthPlus1Label} + '合計'">対象月+1合計ラベル</td>
+									<td th:text="${targetMonthPlus1Goukei}" align="right">対象月+1合計</td>
+									<td></td>
+								</tr>
+								<tr class="table-success">
+									<td colspan="4" th:text="${targetMonthPlus2Label} + '合計'">対象月+2合計ラベル</td>
+									<td th:text="${targetMonthPlus2Goukei}" align="right">対象月+2合計</td>
+									<td></td>
+								</tr>
+							</tbody>
+						</table>
+						</th:block>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+	
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	<!--/* jqueryでテーブル行の選択時アクションを実行 */-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script type="text/javascript" th:src="@{/js/table_tr_click_script.js}"></script>
+	<!--/* 固定費登録で使用するJavaScript */-->
+	<script type="text/javascript" th:src="@{/js/itemmanage/ManageFixedCost.js}"></script>
+	
+</body>
+</html>

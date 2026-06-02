@@ -8,6 +8,7 @@
  * 日付       : version  コメントなど
  * 2023/09/23 : 1.00.00  新規作成
  * 2025/12/21 : 1.01.00  リファクタリング対応(DDD適応)
+ * 2026/05/09 : 1.01.01  リファクタリング追加対応(対象年月ドメインの集約)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.inquiry;
@@ -20,7 +21,6 @@ import org.springframework.stereotype.Service;
 import com.yonetani.webapp.accountbook.application.usecase.common.AccountBookUserInquiryUseCase;
 import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureItemList;
-import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.SisyutuKingakuTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
@@ -75,11 +75,11 @@ public class AccountMonthInquiryUseCase {
 		log.debug("read:userid=" + user.getUserId());
 		
 		// ユーザIDに対応する現在の対象年月の値を取得
-		NowTargetYearMonth yearMonth = userInquiry.getNowTargetYearMonth(UserId.from(user.getUserId()));
+		TargetYearMonth yearMonth = userInquiry.getTargetYearMonth(UserId.from(user.getUserId()));
 		
 		// 収支画面に表示する対象年月情報を生成
 		AccountMonthInquiryTargetYearMonthInfo targetYearMonthInfo = AccountMonthInquiryTargetYearMonthInfo.from(
-				yearMonth.getYearMonth().getValue());
+				yearMonth.getValue());
 		
 		// ユーザID,現在の対象年月を条件に支出項目のリストと収支金額を取得しレスポンス情報を返却
 		return execRead(user, targetYearMonthInfo);

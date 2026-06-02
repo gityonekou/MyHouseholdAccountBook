@@ -7,11 +7,13 @@
  * 日付       : version  コメントなど
  * 2024/06/04 : 1.00.00  新規作成
  * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
+ * 2026/05/23 : 1.01.01  年間固定費合計画面新規追加対応
  *
  */
 package com.yonetani.webapp.accountbook.domain.repository.account.fixedcost;
 
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCost;
+import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostAnnualSummaryList;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
@@ -101,6 +103,16 @@ public interface FixedCostTableRepository {
 	 *
 	 */
 	FixedCostList findByFixedCostTargetPaymentMonthList(SearchQueryUserIdAndFixedCostTargetPaymentMonthList search);
+	
+	/**
+	 *<pre>
+	 * 年間固定費合計画面用に、固定費情報を支出項目階層情報込みで取得します。
+	 *</pre>
+	 * @param userId 検索対象のユーザID
+	 * @return 年間固定費合計データ
+	 *
+	 */
+	FixedCostAnnualSummaryList findForAnnualSummaryByUserId(SearchQueryUserId userId);
 	
 	/**
 	 *<pre>

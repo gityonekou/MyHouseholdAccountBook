@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/11/03 : 1.00.00  新規作成
+ * 2026/05/09 : 1.01.00  リファクタリング追加対応(対象年月ドメインの集約)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.component.ShoppingRegistExpenditureItemComponent;
 import com.yonetani.webapp.accountbook.application.usecase.common.AccountBookUserInquiryUseCase;
-import com.yonetani.webapp.accountbook.domain.model.common.NowTargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
@@ -32,7 +32,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Service
@@ -62,19 +62,19 @@ public class ShoppingRegistTopMenuUseCase {
 		UserId userId = UserId.from(user.getUserId());
 		
 		// ユーザIDに対応する現在の対象年月の値を取得
-		NowTargetYearMonth yearMonth = userInquiry.getNowTargetYearMonth(UserId.from(user.getUserId()));
+		TargetYearMonth yearMonth = userInquiry.getTargetYearMonth(UserId.from(user.getUserId()));
 		
 		// レスポンス情報を作成
-		ShoppingRegistTopMenuResponse response = ShoppingRegistTopMenuResponse.getInstance(yearMonth.getYearMonth());
+		ShoppingRegistTopMenuResponse response = ShoppingRegistTopMenuResponse.getInstance(yearMonth);
 		// 対象月の登録されている買い物情報を取得しレスポンスに設定
 		simpleShoppingRegistListComponent.setSimpleShoppingRegistList(
 				// 検索条件:ユーザID、対象年月
-				SearchQueryUserIdAndYearMonth.from(userId, yearMonth.getYearMonth()),
+				SearchQueryUserIdAndYearMonth.from(userId, yearMonth),
 				// 値を設定するレスポンス
 				response);
 		
 		// 簡易タイプ買い物リストの項目に対応する支出テーブル情報と支出金額テーブル情報が登録されてるかどうかをチェック
-		checkExpenditureAndSisyutuKingaku(userId, yearMonth.getYearMonth(), response);
+		checkExpenditureAndSisyutuKingaku(userId, yearMonth, response);
 		
 		// 買い物登録方法選択画面情報を返却
 		return response;

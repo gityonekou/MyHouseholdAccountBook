@@ -88,7 +88,16 @@ class SisyutuKingakuTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.sisyutukingaku.SisyutuKingakuTableDataSource#add(com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureAmountItem)} のためのテスト・メソッド。
+	 *<pre>
+	 * テストadd：支出金額テーブルへの新規登録テスト
+	 *
+	 * 【検証内容】
+	 * ・全10カラム（USER_ID, TARGET_YEAR, TARGET_MONTH, SISYUTU_ITEM_CODE, PARENT_SISYUTU_ITEM_CODE,
+	 *   SISYUTU_YOTEI_KINGAKU, SISYUTU_KINGAKU, SISYUTU_KINGAKU_B, SISYUTU_KINGAKU_C,
+	 *   SISYUTU_SIHARAI_DATE）が正しく登録されること
+	 * ・同一キーで重複登録した場合、DuplicateKeyExceptionが発生すること
+	 * ・null可項目（SISYUTU_KINGAKU_B, SISYUTU_KINGAKU_C, SISYUTU_SIHARAI_DATE）にnullが正しく登録されること
+	 *</pre>
 	 */
 	@Test
 	@DisplayName("add:支出金額テーブルへの新規登録テスト(全カラム確認)")
@@ -148,7 +157,17 @@ class SisyutuKingakuTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.sisyutukingaku.SisyutuKingakuTableDataSource#update(com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureAmountItem)} のためのテスト・メソッド。
+	 *<pre>
+	 * テストupdate：支出金額テーブルの更新テスト
+	 *
+	 * 【検証内容】
+	 * ・更新対象の4カラム（SISYUTU_KINGAKU, SISYUTU_KINGAKU_B, SISYUTU_KINGAKU_C,
+	 *   SISYUTU_SIHARAI_DATE）が正しく更新されること
+	 * ・非更新カラム（SISYUTU_YOTEI_KINGAKU, PARENT_SISYUTU_ITEM_CODE）が更新されないこと
+	 *   （意図的に別値を渡して確認）
+	 * ・対象データなしの場合に0件が返ること
+	 * ・null可項目（SISYUTU_KINGAKU_B, SISYUTU_KINGAKU_C, SISYUTU_SIHARAI_DATE）をnullに更新できること
+	 *</pre>
 	 */
 	@Test
 	@Sql(value = "SisyutuKingakuTableDataSourceUpdateTest.sql", config = @SqlConfig(encoding = "UTF-8"))

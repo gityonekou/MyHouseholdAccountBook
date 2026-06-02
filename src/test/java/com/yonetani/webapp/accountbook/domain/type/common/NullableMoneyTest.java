@@ -505,4 +505,25 @@ class NullableMoneyTest {
 		assertEquals(amount1.hashCode(), amount2.hashCode());
 		assertEquals(amount3.hashCode(), amount4.hashCode());
 	}
+
+	@Test
+	@DisplayName("正常系：toZeroDashString - null値の場合空文字列を返す")
+	void testToZeroDashString_null値() {
+		// 実行 & 検証
+		assertEquals("", TestNullableMoney.from(null).toZeroDashString());
+	}
+
+	@Test
+	@DisplayName("正常系：toZeroDashString - 0円の場合ダッシュを返す")
+	void testToZeroDashString_0円() {
+		// 実行 & 検証
+		assertEquals("ー", TestNullableMoney.from(BigDecimal.ZERO.setScale(2)).toZeroDashString());
+	}
+
+	@Test
+	@DisplayName("正常系：toZeroDashString - 正の金額の場合フォーマット済み文字列を返す")
+	void testToZeroDashString_正の金額() {
+		// 実行 & 検証
+		assertEquals("10,000円", TestNullableMoney.from(new BigDecimal("10000.00")).toZeroDashString());
+	}
 }

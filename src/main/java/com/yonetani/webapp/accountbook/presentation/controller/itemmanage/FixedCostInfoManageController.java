@@ -5,27 +5,42 @@
  * ・情報管理(固定費)初期表示画面:
  * ・情報管理(固定費)処理選択画面
  * ・情報管理(固定費)更新画面(追加・更新)
- * 
+ * ・情報管理(固定費)一括更新画面
+ * ・年間固定費合計画面
+ *
  * 画面遷移
  * ・トップメニューからの遷移(初期表示)(GET)→情報管理(固定費)初期表示画面
  * ・初期表示画面で固定費一覧から対象の明細を選択(GET)→情報管理(固定費)処理選択画面
  * ・初期表示画面で追加対象の支出項目選択時(GET)
  *   →選択した支出項目に対応する固定費が未登録の場合：情報管理(固定費)更新画面(追加)
  *   →選択した支出項目の固定費が既に登録済みの場合：初期表示画面でメッセージ確認(OK/NGで対応する画面に遷移)
- *   　→OK:情報管理(固定費)更新画面(追加)
+ *   　→OK:情報管理(固定費)更新画面(追加)　GETで要求
  *   　→NG:初期表示画面
- * ・情報管理(固定費)処理選択画面で更新ボタン押下(POST)→情報管理(固定費)更新画面(更新)
- * ・情報管理(固定費)処理選択画面でキャンセルボタン押下(POST)→初期表示画面
+ * ・情報管理(固定費)処理選択画面で更新ボタン押下(GET)→情報管理(固定費)更新画面(更新)
+ * ・情報管理(固定費)処理選択画面でキャンセルボタン押下(GET)→初期表示画面
  * ・情報管理(固定費)処理選択画面で削除ボタン押下(POST)→OK/キャンセル選択後、対応する処理を実行
- * ・情報管理(固定費)更新画面(追加・更新)で登録ボタン押下時(POST)
- * 　→登録成功：初期表示画面
+ * ・情報管理(固定費)処理選択画面で一括更新ボタン押下(GET)→情報管理(固定費)一括更新画面
+ * ・情報管理(固定費)更新画面(追加・更新)で登録ボタン／更新ボタン押下時(POST)
+ * 　→登録成功：初期表示画面へのリダイレクト(リダイレクト参照)
  * 　→登録失敗：情報管理(固定費)更新画面(追加・更新)
- * ・固定費情報登録・更新成功時→リダイレクト(GET)
+ * ・情報管理(固定費)更新画面(追加・更新)でキャンセルボタン押下時(POST)
+ * 　→追加時：初期表示画面
+ * 　→更新時：処理選択画面
+ * ・情報管理(固定費)一括更新画面で一括更新ボタン押下時(POST)
+ * 　→更新成功：初期表示画面へのリダイレクト(リダイレクト参照)
+ * 　→更新失敗：情報管理(固定費)一括更新画面
+ * ・情報管理(固定費)一括更新画面でキャンセルボタン押下時(POST)→処理選択画面
+ * ・固定費情報の登録・更新・一括更新・削除成功時→リダイレクト(GET)
+ * ・年間固定費合計タブ押下(GET)→年間固定費合計画面
  *
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/05/13 : 1.00.00  新規作成
+ * 2026/04/19 : 1.01.00  リファクタリング対応(更新系UseCase分離)
+ * 2026/05/01 : 1.01.01  一括更新機能追加
+ * 2026/05/23 : 1.01.02  年間固定費合計画面追加
+ * 2026/05/27 : 1.01.03  月別固定費一覧画面追加、tabload エンドポイント追加
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.itemmanage;
@@ -41,9 +56,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.yonetani.webapp.accountbook.application.usecase.itemmanage.FixedCostInfoManageUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostAnnualSummaryUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostInquiryUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostMonthlyDetailUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost.FixedCostRegistConfirmUseCase;
+import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
+import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostBulkUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostMonthlyDetailResponse;
+import com.yonetani.webapp.accountbook.presentation.session.FixedCostInfoManageSession;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 
 import lombok.RequiredArgsConstructor;
@@ -77,7 +99,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Controller
@@ -85,10 +107,18 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @RequiredArgsConstructor
 public class FixedCostInfoManageController {
-	// UseCase
-	private final FixedCostInfoManageUseCase usecase;
+	// UseCase(参照系)
+	private final FixedCostInquiryUseCase inquiryUseCase;
+	// UseCase(更新系)
+	private final FixedCostRegistConfirmUseCase registConfirmUseCase;
+	// UseCase(年間固定費合計)
+	private final FixedCostAnnualSummaryUseCase annualSummaryUseCase;
+	// UseCase(月別固定費一覧)
+	private final FixedCostMonthlyDetailUseCase monthlyDetailUseCase;
 	// ログインユーザセッションBean
 	private final LoginUserSession loginUserSession;
+	// 固定費情報管理セッションBean（月別固定費一覧の前回選択月保持用）
+	private final FixedCostInfoManageSession fixedCostInfoManageSession;
 	
 	/**
 	 *<pre>
@@ -101,15 +131,90 @@ public class FixedCostInfoManageController {
 	@GetMapping("/initload/")
 	public ModelAndView getInitLoad() {
 		log.debug("getInitLoad:");
-		
+		// トップメニューからの遷移 → 月別固定費一覧の前回選択月をクリア
+		fixedCostInfoManageSession.setSelectedMonth(null);
 		// 画面表示データ読込
-		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo())
+		return this.inquiryUseCase.readInitInfo(loginUserSession.getLoginUserInfo())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+
+	/**
+	 *<pre>
+	 * 固定費管理タブからの遷移時のGET要求マッピングです。
+	 * 年間固定費合計・月別固定費一覧タブから固定費管理タブに戻る際に使用します。
+	 * initload と異なりセッションはクリアしません。
+	 *</pre>
+	 * @return 情報管理(固定費)初期表示画面
+	 *
+	 */
+	@GetMapping("/tabload/")
+	public ModelAndView getTabLoad() {
+		log.debug("getTabLoad:");
+		// 画面表示データ読込（セッションはクリアしない）
+		return this.inquiryUseCase.readInitInfo(loginUserSession.getLoginUserInfo())
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
 				.build();
 	}
 	
+	/**
+	 *<pre>
+	 * 月別固定費一覧画面のGET要求マッピングです。
+	 * 表示月の決定順序: URL パラメータ month → セッション → UseCase 内で DB 取得
+	 * 表示後、表示した月をセッションに保存します。
+	 *</pre>
+	 * @param month 表示する月（"MM"形式、省略時は null）
+	 * @return 月別固定費一覧画面
+	 *
+	 */
+	@GetMapping("/monthlydetail/")
+	public ModelAndView getMonthlyDetail(@RequestParam(required = false) String month) {
+		log.debug("getMonthlyDetail: month=" + month);
+
+		// 表示月の決定: URL param → session → UseCase 内で DB 取得
+		String targetMonth = null;
+		if (month != null) {
+			targetMonth = month;
+		} else if (fixedCostInfoManageSession.getSelectedMonth() != null) {
+			targetMonth = fixedCostInfoManageSession.getSelectedMonth();
+		}
+
+		// UseCaseを呼び出し
+		FixedCostMonthlyDetailResponse response = this.monthlyDetailUseCase
+				.readMonthlyDetail(loginUserSession.getLoginUserInfo(), targetMonth);
+
+		// セッションに表示月を保存（次回タブ遷移後に同月を表示するため）
+		fixedCostInfoManageSession.setSelectedMonth(response.getCurrentMonth());
+		
+		// レスポンスにログインユーザ名を設定後、ModelAndViewを生成
+		return response
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				.build();
+	}
+
+	/**
+	 *<pre>
+	 * 年間固定費合計画面のGET要求マッピングです。
+	 *</pre>
+	 * @return 年間固定費合計画面
+	 *
+	 */
+	@GetMapping("/annualsummary/")
+	public ModelAndView getAnnualSummary() {
+		log.debug("getAnnualSummary:");
+		
+		// 画面表示情報を取得
+		return this.annualSummaryUseCase.readAnnualSummaryInfo(loginUserSession.getLoginUserInfo())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+
 	/**
 	 *<pre>
 	 * 固定費一覧から任意の明細を選択時のGET要求マッピングです。
@@ -124,7 +229,7 @@ public class FixedCostInfoManageController {
 		log.debug("getActSelect: fixedCostCode=" + fixedCostCode);
 		
 		// 画面表示情報を取得
-		return this.usecase.readActSelectItemInfo(loginUserSession.getLoginUserInfo(), fixedCostCode)
+		return this.inquiryUseCase.readActSelectItemInfo(loginUserSession.getLoginUserInfo(), fixedCostCode)
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
@@ -146,9 +251,9 @@ public class FixedCostInfoManageController {
 		log.debug("getAddLoad: sisyutuItemCode=" + sisyutuItemCode);
 		
 		// 固定費が登録済みかどうかを判定
-		if(this.usecase.hasFixedCostInfoBySisyutuItem(loginUserSession.getLoginUserInfo(), sisyutuItemCode)) {
+		if(this.inquiryUseCase.hasFixedCostInfoBySisyutuItem(loginUserSession.getLoginUserInfo(), sisyutuItemCode)) {
 			// 固定費が登録済みの場合、初期画面に遷移
-			return this.usecase.readRegisteredFixedCostInfoBySisyutuItem(loginUserSession.getLoginUserInfo(), sisyutuItemCode)
+			return this.inquiryUseCase.readRegisteredFixedCostInfoBySisyutuItem(loginUserSession.getLoginUserInfo(), sisyutuItemCode)
 			// レスポンスにログインユーザ名を設定
 			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 			// レスポンスからModelAndViewを生成
@@ -156,7 +261,7 @@ public class FixedCostInfoManageController {
 			
 		} else {
 			// 固定費が未登録の場合、情報管理(固定費)更新画面に遷移
-			return this.usecase.readAddFixedCostInfoBySisyutuItem(loginUserSession.getLoginUserInfo(), sisyutuItemCode)
+			return this.inquiryUseCase.readAddFixedCostInfoBySisyutuItem(loginUserSession.getLoginUserInfo(), sisyutuItemCode)
 					// レスポンスにログインユーザ名を設定
 					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 					// レスポンスからModelAndViewを生成
@@ -166,7 +271,7 @@ public class FixedCostInfoManageController {
 	
 	/**
 	 *<pre>
-	 * 選択した支出項目に属する固定費を追加登録時のPOST要求マッピングです。
+	 * 選択した支出項目に属する固定費を追加登録時のGET要求マッピングです。
 	 * 選択した支出項目に属する固定費が既に登録済みの場合で、新たに同分類の支出項目に属する固定費を登録する場合に
 	 * このアクションが呼ばれます。
 	 * 情報管理(固定費)更新画面に遷移します。
@@ -175,11 +280,11 @@ public class FixedCostInfoManageController {
 	 * @return 情報管理(固定費)更新画面
 	 *
 	 */
-	@PostMapping(value = "/updateload/", params = "actionAdd")
+	@GetMapping(value = "/updateload/", params = "actionAdd")
 	public ModelAndView postActionAddLoad(@RequestParam("sisyutuItemCode") String sisyutuItemCode) {
 		log.debug("postActionAddLoad: sisyutuItemCode=" + sisyutuItemCode);
 		// 画面表示情報を取得
-		return this.usecase.readAddFixedCostInfoBySisyutuItem(loginUserSession.getLoginUserInfo(), sisyutuItemCode)
+		return this.inquiryUseCase.readAddFixedCostInfoBySisyutuItem(loginUserSession.getLoginUserInfo(), sisyutuItemCode)
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
@@ -188,18 +293,37 @@ public class FixedCostInfoManageController {
 	
 	/**
 	 *<pre>
-	 * 選択した固定費に対して、更新操作を選択時のPOST要求マッピングです。
+	 * 選択した固定費に対して、更新操作を選択時のGET要求マッピングです。
 	 * 情報管理(固定費)更新画面に遷移します。
 	 *</pre>
 	 * @param fixedCostCode 更新対象の固定費コード
 	 * @return 情報管理(固定費)更新画面
 	 *
 	 */
-	@PostMapping(value="/updateload/", params = "actionUpdate")
+	@GetMapping(value="/updateload/", params = "actionUpdate")
 	public ModelAndView postActionUpdateLoad(@RequestParam("fixedCostCode") String fixedCostCode) {
 		log.debug("postActionUpdateLoad: fixedCostCode=" + fixedCostCode);
 		// 画面表示情報を取得
-		return this.usecase.readUpdateFixedCostInfo(loginUserSession.getLoginUserInfo(), fixedCostCode)
+		return this.inquiryUseCase.readUpdateFixedCostInfo(loginUserSession.getLoginUserInfo(), fixedCostCode)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+	
+	/**
+	 *<pre>
+	 * 選択した固定費に対して、キャンセルアクションを選択時のGET要求マッピングです。
+	 * 情報管理(固定費)初期表示画面に遷移します。
+	 *</pre>
+	 * @return 情報管理(固定費)初期表示画面
+	 *
+	 */
+	@GetMapping(value = "/updateload/", params = "actionCancel")
+	public ModelAndView postActionCancel() {
+		log.debug("postActionCancel:");
+		// 画面表示データ読込
+		return this.inquiryUseCase.readInitInfo(loginUserSession.getLoginUserInfo())
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
@@ -219,32 +343,13 @@ public class FixedCostInfoManageController {
 	@PostMapping("/delete/")
 	public ModelAndView postDelete(@RequestParam("fixedCostCode") String fixedCostCode, RedirectAttributes redirectAttributes) {
 		log.debug("postDelete: fixedCostCode=" + fixedCostCode);
-		// 画面表示情報を取得
-		return this.usecase.execDelete(loginUserSession.getLoginUserInfo(), fixedCostCode).buildRedirect(redirectAttributes);
+		// 削除処理を実行
+		return this.registConfirmUseCase.execDelete(loginUserSession.getLoginUserInfo(), fixedCostCode).buildRedirect(redirectAttributes);
 	}
 	
 	/**
 	 *<pre>
-	 * 選択した固定費に対して、キャンセルアクションを選択時のPOST要求マッピングです。
-	 * 情報管理(固定費)初期表示画面に遷移します。
-	 *</pre>
-	 * @return 情報管理(固定費)初期表示画面
-	 *
-	 */
-	@PostMapping(value = "/updateload/", params = "actionCancel")
-	public ModelAndView postActionCancel() {
-		log.debug("postActionCancel:");
-		// 画面表示データ読込
-		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo())
-				// レスポンスにログインユーザ名を設定
-				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
-				// レスポンスからModelAndViewを生成
-				.build();
-	}
-	
-	/**
-	 *<pre>
-	 * 固定費情報登録・更新のPOST要求時マッピングです。
+	 * 固定費情報登録・更新のPOST要求時マッピング（新規登録）です。
 	 *</pre>
 	 * @param inputForm 入力フォーム情報
 	 * @param bindingResult フォームのバリデーションチェック結果
@@ -252,7 +357,35 @@ public class FixedCostInfoManageController {
 	 * @return 登録成功時：リダイレクト、登録失敗時:情報管理(固定費)更新画面
 	 *
 	 */
-	@PostMapping("/update/")
+	@PostMapping(value = "/update/", params = "actionAdd")
+	public ModelAndView postAdd(@ModelAttribute @Validated FixedCostInfoUpdateForm inputForm, BindingResult bindingResult,
+			RedirectAttributes redirectAttributes) {
+		log.debug("postAdd: input=" + inputForm);
+		/* 入力フィールドのバリデーションチェック結果を判定 */
+		// チェック結果エラーの場合
+		if(bindingResult.hasErrors()) {
+			// 初期表示情報を取得し、入力チェックエラーを設定
+			return this.inquiryUseCase.readUpdateBindingErrorSetInfo(loginUserSession.getLoginUserInfo(), inputForm)
+					// レスポンスにログインユーザ名を設定
+					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					// レスポンスからModelAndViewを生成
+					.build();
+		}
+		// チェック結果OKの場合 → 新規登録処理を実行
+		return this.registConfirmUseCase.execAdd(loginUserSession.getLoginUserInfo(), inputForm).buildRedirect(redirectAttributes);
+	}
+	
+	/**
+	 *<pre>
+	 * 固定費情報登録・更新のPOST要求時マッピング（更新）です。
+	 *</pre>
+	 * @param inputForm 入力フォーム情報
+	 * @param bindingResult フォームのバリデーションチェック結果
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
+	 * @return 登録成功時：リダイレクト、登録失敗時:情報管理(固定費)更新画面
+	 *
+	 */
+	@PostMapping(value = "/update/", params = "actionUpdate")
 	public ModelAndView postUpdate(@ModelAttribute @Validated FixedCostInfoUpdateForm inputForm, BindingResult bindingResult,
 			RedirectAttributes redirectAttributes) {
 		log.debug("postUpdate: input=" + inputForm);
@@ -260,19 +393,119 @@ public class FixedCostInfoManageController {
 		// チェック結果エラーの場合
 		if(bindingResult.hasErrors()) {
 			// 初期表示情報を取得し、入力チェックエラーを設定
-			return this.usecase.readUpdateBindingErrorSetInfo(loginUserSession.getLoginUserInfo(), inputForm)
+			return this.inquiryUseCase.readUpdateBindingErrorSetInfo(loginUserSession.getLoginUserInfo(), inputForm)
 					// レスポンスにログインユーザ名を設定
 					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 					// レスポンスからModelAndViewを生成
 					.build();
-			
-		// チェック結果OKの場合
-		} else {
-			// actionに従い、処理を実行
-			return this.usecase.execAction(loginUserSession.getLoginUserInfo(), inputForm).buildRedirect(redirectAttributes);
 		}
+		// チェック結果OKの場合 → 更新処理を実行
+		return this.registConfirmUseCase.execUpdate(loginUserSession.getLoginUserInfo(), inputForm).buildRedirect(redirectAttributes);
 	}
 	
+	/**
+	 *<pre>
+	 * 固定費情報更新画面からのキャンセルのPOST要求マッピングです。
+	 * action=add の場合は初期表示画面、action=update の場合は処理選択画面に遷移します。
+	 *</pre>
+	 * @param action アクション種別（add/update）
+	 * @param fixedCostCode 処理選択画面に戻る場合の固定費コード
+	 * @return action=add時：初期表示画面、action=update時：処理選択画面
+	 *
+	 */
+	@PostMapping(value = "/update/", params = "actionCancel")
+	public ModelAndView postUpdateCancel(
+			@RequestParam("action") String action,
+			@RequestParam(value = "fixedCostCode", required = false, defaultValue = "") String fixedCostCode) {
+		log.debug("postUpdateCancel: action=" + action + ",fixedCostCode=" + fixedCostCode);
+		if (MyHouseholdAccountBookContent.ACTION_TYPE_ADD.equals(action)) {
+			// 新規追加からのキャンセル → 初期表示画面へ
+			return this.inquiryUseCase.readInitInfo(loginUserSession.getLoginUserInfo())
+					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					.build();
+		} else {
+			// 更新からのキャンセル → 処理選択画面へ
+			return this.inquiryUseCase.readActSelectItemInfo(loginUserSession.getLoginUserInfo(), fixedCostCode)
+					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					.build();
+		}
+	}
+
+	/**
+	 *<pre>
+	 * 一括更新画面初回表示のGET要求マッピングです。
+	 * 処理選択画面の「一括更新」ボタン押下時のGETリクエストに対応します。
+	 * 基準固定費の支払日・支払金額をフォームの初期値として設定します。
+	 *</pre>
+	 * @param baseFixedCostCode 基準固定費コード
+	 * @return 情報管理(固定費)一括更新画面
+	 *
+	 */
+	@GetMapping("/bulkupdateload/")
+	public ModelAndView getBulkUpdateLoad(@RequestParam("baseFixedCostCode") String baseFixedCostCode) {
+		log.debug("getBulkUpdateLoad: baseFixedCostCode=" + baseFixedCostCode);
+		// 画面表示情報を取得
+		return this.inquiryUseCase.readBulkUpdateInfo(loginUserSession.getLoginUserInfo(), baseFixedCostCode)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+
+	/**
+	 *<pre>
+	 * 固定費一括更新のPOST要求マッピングです。
+	 * バリデーションエラー時は一括更新画面に戻り、成功時は完了画面にリダイレクトします。
+	 *</pre>
+	 * @param inputForm 入力フォーム情報
+	 * @param bindingResult フォームのバリデーションチェック結果
+	 * @param redirectAttributes リダイレクト先引き継ぎ領域
+	 * @return バリデーションエラー時：一括更新画面、成功時：リダイレクト
+	 *
+	 */
+	@PostMapping(value = "/bulkupdate/", params = "actionBulkUpdate")
+	public ModelAndView postBulkUpdate(
+			@ModelAttribute @Validated FixedCostBulkUpdateForm inputForm,
+			BindingResult bindingResult,
+			RedirectAttributes redirectAttributes) {
+		log.debug("postBulkUpdate: input=" + inputForm);
+		/* 入力フィールドのバリデーションチェック結果を判定 */
+		// チェック結果エラーの場合
+		if (bindingResult.hasErrors()) {
+			// バリデーションエラー → 一括更新画面に戻る（送信済みフォームで入力値・チェック状態を復元）
+			return this.inquiryUseCase.readBulkUpdateBindingErrorSetInfo(
+						loginUserSession.getLoginUserInfo(), inputForm)
+					// レスポンスにログインユーザ名を設定
+					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+					// レスポンスからModelAndViewを生成
+					.build();
+		}
+		// チェック結果OKの場合 → 一括更新処理を実行
+		return this.registConfirmUseCase.execBulkUpdate(loginUserSession.getLoginUserInfo(), inputForm)
+				.buildRedirect(redirectAttributes);
+	}
+
+	/**
+	 *<pre>
+	 * 一括更新画面からのキャンセルのPOST要求マッピングです。
+	 * 処理選択画面に遷移します。
+	 *</pre>
+	 * @param baseFixedCostCode 基準固定費コード
+	 * @return 処理選択画面
+	 *
+	 */
+	@PostMapping(value = "/bulkupdate/", params = "actionCancel")
+	public ModelAndView postBulkUpdateCancel(
+			@RequestParam("baseFixedCostCode") String baseFixedCostCode) {
+		log.debug("postBulkUpdateCancel: baseFixedCostCode=" + baseFixedCostCode);
+		// 画面表示情報を取得
+		return this.inquiryUseCase.readActSelectItemInfo(loginUserSession.getLoginUserInfo(), baseFixedCostCode)
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+
 	/**
 	 *<pre>
 	 * 固定費情報登録・更新完了後のリダイレクト(Get要求時)のマッピングです。
@@ -285,7 +518,7 @@ public class FixedCostInfoManageController {
 	public ModelAndView updateComplete(@ModelAttribute CompleteRedirectMessages redirectMessages) {
 		log.debug("updateComplete: input=" + redirectMessages);
 		// 画面表示情報を取得
-		return this.usecase.readInitInfo(loginUserSession.getLoginUserInfo())
+		return this.inquiryUseCase.readInitInfo(loginUserSession.getLoginUserInfo())
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成

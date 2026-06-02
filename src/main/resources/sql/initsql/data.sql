@@ -134,8 +134,8 @@ INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_C
  ('kouki', '0009', 'コミケ C014', '【内容詳細】2024年夏コミ', '0061', '2', '06', null, '15', 49800.00, false),
  ('kouki', '0010', '国民年金保険', null, '0015', '1', '00',null, '00', 16980.00, false),
  ('kouki', '0011', '消費税支払(偶数月)', '【内容詳細】偶数月に消費税支払い', '0012', '1', '30',null, '19', 3260.00, false),
- ('kouki', '0012', 'その他任意で不定期の支払１', '【内容詳細】その他任意で不定期の支払１詳細内容', '0009', '1', '40','【支払月任意詳細】その他任意月１', '40', 36380.00, false),
- ('kouki', '0013', 'その他任意で不定期の支払２', null, '0009', '1', '40','【支払月任意詳細】その他任意月２', '40', 22910.00, false);
+ ('kouki', '0012', 'その他任意で不定期の支払１', '不定期の支払詳細内容１', '0009', '1', '40','不定期の支払１です', '40', 36380.00, false),
+ ('kouki', '0013', 'その他任意で不定期の支払２', null, '0009', '1', '40','不定期の支払２です', '40', 22910.00, false);
 
 -- 収支テーブル：INCOME_AND_EXPENDITURE_TABLE
 INSERT INTO INCOME_AND_EXPENDITURE_TABLE (USER_ID, TARGET_YEAR, TARGET_MONTH, INCOME_KINGAKU, WITHDREW_KINGAKU, EXPENDITURE_ESTIMATE_KINGAKU, EXPENDITURE_KINGAKU, INCOME_AND_EXPENDITURE_KINGAKU)

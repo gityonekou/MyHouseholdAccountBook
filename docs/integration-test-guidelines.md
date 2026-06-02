@@ -114,15 +114,20 @@ assertEquals("固定費(課税)＞水光熱通費＞電気代", response.getSisy
 assertEquals(2, response.getIncomeListInfo().size());
 assertNotNull(response.getExpenditureSelectItemForm());
 
-// × 禁止：build() → ModelAndView経由での検証
+// × 禁止パターン①：build() → ModelAndView経由での検証
 ModelAndView mav = response.build();
 assertEquals("固定費(課税)＞水光熱通費＞電気代", mav.getModel().get("sisyutuItemName"));
+
+// × 禁止パターン②：build() → ModelMap経由での検証（①と同等）
+ModelMap model = response.setLoginUserName("...").build().getModelMap();
+assertEquals("固定費(課税)＞水光熱通費＞電気代", model.getAttribute("sisyutuItemName"));
+List<FixedCostItem> list = (List<FixedCostItem>) model.getAttribute("fixedCostItemList");
 ```
 
 **理由**:
 - `build()`はプレゼンテーション層（Controller→画面）の責務であり、UseCase結合テストの検証対象外
 - getterによる直接アクセスの方がテストの意図が明確
-- 型安全（ModelAndViewの`get()`は`Object`を返すためキャストが必要）
+- 型安全（ModelAndViewの`get()`・ModelMapの`getAttribute()`は`Object`を返すためキャストが必要）
 
 ### 3.2 レスポンスクラスへの@Getter追加ルール
 
@@ -897,3 +902,4 @@ void testPostIncomeUpdate_ValidationError_ShowsView() throws Exception {
 | 2026-02-15 | 初版作成（Phase5 Step2の実績に基づく） |
 | 2026-02-24 | セクション6.5「ロールバックテストのクラス分離パターン」追加（IncomeAndExpenditureRegistRollbackTestの実績から）。セクション8.5〜8.8（収入kubun別金額マッピング、clearStartFlg制御、SISYUTU_KINGAKU_TABLE集計ルール、混合アクション網羅）追加（IncomeAndExpenditureRegistConfirmIntegrationTestの実績から） |
 | 2026-02-25 | タイトル・適用範囲をController層テストを含む形に更新。目次にセクション10追加。セクション1.2適用範囲を更新（対象外からController層を削除し対象として追記）。セクション10「Controller層テストガイドライン」新規追加（standaloneSetupパターン・UseCase vs Sessionモック戦略・@BeforeEachデフォルト設定・actionフィールド注意・モデルキー名・null検証・mvn clean test必須・SQL再利用・テストケース観点）（IncomeAndExpenditureRegistControllerIntegrationTestの実績から） |
+| 2026-04-21 | セクション3.1の禁止パターンに `build() → ModelMap経由` を明示追加（`response.build().getModelMap()` パターンも禁止対象であることを明確化）（FixedCostInfoManageUseCaseIntegrationTestの実績から） |

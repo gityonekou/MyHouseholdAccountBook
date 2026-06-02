@@ -82,7 +82,15 @@ class IncomeAndExpenditureTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.incomeandexpenditure.IncomeAndExpenditureTableDataSource#add(com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure)} のためのテスト・メソッド。
+	 *<pre>
+	 * テストadd：収支テーブルへの新規登録テスト
+	 *
+	 * 【検証内容】
+	 * ・全8カラム（USER_ID, TARGET_YEAR, TARGET_MONTH, INCOME_KINGAKU, WITHDREW_KINGAKU,
+	 *   EXPENDITURE_ESTIMATE_KINGAKU, EXPENDITURE_KINGAKU, INCOME_AND_EXPENDITURE_KINGAKU）が正しく登録されること
+	 * ・同一キーで重複登録した場合、DuplicateKeyExceptionが発生すること
+	 * ・null可項目（WITHDREW_KINGAKU）にnullが正しく登録されること
+	 *</pre>
 	 */
 	@Test
 	@DisplayName("add:収支テーブルへの新規登録テスト(全カラム確認)")
@@ -141,7 +149,16 @@ class IncomeAndExpenditureTableDataSourceTest {
 	}
 
 	/**
-	 * {@link com.yonetani.webapp.accountbook.infrastructure.datasource.account.incomeandexpenditure.IncomeAndExpenditureTableDataSource#update(com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure)} のためのテスト・メソッド。
+	 *<pre>
+	 * テストupdate：収支テーブルの更新テスト
+	 *
+	 * 【検証内容】
+	 * ・更新対象の4カラム（INCOME_KINGAKU, WITHDREW_KINGAKU, EXPENDITURE_KINGAKU,
+	 *   INCOME_AND_EXPENDITURE_KINGAKU）が正しく更新されること
+	 * ・非更新カラム（EXPENDITURE_ESTIMATE_KINGAKU）が更新されないこと（意図的に別値を渡して確認）
+	 * ・対象データなしの場合に0件が返ること
+	 * ・null可項目（WITHDREW_KINGAKU）をnullに更新できること
+	 *</pre>
 	 */
 	@Test
 	@Sql(value = "IncomeAndExpenditureTableDataSourceUpdateTest.sql", config = @SqlConfig(encoding = "UTF-8"))

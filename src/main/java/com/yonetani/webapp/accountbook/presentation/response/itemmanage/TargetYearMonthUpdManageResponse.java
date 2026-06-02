@@ -4,7 +4,8 @@
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  コメントなど
- * 2025/01/13 : 1.01.00(A)  新規作成
+ * 2025/01/13 : 1.00.00(A)  新規作成
+ * 2026/05/09 : 1.01.00     リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.itemmanage;
@@ -12,8 +13,6 @@ package com.yonetani.webapp.accountbook.presentation.response.itemmanage;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.yonetani.webapp.accountbook.domain.type.common.NextTargetYearMonth;
-import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
 import lombok.AccessLevel;
@@ -26,7 +25,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.01.A)
+ * @since 家計簿アプリ(1.01)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -49,18 +48,22 @@ public class TargetYearMonthUpdManageResponse extends AbstractResponse {
 	 *<pre>
 	 * 対象年月更新可の画面表示情報でレスポンス情報を生成して返します。
 	 *</pre>
-	 * @param targetYearMonth 現在の対象年月(YYYMM)
-	 * @param nextYearMonth 更新後の対象年月(YYYMM)
+	 * @param targetYear 現在の対象年月の年の値
+	 * @param targetMonth 現在の対象年月の月の値
+	 * @param nextYear 更新後の対象年月の年の値
+	 * @param nextMonth 更新後の対象年月の月の値
+	 * @param nextYearMonth 更新後の対象年月
 	 * @return 情報管理(対象年月更新)画面表示情報
 	 *
 	 */
-	public static TargetYearMonthUpdManageResponse getUpdateAcceptInstance(TargetYearMonth targetYearMonth, NextTargetYearMonth nextYearMonth) {
+	public static TargetYearMonthUpdManageResponse getUpdateAcceptInstance(
+			String targetYear, String targetMonth, String nextYear, String nextMonth, String nextYearMonth) {
 		TargetYearMonthUpdManageResponse response = new TargetYearMonthUpdManageResponse(
-				targetYearMonth.getYear(),
-				targetYearMonth.getMonth(),
-				nextYearMonth.getYear().getValue(),
-				nextYearMonth.getMonth().getValue(),
-				nextYearMonth.getValue(),
+				targetYear,
+				targetMonth,
+				nextYear,
+				nextMonth,
+				nextYearMonth,
 				true);
 		return response;
 	}

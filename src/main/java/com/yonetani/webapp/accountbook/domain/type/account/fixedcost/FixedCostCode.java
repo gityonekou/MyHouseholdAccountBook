@@ -5,18 +5,15 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/06/03 : 1.00.00  新規作成
+ * 2026/05/04 : 1.01.00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.fixedcost;
 
-import org.springframework.util.StringUtils;
-
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.common.Identifier;
 
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  *<pre>
@@ -25,15 +22,22 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-@EqualsAndHashCode
-public class FixedCostCode {
-	// 固定費コード
-	private final String value;
+@EqualsAndHashCode(callSuper = true)
+public class FixedCostCode extends Identifier {
+	
+	/**
+	 *<pre>
+	 * コンストラクタ（privateでファクトリメソッド経由のみ生成可能）
+	 *</pre>
+	 * @param value 固定費コード
+	 *
+	 */
+	private FixedCostCode(String value) {
+		super(value);
+	}
 	
 	/**
 	 *<pre>
@@ -49,10 +53,10 @@ public class FixedCostCode {
 	 *
 	 */
 	public static FixedCostCode from(String fixedCostCode) {
-		// ガード節(空文字列)
-		if(!StringUtils.hasLength(fixedCostCode)) {
-			throw new MyHouseholdAccountBookRuntimeException("「固定費コード」項目の設定値が空文字列です。管理者に問い合わせてください。");
-		}
+		
+		// 基本検証（null、空文字）
+		Identifier.validate(fixedCostCode, "固定費コード");
+		
 		// ガード節(長さが4桁でない)
 		if(fixedCostCode.length() != 4) {
 			throw new MyHouseholdAccountBookRuntimeException("「固定費コード」項目の設定値が不正です。管理者に問い合わせてください。[fixedCostCode=" + fixedCostCode + "]");
@@ -89,13 +93,5 @@ public class FixedCostCode {
 	 */
 	public static String getNewCode(int count) {
 		return FixedCostCode.from(count).getValue();
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		return value;
 	}
 }
