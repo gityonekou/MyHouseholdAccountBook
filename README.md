@@ -16,7 +16,7 @@ SpringBootを使って作成しています。<br>
 　・買い物登録の残は携帯(アンドロイド側）のアプリもkotlinで作る予定なので、そのSV処理などなど、、、<br>
 <br>
 <br>
-【技術スタック】
+【技術スタック】<br>
 ・SpringBoot:3.0.7<br>
 ・Spring Security:6.0.7<br>
 ・Mybatis:2.2.2<br>
