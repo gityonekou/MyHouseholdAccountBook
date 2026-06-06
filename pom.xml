@@ -13,7 +13,7 @@
 	<version>1.02</version>
 	<packaging>jar</packaging>
 	<name>MyHouseholdAccountBook</name>
-	<description>マイ家計簿です(1.01版)</description>
+	<description>マイ家計簿です(1.02版)</description>
 	<properties>
 		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
