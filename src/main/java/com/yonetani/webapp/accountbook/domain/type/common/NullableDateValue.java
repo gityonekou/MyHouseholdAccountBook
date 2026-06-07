@@ -238,7 +238,7 @@ public abstract class NullableDateValue {
 	 *
 	 */
 	public String toCompactString() {
-		if(value == null) {
+		if(isNull()) {
 			return "";
 		}
 		return this.value.format(YYYYMMDD_FORMAT);
@@ -253,7 +253,7 @@ public abstract class NullableDateValue {
 	 *
 	 */
 	public String toDisplayString() {
-		if(value == null) {
+		if(isNull()) {
 			return "";
 		}
 		return this.value.format(YYYY_SP_MM_SP_DD_FORMAT);
@@ -268,7 +268,7 @@ public abstract class NullableDateValue {
 	 *
 	 */
 	public String toJapaneseDisplayString() {
-		if(value == null) {
+		if(isNull()) {
 			return "";
 		}
 		return this.value.format(JAPANESE_DATE_FORMAT);
@@ -283,12 +283,27 @@ public abstract class NullableDateValue {
 	 *
 	 */
 	public String toJapaneseYearMonthString() {
-		if(value == null) {
+		if(isNull()) {
 			return "";
 		}
 		return this.value.format(JAPANESE_YEAR_MONTH_FORMAT);
 	}
-
+	
+	/**
+	 *<pre>
+	 * 日付を「DD」形式の文字列で返します。
+	 * null値の場合はnullを返却します。
+	 *</pre>
+	 * @return DD形式の文字列(2桁)。null値の場合はnull
+	 *
+	 */
+	public String toDayValue() {
+		if(isNull()) {
+			return null;
+		}
+		return String.format("%02d", value.getDayOfMonth());
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

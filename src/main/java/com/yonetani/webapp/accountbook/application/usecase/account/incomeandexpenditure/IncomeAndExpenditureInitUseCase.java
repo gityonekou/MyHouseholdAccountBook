@@ -268,11 +268,7 @@ public class IncomeAndExpenditureInitUseCase {
 						// 支出詳細
 						domain.getExpenditureDetailContext().getValue(),
 						// 支払日(日付からDDの値を取得して設定):DBはnull可
-						(domain.getPaymentDate().getValue() != null) ?
-								// 値ありの場合、日付から日にちの値を取得(文字列で値を設定)
-								String.format("%02d", domain.getPaymentDate().getValue().getDayOfMonth()) :
-								// 値なしの場合、nullを設定
-								null,
+						domain.getPaymentDate().toDayValue(),
 						// 支払金額
 						domain.getExpenditureAmount().getValue(),
 						// 支払金額の0円開始設定フラグ
