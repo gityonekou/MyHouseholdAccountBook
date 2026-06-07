@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2025/12/28 : 1.00.00  新規作成
+ * 2026/06/07 : 1.02.00  null判定をisNull()メソッドに集約、toDayValue()メソッド追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
@@ -311,7 +312,7 @@ public abstract class NullableDateValue {
 	public String toString() {
 		// 値の文字列表現を返却（デバッグ用、ISO-8601形式：yyyy-MM-dd）
 		// null値の場合は空文字列を返却
-		if(value == null) {
+		if(isNull()) {
 			return "";
 		}
 		return this.value.toString();
