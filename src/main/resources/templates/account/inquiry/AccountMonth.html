@@ -120,8 +120,9 @@
 								</div>
 							</div>
 
-							<!-- 支出項目(レベル2項目)毎の支出表示エリア -->
-							<th:block th:if="${#lists.size(expenditureItemList)}>0">
+							<!-- 支出項目(レベル2項目)毎の支出表示エリア（viewType=item の場合のみ表示）-->
+							<th:block th:if="${viewType == 'item'}">
+						<!--/*	<th:block th:if="${#lists.size(expenditureItemList)}>0"> */-->
 							<div class="card-body">
 								<table class="table table-sm table-borderless">
 									<thead class="border border-dark"><tr class="table-secondary"><th scope="col" class="w20">支出項目</th><th scope="col" class="w20">&emsp;</th><th scope="col" class="w10">支払い年月日</th><th scope="col">&emsp;</th></tr></thead>
@@ -179,7 +180,7 @@
 							</div>
 							</th:block>
 
-							<!-- 支出別一覧（viewType=expenditure の場合のみ表示） -->
+							<!-- 支出別一覧表示エリア（viewType=expenditure の場合のみ表示） -->
 							<th:block th:if="${viewType == 'expenditure'}">
 							<div class="card-body">
 								<table class="table table-sm table-bordered">
