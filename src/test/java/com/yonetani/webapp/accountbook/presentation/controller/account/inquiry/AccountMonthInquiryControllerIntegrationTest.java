@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2025/12/07 : 1.00.00  新規作成
+ * 2026/06/13 : 1.02.00  支出別一覧追加対応のテスト追加
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.account.inquiry;
@@ -613,5 +614,134 @@ public class AccountMonthInquiryControllerIntegrationTest {
 			.andExpect(status().isOk())
 			// ログインユーザ名がモデルに設定されていること
 			.andExpect(model().attribute("loginUserName", is("テストユーザ01")));
+	}
+
+	// ========================================
+	// viewType 対応テスト（ver1.02 追加）
+	// ========================================
+
+	/**
+	 *<pre>
+	 * 【正常系】POST /myhacbook/accountinquiry/accountmonth/targetcontrol/ (viewTypeSwitch)
+	 * 表示切替_支出別に切替
+	 * - viewType=expenditure を送信した場合、支出別一覧がモデルに含まれることを確認
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("正常系：表示切替_支出別に切替")
+	public void testPostViewTypeSwitch_ToExpenditure() throws Exception {
+		// ユーザ情報をモックに設定
+		doReturn(createLoginUser()).when(mockLloginUserSession).getLoginUserInfo();
+		// 画面表示の検証（viewType=expenditure で支出別一覧に切替）
+		// テストデータ(202511): EXPENDITURE_TABLE に5件のレコード
+		mockMvc.perform(post("/myhacbook/accountinquiry/accountmonth/targetcontrol/")
+				.param("viewTypeSwitch", "")
+				.param("targetYearMonth", "202511")
+				.param("viewType", "expenditure")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().isOk())
+			.andExpect(view().name("account/inquiry/AccountMonth"))
+			.andExpect(model().attribute("viewType", is("expenditure")))
+			.andExpect(model().attribute("expenditureList", hasSize(5)))
+			.andExpect(model().attribute("expenditureTotalAmount", is("280,000円")));
+	}
+
+	/**
+	 *<pre>
+	 * 【正常系】POST /myhacbook/accountinquiry/accountmonth/targetcontrol/ (viewTypeSwitch)
+	 * 表示切替_支出項目別に切替
+	 * - viewType=item を送信した場合、支出別リストが空でモデルに設定されることを確認
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("正常系：表示切替_支出項目別に切替")
+	public void testPostViewTypeSwitch_ToItem() throws Exception {
+		// ユーザ情報をモックに設定
+		doReturn(createLoginUser()).when(mockLloginUserSession).getLoginUserInfo();
+		// 画面表示の検証（viewType=item で支出項目別に切替）
+		mockMvc.perform(post("/myhacbook/accountinquiry/accountmonth/targetcontrol/")
+				.param("viewTypeSwitch", "")
+				.param("targetYearMonth", "202511")
+				.param("viewType", "item")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().isOk())
+			.andExpect(view().name("account/inquiry/AccountMonth"))
+			.andExpect(model().attribute("viewType", is("item")))
+			.andExpect(model().attribute("expenditureList", hasSize(0)));
+	}
+
+	/**
+	 *<pre>
+	 * 【正常系】POST /myhacbook/accountinquiry/accountmonth/targetcontrol/ (targetBeforeBtn)
+	 * 前月表示_viewTypeの引き継ぎ確認
+	 * - 前月ボタン押下時に viewType=expenditure が引き継がれることを確認
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("正常系：前月表示_viewTypeの引き継ぎ確認")
+	public void testPostBeforeAccountMonth_ViewTypeIsInherited() throws Exception {
+		// ユーザ情報をモックに設定
+		doReturn(createLoginUser()).when(mockLloginUserSession).getLoginUserInfo();
+		// beforeYearMonth=202511（データあり）, viewType=expenditure を引き継ぐ
+		mockMvc.perform(post("/myhacbook/accountinquiry/accountmonth/targetcontrol/")
+				.param("targetBeforeBtn", "")
+				.param("beforeYearMonth", "202511")
+				.param("returnYearMonth", "202512")
+				.param("viewType", "expenditure")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().isOk())
+			.andExpect(view().name("account/inquiry/AccountMonth"))
+			.andExpect(model().attribute("viewType", is("expenditure")));
+	}
+
+	/**
+	 *<pre>
+	 * 【正常系】GET /myhacbook/accountinquiry/accountmonth/registComplete/
+	 * 登録完了後のリダイレクト_viewType=item で表示
+	 * - 登録完了後のリダイレクトは常に viewType=item（支出項目別）で表示されることを確認
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("正常系：登録完了後のリダイレクト_viewType=item")
+	public void testRegistComplete_ViewTypeIsItem() throws Exception {
+		// ユーザ情報をモックに設定
+		doReturn(createLoginUser()).when(mockLloginUserSession).getLoginUserInfo();
+		// 画面表示の検証
+		mockMvc.perform(get("/myhacbook/accountinquiry/accountmonth/registComplete/")
+				.param("targetYearMonth", "202511")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().isOk())
+			.andExpect(view().name("account/inquiry/AccountMonth"))
+			// 登録完了後は常に viewType=item
+			.andExpect(model().attribute("viewType", is("item")));
+	}
+
+	/**
+	 *<pre>
+	 * 【正常系】POST /myhacbook/accountinquiry/accountmonth/dispatchaction/ (expenditureCorrect)
+	 * 訂正ボタン押下_expenditurecorrectloadへリダイレクト
+	 * - targetYearMonth・expenditureCode がクエリパラメータとして引き継がれることを確認
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("正常系：訂正ボタン押下_expenditurecorrectloadへリダイレクト")
+	public void testPostExpenditureCorrect_RedirectToCorrectLoad() throws Exception {
+		// ユーザ情報をモックに設定
+		doReturn(createLoginUser()).when(mockLloginUserSession).getLoginUserInfo();
+		// 画面表示の検証
+		mockMvc.perform(post("/myhacbook/accountinquiry/accountmonth/dispatchaction/")
+				.param("expenditureCorrect", "")
+				.param("targetYearMonth", "202511")
+				.param("expenditureCode", "001")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(redirectedUrl(
+					"/myhacbook/accountregist/incomeandexpenditure/expenditurecorrectload/"
+					+ "?targetYearMonth=202511&expenditureCode=001"));
 	}
 }

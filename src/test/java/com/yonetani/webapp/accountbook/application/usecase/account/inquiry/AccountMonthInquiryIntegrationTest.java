@@ -7,6 +7,7 @@
  * 日付       : version  コメントなど
  * 2025/11/30 : 1.00.00  新規作成
  * 2025/12/17 : 1.00.00  正常系テストケース追加（積立金取崩金額null）
+ * 2026/06/13 : 1.02.00  支出別一覧 viewType 対応のテスト追加
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.inquiry;
@@ -42,6 +43,11 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  * 4. 異常系: 収入金額不整合（202510）
  * 5. 異常系: 支出金額不整合（202509）
  * 6. 異常系: 収支データなし、支出データあり（202508）
+ * 7. viewType=item → 支出別リストはレスポンスに含まれない
+ * 8. viewType=expenditure → 支出別リストがレスポンスに含まれる
+ * 9. viewType=expenditure → 支出合計金額が正しい（280,000円）
+ * 10. viewType=item → 支出項目別リスト(SisyutuKingaku)が設定される
+ * 11. viewType=expenditure → 支出項目別リスト(SisyutuKingaku)が設定されない
  *
  *</pre>
  *
@@ -326,5 +332,108 @@ class AccountMonthInquiryIntegrationTest {
 
         // Then: レスポンスが返却される
         assertNotNull(response);
+    }
+
+    // ========================================
+    // viewType 対応テスト
+    // ========================================
+
+    @Test
+    @DisplayName("viewType=item → 支出別リストはレスポンスに含まれない（expenditureList 空）")
+    void testRead_ViewTypeItem_ExpenditureListIsEmpty() {
+        // Given: テストユーザ、対象年月202511、viewType=item
+        LoginUserInfo user = createLoginUser();
+        String targetYearMonth = "202511";
+
+        // When: viewType=item で照会（4引数版で returnYearMonth=targetYearMonth）
+        AccountMonthInquiryResponse response = useCase.read(user, targetYearMonth, targetYearMonth, "item");
+
+        // Then: viewType が "item" になっている
+        assertEquals("item", response.getViewType());
+        // Then: 支出別リストは空
+        assertNotNull(response.getExpenditureList());
+        assertTrue(response.getExpenditureList().isEmpty());
+        // Then: 支出合計金額は null（設定されていない）
+        assertNull(response.getExpenditureTotalAmount());
+    }
+
+    @Test
+    @DisplayName("viewType=expenditure → 支出別リストがレスポンスに含まれる")
+    void testRead_ViewTypeExpenditure_ExpenditureListIsNotEmpty() {
+        // Given: テストユーザ、対象年月202511、viewType=expenditure
+        LoginUserInfo user = createLoginUser();
+        String targetYearMonth = "202511";
+
+        // When: viewType=expenditure で照会
+        AccountMonthInquiryResponse response = useCase.read(user, targetYearMonth, targetYearMonth, "expenditure");
+
+        // Then: viewType が "expenditure" になっている
+        assertEquals("expenditure", response.getViewType());
+        // Then: 支出別リストに5件含まれる
+        assertNotNull(response.getExpenditureList());
+        assertEquals(5, response.getExpenditureList().size());
+
+        // Then: 1件目（001: スーパー買い物、NON_WASTED）の明細検証
+        // NON_WASTED のため displayName にプレフィックスなし
+        var row1 = response.getExpenditureList().get(0);
+        assertEquals("001", row1.getExpenditureCode());
+        assertEquals("スーパー買い物", row1.getDisplayName()); // NON_WASTED: プレフィックスなし
+        assertEquals("5日", row1.getPaymentDay());
+        assertEquals("80,000円", row1.getExpenditureAmount());
+        assertEquals("食料品購入", row1.getExpenditureDetailContext());
+
+        // Then: 4件目（004: 映画館、WASTED_B）の明細検証
+        // WASTED_B のため displayName に「【無駄遣いB】」プレフィックスあり
+        // ※ WASTED_C のプレフィックス検証はドメインテスト（ExpenditureCategoryTest.testToDisplayLabel_WastedC）で実施済み
+        var row4 = response.getExpenditureList().get(3);
+        assertEquals("004", row4.getExpenditureCode());
+        assertEquals("【無駄遣いB】映画館", row4.getDisplayName()); // WASTED_B: プレフィックスあり
+        assertEquals("20日", row4.getPaymentDay());
+        assertEquals("20,000円", row4.getExpenditureAmount());
+        assertEquals("娯楽費", row4.getExpenditureDetailContext());
+    }
+
+    @Test
+    @DisplayName("viewType=expenditure → 支出合計金額が正しい（280,000円）")
+    void testRead_ViewTypeExpenditure_TotalAmountIsCorrect() {
+        // Given: テストユーザ、対象年月202511、viewType=expenditure
+        LoginUserInfo user = createLoginUser();
+        String targetYearMonth = "202511";
+
+        // When: viewType=expenditure で照会
+        AccountMonthInquiryResponse response = useCase.read(user, targetYearMonth, targetYearMonth, "expenditure");
+
+        // Then: 支出合計金額が 280,000円（SQLデータの合計: 80000+30000+50000+20000+100000）
+        assertEquals("280,000円", response.getExpenditureTotalAmount());
+    }
+
+    @Test
+    @DisplayName("viewType=item → 支出項目別リスト(SisyutuKingaku)が設定される")
+    void testRead_ViewTypeItem_ExpenditureItemListIsPopulated() {
+        // Given: テストユーザ、対象年月202511、viewType=item
+        LoginUserInfo user = createLoginUser();
+        String targetYearMonth = "202511";
+
+        // When: viewType=item で照会
+        AccountMonthInquiryResponse response = useCase.read(user, targetYearMonth, targetYearMonth, "item");
+
+        // Then: 支出項目別リスト（SisyutuKingaku）が設定される（7件）
+        // ※ 明細内容の詳細検証は testRead_NormalCase_DataExists で実施済みのため、件数のみを確認
+        assertNotNull(response.getExpenditureItemList());
+        assertEquals(7, response.getExpenditureItemList().size());
+    }
+
+    @Test
+    @DisplayName("viewType=expenditure → 支出項目別リスト(SisyutuKingaku)が設定されない")
+    void testRead_ViewTypeExpenditure_ExpenditureItemListIsNotPopulated() {
+        // Given: テストユーザ、対象年月202511、viewType=expenditure
+        LoginUserInfo user = createLoginUser();
+        String targetYearMonth = "202511";
+
+        // When: viewType=expenditure で照会
+        AccountMonthInquiryResponse response = useCase.read(user, targetYearMonth, targetYearMonth, "expenditure");
+
+        // Then: 支出項目別リスト（SisyutuKingaku）は設定されない（空）
+        assertTrue(response.getExpenditureItemList() == null || response.getExpenditureItemList().isEmpty());
     }
 }

@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2025/12/05 : 1.00.00  新規作成
+ * 2026/06/13 : 1.02.00  validateDataExistence拡張(AccountMonthInquiryExpenditureList引数追加)
  *
  */
 package com.yonetani.webapp.accountbook.domain.service.account.inquiry;
@@ -16,6 +17,7 @@ import com.yonetani.webapp.accountbook.domain.exception.ExpenditureAmountInconsi
 import com.yonetani.webapp.accountbook.domain.exception.IncomeAmountInconsistencyException;
 import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureItemList;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTableRepository;
@@ -174,9 +176,10 @@ public class IncomeAndExpenditureConsistencyService {
 	 *
 	 * [ビジネスルール]
 	 * ・収支データが存在しない場合、支出金額データも存在してはならない
+	 * ・収支データが存在しない場合、支出データも存在してはならない
 	 *
 	 * [検証内容]
-	 * 収支集約が空（データなし）の場合に、支出金額リストにデータが存在する場合は
+	 * 収支集約が空（データなし）の場合に、支出金額リストまたは支出リストにデータが存在する場合は
 	 * データ不整合エラーとする。
 	 *
 	 * [例外]
@@ -185,27 +188,39 @@ public class IncomeAndExpenditureConsistencyService {
 	 * [使用例]
 	 * <code>
 	 * IncomeAndExpenditure aggregate = ...;
-	 * AccountMonthInquiryExpenditureItemList expenditureList = ...;
+	 * AccountMonthInquiryExpenditureItemList expenditureItemList = ...;
+	 * AccountMonthInquiryExpenditureList expenditureList = ...;
 	 * SearchQueryUserIdAndYearMonth searchCondition = ...;
-	 * consistencyService.validateDataExistence(aggregate, expenditureList, searchCondition);
+	 * consistencyService.validateDataExistence(aggregate, expenditureItemList, expenditureList, searchCondition);
 	 * </code>
 	 *</pre>
 	 * @param aggregate 検証対象の収支集約
-	 * @param expenditureList 支出金額情報リスト
+	 * @param expenditureItemList 支出金額情報リスト(SisyutuKingakuTable由来)
+	 * @param expenditureList 支出情報リスト(ExpenditureTable由来)
 	 * @param searchCondition 検索条件（ユーザID、対象年月）
 	 * @throws DataInconsistencyException データ存在の整合性エラー
 	 *
 	 */
 	public void validateDataExistence(
 			IncomeAndExpenditure aggregate,
-			AccountMonthInquiryExpenditureItemList expenditureList,
+			AccountMonthInquiryExpenditureItemList expenditureItemList,
+			AccountMonthInquiryExpenditureList expenditureList,
 			SearchQueryUserIdAndYearMonth searchCondition) {
 
 		// 収支データが存在しない場合で、支出金額データが存在する場合はエラー
-		if (aggregate.isEmpty() && !expenditureList.isEmpty()) {
+		if (aggregate.isEmpty() && !expenditureItemList.isEmpty()) {
 			throw new DataInconsistencyException(
 				String.format(
 					"該当月の収支データが未登録の状態で支出金額情報が登録済みの状態です。管理者に問い合わせてください。[yearMonth=%s]",
+					searchCondition.getYearMonth()
+				)
+			);
+		}
+		// 収支データが存在しない場合で、支出データが存在する場合はエラー
+		if (aggregate.isEmpty() && !expenditureList.isEmpty()) {
+			throw new DataInconsistencyException(
+				String.format(
+					"該当月の収支データが未登録の状態で支出情報が登録済みの状態です。管理者に問い合わせてください。[yearMonth=%s]",
 					searchCondition.getYearMonth()
 				)
 			);

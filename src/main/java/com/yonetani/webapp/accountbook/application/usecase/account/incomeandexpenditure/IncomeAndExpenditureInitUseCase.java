@@ -9,6 +9,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2026/02/26 : 1.00.00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
+ * 2026/06/07 : 1.02.00  支払日(PaymentDate)がnullの場合の処理をPaymentDateの親クラス(NullableDateValue)のtoDayValue()メソッドに集約
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -268,11 +269,7 @@ public class IncomeAndExpenditureInitUseCase {
 						// 支出詳細
 						domain.getExpenditureDetailContext().getValue(),
 						// 支払日(日付からDDの値を取得して設定):DBはnull可
-						(domain.getPaymentDate().getValue() != null) ?
-								// 値ありの場合、日付から日にちの値を取得(文字列で値を設定)
-								String.format("%02d", domain.getPaymentDate().getValue().getDayOfMonth()) :
-								// 値なしの場合、nullを設定
-								null,
+						domain.getPaymentDate().toDayValue(),
 						// 支払金額
 						domain.getExpenditureAmount().getValue(),
 						// 支払金額の0円開始設定フラグ

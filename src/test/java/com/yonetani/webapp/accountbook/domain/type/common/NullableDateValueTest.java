@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2025/12/28 : 1.00.00  新規作成
+ * 2026/06/07 : 1.02.00  toDayValue()メソッドのテスト追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
@@ -53,8 +54,8 @@ class NullableDateValueTest {
 	}
 
 	@Test
-	@DisplayName("正常系：日付で生成できる")
-	void testFrom_正常系_日付() {
+	@DisplayName("正常系：日付(2025年11月29日)で生成できる")
+	void testFrom_正常系_日付_20251129() {
 		// 実行
 		LocalDate date = LocalDate.of(2025, 11, 29);
 		TestNullableDateValue dateValue = TestNullableDateValue.from(date);
@@ -63,13 +64,23 @@ class NullableDateValueTest {
 		assertNotNull(dateValue);
 		assertEquals(date, dateValue.getValue());
 		assertEquals("2025-11-29", dateValue.toString());
-		assertEquals("20251129", dateValue.toCompactString());
-		assertEquals("2025/11/29", dateValue.toDisplayString());
-		assertEquals("2025年11月29日", dateValue.toJapaneseDisplayString());
-		assertEquals("2025年11月", dateValue.toJapaneseYearMonthString());
 		assertFalse(dateValue.isNull());
 	}
+	
+	@Test
+	@DisplayName("正常系：日付(2026年01月01日)で生成できる")
+	void testFrom_正常系_日付_20260101() {
+		// 実行
+		LocalDate date = LocalDate.of(2026, 01, 01);
+		TestNullableDateValue dateValue = TestNullableDateValue.from(date);
 
+		// 検証
+		assertNotNull(dateValue);
+		assertEquals(date, dateValue.getValue());
+		assertEquals("2026-01-01", dateValue.toString());
+		assertFalse(dateValue.isNull());
+	}
+	
 	@Test
 	@DisplayName("正常系：null値で生成できる")
 	void testFrom_正常系_null値() {
@@ -81,10 +92,7 @@ class NullableDateValueTest {
 		assertNull(dateValue.getValue());
 		assertTrue(dateValue.isNull());
 		assertEquals("", dateValue.toString());
-		assertEquals("", dateValue.toCompactString());
-		assertEquals("", dateValue.toDisplayString());
-		assertEquals("", dateValue.toJapaneseDisplayString());
-		assertEquals("", dateValue.toJapaneseYearMonthString());
+		assertNull(dateValue.toDayValue());
 	}
 
 	@Test
@@ -299,6 +307,20 @@ class NullableDateValueTest {
 		assertEquals("", date2.toJapaneseYearMonthString()); // null値は空文字列
 	}
 
+	@Test
+	@DisplayName("正常系：toDayValue - 日付がある場合はその日付を返す。null値の場合はnullを返す")
+	void testToDayValue() {
+		// 準備
+		TestNullableDateValue date1 = TestNullableDateValue.from(LocalDate.of(2025, 11, 29));
+		TestNullableDateValue date2 = TestNullableDateValue.from(LocalDate.of(2026, 01, 01));
+		TestNullableDateValue date3 = TestNullableDateValue.from((LocalDate) null);
+
+		// 検証
+		assertEquals("29", date1.toDayValue());
+		assertEquals("01", date2.toDayValue());
+		assertNull(date3.toDayValue()); // null値はnull
+	}
+	
 	@Test
 	@DisplayName("正常系：toString")
 	void testToString() {

@@ -46,6 +46,7 @@
 							<input type="hidden" th:field="*{nextYearMonth}" />
 							<!--/* 画面表示の段階で指定した年月の収支情報があるので、returnYearMonthの値にtargetYearMonthの値を設定する */-->
 							<input type="hidden" name="returnYearMonth" th:value="*{targetYearMonth}" />
+						<input type="hidden" name="viewType" th:value="${viewType}" />
 						</form>
 						
 						<!-- 収支表示 -->
@@ -53,6 +54,7 @@
 							
 							<!-- 月毎収支まとめ表示エリア -->
 							<div class="card-body">
+								<p class="h6">■ 収支 ■</p>
 								<table class="table table-sm table-bordered">
 									<tbody>
 										<tr class="table-info">
@@ -84,9 +86,44 @@
 								</table>
 							</div>
 							
-							<!-- 月毎支出表示(レベル2項目)表示エリア -->
+							<!-- ボタンエリア(収支) -->
 							<div class="card-body">
-								<th:block th:if="${#lists.size(expenditureItemList)}>0">
+								<form id="DispatchAction" class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountmonth/dispatchaction/}">
+									<button class="btn btn-outline-primary" name="shoppinAdd" type="submit">買い物登録</button>
+									<button class="btn btn-outline-primary" name="accountMonthUpdate" type="submit">収支更新</button>
+									<input type="hidden" th:field="*{targetYearMonth}" />
+								</form>
+							</div>
+						</div>
+						
+						<!-- 支出表示エリア -->
+						<div class="card">
+							
+							<!-- 支出一覧 見出し＋表示切替ボタン -->
+							<div class="card-body">
+								<p class="h6">■ 支出一覧 ■</p>
+								<div class="mb-3">
+									<form name="viewTypeForm" class="d-flex" method="post"
+											th:action="@{/myhacbook/accountinquiry/accountmonth/targetcontrol/}">
+										<button th:if="${viewType == 'item'}"
+												class="btn btn-primary" type="button" disabled>支出項目別</button>
+										<button th:if="${viewType != 'item'}"
+												class="btn btn-outline-primary" name="viewTypeSwitch" type="submit">支出項目別</button>
+										<button th:if="${viewType == 'expenditure'}"
+												class="btn btn-primary" type="button" disabled>支出別</button>
+										<button th:if="${viewType != 'expenditure'}"
+												class="btn btn-outline-primary" name="viewTypeSwitch" type="submit">支出別</button>
+										<input type="hidden" name="targetYearMonth" th:value="*{targetYearMonth}" />
+										<input type="hidden" name="viewType"
+												th:value="${viewType == 'item'} ? 'expenditure' : 'item'" />
+									</form>
+								</div>
+							</div>
+
+							<!-- 支出項目(レベル2項目)毎の支出表示エリア（viewType=item の場合のみ表示）-->
+							<th:block th:if="${viewType == 'item'}">
+						<!--/*	<th:block th:if="${#lists.size(expenditureItemList)}>0"> */-->
+							<div class="card-body">
 								<table class="table table-sm table-borderless">
 									<thead class="border border-dark"><tr class="table-secondary"><th scope="col" class="w20">支出項目</th><th scope="col" class="w20">&emsp;</th><th scope="col" class="w10">支払い年月日</th><th scope="col">&emsp;</th></tr></thead>
 									<tbody>
@@ -137,9 +174,61 @@
 												</td>
 											</tr>
 										</th:block>
+										<tr class="table-success"><td colspan="4">&emsp;</td></tr>
 									</tbody>
 								</table>
-								</th:block>
+							</div>
+							</th:block>
+
+							<!-- 支出別一覧表示エリア（viewType=expenditure の場合のみ表示） -->
+							<th:block th:if="${viewType == 'expenditure'}">
+							<div class="card-body">
+								<table class="table table-sm table-bordered">
+									<thead>
+										<tr class="table-secondary">
+											<th scope="col" class="w20">支出名(区分)</th>
+											<th scope="col" class="w5">支払日</th>
+											<th scope="col" class="w10" style="vertical-align:middle; text-align:center;">支出金額</th>
+											<th scope="col" class="w5">&emsp;</th>
+											<th scope="col">支出詳細</th>
+										</tr>
+									</thead>
+									<tbody>
+										<th:block th:each="item, iterStat : ${expenditureList}">
+											<tr th:class="${iterStat.odd} ? 'table-warning' : ''">
+												<td class="w20" th:text="${item.displayName}">支出名(区分)</td>
+												<td class="w5" th:text="${item.paymentDay}">支払日</td>
+												<td class="w10" align="right" th:text="${item.expenditureAmount}">支出金額</td>
+												<td class="w5" align="center">
+													<form method="post"
+															th:action="@{/myhacbook/accountinquiry/accountmonth/dispatchaction/}">
+														<button class="btn text-bg-success btn-sm"
+																name="expenditureCorrect" type="submit">訂正</button>
+														<input type="hidden" name="targetYearMonth" th:value="*{targetYearMonth}" />
+														<input type="hidden" name="expenditureCode" th:value="${item.expenditureCode}" />
+													</form>
+												</td>
+												<td th:text="${item.expenditureDetailContext}">支出詳細</td>
+											</tr>
+										</th:block>
+										<!-- 支出合計行 -->
+										<tr class="table-success">
+											<td class="w25" colspan="2">支出合計</td>
+											<td class="w10" align="right" th:text="${expenditureTotalAmount}">支出合計</td>
+											<td colspan="2"></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							</th:block>
+
+							<!-- ボタンエリア(支出) -->
+							<div class="card-body">
+								<form id="DispatchAction" class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountmonth/dispatchaction/}">
+									<button class="btn btn-outline-primary" name="shoppinAdd" type="submit">買い物登録</button>
+									<button class="btn btn-outline-primary" name="accountMonthUpdate" type="submit">収支更新</button>
+									<input type="hidden" th:field="*{targetYearMonth}" />
+								</form>
 							</div>
 						</div>
 					</div>
@@ -154,14 +243,6 @@
 					</div>
 					
 				</div>
-			</div>
-			<div class="card-body">
-				<form id="DispatchAction" class="d-flex" method="post" th:action="@{/myhacbook/accountinquiry/accountmonth/dispatchaction/}">
-					<button class="btn btn-outline-primary" name="shoppinAdd" type="submit">買い物登録</button>
-					<button class="btn btn-outline-primary" name="accountMonthUpdate" type="submit">収支更新</button>
-					<input type="hidden" th:field="*{targetYearMonth}" />
-				</form>
-				
 			</div>
 		</div>
 	</div>
