@@ -7,6 +7,7 @@
  * 2024/09/08 : 1.00.00  新規作成
  * 2026/02/28 : 1.01.00  isWastedBOrC()インスタンスメソッド追加
  * 2026/03/15 : 1.02.00  クラス名をSisyutuKubunからExpenditureCategoryにリネーム
+ * 2026/06/13 : 1.02.01  toDisplayLabel()追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.expenditure;
@@ -145,6 +146,26 @@ public class ExpenditureCategory {
 	 */
 	public boolean isWastedBOrC() {
 		return ExpenditureCategory.isWastedB(this) || ExpenditureCategory.isWastedC(this);
+	}
+
+	/**
+	 *<pre>
+	 * 支出区分に対応する表示ラベル文字列を返します。
+	 * ・無駄遣い（重度）→ "無駄遣いC"
+	 * ・無駄遣い（軽度）→ "無駄遣いB"
+	 * ・無駄遣いなし    → "" (空文字)
+	 *</pre>
+	 * @return 支出区分の表示ラベル文字列
+	 *
+	 */
+	public String toDisplayLabel() {
+		if (this.equals(WASTED_C)) {
+			return MyHouseholdAccountBookContent.WASTED_C_VIEW_VALUE;
+		}
+		if (this.equals(WASTED_B)) {
+			return MyHouseholdAccountBookContent.WASTED_B_VIEW_VALUE;
+		}
+		return "";
 	}
 
 	/**

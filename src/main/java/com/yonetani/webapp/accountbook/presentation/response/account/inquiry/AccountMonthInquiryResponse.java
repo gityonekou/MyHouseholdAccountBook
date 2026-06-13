@@ -6,6 +6,7 @@
  * 日付       : version  コメントなど
  * 2023/09/23 : 1.00.00  新規作成
  * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
+ * 2026/06/13 : 1.02.00  支出別一覧追加対応(viewType・ExpenditureRow・expenditureList追加)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.inquiry;
@@ -115,11 +116,57 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 		}
 	}
 	
+	/**
+	 *<pre>
+	 * 月毎の支出情報(支出別一覧)明細です
+	 *
+	 *</pre>
+	 *
+	 * @author ：Kouki Yonetani
+	 * @since 家計簿アプリ(1.02)
+	 *
+	 */
+	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+	@Getter
+	@EqualsAndHashCode
+	public static class ExpenditureRow {
+		// 支出コード（訂正ボタンの POST パラメータ用）
+		private final String expenditureCode;
+		// 支出名（区分プレフィックス付き：「【無駄遣いC】」「【無駄遣いB】」または支出名のみ）
+		private final String displayName;
+		// 支払日（"DD日"形式、支払日なしの場合は空文字）
+		private final String paymentDay;
+		// 支出金額（フォーマット済み）
+		private final String expenditureAmount;
+		// 支出詳細
+		private final String expenditureDetailContext;
+
+		/**
+		 *<pre>
+		 * 月毎の支出情報(支出別一覧)明細からレスポンスDTOを生成して返します。
+		 * ドメインモデルからの変換はユースケース層で行い、変換済みの値を引数に渡してください。
+		 *</pre>
+		 * @param expenditureCode 支出コード
+		 * @param displayName 表示名（支出区分プレフィックス付き）
+		 * @param paymentDay 支払日（"DD日"形式、支払日なしの場合は空文字）
+		 * @param expenditureAmount 支出金額（フォーマット済み）
+		 * @param expenditureDetailContext 支出詳細
+		 * @return 月毎の支出情報(支出別一覧)明細レスポンスDTO
+		 *
+		 */
+		public static ExpenditureRow from(String expenditureCode, String displayName, String paymentDay,
+				String expenditureAmount, String expenditureDetailContext) {
+			return new ExpenditureRow(expenditureCode, displayName, paymentDay, expenditureAmount, expenditureDetailContext);
+		}
+	}
+
 	// 表示する月の対象年月情報
 	private final AccountMonthInquiryTargetYearMonthInfo targetYearMonthInfo;
 	// 月毎の支出金額情報明細のリストです。
 	private List<ExpenditureListItem> expenditureItemList = new ArrayList<>();
-	
+	// 月毎の支出情報(支出別一覧)明細のリストです。
+	private List<ExpenditureRow> expenditureList = new ArrayList<>();
+
 	// 指定月の収支情報
 	// 表示する月の収支情報が登録済みかどうかのフラグ(デフォルトはデータあり)
 	@Setter
@@ -139,6 +186,12 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 	// 収支金額
 	@Setter
 	private String syuusiKingaku;
+	// 表示種別（"item"=支出項目別、"expenditure"=支出別）
+	@Setter
+	private String viewType = "item";
+	// 支出合計金額（フォーマット済み）
+	@Setter
+	private String expenditureTotalAmount;
 	
 	/**
 	 *<pre>
@@ -162,6 +215,19 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 	public void addExpenditureItemList(List<ExpenditureListItem> addList) {
 		if(!CollectionUtils.isEmpty(addList)) {
 			expenditureItemList.addAll(addList);
+		}
+	}
+
+	/**
+	 *<pre>
+	 * 月毎の支出情報(支出別一覧)明細を追加します。
+	 *</pre>
+	 * @param addList 追加する月毎の支出情報(支出別一覧)明細のリスト
+	 *
+	 */
+	public void addExpenditureList(List<ExpenditureRow> addList) {
+		if(!CollectionUtils.isEmpty(addList)) {
+			expenditureList.addAll(addList);
 		}
 	}
 	
@@ -210,6 +276,12 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 		modelAndView.addObject("syuusiKingaku", syuusiKingaku);
 		// 月毎の支出項目明細リストを追加
 		modelAndView.addObject("expenditureItemList", expenditureItemList);
+		// 表示種別
+		modelAndView.addObject("viewType", viewType);
+		// 月毎の支出情報(支出別一覧)明細リスト
+		modelAndView.addObject("expenditureList", expenditureList);
+		// 支出合計金額
+		modelAndView.addObject("expenditureTotalAmount", expenditureTotalAmount);
 		return modelAndView;
 	}
 

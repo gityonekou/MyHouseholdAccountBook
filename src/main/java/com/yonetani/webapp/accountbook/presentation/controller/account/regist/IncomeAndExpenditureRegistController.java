@@ -33,6 +33,7 @@
  * 日付       : version  コメントなど
  * 2024/06/16 : 1.00.00  新規作成
  * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
+ * 2026/06/13 : 1.02.00  支出別一覧追加対応(expenditurecorrectloadエンドポイント追加)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.account.regist;
@@ -152,6 +153,53 @@ public class IncomeAndExpenditureRegistController {
 				.build();
 	}
 	
+	/**
+	 *<pre>
+	 * 月別収支確認画面の支出別一覧から訂正ボタン押下後のGET要求時マッピングです。
+	 * 指定した支出コードの訂正フォームを収支登録画面に表示します。
+	 *
+	 * 【処理概要】
+	 * 1. 収支登録セッションを指定月でクリア・初期化
+	 * 2. 当月の収支データをDBから読み込みセッションに設定
+	 * 3. 指定した支出コードの訂正フォームを表示
+	 *</pre>
+	 * @param targetYearMonth 訂正対象の収支年月
+	 * @param expenditureCode 訂正対象の支出コード
+	 * @return 収支登録画面（支出訂正フォーム）
+	 *
+	 */
+	@GetMapping("/expenditurecorrectload/")
+	public ModelAndView getExpenditureCorrectionLoad(
+			@RequestParam("targetYearMonth") String targetYearMonth,
+			@RequestParam("expenditureCode") String expenditureCode) {
+		log.debug("getExpenditureCorrectionLoad:targetYearMonth=" + targetYearMonth + ",expenditureCode=" + expenditureCode);
+
+		// 収支登録セッション情報をクリア
+		registListSession.clearData(targetYearMonth, targetYearMonth);
+		// 画面表示データ読込（当月収支データをセッションに読み込む）
+		IncomeAndExpenditureRegistResponse response = usecase.readUpdateInfo(loginUserSession.getLoginUserInfo(), targetYearMonth);
+		// 収入登録情報をセッションに設定
+		registListSession.setIncomeRegistItemList(response.getIncomeRegistItemList());
+		// 支出登録情報をセッションに設定
+		registListSession.setExpenditureRegistItemList(response.getExpenditureRegistItemList());
+		// 指定した支出コードの訂正フォームを表示
+		return this.expenditureRegistUseCase.readExpenditureUpdateSelect(
+					// ログインユーザ情報
+					loginUserSession.getLoginUserInfo(),
+					// 収支の対象年月
+					registListSession.getTargetYearMonth(),
+					// 支出コード
+					expenditureCode,
+					// セッションに設定されている収入登録情報のリスト
+					registListSession.getIncomeRegistItemList(),
+					// セッションに設定されている支出登録情報のリスト
+					registListSession.getExpenditureRegistItemList())
+				// レスポンスにログインユーザ名を設定
+				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+				// レスポンスからModelAndViewを生成
+				.build();
+	}
+
 	/**
 	 *<pre>
 	 * 指定した年月の収支を更新する場合の収支登録画面初期表示のPOST要求時マッピングです。

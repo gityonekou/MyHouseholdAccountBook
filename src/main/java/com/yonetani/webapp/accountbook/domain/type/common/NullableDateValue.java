@@ -7,6 +7,7 @@
  * 日付       : version  コメントなど
  * 2025/12/28 : 1.00.00  新規作成
  * 2026/06/07 : 1.02.00  null判定をisNull()メソッドに集約、toDayValue()メソッド追加
+ * 2026/06/13 : 1.02.01  toDayString()メソッド追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
@@ -305,6 +306,21 @@ public abstract class NullableDateValue {
 		return String.format("%02d", value.getDayOfMonth());
 	}
 	
+	/**
+	 *<pre>
+	 * 日付を「DD日」形式の文字列で返します。
+	 * null値の場合は空文字列を返却します。
+	 *</pre>
+	 * @return 「DD日」形式の文字列。null値の場合は空文字列
+	 *
+	 */
+	public String toDayString() {
+		if(isNull()) {
+			return "";
+		}
+		return value.getDayOfMonth() + "日";
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
