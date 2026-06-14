@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MyHouseholdAccountBook is a personal household account book web application built with Spring Boot 3.0.7 and Java 17. The project follows Domain-Driven Design (DDD) principles and is currently undergoing refactoring to achieve full DDD compliance.
+MyHouseholdAccountBook is a personal household account book web application built with Spring Boot 3.0.7 and Java 17. The project follows Domain-Driven Design (DDD) principles. DDD refactoring (Phase 1-5) is complete, and the project is in active feature development.
 
 **Tech Stack**: Spring Boot 3.0.7, Spring Security 6.0.7, MyBatis 3.0.2, Thymeleaf, Lombok, MariaDB (production), H2 (test)
 
@@ -98,6 +98,19 @@ Phase 1-5 refactoring (DDD準拠リファクタリング) is complete. Documents
 4. `ExpenditureItemSelectUseCase` - Item selection screen
 5. `IncomeAndExpenditureRegistConfirmUseCase` - Registration confirmation/DB update
 
+## Feature Development History
+
+**Feature1.01** (fixed cost management enhancements, `docs/archive/fixedcost/`):
+- UseCase分割: `FixedCostInfoManageUseCase` (read) / `FixedCostRegistConfirmUseCase` (write)
+- Feature①: Bulk update for same-category fixed costs (`FixedCostRegistConfirmUseCase.execBulkUpdate`)
+- Feature②: 3-month rolling total display on fixed cost screen
+- Feature③-1: Annual fixed cost summary screen (`FixedCostAnnualSummaryUseCase`)
+- Feature③-2: Monthly fixed cost detail screen (`FixedCostMonthlyDetailUseCase`)
+
+**Feature1.02** (monthly account improvements):
+- Feature1.02-dev1: Expenditure list view toggle on monthly account screen (`AccountMonthInquiryUseCase`, `docs/archive/account-month-inquiry/`)
+- Feature1.02-dev2: 0-yen fixed cost registration support with validation (`FixedCostInfoUpdateForm`, `IncomeAndExpenditureInitUseCase`, `docs/archive/fixedcost/`)
+
 ## Documentation
 
 - `docs/test-data-design-rules.md` - Test data conventions
@@ -105,6 +118,8 @@ Phase 1-5 refactoring (DDD準拠リファクタリング) is complete. Documents
 - `docs/DDD設計_金額クラス統合判断基準.md` - Money class design decisions
 - `docs/specifications/07_テスト方針書.md` - Project-wide test strategy (coverage targets, naming conventions, quality standards)
 - `docs/archive/income-expenditure-refactoring/` - Archived Phase 1-5 refactoring documents
+- `docs/archive/fixedcost/` - Archived fixed cost feature documents (Feature1.01: UseCase分割・機能追加, Feature1.02: 0円固定費対応)
+- `docs/archive/account-month-inquiry/` - Archived monthly account inquiry feature documents (Feature1.02: 支出別一覧追加)
 
 ## Japanese Conventions
 

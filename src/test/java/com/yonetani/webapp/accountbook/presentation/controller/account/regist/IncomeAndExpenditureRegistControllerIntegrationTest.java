@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2026/02/25 : 1.00.00  新規作成
+ * 2026/06/13 : 1.02.00  固定費0円対応: 0円固定費初期表示メッセージテスト・内容確認0円チェックテストを追加
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.account.regist;
@@ -77,7 +78,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 @Transactional
 @Sql(scripts = {
 	"/sql/initsql/schema_test.sql",
-	"/com/yonetani/webapp/accountbook/application/usecase/account/regist/IncomeAndExpenditureRegistConfirmIntegrationTest.sql"
+	"/com/yonetani/webapp/accountbook/presentation/controller/account/regist/IncomeAndExpenditureRegistControllerIntegrationTest.sql"
 }, config = @SqlConfig(encoding = "UTF-8"))
 @DisplayName("収支管理機能 収支登録のControllerテスト（統合テスト）")
 public class IncomeAndExpenditureRegistControllerIntegrationTest {
@@ -239,8 +240,8 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 		// セッションのclearDataが正しいパラメータで呼ばれることを確認
 		verify(mockRegistListSession).clearData("202512", "202511");
 		// setExpenditureRegistItemListが呼ばれることを確認
-		// readInitInfoでは expenditureRegistItemList が未設定(null)のため、nullが渡される
-		verify(mockRegistListSession).setExpenditureRegistItemList(null);
+		// Controller専用SQLには毎月払い0円固定費(家賃)があるため、非nullリストが渡される
+		verify(mockRegistListSession).setExpenditureRegistItemList(org.mockito.ArgumentMatchers.anyList());
 	}
 
 	/**
@@ -907,5 +908,108 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 			// 表示年月が202511に設定される
 			.andExpect(model().attribute("viewYear", is("2025")))
 			.andExpect(model().attribute("viewMonth", is("11")));
+	}
+
+	// ================================================================
+	// GROUP 6: 固定費0円対応テスト
+	// ================================================================
+
+	/**
+	 *<pre>
+	 * 【正常系】POST /myhacbook/accountregist/incomeandexpenditure/initload/
+	 * 新規登録初期表示_0円固定費のメッセージ表示確認（②）
+	 * - DBに0円固定費（家賃: 毎月払い 0円）が登録されている場合、
+	 *   収支登録画面初期表示時に注意メッセージが表示されること
+	 * - SQLデータ: FIXED_COST_TABLE に家賃0円(0001)を追加
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("正常系：新規登録初期表示_0円固定費あり_注意メッセージ表示")
+	public void testPostInitLoad_ZeroAmountFixedCost_ShowsMessage() throws Exception {
+		// 202512(データなし月)で初期表示 → 固定費(毎月払い)が検索対象となる
+		mockMvc.perform(post("/myhacbook/accountregist/incomeandexpenditure/initload/")
+				.param("targetYearMonth", "202512")
+				.param("returnYearMonth", "202512")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().isOk())
+			.andExpect(view().name("account/regist/IncomeAndExpenditureRegist"))
+			// 0円固定費メッセージが含まれること
+			// ※readInitInfo()はcheckComponentの必須チェックメッセージ(8件)も同時に追加するため
+			//   メッセージ件数ではなく、期待メッセージの存在で検証する
+			// メッセージ: 「家賃」の支払金額が0円で登録されています。実際の支払金額で更新が必要です。
+			.andExpect(model().attribute("messages", hasItem(containsString("「家賃」の支払金額が0円で登録されています"))));
+	}
+
+	/**
+	 *<pre>
+	 * 【異常系】POST /myhacbook/accountregist/incomeandexpenditure/registcheck/ (actionCheck)
+	 * 内容確認_0円支出チェックエラー（④）
+	 * - セッションの支出一覧に0円（ADD アクション）の支出がある場合、エラーメッセージ付きで収支登録画面が表示される
+	 * - 収支登録内容確認画面には遷移しない
+	 * ※NON_UPDATEの0円（更新フローでDBからロードされた支出）はチェック対象外（テスト⑰参照）
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("異常系：内容確認ボタン押下_0円支出あり(ADD)_収支登録画面にエラーメッセージ表示")
+	public void testPostRegistCheck_ZeroAmountExpenditure_ShowsError() throws Exception {
+		// セッションに収入情報を設定（収入なしエラーは回避）
+		when(mockRegistListSession.getIncomeRegistItemList()).thenReturn(Arrays.asList(
+			createIncomeItem("01", "1", "11月給与", "350000")
+		));
+		// セッションに0円支出（ADD: 初期登録フローで新規追加された0円支出）を設定
+		ExpenditureRegistItem zeroAmountAddItem = ExpenditureRegistItem.from(
+				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
+				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
+				"2026011210000001", "0030", null, "家賃", "1", "月額未定", "27",
+				new BigDecimal("0"), false);
+		when(mockRegistListSession.getExpenditureRegistItemList()).thenReturn(Arrays.asList(zeroAmountAddItem));
+
+		// 画面表示の検証
+		mockMvc.perform(post("/myhacbook/accountregist/incomeandexpenditure/registcheck/")
+				.param("actionCheck", "")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().isOk())
+			// エラー表示のため、収支登録画面が表示される(確認画面ではない)
+			.andExpect(view().name("account/regist/IncomeAndExpenditureRegist"))
+			// エラーメッセージが1件設定されていること
+			.andExpect(model().attribute("messages", hasSize(1)))
+			// メッセージ: 「家賃」の支出が0円から更新されていません。実際の支払金額に更新してください。
+			.andExpect(model().attribute("messages", hasItem(containsString("「家賃」の支出が0円から更新されていません"))));
+	}
+
+	/**
+	 *<pre>
+	 * 【正常系】POST /myhacbook/accountregist/incomeandexpenditure/registcheck/ (actionCheck)
+	 * 内容確認_削除アクションの0円支出はチェック対象外（④）
+	 * - セッションの支出一覧に0円支出があっても、アクションが削除(DELETE)の場合は
+	 *   0円チェック対象外として収支登録内容確認画面に遷移すること
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("正常系：内容確認ボタン押下_0円支出(削除アクション)は除外_収支登録内容確認画面表示")
+	public void testPostRegistCheck_ZeroAmountExpenditureWithDeleteAction_ShowsConfirm() throws Exception {
+		// セッションに収入情報を設定
+		when(mockRegistListSession.getIncomeRegistItemList()).thenReturn(Arrays.asList(
+			createIncomeItem("01", "1", "11月給与", "350000")
+		));
+		// セッションに0円支出（DELETE）を設定 → 削除対象のため0円チェック対象外
+		ExpenditureRegistItem zeroAmountDeleteItem = ExpenditureRegistItem.from(
+				MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
+				MyHouseholdAccountBookContent.ACTION_TYPE_DELETE,
+				"001", "0030", null, "家賃", "1", "月額未定", null,
+				new BigDecimal("0"), false);
+		when(mockRegistListSession.getExpenditureRegistItemList()).thenReturn(
+				Arrays.asList(zeroAmountDeleteItem));
+
+		// 画面表示の検証
+		mockMvc.perform(post("/myhacbook/accountregist/incomeandexpenditure/registcheck/")
+				.param("actionCheck", "")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().isOk())
+			// 削除アクションの0円支出は除外されるため、収支登録内容確認画面に遷移する
+			.andExpect(view().name("account/regist/IncomeAndExpenditureRegistCheck"));
 	}
 }

@@ -27,10 +27,13 @@
  * ⑯  正常系：GET /annualsummary/ 年間固定費合計画面表示（13行）
  * ⑰  正常系：GET /tabload/ 固定費管理タブ（他タブからの遷移）→初期表示画面（セッションはクリアしない）
  * ⑱  正常系：GET /monthlydetail/?month=11 月別固定費一覧（11月・奇数月）4件表示
+ * ⑲  正常系：POST /update/ action=add shiharaiKingaku=0（0円）→ @Min(0)バリデーション通過しリダイレクト
+ * ⑳  異常系：POST /update/ action=add fixedCostKubun=2, shiharaiKingaku=0 → 固定費区分=予定支払い金額で0円は不可（@AssertTrueエラー）
+ * ㉑  正常系：POST /update/ action=add fixedCostKubun=2, shiharaiKingaku=1 → @AssertTrue通過しリダイレクト
  *
  * [テストデータ]
  * 固定費4件: 0001:家賃(0030), 0002:電気代概算(0037), 0003:国民年金保険(0015), 0004:その他任意テスト(0038)
- * 
+ *
  * </pre>
  *------------------------------------------------
  * 更新履歴
@@ -39,6 +42,8 @@
  * 2026/05/01 : 1.01.01  テストシナリオ⑭、⑮を追加（更新画面からのキャンセル操作のパターン追加）
  * 2026/05/24 : 1.01.02  テストシナリオ⑯を追加（年間固定費合計画面表示）
  * 2026/05/27 : 1.01.03  テストシナリオ⑰⑱を追加（tabload・月別固定費一覧）
+ * 2026/06/13 : 1.02.00  テストシナリオ⑲を追加（固定費0円登録対応: @Min(0)バリデーション確認）
+ * 2026/06/14 : 1.02.01  テストシナリオ⑳㉑を追加（固定費区分=予定支払い金額の場合0円不可: @AssertTrue確認）
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.itemmanage;
@@ -664,5 +669,106 @@ public class FixedCostInfoManageControllerIntegrationTest {
 			.andExpect(model().attribute("fixedCostItemList", hasSize(4)))
 			.andExpect(model().attribute("monthlyTotal", is("98,590円")))
 			.andExpect(model().attribute("loginUserName", is("テストユーザ01")));
+	}
+
+	// ================================================================
+	// POST /update/ (0円登録 @Min(0)確認)
+	// ================================================================
+
+	/**
+	 *<pre>
+	 * テスト⑲：正常系：POST /update/ action=add shiharaiKingaku=0 → @Min(0)バリデーション通過しリダイレクト
+	 *
+	 * 【検証内容】
+	 * ・支払金額0円(shiharaiKingaku=0)で新規追加送信した場合、@Min(0)バリデーションが通過すること
+	 * ・バリデーションエラーとならず完了画面にリダイレクトすること
+	 * ・HTTPステータスが3xxリダイレクトであること
+	 * ・リダイレクト先が「/myhacbook/managebaseinfo/fixedcostinfo/updateComplete/」であること
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("正常系：POST /update/ action=add shiharaiKingaku=0（0円）→ @Min(0)バリデーション通過しリダイレクト")
+	void testPostUpdate_addSuccess_zeroAmount() throws Exception {
+		mockMvc.perform(post("/myhacbook/managebaseinfo/fixedcostinfo/update/")
+				.param("actionAdd", "")
+				.param("action", "add")
+				.param("sisyutuItemCode", "0035")
+				.param("fixedCostName", "未定固定費")
+				.param("fixedCostDetailContext", "金額未定のため0円で登録")
+				.param("fixedCostKubun", "1")
+				.param("shiharaiTuki", "00")
+				.param("shiharaiTukiOptionalContext", "")
+				.param("shiharaiDay", "27")
+				.param("shiharaiKingaku", "0")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(redirectedUrl("/myhacbook/managebaseinfo/fixedcostinfo/updateComplete/"));
+	}
+
+	// ================================================================
+	// POST /update/ (固定費区分=2で0円不可 @AssertTrue確認)
+	// ================================================================
+
+	/**
+	 *<pre>
+	 * テスト⑳：異常系：POST /update/ action=add fixedCostKubun=2, shiharaiKingaku=0 → 固定費区分=予定支払い金額で0円は不可
+	 *
+	 * 【検証内容】
+	 * ・固定費区分=「2(予定支払い金額)」かつ支払金額=0で送信した場合、@AssertTrueバリデーションエラーが発生すること
+	 * ・FixedCostInfoUpdateFormの@AssertTrue isValidShiharaiKingakuForKubun()が機能すること
+	 * ・HTTPステータスが200で更新画面に戻ること
+	 * ・fixedCostInfoUpdateFormのvalidShiharaiKingakuForKubunフィールドにエラーが設定されること
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("異常系：POST /update/ action=add fixedCostKubun=2, shiharaiKingaku=0 → @AssertTrueバリデーションエラー")
+	void testPostUpdate_validationError_kubun2ZeroAmount() throws Exception {
+		mockMvc.perform(post("/myhacbook/managebaseinfo/fixedcostinfo/update/")
+				.param("actionAdd", "")
+				.param("action", "add")
+				.param("sisyutuItemCode", "0035")
+				.param("fixedCostName", "予定固定費")
+				.param("fixedCostKubun", "2")
+				.param("shiharaiTuki", "00")
+				.param("shiharaiTukiOptionalContext", "")
+				.param("shiharaiDay", "27")
+				.param("shiharaiKingaku", "0")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().isOk())
+			.andExpect(view().name("itemmanage/fixedcost/FixedCostInfoManageUpdate"))
+			.andExpect(model().attributeHasFieldErrors("fixedCostInfoUpdateForm", "validShiharaiKingakuForKubun"));
+	}
+
+	/**
+	 *<pre>
+	 * テスト㉑：正常系：POST /update/ action=add fixedCostKubun=2, shiharaiKingaku=1 → @AssertTrue通過しリダイレクト
+	 *
+	 * 【検証内容】
+	 * ・固定費区分=「2(予定支払い金額)」かつ支払金額=1円で送信した場合、@AssertTrueバリデーションが通過すること
+	 * ・バリデーションエラーとならず完了画面にリダイレクトすること
+	 * ・HTTPステータスが3xxリダイレクトであること
+	 * ・リダイレクト先が「/myhacbook/managebaseinfo/fixedcostinfo/updateComplete/」であること
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("正常系：POST /update/ action=add fixedCostKubun=2, shiharaiKingaku=1 → @AssertTrue通過しリダイレクト")
+	void testPostUpdate_addSuccess_kubun2NonZeroAmount() throws Exception {
+		mockMvc.perform(post("/myhacbook/managebaseinfo/fixedcostinfo/update/")
+				.param("actionAdd", "")
+				.param("action", "add")
+				.param("sisyutuItemCode", "0035")
+				.param("fixedCostName", "予定固定費")
+				.param("fixedCostDetailContext", "初回金額1円で登録")
+				.param("fixedCostKubun", "2")
+				.param("shiharaiTuki", "00")
+				.param("shiharaiTukiOptionalContext", "")
+				.param("shiharaiDay", "27")
+				.param("shiharaiKingaku", "1")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(redirectedUrl("/myhacbook/managebaseinfo/fixedcostinfo/updateComplete/"));
 	}
 }

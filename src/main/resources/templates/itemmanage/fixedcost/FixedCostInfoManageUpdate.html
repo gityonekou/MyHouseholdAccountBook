@@ -74,6 +74,8 @@
  						<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{shiharaiKingaku}" required>円
  						<p class="invalid-feedback" th:errors="*{shiharaiKingaku}"></p>
  					</div>
+					<!--/* 固定費区分=2（予定支払い金額）の場合0円不可チェックの結果を出力 */-->
+					<p class="invalid-feedback" th:errors="*{validShiharaiKingakuForKubun}" style="display: block;"></p>
 				</div>
 				<div class="mb-3">
 					<button class="btn btn-primary" name="actionAdd" type="submit" th:if="*{#strings.equals(action, 'add')}">登録</button>

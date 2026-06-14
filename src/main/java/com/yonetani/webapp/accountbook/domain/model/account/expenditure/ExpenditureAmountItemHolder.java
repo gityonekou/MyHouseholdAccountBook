@@ -536,9 +536,11 @@ public class ExpenditureAmountItemHolder {
 				// 支出金額=前の値-減算するの値
 				beforeItem.getExpenditureAmount().subtract(subtractItem.getExpenditureAmount()).getValue(),
 				// 無駄遣い（軽度）支出金額=前の値-減算するの値
-				beforeItem.getMinorWasteExpenditureAmount().subtract(subtractItem.getMinorWasteExpenditureAmount()).getValue(),
+				beforeItem.getMinorWasteExpenditureAmount().getValue() == null && subtractItem.getMinorWasteExpenditureAmount().getValue() == null
+					? null : beforeItem.getMinorWasteExpenditureAmount().subtract(subtractItem.getMinorWasteExpenditureAmount()).getValue(),
 				// 無駄遣い（重度）支出金額=前の値-減算するの値
-				beforeItem.getSevereWasteExpenditureAmount().subtract(subtractItem.getSevereWasteExpenditureAmount()).getValue(),
+				beforeItem.getSevereWasteExpenditureAmount().getValue() == null && subtractItem.getSevereWasteExpenditureAmount().getValue() == null
+					? null : beforeItem.getSevereWasteExpenditureAmount().subtract(subtractItem.getSevereWasteExpenditureAmount()).getValue(),
 				// 支出支払日の値は変更なし(前の値をsubtractItem設定)
 				beforeItem.getPaymentDate().getValue()));
 		} catch (Exception ex) {
