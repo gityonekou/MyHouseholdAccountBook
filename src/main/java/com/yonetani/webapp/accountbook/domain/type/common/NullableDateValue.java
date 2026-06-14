@@ -6,6 +6,8 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2025/12/28 : 1.00.00  新規作成
+ * 2026/06/07 : 1.02.00  null判定をisNull()メソッドに集約、toDayValue()メソッド追加
+ * 2026/06/13 : 1.02.01  toDayString()メソッド追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
@@ -238,7 +240,7 @@ public abstract class NullableDateValue {
 	 *
 	 */
 	public String toCompactString() {
-		if(value == null) {
+		if(isNull()) {
 			return "";
 		}
 		return this.value.format(YYYYMMDD_FORMAT);
@@ -253,7 +255,7 @@ public abstract class NullableDateValue {
 	 *
 	 */
 	public String toDisplayString() {
-		if(value == null) {
+		if(isNull()) {
 			return "";
 		}
 		return this.value.format(YYYY_SP_MM_SP_DD_FORMAT);
@@ -268,7 +270,7 @@ public abstract class NullableDateValue {
 	 *
 	 */
 	public String toJapaneseDisplayString() {
-		if(value == null) {
+		if(isNull()) {
 			return "";
 		}
 		return this.value.format(JAPANESE_DATE_FORMAT);
@@ -283,10 +285,40 @@ public abstract class NullableDateValue {
 	 *
 	 */
 	public String toJapaneseYearMonthString() {
-		if(value == null) {
+		if(isNull()) {
 			return "";
 		}
 		return this.value.format(JAPANESE_YEAR_MONTH_FORMAT);
+	}
+	
+	/**
+	 *<pre>
+	 * 日付を「DD」形式の文字列で返します。
+	 * null値の場合はnullを返却します。
+	 *</pre>
+	 * @return DD形式の文字列(2桁)。null値の場合はnull
+	 *
+	 */
+	public String toDayValue() {
+		if(isNull()) {
+			return null;
+		}
+		return String.format("%02d", value.getDayOfMonth());
+	}
+	
+	/**
+	 *<pre>
+	 * 日付を「DD日」形式の文字列で返します。
+	 * null値の場合は空文字列を返却します。
+	 *</pre>
+	 * @return 「DD日」形式の文字列。null値の場合は空文字列
+	 *
+	 */
+	public String toDayString() {
+		if(isNull()) {
+			return "";
+		}
+		return value.getDayOfMonth() + "日";
 	}
 
 	/**
@@ -296,7 +328,7 @@ public abstract class NullableDateValue {
 	public String toString() {
 		// 値の文字列表現を返却（デバッグ用、ISO-8601形式：yyyy-MM-dd）
 		// null値の場合は空文字列を返却
-		if(value == null) {
+		if(isNull()) {
 			return "";
 		}
 		return this.value.toString();

@@ -9,6 +9,7 @@
  * 2023/09/23 : 1.00.00  新規作成
  * 2025/12/21 : 1.01.00  リファクタリング対応(DDD適応)
  * 2026/05/09 : 1.01.01  リファクタリング追加対応(対象年月ドメインの集約)
+ * 2026/06/13 : 1.02.00  支出別一覧追加対応(ExpenditureTableRepository追加・viewType対応・execRead処理順番見直し)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.inquiry;
@@ -18,10 +19,14 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import org.springframework.util.StringUtils;
+
 import com.yonetani.webapp.accountbook.application.usecase.common.AccountBookUserInquiryUseCase;
 import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureItemList;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
+import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.SisyutuKingakuTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.service.account.inquiry.IncomeAndExpenditureConsistencyService;
@@ -62,6 +67,8 @@ public class AccountMonthInquiryUseCase {
 	private final IncomeAndExpenditureTableRepository syuusiRepository;
 	// 収支整合性検証ドメインサービス
 	private final IncomeAndExpenditureConsistencyService consistencyService;
+	// 指定月の支出情報を取得するリポジトリー
+	private final ExpenditureTableRepository expenditureRepository;
 	
 	/**
 	 *<pre>
@@ -82,7 +89,7 @@ public class AccountMonthInquiryUseCase {
 				yearMonth.getValue());
 		
 		// ユーザID,現在の対象年月を条件に支出項目のリストと収支金額を取得しレスポンス情報を返却
-		return execRead(user, targetYearMonthInfo);
+		return execRead(user, targetYearMonthInfo, "item");
 	}
 
 	/**
@@ -96,15 +103,15 @@ public class AccountMonthInquiryUseCase {
 	 */
 	public AccountMonthInquiryResponse read(LoginUserInfo user, String targetYearMonth) {
 		log.debug("read:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
-				
+
 		// ユーザID,入力された対象年月を条件に支出項目のリストと収支金額を取得しレスポンス情報を返却
-		return execRead(user, AccountMonthInquiryTargetYearMonthInfo.from(targetYearMonth));
+		return execRead(user, AccountMonthInquiryTargetYearMonthInfo.from(targetYearMonth), "item");
 	}
-	
+
 	/**
 	 *<pre>
 	 * 要求された指定月の収支を取得します。
-	 * 
+	 *
 	 * 「戻り先の対象の年月」の値は指定した「表示対象の年月」に対応する収支情報がある場合は「戻り先の対象の年月」＝「表示対象の年月」
 	 * となるが、レスポンスを生成した段階だと値があるかどうかを判定できないのでサーバー側処理側ではその判定は行わない。
 	 * (レスポンスを初期生成時、前画面から渡されてきた「戻り先の対象の年月」の値をそのまま変更不可の値でレスポンスに設定する）
@@ -112,7 +119,7 @@ public class AccountMonthInquiryUseCase {
 	 * 画面表示データがある場合に「戻り先の対象の年月」の値を更新する処理を代用しているので注意
 	 * ⇒表示対象の収支情報がない場合、登録確認画面を表示するが、その画面以降でキャンセルなどで各月の収支画面画面に
 	 * 戻る場合は「戻り先の対象の年月」をもとに一つ前の画面に戻ることが可能となっています。
-	 * 
+	 *
 	 *</pre>
 	 * @param user ユーザ情報
 	 * @param targetYearMonth 表示対象の年月
@@ -122,9 +129,29 @@ public class AccountMonthInquiryUseCase {
 	 */
 	public AccountMonthInquiryResponse read(LoginUserInfo user, String targetYearMonth, String returnYearMonth) {
 		log.debug("read:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",returnYearMonth=" + returnYearMonth);
-		
+
 		// ユーザID,入力された対象年月を条件に支出項目のリストと収支金額を取得しレスポンス情報を返却
-		return execRead(user, AccountMonthInquiryTargetYearMonthInfo.from(targetYearMonth, returnYearMonth));
+		return execRead(user, AccountMonthInquiryTargetYearMonthInfo.from(targetYearMonth, returnYearMonth), "item");
+	}
+
+	/**
+	 *<pre>
+	 * 要求された指定月の収支を、表示種別を指定して取得します。
+	 *</pre>
+	 * @param user ユーザ情報
+	 * @param targetYearMonth 表示対象の年月
+	 * @param returnYearMonth 戻り先の対象の年月
+	 * @param viewType 表示種別（"item"=支出項目別、"expenditure"=支出別）
+	 * @return 月間収支情報(レスポンス)
+	 *
+	 */
+	public AccountMonthInquiryResponse read(LoginUserInfo user, String targetYearMonth, String returnYearMonth,
+			String viewType) {
+		log.debug("read:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth
+				+ ",returnYearMonth=" + returnYearMonth + ",viewType=" + viewType);
+
+		// ユーザID,入力された対象年月を条件に支出項目のリストと収支金額を取得しレスポンス情報を返却
+		return execRead(user, AccountMonthInquiryTargetYearMonthInfo.from(targetYearMonth, returnYearMonth), viewType);
 	}
 	
 	/**
@@ -165,41 +192,45 @@ public class AccountMonthInquiryUseCase {
 	 *</pre>
 	 * @param user ユーザ情報
 	 * @param targetYearMonthInfo 表示対象の対象年月情報
+	 * @param viewType 表示種別（"item"=支出項目別、"expenditure"=支出別。不正値は"item"として扱う）
 	 * @return 月間収支情報(レスポンス)
 	 *
 	 */
 	private AccountMonthInquiryResponse execRead(
-			LoginUserInfo user, AccountMonthInquiryTargetYearMonthInfo targetYearMonthInfo) {
-		log.debug("execRead:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonthInfo.getTargetYearMonth());
-		
+			LoginUserInfo user, AccountMonthInquiryTargetYearMonthInfo targetYearMonthInfo, String viewType) {
+		log.debug("execRead:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonthInfo.getTargetYearMonth()
+				+ ",viewType=" + viewType);
+
 		// レスポンスを生成
 		AccountMonthInquiryResponse response = AccountMonthInquiryResponse.getInstance(targetYearMonthInfo);
-		
+
+		// viewType の正規化（不正値は "item" として扱う）
+		String normalizedViewType = "expenditure".equals(viewType) ? "expenditure" : "item";
+		response.setViewType(normalizedViewType);
+
 		// 検索条件(ユーザID、年月(YYYYMM))をドメインオブジェクトに変換
 		SearchQueryUserIdAndYearMonth searchCondition = SearchQueryUserIdAndYearMonth.from(
 				UserId.from(user.getUserId()), TargetYearMonth.from(targetYearMonthInfo.getTargetYearMonth()));
 
-		// ユーザID,対象年月を検索条件にドメインデータを取得
-		AccountMonthInquiryExpenditureItemList expenditureList = sisyutuRepository.select(searchCondition);
+		// ①ユーザID,対象年月を検索条件に支出金額情報(SisyutuKingakuTable)を取得
+		AccountMonthInquiryExpenditureItemList expenditureItemList = sisyutuRepository.select(searchCondition);
+		// ②ユーザID,対象年月を検索条件に収支集約(IncomeAndExpenditureTable)を取得
 		IncomeAndExpenditure incomeAndExpenditure = syuusiRepository.findByPrimaryKey(searchCondition);
-		
-		// データ存在の整合性検証(収支データなし&支出金額データありの場合はエラー)
-		consistencyService.validateDataExistence(incomeAndExpenditure, expenditureList, searchCondition);
+		// ③ユーザID,対象年月を検索条件に支出情報(ExpenditureTable)を取得(viewTypeによらず常時取得)
+		AccountMonthInquiryExpenditureList monthExpenditureList = AccountMonthInquiryExpenditureList.from(
+				expenditureRepository.findBy(searchCondition));
 
-		// 支出金額情報のリスト(ドメインモデル)をレスポンスに設定
-		if(expenditureList.isEmpty()) {
-			// 支出金額情報のリストが0件の場合、メッセージを設定
-			response.addMessage("登録済みの支出金額情報が0件です。");
-		} else {
-			// 支出金額情報のリストをレスポンスに設定(ドメインモデルからレスポンスへの変換)
-			response.addExpenditureItemList(convertExpenditureItemList(expenditureList));
-		}
+		// ④データ存在の整合性検証(収支データなし&(支出金額データあり OR 支出データあり)の場合はエラー)
+		consistencyService.validateDataExistence(incomeAndExpenditure, expenditureItemList, monthExpenditureList, searchCondition);
 
-		// 収支情報(ドメインモデル)をレスポンスに設定
+		// ⑤収支情報(ドメインモデル)をレスポンスに設定
 		if(incomeAndExpenditure.isEmpty()) {
 			// 該当月の収支データがない場合、メッセージを設定
 			response.addMessage("該当月の収支データがありません。");
 			response.setSyuusiDataFlg(false);
+			// 収支データがない場合は早期リターン(以降の明細データ設定は不要)
+			return response;
+			
 		} else {
 			// 収支整合性検証(収入・支出の合計値が収支テーブルの値と一致するかをドメインサービスで検証)
 			consistencyService.validateAll(incomeAndExpenditure, searchCondition);
@@ -216,10 +247,29 @@ public class AccountMonthInquiryUseCase {
 			// 収支金額
 			response.setSyuusiKingaku(incomeAndExpenditure.getBalanceAmount().toFormatString());
 		}
-		
+
+		// ⑥viewType=item の場合のみ、支出金額情報のリスト(ドメインモデル)をレスポンスに設定
+		if("item".equals(normalizedViewType)) {
+			if(expenditureItemList.isEmpty()) {
+				// 支出金額情報のリストが0件の場合、メッセージを設定
+				response.addMessage("登録済みの支出金額情報が0件です。");
+			} else {
+				// 支出金額情報のリストをレスポンスに設定(ドメインモデルからレスポンスへの変換)
+				response.addExpenditureItemList(convertExpenditureItemList(expenditureItemList));
+			}
+		}
+
+		// ⑦viewType=expenditure の場合のみ、支出別一覧(③取得済み)をレスポンスに設定
+		if("expenditure".equals(normalizedViewType)) {
+			if(!monthExpenditureList.isEmpty()) {
+				response.addExpenditureList(convertExpenditureList(monthExpenditureList));
+			}
+			response.setExpenditureTotalAmount(monthExpenditureList.getTotalAmount().toFormatString());
+		}
+
 		return response;
 	}
-	
+
 	/**
 	 *<pre>
 	 * 支出項目のリスト(ドメインモデル)を支出項目のリスト(レスポンス)に変換して返却
@@ -242,5 +292,32 @@ public class AccountMonthInquiryUseCase {
 				domain.getTotalWasteExpenditureAmount().toFormatString(),
 				domain.getTotalWasteExpenditureAmount().getPercentage(domain.getExpenditureAmount()),
 				domain.getPaymentDate().toDisplayString())).collect(Collectors.toUnmodifiableList());
-	}	
+	}
+
+	/**
+	 *<pre>
+	 * 支出別一覧(ドメインモデル)を支出別一覧(レスポンス)に変換して返却
+	 * 支出区分に応じた表示名プレフィックスの付与、支払日・金額のフォーマット変換を行う
+	 *</pre>
+	 * @param list 支出別一覧(ドメインモデル)
+	 * @return 支出別一覧(レスポンス)
+	 *
+	 */
+	private List<AccountMonthInquiryResponse.ExpenditureRow> convertExpenditureList(
+			AccountMonthInquiryExpenditureList list) {
+		return list.getValues().stream()
+				.map(domain -> {
+					// 支出区分に応じた表示名のプレフィックスを生成（ラベル生成はドメインに委譲）
+					String label = domain.getExpenditureCategory().toDisplayLabel();
+					String prefix = label.isEmpty() ? "" : "【" + label + "】";
+					return AccountMonthInquiryResponse.ExpenditureRow.from(
+							domain.getExpenditureCode().getValue(),
+							prefix + domain.getExpenditureName().getValue(),
+							domain.getPaymentDate().toDayString(),
+							domain.getExpenditureAmount().toFormatString(),
+							StringUtils.hasLength(domain.getExpenditureDetailContext().getValue())
+									? domain.getExpenditureDetailContext().getValue() : "");
+				})
+				.collect(Collectors.toUnmodifiableList());
+	}
 }

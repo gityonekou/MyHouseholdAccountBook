@@ -7,6 +7,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2026/02/28 : 1.00.00  新規作成
+ * 2026/06/13 : 1.02.00  支出区分の値が無駄遣いB(2)、無駄遣いC(3)の場合のラベル生成処理を支出区分区分ドメインタイプのExpenditureCategoryに委譲
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -131,23 +132,13 @@ public class IncomeAndExpenditureRegistListComponent {
 				if(Objects.equals(session.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_DELETE)) {
 					continue;
 				}
-				/* 支出区分が無駄遣いB(2)、無駄遣いC(3)の場合、支出名の先頭に支出区分の名称を追加 */
-				StringBuilder expenditureNameBuff = new StringBuilder(session.getExpenditureName().length() + 15);
-				// 支出区分が無駄遣いB(2)、無駄遣いC(3)と等しい場合
-				ExpenditureCategory checkSisyutuKubun = ExpenditureCategory.from(session.getExpenditureCategory());
-				if(checkSisyutuKubun.isWastedBOrC()) {
-					// 支出区分の値をコード変換し、【支出区分コード値】の形式で設定
-					expenditureNameBuff.append("【");
-					expenditureNameBuff.append(codeTableItem.getCodeValue(
-							// コード区分：支出区分
-							MyHouseholdAccountBookContent.CODE_DEFINES_EXPENDITURE_KUBUN,
-							// 支出区分
-							session.getExpenditureCategory()));
-					expenditureNameBuff.append("】");
-				}
-				// 支出名を設定
-				expenditureNameBuff.append(session.getExpenditureName());
-
+				
+				// 支出区分のドメインを生成
+				ExpenditureCategory sisyutuKubun = ExpenditureCategory.from(session.getExpenditureCategory());
+				String label = sisyutuKubun.toDisplayLabel();
+				// 支出名のprefixを生成：無駄遣いB(2)、無駄遣いC(3)の場合、支出名の先頭に支出区分の名称を追加が必要
+				String prefix = label.isEmpty() ? "" : "【" + label + "】";
+				
 				// 支出項目コードに対応する支出項目情報を取得
 				ExpenditureItemInfo expenditureItemInfo = expenditureItemInfoComponent.getExpenditureItemInfo(userId, ExpenditureItemCode.from(session.getExpenditureItemCode()));
 				if(expenditureItemInfo == null) {
@@ -162,7 +153,7 @@ public class IncomeAndExpenditureRegistListComponent {
 						// 支出コード(仮登録用支出コード)
 						session.getExpenditureCode(),
 						// 支出名と支出区分
-						expenditureNameBuff.toString(),
+						prefix + session.getExpenditureName(),
 						// 支出詳細
 						session.getExpenditureDetailContext(),
 						// 支払日(支払日が設定されている場合、日を追加)

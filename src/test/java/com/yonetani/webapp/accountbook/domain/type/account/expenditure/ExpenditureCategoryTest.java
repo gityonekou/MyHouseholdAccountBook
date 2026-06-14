@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2026/03/15 : 1.00.00  新規作成
+ * 2026/06/13 : 1.02.01  toDisplayLabel()のテスト追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.expenditure;
@@ -167,5 +168,23 @@ class ExpenditureCategoryTest {
 	void testToString() {
 		assertEquals("1", ExpenditureCategory.from("1").toString());
 		assertEquals("2", ExpenditureCategory.from("2").toString());
+	}
+
+	@Test
+	@DisplayName("正常系：toDisplayLabel - NON_WASTED は空文字を返す")
+	void testToDisplayLabel_NonWasted() {
+		assertEquals("", ExpenditureCategory.NON_WASTED.toDisplayLabel());
+	}
+
+	@Test
+	@DisplayName("正常系：toDisplayLabel - WASTED_B は「無駄遣いB」を返す")
+	void testToDisplayLabel_WastedB() {
+		assertEquals("無駄遣いB", ExpenditureCategory.WASTED_B.toDisplayLabel());
+	}
+
+	@Test
+	@DisplayName("正常系：toDisplayLabel - WASTED_C は「無駄遣いC」を返す")
+	void testToDisplayLabel_WastedC() {
+		assertEquals("無駄遣いC", ExpenditureCategory.WASTED_C.toDisplayLabel());
 	}
 }

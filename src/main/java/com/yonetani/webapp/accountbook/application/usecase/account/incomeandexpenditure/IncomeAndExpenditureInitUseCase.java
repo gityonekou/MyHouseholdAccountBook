@@ -9,14 +9,19 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2026/02/26 : 1.00.00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
+ * 2026/06/07 : 1.02.00  支払日(PaymentDate)がnullの場合の処理をPaymentDateの親クラス(NullableDateValue)のtoDayValue()メソッドに集約
+ * 2026/06/14 : 1.02.01  固定費0円対応: readInitInfo()に0円注意メッセージ追加、readRegistCheckValidateInfo()新規追加（readRegistCheckErrorSetInfo()・readZeroAmountExpenditureCheckErrorSetInfo()を統合）
+ * 2026/06/14 : 1.02.02  バグ修正: readRegistCheckValidateInfo()の0円チェックからACTION_TYPE_NON_UPDATEを除外（更新フローのclearStart支出誤検知修正）
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
 
 
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -188,6 +193,14 @@ public class IncomeAndExpenditureInitUseCase {
 				response.addErrorMessage(message);
 			});
 
+			// 支払金額が0円の支出登録情報がある場合、注意メッセージを追加
+			expenditureRegistItemList.forEach(item -> {
+				if(BigDecimal.ZERO.compareTo(item.getExpenditureKingaku()) == 0) {
+					response.addMessage(String.format("「%s」の支払金額が0円で登録されています。実際の支払金額で更新が必要です。",
+							buildExpenditureDisplayName(item)));
+				}
+			});
+
 			// セッションの支出登録情報をもとに、画面表示する支出一覧情報を設定(収入情報は未登録のためnullを設定)
 			registListComponent.setIncomeAndExpenditureInfoList(userId, null, expenditureRegistItemList, response);
 		}
@@ -268,11 +281,7 @@ public class IncomeAndExpenditureInitUseCase {
 						// 支出詳細
 						domain.getExpenditureDetailContext().getValue(),
 						// 支払日(日付からDDの値を取得して設定):DBはnull可
-						(domain.getPaymentDate().getValue() != null) ?
-								// 値ありの場合、日付から日にちの値を取得(文字列で値を設定)
-								String.format("%02d", domain.getPaymentDate().getValue().getDayOfMonth()) :
-								// 値なしの場合、nullを設定
-								null,
+						domain.getPaymentDate().toDayValue(),
 						// 支払金額
 						domain.getExpenditureAmount().getValue(),
 						// 支払金額の0円開始設定フラグ
@@ -311,27 +320,61 @@ public class IncomeAndExpenditureInitUseCase {
 
 	/**
 	 *<pre>
-	 * 内容確認ボタン押下時の入力チェックエラーの場合の画面表示情報取得
+	 * 内容確認ボタン押下時のセッションデータ検証を行い画面表示情報を取得します。
+	 * 以下の順序でチェックを行い、エラーがある場合はメッセージを設定して即時リターンします。
+	 * ①収入登録情報が0件の場合、「収入情報が未登録です。」メッセージを設定
+	 * ②削除以外かつ更新なし(NON_UPDATE)以外の支出登録情報のうち、支払金額が0円のものについてメッセージを設定
+	 *   (NON_UPDATEはDBからロードされた支出で過去に意図的に登録された0円のためチェック対象外)
+	 * メッセージが0件の場合は正常（バリデーション通過）となります。
 	 *</pre>
 	 * @param user ログインユーザ情報
 	 * @param targetYearMonth 収支の対象年月の値
-	 * @param incomeRegistItemList セッションに設定されている収支情報のリスト
-	 * @param expenditureRegistItemList セッションに設定されている支出情報のリスト
-	 * @return 収支登録画面の表示情報
+	 * @param incomeRegistItemList セッションに設定されている収入登録情報のリスト
+	 * @param expenditureRegistItemList セッションに設定されている支出登録情報のリスト
+	 * @return 収支登録画面の表示情報(hasMessages()がtrueの場合はエラーあり)
 	 *
 	 */
-	public IncomeAndExpenditureRegistResponse readRegistCheckErrorSetInfo(LoginUserInfo user, String targetYearMonth,
+	public IncomeAndExpenditureRegistResponse readRegistCheckValidateInfo(LoginUserInfo user, String targetYearMonth,
 			List<IncomeRegistItem> incomeRegistItemList, List<ExpenditureRegistItem> expenditureRegistItemList) {
-		log.debug("readRegistCheckErrorSetInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+		log.debug("readRegistCheckValidateInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
 
 		// レスポンスを生成
 		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
 		// セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を設定
 		registListComponent.setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
-		// メッセージを設定
-		response.addMessage("収入情報が未登録です。");
+
+		// ①収入登録情報が0件の場合、エラーメッセージを設定して即時リターン
+		if (incomeRegistItemList.isEmpty()) {
+			response.addMessage("収入情報が未登録です。");
+			return response;
+		}
+		// ②削除以外かつ更新なし(NON_UPDATE)以外の支出登録情報のうち、支払金額が0円のものについてメッセージを設定
+		// (NON_UPDATEはDBからロードされた支出で過去に意図的に登録された0円のためチェック対象外)
+		expenditureRegistItemList.stream()
+				.filter(item -> !Objects.equals(item.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_DELETE))
+				.filter(item -> !Objects.equals(item.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE))
+				.filter(item -> BigDecimal.ZERO.compareTo(item.getExpenditureKingaku()) == 0)
+				.forEach(item -> response.addMessage(String.format(
+						"「%s」の支出が0円から更新されていません。実際の支払金額に更新してください。",
+						buildExpenditureDisplayName(item))));
 
 		return response;
+	}
+
+	/**
+	 *<pre>
+	 * 支出登録情報から画面表示用の支出名（支出区分ラベル付き）を生成します。
+	 * IncomeAndExpenditureRegistListComponentの表示名生成と同じ編集ロジックです。
+	 *</pre>
+	 * @param item 支出登録情報
+	 * @return 支出区分ラベルを含む表示用支出名
+	 *
+	 */
+	private String buildExpenditureDisplayName(ExpenditureRegistItem item) {
+		ExpenditureCategory category = ExpenditureCategory.from(item.getExpenditureCategory());
+		String label = category.toDisplayLabel();
+		String prefix = label.isEmpty() ? "" : "【" + label + "】";
+		return prefix + item.getExpenditureName();
 	}
 
 	/**

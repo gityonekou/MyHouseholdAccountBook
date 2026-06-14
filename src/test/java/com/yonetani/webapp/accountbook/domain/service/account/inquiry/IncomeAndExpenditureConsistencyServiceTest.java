@@ -22,8 +22,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.yonetani.webapp.accountbook.domain.exception.DataInconsistencyException;
 import com.yonetani.webapp.accountbook.domain.exception.ExpenditureAmountInconsistencyException;
 import com.yonetani.webapp.accountbook.domain.exception.IncomeAmountInconsistencyException;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureItemList;
+import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTableRepository;
@@ -199,12 +202,15 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			userId, yearMonth, income, null, null, null, null
 		);
 
-		// 支出リスト：空
-		AccountMonthInquiryExpenditureItemList expenditureList =
+		// 支出金額リスト：空
+		AccountMonthInquiryExpenditureItemList expenditureItemList =
 			AccountMonthInquiryExpenditureItemList.from(Collections.emptyList());
+		// 支出リスト：空
+		AccountMonthInquiryExpenditureList expenditureList =
+			AccountMonthInquiryExpenditureList.from(ExpenditureItemInquiryList.from(Collections.emptyList()));
 
 		// 実行 & 検証（例外がスローされないことを確認）
-		assertDoesNotThrow(() -> service.validateDataExistence(aggregate, expenditureList, searchCondition));
+		assertDoesNotThrow(() -> service.validateDataExistence(aggregate, expenditureItemList, expenditureList, searchCondition));
 	}
 
 	@Test
@@ -222,16 +228,19 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			userId, yearMonth, null, null, null, null, balamce
 		);
 
-		// 支出リスト：データあり（モックで作成）
+		// 支出金額リスト：データあり（モックで作成）
 		List<AccountMonthInquiryExpenditureItemList.ExpenditureListItem> items = new ArrayList<>();
 		AccountMonthInquiryExpenditureItemList.ExpenditureListItem item =
 			mock(AccountMonthInquiryExpenditureItemList.ExpenditureListItem.class);
 		items.add(item);
-		AccountMonthInquiryExpenditureItemList expenditureList =
+		AccountMonthInquiryExpenditureItemList expenditureItemList =
 			AccountMonthInquiryExpenditureItemList.from(items);
+		// 支出リスト：空
+		AccountMonthInquiryExpenditureList expenditureList =
+			AccountMonthInquiryExpenditureList.from(ExpenditureItemInquiryList.from(Collections.emptyList()));
 
 		// 実行 & 検証（例外がスローされないことを確認）
-		assertDoesNotThrow(() -> service.validateDataExistence(aggregate, expenditureList, searchCondition));
+		assertDoesNotThrow(() -> service.validateDataExistence(aggregate, expenditureItemList, expenditureList, searchCondition));
 	}
 
 	@Test
@@ -246,17 +255,20 @@ class IncomeAndExpenditureConsistencyServiceTest {
 		// 収支集約：空
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.empty(userId, yearMonth);
 
-		// 支出リスト：空
-		AccountMonthInquiryExpenditureItemList expenditureList =
+		// 支出金額リスト：空
+		AccountMonthInquiryExpenditureItemList expenditureItemList =
 			AccountMonthInquiryExpenditureItemList.from(Collections.emptyList());
+		// 支出リスト：空
+		AccountMonthInquiryExpenditureList expenditureList =
+			AccountMonthInquiryExpenditureList.from(ExpenditureItemInquiryList.from(Collections.emptyList()));
 
 		// 実行 & 検証（例外がスローされないことを確認）
-		assertDoesNotThrow(() -> service.validateDataExistence(aggregate, expenditureList, searchCondition));
+		assertDoesNotThrow(() -> service.validateDataExistence(aggregate, expenditureItemList, expenditureList, searchCondition));
 	}
 
 	@Test
-	@DisplayName("異常系：validateDataExistence - 収支データなし、支出データありの場合、例外をスロー")
-	void testValidateDataExistence_IncomeEmptyExpenditureExists_ThrowsException() {
+	@DisplayName("異常系：validateDataExistence - 収支データなし、支出金額データありの場合、例外をスロー")
+	void testValidateDataExistence_IncomeEmptyExpenditureItemExists_ThrowsException() {
 		// 準備
 		UserId userId = UserId.from("user01");
 		TargetYearMonth yearMonth = TargetYearMonth.from("202508");
@@ -266,24 +278,65 @@ class IncomeAndExpenditureConsistencyServiceTest {
 		// 収支集約：空
 		IncomeAndExpenditure aggregate = IncomeAndExpenditure.empty(userId, yearMonth);
 
-		// 支出リスト：データあり（不整合）
+		// 支出金額リスト：データあり（不整合）
 		List<AccountMonthInquiryExpenditureItemList.ExpenditureListItem> items = new ArrayList<>();
 		AccountMonthInquiryExpenditureItemList.ExpenditureListItem item =
 			mock(AccountMonthInquiryExpenditureItemList.ExpenditureListItem.class);
 		items.add(item);
-		AccountMonthInquiryExpenditureItemList expenditureList =
+		AccountMonthInquiryExpenditureItemList expenditureItemList =
 			AccountMonthInquiryExpenditureItemList.from(items);
+		// 支出リスト：空
+		AccountMonthInquiryExpenditureList expenditureList =
+			AccountMonthInquiryExpenditureList.from(ExpenditureItemInquiryList.from(Collections.emptyList()));
 
 		// 実行 & 検証
 		DataInconsistencyException exception = assertThrows(
 			DataInconsistencyException.class,
-			() -> service.validateDataExistence(aggregate, expenditureList, searchCondition)
+			() -> service.validateDataExistence(aggregate, expenditureItemList, expenditureList, searchCondition)
 		);
 
 		// 例外メッセージの検証
 		assertTrue(exception.getMessage().contains("収支データが未登録"));
 		assertTrue(exception.getMessage().contains("支出金額情報が登録済み"));
 		assertTrue(exception.getMessage().contains("202508"));
+	}
+
+	@Test
+	@DisplayName("異常系：validateDataExistence - 収支データなし、支出データありの場合、例外をスロー")
+	void testValidateDataExistence_IncomeEmptyExpenditureDetailExists_ThrowsException() {
+		// 準備
+		UserId userId = UserId.from("user01");
+		TargetYearMonth yearMonth = TargetYearMonth.from("202509");
+		SearchQueryUserIdAndYearMonth searchCondition =
+			SearchQueryUserIdAndYearMonth.from(userId, yearMonth);
+
+		// 収支集約：空
+		IncomeAndExpenditure aggregate = IncomeAndExpenditure.empty(userId, yearMonth);
+
+		// 支出金額リスト：空
+		AccountMonthInquiryExpenditureItemList expenditureItemList =
+			AccountMonthInquiryExpenditureItemList.from(Collections.emptyList());
+		// 支出リスト：データあり（不整合）
+		ExpenditureItem expenditureItem = ExpenditureItem.from(
+			"user01", "2025", "09", "001", "0001", null,
+			"テスト支出", "1", "", null,
+			BigDecimal.valueOf(10000).setScale(2),
+			BigDecimal.valueOf(10000).setScale(2),
+			false);
+		AccountMonthInquiryExpenditureList expenditureList =
+			AccountMonthInquiryExpenditureList.from(
+				ExpenditureItemInquiryList.from(List.of(expenditureItem)));
+
+		// 実行 & 検証
+		DataInconsistencyException exception = assertThrows(
+			DataInconsistencyException.class,
+			() -> service.validateDataExistence(aggregate, expenditureItemList, expenditureList, searchCondition)
+		);
+
+		// 例外メッセージの検証
+		assertTrue(exception.getMessage().contains("収支データが未登録"));
+		assertTrue(exception.getMessage().contains("支出情報が登録済み"));
+		assertTrue(exception.getMessage().contains("202509"));
 	}
 
 	@Test

@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/05/22 : 1.00.00  新規作成
+ * 2026/06/14 : 1.02.00  固定費0円対応: @Min(1)→@Min(0)、@AssertTrue isValidShiharaiKingakuForKubun()追加
  *
  */
 package com.yonetani.webapp.accountbook.presentation.request.itemmanage;
@@ -65,12 +66,12 @@ public class FixedCostInfoUpdateForm {
 	private String shiharaiDay;
 	// 支払金額
 	@NotNull
-	@Min(1)
+	@Min(0)
 	private Integer shiharaiKingaku;
 	
 	/**
 	 * 相関チェック(支払月でその他任意を選択した場合、支払月任意詳細は必須)
-	 * 
+	 *
 	 * @return その他任意を選択した場合で支払月任意詳細の設定ありならtrue、空ならfalse
 	 */
 	@AssertTrue(message = "その他任意が未選択か支払月任意詳細が未入力です。")
@@ -83,6 +84,23 @@ public class FixedCostInfoUpdateForm {
 		// 支払月任意詳細が入力ありで支払月の値がその他任意(40)以外の場合、false
 		if(StringUtils.hasLength(shiharaiTukiOptionalContext)
 				&& !Objects.equals(shiharaiTuki, MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE)) {
+			return false;
+		}
+		// 上記以外はチェック結果OK:trueを返却
+		return true;
+	}
+
+	/**
+	 * 相関チェック(固定費区分が「予定支払い金額」の場合、支払金額に0円は設定不可)
+	 *
+	 * @return 固定費区分が予定支払い金額以外の場合、または支払金額が1円以上の場合はtrue、
+	 *         固定費区分が予定支払い金額かつ支払金額が0円の場合はfalse
+	 */
+	@AssertTrue(message = "固定費区分が「予定支払い金額」の場合、支払金額に0円は設定できません。")
+	public boolean isValidShiharaiKingakuForKubun() {
+		// 固定費区分が「予定支払い金額(2)」かつ支払金額が0円の場合、false
+		if (Objects.equals(fixedCostKubun, MyHouseholdAccountBookContent.FIXED_COST_ESTIMATE_SELECTED_VALUE)
+				&& shiharaiKingaku != null && shiharaiKingaku == 0) {
 			return false;
 		}
 		// 上記以外はチェック結果OK:trueを返却
