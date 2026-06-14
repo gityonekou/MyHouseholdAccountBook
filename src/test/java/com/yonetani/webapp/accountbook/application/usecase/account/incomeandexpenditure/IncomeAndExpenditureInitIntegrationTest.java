@@ -6,6 +6,8 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2026/01/12 : 1.00.00  新規作成
+ * 2026/06/14 : 1.02.00  テストシナリオ⑭をreadRegistCheckValidateInfoに変更、⑮⑯を追加
+ * 2026/06/14 : 1.02.01  テストシナリオ⑰を追加（0円NON_UPDATEはバリデーション通過）
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -46,7 +48,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  * 1. readInitInfo - 新規登録時の画面初期表示（固定費から自動生成）
  * 2. readUpdateInfo - 更新時の画面初期表示（DB登録済み情報取得）
  * 3. readIncomeAndExpenditureInfoList - 収入・支出一覧の再表示
- * 4. readRegistCheckErrorSetInfo - 内容確認時の入力不備エラー処理（収入未登録）
+ * 4. readRegistCheckValidateInfo - 内容確認時のセッションデータ検証（収入未登録・0円支出チェック）
  *
  * [テストシナリオ]
  * readInitInfo:
@@ -65,8 +67,11 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  *  12. 正常系: 更新_収入テーブル情報あり・支出テーブル情報なし → 支出リスト空 - 202508
  * readIncomeAndExpenditureInfoList:
  *  13. 正常系: 収入・支出一覧再表示（削除アクション設定データの除外確認含む）
- * readRegistCheckErrorSetInfo:
- *  14. 正常系: 入力確認エラー_収入未登録
+ * readRegistCheckValidateInfo:
+ *  14. 正常系: バリデーションエラー_収入未登録（hasMessages=true、メッセージに「収入情報が未登録です。」）
+ *  15. 正常系: バリデーションエラー_0円支出あり（hasMessages=true、0円支出のメッセージ）
+ *  16. 正常系: バリデーション通過（収入あり・0円支出なし→hasMessages=false）
+ *  17. 正常系: バリデーション通過（0円支出あり・ACTION_TYPE_NON_UPDATE→hasMessages=false）
  *
  *</pre>
  *
@@ -1110,21 +1115,23 @@ class IncomeAndExpenditureInitIntegrationTest {
     }
 
     // ========================================
-    // 正常系テスト - readRegistCheckErrorSetInfo
+    // 正常系テスト - readRegistCheckValidateInfo
     // ========================================
 
     /**
      *<pre>
-     * テスト⑭：正常系：入力確認エラー_収入未登録
+     * テスト⑭：正常系：バリデーションエラー_収入未登録
      *
      * 【検証内容】
      * ・セッションの収入登録リストが空の場合、エラーメッセージが設定されること
+     * ・hasMessages()がtrueであること
      * ・エラーメッセージに「収入情報が未登録です。」が含まれること
+     * ・0円支出があっても収入未登録チェックで即時リターンすること（0円支出メッセージは追加されない）
      *</pre>
      */
     @Test
-    @DisplayName("正常系：入力確認エラー_収入未登録")
-    void testReadRegistCheckErrorSetInfo_NormalCase_NoIncomeData() {
+    @DisplayName("正常系：バリデーションエラー_収入未登録")
+    void testReadRegistCheckValidateInfo_NormalCase_NoIncomeData() {
         // Given: テストユーザ、対象年月、セッションの収入・支出リスト（収入なし）
         LoginUserInfo user = createLoginUser();
         String targetYearMonth = "202511";
@@ -1132,26 +1139,171 @@ class IncomeAndExpenditureInitIntegrationTest {
         // セッションデータのモック（収入情報リストは空）
         List<IncomeRegistItem> incomeRegistItemList = new ArrayList<>();
 
-        // セッションデータのモック（支出情報リスト）
+        // セッションデータのモック（支出情報リスト: 0円支出を含む）
         List<ExpenditureRegistItem> expenditureRegistItemList = new ArrayList<>();
         expenditureRegistItemList.add(ExpenditureRegistItem.from(
         		MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD, "2026011210000001", "0001", "", "電気代", "1",
-            "支払詳細", "20251130", new BigDecimal("10000"), false));
+            "支払詳細", "20251130", BigDecimal.ZERO, false));
 
-        // When: 入力確認時のエラー処理
-        IncomeAndExpenditureRegistResponse response = useCase.readRegistCheckErrorSetInfo(
+        // When: 内容確認バリデーション
+        IncomeAndExpenditureRegistResponse response = useCase.readRegistCheckValidateInfo(
             user, targetYearMonth, incomeRegistItemList, expenditureRegistItemList);
 
         // Then: レスポンスが返却される
         assertNotNull(response);
 
-        // Then: エラーメッセージが設定されている
+        // Then: エラーメッセージが設定されている（hasMessages=true）
         // ※セッションデータ⇒画面表示データの変換検証はreadInitInfo/readUpdateInfoテストで網羅済み
-        assertFalse(response.getMessagesList().isEmpty());
+        assertTrue(response.hasMessages());
         assertTrue(response.getMessagesList().stream()
             .anyMatch(msg -> msg.contains("収入情報が未登録です。")));
+
+        // Then: 収入未登録で即時リターンするため、0円支出メッセージは設定されないこと
+        assertFalse(response.getMessagesList().stream()
+            .anyMatch(msg -> msg.contains("0円から更新されていません")));
     }
-    
+
+    /**
+     *<pre>
+     * テスト⑮：正常系：バリデーションエラー_0円支出あり
+     *
+     * 【検証内容】
+     * ・収入登録あり・削除以外の支出登録情報に0円のものがある場合、エラーメッセージが設定されること
+     * ・hasMessages()がtrueであること
+     * ・エラーメッセージに支出名と「0円から更新されていません」が含まれること
+     * ・削除(ACTION_TYPE_DELETE)アクションの支出は0円チェックから除外されること
+     *</pre>
+     */
+    @Test
+    @DisplayName("正常系：バリデーションエラー_0円支出あり")
+    void testReadRegistCheckValidateInfo_NormalCase_ZeroAmountExpenditure() {
+        // Given: テストユーザ、対象年月
+        LoginUserInfo user = createLoginUser();
+        String targetYearMonth = "202511";
+
+        // セッションデータのモック（収入情報リスト: 1件）
+        List<IncomeRegistItem> incomeRegistItemList = new ArrayList<>();
+        incomeRegistItemList.add(IncomeRegistItem.from(
+        		MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
+        		"01", "1", "", new BigDecimal("100000")));
+
+        // セッションデータのモック（支出情報リスト）
+        // ADD: 0円支出 → エラーメッセージ対象
+        List<ExpenditureRegistItem> expenditureRegistItemList = new ArrayList<>();
+        expenditureRegistItemList.add(ExpenditureRegistItem.from(
+        		MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD, "2026011210000001", "0001", "", "電気代", "1",
+            "支払詳細", "20251130", BigDecimal.ZERO, false));
+        // DELETE: 0円支出 → チェック除外（メッセージ対象外）
+        expenditureRegistItemList.add(ExpenditureRegistItem.from(
+        		MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_DELETE, "2026011210000002", "0002", "", "ガス代", "1",
+            "", "20251130", BigDecimal.ZERO, false));
+
+        // When: 内容確認バリデーション
+        IncomeAndExpenditureRegistResponse response = useCase.readRegistCheckValidateInfo(
+            user, targetYearMonth, incomeRegistItemList, expenditureRegistItemList);
+
+        // Then: レスポンスが返却される
+        assertNotNull(response);
+
+        // Then: エラーメッセージが設定されている（hasMessages=true）
+        assertTrue(response.hasMessages());
+
+        // Then: ADDの0円支出（電気代）のメッセージが設定されること
+        assertTrue(response.getMessagesList().stream()
+            .anyMatch(msg -> msg.contains("「電気代」") && msg.contains("0円から更新されていません")));
+
+        // Then: DELETE対象の支出（ガス代）はチェック除外のためメッセージなし
+        assertFalse(response.getMessagesList().stream()
+            .anyMatch(msg -> msg.contains("「ガス代」")));
+    }
+
+    /**
+     *<pre>
+     * テスト⑯：正常系：バリデーション通過（収入あり・0円支出なし）
+     *
+     * 【検証内容】
+     * ・収入登録あり・削除以外の支出登録情報に0円のものがない場合、メッセージなしでレスポンスが返ること
+     * ・hasMessages()がfalseであること
+     *</pre>
+     */
+    @Test
+    @DisplayName("正常系：バリデーション通過（収入あり・0円支出なし）")
+    void testReadRegistCheckValidateInfo_NormalCase_ValidationPass() {
+        // Given: テストユーザ、対象年月
+        LoginUserInfo user = createLoginUser();
+        String targetYearMonth = "202511";
+
+        // セッションデータのモック（収入情報リスト: 1件）
+        List<IncomeRegistItem> incomeRegistItemList = new ArrayList<>();
+        incomeRegistItemList.add(IncomeRegistItem.from(
+        		MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
+        		"01", "1", "", new BigDecimal("100000")));
+
+        // セッションデータのモック（支出情報リスト: 全件1円以上）
+        List<ExpenditureRegistItem> expenditureRegistItemList = new ArrayList<>();
+        expenditureRegistItemList.add(ExpenditureRegistItem.from(
+        		MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD, "2026011210000001", "0001", "", "電気代", "1",
+            "支払詳細", "20251130", new BigDecimal("10000"), false));
+
+        // When: 内容確認バリデーション
+        IncomeAndExpenditureRegistResponse response = useCase.readRegistCheckValidateInfo(
+            user, targetYearMonth, incomeRegistItemList, expenditureRegistItemList);
+
+        // Then: レスポンスが返却される
+        assertNotNull(response);
+
+        // Then: エラーメッセージなし（hasMessages=false）
+        assertFalse(response.hasMessages());
+    }
+
+    /**
+     *<pre>
+     * テスト⑰：正常系：バリデーション通過（0円支出あり・ACTION_TYPE_NON_UPDATE）
+     *
+     * 【検証内容】
+     * ・readUpdateInfo()でDBからロードされた0円支出（ACTION_TYPE_NON_UPDATE）は
+     *   0円チェックの対象外となり、hasMessages()がfalseであること
+     * ・これは固定費区分=2（予定支払い金額）の支出がDB上は0円で登録されるケースの
+     *   更新フローでのバリデーション通過を保証する
+     *</pre>
+     */
+    @Test
+    @DisplayName("正常系：バリデーション通過（0円支出あり・ACTION_TYPE_NON_UPDATE）")
+    void testReadRegistCheckValidateInfo_NormalCase_ZeroAmountNonUpdate_ValidationPass() {
+        // Given: テストユーザ、対象年月
+        LoginUserInfo user = createLoginUser();
+        String targetYearMonth = "202511";
+
+        // セッションデータのモック（収入情報リスト: 1件）
+        List<IncomeRegistItem> incomeRegistItemList = new ArrayList<>();
+        incomeRegistItemList.add(IncomeRegistItem.from(
+                MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
+                "01", "1", "11月給与", new BigDecimal("350000")));
+
+        // セッションデータのモック（支出情報リスト）
+        // NON_UPDATE + 0円: readUpdateInfo()でDBからロードされた固定費区分=2由来の支出を模擬
+        // (固定費区分=2はDBへの書き込み時に金額が0円に変換される仕様のため、更新フローでは0円がロードされる)
+        List<ExpenditureRegistItem> expenditureRegistItemList = new ArrayList<>();
+        expenditureRegistItemList.add(ExpenditureRegistItem.from(
+                MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
+                "001", "0030", null, "家賃", "1",
+                "家賃支払詳細", "27", BigDecimal.ZERO, false));
+
+        // When: 内容確認バリデーション
+        IncomeAndExpenditureRegistResponse response = useCase.readRegistCheckValidateInfo(
+            user, targetYearMonth, incomeRegistItemList, expenditureRegistItemList);
+
+        // Then: レスポンスが返却される
+        assertNotNull(response);
+
+        // Then: NON_UPDATEの0円支出はチェック除外のためメッセージなし（hasMessages=false）
+        assertFalse(response.hasMessages());
+
+        // Then: 0円支出メッセージが設定されていないこと
+        assertFalse(response.getMessagesList().stream()
+            .anyMatch(msg -> msg.contains("0円から更新されていません")));
+    }
+
 	/**
 	 *<pre>
 	 * 必須登録データ未登録時のメッセージ期待値(固定値)を作成

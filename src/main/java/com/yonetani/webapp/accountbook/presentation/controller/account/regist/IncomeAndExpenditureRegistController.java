@@ -34,6 +34,7 @@
  * 2024/06/16 : 1.00.00  新規作成
  * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
  * 2026/06/13 : 1.02.00  支出別一覧追加対応(expenditurecorrectloadエンドポイント追加)
+ * 2026/06/14 : 1.02.00  固定費0円対応: getRegistCheckLoad()をreadRegistCheckValidateInfo()経由に変更（UseCaseに検証ロジック集約）
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.account.regist;
@@ -641,6 +642,7 @@ public class IncomeAndExpenditureRegistController {
 	 * 収支登録画面で内容確認ボタン押下時のPOST要求時マッピングです。
 	 * 収入一覧・支出一覧をもとに、収支登録内容確認画面に遷移します。
 	 * 収入一覧の登録件数が0件の場合、エラーとします。(もし、未収入でも0円で収入を登録する必要あり)
+	 * 削除以外の支出登録情報に0円のものがある場合、エラーとします。
 	 *</pre>
 	 * @return 収支登録内容確認画面
 	 *
@@ -648,40 +650,41 @@ public class IncomeAndExpenditureRegistController {
 	@PostMapping(value = "/registcheck/", params = "actionCheck")
 	public ModelAndView getRegistCheckLoad() {
 		log.debug("getRegistCheckLoad:");
-		
-		// 収入登録情報の件数で遷移先を判定
-		if(registListSession.getIncomeRegistItemList().size() == 0) {
-			// 収入登録情報が未登録の場合、収支登録画面にエラーメッセージを表示(メッセージは収支登録ユースケースで設定)
-			return this.usecase.readRegistCheckErrorSetInfo(
-					// ログインユーザ情報
-					loginUserSession.getLoginUserInfo(),
-					// 収支の対象年月
-					registListSession.getTargetYearMonth(),
-					// セッションに設定されている収入登録情報のリスト
-					registListSession.getIncomeRegistItemList(),
-					// セッションに設定されている支出登録情報のリスト
-					registListSession.getExpenditureRegistItemList())
-				// レスポンスにログインユーザ名を設定
-				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
-				// レスポンスからModelAndViewを生成
-				.build();
-			
-		} else {
-			// 収入登録情報の登録ありの場合、収支登録内容確認画面に遷移
-			return this.incomeAndExpenditureRegistConfirmUseCase.readRegistCheckInfo(
-					// ログインユーザ情報
-					loginUserSession.getLoginUserInfo(),
-					// 収支の対象年月
-					registListSession.getTargetYearMonth(),
-					// セッションに設定されている収入登録情報のリスト
-					registListSession.getIncomeRegistItemList(),
-					// セッションに設定されている支出登録情報のリスト
-					registListSession.getExpenditureRegistItemList())
+
+		// UseCaseでセッションデータ（収入0件・0円支出）のバリデーションを実施
+		IncomeAndExpenditureRegistResponse validationResponse = this.usecase.readRegistCheckValidateInfo(
+				// ログインユーザ情報
+				loginUserSession.getLoginUserInfo(),
+				// 収支の対象年月
+				registListSession.getTargetYearMonth(),
+				// セッションに設定されている収入登録情報のリスト
+				registListSession.getIncomeRegistItemList(),
+				// セッションに設定されている支出登録情報のリスト
+				registListSession.getExpenditureRegistItemList());
+
+		// バリデーションエラーがある場合は収支登録画面にエラーメッセージを表示
+		if (validationResponse.hasMessages()) {
+			return validationResponse
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
 				.build();
 		}
+
+		// バリデーション通過 → 収支登録内容確認画面に遷移
+		return this.incomeAndExpenditureRegistConfirmUseCase.readRegistCheckInfo(
+				// ログインユーザ情報
+				loginUserSession.getLoginUserInfo(),
+				// 収支の対象年月
+				registListSession.getTargetYearMonth(),
+				// セッションに設定されている収入登録情報のリスト
+				registListSession.getIncomeRegistItemList(),
+				// セッションに設定されている支出登録情報のリスト
+				registListSession.getExpenditureRegistItemList())
+			// レスポンスにログインユーザ名を設定
+			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
+			// レスポンスからModelAndViewを生成
+			.build();
 
 	}
 	
