@@ -113,6 +113,7 @@ Phase 1-5 refactoring (DDD準拠リファクタリング) is complete. Documents
 
 ## Documentation
 
+- `docs/ドメイン用語集.md` - Domain glossary (収支/支出項目/固定費/支払方法/銀行口座/システム予約値 etc.); update whenever a feature introduces new domain terms
 - `docs/test-data-design-rules.md` - Test data conventions
 - `docs/integration-test-guidelines.md` - UseCase integration test detailed guidelines (response verification, assertion rules, session/DB patterns)
 - `docs/DDD設計_金額クラス統合判断基準.md` - Money class design decisions
