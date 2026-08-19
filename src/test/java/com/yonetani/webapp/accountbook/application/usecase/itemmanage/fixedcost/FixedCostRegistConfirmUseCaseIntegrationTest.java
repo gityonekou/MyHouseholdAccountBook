@@ -171,6 +171,7 @@ class FixedCostRegistConfirmUseCaseIntegrationTest {
 		form.setShiharaiTukiOptionalContext(null);
 		form.setShiharaiDay("27");
 		form.setShiharaiKingaku(30000);
+		form.setPaymentMethodCode("001");
 
 		// 実行
 		FixedCostInfoManageUpdateResponse response = useCase.execAdd(TEST_USER, form);
@@ -232,6 +233,7 @@ class FixedCostRegistConfirmUseCaseIntegrationTest {
 		form.setShiharaiTukiOptionalContext(null);
 		form.setShiharaiDay("27");
 		form.setShiharaiKingaku(15000);
+		form.setPaymentMethodCode("001");
 
 		// 実行
 		FixedCostInfoManageUpdateResponse response = useCase.execUpdate(TEST_USER, form);
@@ -276,6 +278,7 @@ class FixedCostRegistConfirmUseCaseIntegrationTest {
 		form.setShiharaiTukiOptionalContext(null);
 		form.setShiharaiDay("27");
 		form.setShiharaiKingaku(10000);
+		form.setPaymentMethodCode("001");
 
 		assertThrows(MyHouseholdAccountBookRuntimeException.class,
 				() -> useCase.execUpdate(TEST_USER, form),

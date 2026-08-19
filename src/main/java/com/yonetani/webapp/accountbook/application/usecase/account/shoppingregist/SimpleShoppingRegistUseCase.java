@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.component.ExpenditureAmountItemHolderComponent;
+import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent;
 import com.yonetani.webapp.accountbook.application.usecase.account.component.ShoppingRegistExpenditureItemComponent;
 import com.yonetani.webapp.accountbook.application.usecase.common.CodeTableItemComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
@@ -98,6 +99,8 @@ public class SimpleShoppingRegistUseCase {
 	private final IncomeAndExpenditureTableRepository incomeAndExpenditureRepository;
 	// 買い物登録時の必須支出項目をまとめたコンポーネント
 	private final ShoppingRegistExpenditureItemComponent expenditureAndSisyutuKingakuComponent;
+	// 支払方法情報取得コンポーネント
+	private final PaymentMethodInfoComponent paymentMethodInfoComponent;
 	
 	/**
 	 *<pre>
@@ -181,6 +184,8 @@ public class SimpleShoppingRegistUseCase {
 		inputForm.setShoppingDate(result.getShoppingDate().getValue());
 		// 備考
 		inputForm.setShoppingRemarks(result.getShoppingRemarks().getValue());
+		// 支払方法コード
+		inputForm.setPaymentMethodCode(result.getPaymentMethodCode().getValue());
 		// 食料品(必須)
 		inputForm.setShoppingFoodExpenses(DomainCommonUtils.convertInteger(result.getShoppingFoodExpenditureAmount().getValue()));
 		// 消費税：食料品(必須)
@@ -763,16 +768,21 @@ public class SimpleShoppingRegistUseCase {
 		
 		// 選択した店舗区分に属する店舗情報を取得
 		ShopInquiryList shopSearchResult = shopRepository.findById(SearchQueryUserIdAndShopKubunCode.from(userId, ShopKubunCode.from(registInfoForm.getShopKubunCode())));
-		// 店舗情報ありの場合、店舗名選択ボックスの表示リストを作成
-		List<OptionItem> shopNameOptionItemList = null;
+		// 店舗情報ありの場合、店舗名選択肢のリストを作成(デフォルト支払方法をdata属性経由でJSに渡すため、5.6節)
+		List<SimpleShoppingRegistResponse.ShopOptionItem> shopNameOptionItemList = null;
 		if(!shopSearchResult.isEmpty()) {
 			// 店舗情報をレスポンスに設定
 			shopNameOptionItemList = shopSearchResult.getValues().stream().map(domain ->
-				OptionItem.from(domain.getShopCode().getValue(), domain.getShopName().getValue())).collect(Collectors.toUnmodifiableList());
+				SimpleShoppingRegistResponse.ShopOptionItem.from(
+						domain.getShopCode().getValue(),
+						domain.getShopName().getValue(),
+						domain.getDefaultPaymentMethodCode() == null ? null : domain.getDefaultPaymentMethodCode().getValue()))
+				.collect(Collectors.toUnmodifiableList());
 		}
 		// 支出テーブルに該当項目の支出データが登録されていることを確認
 		// レスポンスを生成
-		SimpleShoppingRegistResponse response = SimpleShoppingRegistResponse.getInstance(shopKubunOptionItemList, shopNameOptionItemList, registInfoForm);
+		SimpleShoppingRegistResponse response = SimpleShoppingRegistResponse.getInstance(shopKubunOptionItemList, shopNameOptionItemList,
+				paymentMethodInfoComponent.getPaymentMethodOptions(userId), registInfoForm);
 		if(shopSearchResult.isEmpty()) {
 			// 店舗情報が0件の場合、メッセージを設定
 			response.addMessage("選択した店舗区分に属する店舗情報が0件です。店舗区分を再選択してください。");

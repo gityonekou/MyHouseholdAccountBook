@@ -32,15 +32,15 @@
 --
 -- ========================================
 
-INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, SISYUTU_ITEM_CODE, FIXED_COST_KUBUN, FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT, FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU, DELETE_FLG)
+INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, SISYUTU_ITEM_CODE, FIXED_COST_KUBUN, FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT, FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU, PAYMENT_METHOD_CODE, DELETE_FLG)
 	VALUES
- ('user01', '0001', '電気代(無駄遣いB)', '電気代詳細', '0037', '2', '00', null, '31', 10000.00, false),
- ('user01', '0002', 'ガス代(無駄遣いC)', 'ガス代詳細', '0038', '1', '00', null, '40', 8000.00, false),
- ('user01', '0003', '水道代', '水道代詳細(無駄遣いB)', '0040', '2', '10', null, '20', 5000.00, false),
- ('user01', '0004', '家賃', '家賃支払詳細', '0030', '1', '30', null, '00', 62000.00, false),
- ('user01', '0005', '通信費(無駄遣いB)', '携帯電話・インターネット詳細', '0039', '1', '40', null, '25', 7000.00, false),
- ('user01', '0006', '趣味の支払(8月)', '毎年の8月に実施されるイベントの支払い(予算:34000円)', '0057', '2', '08', null, '15', 34000.00, false),
- ('user01', '0007', 'NHK受信料', 'NHK受信料（奇数月のみ）', '0041', '1', '20', null, '40', 12000.00, false);
+ ('user01', '0001', '電気代(無駄遣いB)', '電気代詳細', '0037', '2', '00', null, '31', 10000.00, '001', false),
+ ('user01', '0002', 'ガス代(無駄遣いC)', 'ガス代詳細', '0038', '1', '00', null, '40', 8000.00, '001', false),
+ ('user01', '0003', '水道代', '水道代詳細(無駄遣いB)', '0040', '2', '10', null, '20', 5000.00, '001', false),
+ ('user01', '0004', '家賃', '家賃支払詳細', '0030', '1', '30', null, '00', 62000.00, '001', false),
+ ('user01', '0005', '通信費(無駄遣いB)', '携帯電話・インターネット詳細', '0039', '1', '40', null, '25', 7000.00, '001', false),
+ ('user01', '0006', '趣味の支払(8月)', '毎年の8月に実施されるイベントの支払い(予算:34000円)', '0057', '2', '08', null, '15', 34000.00, '001', false),
+ ('user01', '0007', 'NHK受信料', 'NHK受信料（奇数月のみ）', '0041', '1', '20', null, '40', 12000.00, '001', false);
 
 -- ========================================
 -- テストデータ作成完了

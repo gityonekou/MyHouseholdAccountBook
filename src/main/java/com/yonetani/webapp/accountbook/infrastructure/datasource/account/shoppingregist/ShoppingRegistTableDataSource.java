@@ -21,6 +21,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.Simpl
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndShoppingRegistCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.shoppingregist.ShoppingRegistTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
@@ -169,6 +170,8 @@ public class ShoppingRegistTableDataSource implements ShoppingRegistTableReposit
 				ShoppingDate.from(dto.getShoppingDate(), targetYearMonth),
 				// 備考
 				ShoppingRemarks.from(dto.getShoppingRemarks()),
+				// 支払方法コード
+				PaymentMethodCode.from(dto.getPaymentMethodCode()),
 				// 食料品(必須)金額
 				ShoppingFoodExpenditureAmount.from(dto.getShoppingFoodExpenses()),
 				// 消費税:食料品(必須)金額

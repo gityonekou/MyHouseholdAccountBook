@@ -23,6 +23,7 @@ import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookCont
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookException;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.expenditureinfo.ExpenditureItemInfo;
+import com.yonetani.webapp.accountbook.domain.model.account.paymentmethod.PaymentMethod;
 import com.yonetani.webapp.accountbook.domain.model.account.shop.Shop;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.AdminMenuUserInfo;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.AdminMenuUserInfoItemList;
@@ -31,6 +32,7 @@ import com.yonetani.webapp.accountbook.domain.model.adminmenu.SisyutuItemBaseLis
 import com.yonetani.webapp.accountbook.domain.model.common.AccountBookUser;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.repository.account.expenditureinfo.SisyutuItemTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.paymentmethod.PaymentMethodTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.AdminMenuUserInfoRepository;
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.ShopBaseTableRepository;
@@ -77,6 +79,8 @@ public class AdminMenuUserInfoUseCase {
 	private final SisyutuItemTableRepository sisyutuItemTableRepository;
 	// 店舗テーブルデータを登録するリポジトリー
 	private final ShopTableRepository shopTableRepository;
+	// 支払方法テーブルデータを登録するリポジトリー
+	private final PaymentMethodTableRepository paymentMethodTableRepository;
 	/**
 	 *<pre>
 	 * ユーザ情報管理画面の表示情報を取得します。
@@ -209,7 +213,8 @@ public class AdminMenuUserInfoUseCase {
 								baseData.getShopCode().getValue(),
 								baseData.getShopCode().getValue(),
 								baseData.getShopName().getValue(),
-								baseData.getShopCode().getValue());
+								baseData.getShopCode().getValue(),
+								null);
 						// データを登録
 						int addCount = shopTableRepository.add(addData);
 						// 追加件数が1件以上の場合、業務エラー
@@ -217,7 +222,40 @@ public class AdminMenuUserInfoUseCase {
 							throw new MyHouseholdAccountBookRuntimeException("店舗テーブルへの追加件数が不正でした。[add data:" + addData + "]");
 						}
 					});
-				
+
+				// 支払方法マスタに「支払方法がない」システム行と「現金」を初期投入する(Feature1.03-dev1)
+				// 「支払方法がない」システム行：PAYMENT_METHOD_CODE=999固定値、種別は現金(1)を仮設定、
+				// 銀行口座コードはNULL(現金種別は銀行口座不要)、更新不可(ENABLE_UPDATE_FLG=false)
+				PaymentMethod noneData = PaymentMethod.from(
+						accountBookUser.getUserId().getValue(),
+						MyHouseholdAccountBookContent.PAYMENT_METHOD_CODE_NONE_VALUE,
+						"支払方法がない",
+						MyHouseholdAccountBookContent.PAYMENT_METHOD_KUBUN_CASH_SELECTED_VALUE,
+						null,
+						null,
+						MyHouseholdAccountBookContent.PAYMENT_METHOD_CODE_NONE_VALUE,
+						true,
+						false);
+				int addNoneCount = paymentMethodTableRepository.add(noneData);
+				if(addNoneCount != 1) {
+					throw new MyHouseholdAccountBookRuntimeException("支払方法テーブルへの追加件数が不正でした。[add data:" + noneData + "]");
+				}
+				// 「現金」：通常の支払方法として登録し、更新可能(ENABLE_UPDATE_FLG=true)とする
+				PaymentMethod cashData = PaymentMethod.from(
+						accountBookUser.getUserId().getValue(),
+						"001",
+						"現金",
+						MyHouseholdAccountBookContent.PAYMENT_METHOD_KUBUN_CASH_SELECTED_VALUE,
+						null,
+						null,
+						"001",
+						true,
+						true);
+				int addCashCount = paymentMethodTableRepository.add(cashData);
+				if(addCashCount != 1) {
+					throw new MyHouseholdAccountBookRuntimeException("支払方法テーブルへの追加件数が不正でした。[add data:" + cashData + "]");
+				}
+
 				// 完了メッセージ
 				response.addMessage("ユーザを追加しました。[ユーザID:" + userInfo.getUserId() + "][ユーザ名:" + userInfo.getUserName() + "]");
 				

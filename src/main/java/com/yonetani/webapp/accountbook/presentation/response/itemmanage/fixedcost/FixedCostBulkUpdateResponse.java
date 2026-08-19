@@ -64,6 +64,8 @@ public class FixedCostBulkUpdateResponse extends AbstractResponse {
 		private final String shiharaiDay;
 		// 現在の支払金額（フォーマット済み）
 		private final String shiharaiKingaku;
+		// 支払方法名（解決済み。表示のみ、一括更新の対象にはしない。5.4.2節）
+		private final String paymentMethodName;
 
 		/**
 		 *<pre>
@@ -75,14 +77,15 @@ public class FixedCostBulkUpdateResponse extends AbstractResponse {
 		 * @param shiharaiTukiOptionalContext 支払月任意詳細
 		 * @param shiharaiDay 現在の支払日（コード変換済み）
 		 * @param shiharaiKingaku 現在の支払金額（フォーマット済み）
+		 * @param paymentMethodName 支払方法名（解決済み）
 		 * @return 一括更新対象の固定費明細情報
 		 *
 		 */
 		public static BulkUpdateTargetItem from(String fixedCostCode, String shiharaiName,
 				String shiharaiTukiDetailContext, String shiharaiTukiOptionalContext,
-				String shiharaiDay, String shiharaiKingaku) {
+				String shiharaiDay, String shiharaiKingaku, String paymentMethodName) {
 			return new BulkUpdateTargetItem(fixedCostCode, shiharaiName,
-					shiharaiTukiDetailContext, shiharaiTukiOptionalContext, shiharaiDay, shiharaiKingaku);
+					shiharaiTukiDetailContext, shiharaiTukiOptionalContext, shiharaiDay, shiharaiKingaku, paymentMethodName);
 		}
 	}
 

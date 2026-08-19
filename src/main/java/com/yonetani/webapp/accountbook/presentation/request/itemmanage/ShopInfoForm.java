@@ -9,6 +9,11 @@
  */
 package com.yonetani.webapp.accountbook.presentation.request.itemmanage;
 
+import org.springframework.util.StringUtils;
+
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
+
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -45,4 +50,24 @@ public class ShopInfoForm {
 	@Min(1)
 	@Max(899)
 	private Integer shopSort;
+	// デフォルト支払方法コード(任意)
+	private String defaultPaymentMethodCode;
+
+	/**
+	 *<pre>
+	 * デフォルト支払方法にシステム予約値が指定されていないかを検証します。
+	 * 任意項目のため、未入力の場合は許容します。
+	 *</pre>
+	 * @return 検証結果
+	 *
+	 */
+	@AssertTrue(message = "デフォルト支払方法にシステム予約値は指定できません。")
+	private boolean isDefaultPaymentMethodCodeValid() {
+		if(!StringUtils.hasLength(defaultPaymentMethodCode)) {
+			return true;
+		}
+		return PaymentMethodCode.tryFrom(defaultPaymentMethodCode)
+				.map(code -> !code.isSystemReserved())
+				.orElse(true);
+	}
 }

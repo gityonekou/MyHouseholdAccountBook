@@ -56,9 +56,11 @@ public class ExpenditureReadWriteDto {
 	private final BigDecimal sisyutuYoteiKingaku;
 	// 支出金額
 	private final BigDecimal sisyutuKingaku;
+	// 支払方法コード
+	private final String paymentMethodCode;
 	// 削除フラグ
 	private final boolean deleteFlg;
-	
+
 	/**
 	 *<pre>
 	 * 支出テーブル情報ドメインモデルをもとにExpenditureReadWriteDtoを生成して返します。
@@ -93,6 +95,8 @@ public class ExpenditureReadWriteDto {
 				domain.getExpectedExpenditureAmount().getValue(),
 				// 支出金額
 				domain.getExpenditureAmount().getValue(),
+				// 支払方法コード
+				domain.getPaymentMethodCode().getValue(),
 				// 削除フラグ
 				domain.getDeleteFlg().getValue());
 	}

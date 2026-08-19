@@ -21,6 +21,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.expenditure.Expenditu
 import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCode;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureName;
 import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpenditureTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
 
@@ -71,6 +72,8 @@ public class AccountMonthInquiryExpenditureList {
 		private final ExpenditureAmount expenditureAmount;
 		// 支出詳細
 		private final ExpenditureDetailContext expenditureDetailContext;
+		// 支払方法コード
+		private final PaymentMethodCode paymentMethodCode;
 
 		/**
 		 *<pre>
@@ -87,7 +90,8 @@ public class AccountMonthInquiryExpenditureList {
 					item.getExpenditureCategory(),
 					item.getPaymentDate(),
 					item.getExpenditureAmount(),
-					item.getExpenditureDetailContext());
+					item.getExpenditureDetailContext(),
+					item.getPaymentMethodCode());
 		}
 	}
 

@@ -322,6 +322,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			"テスト支出", "1", "", null,
 			BigDecimal.valueOf(10000).setScale(2),
 			BigDecimal.valueOf(10000).setScale(2),
+			"001",
 			false);
 		AccountMonthInquiryExpenditureList expenditureList =
 			AccountMonthInquiryExpenditureList.from(

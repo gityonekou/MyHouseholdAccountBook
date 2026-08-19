@@ -48,10 +48,12 @@ public class FixedCostReadWriteDto {
 	private final String fixedCostShiharaiDay;
 	// 支払金額
 	private final BigDecimal shiharaiKingaku;
+	// 支払方法コード
+	private final String paymentMethodCode;
 	// 削除フラグ(論理削除状態にするためのフラグ)
 	// 注意:アプリ側からこの値を直接利用することはありませんSQLで直接値を指定し、検索条件とします
 	private boolean deleteFlg;
-	
+
 	/**
 	 *<pre>
 	 * 引数のパラメータ値をもとにFixedCostReadWriteDtoを生成して返します。
@@ -66,6 +68,7 @@ public class FixedCostReadWriteDto {
 	 * @param fixedCostShiharaiTukiOptionalContext 固定費支払月任意詳細
 	 * @param fixedCostShiharaiDay 固定費支払日(支払日)
 	 * @param shiharaiKingaku 支払金額
+	 * @param paymentMethodCode 支払方法コード
 	 * @return 固定費テーブル:FIXED_COST_TABLE出力情報
 	 *
 	 */
@@ -79,17 +82,19 @@ public class FixedCostReadWriteDto {
 			String fixedCostShiharaiTuki,
 			String fixedCostShiharaiTukiOptionalContext,
 			String fixedCostShiharaiDay,
-			BigDecimal shiharaiKingaku) {
+			BigDecimal shiharaiKingaku,
+			String paymentMethodCode) {
 		return new FixedCostReadWriteDto(
 				userId,
 				fixedCostCode,
 				fixedCostName,
-				fixedCostDetailContext, 
+				fixedCostDetailContext,
 				sisyutuItemCode,
 				fixedCostKubun,
 				fixedCostShiharaiTuki,
 				fixedCostShiharaiTukiOptionalContext,
 				fixedCostShiharaiDay,
-				shiharaiKingaku);
+				shiharaiKingaku,
+				paymentMethodCode);
 	}
 }

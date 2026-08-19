@@ -51,6 +51,7 @@
 									<td th:text="${item.shiharaiName}" class="w20">支払名</td>
 									<td class="w20"><span th:text="${item.shiharaiTuki}">支払月</span>(<span th:text="${item.shiharaiDay}">支払日</span>)</td>
 									<td th:text="${item.shiharaiKingaku}" class="w10" align="right">支払金額</td>
+									<td th:text="${item.paymentMethodName}" class="w10">支払方法</td>
 									<td></td>
 								</tr>
 								</th:block>
@@ -80,10 +81,11 @@
 							<thead>
 								<tr class="table-secondary">
 								<th scope="col" class="w20">支出項目名</th>
-								<th scope="col" class="w25">支払名</th>
+								<th scope="col" class="w20">支払名</th>
 								<th scope="col" class="w10">支払月</th>
 								<th scope="col" class="w10">支払日</th>
 								<th scope="col" class="w10">支払金額</th>
+								<th scope="col" class="w10">支払方法</th>
 								<th scope="col">その他任意詳細</th>
 								</tr>
 							</thead>
@@ -96,6 +98,7 @@
 									<td th:text="${item.shiharaiTuki}">支払月</td>
 									<td th:text="${item.shiharaiDay}">支払日</td>
 									<td th:text="${item.shiharaiKingaku}" align="right">支払金額</td>
+									<td th:text="${item.paymentMethodName}">支払方法</td>
 									<td th:text="${item.optionalContext}">その他任意詳細</td>
 								</tr>
 								</th:block>
@@ -103,15 +106,18 @@
 									<td colspan="4" th:text="${targetMonthLabel} + '合計'">対象月合計ラベル</td>
 									<td th:text="${targetMonthGoukei}" align="right">対象月合計</td>
 									<td></td>
+									<td></td>
 								</tr>
 								<tr>
 									<td colspan="4" th:text="${targetMonthPlus1Label} + '合計'">対象月+1合計ラベル</td>
 									<td th:text="${targetMonthPlus1Goukei}" align="right">対象月+1合計</td>
 									<td></td>
+									<td></td>
 								</tr>
 								<tr class="table-success">
 									<td colspan="4" th:text="${targetMonthPlus2Label} + '合計'">対象月+2合計ラベル</td>
 									<td th:text="${targetMonthPlus2Goukei}" align="right">対象月+2合計</td>
+									<td></td>
 									<td></td>
 								</tr>
 							</tbody>

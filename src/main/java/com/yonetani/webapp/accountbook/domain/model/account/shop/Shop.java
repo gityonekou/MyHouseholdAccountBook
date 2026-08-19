@@ -9,6 +9,9 @@
  */
 package com.yonetani.webapp.accountbook.domain.model.account.shop;
 
+import org.springframework.util.StringUtils;
+
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
@@ -46,7 +49,9 @@ public class Shop {
 	private final ShopName shopName;
 	// 店舗表示順
 	private final ShopSort shopSort;
-	
+	// デフォルト支払方法コード(null許容)
+	private final PaymentMethodCode defaultPaymentMethodCode;
+
 	/**
 	 *<pre>
 	 * 引数の値から店舗テーブル情報を表すドメインモデルを生成して返します。
@@ -56,15 +61,18 @@ public class Shop {
 	 * @param shopKubunCode 店舗区分コード
 	 * @param shopName 店舗名
 	 * @param shopSort 店舗表示順
+	 * @param defaultPaymentMethodCode デフォルト支払方法コード(null許容)
 	 * @return 店舗テーブル情報を表すドメインモデル
 	 *
 	 */
-	public static Shop from(String userId, String shopCode, String shopKubunCode, String shopName, String shopSort) {
+	public static Shop from(String userId, String shopCode, String shopKubunCode, String shopName, String shopSort,
+			String defaultPaymentMethodCode) {
 		return new Shop(
 				UserId.from(userId),
 				ShopCode.from(shopCode),
 				ShopKubunCode.from(shopKubunCode),
 				ShopName.from(shopName),
-				ShopSort.from(shopSort));
+				ShopSort.from(shopSort),
+				StringUtils.hasLength(defaultPaymentMethodCode) ? PaymentMethodCode.from(defaultPaymentMethodCode) : null);
 	}
 }

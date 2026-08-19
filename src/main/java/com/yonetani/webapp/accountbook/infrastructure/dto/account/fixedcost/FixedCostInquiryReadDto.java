@@ -44,4 +44,6 @@ public class FixedCostInquiryReadDto {
 	private final String fixedCostShiharaiDay;
 	// 支払金額
 	private final BigDecimal shiharaiKingaku;
+	// 支払方法コード
+	private final String paymentMethodCode;
 }

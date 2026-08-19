@@ -47,6 +47,7 @@ class AccountMonthInquiryExpenditureListTest {
 				paymentDate,
 				BigDecimal.valueOf(amount).setScale(2),
 				BigDecimal.valueOf(amount).setScale(2),
+				"001",
 				false);
 	}
 

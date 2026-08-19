@@ -26,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ui.ModelMap;
 
+import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent;
 import com.yonetani.webapp.accountbook.application.usecase.common.CodeTableItemComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
@@ -69,7 +70,12 @@ class ShopInfoManageUseCaseUnitTest {
 	// モック:店舗情報取得リポジトリー
 	@Mock
 	private ShopTableRepository shopRepository;
-	
+
+	// モック:支払方法・銀行口座の名称解決、選択肢生成コンポーネント
+	@Mock
+	private PaymentMethodInfoComponent paymentMethodInfoComponent;
+
+
 	// ユーザ情報
 	private final LoginUserInfo TEST_USER = LoginUserInfo.from("TESTUSER001", "テストユーザ01");
 	
@@ -469,8 +475,9 @@ class ShopInfoManageUseCaseUnitTest {
 				"TESTUSER001",
 				form.getShopCode(),
 				form.getShopKubun(),
-				form.getShopName(), 
-				"003"));
+				form.getShopName(),
+				"003",
+				null));
 		// 店舗表示順A～店舗表示順B間の検索処理のモックを設定
 		doReturn(ShopInquiryList.from(shopList)).when(shopRepository).findById(
 				SearchQueryUserIdAndShopSortBetweenAB.from(

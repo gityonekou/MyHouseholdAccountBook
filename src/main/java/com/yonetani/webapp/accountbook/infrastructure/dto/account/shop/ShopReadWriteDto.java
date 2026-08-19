@@ -36,7 +36,9 @@ public class ShopReadWriteDto {
 	private final String shopName;
 	// 店舗表示順
 	private final String shopSort;
-	
+	// デフォルト支払方法コード
+	private final String defaultPaymentMethodCode;
+
 	/**
 	 *<pre>
 	 * 引数のパラメータ値をもとにShopReadWriteDtoを生成して返します。
@@ -46,11 +48,12 @@ public class ShopReadWriteDto {
 	 * @param shopKubunCode 店舗区分コード
 	 * @param shopName 店舗名
 	 * @param shopSort 表示順
+	 * @param defaultPaymentMethodCode デフォルト支払方法コード
 	 * @return 店舗テーブル:SHOP_TABLE出力情報
 	 *
 	 */
-	public static ShopReadWriteDto from(String userId, String shopCode, String shopKubunCode, String shopName, 
-			String shopSort) {
-		return new ShopReadWriteDto(userId, shopCode, shopKubunCode, shopName, shopSort);
+	public static ShopReadWriteDto from(String userId, String shopCode, String shopKubunCode, String shopName,
+			String shopSort, String defaultPaymentMethodCode) {
+		return new ShopReadWriteDto(userId, shopCode, shopKubunCode, shopName, shopSort, defaultPaymentMethodCode);
 	}
 }

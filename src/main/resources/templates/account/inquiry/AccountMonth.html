@@ -187,8 +187,10 @@
 									<thead>
 										<tr class="table-secondary">
 											<th scope="col" class="w20">支出名(区分)</th>
+											<th scope="col" class="w10">支払方法</th>
 											<th scope="col" class="w5">支払日</th>
 											<th scope="col" class="w10" style="vertical-align:middle; text-align:center;">支出金額</th>
+											<th scope="col" class="w10">引落先口座</th>
 											<th scope="col" class="w5">&emsp;</th>
 											<th scope="col">支出詳細</th>
 										</tr>
@@ -197,8 +199,10 @@
 										<th:block th:each="item, iterStat : ${expenditureList}">
 											<tr th:class="${iterStat.odd} ? 'table-warning' : ''">
 												<td class="w20" th:text="${item.displayName}">支出名(区分)</td>
+												<td class="w10" th:text="${item.paymentMethodName}">支払方法</td>
 												<td class="w5" th:text="${item.paymentDay}">支払日</td>
 												<td class="w10" align="right" th:text="${item.expenditureAmount}">支出金額</td>
+												<td class="w10" th:text="${item.bankAccountName}">引落先口座</td>
 												<td class="w5" align="center">
 													<form method="post"
 															th:action="@{/myhacbook/accountinquiry/accountmonth/dispatchaction/}">

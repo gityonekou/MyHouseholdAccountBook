@@ -79,7 +79,9 @@ public abstract class AbstractFixedCostItemListResponse extends AbstractExpendit
 		private final String shiharaiKingaku;
 		// その他任意詳細
 		private final String optionalContext;
-		
+		// 支払方法名（解決済み）
+		private final String paymentMethodName;
+
 		/**
 		 *<pre>
 		 * 引数の値から固定費一覧情報の明細データを生成して返します。
@@ -91,13 +93,15 @@ public abstract class AbstractFixedCostItemListResponse extends AbstractExpendit
 		 * @param shiharaiDay 支払日
 		 * @param shiharaiKingaku 支払金額
 		 * @param optionalContext その他任意詳細
+		 * @param paymentMethodName 支払方法名（解決済み）
 		 * @return 固定費一覧情報の明細データ
 		 *
 		 */
 		public static FixedCostItem from(String fixedCostCode, String sisyutuItemName, String shiharaiName,
-				String shiharaiTuki, String shiharaiDay, String shiharaiKingaku, String optionalContext) {
+				String shiharaiTuki, String shiharaiDay, String shiharaiKingaku, String optionalContext,
+				String paymentMethodName) {
 			return new FixedCostItem(fixedCostCode, sisyutuItemName, shiharaiName,
-					shiharaiTuki, shiharaiDay, shiharaiKingaku, optionalContext);
+					shiharaiTuki, shiharaiDay, shiharaiKingaku, optionalContext, paymentMethodName);
 		}
 	}
 	

@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent;
 import com.yonetani.webapp.accountbook.application.usecase.common.CodeTableItemComponent;
 import com.yonetani.webapp.accountbook.application.usecase.common.ExpenditureItemInfoComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
@@ -69,6 +70,8 @@ public class ExpenditureRegistUseCase {
 	private final IncomeAndExpenditureRegistListComponent registListComponent;
 	// イベントテーブル:EVENT_ITEM_TABLEリポジトリー
 	private final EventItemTableRepository eventRepository;
+	// 支払方法情報取得コンポーネント
+	private final PaymentMethodInfoComponent paymentMethodInfoComponent;
 
 	/**
 	 *<pre>
@@ -124,6 +127,8 @@ public class ExpenditureRegistUseCase {
 				expenditureItemForm.setExpenditureKingaku(DomainCommonUtils.convertInteger(session.getExpenditureKingaku()));
 				// 支払金額の0円開始設定フラグ
 				expenditureItemForm.setClearStartFlg(session.isClearStartFlg());
+				// 支払方法コード
+				expenditureItemForm.setPaymentMethodCode(session.getPaymentMethodCode());
 				// hitしたのでループを抜ける
 				break;
 			}
@@ -134,7 +139,7 @@ public class ExpenditureRegistUseCase {
 		}
 
 		// レスポンスを生成
-		IncomeAndExpenditureRegistResponse response = createExpenditureItemFormResponse(targetYearMonth, expenditureItemForm);
+		IncomeAndExpenditureRegistResponse response = createExpenditureItemFormResponse(userId, targetYearMonth, expenditureItemForm);
 
 		// セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を設定
 		registListComponent.setIncomeAndExpenditureInfoList(userId, incomeRegistItemList, expenditureRegistItemList, response);
@@ -160,7 +165,7 @@ public class ExpenditureRegistUseCase {
 		log.debug("readExpenditureUpdateBindingErrorSetInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",inputForm=" + inputForm);
 
 		// レスポンスを生成
-		IncomeAndExpenditureRegistResponse response = createExpenditureItemFormResponse(targetYearMonth, inputForm);
+		IncomeAndExpenditureRegistResponse response = createExpenditureItemFormResponse(UserId.from(user.getUserId()), targetYearMonth, inputForm);
 
 		// セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を設定
 		registListComponent.setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
@@ -327,7 +332,9 @@ public class ExpenditureRegistUseCase {
 							// 支払金額
 							session.getExpenditureKingaku(),
 							// 支払金額の0円開始設定フラグ
-							session.isClearStartFlg()));
+							session.isClearStartFlg(),
+							// 支払方法コード
+							session.getPaymentMethodCode()));
 				}
 
 				deleteFlg = true;
@@ -406,7 +413,7 @@ public class ExpenditureRegistUseCase {
 		expenditureItemForm.setClearStartFlg(false);
 
 		// レスポンスを生成
-		IncomeAndExpenditureRegistResponse response = createExpenditureItemFormResponse(targetYearMonth, expenditureItemForm);
+		IncomeAndExpenditureRegistResponse response = createExpenditureItemFormResponse(userId, targetYearMonth, expenditureItemForm);
 
 		// セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を設定
 		registListComponent.setIncomeAndExpenditureInfoList(userId, incomeRegistItemList, expenditureRegistItemList, response);
@@ -418,12 +425,13 @@ public class ExpenditureRegistUseCase {
 	 *<pre>
 	 * 支出情報入力フォームを指定して収支登録画面の表示情報を生成します。
 	 *</pre>
+	 * @param userId ユーザID
 	 * @param targetYearMonth 収支を新規登録する対象年月の値
 	 * @param expenditureItemForm 支出情報入力フォームデータ
 	 * @return 収支登録画面の表示情報
 	 *
 	 */
-	private IncomeAndExpenditureRegistResponse createExpenditureItemFormResponse(String targetYearMonth, ExpenditureItemForm expenditureItemForm) {
+	private IncomeAndExpenditureRegistResponse createExpenditureItemFormResponse(UserId userId, String targetYearMonth, ExpenditureItemForm expenditureItemForm) {
 
 		// コードテーブル情報から支出区分選択ボックスの表示情報を取得し、リストに設定
 		List<CodeAndValuePair> expenditureKubunList = codeTableItem.getCodeValues(MyHouseholdAccountBookContent.CODE_DEFINES_EXPENDITURE_KUBUN);
@@ -440,7 +448,9 @@ public class ExpenditureRegistUseCase {
 				expenditureItemForm,
 				// 収入区分選択ボックスの表示情報リストはデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定
 				expenditureKubunList.stream().map(pair ->
-					OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList()));
+					OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList()),
+				// 支払方法選択ボックスの表示情報リスト(findSelectableByUserId()ベース。システム予約値は含まない)
+				paymentMethodInfoComponent.getPaymentMethodOptions(userId));
 
 		return response;
 	}
@@ -478,7 +488,9 @@ public class ExpenditureRegistUseCase {
 				// 支払金額
 				DomainCommonUtils.convertKingakuBigDecimal(inputForm.getExpenditureKingaku()),
 				// 支払金額の0円開始設定フラグ
-				inputForm.isClearStartFlg());
+				inputForm.isClearStartFlg(),
+				// 支払方法コード
+				inputForm.getPaymentMethodCode());
 	}
 
 	/**

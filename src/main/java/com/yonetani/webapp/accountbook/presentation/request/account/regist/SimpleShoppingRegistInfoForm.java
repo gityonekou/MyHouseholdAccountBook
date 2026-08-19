@@ -16,6 +16,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.StringUtils;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Max;
@@ -54,7 +55,10 @@ public class SimpleShoppingRegistInfoForm {
 	@NotNull
 	@DateTimeFormat(pattern = "yyyy/MM/dd")
 	private LocalDate shoppingDate;
-	
+	// 支払方法コード
+	@NotBlank
+	private String paymentMethodCode;
+
 	// 食料品(必須)
 	@Min(value = 0, message = "食料品(必須)の入力値がマイナスです。0円以上の値を入力してください。")
 	private Integer shoppingFoodExpenses;
@@ -220,5 +224,21 @@ public class SimpleShoppingRegistInfoForm {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * 支払方法コードにシステム予約値が指定されていないかどうか
+	 * (tryFrom()により、不正な形式値でも例外が伝播せず500エラーにならない。突合レビュー指摘AA反映)
+	 *
+	 * @return システム予約値でない場合:true、システム予約値の場合はfalse
+	 */
+	@AssertTrue(message = "支払方法にシステム予約値は指定できません。")
+	private boolean isPaymentMethodCodeValid() {
+		if (!StringUtils.hasLength(paymentMethodCode)) {
+			return true; // 未入力は@NotBlank側で検出
+		}
+		return PaymentMethodCode.tryFrom(paymentMethodCode)
+				.map(code -> !code.isSystemReserved())
+				.orElse(true);
 	}
 }

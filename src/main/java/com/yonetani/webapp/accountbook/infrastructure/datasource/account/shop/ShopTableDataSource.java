@@ -207,7 +207,9 @@ public class ShopTableDataSource implements ShopTableRepository {
 				// 店舗名
 				dto.getShopName(),
 				// 店舗表示順
-				dto.getShopSort());
+				dto.getShopSort(),
+				// デフォルト支払方法コード
+				dto.getDefaultPaymentMethodCode());
 	}
 	
 	/**
@@ -229,6 +231,8 @@ public class ShopTableDataSource implements ShopTableRepository {
 				// 店舗名
 				data.getShopName().getValue(),
 				// 店舗表示順
-				data.getShopSort().getValue());
+				data.getShopSort().getValue(),
+				// デフォルト支払方法コード
+				data.getDefaultPaymentMethodCode() == null ? null : data.getDefaultPaymentMethodCode().getValue());
 	}
 }

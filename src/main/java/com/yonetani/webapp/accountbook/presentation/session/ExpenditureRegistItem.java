@@ -59,7 +59,9 @@ public class ExpenditureRegistItem implements Serializable {
 	private final BigDecimal expenditureKingaku;
 	// 0円開始設定フラグ
 	private final boolean clearStartFlg;
-	
+	// 支払方法コード
+	private final String paymentMethodCode;
+
 	/**
 	 *<pre>
 	 * 引数の値からセッションに設定する支出登録情報を生成して返します。
@@ -75,6 +77,7 @@ public class ExpenditureRegistItem implements Serializable {
 	 * @param siharaiDate 支払日(DD)
 	 * @param expenditureKingaku 支払金額
 	 * @param clearStartFlg 支払金額の0円開始設定フラグ
+	 * @param paymentMethodCode 支払方法コード
 	 * @return　支出登録情報
 	 *
 	 */
@@ -89,8 +92,10 @@ public class ExpenditureRegistItem implements Serializable {
 			String expenditureDetailContext,
 			String siharaiDate,
 			BigDecimal expenditureKingaku,
-			boolean clearStartFlg) {
-		return new ExpenditureRegistItem(dataType, action, expenditureCode, expenditureItemCode, eventCode, expenditureName, 
-				expenditureCategory, expenditureDetailContext, siharaiDate, expenditureKingaku.setScale(2), clearStartFlg);
+			boolean clearStartFlg,
+			String paymentMethodCode) {
+		return new ExpenditureRegistItem(dataType, action, expenditureCode, expenditureItemCode, eventCode, expenditureName,
+				expenditureCategory, expenditureDetailContext, siharaiDate, expenditureKingaku.setScale(2), clearStartFlg,
+				paymentMethodCode);
 	}
 }

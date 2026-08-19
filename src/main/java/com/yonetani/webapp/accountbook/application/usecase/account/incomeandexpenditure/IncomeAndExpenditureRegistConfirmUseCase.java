@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import com.yonetani.webapp.accountbook.application.usecase.account.component.ShoppingRegistExpenditureItemComponent;
 import com.yonetani.webapp.accountbook.application.usecase.account.component.ExpenditureAmountItemHolderComponent;
+import com.yonetani.webapp.accountbook.application.usecase.account.component.ShoppingRegistExpenditureItemComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureAmountItemHolder;
@@ -179,7 +179,9 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 		}
 		// ⑤ 収入情報、支出情報更新ありの場合、収支テーブルを更新しメッセージを設定
 		updateIncomeAndExpenditureAndSetMessage(userId, targetYearMonth, initFlg, incomeResult, expenditureResult, response);
-
+		// ⑥ 登録した収支の整合性をチェック(各月の収支照会画面でもチェックを行うが、トランザクションコミット前でもチェックを行い、問題があればロールバックする)
+		
+		// ⑦ トランザクション完了
 		response.setTransactionSuccessFull();
 
 		return response;

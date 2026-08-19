@@ -28,24 +28,24 @@
 --
 -- ========================================
 
-INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, SISYUTU_ITEM_CODE, FIXED_COST_KUBUN, FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT, FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU, DELETE_FLG)
+INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, SISYUTU_ITEM_CODE, FIXED_COST_KUBUN, FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT, FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU, PAYMENT_METHOD_CODE, DELETE_FLG)
 	VALUES
 -- 【必須データ】飲食(無駄遣いなし) - SISYUTU_ITEM_CODE='0051', 支出区分='1'
- ('user01', '0001', '飲食(無駄遣いなし)', '月毎の飲食(無駄遣いなし)予定金額', '0051', '2', '00', null, '40', 45600.00, false),
+ ('user01', '0001', '飲食(無駄遣いなし)', '月毎の飲食(無駄遣いなし)予定金額', '0051', '2', '00', null, '40', 45600.00, '001', false),
 -- 【必須データ】飲食(無駄遣いB) - SISYUTU_ITEM_CODE='0051', 支出区分='2'
- ('user01', '0002', '飲食(無駄遣いB)', '月毎の飲食(無駄遣いB)予定金額', '0051', '2', '00', null, '40', 12300.00, false),
+ ('user01', '0002', '飲食(無駄遣いB)', '月毎の飲食(無駄遣いB)予定金額', '0051', '2', '00', null, '40', 12300.00, '001', false),
 -- 【必須データ】飲食(無駄遣いC) - SISYUTU_ITEM_CODE='0051', 支出区分='3'
- ('user01', '0003', '飲食(無駄遣いC)', '月毎の飲食(無駄遣いC)予定金額', '0051', '2', '00', null, '40', 6500.00, false),
+ ('user01', '0003', '飲食(無駄遣いC)', '月毎の飲食(無駄遣いC)予定金額', '0051', '2', '00', null, '40', 6500.00, '001', false),
 -- 【必須データ】一人プチ贅沢・外食(無駄遣いなし) - SISYUTU_ITEM_CODE='0052', 支出区分='1'
- ('user01', '0004', '外食', '月毎の外食予定金額', '0052', '2', '00', null, '40', 1500.00, false),
+ ('user01', '0004', '外食', '月毎の外食予定金額', '0052', '2', '00', null, '40', 1500.00, '001', false),
 -- 【必須データ】日用消耗品(無駄遣いなし) - SISYUTU_ITEM_CODE='0050', 支出区分='1'
- ('user01', '0005', '日用消耗品', '月毎の日用消耗品予定金額', '0050', '2', '00', null, '40', 3500.00, false),
+ ('user01', '0005', '日用消耗品', '月毎の日用消耗品予定金額', '0050', '2', '00', null, '40', 3500.00, '001', false),
 -- 【必須データ】被服費(無駄遣いなし) - SISYUTU_ITEM_CODE='0046', 支出区分='1'
- ('user01', '0006', '被服費', '月毎の被服費予定金額', '0046', '2', '00', null, '40', 11000.00, false),
+ ('user01', '0006', '被服費', '月毎の被服費予定金額', '0046', '2', '00', null, '40', 11000.00, '001', false),
 -- 【必須データ】仕事(流動経費)(無駄遣いなし) - SISYUTU_ITEM_CODE='0007', 支出区分='1'
- ('user01', '0007', '事業流動経費', '月毎の事業流動経費予定金額', '0007', '2', '00', null, '40', 1200.00, false),
+ ('user01', '0007', '事業流動経費', '月毎の事業流動経費予定金額', '0007', '2', '00', null, '40', 1200.00, '001', false),
 -- 【必須データ】住居設備(無駄遣いなし) - SISYUTU_ITEM_CODE='0047', 支出区分='1'
- ('user01', '0008', '住居設備', '月毎の住居設備予定金額', '0047', '2', '00', null, '40', 6700.00, false);
+ ('user01', '0008', '住居設備', '月毎の住居設備予定金額', '0047', '2', '00', null, '40', 6700.00, '001', false);
 
 -- ========================================
 -- テストデータ作成完了

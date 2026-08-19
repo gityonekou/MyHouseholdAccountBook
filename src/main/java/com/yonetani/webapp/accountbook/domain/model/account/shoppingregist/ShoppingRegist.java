@@ -10,6 +10,7 @@
  */
 package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
 
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesExpenses;
@@ -77,7 +78,9 @@ public class ShoppingRegist {
 	private final ShoppingDate shoppingDate;
 	// 備考
 	private final ShoppingRemarks shoppingRemarks;
-	
+	// 支払方法コード
+	private final PaymentMethodCode paymentMethodCode;
+
 	// 登録データ(金額)
 	// 食料品(必須)金額
 	private final ShoppingFoodExpenditureAmount shoppingFoodExpenditureAmount;
@@ -131,6 +134,7 @@ public class ShoppingRegist {
 	 * @param shopCode 店舗コード
 	 * @param shoppingDate 買い物日
 	 * @param shoppingRemarks 備考
+	 * @param paymentMethodCode 支払方法コード
 	 * @param shoppingFoodExpenditureAmount 食料品(必須)金額
 	 * @param shoppingFoodTaxExpenses 消費税:食料品(必須)金額
 	 * @param shoppingFoodBExpenses 食料品B(無駄遣い)金額
@@ -162,6 +166,7 @@ public class ShoppingRegist {
 			ShopCode shopCode,
 			ShoppingDate shoppingDate,
 			ShoppingRemarks shoppingRemarks,
+			PaymentMethodCode paymentMethodCode,
 			ShoppingFoodExpenditureAmount shoppingFoodExpenditureAmount,
 			ShoppingFoodTaxExpenses shoppingFoodTaxExpenses,
 			ShoppingFoodBExpenses shoppingFoodBExpenses,
@@ -191,6 +196,7 @@ public class ShoppingRegist {
 				shopCode,
 				shoppingDate,
 				shoppingRemarks,
+				paymentMethodCode,
 				shoppingFoodExpenditureAmount,
 				shoppingFoodTaxExpenses,
 				shoppingFoodBExpenses,
@@ -242,6 +248,8 @@ public class ShoppingRegist {
 				ShoppingDate.from(inputForm.getShoppingDate(), targetYearMonth),
 				// 備考
 				ShoppingRemarks.from(inputForm.getShoppingRemarks()),
+				// 支払方法コード
+				PaymentMethodCode.from(inputForm.getPaymentMethodCode()),
 				// 食料品(必須)金額
 				ShoppingFoodExpenditureAmount.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingFoodExpenses())),
 				// 消費税:食料品(必須)金額

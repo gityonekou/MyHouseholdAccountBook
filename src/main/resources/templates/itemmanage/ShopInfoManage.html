@@ -43,6 +43,13 @@
  					<p class="invalid-feedback" th:errors="*{shopSort}"></p>
 				</div>
 				<div class="mb-3">
+					<label for="defaultPaymentMethodCode" class="form-label">デフォルト支払方法</label>
+					<select class="form-select w20" th:errorclass="is-invalid" th:field="*{defaultPaymentMethodCode}">
+						<option th:each="item : ${defaultPaymentMethod.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+					</select>
+					<p class="invalid-feedback" th:errors="*{defaultPaymentMethodCode}"></p>
+				</div>
+				<div class="mb-3">
 					<button class="btn btn-primary" type="submit">登録</button>
 					<input type="hidden" th:field="*{action}" />
 					<input type="hidden" th:field="*{shopCode}" />
@@ -53,9 +60,9 @@
 			
 			<!-- お店一覧表示エリア -->
 			<div class="list-group">
-				<a class="list-group-item list-group-item-secondary">表示順&emsp;店名&emsp;：店舗区分&emsp;&emsp;※更新する場合は対象行をクリックしてください</a>
-				<a th:each="shopItem : ${shopList}" th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload(shopCode=${shopItem.shopCode})}" class="list-group-item list-group-item-action"><span th:text="${shopItem.shopSort}"></span>&emsp;<span th:text="${shopItem.shopName}"></span>&emsp;：<span th:text="${shopItem.shopKubunName}"></span></a>
-				<a th:each="nonEditShopItem : ${nonEditShopList}" class="list-group-item list-group-item-secondary"><span th:text="${nonEditShopItem.shopSort}"></span>&emsp;<span th:text="${nonEditShopItem.shopName}"></span>&emsp;※変更できません</a>
+				<a class="list-group-item list-group-item-secondary">表示順&emsp;店名&emsp;：店舗区分&emsp;：デフォルト支払方法&emsp;&emsp;※更新する場合は対象行をクリックしてください</a>
+				<a th:each="shopItem : ${shopList}" th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload(shopCode=${shopItem.shopCode})}" class="list-group-item list-group-item-action"><span th:text="${shopItem.shopSort}"></span>&emsp;<span th:text="${shopItem.shopName}"></span>&emsp;：<span th:text="${shopItem.shopKubunName}"></span>&emsp;：<span th:text="${shopItem.defaultPaymentMethodName}"></span></a>
+				<a th:each="nonEditShopItem : ${nonEditShopList}" class="list-group-item list-group-item-secondary"><span th:text="${nonEditShopItem.shopSort}"></span>&emsp;<span th:text="${nonEditShopItem.shopName}"></span>&emsp;：<span th:text="${nonEditShopItem.defaultPaymentMethodName}"></span>&emsp;※変更できません</a>
 			</div>
 		</div>
 	</div>

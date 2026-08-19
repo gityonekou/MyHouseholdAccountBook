@@ -20,6 +20,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.expenditure.Expenditu
 import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureName;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
 import com.yonetani.webapp.accountbook.domain.type.common.DeleteFlg;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
@@ -75,9 +76,11 @@ public class ExpenditureItem {
 	private final ExpectedExpenditureAmount expectedExpenditureAmount;
 	// 支出金額
 	private final ExpenditureAmount expenditureAmount;
+	// 支払方法コード
+	private final PaymentMethodCode paymentMethodCode;
 	// 削除フラグ
 	private final DeleteFlg deleteFlg;
-	
+
 	/**
 	 *<pre>
 	 * 引数の値から支出テーブル情報を表すドメインモデルを生成して返します。
@@ -94,6 +97,7 @@ public class ExpenditureItem {
 	 * @param paymentDate 支払日
 	 * @param expectedExpenditureAmount 支出予定金額
 	 * @param expenditureAmount 支出金額
+	 * @param paymentMethodCode 支払方法コード
 	 * @param deleteFlg 削除フラグ
 	 * @return 支出テーブル情報を表すドメインモデル
 	 *
@@ -111,8 +115,9 @@ public class ExpenditureItem {
 			LocalDate paymentDate,
 			BigDecimal expectedExpenditureAmount,
 			BigDecimal expenditureAmount,
+			String paymentMethodCode,
 			boolean deleteFlg) {
-		
+
 		// 支出テーブル情報を表すドメインモデルを生成して返却
 		return new ExpenditureItem(
 				UserId.from(userId),
@@ -127,8 +132,9 @@ public class ExpenditureItem {
 				PaymentDate.from(paymentDate),
 				ExpectedExpenditureAmount.from(expectedExpenditureAmount),
 				ExpenditureAmount.from(expenditureAmount),
+				PaymentMethodCode.from(paymentMethodCode),
 				DeleteFlg.from(deleteFlg));
-		
+
 	}
 	
 	/**
@@ -177,6 +183,8 @@ public class ExpenditureItem {
 				expectedExpenditureAmount,
 				// 支出金額
 				sisyutuKingaku,
+				// 支払方法コード
+				expenditureData.getPaymentMethodCode(),
 				// 削除フラグ
 				false);
 	}
@@ -216,9 +224,11 @@ public class ExpenditureItem {
 				expectedExpenditureAmount.getValue(),
 				// 支出金額
 				expenditureAmount.add(addValue).getValue(),
+				// 支払方法コード(金額調整では変更しない。現在値のままコピー)
+				paymentMethodCode.getValue(),
 				// 削除フラグ
 				deleteFlg.getValue());
-		
+
 	}
 	
 	/**
@@ -256,6 +266,8 @@ public class ExpenditureItem {
 				expectedExpenditureAmount.getValue(),
 				// 支出金額
 				expenditureAmount.subtract(subtractValue).getValue(),
+				// 支払方法コード(金額調整では変更しない。現在値のままコピー)
+				paymentMethodCode.getValue(),
 				// 削除フラグ
 				deleteFlg.getValue());
 		

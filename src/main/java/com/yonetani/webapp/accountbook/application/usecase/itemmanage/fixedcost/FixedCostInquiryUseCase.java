@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent;
+import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent.PaymentMethodNameResolver;
 import com.yonetani.webapp.accountbook.application.usecase.common.CodeTableItemComponent;
 import com.yonetani.webapp.accountbook.application.usecase.common.ExpenditureItemInfoComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
@@ -90,7 +92,9 @@ public class FixedCostInquiryUseCase {
 	private final FixedCostTableRepository fixedCostRepository;
 	// 家計簿ユーザーリポジトリー
 	private final AccountBookUserRepository accountBookUserRepository;
-	
+	// 支払方法情報取得コンポーネント
+	private final PaymentMethodInfoComponent paymentMethodInfoComponent;
+
 	/**
 	 *<pre>
 	 * 情報管理(固定費)初期表示画面情報取得(デフォルト時)
@@ -154,6 +158,8 @@ public class FixedCostInquiryUseCase {
 			shiharaiTukiDetailContext += "(" + searchResult.getFixedCostTargetPaymentMonthOptionalContext().getValue() + ")";
 		}
 		/* 固定費支払日区分、固定費支払日の値をもとに支払日詳細を設定 */
+		// 支払方法名の解決リゾルバを1回だけ生成(N+1回避。突合レビュー指摘④)
+		PaymentMethodNameResolver resolver = paymentMethodInfoComponent.createResolver(userId);
 		/* レスポンスの生成 */
 		// 固定費情報をもとにレスポンスを生成
 		FixedCostInfoManageActSelectResponse response = FixedCostInfoManageActSelectResponse.getInstance(
@@ -175,10 +181,12 @@ public class FixedCostInquiryUseCase {
 								// 固定費支払月
 								searchResult.getFixedCostPaymentDay().getValue()),
 						// 支払金額
-						searchResult.getFixedCostPaymentAmount().toFormatString()));
+						searchResult.getFixedCostPaymentAmount().toFormatString(),
+						// 支払方法名
+						resolver.getPaymentMethodName(searchResult.getPaymentMethodCode())));
 		// 固定費一覧をレスポンスに設定
 		setFixedCostItemList(userId, response);
-		
+
 		/* 選択固定費の支出項目コードで同一支出項目に属する固定費情報を取得 */
 		// 選択固定費の支出項目コードで同一支出項目に属する固定費の件数を取得
 		int siblingCount = fixedCostRepository.countByExpenditureItemCode(
@@ -187,7 +195,7 @@ public class FixedCostInquiryUseCase {
 		if (siblingCount >= 2) {
 			FixedCostInquiryList siblingList = fixedCostRepository.findByExpenditureItemCode(
 					SearchQueryUserIdAndExpenditureItemCode.from(userId, searchResult.getExpenditureItemCode()));
-			response.addSiblingFixedCostItemList(createSiblingFixedCostItemList(siblingList));
+			response.addSiblingFixedCostItemList(createSiblingFixedCostItemList(siblingList, resolver));
 		}
 
 		return response;
@@ -260,7 +268,7 @@ public class FixedCostInquiryUseCase {
 			response.addMessage("既に登録済みの支出項目の固定費一覧が0件でした。");
 		} else {
 			// 登録済みの固定費一覧情報をレスポンスに設定
-			response.addRegisteredFixedCostInfoList(createFixedCostItemList(searchResult));
+			response.addRegisteredFixedCostInfoList(createFixedCostItemList(searchResult, paymentMethodInfoComponent.createResolver(userId)));
 		}
 		
 		return response;
@@ -344,6 +352,8 @@ public class FixedCostInquiryUseCase {
 		updateForm.setShiharaiDay(searchResult.getFixedCostPaymentDay().getValue());
 		// 支払金額
 		updateForm.setShiharaiKingaku(searchResult.getFixedCostPaymentAmount().toIntegerValue());
+		// 支払方法コード
+		updateForm.setPaymentMethodCode(searchResult.getPaymentMethodCode().getValue());
 		// 支払い月選択ボックス、支出項目名をレスポンスに設定し返却
 		return getUpdateResponse(userId, updateForm);
 	}
@@ -479,8 +489,8 @@ public class FixedCostInquiryUseCase {
 					SearchQueryUserId.from(userId));
 			TargetYearMonth ym1 = targetYearMonth.plusMonths(1);
 			TargetYearMonth ym2 = targetYearMonth.plusMonths(2);
-			// 固定費一覧情報をレスポンスに設定
-			response.addFixedCostItemList(createFixedCostItemList(searchResult));
+			// 固定費一覧情報をレスポンスに設定(支払方法名の解決リゾルバは1回だけ生成)
+			response.addFixedCostItemList(createFixedCostItemList(searchResult, paymentMethodInfoComponent.createResolver(userId)));
 			// 対象月ラベルを設定
 			response.setTargetMonthLabel(targetYearMonth.toDisplayLabel());
 			// 対象月+1ラベルを設定
@@ -535,14 +545,16 @@ public class FixedCostInquiryUseCase {
 				// 固定費情報入力フォーム
 				inputForm,
 				// 固定費区分の表示情報リスト(初期選択は「支払い金額確定」なので、不変リストを設定)
-				fixedCostKubunList.stream().map(pair -> 
+				fixedCostKubunList.stream().map(pair ->
 					OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toUnmodifiableList()),
 				// 支払月選択ボックスの表示情報リストはデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定
 				shiharaiTukiList.stream().map(pair ->
 					OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList()),
 				// 支払日選択ボックスの表示情報リストはデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定
 				shiharaiDayList.stream().map(pair ->
-					OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList()));
+					OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList()),
+				// 支払方法選択ボックスの表示情報リスト(findEnabledByUserId()ベース。「支払方法がない」を含む)
+				paymentMethodInfoComponent.getFixedCostPaymentMethodOptions(userId));
 		
 		// 支出項目名(＞で区切った値)を取得しレスポンスに設定
 		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, ExpenditureItemCode.from(inputForm.getSisyutuItemCode())));
@@ -556,10 +568,11 @@ public class FixedCostInquiryUseCase {
 	 * 引数の固定費一覧情報(ドメイン)から画面表示する固定費一覧明細情報のリストを生成して返します。
 	 *</pre>
 	 * @param searchResult 固定費一覧情報(ドメイン)
+	 * @param resolver 支払方法名の解決リゾルバ(呼び出し元で1回だけ生成済み)
 	 * @return 画面表示する固定費一覧明細情報のリスト
 	 *
 	 */
-	private List<FixedCostItem> createFixedCostItemList(FixedCostInquiryList searchResult) {
+	private List<FixedCostItem> createFixedCostItemList(FixedCostInquiryList searchResult, PaymentMethodNameResolver resolver) {
 		return searchResult.getValues().stream().map(domain ->
 			AbstractFixedCostItemListResponse.FixedCostItem.from(
 				// 固定費コード
@@ -583,7 +596,9 @@ public class FixedCostInquiryUseCase {
 				// 支払金額
 				domain.getFixedCostPaymentAmount().toFormatString(),
 				// その他任意詳細：固定費支払月任意詳細
-				domain.getFixedCostTargetPaymentMonthOptionalContext().getValue())
+				domain.getFixedCostTargetPaymentMonthOptionalContext().getValue(),
+				// 支払方法名
+				resolver.getPaymentMethodName(domain.getPaymentMethodCode()))
 		).collect(Collectors.toUnmodifiableList());
 	}
 
@@ -623,7 +638,7 @@ public class FixedCostInquiryUseCase {
 		// 同一支出項目の全固定費一覧を取得して設定
 		FixedCostInquiryList siblingList = fixedCostRepository.findByExpenditureItemCode(
 				SearchQueryUserIdAndExpenditureItemCode.from(userId, expenditureItemCode));
-		response.addBulkUpdateTargetList(createBulkUpdateTargetList(siblingList));
+		response.addBulkUpdateTargetList(createBulkUpdateTargetList(siblingList, paymentMethodInfoComponent.createResolver(userId)));
 
 		return response;
 	}
@@ -633,10 +648,11 @@ public class FixedCostInquiryUseCase {
 	 * 引数の固定費一覧情報(ドメイン)から兄弟固定費明細情報のリストを生成して返します。
 	 *</pre>
 	 * @param searchResult 固定費一覧情報(ドメイン)
+	 * @param resolver 支払方法名の解決リゾルバ(呼び出し元で1回だけ生成済み)
 	 * @return 兄弟固定費明細情報のリスト
 	 *
 	 */
-	private List<SiblingFixedCostItem> createSiblingFixedCostItemList(FixedCostInquiryList searchResult) {
+	private List<SiblingFixedCostItem> createSiblingFixedCostItemList(FixedCostInquiryList searchResult, PaymentMethodNameResolver resolver) {
 		// 兄弟固定費明細情報のリストを生成して返却
 		return searchResult.getValues().stream().map(domain -> {
 			// 支払月任意詳細の値は固定費支払月の値の値に応じて以下値を設定
@@ -664,7 +680,9 @@ public class FixedCostInquiryUseCase {
 							MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_DAY,
 							domain.getFixedCostPaymentDay().getValue()),
 					// 支払金額：固定費支払金額の値をフォーマットして設定
-					domain.getFixedCostPaymentAmount().toFormatString());
+					domain.getFixedCostPaymentAmount().toFormatString(),
+					// 支払方法名
+					resolver.getPaymentMethodName(domain.getPaymentMethodCode()));
 		}).collect(Collectors.toUnmodifiableList());
 	}
 
@@ -673,10 +691,11 @@ public class FixedCostInquiryUseCase {
 	 * 引数の固定費一覧情報(ドメイン)から一括更新対象固定費明細情報のリストを生成して返します。
 	 *</pre>
 	 * @param searchResult 固定費一覧情報(ドメイン)
+	 * @param resolver 支払方法名の解決リゾルバ(呼び出し元で1回だけ生成済み)
 	 * @return 一括更新対象固定費明細情報のリスト
 	 *
 	 */
-	private List<BulkUpdateTargetItem> createBulkUpdateTargetList(FixedCostInquiryList searchResult) {
+	private List<BulkUpdateTargetItem> createBulkUpdateTargetList(FixedCostInquiryList searchResult, PaymentMethodNameResolver resolver) {
 		// 一括更新対象固定費明細情報のリストを生成して返却
 		return searchResult.getValues().stream().map(domain -> {
 			// 支払月任意詳細の値は固定費支払月の値の値に応じて以下値を設定
@@ -704,7 +723,9 @@ public class FixedCostInquiryUseCase {
 							MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_DAY,
 							domain.getFixedCostPaymentDay().getValue()),
 					// 支払金額：固定費支払金額の値をフォーマットして設定
-					domain.getFixedCostPaymentAmount().toFormatString());
+					domain.getFixedCostPaymentAmount().toFormatString(),
+					// 支払方法名
+					resolver.getPaymentMethodName(domain.getPaymentMethodCode()));
 		}).collect(Collectors.toUnmodifiableList());
 	}
 }

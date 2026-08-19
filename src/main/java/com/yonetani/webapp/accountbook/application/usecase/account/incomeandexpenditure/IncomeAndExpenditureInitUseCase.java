@@ -182,7 +182,9 @@ public class IncomeAndExpenditureInitUseCase {
 							// 支払金額
 							domain.getFixedCostPaymentAmount().getValue(),
 							// 支払金額の0円開始設定フラグ
-							domain.getFixedCostKubun().isClearStart()
+							domain.getFixedCostKubun().isClearStart(),
+							// 支払方法コード(固定費から引き継ぐ。買い物集計8項目はここで「支払方法がない」が伝播する)
+							domain.getPaymentMethodCode().getValue()
 						)).collect(Collectors.toList());
 
 			// レスポンスにセッションの支出登録情報を設定
@@ -285,7 +287,9 @@ public class IncomeAndExpenditureInitUseCase {
 						// 支払金額
 						domain.getExpenditureAmount().getValue(),
 						// 支払金額の0円開始設定フラグ
-						false)
+						false,
+						// 支払方法コード
+						domain.getPaymentMethodCode().getValue())
 				).collect(Collectors.toList());
 		// レスポンスにセッションの支出登録情報を設定
 		response.setExpenditureRegistItemList(expenditureRegistItemList);

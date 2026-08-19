@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent;
 import com.yonetani.webapp.accountbook.application.usecase.common.CodeTableItemComponent;
 import com.yonetani.webapp.accountbook.application.usecase.common.ExpenditureItemInfoComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
@@ -68,6 +69,8 @@ public class FixedCostRegistConfirmUseCase {
 	private final CodeTableItemComponent codeTableItem;
 	// 固定費テーブル:FIXED_COST_TABLEリポジトリー
 	private final FixedCostTableRepository fixedCostRepository;
+	// 支払方法情報取得コンポーネント
+	private final PaymentMethodInfoComponent paymentMethodInfoComponent;
 
 	/**
 	 *<pre>
@@ -307,7 +310,9 @@ public class FixedCostRegistConfirmUseCase {
 					OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList()),
 				// 支払日選択ボックスの表示情報リスト(可変リスト)
 				shiharaiDayList.stream().map(pair ->
-					OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList()));
+					OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList()),
+				// 支払方法選択ボックスの表示情報リスト(findEnabledByUserId()ベース。「支払方法がない」を含む)
+				paymentMethodInfoComponent.getFixedCostPaymentMethodOptions(userId));
 
 		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
 		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, ExpenditureItemCode.from(inputForm.getSisyutuItemCode())));
@@ -345,6 +350,8 @@ public class FixedCostRegistConfirmUseCase {
 				// 固定費支払日(支払日)
 				inputForm.getShiharaiDay(),
 				// 支払金額
-				inputForm.getShiharaiKingaku());
+				inputForm.getShiharaiKingaku(),
+				// 支払方法コード
+				inputForm.getPaymentMethodCode());
 	}
 }

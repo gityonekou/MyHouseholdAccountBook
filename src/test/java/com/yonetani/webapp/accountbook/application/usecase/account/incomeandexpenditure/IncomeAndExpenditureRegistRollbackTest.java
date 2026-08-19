@@ -183,7 +183,7 @@ class IncomeAndExpenditureRegistRollbackTest {
 		expenditureList.add(ExpenditureRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
 				"err",  // 未定義アクション → else節でMyHouseholdAccountBookRuntimeException
-				"001", "0051", "", "テスト食費", "1", "食費詳細", "", new BigDecimal("10000"), false));
+				"001", "0051", "", "テスト食費", "1", "食費詳細", "", new BigDecimal("10000"), false, "001"));
 
 		// When: 例外がスローされる
 		assertThrows(MyHouseholdAccountBookRuntimeException.class, () -> {
@@ -232,26 +232,26 @@ class IncomeAndExpenditureRegistRollbackTest {
 		List<ExpenditureRegistItem> expenditureList = new ArrayList<>();
 		expenditureList.add(ExpenditureRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
-				"20251201120000001", "0051", "", "飲食(無駄遣いなし)", "1", "飲食詳細", "05", new BigDecimal("10000"), false));
+				"20251201120000001", "0051", "", "飲食(無駄遣いなし)", "1", "飲食詳細", "05", new BigDecimal("10000"), false, "001"));
 		expenditureList.add(ExpenditureRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
-				"20251201120000002", "0051", "", "飲食(無駄遣いB)", "2", "飲食B詳細", "05", new BigDecimal("2000"), false));
+				"20251201120000002", "0051", "", "飲食(無駄遣いB)", "2", "飲食B詳細", "05", new BigDecimal("2000"), false, "001"));
 		expenditureList.add(ExpenditureRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
-				"20251201120000003", "0051", "", "飲食(無駄遣いC)", "3", "飲食C詳細", "05", new BigDecimal("1000"), false));
+				"20251201120000003", "0051", "", "飲食(無駄遣いC)", "3", "飲食C詳細", "05", new BigDecimal("1000"), false, "001"));
 		expenditureList.add(ExpenditureRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
-				"20251201120000004", "0052", "", "一人プチ贅沢・外食", "1", "外食詳細", "10", new BigDecimal("5000"), false));
+				"20251201120000004", "0052", "", "一人プチ贅沢・外食", "1", "外食詳細", "10", new BigDecimal("5000"), false, "001"));
 		expenditureList.add(ExpenditureRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
-				"20251201120000005", "0050", "", "日用消耗品", "1", "日用消耗品詳細", "15", new BigDecimal("3000"), false));
+				"20251201120000005", "0050", "", "日用消耗品", "1", "日用消耗品詳細", "15", new BigDecimal("3000"), false, "001"));
 		// 0046(被服費)は意図的に省略 → checkExpenditureAndSisyutuKingakuで必須チェック失敗
 		expenditureList.add(ExpenditureRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
-				"20251201120000006", "0007", "", "流動経費", "1", "流動経費詳細", "10", new BigDecimal("10000"), false));
+				"20251201120000006", "0007", "", "流動経費", "1", "流動経費詳細", "10", new BigDecimal("10000"), false, "001"));
 		expenditureList.add(ExpenditureRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
-				"20251201120000007", "0047", "", "住居設備", "1", "住居設備詳細", "25", new BigDecimal("2000"), false));
+				"20251201120000007", "0047", "", "住居設備", "1", "住居設備詳細", "25", new BigDecimal("2000"), false, "001"));
 
 		// When: 例外がスローされる（収入3件+支出7件のINSERT完了後の必須チェックで失敗）
 		assertThrows(MyHouseholdAccountBookRuntimeException.class, () -> {

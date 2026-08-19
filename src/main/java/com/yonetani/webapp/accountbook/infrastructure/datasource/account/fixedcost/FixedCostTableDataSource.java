@@ -220,9 +220,11 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 				// 固定費支払日(支払日)
 				dto.getFixedCostShiharaiDay(),
 				// 支払金額
-				dto.getShiharaiKingaku());
+				dto.getShiharaiKingaku(),
+				// 支払方法コード
+				dto.getPaymentMethodCode());
 	}
-	
+
 	/**
 	 *<pre>
 	 * 引数で指定した固定費情報ドメインモデルからDTOを生成して返します。
@@ -252,7 +254,9 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 				// 固定費支払日(支払日)
 				data.getFixedCostPaymentDay().getValue(),
 				// 支払金額
-				data.getFixedCostPaymentAmount().getValue());
+				data.getFixedCostPaymentAmount().getValue(),
+				// 支払方法コード
+				data.getPaymentMethodCode().getValue());
 	}
 	
 	/**
@@ -280,7 +284,9 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 				// 固定費支払日(支払日)
 				dto.getFixedCostShiharaiDay(),
 				// 支払金額
-				dto.getShiharaiKingaku());
+				dto.getShiharaiKingaku(),
+				// 支払方法コード
+				dto.getPaymentMethodCode());
 	}
 	
 	/**

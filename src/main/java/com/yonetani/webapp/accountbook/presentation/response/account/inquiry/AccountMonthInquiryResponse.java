@@ -140,6 +140,10 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 		private final String expenditureAmount;
 		// 支出詳細
 		private final String expenditureDetailContext;
+		// 支払方法名（解決済み）
+		private final String paymentMethodName;
+		// 引落先口座名（解決済み）
+		private final String bankAccountName;
 
 		/**
 		 *<pre>
@@ -151,12 +155,15 @@ public class AccountMonthInquiryResponse extends AbstractResponse {
 		 * @param paymentDay 支払日（"DD日"形式、支払日なしの場合は空文字）
 		 * @param expenditureAmount 支出金額（フォーマット済み）
 		 * @param expenditureDetailContext 支出詳細
+		 * @param paymentMethodName 支払方法名（解決済み）
+		 * @param bankAccountName 引落先口座名（解決済み）
 		 * @return 月毎の支出情報(支出別一覧)明細レスポンスDTO
 		 *
 		 */
 		public static ExpenditureRow from(String expenditureCode, String displayName, String paymentDay,
-				String expenditureAmount, String expenditureDetailContext) {
-			return new ExpenditureRow(expenditureCode, displayName, paymentDay, expenditureAmount, expenditureDetailContext);
+				String expenditureAmount, String expenditureDetailContext, String paymentMethodName, String bankAccountName) {
+			return new ExpenditureRow(expenditureCode, displayName, paymentDay, expenditureAmount, expenditureDetailContext,
+					paymentMethodName, bankAccountName);
 		}
 	}
 

@@ -60,8 +60,8 @@ INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, S
 -- ----------------------------------------
 -- 3. 固定費テーブルデータ（user01 / 4件、全て毎月払い）
 -- ----------------------------------------
-INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, SISYUTU_ITEM_CODE, FIXED_COST_KUBUN, FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT, FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU, DELETE_FLG) VALUES
-('user01', '0001', '家賃',         '毎月27日引き落とし', '0030', '1', '00', NULL, '27',  80000.00, false),
-('user01', '0002', '電気代概算',   '概算で登録',         '0037', '2', '00', NULL, '27',   8000.00, false),
-('user01', '0003', '国民年金保険', '毎月月初払い',       '0015', '1', '00', NULL, '00',  16520.00, false),
-('user01', '0004', '積立NISA',    '毎月積立',            '0032', '1', '00', NULL, '27',  20000.00, false);
+INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, SISYUTU_ITEM_CODE, FIXED_COST_KUBUN, FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT, FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU, PAYMENT_METHOD_CODE, DELETE_FLG) VALUES
+('user01', '0001', '家賃',         '毎月27日引き落とし', '0030', '1', '00', NULL, '27',  80000.00, '001', false),
+('user01', '0002', '電気代概算',   '概算で登録',         '0037', '2', '00', NULL, '27',   8000.00, '001', false),
+('user01', '0003', '国民年金保険', '毎月月初払い',       '0015', '1', '00', NULL, '00',  16520.00, '001', false),
+('user01', '0004', '積立NISA',    '毎月積立',            '0032', '1', '00', NULL, '27',  20000.00, '001', false);

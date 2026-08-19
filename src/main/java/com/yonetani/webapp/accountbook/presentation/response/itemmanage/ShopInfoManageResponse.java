@@ -61,7 +61,9 @@ public class ShopInfoManageResponse extends AbstractResponse {
 		private final String shopKubunName;
 		// 店舗表示順
 		private final String shopSort;
-		
+		// デフォルト支払方法名(表示用に解決済み文字列。未設定の場合は「－」)
+		private final String defaultPaymentMethodName;
+
 		/**
 		 *<pre>
 		 * 引数の値から店舗一覧情報の明細データを生成して返します。
@@ -70,18 +72,22 @@ public class ShopInfoManageResponse extends AbstractResponse {
 		 * @param shopName 店舗名
 		 * @param shopKubunName 店舗区分名称
 		 * @param shopSort 店舗表示順
+		 * @param defaultPaymentMethodName デフォルト支払方法名
 		 * @return 店舗一覧情報の明細データ
 		 *
 		 */
-		public static ShopListItem from(String shopCode, String shopName, String shopKubunName, String shopSort) {
-			return new ShopListItem(shopCode, shopName, shopKubunName, shopSort);
+		public static ShopListItem from(String shopCode, String shopName, String shopKubunName, String shopSort,
+				String defaultPaymentMethodName) {
+			return new ShopListItem(shopCode, shopName, shopKubunName, shopSort, defaultPaymentMethodName);
 		}
 	}
-	
+
 	// 店舗情報入力フォーム
 	private final ShopInfoForm shopInfoForm;
 	// 店舗グループ
 	private final SelectViewItem shopKubunItem;
+	// 支払方法(デフォルト支払方法選択用)
+	private final SelectViewItem paymentMethodItem;
 	// 店舗一覧情報の明細データ(変更可能分)
 	private List<ShopListItem> shopList = new ArrayList<>();
 	// 店舗一覧情報の明細データ(変更不可分)
@@ -93,17 +99,23 @@ public class ShopInfoManageResponse extends AbstractResponse {
 	 *</pre>
 	 * @param shopInfoForm 店舗情報入力フォーム
 	 * @param addList 店舗グループ表示情報のリスト
+	 * @param paymentMethodOptionList デフォルト支払方法選択肢のリスト
 	 * @return 情報管理(お店)画面表示情報
 	 *
 	 */
-	public static ShopInfoManageResponse getInstance(ShopInfoForm shopInfoForm, List<OptionItem> addList) {
+	public static ShopInfoManageResponse getInstance(ShopInfoForm shopInfoForm, List<OptionItem> addList, List<OptionItem> paymentMethodOptionList) {
 		List<OptionItem> optionList = new ArrayList<>();
 		optionList.add(OptionItem.from("", "グループメニューを開く"));
 		if(!CollectionUtils.isEmpty(addList)) {
 			optionList.addAll(addList);
 		}
+		List<OptionItem> paymentMethodOptions = new ArrayList<>();
+		paymentMethodOptions.add(OptionItem.from("", "設定しない"));
+		if(!CollectionUtils.isEmpty(paymentMethodOptionList)) {
+			paymentMethodOptions.addAll(paymentMethodOptionList);
+		}
 		// グループメニューを開くを選択状態で情報管理(お店)画面表示情報を生成
-		return new ShopInfoManageResponse(shopInfoForm, SelectViewItem.from(optionList));
+		return new ShopInfoManageResponse(shopInfoForm, SelectViewItem.from(optionList), SelectViewItem.from(paymentMethodOptions));
 	}
 	
 	/**
@@ -143,6 +155,8 @@ public class ShopInfoManageResponse extends AbstractResponse {
 		modelAndView.addObject("shopInfoForm", shopInfoForm);
 		// 店舗グループを設定
 		modelAndView.addObject("shopKubun", shopKubunItem);
+		// デフォルト支払方法選択肢を設定
+		modelAndView.addObject("defaultPaymentMethod", paymentMethodItem);
 		// 店舗一覧情報を設定
 		modelAndView.addObject("shopList", shopList);
 		modelAndView.addObject("nonEditShopList", nonEditShopList);

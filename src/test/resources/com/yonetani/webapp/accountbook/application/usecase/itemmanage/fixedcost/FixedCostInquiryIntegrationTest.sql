@@ -131,9 +131,9 @@ INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, S
 -- ※ 0003 は execDelete テスト用
 -- ※ execAdd テスト用支出項目: 0035(自由用途積立金) ← 固定費未登録
 -- ※ execUpdate テスト用: 0002の電気代を更新
-INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, SISYUTU_ITEM_CODE, FIXED_COST_KUBUN, FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT, FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU, DELETE_FLG) VALUES
-('user01', '0001', '家賃', '毎月27日引き落とし', '0030', '1', '00', NULL, '27', 60000.00, false),
-('user01', '0002', '電気代概算', '概算で登録', '0037', '2', '00', NULL, '27', 12000.00, false),
-('user01', '0003', '国民年金保険', '奇数月払い', '0015', '1', '20', NULL, '00', 16590.00, false),
-('user01', '0004', 'その他任意テスト', 'その他任意テスト詳細内容', '0038', '1', '40', '不定期の支払です', '27', 10000.00, false),
-('user01', '0005', '電気代夏季割増', '夏季の電気代割増分', '0037', '2', '30', NULL, '27', 8000.00, false);
+INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, SISYUTU_ITEM_CODE, FIXED_COST_KUBUN, FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT, FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU, PAYMENT_METHOD_CODE, DELETE_FLG) VALUES
+('user01', '0001', '家賃', '毎月27日引き落とし', '0030', '1', '00', NULL, '27', 60000.00, '001', false),
+('user01', '0002', '電気代概算', '概算で登録', '0037', '2', '00', NULL, '27', 12000.00, '001', false),
+('user01', '0003', '国民年金保険', '奇数月払い', '0015', '1', '20', NULL, '00', 16590.00, '001', false),
+('user01', '0004', 'その他任意テスト', 'その他任意テスト詳細内容', '0038', '1', '40', '不定期の支払です', '27', 10000.00, '001', false),
+('user01', '0005', '電気代夏季割増', '夏季の電気代割増分', '0037', '2', '30', NULL, '27', 8000.00, '001', false);

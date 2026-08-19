@@ -12,10 +12,17 @@
 package com.yonetani.webapp.accountbook.presentation.request.itemmanage;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.util.StringUtils;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
+import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ShoppingAggregateSpecification;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostName;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.common.SafeDomainFactory;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
@@ -68,7 +75,11 @@ public class FixedCostInfoUpdateForm {
 	@NotNull
 	@Min(0)
 	private Integer shiharaiKingaku;
-	
+	// 支払方法コード(固定費登録画面のみ、買い物集計8項目に限りシステム予約値「支払方法がない」を許容する)
+	@NotBlank
+	private String paymentMethodCode;
+
+
 	/**
 	 * 相関チェック(支払月でその他任意を選択した場合、支払月任意詳細は必須)
 	 *
@@ -105,5 +116,41 @@ public class FixedCostInfoUpdateForm {
 		}
 		// 上記以外はチェック結果OK:trueを返却
 		return true;
+	}
+
+	/**
+	 * 相関チェック(支払方法コードがシステム予約値の場合、買い物集計8項目に対応する固定費にのみ設定を許容する)
+	 *
+	 * 固定費登録画面は「支払方法がない」の入力経路として正当だが、対象8項目以外の通常の固定費に
+	 * 誤って設定されると、月別収支照会での表示や口座別支払確認、dev5の逆変換で不整合が生じるため、
+	 * 対象8項目（支出項目コード＋固定費名から導出される支出区分の組み合わせ）に一致する場合のみ許容する。
+	 *
+	 * @return 検証結果
+	 */
+	@AssertTrue(message = "「支払方法がない」は買い物集計8項目専用の固定費にのみ設定できます。")
+	private boolean isPaymentMethodCodeValid() {
+		// paymentMethodCode・sisyutuItemCode・fixedCostNameの3つとも、このメソッドが参照する可能性がある
+		// (@AssertTrueは他フィールドの@NotBlank違反があっても実行されるため、3つとも明示的にガードする)
+		if (!StringUtils.hasLength(paymentMethodCode)
+				|| !StringUtils.hasLength(sisyutuItemCode)
+				|| !StringUtils.hasLength(fixedCostName)) {
+			return true; // 各フィールドの@NotBlank側で検出
+		}
+		// tryFrom()により、不正な形式値でも例外が伝播せず500エラーにならない
+		Optional<PaymentMethodCode> code = PaymentMethodCode.tryFrom(paymentMethodCode);
+		if (code.isEmpty() || !code.get().isSystemReserved()) {
+			return true; // 形式不正、または通常の支払方法はここでは判定不要
+		}
+		// システム予約値が選択された場合のみ、対象8項目かどうかを判定する。
+		// FixedCostName・ExpenditureItemCodeは既存(Feature1.03以前)の型でtryFrom()を持たないため、
+		// SafeDomainFactory.tryCreate()で直接包む
+		Optional<FixedCostName> name = SafeDomainFactory.tryCreate(() -> FixedCostName.from(fixedCostName));
+		Optional<ExpenditureItemCode> itemCode = SafeDomainFactory.tryCreate(() -> ExpenditureItemCode.from(sisyutuItemCode));
+		if (name.isEmpty() || itemCode.isEmpty()) {
+			return true; // 形式不正はsisyutuItemCode/fixedCostNameそれぞれの既存チェックで弾かれる想定
+		}
+		ExpenditureCategory category = ExpenditureCategory.from(name.get());
+		// ShoppingAggregateSpecificationはSpring管理外の単純な値オブジェクトのため、その場でnewする
+		return new ShoppingAggregateSpecification().isSatisfiedBy(itemCode.get(), category);
 	}
 }

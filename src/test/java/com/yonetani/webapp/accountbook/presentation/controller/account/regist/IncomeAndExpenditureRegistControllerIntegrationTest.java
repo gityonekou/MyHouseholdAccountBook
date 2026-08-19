@@ -160,7 +160,7 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
 				MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				code, sisyutuItemCode, null, name, kubun, detail, null,
-				new BigDecimal(amount), false);
+				new BigDecimal(amount), false, "001");
 	}
 
 	/**
@@ -538,6 +538,7 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 				.param("expenditureName", "テスト食費")
 				.param("expenditureKubun", "1")
 				.param("expenditureKingaku", "5000") // @Min(1)
+				.param("paymentMethodCode", "001")
 				.with(user("user01").password("password").roles("USER"))
 				.with(csrf()))
 			.andExpect(status().is3xxRedirection())
@@ -592,6 +593,7 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 				.param("expenditureName", "飲食(無駄遣いなし)")
 				.param("expenditureKubun", "1")
 				.param("expenditureKingaku", "1") // @Min(1)
+				.param("paymentMethodCode", "001")
 				.with(user("user01").password("password").roles("USER"))
 				.with(csrf()))
 			.andExpect(status().is3xxRedirection())
@@ -962,7 +964,7 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"2026011210000001", "0030", null, "家賃", "1", "月額未定", "27",
-				new BigDecimal("0"), false);
+				new BigDecimal("0"), false, "001");
 		when(mockRegistListSession.getExpenditureRegistItemList()).thenReturn(Arrays.asList(zeroAmountAddItem));
 
 		// 画面表示の検証
@@ -999,7 +1001,7 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
 				MyHouseholdAccountBookContent.ACTION_TYPE_DELETE,
 				"001", "0030", null, "家賃", "1", "月額未定", null,
-				new BigDecimal("0"), false);
+				new BigDecimal("0"), false, "001");
 		when(mockRegistListSession.getExpenditureRegistItemList()).thenReturn(
 				Arrays.asList(zeroAmountDeleteItem));
 

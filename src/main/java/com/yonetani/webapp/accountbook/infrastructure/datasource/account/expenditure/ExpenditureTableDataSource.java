@@ -204,6 +204,8 @@ public class ExpenditureTableDataSource implements ExpenditureTableRepository {
 				dto.getSisyutuYoteiKingaku(),
 				// 支出金額
 				dto.getSisyutuKingaku(),
+				// 支払方法コード
+				dto.getPaymentMethodCode(),
 				// 削除フラグ
 				dto.isDeleteFlg());
 	}

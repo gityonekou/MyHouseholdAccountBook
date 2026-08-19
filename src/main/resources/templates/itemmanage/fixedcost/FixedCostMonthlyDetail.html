@@ -56,10 +56,11 @@
 							<thead>
 								<tr class="table-secondary">
 								<th scope="col" class="w20">支出項目名</th>
-								<th scope="col" class="w25">支払名</th>
+								<th scope="col" class="w20">支払名</th>
 								<th scope="col" class="w10">支払月</th>
 								<th scope="col" class="w10">支払日</th>
 								<th scope="col" class="w10">支払金額</th>
+								<th scope="col" class="w10">支払方法</th>
 								<th scope="col">その他任意詳細</th>
 								</tr>
 							</thead>
@@ -72,12 +73,14 @@
 									<td th:text="${item.shiharaiTuki}">支払月</td>
 									<td th:text="${item.shiharaiDay}">支払日</td>
 									<td th:text="${item.shiharaiKingaku}" align="right">支払金額</td>
+									<td th:text="${item.paymentMethodName}">支払方法</td>
 									<td th:text="${item.optionalContext}">その他任意詳細</td>
 								</tr>
 								</th:block>
 								<tr class="table-success">
 									<td colspan="4" th:text="${displayMonthLabel} + '合計'">月合計ラベル</td>
 									<td th:text="${monthlyTotal}" align="right">月合計</td>
+									<td></td>
 									<td></td>
 								</tr>
 							</tbody>

@@ -81,7 +81,16 @@ INSERT INTO SISYUTU_ITEM_TABLE VALUES
 ('kouki', '0062', '父東京遠征', '父東京遠征イベント詳細を入力', '0058', '3','0603020000', true),
 ('kouki', '0063', '実家帰省', '年末年始実家帰省イベント詳細を入力', '0058', '3','0603030000', true);
 
-
+-- 銀行口座テーブル：BANK_ACCOUNT_TABLE
+INSERT INTO BANK_ACCOUNT_TABLE VALUES
+	('kouki', '01', 'てすと１銀行', 'テスト銀行①めも', '01', true),
+	('kouki', '02', 'てすと２銀行', 'テスト銀行②めも', '02', true);
+-- 支払方法テーブル：PAYMENT_METHOD_TABLE
+INSERT INTO PAYMENT_METHOD_TABLE VALUES
+	('kouki', '001', '現金', '1', NULL, NULL, '001', true, true),
+	('kouki', '002', '○○クレジットカード', '3', '02', '16', '002', true, true),
+	('kouki', '003', 'てすと１銀行口座振替', '2', '01', NULL, '003', true, true),
+	('kouki', '999', '支払方法がない', '1', null, null, '999', true, false);
 -- 支出金額テーブル：SISYUTU_KINGAKU_TABLE
 INSERT INTO SISYUTU_KINGAKU_TABLE VALUES
 	('kouki', '2023', '09', '0001', '0001', 36500.00, 36500.00, null, 0.00, null),
@@ -105,37 +114,37 @@ INSERT INTO SISYUTU_KINGAKU_TABLE VALUES
 	('kouki', '2023', '08', '0026', '0026', 6000.00, 6100.00, 0.00, 0.00, null);
 
 -- 店舗テーブルテストデータ
-INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SORT) VALUES ('kouki', '001', '901', 'エイヴィ', '001');
-INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SORT) VALUES ('kouki', '002', '901', 'OK', '002');
+INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SORT, DEFAULT_PAYMENT_METHOD_CODE) VALUES ('kouki', '001', '901', 'エイヴィ', '001', '001');
+INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SORT, DEFAULT_PAYMENT_METHOD_CODE) VALUES ('kouki', '002', '901', 'OK', '002', '002');
 INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SORT) VALUES ('kouki', '003', '907', 'イオン', '003');
 INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SORT) VALUES ('kouki', '004', '901', 'コンビニ', '004');
 INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SORT) VALUES ('kouki', '005', '901', 'ロピア', '005');
 INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SORT) VALUES ('kouki', '006', '901', 'いなげや', '006');
 INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SORT) VALUES ('kouki', '007', '907', 'ドン・キホーテ', '007');
-INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SORT) VALUES ('kouki', '008', '903', 'ユニクロ', '008');
+INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SORT, DEFAULT_PAYMENT_METHOD_CODE) VALUES ('kouki', '008', '903', 'ユニクロ', '008', '002');
 INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SORT) VALUES ('kouki', '009', '902', 'カインズホーム', '009');
 INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SORT) VALUES ('kouki', '010', '905', 'クリエイト', '010');
-INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SORT) VALUES ('kouki', '011', '904', '靴流通センター', '011');
+INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SORT, DEFAULT_PAYMENT_METHOD_CODE) VALUES ('kouki', '011', '904', '靴流通センター', '011', '002');
 INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SORT) VALUES ('kouki', '901', '901', '食品・日用品店舗(その他)', '901');
 INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SORT) VALUES ('kouki', '902', '902', 'ホームセンター(その他)', '902');
 INSERT INTO SHOP_TABLE (USER_ID, SHOP_CODE, SHOP_KUBUN_CODE, SHOP_NAME, SHOP_SORT) VALUES ('kouki', '903', '903', '衣類店舗(その他)', '903');
 
 -- 固定費テストデータ
-INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, SISYUTU_ITEM_CODE, FIXED_COST_KUBUN, FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT, FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU, DELETE_FLG) 
+INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, SISYUTU_ITEM_CODE, FIXED_COST_KUBUN, FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT, FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU, PAYMENT_METHOD_CODE, DELETE_FLG) 
 	VALUES
- ('kouki', '0001', '飲食(無駄遣いなし)', '月毎の飲食(無駄遣いなし)予定金額', '0051', '2', '00', null, '40', 45600.00, false),
- ('kouki', '0002', '飲食(無駄遣いB)', '月毎の飲食(無駄遣いB)予定金額', '0051', '2', '00', null, '40', 12300.00, false),
- ('kouki', '0003', '飲食(無駄遣いC)', '月毎の飲食(無駄遣いC)予定金額', '0051', '2', '00', null, '40', 6500.00, false),
- ('kouki', '0004', '日用消耗品', '月毎の日用消耗品予定金額', '0050', '2', '00', null, '40', 3500.00, false),
- ('kouki', '0005', '被服費', '月毎の被服費予定金額', '0046', '2', '00', null, '40', 11000.00, false),
- ('kouki', '0006', '住居設備', '月毎の住居設備予定金額', '0047', '2', '00', null, '40', 6700.00, false),
- ('kouki', '0007', '外食', '月毎の外食予定金額', '0052', '2', '00', null, '40', 1500.00, false),
- ('kouki', '0008', '事業流動経費', '月毎の事業流動経費予定金額', '0007', '2', '00', null, '40', 1200.00, false),
- ('kouki', '0009', 'コミケ C014', '【内容詳細】2024年夏コミ', '0061', '2', '06', null, '15', 49800.00, false),
- ('kouki', '0010', '国民年金保険', null, '0015', '1', '00',null, '00', 16980.00, false),
- ('kouki', '0011', '消費税支払(偶数月)', '【内容詳細】偶数月に消費税支払い', '0012', '1', '30',null, '19', 3260.00, false),
- ('kouki', '0012', 'その他任意で不定期の支払１', '不定期の支払詳細内容１', '0009', '1', '40','不定期の支払１です', '40', 36380.00, false),
- ('kouki', '0013', 'その他任意で不定期の支払２', null, '0009', '1', '40','不定期の支払２です', '40', 22910.00, false);
+ ('kouki', '0001', '飲食(無駄遣いなし)', '月毎の飲食(無駄遣いなし)予定金額', '0051', '2', '00', null, '40', 45600.00, '999', false),
+ ('kouki', '0002', '飲食(無駄遣いB)', '月毎の飲食(無駄遣いB)予定金額', '0051', '2', '00', null, '40', 12300.00, '999', false),
+ ('kouki', '0003', '飲食(無駄遣いC)', '月毎の飲食(無駄遣いC)予定金額', '0051', '2', '00', null, '40', 6500.00, '999', false),
+ ('kouki', '0004', '日用消耗品', '月毎の日用消耗品予定金額', '0050', '2', '00', null, '40', 3500.00, '999', false),
+ ('kouki', '0005', '被服費', '月毎の被服費予定金額', '0046', '2', '00', null, '40', 11000.00, '999', false),
+ ('kouki', '0006', '住居設備', '月毎の住居設備予定金額', '0047', '2', '00', null, '40', 6700.00, '999', false),
+ ('kouki', '0007', '外食', '月毎の外食予定金額', '0052', '2', '00', null, '40', 1500.00, '999', false),
+ ('kouki', '0008', '事業流動経費', '月毎の事業流動経費予定金額', '0007', '2', '00', null, '40', 1200.00,'999',  false),
+ ('kouki', '0009', 'コミケ C014', '【内容詳細】2024年夏コミ', '0061', '2', '06', null, '15', 49800.00, '001', false),
+ ('kouki', '0010', '国民年金保険', null, '0015', '1', '00',null, '00', 16980.00, '003', false),
+ ('kouki', '0011', '消費税支払(偶数月)', '【内容詳細】偶数月に消費税支払い', '0012', '1', '30',null, '19', 3260.00, '002', false),
+ ('kouki', '0012', 'その他任意で不定期の支払１', '不定期の支払詳細内容１', '0009', '1', '40','不定期の支払１です', '40', 36380.00, '001', false),
+ ('kouki', '0013', 'その他任意で不定期の支払２', null, '0009', '1', '40','不定期の支払２です', '40', 22910.00, '001', false);
 
 -- 収支テーブル：INCOME_AND_EXPENDITURE_TABLE
 INSERT INTO INCOME_AND_EXPENDITURE_TABLE (USER_ID, TARGET_YEAR, TARGET_MONTH, INCOME_KINGAKU, WITHDREW_KINGAKU, EXPENDITURE_ESTIMATE_KINGAKU, EXPENDITURE_KINGAKU, INCOME_AND_EXPENDITURE_KINGAKU)
@@ -158,10 +167,10 @@ INSERT INTO INCOME_TABLE VALUES
 
 -- 支出テーブルテストデータ
 INSERT INTO EXPENDITURE_TABLE VALUES
- ('kouki', '2023', '07', '001', '0028', null, 'その他ALLの仮登録(趣味娯楽)', '1', 'その他すべて仮登録(趣味娯楽で入れてます)', null, 295800.00, 315800.00, false),
- ('kouki', '2023', '08', '001', '0018', null, '衣類住居設備仮登録', '1', null, null, 0.00, 4000.00, false),
- ('kouki', '2023', '08', '002', '0028', null, 'その他ALLの仮登録(趣味娯楽)', '1', 'その他すべて仮登録(趣味娯楽で入れてます)', null, 335800.00, 361800.00, false),
- ('kouki', '2023', '09', '001', '0018', null, '衣類住居設備仮登録ALL', '1', null, null, 295800.00, 285300.00, false),
- ('kouki', '2023', '10', '001', '0028', null, 'その他ALLの仮登録(趣味娯楽)', '1', 'その他すべて仮登録(趣味娯楽で入れてます)', null, 295800.00, 441400.00, false);
+ ('kouki', '2023', '07', '001', '0028', null, 'その他ALLの仮登録(趣味娯楽)', '1', 'その他すべて仮登録(趣味娯楽で入れてます)', null, 295800.00, 315800.00, '001', false),
+ ('kouki', '2023', '08', '001', '0018', null, '衣類住居設備仮登録', '1', null, null, 0.00, 4000.00, '002', false),
+ ('kouki', '2023', '08', '002', '0028', null, 'その他ALLの仮登録(趣味娯楽)', '1', 'その他すべて仮登録(趣味娯楽で入れてます)', null, 335800.00, 361800.00, '003', false),
+ ('kouki', '2023', '09', '001', '0018', null, '衣類住居設備仮登録ALL', '1', null, null, 295800.00, 285300.00, '002', false),
+ ('kouki', '2023', '10', '001', '0028', null, 'その他ALLの仮登録(趣味娯楽)', '1', 'その他すべて仮登録(趣味娯楽で入れてます)', null, 295800.00, 441400.00, '001', false);
 
 

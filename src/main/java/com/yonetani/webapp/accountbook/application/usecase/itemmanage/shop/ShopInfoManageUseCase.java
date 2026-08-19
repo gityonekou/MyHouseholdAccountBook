@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent;
+import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent.PaymentMethodNameResolver;
 import com.yonetani.webapp.accountbook.application.usecase.common.CodeTableItemComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
@@ -66,7 +68,9 @@ public class ShopInfoManageUseCase {
 	
 	// 店舗情報取得リポジトリー
 	private final ShopTableRepository shopRepository;
-	
+	// 支払方法・銀行口座の名称解決、選択肢生成コンポーネント
+	private final PaymentMethodInfoComponent paymentMethodInfoComponent;
+
 	/**
 	 *<pre>
 	 * 指定したユーザIDに応じた情報管理(お店)画面の表示情報を取得します。
@@ -121,7 +125,9 @@ public class ShopInfoManageUseCase {
 		form.setShopSort(Integer.parseInt(shop.getShopSort().getValue()));
 		// 表示順(更新比較用)
 		form.setShopSortBefore(shop.getShopSort().getValue());
-		
+		// デフォルト支払方法
+		form.setDefaultPaymentMethodCode(shop.getDefaultPaymentMethodCode() == null ? null : shop.getDefaultPaymentMethodCode().getValue());
+
 		// 取得したformデータをもとに情報管理(お店)画面を生成
 		ShopInfoManageResponse response = createShopInfoManageResponse(userId, form);
 		
@@ -165,7 +171,7 @@ public class ShopInfoManageUseCase {
 		
 		// 正常時、初期表示にリダイレクトされるのでここでは空の店舗グループ表示情報で画面表示情報を作成
 		// 以降でエラー発生時は表示店舗グループが空で画面表示し、再登録の形とする
-		ShopInfoManageResponse response = ShopInfoManageResponse.getInstance(shopForm, null);
+		ShopInfoManageResponse response = ShopInfoManageResponse.getInstance(shopForm, null, null);
 		
 		// ドメインタイプ:ユーザID
 		UserId userId = UserId.from(user.getUserId());
@@ -208,8 +214,9 @@ public class ShopInfoManageUseCase {
 					userId.getValue(),
 					ShopCode.getNewCode(count),
 					shopForm.getShopKubun(),
-					shopForm.getShopName(), 
-					String.format("%03d", shopForm.getShopSort()));
+					shopForm.getShopName(),
+					String.format("%03d", shopForm.getShopSort()),
+					shopForm.getDefaultPaymentMethodCode());
 			
 			// 新規店舗情報を追加
 			int addCount = shopRepository.add(shop);
@@ -278,8 +285,9 @@ public class ShopInfoManageUseCase {
 					userId.getValue(),
 					shopForm.getShopCode(),
 					shopForm.getShopKubun(),
-					shopForm.getShopName(), 
-					newShopSort.getValue());
+					shopForm.getShopName(),
+					newShopSort.getValue(),
+					shopForm.getDefaultPaymentMethodCode());
 			int updateCount = shopRepository.update(shop);
 			// 更新件数が1件以上の場合、業務エラー
 			if(updateCount != 1) {
@@ -336,21 +344,26 @@ public class ShopInfoManageUseCase {
 				// 店舗グループの選択ボックスは入力先でデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定
 				shopGroupList.stream()
 					.map(pair -> OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue()))
-					.collect(Collectors.toList()));
-		
+					.collect(Collectors.toList()),
+				// デフォルト支払方法選択肢のリスト(予約値・無効な支払方法を含まない)
+				paymentMethodInfoComponent.getPaymentMethodOptions(userId));
+
 		// ログインユーザの店舗情報を取得
 		ShopInquiryList shopSearchResult = shopRepository.findById(SearchQueryUserId.from(userId));
 		if(shopSearchResult.isEmpty()) {
 			// 店舗情報が0件の場合、メッセージを設定
 			response.addMessage("店舗情報取得結果が0件です。");
 		} else {
+			// 支払方法コード→支払方法名の解決用リゾルバ(N+1回避)
+			PaymentMethodNameResolver resolver = paymentMethodInfoComponent.createResolver(userId);
 			// 店舗情報をレスポンスに設定
 			response.addShopList(shopSearchResult.getValues().stream().map(domain ->
 				ShopInfoManageResponse.ShopListItem.from(
 						domain.getShopCode().getValue(),
 						domain.getShopName().getValue(),
 						codeTableItem.getCodeValue(MyHouseholdAccountBookContent.CODE_DEFINES_SHOP_KUBUN, domain.getShopKubunCode().getValue()),
-						domain.getShopSort().getValue())
+						domain.getShopSort().getValue(),
+						domain.getDefaultPaymentMethodCode() == null ? "－" : resolver.getPaymentMethodName(domain.getDefaultPaymentMethodCode()))
 			).collect(Collectors.toUnmodifiableList()));
 		}
 		return response;
@@ -371,7 +384,8 @@ public class ShopInfoManageUseCase {
 				data.getShopCode().getValue(),
 				data.getShopKubunCode().getValue(),
 				data.getShopName().getValue(),
-				String.format("%03d", Integer.parseInt(data.getShopSort().getValue()) + add)
+				String.format("%03d", Integer.parseInt(data.getShopSort().getValue()) + add),
+				data.getDefaultPaymentMethodCode() == null ? null : data.getDefaultPaymentMethodCode().getValue()
 				);
 	}
 }

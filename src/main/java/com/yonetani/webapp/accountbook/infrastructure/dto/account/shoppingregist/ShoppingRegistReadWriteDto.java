@@ -50,6 +50,8 @@ public class ShoppingRegistReadWriteDto {
 	private final LocalDate shoppingDate;
 	// 備考
 	private final String shoppingRemarks;
+	// 支払方法コード
+	private final String paymentMethodCode;
 	// 登録データ(金額)
 	// 食料品(必須)金額
 	private final BigDecimal shoppingFoodExpenses;
@@ -119,6 +121,8 @@ public class ShoppingRegistReadWriteDto {
 				domain.getShoppingDate().getValue(),
 				// 備考
 				domain.getShoppingRemarks().getValue(),
+				// 支払方法コード
+				domain.getPaymentMethodCode().getValue(),
 				// 食料品(必須)金額
 				domain.getShoppingFoodExpenditureAmount().getValue(),
 				// 消費税:食料品(必須)金額

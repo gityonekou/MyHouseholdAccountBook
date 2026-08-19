@@ -63,5 +63,8 @@ public class ExpenditureItemForm {
 	@NotNull
 	@Min(1)
 	private Integer expenditureKingaku;
-	
+	// 支払方法コード
+	@NotBlank
+	private String paymentMethodCode;
+
 }

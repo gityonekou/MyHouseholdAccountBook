@@ -904,7 +904,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 */
 	private List<ShopListItem> shopListOne() {
 		List<ShopListItem> shopList = new ArrayList<>();
-		shopList.add(ShopListItem.from("001", "テストユーザ登録店舗０１", "食品・日用品店舗", "001"));
+		shopList.add(ShopListItem.from("001", "テストユーザ登録店舗０１", "食品・日用品店舗", "001", "－"));
 		return shopList;
 	}
 	
@@ -917,9 +917,9 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 */
 	private List<ShopListItem> shopListThree() {
 		List<ShopListItem> shopList = new ArrayList<>();
-		shopList.add(ShopListItem.from("001", "テストユーザ登録店舗０１", "食品・日用品店舗", "001"));
-		shopList.add(ShopListItem.from("002", "テストユーザ登録店舗０２", "ホームセンター", "002"));
-		shopList.add(ShopListItem.from("003", "テストユーザ登録店舗０３", "衣類店舗", "003"));
+		shopList.add(ShopListItem.from("001", "テストユーザ登録店舗０１", "食品・日用品店舗", "001", "－"));
+		shopList.add(ShopListItem.from("002", "テストユーザ登録店舗０２", "ホームセンター", "002", "－"));
+		shopList.add(ShopListItem.from("003", "テストユーザ登録店舗０３", "衣類店舗", "003", "－"));
 		return shopList;
 	}
 	
@@ -932,7 +932,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 */
 	private List<ShopListItem> nonEditShopListOne() {
 		List<ShopListItem> shopList = new ArrayList<>();
-		shopList.add(ShopListItem.from("901", "食品・日用品店舗(その他)", "食品・日用品店舗", "901"));
+		shopList.add(ShopListItem.from("901", "食品・日用品店舗(その他)", "食品・日用品店舗", "901", "－"));
 		return shopList;
 	}
 	
@@ -945,9 +945,9 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 */
 	private List<ShopListItem> nonEditShopListThree() {
 		List<ShopListItem> shopList = new ArrayList<>();
-		shopList.add(ShopListItem.from("901", "食品・日用品店舗(その他)", "食品・日用品店舗", "901"));
-		shopList.add(ShopListItem.from("902", "ホームセンター(その他)", "ホームセンター", "902"));
-		shopList.add(ShopListItem.from("903", "衣類店舗(その他)", "衣類店舗", "903"));
+		shopList.add(ShopListItem.from("901", "食品・日用品店舗(その他)", "食品・日用品店舗", "901", "－"));
+		shopList.add(ShopListItem.from("902", "ホームセンター(その他)", "ホームセンター", "902", "－"));
+		shopList.add(ShopListItem.from("903", "衣類店舗(その他)", "衣類店舗", "903", "－"));
 		return shopList;
 	}
 	

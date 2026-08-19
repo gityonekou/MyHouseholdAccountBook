@@ -167,6 +167,13 @@ public class MyHouseholdAccountBookContent {
 	/** 商品JANコードを検索条件に商品を検索 */
 	public static final String SEARCH_TARGET_SHOPPING_ITEM_JAN_CODE = "janCode";
 	
+	/** コード定義区分(支払方法種別:008) */
+	public static final String CODE_DEFINES_PAYMENT_METHOD_KUBUN = "008";
+	/** 支払方法コード:「支払方法がない」固定値(999) */
+	public static final String PAYMENT_METHOD_CODE_NONE_VALUE = "999";
+	/** コード定義:支払方法種別で現金(1)を選択時 */
+	public static final String PAYMENT_METHOD_KUBUN_CASH_SELECTED_VALUE = "1";
+
 	/** 日付チェック用のフォーマットです */
 	public static final DateTimeFormatter YEAR_MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyyMM");
 	/** 日付チェック用のフォーマットです(うるう年でない年で29日を指定した場合、28日のLocalDateとして判断します */

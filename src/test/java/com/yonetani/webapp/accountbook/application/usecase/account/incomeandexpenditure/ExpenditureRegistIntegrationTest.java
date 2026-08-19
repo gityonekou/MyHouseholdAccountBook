@@ -117,7 +117,8 @@ class ExpenditureRegistIntegrationTest {
             "テスト電気代詳細",
             "25",   // 支払日（日のみ）
             new BigDecimal("5000.00"),
-            false   // clearStartFlg
+            false,   // clearStartFlg
+            "001"
         ));
         list.add(ExpenditureRegistItem.from(
             MyHouseholdAccountBookContent.DATA_TYPE_NEW,
@@ -130,7 +131,8 @@ class ExpenditureRegistIntegrationTest {
             "テスト食費詳細",
             "26",   // 支払日（日のみ）
             new BigDecimal("3000.00"),
-            false   // clearStartFlg
+            false,   // clearStartFlg
+            "001"
         ));
         return list;
     }
@@ -151,7 +153,8 @@ class ExpenditureRegistIntegrationTest {
             "DB登録済み電気代詳細",
             "15",   // 支払日（日のみ）
             new BigDecimal("8000.00"),
-            false   // clearStartFlg
+            false,   // clearStartFlg
+            "001"
         ));
         list.add(ExpenditureRegistItem.from(
             MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
@@ -164,7 +167,8 @@ class ExpenditureRegistIntegrationTest {
             "DB登録済み食費詳細",
             "20",   // 支払日（日のみ）
             new BigDecimal("2000.00"),
-            true    // clearStartFlg=true
+            true,    // clearStartFlg=true
+            "001"
         ));
         return list;
     }

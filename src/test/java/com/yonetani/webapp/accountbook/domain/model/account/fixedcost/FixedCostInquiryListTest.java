@@ -69,7 +69,7 @@ class FixedCostInquiryListTest {
 		return FixedCostInquiryItem.from(
 				"0001", "テスト固定費", "", "テスト支出項目",
 				tuki, null, "27",
-				new BigDecimal(amount).setScale(2));
+				new BigDecimal(amount).setScale(2), "001");
 	}
 
 	/**

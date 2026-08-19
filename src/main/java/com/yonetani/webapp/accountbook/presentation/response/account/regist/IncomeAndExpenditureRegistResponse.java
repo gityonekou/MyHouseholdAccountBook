@@ -57,7 +57,10 @@ public class IncomeAndExpenditureRegistResponse extends AbstractIncomeAndExpendi
 	// 支出区分選択ボックス
 	@Getter
 	private final SelectViewItem expenditureKubunSelectList;
-	
+	// 支払方法選択ボックス(findSelectableByUserId()ベース。システム予約値は含まない)
+	@Getter
+	private final SelectViewItem paymentMethodSelectList;
+
 	// セッション管理する収入登録情報のリストです。
 	@Setter
 	@Getter
@@ -76,8 +79,8 @@ public class IncomeAndExpenditureRegistResponse extends AbstractIncomeAndExpendi
 	 *
 	 */
 	public static IncomeAndExpenditureRegistResponse getInstance(String targetYearMonth) {
-		// 収入入力フォーム、収入区分選択ボックス、支出入力フォーム、支出区分選択ボックスなしで画面を表示
-		IncomeAndExpenditureRegistResponse response = new IncomeAndExpenditureRegistResponse(null, null, null, null);
+		// 収入入力フォーム、収入区分選択ボックス、支出入力フォーム、支出区分選択ボックス、支払方法選択ボックスなしで画面を表示
+		IncomeAndExpenditureRegistResponse response = new IncomeAndExpenditureRegistResponse(null, null, null, null, null);
 		response.setYearMonth(targetYearMonth);
 		return response;
 	}
@@ -108,7 +111,7 @@ public class IncomeAndExpenditureRegistResponse extends AbstractIncomeAndExpendi
 		}
 		// 収入入力フォームの表示データを設定して画面を表示
 		IncomeAndExpenditureRegistResponse response = new IncomeAndExpenditureRegistResponse(incomeItemForm,
-				SelectViewItem.from(incomeKubunList), null, null);
+				SelectViewItem.from(incomeKubunList), null, null, null);
 		response.setYearMonth(targetYearMonth);
 		return response;
 	}
@@ -121,12 +124,14 @@ public class IncomeAndExpenditureRegistResponse extends AbstractIncomeAndExpendi
 	 * @param targetYearMonth 収支対象の年月(YYYMM)
 	 * @param expenditureItemForm 支出情報が格納されたフォームデータ
 	 * @param addExpenditureKubunList 支出区分選択ボックスの表示情報リスト
+	 * @param addPaymentMethodList 支払方法選択ボックスの表示情報リスト(findSelectableByUserId()ベース)
 	 * @return 収支登録画面表示情報
 	 *
 	 */
-	public static IncomeAndExpenditureRegistResponse getInstance(String targetYearMonth, 
-			ExpenditureItemForm expenditureItemForm, List<OptionItem> addExpenditureKubunList) {
-		
+	public static IncomeAndExpenditureRegistResponse getInstance(String targetYearMonth,
+			ExpenditureItemForm expenditureItemForm, List<OptionItem> addExpenditureKubunList,
+			List<OptionItem> addPaymentMethodList) {
+
 		// 支出情報フォームデータがnullなら空データを設定(アクションなしで処理継続となるので、後の登録ではエラーになる：継続処理可能)
 		if(expenditureItemForm == null) {
 			expenditureItemForm = new ExpenditureItemForm();
@@ -137,8 +142,15 @@ public class IncomeAndExpenditureRegistResponse extends AbstractIncomeAndExpendi
 		if(!CollectionUtils.isEmpty(addExpenditureKubunList)) {
 			expenditureKubunList.addAll(addExpenditureKubunList);
 		}
+		// 支払方法選択ボックスの表示情報リストを生成
+		List<OptionItem> paymentMethodList = new ArrayList<>();
+		paymentMethodList.add(OptionItem.from("", "支払方法を選択してください"));
+		if(!CollectionUtils.isEmpty(addPaymentMethodList)) {
+			paymentMethodList.addAll(addPaymentMethodList);
+		}
 		// 支出入力フォームの表示データを設定して画面を表示
-		IncomeAndExpenditureRegistResponse response = new IncomeAndExpenditureRegistResponse(null, null,expenditureItemForm, SelectViewItem.from(expenditureKubunList));
+		IncomeAndExpenditureRegistResponse response = new IncomeAndExpenditureRegistResponse(null, null,
+				expenditureItemForm, SelectViewItem.from(expenditureKubunList), SelectViewItem.from(paymentMethodList));
 		response.setYearMonth(targetYearMonth);
 		return response;
 	}

@@ -8,6 +8,19 @@ $(function() {
 	$("#shoppingDate").datepicker();
 });
 
+// 店舗名の値変更時、選択した店舗のデフォルト支払方法を支払方法欄に自動設定する(5.6節)。
+// 新規登録時(action=add)のみ自動設定し、更新時(action=update)は登録済みの実際の支払方法を優先し上書きしない。
+// ユーザーが自動設定後に手動で支払方法を変更することは妨げない(あくまで初期値のヒント)。
+$('#shopCode').change(function() {
+	if ($('#SimpleShoppingRegistInfo [name=action]').val() !== 'add') {
+		return;
+	}
+	let defaultPaymentMethodCode = $(this).find('option:selected').attr('data-default-payment-method');
+	if (defaultPaymentMethodCode) {
+		$('#SimpleShoppingRegistInfo [name=paymentMethodCode]').val(defaultPaymentMethodCode);
+	}
+});
+
 // 店舗区分の値変更時
 $('#shopKubunCode').change(function() {
 	// 買い物登録フォームの送信データをコピー

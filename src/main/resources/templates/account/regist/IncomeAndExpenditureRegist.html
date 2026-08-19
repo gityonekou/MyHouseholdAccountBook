@@ -159,6 +159,16 @@
 										支払金額：<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{expenditureKingaku}" required>円
 										<p class="invalid-feedback" th:errors="*{expenditureKingaku}"></p>
 									</div>
+									<div class="input-group w25" th:with="paymentMethodSelectable=${#strings.isEmpty(expenditureItemForm.paymentMethodCode) or !#lists.isEmpty(paymentMethodSelectList.optionList.?[value == expenditureItemForm.paymentMethodCode])}">支払方法：
+										<select th:if="${paymentMethodSelectable}" class="form-select" th:errorclass="is-invalid" th:field="*{paymentMethodCode}" required>
+											<option th:each="item : ${paymentMethodSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+										</select>
+										<select th:unless="${paymentMethodSelectable}" class="form-select" disabled>
+											<option th:text="*{paymentMethodCode}"></option>
+										</select>
+										<input th:unless="${paymentMethodSelectable}" type="hidden" th:field="*{paymentMethodCode}">
+										<p class="invalid-feedback" th:errors="*{paymentMethodCode}"></p>
+									</div>
 									<div class="mb-3 w15">
 										<br>
 										<span>&emsp;</span><button class="btn btn-primary" type="submit" name="actionUpdate">登録</button>

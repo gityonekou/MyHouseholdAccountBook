@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.util.StringUtils;
 
+import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent;
+import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent.PaymentMethodNameResolver;
 import com.yonetani.webapp.accountbook.application.usecase.common.AccountBookUserInquiryUseCase;
 import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonthInquiryExpenditureItemList;
@@ -69,7 +71,9 @@ public class AccountMonthInquiryUseCase {
 	private final IncomeAndExpenditureConsistencyService consistencyService;
 	// 指定月の支出情報を取得するリポジトリー
 	private final ExpenditureTableRepository expenditureRepository;
-	
+	// 支払方法情報取得コンポーネント
+	private final PaymentMethodInfoComponent paymentMethodInfoComponent;
+
 	/**
 	 *<pre>
 	 * 現在の決算月の収支を取得します。
@@ -262,7 +266,9 @@ public class AccountMonthInquiryUseCase {
 		// ⑦viewType=expenditure の場合のみ、支出別一覧(③取得済み)をレスポンスに設定
 		if("expenditure".equals(normalizedViewType)) {
 			if(!monthExpenditureList.isEmpty()) {
-				response.addExpenditureList(convertExpenditureList(monthExpenditureList));
+				// 支払方法名・引落先口座名の解決リゾルバを1回だけ生成(N+1回避。突合レビュー指摘④・B)
+				PaymentMethodNameResolver resolver = paymentMethodInfoComponent.createResolver(UserId.from(user.getUserId()));
+				response.addExpenditureList(convertExpenditureList(monthExpenditureList, resolver));
 			}
 			response.setExpenditureTotalAmount(monthExpenditureList.getTotalAmount().toFormatString());
 		}
@@ -298,13 +304,15 @@ public class AccountMonthInquiryUseCase {
 	 *<pre>
 	 * 支出別一覧(ドメインモデル)を支出別一覧(レスポンス)に変換して返却
 	 * 支出区分に応じた表示名プレフィックスの付与、支払日・金額のフォーマット変換を行う
+	 * 支払方法名・引落先口座名の解決は引数のリゾルバを使用し、行ごとのDBアクセスは発生させない(突合レビュー指摘B)
 	 *</pre>
 	 * @param list 支出別一覧(ドメインモデル)
+	 * @param resolver 支払方法名・引落先口座名の解決リゾルバ(呼び出し元で1回だけ生成済み)
 	 * @return 支出別一覧(レスポンス)
 	 *
 	 */
 	private List<AccountMonthInquiryResponse.ExpenditureRow> convertExpenditureList(
-			AccountMonthInquiryExpenditureList list) {
+			AccountMonthInquiryExpenditureList list, PaymentMethodNameResolver resolver) {
 		return list.getValues().stream()
 				.map(domain -> {
 					// 支出区分に応じた表示名のプレフィックスを生成（ラベル生成はドメインに委譲）
@@ -316,7 +324,9 @@ public class AccountMonthInquiryUseCase {
 							domain.getPaymentDate().toDayString(),
 							domain.getExpenditureAmount().toFormatString(),
 							StringUtils.hasLength(domain.getExpenditureDetailContext().getValue())
-									? domain.getExpenditureDetailContext().getValue() : "");
+									? domain.getExpenditureDetailContext().getValue() : "",
+							resolver.getPaymentMethodName(domain.getPaymentMethodCode()),
+							resolver.getBankAccountName(domain.getPaymentMethodCode()));
 				})
 				.collect(Collectors.toUnmodifiableList());
 	}

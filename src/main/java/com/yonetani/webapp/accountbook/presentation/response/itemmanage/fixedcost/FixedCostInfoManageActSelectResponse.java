@@ -63,7 +63,9 @@ public class FixedCostInfoManageActSelectResponse extends AbstractFixedCostItemL
 		private final String shiharaiDay;
 		// 支払金額
 		private final String shiharaiKingaku;
-		
+		// 支払方法名（解決済み）
+		private final String paymentMethodName;
+
 		/**
 		 *<pre>
 		 * 引数の値から選択固定費の詳細情報を生成して返します。
@@ -75,15 +77,16 @@ public class FixedCostInfoManageActSelectResponse extends AbstractFixedCostItemL
 		 * @param shiharaiTukiDetailContext 支払月詳細
 		 * @param shiharaiDay 支払日
 		 * @param shiharaiKingaku 支払金額
+		 * @param paymentMethodName 支払方法名（解決済み）
 		 * @return 選択固定費の詳細情報
 		 *
 		 */
 		public static SelectFixedCostInfo from(String fixedCostCode, String sisyutuItemName, String shiharaiName,
 				String shiharaiDetailContext, String shiharaiTukiDetailContext, String shiharaiDay,
-				String shiharaiKingaku) {
+				String shiharaiKingaku, String paymentMethodName) {
 			return new SelectFixedCostInfo(fixedCostCode, sisyutuItemName, shiharaiName,
 					shiharaiDetailContext, shiharaiTukiDetailContext, shiharaiDay,
-					shiharaiKingaku);
+					shiharaiKingaku, paymentMethodName);
 		}
 	}
 	
@@ -112,6 +115,8 @@ public class FixedCostInfoManageActSelectResponse extends AbstractFixedCostItemL
 		private final String shiharaiDay;
 		// 支払金額（フォーマット済み）
 		private final String shiharaiKingaku;
+		// 支払方法名（解決済み）
+		private final String paymentMethodName;
 
 		/**
 		 *<pre>
@@ -123,14 +128,15 @@ public class FixedCostInfoManageActSelectResponse extends AbstractFixedCostItemL
 		 * @param shiharaiTukiOptionalContext 支払月任意詳細
 		 * @param shiharaiDay 支払日（コード変換済み）
 		 * @param shiharaiKingaku 支払金額（フォーマット済み）
+		 * @param paymentMethodName 支払方法名（解決済み）
 		 * @return 同一支出項目の兄弟固定費明細情報
 		 *
 		 */
 		public static SiblingFixedCostItem from(String fixedCostCode, String shiharaiName,
 				String shiharaiTukiDetailContext, String shiharaiTukiOptionalContext,
-				String shiharaiDay, String shiharaiKingaku) {
+				String shiharaiDay, String shiharaiKingaku, String paymentMethodName) {
 			return new SiblingFixedCostItem(fixedCostCode, shiharaiName,
-					shiharaiTukiDetailContext, shiharaiTukiOptionalContext, shiharaiDay, shiharaiKingaku);
+					shiharaiTukiDetailContext, shiharaiTukiOptionalContext, shiharaiDay, shiharaiKingaku, paymentMethodName);
 		}
 	}
 
