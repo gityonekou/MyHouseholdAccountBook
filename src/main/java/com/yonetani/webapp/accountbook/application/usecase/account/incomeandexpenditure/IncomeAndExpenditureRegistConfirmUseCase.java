@@ -6,8 +6,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/02/26 : 1.00.00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/02/26 : 1.00.00  feature-1.00-dev00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -574,11 +574,11 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 				throw new MyHouseholdAccountBookRuntimeException(msb.toString());
 			}
 
-			response.addMessage(String.format("%s年%s月度の収支情報を登録しました。", targetYearMonth.getYear(), targetYearMonth.getMonth()));
+			response.addMessage(String.format("%s年%s月度の収支情報を登録しました。", targetYearMonth.getTargetYear().getValue(), targetYearMonth.getTargetMonth().getValue()));
 
 		// 収支テーブル更新なしの場合、メッセージを設定
 		} else {
-			response.addMessage(String.format("【注意】%s年%s月度の収支情報の変更箇所がありませんでした。", targetYearMonth.getYear(), targetYearMonth.getMonth()));
+			response.addMessage(String.format("【注意】%s年%s月度の収支情報の変更箇所がありませんでした。", targetYearMonth.getTargetYear().getValue(), targetYearMonth.getTargetMonth().getValue()));
 		}
 	}
 

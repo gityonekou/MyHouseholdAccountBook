@@ -5,14 +5,12 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2026/05/07 : 1.01.03  新規作成
+ * 2026/09/10 : 1.03.00  リファクタリング対応：年項目、月項目のドメインタイプの文字列型返却を廃止、フォーマットメソッド名の変更
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,18 +23,18 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
  * C1（分岐網羅）で以下メソッドを検証します。
  * ・from(String yearMonth) ：ガード節3分岐＋正常系
  * ・from(String year, String month)：引数不正2分岐＋正常系
- * ・getYear / getMonth / toString：正常系
+ * ・getTargetYear / getTargetMonth / toString：正常系
  * ・plusMonths：0加算・年内加算・年跨ぎ加算・負加算
- * ・toDisplayLabel：1桁月（先頭0あり）・2桁月
+ * ・toFormatString：1桁月（先頭0あり）・2桁月
  * ・equals / hashCode：同値・異値
  *
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.01.A)
+ * @since 家計簿アプリ(1.01)
  *
  */
-@DisplayName("年月(TargetYearMonth)のテスト")
+@DisplayName("年月項目(TargetYearMonth)のテスト")
 class TargetYearMonthTest {
 
 	// ===========================================================
@@ -52,8 +50,8 @@ class TargetYearMonthTest {
 		// 検証
 		assertNotNull(result);
 		assertEquals("202511", result.getValue());
-		assertEquals("2025", result.getYear());
-		assertEquals("11", result.getMonth());
+		assertEquals("2025", result.getTargetYear().getValue());
+		assertEquals("11", result.getTargetMonth().getValue());
 	}
 
 	@Test
@@ -65,8 +63,8 @@ class TargetYearMonthTest {
 		// 検証
 		assertNotNull(result);
 		assertEquals("202601", result.getValue());
-		assertEquals("2026", result.getYear());
-		assertEquals("01", result.getMonth());
+		assertEquals("2026", result.getTargetYear().getValue());
+		assertEquals("01", result.getTargetMonth().getValue());
 	}
 
 	@Test
@@ -132,8 +130,8 @@ class TargetYearMonthTest {
 		// 検証
 		assertNotNull(result);
 		assertEquals("202511", result.getValue());
-		assertEquals("2025", result.getYear());
-		assertEquals("11", result.getMonth());
+		assertEquals("2025", result.getTargetYear().getValue());
+		assertEquals("11", result.getTargetMonth().getValue());
 	}
 
 	@Test
@@ -145,7 +143,7 @@ class TargetYearMonthTest {
 		// 検証
 		assertNotNull(result);
 		assertEquals("202601", result.getValue());
-		assertEquals("01", result.getMonth());
+		assertEquals("01", result.getTargetMonth().getValue());
 	}
 
 	@Test
@@ -179,7 +177,7 @@ class TargetYearMonthTest {
 		TargetYearMonth ym = TargetYearMonth.from("202511");
 
 		// 実行 & 検証
-		assertEquals("2025", ym.getYear());
+		assertEquals("2025", ym.getTargetYear().getValue());
 	}
 
 	@Test
@@ -189,7 +187,7 @@ class TargetYearMonthTest {
 		TargetYearMonth ym = TargetYearMonth.from("202511");
 
 		// 実行 & 検証
-		assertEquals("11", ym.getMonth());
+		assertEquals("11", ym.getTargetMonth().getValue());
 	}
 
 	// ===========================================================
@@ -220,8 +218,8 @@ class TargetYearMonthTest {
 
 		// 検証
 		assertEquals("202512", result.getValue());
-		assertEquals("2025", result.getYear());
-		assertEquals("12", result.getMonth());
+		assertEquals("2025", result.getTargetYear().getValue());
+		assertEquals("12", result.getTargetMonth().getValue());
 	}
 
 	@Test
@@ -235,8 +233,8 @@ class TargetYearMonthTest {
 
 		// 検証
 		assertEquals("202601", result.getValue());
-		assertEquals("2026", result.getYear());
-		assertEquals("01", result.getMonth());
+		assertEquals("2026", result.getTargetYear().getValue());
+		assertEquals("01", result.getTargetMonth().getValue());
 	}
 
 	@Test
@@ -250,31 +248,31 @@ class TargetYearMonthTest {
 
 		// 検証
 		assertEquals("202510", result.getValue());
-		assertEquals("10", result.getMonth());
+		assertEquals("10", result.getTargetMonth().getValue());
 	}
 
 	// ===========================================================
-	// toDisplayLabel()
+	// toFormatString()
 	// ===========================================================
 
 	@Test
-	@DisplayName("toDisplayLabel：2桁月は「YYYY年MM月」形式で返す（2025年11月）")
-	void testToDisplayLabel_2桁月() {
+	@DisplayName("toFormatString：2桁月は「YYYY年MM月」形式で返す（2025年11月）")
+	void testToFormatString_2桁月() {
 		// 準備
 		TargetYearMonth ym = TargetYearMonth.from("202511");
 
 		// 実行 & 検証
-		assertEquals("2025年11月", ym.toDisplayLabel());
+		assertEquals("2025年11月", ym.toFormatString());
 	}
 
 	@Test
-	@DisplayName("toDisplayLabel：1桁月は先頭0ありで「YYYY年MM月」形式で返す（2026年01月）")
-	void testToDisplayLabel_1桁月先頭0あり() {
+	@DisplayName("toFormatString：1桁月は先頭0ありで「YYYY年MM月」形式で返す（2026年01月）")
+	void testToFormatString_1桁月先頭0あり() {
 		// 準備
 		TargetYearMonth ym = TargetYearMonth.from("202601");
 
 		// 実行 & 検証
-		assertEquals("2026年01月", ym.toDisplayLabel());
+		assertEquals("2026年01月", ym.toFormatString());
 	}
 
 	// ===========================================================

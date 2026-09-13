@@ -10,6 +10,12 @@
 <link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
 <link th:href="@{/css/MyHouseholdAccountBookDatepicker.css}" rel="stylesheet" type="text/css">
 <style>
+.w4{
+  width:4%;
+}
+.w6{
+  width:6%;
+}
 .w7{
   width:7%;
 }
@@ -40,18 +46,29 @@
 						<form name="SimpleShoppingRegistInfo" id="SimpleShoppingRegistInfo"  method="post" th:action="@{/myhacbook/accountregist/simpleshoppingregist/update/}" th:object="${simpleShoppingRegistInfoForm}">
 							<div class="mb-3">
 								<label for="exampleSelect" class="form-label">■店舗区分</label>
-								<select class="form-select" th:errorclass="is-invalid" th:field="*{shopKubunCode}" required>
+								<select class="form-select w20" th:errorclass="is-invalid" th:field="*{shopKubunCode}" required>
 									<option th:each="item : ${shopKubunSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
 								</select>
 			 					<p class="invalid-feedback" th:errors="*{shopKubunCode}"></p>
 							</div>
 							<div class="mb-3">
 								<label for="validationServer01" class="form-label">■店舗名</label>
-								<select class="form-select" th:errorclass="is-invalid" th:field="*{shopCode}" required>
+								<select class="form-select w30" th:errorclass="is-invalid" th:field="*{shopCode}" required>
 									<option th:each="item : ${shopNameOptionList}" th:value="${item.value}" th:text="${item.text}"
 											th:attr="data-default-payment-method=${item.defaultPaymentMethodCode}"></option>
 								</select>
 			 					<p class="invalid-feedback" th:errors="*{shopCode}"></p>
+							</div>
+							<div class="mb-3" th:with="paymentMethodSelectable=${#strings.isEmpty(simpleShoppingRegistInfoForm.paymentMethodCode) or !#lists.isEmpty(paymentMethodSelectList.optionList.?[value == simpleShoppingRegistInfoForm.paymentMethodCode])}">
+								<label for="validationServer01" class="form-label">■支払方法</label>
+								<select th:if="${paymentMethodSelectable}" class="form-select w30" th:errorclass="is-invalid" th:field="*{paymentMethodCode}" required>
+									<option th:each="item : ${paymentMethodSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+								</select>
+								<select th:unless="${paymentMethodSelectable}" class="form-select w30" disabled>
+									<option th:text="*{paymentMethodCode}"></option>
+								</select>
+								<input th:unless="${paymentMethodSelectable}" type="hidden" th:field="*{paymentMethodCode}">
+			 					<p class="invalid-feedback" th:errors="*{paymentMethodCode}"></p>
 							</div>
 							<div class="mb-3">
 								<label for="validationServer01" class="form-label">■買い物日</label>
@@ -63,18 +80,7 @@
 									
 								</div>
 							</div>
-							<div class="mb-3" th:with="paymentMethodSelectable=${#strings.isEmpty(simpleShoppingRegistInfoForm.paymentMethodCode) or !#lists.isEmpty(paymentMethodSelectList.optionList.?[value == simpleShoppingRegistInfoForm.paymentMethodCode])}">
-								<label for="validationServer01" class="form-label">■支払方法</label>
-								<select th:if="${paymentMethodSelectable}" class="form-select" th:errorclass="is-invalid" th:field="*{paymentMethodCode}" required>
-									<option th:each="item : ${paymentMethodSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
-								</select>
-								<select th:unless="${paymentMethodSelectable}" class="form-select" disabled>
-									<option th:text="*{paymentMethodCode}"></option>
-								</select>
-								<input th:unless="${paymentMethodSelectable}" type="hidden" th:field="*{paymentMethodCode}">
-			 					<p class="invalid-feedback" th:errors="*{paymentMethodCode}"></p>
-							</div>
-							<!-- 収支(マージ)表示エリア -->
+							<!-- 買い物情報登録エリア -->
 							<table class="table table-sm table-borderless">
 								<thead>
 								<tr class="table-secondary">
@@ -162,28 +168,29 @@
 						<table class="table table-sm table-bordered table-hover">
 							<thead>
 								<tr class="table-secondary">
-								<th scope="col" class="w5" style="vertical-align:middle; text-align:center;">買い物日</th>
+								<th scope="col" class="w4" style="vertical-align:middle; text-align:center;">日付</th>
 								<th scope="col" class="w15" style="vertical-align:middle; text-align:center;">店舗名</th>
-								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">食料品<br>(必須)</th>
-								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">食料品B<br>(無駄遣い)</th>
-								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">食料品C<br>(お酒類)</th>
-								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">外食</th>
-								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">日用品</th>
-								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">衣料品<br>(私服)</th>
-								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">仕事</th>
-								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">住居設備</th>
-								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">クーポン金額</th>
+								<th scope="col" class="w15" style="vertical-align:middle; text-align:center;">支払方法</th>
+								<th scope="col" class="w6" style="vertical-align:middle; text-align:center;">食料品<br>(必須)</th>
+								<th scope="col" class="w6" style="vertical-align:middle; text-align:center;">食料品B<br>(無駄遣い)</th>
+								<th scope="col" class="w6" style="vertical-align:middle; text-align:center;">食料品C<br>(お酒類)</th>
+								<th scope="col" class="w6" style="vertical-align:middle; text-align:center;">外食</th>
+								<th scope="col" class="w6" style="vertical-align:middle; text-align:center;">日用品</th>
+								<th scope="col" class="w6" style="vertical-align:middle; text-align:center;">衣料品<br>(私服)</th>
+								<th scope="col" class="w6" style="vertical-align:middle; text-align:center;">仕事</th>
+								<th scope="col" class="w6" style="vertical-align:middle; text-align:center;">住居設備</th>
+								<th scope="col" class="w6" style="vertical-align:middle; text-align:center;">クーポン<br>金額</th>
 								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">合計金額</th>
-								<th scope="col" class="w5"></th>
+								<th scope="col" class="w4"></th>
 								<th scope="col"></th>
 								</tr>
 							</thead>
 							<tbody>
 								<th:block th:each="item, itemStat : ${shoppingRegistList}">
-									<th:block th:if="${itemStat.odd}"><tr class="table-warning"></th:block>
-									<th:block th:if="${itemStat.even}"><tr></th:block>
-										<td align="center" th:text="${item.shoppingDay}">買い物日</td>
+									<tr th:class="${itemStat.odd} ? 'table-warning' : ''">
+										<td align="center" th:text="${item.shoppingDay}">日付</td>
 										<td th:text="${item.shopName}">店舗名</td>
+										<td th:text="${item.paymentMethodName}">支払方法</td>
 										<td align="right" th:text="${item.shoppingFood}">食料品(必須)</td>
 										<td align="right" th:text="${item.shoppingFoodB}">食料品B(無駄遣い)</td>
 										<td align="right" th:text="${item.shoppingFoodC}">食料品C(お酒類)</td>
@@ -201,6 +208,7 @@
 								<th:block th:if="${#lists.size(shoppingRegistList)} >= 2">
 									<tr class="table-secondary">
 										<td align="center">合計</td>
+										<td></td>
 										<td></td>
 										<td align="right" th:text="${totalShoppingFood}">食料品(必須)合計</td>
 										<td align="right" th:text="${totalShoppingFoodB}">食料品B(無駄遣い)合計</td>

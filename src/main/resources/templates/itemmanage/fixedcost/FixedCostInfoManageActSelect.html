@@ -6,6 +6,9 @@
 		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
 		crossorigin="anonymous">
 <link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<style>
+.w8{ width:8%; }
+</style>
 <title>情報管理(固定費)</title>
 </head>
 <body>
@@ -42,10 +45,10 @@
 							<label for="name" class="form-label">支払日：<span th:text="*{shiharaiTukiDetailContext}"></span><span th:text="*{shiharaiDay}"></span></label>
 						</div>
 						<div class="mb-3">
-							<label for="name" class="form-label">支払金額：<span th:text="*{shiharaiKingaku}"></span></label>
+							<label for="name" class="form-label">支払方法：<span th:text="*{paymentMethodName}"></span></label>
 						</div>
 						<div class="mb-3">
-							<label for="name" class="form-label">支払方法：<span th:text="*{paymentMethodName}"></span></label>
+							<label for="name" class="form-label">支払金額：<span th:text="*{shiharaiKingaku}"></span></label>
 						</div>
 						<div class="mb-3">
 							<button class="btn btn-primary" name="actionUpdate" type="submit">更新</button>
@@ -79,10 +82,10 @@
 							<thead>
 								<tr class="table-secondary">
 									<th scope="col" class="w20">支払名</th>
-									<th scope="col" class="w10">支払月</th>
-									<th scope="col" class="w10">支払日</th>
-									<th scope="col" class="w10">支払金額</th>
-									<th scope="col" class="w10">支払方法</th>
+									<th scope="col" class="w8">支払月</th>
+									<th scope="col" class="w8">支払日</th>
+									<th scope="col" class="w20">支払方法</th>
+									<th scope="col" class="w8" style="text-align:center;">支払金額</th>
 									<th scope="col">その他任意詳細</th>
 								</tr>
 							</thead>
@@ -92,8 +95,8 @@
 									<td th:text="${item.shiharaiName}">支払名</td>
 									<td th:text="${item.shiharaiTukiDetailContext}">支払月</td>
 									<td th:text="${item.shiharaiDay}">支払日</td>
-									<td th:text="${item.shiharaiKingaku}" align="right">支払金額</td>
 									<td th:text="${item.paymentMethodName}">支払方法</td>
+									<td th:text="${item.shiharaiKingaku}" align="right">支払金額</td>
 									<td th:text="${item.shiharaiTukiOptionalContext}"></td>
 								</tr>
 							</tbody>
@@ -119,25 +122,24 @@
 						<table class="table table-sm table-bordered table-hover">
 							<thead>
 								<tr class="table-secondary">
-								<th scope="col" class="w20">支出項目名</th>
+								<th scope="col" class="w15">支出項目名</th>
 								<th scope="col" class="w20">支払名</th>
-								<th scope="col" class="w10">支払月</th>
-								<th scope="col" class="w10">支払日</th>
-								<th scope="col" class="w10">支払金額</th>
-								<th scope="col" class="w10">支払方法</th>
+								<th scope="col" class="w8">支払月</th>
+								<th scope="col" class="w8">支払日</th>
+								<th scope="col" class="w20">支払方法</th>
+								<th scope="col" class="w8" style="text-align:center;">支払金額</th>
 								<th scope="col">その他任意詳細</th>
 								</tr>
 							</thead>
 							<tbody>
 								<th:block th:each="item, itemStat : ${fixedCostItemList}">
-								<th:block th:if="${itemStat.odd}"><tr th:data-href="@{/myhacbook/managebaseinfo/fixedcostinfo/select(fixedCostCode=${item.fixedCostCode})}"></th:block>
-								<th:block th:if="${itemStat.even}"><tr class="table-warning" th:data-href="@{/myhacbook/managebaseinfo/fixedcostinfo/select(fixedCostCode=${item.fixedCostCode})}"></th:block>
+								<tr th:class="${itemStat.odd} ? 'table-warning' : ''" th:data-href="@{/myhacbook/managebaseinfo/fixedcostinfo/select(fixedCostCode=${item.fixedCostCode})}">
 									<td th:text="${item.sisyutuItemName}">支出項目名</td>
 									<td th:text="${item.shiharaiName}">支払名</td>
 									<td th:text="${item.shiharaiTuki}">支払月</td>
 									<td th:text="${item.shiharaiDay}">支払日</td>
-									<td th:text="${item.shiharaiKingaku}" align="right">支払金額</td>
 									<td th:text="${item.paymentMethodName}">支払方法</td>
+									<td th:text="${item.shiharaiKingaku}" align="right">支払金額</td>
 									<td th:text="${item.optionalContext}">その他任意詳細</td>
 								</tr>
 								</th:block>

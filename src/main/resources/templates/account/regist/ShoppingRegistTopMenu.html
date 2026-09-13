@@ -7,6 +7,12 @@
 		crossorigin="anonymous">
 <link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
 <style>
+.w4{
+  width:4%;
+}
+.w6{
+  width:6%;
+}
 .w7{
   width:7%;
 }
@@ -60,17 +66,18 @@
 						<table class="table table-sm table-bordered table-hover">
 							<thead>
 								<tr class="table-secondary">
-								<th scope="col" class="w5" style="vertical-align:middle; text-align:center;">買い物日</th>
-								<th scope="col" class="w20" style="vertical-align:middle; text-align:center;">店舗名</th>
-								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">食料品<br>(必須)</th>
-								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">食料品B<br>(無駄遣い)</th>
-								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">食料品C<br>(お酒類)</th>
-								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">外食</th>
-								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">日用品</th>
-								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">衣料品<br>(私服)</th>
-								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">仕事</th>
-								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">住居設備</th>
-								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">クーポン金額</th>
+								<th scope="col" class="w4" style="vertical-align:middle; text-align:center;">日付</th>
+								<th scope="col" class="w15" style="vertical-align:middle; text-align:center;">店舗名</th>
+								<th scope="col" class="w15" style="vertical-align:middle; text-align:center;">支払方法</th>
+								<th scope="col" class="w6" style="vertical-align:middle; text-align:center;">食料品<br>(必須)</th>
+								<th scope="col" class="w6" style="vertical-align:middle; text-align:center;">食料品B<br>(無駄遣い)</th>
+								<th scope="col" class="w6" style="vertical-align:middle; text-align:center;">食料品C<br>(お酒類)</th>
+								<th scope="col" class="w6" style="vertical-align:middle; text-align:center;">外食</th>
+								<th scope="col" class="w6" style="vertical-align:middle; text-align:center;">日用品</th>
+								<th scope="col" class="w6" style="vertical-align:middle; text-align:center;">衣料品<br>(私服)</th>
+								<th scope="col" class="w6" style="vertical-align:middle; text-align:center;">仕事</th>
+								<th scope="col" class="w6" style="vertical-align:middle; text-align:center;">住居設備</th>
+								<th scope="col" class="w6" style="vertical-align:middle; text-align:center;">クーポン<br>金額</th>
 								<th scope="col" class="w7" style="vertical-align:middle; text-align:center;">合計金額</th>
 								<th scope="col"></th>
 								</tr>
@@ -79,7 +86,7 @@
 								<th:block th:if="${#lists.size(shoppingRegistList)} >= 12">
 									<tr class="table-success">
 										<td align="center">合計</td>
-										<td></td>
+										<td colspan="2"></td>
 										<td align="right" th:text="${totalShoppingFood}">食料品(必須)合計</td>
 										<td align="right" th:text="${totalShoppingFoodB}">食料品B(無駄遣い)合計</td>
 										<td align="right" th:text="${totalShoppingFoodC}">食料品C(お酒類)合計</td>
@@ -94,10 +101,10 @@
 									</tr>
 								</th:block>
 								<th:block th:each="item, itemStat : ${shoppingRegistList}">
-									<th:block th:if="${itemStat.odd}"><tr class="table-warning"></th:block>
-									<th:block th:if="${itemStat.even}"><tr></th:block>
+									<tr th:class="${itemStat.odd} ? 'table-warning' : ''">
 										<td align="center" th:text="${item.shoppingDay}">買い物日</td>
 										<td th:text="${item.shopName}">店舗名</td>
+										<td th:text="${item.paymentMethodName}">支払方法</td>
 										<td align="right" th:text="${item.shoppingFood}">食料品(必須)</td>
 										<td align="right" th:text="${item.shoppingFoodB}">食料品B(無駄遣い)</td>
 										<td align="right" th:text="${item.shoppingFoodC}">食料品C(お酒類)</td>
@@ -114,7 +121,7 @@
 								<th:block th:if="${#lists.size(shoppingRegistList)} >= 2">
 									<tr class="table-success">
 										<td align="center">合計</td>
-										<td></td>
+										<td colspan="2"></td>
 										<td align="right" th:text="${totalShoppingFood}">食料品(必須)合計</td>
 										<td align="right" th:text="${totalShoppingFoodB}">食料品B(無駄遣い)合計</td>
 										<td align="right" th:text="${totalShoppingFoodC}">食料品C(お酒類)合計</td>

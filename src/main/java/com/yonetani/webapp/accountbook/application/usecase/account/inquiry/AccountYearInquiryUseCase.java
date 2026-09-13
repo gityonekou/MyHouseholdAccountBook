@@ -5,11 +5,12 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2023/10/09 : 1.00.00  新規作成
- * 2025/12/28 : 1.01.00  リファクタリング対応(DDD適応)
+ * 日付       : version  ブランチ            コメントなど
+ * 2023/10/09 : 1.00.00                      新規作成
+ * 2025/12/28 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
  *
  */
+
 package com.yonetani.webapp.accountbook.application.usecase.account.inquiry;
 
 import java.util.List;
@@ -122,7 +123,7 @@ public class AccountYearInquiryUseCase {
 	private List<MageInquiryListItem> convertMageList(IncomeAndExpenditureInquiryList resultList) {
 		return resultList.getValues().stream().map(domain ->
 			AccountYearMageInquiryResponse.MageInquiryListItem.from(
-					domain.getTargetYearMonth().getMonth(),
+					domain.getTargetYearMonth().getTargetMonth().toFormatString(),
 					domain.getRegularIncomeAmount().toFormatString(),
 					domain.getWithdrawingAmount().toFormatString(),
 					domain.getExpectedExpenditureAmount().toFormatString(),
@@ -205,7 +206,7 @@ public class AccountYearInquiryUseCase {
 	private List<MeisaiInquiryListItem> convertMeisaiList(AccountYearMeisaiInquiryList resultList) {
 		return resultList.getValues().stream().map(domain ->
 			AccountYearMeisaiInquiryResponse.MeisaiInquiryListItem.from(
-					domain.getMonth().getValue(),
+					domain.getMonth().toFormatString(),
 					domain.getRegularIncomeAmount().toFormatString(),
 					domain.getWithdrawingAmount().toFormatString(),
 					domain.getJigyouKeihiKingaku().toString(),

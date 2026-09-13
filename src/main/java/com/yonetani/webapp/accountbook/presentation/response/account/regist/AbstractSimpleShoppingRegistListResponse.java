@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/12/28 : 1.00.00  新規作成
+ * 2026/08/18 : 1.03.00  支払方法・銀行口座管理追加対応(Feature1.03 dev1)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.regist;
@@ -15,6 +16,22 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent.ResolvedPaymentMethodName;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDate;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodBItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingRegistCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkItem;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -54,10 +71,12 @@ public abstract class AbstractSimpleShoppingRegistListResponse extends AbstractR
 		private final String targetYearMonth;
 		// 買い物登録コード
 		private final String shoppingRegistCode;
-		// 買い物日(DD:日付の値)
+		// 買い物日(MM/dd形式の日付の値)
 		private final String shoppingDay;
 		// 店舗名
 		private final String shopName;
+		// 支払方法名(解決済み)
+		private final String paymentMethodName;
 		// 食料品(必須)
 		private final String shoppingFood;
 		// 食料品B(無駄遣い)
@@ -78,6 +97,7 @@ public abstract class AbstractSimpleShoppingRegistListResponse extends AbstractR
 		private final String shoppingCoupon;
 		// 買い物合計金額
 		private final String shoppingTotalAmount;
+		
 		/**
 		 *<pre>
 		 * 引数の値から当月の買い物一覧情報を生成して返します。
@@ -86,6 +106,7 @@ public abstract class AbstractSimpleShoppingRegistListResponse extends AbstractR
 		 * @param shoppingRegistCode 買い物登録コード
 		 * @param shoppingDay 買い物日(DD:日付の値を設定)
 		 * @param shopName 店舗名
+		 * @param paymentMethodName 支払方法名(解決済み)
 		 * @param shoppingFood 食料品(必須)
 		 * @param shoppingFoodB 食料品B(無駄遣い)
 		 * @param shoppingFoodC 食料品C(お酒類)金額
@@ -100,35 +121,37 @@ public abstract class AbstractSimpleShoppingRegistListResponse extends AbstractR
 		 *
 		 */
 		public static SimpleShoppingRegistListItem from(
-				String targetYearMonth,
-				String shoppingRegistCode,
-				String shoppingDay,
-				String shopName,
-				String shoppingFood,
-				String shoppingFoodB,
-				String shoppingFoodC,
-				String shoppingDineOut,
-				String shoppingConsumerGoods,
-				String shoppingClothes,
-				String shoppingWork,
-				String shoppingHouseEquipment,
-				String shoppingCoupon,
-				String shoppingTotalAmount) {
+				TargetYearMonth targetYearMonth,
+				ShoppingRegistCode shoppingRegistCode,
+				ShoppingDate shoppingDay,
+				ShopName shopName,
+				ResolvedPaymentMethodName paymentMethodName,
+				ShoppingFoodItem shoppingFood,
+				ShoppingFoodBItem shoppingFoodB,
+				ShoppingFoodCItem shoppingFoodC,
+				ShoppingDineOutItem shoppingDineOut,
+				ShoppingConsumerGoodsItem shoppingConsumerGoods,
+				ShoppingClothesItem shoppingClothes,
+				ShoppingWorkItem shoppingWork,
+				ShoppingHouseEquipmentItem shoppingHouseEquipment,
+				ShoppingCouponPrice shoppingCoupon,
+				ShoppingTotalAmount shoppingTotalAmount) {
 			return new SimpleShoppingRegistListItem(
-					targetYearMonth,
-					shoppingRegistCode,
-					shoppingDay,
-					shopName,
-					shoppingFood,
-					shoppingFoodB,
-					shoppingFoodC,
-					shoppingDineOut,
-					shoppingConsumerGoods,
-					shoppingClothes,
-					shoppingWork,
-					shoppingHouseEquipment,
-					shoppingCoupon,
-					shoppingTotalAmount);
+					targetYearMonth.getValue(),
+					shoppingRegistCode.getValue(),
+					shoppingDay.toFormatString(),
+					shopName.getValue(),
+					paymentMethodName.getValue(),
+					shoppingFood.toFormatString(),
+					shoppingFoodB.toFormatString(),
+					shoppingFoodC.toFormatString(),
+					shoppingDineOut.toFormatString(),
+					shoppingConsumerGoods.toFormatString(),
+					shoppingClothes.toFormatString(),
+					shoppingWork.toFormatString(),
+					shoppingHouseEquipment.toFormatString(),
+					shoppingCoupon.toFormatString(),
+					shoppingTotalAmount.toFormatString());
 		}
 	}
 	

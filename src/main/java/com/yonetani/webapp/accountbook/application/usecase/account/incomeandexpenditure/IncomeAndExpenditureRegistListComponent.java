@@ -5,9 +5,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/02/28 : 1.00.00  新規作成
- * 2026/06/13 : 1.02.00  支出区分の値が無駄遣いB(2)、無駄遣いC(3)の場合のラベル生成処理を支出区分区分ドメインタイプのExpenditureCategoryに委譲
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/02/28 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/06/13 : 1.01.00  feature-1.02-dev2   リファクタリング対応（支出区分の値が無駄遣いB(2)、無駄遣いC(3)の場合のラベル生成処理を支出区分区分ドメインタイプのExpenditureCategoryに委譲）
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;

@@ -5,6 +5,8 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2025/12/30 : 1.00.00  新規作成
+ * 2026/09/12 : 1.03.00  買い物日の表示形式変更(Feature1.03 dev1)
+ * 
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.shoppingregist;
@@ -79,17 +81,17 @@ class ShoppingDateTest {
 	}
 
 	@Test
-	@DisplayName("正常系：toDisplayString()でyyyy/MM/dd形式の文字列を取得")
-	void testToDisplayString() {
+	@DisplayName("正常系：toFormatString()でMM/dd形式の文字列を取得")
+	void testToFormatString() {
 		// 準備
 		TargetYearMonth targetYearMonth = TargetYearMonth.from("202408");
 		ShoppingDate date = ShoppingDate.from(LocalDate.of(2024, 8, 18), targetYearMonth);
 
 		// 実行
-		String result = date.toDisplayString();
+		String result = date.toFormatString();
 
 		// 検証
-		assertEquals("2024/08/18", result);
+		assertEquals("08/18", result);
 	}
 
 	@Test

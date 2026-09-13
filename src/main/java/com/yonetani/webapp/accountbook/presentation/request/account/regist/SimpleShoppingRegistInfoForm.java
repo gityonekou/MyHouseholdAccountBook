@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/11/04 : 1.00.00  新規作成
+ * 2026/08/18 : 1.03.00  支払方法・銀行口座管理追加対応(Feature1.03 dev1)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.request.account.regist;
@@ -51,13 +52,13 @@ public class SimpleShoppingRegistInfoForm {
 	// 店舗コード
 	@NotBlank
 	private String shopCode;
+	// 支払方法コード
+	@NotBlank(message = "支払方法を選択してください。")
+	private String paymentMethodCode;
 	// 買い物日
 	@NotNull
 	@DateTimeFormat(pattern = "yyyy/MM/dd")
 	private LocalDate shoppingDate;
-	// 支払方法コード
-	@NotBlank
-	private String paymentMethodCode;
 
 	// 食料品(必須)
 	@Min(value = 0, message = "食料品(必須)の入力値がマイナスです。0円以上の値を入力してください。")

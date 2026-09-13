@@ -6,6 +6,7 @@
  * 日付       : version  コメントなど
  * 2024/11/24 : 1.00.00  新規作成
  * 2025/12/21 : 1.01.00  リファクタリング対応(DDD適応)
+ * 2026/09/12 : 1.03.00  買い物日の表示形式変更(Feature1.03 dev1)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.shoppingregist;
@@ -38,8 +39,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @EqualsAndHashCode
 public class ShoppingDate {
-	// yyyy/MM/dd形式のフォーマッター
-	private static final DateTimeFormatter YYYY_SP_MM_SP_DD_FORMAT = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+	// MM/dd形式のフォーマッター
+	private static final DateTimeFormatter MM_SP_DD_FORMAT = DateTimeFormatter.ofPattern("MM/dd");
 	// 買い物日
 	private final LocalDate value;
 	
@@ -60,18 +61,6 @@ public class ShoppingDate {
 		if(date == null) {
 			throw new MyHouseholdAccountBookRuntimeException("「買い物日」項目の設定値がnullです。管理者に問い合わせてください。");
 		}
-		/*
-		 *  以下の方法では最終日の確認でdateの値に時間が含まれる場合にNGとなるので、Dataの値の年月の部分が等しいかどうかで判定するように修正
-		 */
-//		// 対象年月の月初めの日を取得
-//		LocalDate firstDayOfMonth = LocalDate.parse(checkYearMonth.getValue() + "01", MyHouseholdAccountBookContent.DATE_TIME_FORMATTER);
-//		// 対象月の最終日を取得
-//		LocalDate lastDayOfMonth = firstDayOfMonth.with(TemporalAdjusters.lastDayOfMonth());
-//		// ガード節(対象年月の範囲内でない)
-//		if(firstDayOfMonth.isBefore(date) || date.isAfter(lastDayOfMonth)) {
-//			throw new MyHouseholdAccountBookRuntimeException("「買い物日」項目の設定値の範囲が対象年月の範囲と一致しません。管理者に問い合わせてください。[TargetYearMonth=" 
-//					+ checkYearMonth + "][value=" + DomainCommonUtils.formatyyyyMMdd(date) +"]");
-//		}
 		// 入力した買い物日のyyyyMMの値を取得
 		String yearMonth = date.format(MyHouseholdAccountBookContent.YEAR_MONTH_FORMATTER);
 		// ガード節(対象年月の範囲内でない)
@@ -84,13 +73,13 @@ public class ShoppingDate {
 	
 	/**
 	 *<pre>
-	 * 日付を表示用形式（yyyy/MM/dd）の文字列で取得します。
+	 * 日付を表示用形式（MM/dd）の文字列で取得します。
 	 *</pre>
-	 * @return yyyy/MM/dd形式の文字列
+	 * @return MM/dd形式の文字列
 	 *
 	 */
-	public String toDisplayString() {
-		return this.value.format(YYYY_SP_MM_SP_DD_FORMAT);
+	public String toFormatString() {
+		return this.value.format(MM_SP_DD_FORMAT);
 	}
 
 	/**

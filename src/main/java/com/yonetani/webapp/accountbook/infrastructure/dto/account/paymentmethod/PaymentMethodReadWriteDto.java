@@ -32,6 +32,8 @@ public class PaymentMethodReadWriteDto {
 	private final String paymentMethodCode;
 	// 支払方法名
 	private final String paymentMethodName;
+	// 支払方法メモ
+	private final String paymentMethodMemo;
 	// 支払方法種別
 	private final String paymentMethodKubun;
 	// 銀行口座コード
@@ -52,6 +54,7 @@ public class PaymentMethodReadWriteDto {
 	 * @param userId ユーザID
 	 * @param paymentMethodCode 支払方法コード
 	 * @param paymentMethodName 支払方法名
+	 * @param paymentMethodMemo 支払方法メモ
 	 * @param paymentMethodKubun 支払方法種別
 	 * @param bankAccountCode 銀行口座コード
 	 * @param closingDay 集計開始日
@@ -62,9 +65,9 @@ public class PaymentMethodReadWriteDto {
 	 *
 	 */
 	public static PaymentMethodReadWriteDto from(String userId, String paymentMethodCode, String paymentMethodName,
-			String paymentMethodKubun, String bankAccountCode, String closingDay, String paymentMethodSort,
-			boolean enableFlg, boolean enableUpdateFlg) {
-		return new PaymentMethodReadWriteDto(userId, paymentMethodCode, paymentMethodName, paymentMethodKubun,
-				bankAccountCode, closingDay, paymentMethodSort, enableFlg, enableUpdateFlg);
+			String paymentMethodMemo, String paymentMethodKubun, String bankAccountCode, String closingDay,
+			String paymentMethodSort, boolean enableFlg, boolean enableUpdateFlg) {
+		return new PaymentMethodReadWriteDto(userId, paymentMethodCode, paymentMethodName, paymentMethodMemo,
+				paymentMethodKubun, bankAccountCode, closingDay, paymentMethodSort, enableFlg, enableUpdateFlg);
 	}
 }

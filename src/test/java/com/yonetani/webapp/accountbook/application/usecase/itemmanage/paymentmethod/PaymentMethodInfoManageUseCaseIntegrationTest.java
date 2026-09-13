@@ -131,6 +131,7 @@ class PaymentMethodInfoManageUseCaseIntegrationTest {
 		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE, form.getAction());
 		assertEquals("002", form.getPaymentMethodCode());
 		assertEquals("〇〇銀行引き落とし", form.getPaymentMethodName());
+		assertNull(form.getPaymentMethodMemo(), "テストデータにメモの設定がないためnullであること");
 		assertEquals("2", form.getPaymentMethodKubun());
 		assertEquals("01", form.getBankAccountCode());
 		assertNull(form.getClosingDay());
@@ -171,6 +172,7 @@ class PaymentMethodInfoManageUseCaseIntegrationTest {
 	@Sql(scripts = "ReadPaymentMethodInfoQueryNotFoundTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddAction_現金() {
 		PaymentMethodInfoForm form = inputAddForm("1", null, null, null);
+		form.setPaymentMethodMemo("ポイント還元率1%");
 
 		PaymentMethodInfoManageResponse res = service.execAction(TEST_USER, form);
 		assertTrue(res.isTransactionSuccessFull());
@@ -180,10 +182,25 @@ class PaymentMethodInfoManageUseCaseIntegrationTest {
 		assertEquals(1, resultList.size());
 		PaymentMethodReadWriteDto dto = resultList.get(0);
 		assertEquals("001", dto.getPaymentMethodCode());
+		assertEquals("ポイント還元率1%", dto.getPaymentMethodMemo());
 		assertNull(dto.getBankAccountCode());
 		assertNull(dto.getClosingDay());
 		assertEquals("001", dto.getPaymentMethodSort());
 		assertTrue(dto.isEnableUpdateFlg());
+	}
+
+	/**
+	 * 支払方法メモは任意項目のため、未入力(null)のまま新規登録できることを確認します。
+	 */
+	@Test
+	@Sql(scripts = "ReadPaymentMethodInfoQueryNotFoundTest.sql", config = @SqlConfig(encoding = "UTF-8"))
+	void testExecAddAction_支払方法メモは未入力でも登録できる() {
+		PaymentMethodInfoForm form = inputAddForm("1", null, null, null);
+
+		service.execAction(TEST_USER, form);
+
+		List<PaymentMethodReadWriteDto> resultList = execQueryAllPaymentMethodList();
+		assertNull(resultList.get(0).getPaymentMethodMemo());
 	}
 
 	/**

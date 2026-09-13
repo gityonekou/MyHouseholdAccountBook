@@ -3,12 +3,14 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/12/02 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/12/02 : 1.00.00                      新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
 
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsItem;
@@ -37,7 +39,7 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -51,6 +53,8 @@ public class SimpleShoppingRegistItem {
 	private final ShoppingRegistCode shoppingRegistCode;
 	// 店舗名
 	private final ShopName shopName;
+	// 支払方法コード
+	private final PaymentMethodCode paymentMethodCode;
 	// 買い物日
 	private final ShoppingDate shoppingDate;
 	// 一覧項目:食料品(必須)
@@ -73,7 +77,7 @@ public class SimpleShoppingRegistItem {
 	private final ShoppingCouponPrice shoppingCouponPrice;
 	// 買い物合計金額
 	private final ShoppingTotalAmount shoppingTotalAmount;
-	
+
 	/**
 	 *<pre>
 	 * 引数の値から買い物登録一覧情報(簡易タイプ)を表すドメインモデルを生成して返します。
@@ -81,6 +85,7 @@ public class SimpleShoppingRegistItem {
 	 * @param targetYearMonth 対象年月
 	 * @param shoppingRegistCode 買い物登録コード
 	 * @param shopName 店舗名
+	 * @param paymentMethodCode 支払方法コード
 	 * @param shoppingDate 買い物日
 	 * @param shoppingFoodItem 食料品(必須)
 	 * @param shoppingFoodBItem 食料品B(無駄遣い)
@@ -99,6 +104,7 @@ public class SimpleShoppingRegistItem {
 			TargetYearMonth targetYearMonth,
 			ShoppingRegistCode shoppingRegistCode,
 			ShopName shopName,
+			PaymentMethodCode paymentMethodCode,
 			ShoppingDate shoppingDate,
 			ShoppingFoodItem shoppingFoodItem,
 			ShoppingFoodBItem shoppingFoodBItem,
@@ -110,11 +116,12 @@ public class SimpleShoppingRegistItem {
 			ShoppingHouseEquipmentItem shoppingHouseEquipmentItem,
 			ShoppingCouponPrice shoppingCouponPrice,
 			ShoppingTotalAmount shoppingTotalAmount) {
-		
+
 		return new SimpleShoppingRegistItem(
 				targetYearMonth,
 				shoppingRegistCode,
 				shopName,
+				paymentMethodCode,
 				shoppingDate,
 				shoppingFoodItem,
 				shoppingFoodBItem,

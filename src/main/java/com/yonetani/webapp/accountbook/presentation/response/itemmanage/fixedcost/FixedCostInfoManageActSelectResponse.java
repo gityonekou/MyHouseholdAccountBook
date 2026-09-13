@@ -7,6 +7,7 @@
  * 日付       : version  コメントなど
  * 2024/05/22 : 1.00.00  新規作成
  * 2026/05/01 : 1.01.00  同一支出項目の兄弟固定費明細情報を追加
+ * 2026/08/18 : 1.02.00  支払方法・銀行口座管理追加対応(Feature1.03 dev1)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost;
@@ -17,6 +18,13 @@ import java.util.List;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent.ResolvedPaymentMethodName;
+import com.yonetani.webapp.accountbook.application.usecase.common.ExpenditureItemInfoComponent.ExpenditureItemNamePath;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostName;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentAmount;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -43,7 +51,7 @@ public class FixedCostInfoManageActSelectResponse extends AbstractFixedCostItemL
 	 *</pre>
 	 *
 	 * @author ：Kouki Yonetani
-	 * @since 家計簿アプリ(1.00.A)
+	 * @since 家計簿アプリ(1.00)
 	 *
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -61,10 +69,10 @@ public class FixedCostInfoManageActSelectResponse extends AbstractFixedCostItemL
 		private final String shiharaiTukiDetailContext;
 		// 支払日
 		private final String shiharaiDay;
-		// 支払金額
-		private final String shiharaiKingaku;
 		// 支払方法名（解決済み）
 		private final String paymentMethodName;
+		// 支払金額
+		private final String shiharaiKingaku;
 
 		/**
 		 *<pre>
@@ -76,17 +84,32 @@ public class FixedCostInfoManageActSelectResponse extends AbstractFixedCostItemL
 		 * @param shiharaiDetailContext 支払内容詳細
 		 * @param shiharaiTukiDetailContext 支払月詳細
 		 * @param shiharaiDay 支払日
-		 * @param shiharaiKingaku 支払金額
 		 * @param paymentMethodName 支払方法名（解決済み）
+		 * @param shiharaiKingaku 支払金額
 		 * @return 選択固定費の詳細情報
 		 *
 		 */
-		public static SelectFixedCostInfo from(String fixedCostCode, String sisyutuItemName, String shiharaiName,
-				String shiharaiDetailContext, String shiharaiTukiDetailContext, String shiharaiDay,
-				String shiharaiKingaku, String paymentMethodName) {
-			return new SelectFixedCostInfo(fixedCostCode, sisyutuItemName, shiharaiName,
-					shiharaiDetailContext, shiharaiTukiDetailContext, shiharaiDay,
-					shiharaiKingaku, paymentMethodName);
+		public static SelectFixedCostInfo from(FixedCostCode fixedCostCode, ExpenditureItemNamePath sisyutuItemName, 
+				FixedCostName shiharaiName, FixedCostDetailContext shiharaiDetailContext, 
+				String shiharaiTukiDetailContext, String shiharaiDay,
+				ResolvedPaymentMethodName paymentMethodName, FixedCostPaymentAmount shiharaiKingaku) {
+			return new SelectFixedCostInfo(
+					// 固定費コード
+					fixedCostCode.getValue(),
+					// 支出項目名
+					sisyutuItemName.toFormatString(),
+					// 支払名
+					shiharaiName.getValue(),
+					// 支払内容詳細
+					shiharaiDetailContext.getValue(),
+					// 支払月詳細
+					shiharaiTukiDetailContext,
+					// 支払日
+					shiharaiDay,
+					// 支払方法名（解決済み）
+					paymentMethodName.getValue(),
+					// 支払金額
+					shiharaiKingaku.toFormatString());
 		}
 	}
 	
@@ -113,11 +136,11 @@ public class FixedCostInfoManageActSelectResponse extends AbstractFixedCostItemL
 		private final String shiharaiTukiOptionalContext;
 		// 支払日（コード変換済み）
 		private final String shiharaiDay;
-		// 支払金額（フォーマット済み）
-		private final String shiharaiKingaku;
 		// 支払方法名（解決済み）
 		private final String paymentMethodName;
-
+		// 支払金額（フォーマット済み）
+		private final String shiharaiKingaku;
+		
 		/**
 		 *<pre>
 		 * 引数の値から同一支出項目の兄弟固定費明細情報を生成して返します。
@@ -127,16 +150,29 @@ public class FixedCostInfoManageActSelectResponse extends AbstractFixedCostItemL
 		 * @param shiharaiTukiDetailContext 支払月（コード変換済み）
 		 * @param shiharaiTukiOptionalContext 支払月任意詳細
 		 * @param shiharaiDay 支払日（コード変換済み）
-		 * @param shiharaiKingaku 支払金額（フォーマット済み）
 		 * @param paymentMethodName 支払方法名（解決済み）
+		 * @param shiharaiKingaku 支払金額（フォーマット済み）
 		 * @return 同一支出項目の兄弟固定費明細情報
 		 *
 		 */
-		public static SiblingFixedCostItem from(String fixedCostCode, String shiharaiName,
-				String shiharaiTukiDetailContext, String shiharaiTukiOptionalContext,
-				String shiharaiDay, String shiharaiKingaku, String paymentMethodName) {
-			return new SiblingFixedCostItem(fixedCostCode, shiharaiName,
-					shiharaiTukiDetailContext, shiharaiTukiOptionalContext, shiharaiDay, shiharaiKingaku, paymentMethodName);
+		public static SiblingFixedCostItem from(FixedCostCode fixedCostCode, FixedCostName shiharaiName,
+				String shiharaiTukiDetailContext, String shiharaiTukiOptionalContext, String shiharaiDay, 
+				ResolvedPaymentMethodName paymentMethodName, FixedCostPaymentAmount shiharaiKingaku) {
+			return new SiblingFixedCostItem(
+					// 固定費コード
+					fixedCostCode.getValue(),
+					// 支払名
+					shiharaiName.getValue(),
+					// 支払月（コード変換済み）
+					shiharaiTukiDetailContext,
+					// 支払月任意詳細（その他任意選択時のみ値あり）
+					shiharaiTukiOptionalContext,
+					// 支払日（コード変換済み）
+					shiharaiDay,
+					// 支払方法名（解決済み）
+					paymentMethodName.getValue(),
+					// 支払金額（フォーマット済み）
+					shiharaiKingaku.toFormatString());
 		}
 	}
 

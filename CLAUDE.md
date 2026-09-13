@@ -117,10 +117,40 @@ Phase 1-5 refactoring (DDD準拠リファクタリング) is complete. Documents
 - `docs/test-data-design-rules.md` - Test data conventions
 - `docs/integration-test-guidelines.md` - UseCase integration test detailed guidelines (response verification, assertion rules, session/DB patterns)
 - `docs/DDD設計_金額クラス統合判断基準.md` - Money class design decisions
+- `docs/specifications/06_コーディング規約.md` - Coding conventions: Java file header update-history format, `@since` versioning rule, encoding/line-ending standard per file type
 - `docs/specifications/07_テスト方針書.md` - Project-wide test strategy (coverage targets, naming conventions, quality standards)
 - `docs/archive/income-expenditure-refactoring/` - Archived Phase 1-5 refactoring documents
 - `docs/archive/fixedcost/` - Archived fixed cost feature documents (Feature1.01: UseCase分割・機能追加, Feature1.02: 0円固定費対応)
 - `docs/archive/account-month-inquiry/` - Archived monthly account inquiry feature documents (Feature1.02: 支出別一覧追加)
+
+## Coding Conventions
+
+Full details: `docs/specifications/06_コーディング規約.md` (must-follow, applies across all chats/sessions on this project).
+
+- **Javaファイルヘッダの更新履歴** (java files only; other source files and .js files have no update-history header):
+  ```java
+  /**
+   * クラスの概要説明
+   *
+   *------------------------------------------------
+   * 更新履歴
+   * 日付       : version  ブランチ            コメントなど
+   * 2026/05/27 : 1.00.00  feature-1.01-dev4   新規作成
+   * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+   *
+   */
+  ```
+  Only "日付 : version" is colon-separated; version increments per branch (1.00→1.01→…→99→alphabetic), resets to X.00.00 when the branch major changes (e.g. `feature-2.00.**`). Add a new line per update; never rewrite past lines.
+- **`@since` tag**: `@since 家計簿アプリ(1.03)` — the version part reflects the branch at class **creation** time only, and never changes afterward (update history above is where later changes are tracked).
+- **Encoding / line endings** (new and edited files):
+
+  | Type | Encoding | Line ending |
+  |---|---|---|
+  | java | UTF-8 | CRLF |
+  | sql | UTF-8 | LF |
+  | css | UTF-8 | LF |
+  | js | UTF-8 | LF |
+  | html | UTF-8 | CRLF |
 
 ## Japanese Conventions
 

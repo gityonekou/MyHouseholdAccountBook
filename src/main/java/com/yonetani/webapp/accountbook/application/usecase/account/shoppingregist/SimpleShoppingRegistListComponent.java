@@ -4,8 +4,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/12/28 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/12/28 : 1.00.00                      新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist;
@@ -14,10 +15,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent;
+import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent.PaymentMethodNameResolver;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.SimpleShoppingRegistItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.shoppingregist.ShoppingRegistTableRepository;
-import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.AbstractSimpleShoppingRegistListResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.AbstractSimpleShoppingRegistListResponse.SimpleShoppingRegistListItem;
 
@@ -32,7 +34,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Component
@@ -42,7 +44,9 @@ public class SimpleShoppingRegistListComponent {
 	
 	// 買い物登録情報リポジトリー
 	private final ShoppingRegistTableRepository shoppingRegistRepository;
-	
+	// 支払方法コード→表示名解決コンポーネント
+	private final PaymentMethodInfoComponent paymentMethodInfoComponent;
+
 	/**
 	 *<pre>
 	 * 簡易タイプ買い物リスト情報を取得し、画面情報に設定します。
@@ -60,60 +64,63 @@ public class SimpleShoppingRegistListComponent {
 			// 登録済み買い物情報が0件の場合、メッセージを設定
 			response.addMessage("登録済みの買い物情報は0件です。");
 		} else {
+			// 支払方法コード→表示名解決リゾルバをリクエスト単位で1回だけ生成(N+1回避)
+			PaymentMethodNameResolver paymentMethodNameResolver = paymentMethodInfoComponent.createResolver(search.getUserId());
 			response.addShoppingRegistListItemInfo(resultList.getValues().stream().map(domain ->
 				SimpleShoppingRegistListItem.from(
 						// 対象年月
-						domain.getTargetYearMonth().getValue(),
+						domain.getTargetYearMonth(),
 						// 買い物登録コード
-						domain.getShoppingRegistCode().getValue(),
-						// 買い物日(DD:日付の値)
-						String.format("%02d", domain.getShoppingDate().getValue().getDayOfMonth()),
+						domain.getShoppingRegistCode(),
+						// 買い物日
+						domain.getShoppingDate(),
 						// 店舗名
-						domain.getShopName().getValue(),
+						domain.getShopName(),
+						// 支払方法名(解決済み)
+						paymentMethodNameResolver.getPaymentMethodName(domain.getPaymentMethodCode()),
 						// 食料品(必須)
-						DomainCommonUtils.formatKingakuAndYen(domain.getShoppingFoodItem().getValue()),
+						domain.getShoppingFoodItem(),
 						// 食料品B(無駄遣い)
-						DomainCommonUtils.formatKingakuAndYen(domain.getShoppingFoodBItem().getValue()),
+						domain.getShoppingFoodBItem(),
 						// 食料品C(お酒類)
-						DomainCommonUtils.formatKingakuAndYen(domain.getShoppingFoodCItem().getValue()),
+						domain.getShoppingFoodCItem(),
 						// 外食
-						DomainCommonUtils.formatKingakuAndYen(domain.getShoppingDineOutItem().getValue()),
+						domain.getShoppingDineOutItem(),
 						// 日用品
-						DomainCommonUtils.formatKingakuAndYen(domain.getShoppingConsumerGoodsItem().getValue()),
+						domain.getShoppingConsumerGoodsItem(),
 						// 衣料品(私服)
-						DomainCommonUtils.formatKingakuAndYen(domain.getShoppingClothesItem().getValue()),
+						domain.getShoppingClothesItem(),
 						// 仕事
-						DomainCommonUtils.formatKingakuAndYen(domain.getShoppingWorkItem().getValue()),
+						domain.getShoppingWorkItem(),
 						// 住居設備
-						DomainCommonUtils.formatKingakuAndYen(domain.getShoppingHouseEquipmentItem().getValue()),
+						domain.getShoppingHouseEquipmentItem(),
 						// クーポン金額
-						DomainCommonUtils.formatKingakuAndYen(domain.getShoppingCouponPrice().getValue()),
+						domain.getShoppingCouponPrice(),
 						// 買い物合計金額
-						DomainCommonUtils.formatKingakuAndYen(domain.getShoppingTotalAmount().getValue())
-						)
+						domain.getShoppingTotalAmount())
 			).collect(Collectors.toUnmodifiableList()));
 			
 			// 月度の各種買い物項目の合計値を設定
 			// 食料品(必須)合計
-			response.setTotalShoppingFood(DomainCommonUtils.formatKingakuAndYen(resultList.getTotalShoppingFoodItem().getValue()));
+			response.setTotalShoppingFood(resultList.getTotalShoppingFoodItem().toFormatString());
 			// 食料品B(無駄遣い)合計
-			response.setTotalShoppingFoodB(DomainCommonUtils.formatKingakuAndYen(resultList.getTotalShoppingFoodBItem().getValue()));
+			response.setTotalShoppingFoodB(resultList.getTotalShoppingFoodBItem().toFormatString());
 			// 食料品C(お酒類)合計
-			response.setTotalShoppingFoodC(DomainCommonUtils.formatKingakuAndYen(resultList.getTotalShoppingFoodCItem().getValue()));
+			response.setTotalShoppingFoodC(resultList.getTotalShoppingFoodCItem().toFormatString());
 			// 外食合計
-			response.setTotalShoppingDineOut(DomainCommonUtils.formatKingakuAndYen(resultList.getTotalShoppingDineOutItem().getValue()));
+			response.setTotalShoppingDineOut(resultList.getTotalShoppingDineOutItem().toFormatString());
 			// 日用品合計
-			response.setTotalShoppingConsumerGoods(DomainCommonUtils.formatKingakuAndYen(resultList.getTotalShoppingConsumerGoodsItem().getValue()));
+			response.setTotalShoppingConsumerGoods(resultList.getTotalShoppingConsumerGoodsItem().toFormatString());
 			// 衣料品(私服)合計
-			response.setTotalShoppingClothes(DomainCommonUtils.formatKingakuAndYen(resultList.getTotalShoppingClothesItem().getValue()));
+			response.setTotalShoppingClothes(resultList.getTotalShoppingClothesItem().toFormatString());
 			// 仕事合計
-			response.setTotalShoppingWork(DomainCommonUtils.formatKingakuAndYen(resultList.getTotalShoppingWorkItem().getValue()));
+			response.setTotalShoppingWork(resultList.getTotalShoppingWorkItem().toFormatString());
 			// 住居設備合計
-			response.setTotalShoppingHouseEquipment(DomainCommonUtils.formatKingakuAndYen(resultList.getTotalShoppingHouseEquipmentItem().getValue()));
+			response.setTotalShoppingHouseEquipment(resultList.getTotalShoppingHouseEquipmentItem().toFormatString());
 			// クーポン金額合計
-			response.setTotalShoppingCouponPrice(DomainCommonUtils.formatKingakuAndYen(resultList.getTotalShoppingCouponPrice().getValue()));
+			response.setTotalShoppingCouponPrice(resultList.getTotalShoppingCouponPrice().toFormatString());
 			// 月度買い物合計金額
-			response.setShoppingMonthTotalAmount(DomainCommonUtils.formatKingakuAndYen(resultList.getShoppingMonthTotalAmount().getValue()));
+			response.setShoppingMonthTotalAmount(resultList.getShoppingMonthTotalAmount().toFormatString());
 			
 		}
 	}

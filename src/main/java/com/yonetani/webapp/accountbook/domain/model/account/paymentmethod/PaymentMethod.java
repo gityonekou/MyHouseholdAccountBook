@@ -3,8 +3,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/08/19 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/08/19 : 1.00.00  feature-1.03-dev1   新規作成
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.paymentmethod;
@@ -13,6 +13,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.bankaccount.BankAccou
 import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.ClosingDay;
 import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
 import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodKubun;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodMemo;
 import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodName;
 import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodSort;
 import com.yonetani.webapp.accountbook.domain.type.common.EnableFlg;
@@ -47,6 +48,8 @@ public class PaymentMethod {
 	private final PaymentMethodCode paymentMethodCode;
 	// 支払方法名
 	private final PaymentMethodName paymentMethodName;
+	// 支払方法メモ(null許容)
+	private final PaymentMethodMemo paymentMethodMemo;
 	// 支払方法種別
 	private final PaymentMethodKubun paymentMethodKubun;
 	// 銀行口座コード(null許容。種別により要否が異なる)
@@ -67,6 +70,7 @@ public class PaymentMethod {
 	 * @param userId ユーザID
 	 * @param paymentMethodCode 支払方法コード
 	 * @param paymentMethodName 支払方法名
+	 * @param paymentMethodMemo 支払方法メモ(null許容)
 	 * @param paymentMethodKubun 支払方法種別
 	 * @param bankAccountCode 銀行口座コード(null許容)
 	 * @param closingDay 集計開始日(null許容)
@@ -80,6 +84,7 @@ public class PaymentMethod {
 			String userId,
 			String paymentMethodCode,
 			String paymentMethodName,
+			String paymentMethodMemo,
 			String paymentMethodKubun,
 			String bankAccountCode,
 			String closingDay,
@@ -90,6 +95,7 @@ public class PaymentMethod {
 				UserId.from(userId),
 				PaymentMethodCode.from(paymentMethodCode),
 				PaymentMethodName.from(paymentMethodName),
+				PaymentMethodMemo.from(paymentMethodMemo),
 				PaymentMethodKubun.from(paymentMethodKubun),
 				StringUtils.hasLength(bankAccountCode) ? BankAccountCode.from(bankAccountCode) : null,
 				ClosingDay.from(closingDay),

@@ -94,8 +94,8 @@ class FixedCostTableDataSourceTest {
 		/* 全項目の登録チェック（FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXTあり） */
 		FixedCost addData = FixedCost.from(
 				"TEST-USER-ID", "0001", "家賃", "毎月27日引き落とし",
-				"0030", "1", "00", "任意詳細テスト", "27",
-				new BigDecimal("60000.00"), "001");
+				"0030", "1", "00", "任意詳細テスト", "27", "001",
+				new BigDecimal("60000.00"));
 		assertEquals(1, repository.add(addData), "登録データが1件であること");
 
 		Map<String, Object> actual = jdbcTemplate.queryForMap(
@@ -121,8 +121,8 @@ class FixedCostTableDataSourceTest {
 		/* null可項目の登録チェック（FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT=null） */
 		FixedCost addNullData = FixedCost.from(
 				"TEST-USER-ID", "0002", "電気代概算", "概算で登録",
-				"0037", "2", "00", null, "27",
-				new BigDecimal("12000.00"), "001");
+				"0037", "2", "00", null, "27", "001",
+				new BigDecimal("12000.00"));
 		assertEquals(1, repository.add(addNullData), "null可項目あり:登録データが1件であること");
 
 		Map<String, Object> actualNull = jdbcTemplate.queryForMap(
@@ -163,8 +163,8 @@ class FixedCostTableDataSourceTest {
 		 * FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXTに値をセット（更新されることを確認） */
 		FixedCost updateData = FixedCost.from(
 				"TEST-USER-ID", "0001", "更新後支払名", "更新後詳細",
-				"9999", "2", "20", "更新後任意詳細", "00",
-				new BigDecimal("35000.00"), "001");
+				"9999", "2", "20", "更新後任意詳細", "00", "001",
+				new BigDecimal("35000.00"));
 		assertEquals(1, repository.update(updateData), "更新データが1件であること");
 
 		Map<String, Object> actual = jdbcTemplate.queryForMap(
@@ -186,15 +186,15 @@ class FixedCostTableDataSourceTest {
 		/* 対象データなしの場合、0件が返ること */
 		FixedCost notFound = FixedCost.from(
 				"TEST-USER-ID", "9999", "対象なし", "",
-				"0001", "1", "00", null, "27",
-				new BigDecimal("0.00"), "001");
+				"0001", "1", "00", null, "27", "001",
+				new BigDecimal("0.00"));
 		assertEquals(0, repository.update(notFound), "対象データなしの場合、0件であること");
 
 		/* null可項目の更新チェック（FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT=nullに更新） */
 		FixedCost updateNullData = FixedCost.from(
 				"TEST-USER-ID", "0001", "更新後支払名(null可)", "更新後詳細(null可)",
-				"9999", "1", "00", null, "27",
-				new BigDecimal("40000.00"), "001");
+				"9999", "1", "00", null, "27", "001",
+				new BigDecimal("40000.00"));
 		assertEquals(1, repository.update(updateNullData), "null可項目更新:更新データが1件であること");
 
 		Map<String, Object> actualNull = jdbcTemplate.queryForMap(
@@ -226,8 +226,8 @@ class FixedCostTableDataSourceTest {
 		/* 論理削除チェック */
 		FixedCost deleteData = FixedCost.from(
 				"TEST-USER-ID", "0001", "削除対象支払名", "削除対象詳細",
-				"0002", "1", "40", "削除対象任意詳細", "15",
-				new BigDecimal("30000.00"), "001");
+				"0002", "1", "40", "削除対象任意詳細", "15", "001",
+				new BigDecimal("30000.00"));
 		assertEquals(1, repository.delete(deleteData), "削除データが1件であること");
 
 		Map<String, Object> actual = jdbcTemplate.queryForMap(
@@ -249,8 +249,8 @@ class FixedCostTableDataSourceTest {
 		/* 対象データなしの場合、0件が返ること */
 		FixedCost notFound = FixedCost.from(
 				"TEST-USER-ID", "9999", "対象なし", "",
-				"0001", "1", "00", null, "27",
-				new BigDecimal("0.00"), "001");
+				"0001", "1", "00", null, "27", "001",
+				new BigDecimal("0.00"));
 		assertEquals(0, repository.delete(notFound), "対象データなしの場合、0件であること");
 	}
 }

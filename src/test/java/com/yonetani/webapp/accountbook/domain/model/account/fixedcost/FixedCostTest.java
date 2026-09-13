@@ -34,8 +34,8 @@ class FixedCostTest {
 	void testFrom_BigDecimal_正常系_全項目指定() {
 		FixedCost fixedCost = FixedCost.from(
 				"user01", "0001", "家賃", "毎月27日引き落とし",
-				"0035", "1", "00", null, "27",
-				new BigDecimal("60000.00"), "001");
+				"0035", "1", "00", null, "27", "001",
+				new BigDecimal("60000.00"));
 
 		assertEquals("user01", fixedCost.getUserId().getValue());
 		assertEquals("0001", fixedCost.getFixedCostCode().getValue());
@@ -55,8 +55,8 @@ class FixedCostTest {
 	void testFrom_Integer_正常系_全項目指定() {
 		FixedCost fixedCost = FixedCost.from(
 				"user01", "0002", "電気代概算", "概算で登録",
-				"0037", "2", "00", null, "27",
-				Integer.valueOf(12000), "001");
+				"0037", "2", "00", null, "27", "001",
+				Integer.valueOf(12000));
 
 		assertEquals(0, new BigDecimal("12000.00").compareTo(fixedCost.getFixedCostPaymentAmount().getValue()));
 		assertEquals("2", fixedCost.getFixedCostKubun().getValue());
@@ -68,8 +68,8 @@ class FixedCostTest {
 	void testUpdateBulkUpdateItem_正常系_支払日と支払金額のみ更新() {
 		FixedCost before = FixedCost.from(
 				"user01", "0001", "家賃", "毎月27日引き落とし",
-				"0035", "1", "00", null, "27",
-				new BigDecimal("60000.00"), "001");
+				"0035", "1", "00", null, "27", "001",
+				new BigDecimal("60000.00"));
 
 		FixedCost after = before.updateBulkUpdateItem("31", Integer.valueOf(65000));
 
@@ -92,8 +92,8 @@ class FixedCostTest {
 	void testUpdateBulkUpdateItem_正常系_支払方法コードは現在値のまま() {
 		FixedCost before = FixedCost.from(
 				"user01", "0001", "家賃", "毎月27日引き落とし",
-				"0035", "1", "00", null, "27",
-				new BigDecimal("60000.00"), "001");
+				"0035", "1", "00", null, "27", "001",
+				new BigDecimal("60000.00"));
 
 		FixedCost after = before.updateBulkUpdateItem("27", Integer.valueOf(60000));
 
@@ -105,8 +105,8 @@ class FixedCostTest {
 	void testGetExpenditureDetailContext_正常系_両方未設定() {
 		FixedCost fixedCost = FixedCost.from(
 				"user01", "0001", "家賃", "",
-				"0035", "1", "00", "", "27",
-				new BigDecimal("60000.00"), "001");
+				"0035", "1", "00", "", "27", "001",
+				new BigDecimal("60000.00"));
 
 		assertEquals("", fixedCost.getExpenditureDetailContext());
 	}
@@ -116,8 +116,8 @@ class FixedCostTest {
 	void testGetExpenditureDetailContext_正常系_詳細のみ設定() {
 		FixedCost fixedCost = FixedCost.from(
 				"user01", "0001", "家賃", "毎月27日引き落とし",
-				"0035", "1", "00", "", "27",
-				new BigDecimal("60000.00"), "001");
+				"0035", "1", "00", "", "27", "001",
+				new BigDecimal("60000.00"));
 
 		assertEquals("毎月27日引き落とし", fixedCost.getExpenditureDetailContext());
 	}
@@ -127,8 +127,8 @@ class FixedCostTest {
 	void testGetExpenditureDetailContext_正常系_任意詳細のみ設定() {
 		FixedCost fixedCost = FixedCost.from(
 				"user01", "0004", "その他任意テスト", "",
-				"0038", "1", "40", "不定期の支払です", "27",
-				new BigDecimal("10000.00"), "001");
+				"0038", "1", "40", "不定期の支払です", "27", "001",
+				new BigDecimal("10000.00"));
 
 		assertEquals("不定期の支払です", fixedCost.getExpenditureDetailContext());
 	}
@@ -138,8 +138,8 @@ class FixedCostTest {
 	void testGetExpenditureDetailContext_正常系_両方設定で連結() {
 		FixedCost fixedCost = FixedCost.from(
 				"user01", "0004", "その他任意テスト", "その他任意テスト詳細内容",
-				"0038", "1", "40", "不定期の支払です", "27",
-				new BigDecimal("10000.00"), "001");
+				"0038", "1", "40", "不定期の支払です", "27", "001",
+				new BigDecimal("10000.00"));
 
 		assertEquals("その他任意テスト詳細内容/不定期の支払です", fixedCost.getExpenditureDetailContext());
 	}
@@ -149,12 +149,12 @@ class FixedCostTest {
 	void testEquals_正常系_値ベースで一致() {
 		FixedCost fixedCost1 = FixedCost.from(
 				"user01", "0001", "家賃", "毎月27日引き落とし",
-				"0035", "1", "00", null, "27",
-				new BigDecimal("60000.00"), "001");
+				"0035", "1", "00", null, "27", "001",
+				new BigDecimal("60000.00"));
 		FixedCost fixedCost2 = FixedCost.from(
 				"user01", "0001", "家賃", "毎月27日引き落とし",
-				"0035", "1", "00", null, "27",
-				new BigDecimal("60000.00"), "001");
+				"0035", "1", "00", null, "27", "001",
+				new BigDecimal("60000.00"));
 
 		assertEquals(fixedCost1, fixedCost2);
 		assertEquals(fixedCost1.hashCode(), fixedCost2.hashCode());

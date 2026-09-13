@@ -100,6 +100,31 @@ class SimpleShoppingRegistControllerIntegrationTest {
 	}
 
 	@Test
+	@DisplayName("正常系：GET / 初期表示の登録済み買い物一覧に支払方法名が解決されて設定される")
+	void testGetInitLoad_ShoppingRegistListPaymentMethodName() throws Exception {
+		var result = mockMvc.perform(get("/myhacbook/accountregist/simpleshoppingregist/")
+				.param("targetYearMonth", "202511")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().isOk())
+			.andReturn();
+
+		@SuppressWarnings("unchecked")
+		var shoppingRegistList = (java.util.List<com.yonetani.webapp.accountbook.presentation.response.account.regist.AbstractSimpleShoppingRegistListResponse.SimpleShoppingRegistListItem>)
+				result.getModelAndView().getModel().get("shoppingRegistList");
+		org.junit.jupiter.api.Assertions.assertEquals(2, shoppingRegistList.size());
+
+		var item001 = shoppingRegistList.stream()
+				.filter(i -> "001".equals(i.getShoppingRegistCode())).findFirst().orElseThrow();
+		org.junit.jupiter.api.Assertions.assertEquals("現金", item001.getPaymentMethodName(), "支払方法コード001は「現金」に解決されること");
+
+		var item002 = shoppingRegistList.stream()
+				.filter(i -> "002".equals(i.getShoppingRegistCode())).findFirst().orElseThrow();
+		org.junit.jupiter.api.Assertions.assertEquals("無効化済み口座振替", item002.getPaymentMethodName(),
+				"無効化された支払方法(003)でも、一覧では実際の支払方法名で表示されること(選択肢から除外されるのはフォームのプルダウンのみ)");
+	}
+
+	@Test
 	@DisplayName("正常系：GET /updateload で既存の支払方法コードがフォームに反映される")
 	void testGetUpdateLoad_NormalCase() throws Exception {
 		mockMvc.perform(get("/myhacbook/accountregist/simpleshoppingregist/updateload")

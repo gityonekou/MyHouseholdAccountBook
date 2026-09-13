@@ -6,8 +6,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/08/19 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/08/19 : 1.00.00  feature-1.03-dev1   新規作成
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.paymentmethod;
@@ -126,6 +126,7 @@ public class PaymentMethodInfoManageUseCase {
 		form.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE);
 		form.setPaymentMethodCode(paymentMethod.getPaymentMethodCode().getValue());
 		form.setPaymentMethodName(paymentMethod.getPaymentMethodName().getValue());
+		form.setPaymentMethodMemo(paymentMethod.getPaymentMethodMemo().getValue());
 		form.setPaymentMethodKubun(paymentMethod.getPaymentMethodKubun().getValue());
 		form.setBankAccountCode(paymentMethod.getBankAccountCode() == null ? null : paymentMethod.getBankAccountCode().getValue());
 		form.setClosingDay(paymentMethod.getClosingDay().getValue());
@@ -210,6 +211,7 @@ public class PaymentMethodInfoManageUseCase {
 					userId.getValue(),
 					PaymentMethodCode.getNewCode(count),
 					paymentMethodForm.getPaymentMethodName(),
+					paymentMethodForm.getPaymentMethodMemo(),
 					paymentMethodForm.getPaymentMethodKubun(),
 					normalizedBankAccountCode,
 					normalizedClosingDay,
@@ -267,6 +269,7 @@ public class PaymentMethodInfoManageUseCase {
 					userId.getValue(),
 					paymentMethodForm.getPaymentMethodCode(),
 					paymentMethodForm.getPaymentMethodName(),
+					paymentMethodForm.getPaymentMethodMemo(),
 					paymentMethodForm.getPaymentMethodKubun(),
 					normalizedBankAccountCode,
 					normalizedClosingDay,
@@ -329,7 +332,7 @@ public class PaymentMethodInfoManageUseCase {
 						domain.getPaymentMethodCode().getValue(),
 						domain.getPaymentMethodName().getValue(),
 						codeTableItem.getCodeValue(MyHouseholdAccountBookContent.CODE_DEFINES_PAYMENT_METHOD_KUBUN, domain.getPaymentMethodKubun().getValue()),
-						resolver.getBankAccountName(domain.getPaymentMethodCode()),
+						resolver.getBankAccountName(domain.getPaymentMethodCode()).getValue(),
 						domain.getClosingDay().getValue() == null ? "－" : domain.getClosingDay().getValue(),
 						domain.getPaymentMethodSort().getValue(),
 						domain.getEnableFlg().getValue())
@@ -371,6 +374,7 @@ public class PaymentMethodInfoManageUseCase {
 				data.getUserId().getValue(),
 				data.getPaymentMethodCode().getValue(),
 				data.getPaymentMethodName().getValue(),
+				data.getPaymentMethodMemo().getValue(),
 				data.getPaymentMethodKubun().getValue(),
 				data.getBankAccountCode() == null ? null : data.getBankAccountCode().getValue(),
 				data.getClosingDay().getValue(),

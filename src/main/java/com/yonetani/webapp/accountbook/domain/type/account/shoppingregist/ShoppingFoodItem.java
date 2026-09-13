@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2024/12/07 : 1.00.00  新規作成
+ * 2026/09/13 : 1.03.00  リファクタリング対応(Feature1.03 dev1)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.shoppingregist;
@@ -13,6 +14,7 @@ package com.yonetani.webapp.accountbook.domain.type.account.shoppingregist;
 import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.common.NullableMoney;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 
 import lombok.AccessLevel;
@@ -34,7 +36,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @EqualsAndHashCode
-public class ShoppingFoodItem {
+public class ShoppingFoodItem extends NullableMoney {
 	// 食料品(必須)金額
 	private final BigDecimal value;
 	// 「食料品(必須)金額」項目

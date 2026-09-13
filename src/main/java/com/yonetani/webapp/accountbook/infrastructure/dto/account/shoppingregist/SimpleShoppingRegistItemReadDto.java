@@ -75,4 +75,6 @@ public class SimpleShoppingRegistItemReadDto {
 	private final BigDecimal shoppingCouponPrice;
 	// 買い物合計金額
 	private final BigDecimal shoppingTotalAmount;
+	// 支払方法コード
+	private final String paymentMethodCode;
 }

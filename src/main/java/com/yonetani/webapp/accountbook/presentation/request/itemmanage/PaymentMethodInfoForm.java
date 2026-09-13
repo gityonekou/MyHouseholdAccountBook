@@ -43,6 +43,9 @@ public class PaymentMethodInfoForm {
 	@NotBlank
 	@Size(min = 1, max = 50)
 	private String paymentMethodName;
+	// 支払方法メモ(任意項目。dev2のクレジットカードポイント減算で、設定値がある場合のみ画面表示)
+	@Size(max = 400)
+	private String paymentMethodMemo;
 	// 支払方法種別(1～5)
 	@NotBlank
 	private String paymentMethodKubun;

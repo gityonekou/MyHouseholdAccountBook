@@ -7,6 +7,7 @@
  * 2023/09/24 : 1.00.00  新規作成
  * 2026/05/07 : 1.01.00  固定費合計表示変更対応(対象年月の加算メソッドとラベル取得メソッドを追加)  
  * 2026/05/09 : 1.01.01  リファクタリング追加対応(対象年月ドメインの集約)
+ * 2026/09/10 : 1.03.00  リファクタリング対応：年項目、月項目のドメインタイプの文字列型返却を廃止、フォーマットメソッド名の変更
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
@@ -116,28 +117,6 @@ public class TargetYearMonth {
 	
 	/**
 	 *<pre>
-	 * パッケージしている年(YYYY)の値を文字列で返します。
-	 *</pre>
-	 * @return 年(YYYY)の値
-	 *
-	 */
-	public String getYear() {
-		return targetYear.getValue();
-	}
-	
-	/**
-	 *<pre>
-	 * パッケージしている月(MM)の値を文字列で返します。
-	 *</pre>
-	 * @return getYear 月(MM)の値
-	 *
-	 */
-	public String getMonth() {
-		return targetMonth.getValue();
-	}
-	
-	/**
-	 *<pre>
 	 * 指定した月数後の TargetYearMonth を返します。
 	 *</pre>
 	 * @param months 加算する月数
@@ -152,16 +131,16 @@ public class TargetYearMonth {
 
 	/**
 	 *<pre>
-	 * "YYYY年MM月" 形式の表示ラベルを返します（月の先頭0あり）。
+	 * "YYYY年MM月" 形式のフォーマット値を返します（月の先頭0あり）。
 	 * 例: 2025年11月、2026年01月
 	 *</pre>
-	 * @return 表示ラベル
+	 * @return "YYYY年MM月" 形式のフォーマット値
 	 *
 	 */
-	public String toDisplayLabel() {
+	public String toFormatString() {
 		return targetYear.getValue() + "年" + targetMonth.getValue() + "月";
 	}
-
+	
 	@Override
 	public String toString() {
 		return value;

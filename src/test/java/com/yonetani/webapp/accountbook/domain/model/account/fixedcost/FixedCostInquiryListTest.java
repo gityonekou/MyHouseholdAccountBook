@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostInquiryList.FixedCostInquiryItem;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 
 /**
@@ -61,15 +62,15 @@ import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 class FixedCostInquiryListTest {
 
 	// 対象年月: 2025/11(奇)・2025/12(偶)・2026/01(奇)
-	private static final TargetYearMonth YM_NOV = TargetYearMonth.from("202511");
-	private static final TargetYearMonth YM_DEC = TargetYearMonth.from("202512");
-	private static final TargetYearMonth YM_JAN = TargetYearMonth.from("202601");
+	private static final TargetMonth NOV = TargetYearMonth.from("202511").getTargetMonth();
+	private static final TargetMonth DEC = TargetYearMonth.from("202512").getTargetMonth();
+	private static final TargetMonth JAN = TargetYearMonth.from("202601").getTargetMonth();
 
 	private FixedCostInquiryItem item(String tuki, int amount) {
 		return FixedCostInquiryItem.from(
 				"0001", "テスト固定費", "", "テスト支出項目",
-				tuki, null, "27",
-				new BigDecimal(amount).setScale(2), "001");
+				tuki, null, "27","001",
+				new BigDecimal(amount).setScale(2));
 	}
 
 	/**
@@ -81,9 +82,9 @@ class FixedCostInquiryListTest {
 	@DisplayName("① 空リスト → 全月ZERO")
 	void testEmpty() {
 		FixedCostInquiryList list = FixedCostInquiryList.from(Collections.emptyList());
-		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(YM_NOV), "11月はZERO");
-		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(YM_DEC), "12月はZERO");
-		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(YM_JAN), "01月はZERO");
+		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(NOV), "11月はZERO");
+		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(DEC), "12月はZERO");
+		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(JAN), "01月はZERO");
 	}
 
 	/**
@@ -95,9 +96,9 @@ class FixedCostInquiryListTest {
 	@DisplayName("② 毎月(00) → 全月加算")
 	void testEveryMonth() {
 		FixedCostInquiryList list = FixedCostInquiryList.from(List.of(item("00", 10000)));
-		assertEquals("10,000円", list.calculateMonthlyTotal(YM_NOV).toFormatString(), "11月は加算");
-		assertEquals("10,000円", list.calculateMonthlyTotal(YM_DEC).toFormatString(), "12月は加算");
-		assertEquals("10,000円", list.calculateMonthlyTotal(YM_JAN).toFormatString(), "01月は加算");
+		assertEquals("10,000円", list.calculateMonthlyTotal(NOV).toFormatString(), "11月は加算");
+		assertEquals("10,000円", list.calculateMonthlyTotal(DEC).toFormatString(), "12月は加算");
+		assertEquals("10,000円", list.calculateMonthlyTotal(JAN).toFormatString(), "01月は加算");
 	}
 
 	/**
@@ -109,9 +110,9 @@ class FixedCostInquiryListTest {
 	@DisplayName("③ 奇数月(20) → 11月・01月加算、12月除外")
 	void testOddMonth() {
 		FixedCostInquiryList list = FixedCostInquiryList.from(List.of(item("20", 10000)));
-		assertEquals("10,000円", list.calculateMonthlyTotal(YM_NOV).toFormatString(), "11月(奇)は加算");
-		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(YM_DEC), "12月(偶)は除外");
-		assertEquals("10,000円", list.calculateMonthlyTotal(YM_JAN).toFormatString(), "01月(奇)は加算");
+		assertEquals("10,000円", list.calculateMonthlyTotal(NOV).toFormatString(), "11月(奇)は加算");
+		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(DEC), "12月(偶)は除外");
+		assertEquals("10,000円", list.calculateMonthlyTotal(JAN).toFormatString(), "01月(奇)は加算");
 	}
 
 	/**
@@ -123,9 +124,9 @@ class FixedCostInquiryListTest {
 	@DisplayName("④ 偶数月(30) → 12月加算、11月・01月除外")
 	void testEvenMonth() {
 		FixedCostInquiryList list = FixedCostInquiryList.from(List.of(item("30", 10000)));
-		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(YM_NOV), "11月(奇)は除外");
-		assertEquals("10,000円", list.calculateMonthlyTotal(YM_DEC).toFormatString(), "12月(偶)は加算");
-		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(YM_JAN), "01月(奇)は除外");
+		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(NOV), "11月(奇)は除外");
+		assertEquals("10,000円", list.calculateMonthlyTotal(DEC).toFormatString(), "12月(偶)は加算");
+		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(JAN), "01月(奇)は除外");
 	}
 
 	/**
@@ -137,9 +138,9 @@ class FixedCostInquiryListTest {
 	@DisplayName("⑤ 11月指定(11) → 11月加算、12月・01月除外")
 	void testSpecificMonth11() {
 		FixedCostInquiryList list = FixedCostInquiryList.from(List.of(item("11", 10000)));
-		assertEquals("10,000円", list.calculateMonthlyTotal(YM_NOV).toFormatString(), "11月は加算");
-		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(YM_DEC), "12月は除外");
-		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(YM_JAN), "01月は除外");
+		assertEquals("10,000円", list.calculateMonthlyTotal(NOV).toFormatString(), "11月は加算");
+		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(DEC), "12月は除外");
+		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(JAN), "01月は除外");
 	}
 
 	/**
@@ -151,9 +152,9 @@ class FixedCostInquiryListTest {
 	@DisplayName("⑥ 01月指定(01) → 01月加算、11月・12月除外")
 	void testSpecificMonth01() {
 		FixedCostInquiryList list = FixedCostInquiryList.from(List.of(item("01", 10000)));
-		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(YM_NOV), "11月は除外");
-		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(YM_DEC), "12月は除外");
-		assertEquals("10,000円", list.calculateMonthlyTotal(YM_JAN).toFormatString(), "01月は加算");
+		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(NOV), "11月は除外");
+		assertEquals(FixedCostPaymentTotalAmount.ZERO, list.calculateMonthlyTotal(DEC), "12月は除外");
+		assertEquals("10,000円", list.calculateMonthlyTotal(JAN).toFormatString(), "01月は加算");
 	}
 
 	/**
@@ -165,9 +166,9 @@ class FixedCostInquiryListTest {
 	@DisplayName("⑦ その他任意(40) → 全月加算")
 	void testOptional() {
 		FixedCostInquiryList list = FixedCostInquiryList.from(List.of(item("40", 10000)));
-		assertEquals("10,000円", list.calculateMonthlyTotal(YM_NOV).toFormatString(), "11月は加算");
-		assertEquals("10,000円", list.calculateMonthlyTotal(YM_DEC).toFormatString(), "12月は加算");
-		assertEquals("10,000円", list.calculateMonthlyTotal(YM_JAN).toFormatString(), "01月は加算");
+		assertEquals("10,000円", list.calculateMonthlyTotal(NOV).toFormatString(), "11月は加算");
+		assertEquals("10,000円", list.calculateMonthlyTotal(DEC).toFormatString(), "12月は加算");
+		assertEquals("10,000円", list.calculateMonthlyTotal(JAN).toFormatString(), "01月は加算");
 	}
 
 	/**
@@ -199,9 +200,9 @@ class FixedCostInquiryListTest {
 				item("40", 10000),
 				item("11", 5000));
 		FixedCostInquiryList list = FixedCostInquiryList.from(items);
-		assertEquals("103,590円", list.calculateMonthlyTotal(YM_NOV).toFormatString(), "11月合計");
-		assertEquals("90,000円",  list.calculateMonthlyTotal(YM_DEC).toFormatString(), "12月合計");
-		assertEquals("98,590円",  list.calculateMonthlyTotal(YM_JAN).toFormatString(), "01月合計");
+		assertEquals("103,590円", list.calculateMonthlyTotal(NOV).toFormatString(), "11月合計");
+		assertEquals("90,000円",  list.calculateMonthlyTotal(DEC).toFormatString(), "12月合計");
+		assertEquals("98,590円",  list.calculateMonthlyTotal(JAN).toFormatString(), "01月合計");
 	}
 
 	// =========================================================
@@ -217,7 +218,7 @@ class FixedCostInquiryListTest {
 	@DisplayName("⑨ getValuesForMonth: 空リスト → 空リストを返す")
 	void testGetValuesForMonthEmpty() {
 		FixedCostInquiryList list = FixedCostInquiryList.from(Collections.emptyList());
-		assertTrue(list.getValuesForMonth(11).isEmpty(), "11月は空リスト");
+		assertTrue(list.getValuesForMonth(TargetMonth.from(11)).isEmpty(), "11月は空リスト");
 	}
 
 	/**
@@ -230,9 +231,9 @@ class FixedCostInquiryListTest {
 	void testGetValuesForMonthEveryMonth() {
 		FixedCostInquiryItem itemA = item("00", 10000);
 		FixedCostInquiryList list = FixedCostInquiryList.from(List.of(itemA));
-		assertEquals(List.of(itemA), list.getValuesForMonth(11), "11月は含む");
-		assertEquals(List.of(itemA), list.getValuesForMonth(12), "12月は含む");
-		assertEquals(List.of(itemA), list.getValuesForMonth(1),  "01月は含む");
+		assertEquals(List.of(itemA), list.getValuesForMonth(TargetMonth.from(11)), "11月は含む");
+		assertEquals(List.of(itemA), list.getValuesForMonth(TargetMonth.from(12)), "12月は含む");
+		assertEquals(List.of(itemA), list.getValuesForMonth(TargetMonth.from(1)),  "01月は含む");
 	}
 
 	/**
@@ -245,9 +246,9 @@ class FixedCostInquiryListTest {
 	void testGetValuesForMonthOddMonth() {
 		FixedCostInquiryItem itemA = item("20", 10000);
 		FixedCostInquiryList list = FixedCostInquiryList.from(List.of(itemA));
-		assertEquals(List.of(itemA), list.getValuesForMonth(11), "11月(奇)は含む");
-		assertTrue(list.getValuesForMonth(12).isEmpty(),          "12月(偶)は除外");
-		assertEquals(List.of(itemA), list.getValuesForMonth(1),  "01月(奇)は含む");
+		assertEquals(List.of(itemA), list.getValuesForMonth(TargetMonth.from(11)), "11月(奇)は含む");
+		assertTrue(list.getValuesForMonth(TargetMonth.from(12)).isEmpty(),          "12月(偶)は除外");
+		assertEquals(List.of(itemA), list.getValuesForMonth(TargetMonth.from(1)),  "01月(奇)は含む");
 	}
 
 	/**
@@ -260,9 +261,9 @@ class FixedCostInquiryListTest {
 	void testGetValuesForMonthEvenMonth() {
 		FixedCostInquiryItem itemA = item("30", 10000);
 		FixedCostInquiryList list = FixedCostInquiryList.from(List.of(itemA));
-		assertTrue(list.getValuesForMonth(11).isEmpty(),          "11月(奇)は除外");
-		assertEquals(List.of(itemA), list.getValuesForMonth(12), "12月(偶)は含む");
-		assertTrue(list.getValuesForMonth(1).isEmpty(),           "01月(奇)は除外");
+		assertTrue(list.getValuesForMonth(TargetMonth.from(11)).isEmpty(),          "11月(奇)は除外");
+		assertEquals(List.of(itemA), list.getValuesForMonth(TargetMonth.from(12)), "12月(偶)は含む");
+		assertTrue(list.getValuesForMonth(TargetMonth.from(1)).isEmpty(),           "01月(奇)は除外");
 	}
 
 	/**
@@ -275,9 +276,9 @@ class FixedCostInquiryListTest {
 	void testGetValuesForMonthSpecific11() {
 		FixedCostInquiryItem itemA = item("11", 10000);
 		FixedCostInquiryList list = FixedCostInquiryList.from(List.of(itemA));
-		assertEquals(List.of(itemA), list.getValuesForMonth(11), "11月は含む");
-		assertTrue(list.getValuesForMonth(12).isEmpty(),          "12月は除外");
-		assertTrue(list.getValuesForMonth(1).isEmpty(),           "01月は除外");
+		assertEquals(List.of(itemA), list.getValuesForMonth(TargetMonth.from(11)), "11月は含む");
+		assertTrue(list.getValuesForMonth(TargetMonth.from(12)).isEmpty(),          "12月は除外");
+		assertTrue(list.getValuesForMonth(TargetMonth.from(1)).isEmpty(),           "01月は除外");
 	}
 
 	/**
@@ -290,9 +291,9 @@ class FixedCostInquiryListTest {
 	void testGetValuesForMonthOptional() {
 		FixedCostInquiryItem itemA = item("40", 10000);
 		FixedCostInquiryList list = FixedCostInquiryList.from(List.of(itemA));
-		assertEquals(List.of(itemA), list.getValuesForMonth(11), "11月は含む");
-		assertEquals(List.of(itemA), list.getValuesForMonth(12), "12月は含む");
-		assertEquals(List.of(itemA), list.getValuesForMonth(1),  "01月は含む");
+		assertEquals(List.of(itemA), list.getValuesForMonth(TargetMonth.from(11)), "11月は含む");
+		assertEquals(List.of(itemA), list.getValuesForMonth(TargetMonth.from(12)), "12月は含む");
+		assertEquals(List.of(itemA), list.getValuesForMonth(TargetMonth.from(1)),  "01月は含む");
 	}
 
 	/**
@@ -326,10 +327,10 @@ class FixedCostInquiryListTest {
 				Arrays.asList(item0, item1, item2, item3, item4, item5));
 
 		// 11月(奇数月): 奇数月・毎月・毎月・任意・11月指定 → 5件
-		assertEquals(Arrays.asList(item0, item1, item2, item4, item5), list.getValuesForMonth(11), "11月: 5件・順序確認（11月指定も含まれること）");
+		assertEquals(Arrays.asList(item0, item1, item2, item4, item5), list.getValuesForMonth(TargetMonth.from(11)), "11月: 5件・順序確認（11月指定も含まれること）");
 		// 12月(偶数月): 毎月・毎月・偶数月・任意 → 4件（11月指定は除外）
-		assertEquals(Arrays.asList(item1, item2, item3, item4), list.getValuesForMonth(12), "12月: 4件・順序確認（11月指定は除外されること）");
+		assertEquals(Arrays.asList(item1, item2, item3, item4), list.getValuesForMonth(TargetMonth.from(12)), "12月: 4件・順序確認（11月指定は除外されること）");
 		// 01月(奇数月): 奇数月・毎月・毎月・任意 → 4件（11月指定は除外）
-		assertEquals(Arrays.asList(item0, item1, item2, item4), list.getValuesForMonth(1),  "01月: 4件・順序確認（11月指定は除外されること）");
+		assertEquals(Arrays.asList(item0, item1, item2, item4), list.getValuesForMonth(TargetMonth.from(1)),  "01月: 4件・順序確認（11月指定は除外されること）");
 	}
 }

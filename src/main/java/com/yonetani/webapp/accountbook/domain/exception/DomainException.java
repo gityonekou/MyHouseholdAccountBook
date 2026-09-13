@@ -4,8 +4,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2025/11/29 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2025/11/29 : 1.00.00  feature-1.00-dev00  新規作成
  *
  */
 package com.yonetani.webapp.accountbook.domain.exception;

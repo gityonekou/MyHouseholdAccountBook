@@ -3,10 +3,12 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/05/27 : 1.01.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/05/27 : 1.00.00  feature-1.01-dev4   新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
+
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
 
 import java.util.List;
@@ -23,6 +25,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.common.AccountBookUserRepository;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.AbstractFixedCostItemListResponse;
@@ -75,25 +78,24 @@ public class FixedCostMonthlyDetailUseCase {
 		UserId userId = UserId.from(user.getUserId());
 
 		// 表示月の決定（月番号を 1〜12 の int で保持）
-		int monthValue;
+		TargetMonth monthValue;
 		if (monthStr != null) {
-			monthValue = Integer.parseInt(monthStr);
+			monthValue = TargetMonth.from(monthStr);
 		} else {
 			TargetYearMonth targetYearMonth = accountBookUserRepository.getTargetYearMonth(
 					SearchQueryUserId.from(userId));
-			monthValue = Integer.parseInt(targetYearMonth.getMonth());
+			monthValue = targetYearMonth.getTargetMonth();
 		}
 
 		// 前月・次月の計算（1↔12 ラップ）
-		int prevMonthValue = (monthValue == 1) ? 12 : monthValue - 1;
-		int nextMonthValue = (monthValue == 12) ? 1 : monthValue + 1;
+		TargetMonth prevMonthValue = monthValue.minus(1);
+		TargetMonth nextMonthValue = monthValue.plus(1);
 
 		// レスポンスを生成
 		FixedCostMonthlyDetailResponse response = FixedCostMonthlyDetailResponse.getInstance(
-				monthValue + "月",
-				String.format("%02d", monthValue),
-				String.format("%02d", prevMonthValue),
-				String.format("%02d", nextMonthValue));
+				monthValue,
+				prevMonthValue,
+				nextMonthValue);
 
 		// 全固定費一覧を取得
 		FixedCostInquiryList allFixedCosts = fixedCostRepository.findByUserId(
@@ -107,10 +109,8 @@ public class FixedCostMonthlyDetailUseCase {
 				// 支払方法名の解決リゾルバを1回だけ生成(N+1回避。突合レビュー指摘④)
 				response.setFixedCostItemList(createFixedCostItemList(monthItems, paymentMethodInfoComponent.createResolver(userId)));
 			}
-			// 当月合計（calculateMonthlyTotal は月部分のみ使用するため年は任意値（2000年）を設定
-			response.setMonthlyTotal(
-					allFixedCosts.calculateMonthlyTotal(
-							TargetYearMonth.from(String.format("2000%02d", monthValue))).toFormatString());
+			// 当月合計
+			response.setMonthlyTotal(allFixedCosts.calculateMonthlyTotal(monthValue).toFormatString());
 		}
 		return response;
 	}
@@ -128,11 +128,11 @@ public class FixedCostMonthlyDetailUseCase {
 		return items.stream().map(domain ->
 			AbstractFixedCostItemListResponse.FixedCostItem.from(
 				// 固定費コード
-				domain.getFixedCostCode().getValue(),
+				domain.getFixedCostCode(),
 				// 支出項目名
-				domain.getExpenditureItemName().getValue(),
+				domain.getExpenditureItemName(),
 				// 支払名
-				domain.getFixedCostName().getValue(),
+				domain.getFixedCostName(),
 				// 支払月：コード変換
 				codeTableItem.getCodeValue(
 						MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_TUKI,
@@ -141,12 +141,12 @@ public class FixedCostMonthlyDetailUseCase {
 				codeTableItem.getCodeValue(
 						MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_DAY,
 						domain.getFixedCostPaymentDay().getValue()),
-				// 支払金額
-				domain.getFixedCostPaymentAmount().toFormatString(),
-				// その他任意詳細
-				domain.getFixedCostTargetPaymentMonthOptionalContext().getValue(),
 				// 支払方法名
-				resolver.getPaymentMethodName(domain.getPaymentMethodCode()))
+				resolver.getPaymentMethodName(domain.getPaymentMethodCode()),
+				// 支払金額
+				domain.getFixedCostPaymentAmount(),
+				// その他任意詳細
+				domain.getFixedCostTargetPaymentMonthOptionalContext())
 		).collect(Collectors.toUnmodifiableList());
 	}
 }

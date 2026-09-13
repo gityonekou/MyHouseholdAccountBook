@@ -22,53 +22,94 @@
 				</th:block>
 			</div>
 			
-			<!-- 店舗情報入力フォーム -->
-			<form name="ShopInfoUpdate" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/shopinfo/update/}" th:object="${shopInfoForm}">
+			<!-- 店舗情報 登録・更新エリア -->
 			<div class="card-body">
-				<div class="mb-3">
-					<label for="shopKubun" class="form-label">店舗区分</label>
-					<select class="form-select w20" th:errorclass="is-invalid" th:field="*{shopKubun}" required>
-						<option th:each="item : ${shopKubun.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
-					</select>
-					<p class="invalid-feedback" th:errors="*{shopKubun}"></p>
-				</div>
-				<div class="mb-3">
-					<label for="shopName" class="form-label">店舗名</label>
- 					<input type="text" class="form-control w50" th:errorclass="is-invalid" th:field="*{shopName}" required>
- 					<p class="invalid-feedback" th:errors="*{shopName}"></p>
-				</div>
-				<div class="mb-3">
-					<label for="validationServer01" class="form-label">表示順</label>
- 					<input type="text" class="form-control w10" th:errorclass="is-invalid" th:field="*{shopSort}">
- 					<p class="invalid-feedback" th:errors="*{shopSort}"></p>
-				</div>
-				<div class="mb-3">
-					<label for="defaultPaymentMethodCode" class="form-label">デフォルト支払方法</label>
-					<select class="form-select w20" th:errorclass="is-invalid" th:field="*{defaultPaymentMethodCode}">
-						<option th:each="item : ${defaultPaymentMethod.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
-					</select>
-					<p class="invalid-feedback" th:errors="*{defaultPaymentMethodCode}"></p>
-				</div>
-				<div class="mb-3">
-					<button class="btn btn-primary" type="submit">登録</button>
-					<input type="hidden" th:field="*{action}" />
-					<input type="hidden" th:field="*{shopCode}" />
-					<input type="hidden" th:field="*{shopSortBefore}" />
+				<div class="card">
+					<!-- 店舗情報入力フォーム -->
+					<form name="ShopInfoUpdate" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/shopinfo/update/}" th:object="${shopInfoForm}">
+					<div class="card-body">
+						<p class="h6">■ 登録・編集エリア ■</p>
+						<div class="mb-3">
+							<label for="shopKubun" class="form-label">店舗区分</label>
+							<select class="form-select w20" th:errorclass="is-invalid" th:field="*{shopKubun}" required>
+								<option th:each="item : ${shopKubun.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+							</select>
+							<p class="invalid-feedback" th:errors="*{shopKubun}"></p>
+						</div>
+						<div class="mb-3">
+							<label for="shopName" class="form-label">店舗名</label>
+		 					<input type="text" class="form-control w50" th:errorclass="is-invalid" th:field="*{shopName}" required>
+		 					<p class="invalid-feedback" th:errors="*{shopName}"></p>
+						</div>
+						<div class="mb-3">
+							<label for="defaultPaymentMethodCode" class="form-label">デフォルト支払方法（任意）</label>
+							<select class="form-select w20" th:errorclass="is-invalid" th:field="*{defaultPaymentMethodCode}">
+								<option th:each="item : ${defaultPaymentMethod.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+							</select>
+							<p class="invalid-feedback" th:errors="*{defaultPaymentMethodCode}"></p>
+							<div class="form-text">設定した場合、買い物登録時の支払方法の初期値として使用されます。</div>
+						</div>
+						<div class="mb-3">
+							<label for="validationServer01" class="form-label">表示順</label>
+		 					<input type="text" class="form-control w10" th:errorclass="is-invalid" th:field="*{shopSort}">
+		 					<p class="invalid-feedback" th:errors="*{shopSort}"></p>
+						</div>
+						<div class="mb-3">
+							<button class="btn btn-primary" type="submit">登録</button>
+							<input type="hidden" th:field="*{action}" />
+							<input type="hidden" th:field="*{shopCode}" />
+							<input type="hidden" th:field="*{shopSortBefore}" />
+						</div>
+					</div>
+					</form>
 				</div>
 			</div>
-			</form>
 			
-			<!-- お店一覧表示エリア -->
-			<div class="list-group">
-				<a class="list-group-item list-group-item-secondary">表示順&emsp;店名&emsp;：店舗区分&emsp;：デフォルト支払方法&emsp;&emsp;※更新する場合は対象行をクリックしてください</a>
-				<a th:each="shopItem : ${shopList}" th:href="@{/myhacbook/managebaseinfo/shopinfo/updateload(shopCode=${shopItem.shopCode})}" class="list-group-item list-group-item-action"><span th:text="${shopItem.shopSort}"></span>&emsp;<span th:text="${shopItem.shopName}"></span>&emsp;：<span th:text="${shopItem.shopKubunName}"></span>&emsp;：<span th:text="${shopItem.defaultPaymentMethodName}"></span></a>
-				<a th:each="nonEditShopItem : ${nonEditShopList}" class="list-group-item list-group-item-secondary"><span th:text="${nonEditShopItem.shopSort}"></span>&emsp;<span th:text="${nonEditShopItem.shopName}"></span>&emsp;：<span th:text="${nonEditShopItem.defaultPaymentMethodName}"></span>&emsp;※変更できません</a>
+			<!-- 登録済み店舗一覧表示エリア -->
+			<div class="card-body">
+				<div class="card">
+				
+					<div class="card-body">
+						<p class="h6">■ 登録済み店舗一覧 ■</p>
+						<p class="card-text">更新対象の店舗を選択してください。</p>
+						<table class="table table-sm table-bordered table-hover">
+							<thead>
+								<tr class="table-secondary">
+									<th scope="col" class="w5">表示順</th>
+									<th scope="col" class="w20">店舗区分</th>
+									<th scope="col" class="w30">店舗名</th>
+									<th scope="col" class="w20">デフォルト支払方法</th>
+									<th scope="col"></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="shopItem : ${shopList}" th:data-href="@{/myhacbook/managebaseinfo/shopinfo/updateload(shopCode=${shopItem.shopCode})}">
+									<td th:text="${shopItem.shopSort}">表示順</td>
+									<td th:text="${shopItem.shopKubunName}">店舗区分</td>
+									<td th:text="${shopItem.shopName}">店舗名</td>
+									<td th:text="${shopItem.defaultPaymentMethodName}">デフォルト支払方法</td>
+									<td></td>
+								</tr>
+								<tr class="table-secondary" th:each="nonEditShopItem : ${nonEditShopList}">
+									<td th:text="${nonEditShopItem.shopSort}">表示順</td>
+									<td th:text="${nonEditShopItem.shopKubunName}">店舗区分</td>
+									<td th:text="${nonEditShopItem.shopName}">店舗名</td>
+									<td th:text="${nonEditShopItem.defaultPaymentMethodName}">デフォルト支払方法</td>
+									<td align="left">※変更できません</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
 	
 	<!--/* フッター共通jsのインクルード) */-->
 	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	<!--/* jqueryでテーブル行の選択時アクションを実行 */-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script type="text/javascript" th:src="@{/js/table_tr_click_script.js}"></script>
 	
 </body>
 </html>

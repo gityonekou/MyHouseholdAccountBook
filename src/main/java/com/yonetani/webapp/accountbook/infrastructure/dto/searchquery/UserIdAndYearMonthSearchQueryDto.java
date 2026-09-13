@@ -68,8 +68,8 @@ public class UserIdAndYearMonthSearchQueryDto {
 				// 検索条件:ユーザID
 				search.getUserId().toString(),
 				// 検索条件:対象年
-				search.getYearMonth().getYear(),
+				search.getYearMonth().getTargetYear().getValue(),
 				// 検索条件:対象月
-				search.getYearMonth().getMonth());
+				search.getYearMonth().getTargetMonth().getValue());
 	}
 }

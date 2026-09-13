@@ -6,8 +6,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2023/10/29 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2023/10/29 : 1.00.00                      新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop;
@@ -55,7 +56,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Service
@@ -363,7 +364,7 @@ public class ShopInfoManageUseCase {
 						domain.getShopName().getValue(),
 						codeTableItem.getCodeValue(MyHouseholdAccountBookContent.CODE_DEFINES_SHOP_KUBUN, domain.getShopKubunCode().getValue()),
 						domain.getShopSort().getValue(),
-						domain.getDefaultPaymentMethodCode() == null ? "－" : resolver.getPaymentMethodName(domain.getDefaultPaymentMethodCode()))
+						domain.getDefaultPaymentMethodCode() == null ? "－" : resolver.getPaymentMethodName(domain.getDefaultPaymentMethodCode()).getValue())
 			).collect(Collectors.toUnmodifiableList()));
 		}
 		return response;

@@ -34,8 +34,7 @@
 						<table class="table table-sm table-bordered">
 							<tbody>
 								<th:block th:each="item, itemStat : ${incomeListInfo}">
-									<th:block th:if="${itemStat.odd}"><tr class="table-info"></th:block>
-									<th:block th:if="${itemStat.even}"><tr></th:block>
+									<tr th:class="${itemStat.odd} ? 'table-info' : ''">
 										<td class="w10" th:text="${item.incomeKubunName}">収入区分名</td>
 										<td class="w10" th:text="${item.incomeKingaku}" align="right">収入金額</td>
 										<td class="w5" align="center"><a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/accountregist/incomeandexpenditure/incomeupdateselect(incomeCode=${item.incomeCode})}">訂正</a></td>
@@ -109,8 +108,7 @@
 						<table class="table table-sm table-bordered">
 							<tbody>
 								<th:block th:each="item, itemStat : ${expenditureListInfo}">
-									<th:block th:if="${itemStat.odd}"><tr class="table-warning"></th:block>
-									<th:block th:if="${itemStat.even}"><tr></th:block>
+									<tr th:class="${itemStat.odd} ? 'table-warning' : ''">
 										<td class="w20" th:text="${item.expenditureName}">支出名と支出区分</td>
 										<td class="w10" th:text="${item.shiharaiKingaku}" align="right">支出金額</td>
 										<td class="w5" align="center"><a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/accountregist/incomeandexpenditure/expenditureupdateselect(expenditureCode=${item.expenditureCode})}">訂正</a></td>

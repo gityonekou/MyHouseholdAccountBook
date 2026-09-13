@@ -3,10 +3,11 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/06/07 : 1.00.00  新規作成
- * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
- * 2026/05/07 : 1.01.01  合計フィールド廃止・calculateMonthlyTotal()メソッド追加
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/06/07 : 1.00.00                      新規作成
+ * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/05/07 : 1.02.00  feature-1.01-dev2   合計フィールド廃止・calculateMonthlyTotal()メソッド追加
+ * 2026/08/18 : 1.03.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.fixedcost;
@@ -29,7 +30,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPa
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonth;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonthOptionalContext;
 import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
-import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -58,7 +59,7 @@ public class FixedCostInquiryList {
 	 *</pre>
 	 *
 	 * @author ：Kouki Yonetani
-	 * @since 家計簿アプリ(1.00.A)
+	 * @since 家計簿アプリ(1.00)
 	 *
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -80,10 +81,10 @@ public class FixedCostInquiryList {
 		private final FixedCostTargetPaymentMonthOptionalContext fixedCostTargetPaymentMonthOptionalContext;
 		// 固定費支払日(支払日)
 		private final FixedCostPaymentDay fixedCostPaymentDay;
-		// 支払金額
-		private final FixedCostPaymentAmount fixedCostPaymentAmount;
 		// 支払方法コード
 		private final PaymentMethodCode paymentMethodCode;
+		// 支払金額
+		private final FixedCostPaymentAmount fixedCostPaymentAmount;
 
 		/**
 		 *<pre>
@@ -96,8 +97,8 @@ public class FixedCostInquiryList {
 		 * @param fixedCostTargetPaymentMonth 固定費支払月(支払月)
 		 * @param fixedCostTargetPaymentMonthOptionalContext 固定費支払月任意詳細
 		 * @param fixedCostPaymentDay 固定費支払日(支払日)
-		 * @param fixedCostPaymentAmount 支払金額
 		 * @param paymentMethodCode 支払方法コード
+		 * @param fixedCostPaymentAmount 支払金額
 		 * @return 固定費一覧明細情報を表すドメインモデル
 		 *
 		 */
@@ -109,19 +110,19 @@ public class FixedCostInquiryList {
 				String fixedCostTargetPaymentMonth,
 				String fixedCostTargetPaymentMonthOptionalContext,
 				String fixedCostPaymentDay,
-				BigDecimal fixedCostPaymentAmount,
-				String paymentMethodCode
+				String paymentMethodCode,
+				BigDecimal fixedCostPaymentAmount
 				) {
 			return new FixedCostInquiryItem(
-					FixedCostCode.from(fixedCostCode),
-					FixedCostName.from(fixedCostName),
-					FixedCostDetailContext.from(fixedCostDetailContext),
-					ExpenditureItemName.from(expenditureItemName),
-					FixedCostTargetPaymentMonth.from(fixedCostTargetPaymentMonth),
-					FixedCostTargetPaymentMonthOptionalContext.from(fixedCostTargetPaymentMonthOptionalContext),
-					FixedCostPaymentDay.from(fixedCostPaymentDay),
-					FixedCostPaymentAmount.from(fixedCostPaymentAmount),
-					PaymentMethodCode.from(paymentMethodCode));
+						FixedCostCode.from(fixedCostCode),
+						FixedCostName.from(fixedCostName),
+						FixedCostDetailContext.from(fixedCostDetailContext),
+						ExpenditureItemName.from(expenditureItemName),
+						FixedCostTargetPaymentMonth.from(fixedCostTargetPaymentMonth),
+						FixedCostTargetPaymentMonthOptionalContext.from(fixedCostTargetPaymentMonthOptionalContext),
+						FixedCostPaymentDay.from(fixedCostPaymentDay),
+						PaymentMethodCode.from(paymentMethodCode),
+						FixedCostPaymentAmount.from(fixedCostPaymentAmount));
 		}
 	}
 
@@ -153,11 +154,11 @@ public class FixedCostInquiryList {
 	 * @return 指定した対象月の固定費支払金額合計
 	 *
 	 */
-	public FixedCostPaymentTotalAmount calculateMonthlyTotal(TargetYearMonth targetMonth) {
+	public FixedCostPaymentTotalAmount calculateMonthlyTotal(TargetMonth targetMonth) {
 		if (CollectionUtils.isEmpty(values)) {
 			return FixedCostPaymentTotalAmount.ZERO;
 		}
-		int monthValue = Integer.parseInt(targetMonth.getMonth());
+		int monthValue = targetMonth.intValue();
 		FixedCostPaymentTotalAmount total = FixedCostPaymentTotalAmount.ZERO;
 		for (FixedCostInquiryItem item : values) {
 			if (shouldAdd(item.getFixedCostTargetPaymentMonth().getValue(), monthValue)) {
@@ -176,12 +177,12 @@ public class FixedCostInquiryList {
 	 * @return 指定月に支払いが発生する固定費一覧（DB取得順を維持）
 	 *
 	 */
-	public List<FixedCostInquiryItem> getValuesForMonth(int monthValue) {
+	public List<FixedCostInquiryItem> getValuesForMonth(TargetMonth monthValue) {
 		if (CollectionUtils.isEmpty(values)) {
 			return Collections.emptyList();
 		}
 		return values.stream()
-				.filter(item -> shouldAdd(item.getFixedCostTargetPaymentMonth().getValue(), monthValue))
+				.filter(item -> shouldAdd(item.getFixedCostTargetPaymentMonth().getValue(), monthValue.intValue()))
 				.collect(Collectors.toList());
 	}
 
@@ -222,7 +223,7 @@ public class FixedCostInquiryList {
 	@Override
 	public String toString() {
 		if(values.size() > 0) {
-			StringBuilder buff = new StringBuilder((values.size() + 1) * 385);
+			StringBuilder buff = new StringBuilder((values.size() + 1) * 300);
 			buff.append("固定費一覧:")
 			.append(values.size())
 			.append("件:");

@@ -3,9 +3,10 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/04/17 : 1.00.00  新規作成
- * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/04/17 : 1.00.00                      新規作成
+ * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/09/06 : 1.02.00  feature-1.03-dev1   リファクタリング対応(getExpenditureItemNameメソッドの戻り値を値オブジェクトに変更)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.common;
@@ -28,6 +29,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.Expen
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractExpenditureItemInfoManageResponse;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -45,7 +47,6 @@ import lombok.extern.log4j.Log4j2;
 @Log4j2
 @RequiredArgsConstructor
 public class ExpenditureItemInfoComponent {
-
 	// 支出項目テーブル:SISYUTU_ITEM_TABLE参照リポジトリー
 	private final SisyutuItemTableRepository sisyutuItemRepository;
 	
@@ -97,14 +98,14 @@ public class ExpenditureItemInfoComponent {
 	
 	/**
 	 *<pre>
-	 * 支出項目の名称を＞区切りで連結した値で返します。
+	 * 指定した支出項目コードが属する親をたどり、親⇒子の支出項目名を格納した値オブジェクトを取得します。
 	 *</pre>
 	 * @param userId ユーザID
 	 * @param sisyutuItemCode 取得対象の支出項目コード
-	 * @return 支出項目の名称を＞区切りで連結した値 名称取得に失敗した場合はnullを返却
+	 * @return 支出項目の親⇒子の支出項目名を格納した値オブジェクト
 	 *
 	 */
-	public String getExpenditureItemName(UserId userId, ExpenditureItemCode expenditureItemCode) {
+	public ExpenditureItemNamePath getExpenditureItemNamePath(UserId userId, ExpenditureItemCode expenditureItemCode) {
 		log.debug("getExpenditureItemName:userid="+ userId + ",expenditureItemCode=" + expenditureItemCode);
 		
 		// 指定した支出項目の存在チェック
@@ -155,8 +156,57 @@ public class ExpenditureItemInfoComponent {
 					+ expenditureItemCode + ", parentExpenditureItemCode:" + parentExpenditureItemCode);
 		}
 		
-		// 親の支出項目名を＞区切りで設定
-		return String.join("＞", wkList);
+		return ExpenditureItemNamePath.from(wkList);
+	}
+	
+	/**
+	 *<pre>
+	 * 支出項目名を親⇒子の順で格納した値オブジェクトです
+	 *
+	 *</pre>
+	 *
+	 * @author ：Kouki Yonetani
+	 * @since 家計簿アプリ(1.03)
+	 *
+	 */
+	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+	public static class ExpenditureItemNamePath {
+		// 支出項目名を親⇒子の順で格納したリスト
+		private final List<String> value;
+		
+		/**
+		 *<pre>
+		 * 支出項目名を親⇒子の順で格納した値オブジェクトを生成します。
+		 *</pre>
+		 * @param value 支出項目名を親⇒子の順で格納した値
+		 * @return 支出項目名を親⇒子の順で格納した値オブジェクト
+		 *
+		 */
+		private static ExpenditureItemNamePath from(List<String> value) {
+			return new ExpenditureItemNamePath(value);
+		}
+		
+		/**
+		 *<pre>
+		 * 支出項目名を＞区切りで連結した文字列を返します。
+		 *</pre>
+		 * @return 支出項目名を＞区切りで連結した文字列
+		 *
+		 */
+		public String toFormatString() {
+			return String.join("＞", value);
+		}
+		
+		/**
+		 *<pre>
+		 * 支出項目名を指定した区切りで連結した文字列を返します。
+		 *</pre>
+		 * @return 支出項目名を指定した区切り文字で連結した文字列
+		 *
+		 */
+		public String toFormatString(String delimiter) {
+			return String.join(delimiter, value);
+		}
 	}
 	
 	/**

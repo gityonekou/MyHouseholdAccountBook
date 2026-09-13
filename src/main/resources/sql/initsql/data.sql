@@ -83,14 +83,15 @@ INSERT INTO SISYUTU_ITEM_TABLE VALUES
 
 -- 銀行口座テーブル：BANK_ACCOUNT_TABLE
 INSERT INTO BANK_ACCOUNT_TABLE VALUES
-	('kouki', '01', 'てすと１銀行', 'テスト銀行①めも', '01', true),
+	('kouki', '01', 'みんなのテスト＠銀行', 'みんなのテスト＠銀行 めも①', '01', true),
 	('kouki', '02', 'てすと２銀行', 'テスト銀行②めも', '02', true);
 -- 支払方法テーブル：PAYMENT_METHOD_TABLE
 INSERT INTO PAYMENT_METHOD_TABLE VALUES
-	('kouki', '001', '現金', '1', NULL, NULL, '001', true, true),
-	('kouki', '002', '○○クレジットカード', '3', '02', '16', '002', true, true),
-	('kouki', '003', 'てすと１銀行口座振替', '2', '01', NULL, '003', true, true),
-	('kouki', '999', '支払方法がない', '1', null, null, '999', true, false);
+	('kouki', '001', '現金', NULL, '1', NULL, NULL, '001', true, true),
+	('kouki', '002', '○○クレジットカード', 'スペシャルポイント = 合計金額 × 9.5％ ÷ 5\n当月ポイント=スペシャルポイント＋基本の1000円1ポイント', '3', '02', '16', '002', true, true),
+	('kouki', '003', 'みんなのテスト＠銀行　口座振替', NULL, '2', '01', NULL, '003', true, true),
+	('kouki', '999', '支払方法がない', NULL, '1', null, null, '999', true, false);
+	
 -- 支出金額テーブル：SISYUTU_KINGAKU_TABLE
 INSERT INTO SISYUTU_KINGAKU_TABLE VALUES
 	('kouki', '2023', '09', '0001', '0001', 36500.00, 36500.00, null, 0.00, null),
@@ -136,7 +137,7 @@ INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_C
  ('kouki', '0002', '飲食(無駄遣いB)', '月毎の飲食(無駄遣いB)予定金額', '0051', '2', '00', null, '40', 12300.00, '999', false),
  ('kouki', '0003', '飲食(無駄遣いC)', '月毎の飲食(無駄遣いC)予定金額', '0051', '2', '00', null, '40', 6500.00, '999', false),
  ('kouki', '0004', '日用消耗品', '月毎の日用消耗品予定金額', '0050', '2', '00', null, '40', 3500.00, '999', false),
- ('kouki', '0005', '被服費', '月毎の被服費予定金額', '0046', '2', '00', null, '40', 11000.00, '999', false),
+ ('kouki', '0005', '衣類・クリーニング・靴【更新不可予定額(アプリ更新)】', '月毎の被服費予定金額で、アプリ側で自動更新するのでユーザ更新不可となる値', '0046', '2', '00', null, '40', 11000.00, '999', false),
  ('kouki', '0006', '住居設備', '月毎の住居設備予定金額', '0047', '2', '00', null, '40', 6700.00, '999', false),
  ('kouki', '0007', '外食', '月毎の外食予定金額', '0052', '2', '00', null, '40', 1500.00, '999', false),
  ('kouki', '0008', '事業流動経費', '月毎の事業流動経費予定金額', '0007', '2', '00', null, '40', 1200.00,'999',  false),

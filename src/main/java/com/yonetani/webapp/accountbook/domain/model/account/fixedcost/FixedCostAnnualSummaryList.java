@@ -4,8 +4,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/05/23 : 1.01.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/05/23 : 1.00.00  feature-1.01-dev3   新規作成
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.fixedcost;
@@ -21,6 +21,7 @@ import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookCont
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonth;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -105,9 +106,9 @@ public class FixedCostAnnualSummaryList {
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 	public static class MonthlyRow {
-		// 月（1〜12）
+		// 対象月（01〜12）
 		@Getter
-		private final int month;
+		private final TargetMonth month;
 		// 列ごとの金額合計
 		private final Map<AnnualSummaryColumn, FixedCostPaymentTotalAmount> columnAmounts;
 
@@ -262,7 +263,7 @@ public class FixedCostAnnualSummaryList {
 				amounts.put(col, amounts.get(col).add(item.getFixedCostPaymentAmount()));
 			}
 		}
-		return new MonthlyRow(month, amounts);
+		return new MonthlyRow(TargetMonth.from(month), amounts);
 	}
 	
 	/**

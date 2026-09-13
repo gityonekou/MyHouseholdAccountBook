@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2026/05/27 : 1.01.00  新規作成
+ * 2026/09/12 : 1.03.00  リファクタリング対応(Feature1.03 dev1)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import org.springframework.web.servlet.ModelAndView;
 
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
 import lombok.AccessLevel;
@@ -59,16 +61,23 @@ public class FixedCostMonthlyDetailResponse extends AbstractResponse {
 	 *<pre>
 	 * 引数の値からレスポンス情報を生成して返します。
 	 *</pre>
-	 * @param displayMonthLabel 表示中の月ラベル（"M月" 形式）
-	 * @param currentMonth 表示中の月番号（"MM" 形式、セッション更新用）
-	 * @param prevMonth 前月番号（"MM" 形式）
-	 * @param nextMonth 次月番号（"MM" 形式）
+	 * @param displayMonthLabel 表示中の月
+	 * @param prevMonth 前月
+	 * @param nextMonth 次月
 	 * @return 月別固定費一覧画面表示情報
 	 *
 	 */
 	public static FixedCostMonthlyDetailResponse getInstance(
-			String displayMonthLabel, String currentMonth, String prevMonth, String nextMonth) {
-		return new FixedCostMonthlyDetailResponse(displayMonthLabel, currentMonth, prevMonth, nextMonth);
+			TargetMonth currentMonth, TargetMonth prevMonth, TargetMonth nextMonth) {
+		return new FixedCostMonthlyDetailResponse(
+				// 表示中の月ラベル（"M月" 形式）
+				currentMonth.toFormatString(),
+				// 表示中の月番号（"MM" 形式、セッション更新用）
+				currentMonth.getValue(),
+				// 前月番号（"MM" 形式）
+				prevMonth.getValue(),
+				// 次月番号（"MM" 形式）
+				nextMonth.getValue());
 	}
 
 	/**

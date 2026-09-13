@@ -3,9 +3,10 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/11/03 : 1.00.00  新規作成
- * 2025/12/28 : 1.01.00  リファクタリング対応（DDD適応) 
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/11/03 : 1.00.00                      新規作成
+ * 2025/12/28 : 1.01.00  feature-1.00-dev00  リファクタリング対応（DDD適応) 
+ * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist;
@@ -180,12 +181,12 @@ public class SimpleShoppingRegistUseCase {
 		inputForm.setShopKubunCode(result.getShopKubunCode().getValue());
 		// 店舗コード
 		inputForm.setShopCode(result.getShopCode().getValue());
+		// 支払方法コード
+		inputForm.setPaymentMethodCode(result.getPaymentMethodCode().getValue());
 		// 買い物日
 		inputForm.setShoppingDate(result.getShoppingDate().getValue());
 		// 備考
 		inputForm.setShoppingRemarks(result.getShoppingRemarks().getValue());
-		// 支払方法コード
-		inputForm.setPaymentMethodCode(result.getPaymentMethodCode().getValue());
 		// 食料品(必須)
 		inputForm.setShoppingFoodExpenses(DomainCommonUtils.convertInteger(result.getShoppingFoodExpenditureAmount().getValue()));
 		// 消費税：食料品(必須)

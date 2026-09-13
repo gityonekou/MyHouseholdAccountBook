@@ -7,11 +7,11 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/02/26 : 1.00.00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
- * 2026/06/07 : 1.02.00  支払日(PaymentDate)がnullの場合の処理をPaymentDateの親クラス(NullableDateValue)のtoDayValue()メソッドに集約
- * 2026/06/14 : 1.02.01  固定費0円対応: readInitInfo()に0円注意メッセージ追加、readRegistCheckValidateInfo()新規追加（readRegistCheckErrorSetInfo()・readZeroAmountExpenditureCheckErrorSetInfo()を統合）
- * 2026/06/14 : 1.02.02  バグ修正: readRegistCheckValidateInfo()の0円チェックからACTION_TYPE_NON_UPDATEを除外（更新フローのclearStart支出誤検知修正）
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/02/26 : 1.00.00  feature-1.00-dev00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
+ * 2026/06/07 : 1.01.00  feature-1.02-dev1   支払日(PaymentDate)がnullの場合の処理をPaymentDateの親クラス(NullableDateValue)のtoDayValue()メソッドに集約
+ * 2026/06/14 : 1.02.00  feature-1.02-dev2   固定費0円対応: readInitInfo()に0円注意メッセージ追加、readRegistCheckValidateInfo()新規追加（readRegistCheckErrorSetInfo()・readZeroAmountExpenditureCheckErrorSetInfo()を統合）
+ * 2026/06/14 : 1.02.01  feature-1.02-dev2   バグ修正: readRegistCheckValidateInfo()の0円チェックからACTION_TYPE_NON_UPDATEを除外（更新フローのclearStart支出誤検知修正）
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -43,6 +43,7 @@ import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTa
 import com.yonetani.webapp.accountbook.domain.service.account.regist.TemporaryCodeGenerator;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCategory;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonth;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.request.account.regist.IncomeItemForm;
@@ -120,16 +121,16 @@ public class IncomeAndExpenditureInitUseCase {
 
 		/* 固定費テーブルに登録されている固定費情報から対象年月に合致する固定費一覧を取得 */
 		// 対象の月の値を取得
-		String month = targetYearMonth.getMonth();
+		TargetMonth month = targetYearMonth.getTargetMonth();
 		// 対象月が奇数月(20) or 偶数月(30)かを取得
-		String oddEven = Integer.parseInt(month) % 2 == 1
+		String oddEven = month.intValue() % 2 == 1
 				? MyHouseholdAccountBookContent.SHIHARAI_TUKI_ODD_SELECTED_VALUE
 						: MyHouseholdAccountBookContent.SHIHARAI_TUKI_AN_EVEN_SELECTED_VALUE;
 		List<String> shiharaiTukiList = new ArrayList<>();
 		// 検索条件:毎月(00)
 		shiharaiTukiList.add(MyHouseholdAccountBookContent.SHIHARAI_TUKI_EVERY_SELECTED_VALUE);
 		// 検索条件:指定月
-		shiharaiTukiList.add(month);
+		shiharaiTukiList.add(month.getValue());
 		// 検索条件:奇数月 or 偶数月
 		shiharaiTukiList.add(oddEven);
 		// 検索条件:任意月(40)

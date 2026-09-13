@@ -47,8 +47,7 @@
 							</thead>
 							<tbody>
 								<th:block th:each="item, itemStat : ${eventList}">
-									<th:block th:if="${itemStat.odd}"><tr class="table-warning"></th:block>
-									<th:block th:if="${itemStat.even}"><tr></th:block>
+									<tr th:class="${itemStat.odd} ? 'table-warning' : ''">
 										<td th:text="${item.sisyutuItemName}">支出項目名</td>
 										<td align="center"><a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/managebaseinfo/eventinfo/updateload(eventCode=${item.eventCode})}">訂正</a></td>
 										<td th:text="${item.eventName}">イベント名</td>

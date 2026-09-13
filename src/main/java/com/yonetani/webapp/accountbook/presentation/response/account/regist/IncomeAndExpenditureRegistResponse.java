@@ -170,7 +170,9 @@ public class IncomeAndExpenditureRegistResponse extends AbstractIncomeAndExpendi
 		modelAndView.addObject("expenditureItemForm", expenditureItemForm);
 		// 支出区分選択ボックス
 		modelAndView.addObject("expenditureKubunSelectList", expenditureKubunSelectList);
-		
+		// 支払方法選択ボックス
+		modelAndView.addObject("paymentMethodSelectList", paymentMethodSelectList);
+
 		return modelAndView;
 	}
 	

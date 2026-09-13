@@ -10,13 +10,14 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/05/19 : 1.00.00  新規作成
- * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
- * 2026/04/19 : 1.01.01  リファクタリング対応(FixedCostInfoManageUseCaseから参照系の処理を分離し、クラス名をFixedCostInquiryUseCase にリネーム)
- * 2026/05/01 : 1.01.02  固定費一括更新機能追加に伴う処理追加
- * 2026/05/07 : 1.01.03  固定費合計表示変更(奇数月/偶数月合計→3か月合計)
- * 2026/05/09 : 1.01.04  リファクタリング追加対応(対象年月ドメインの集約)
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/05/19 : 1.00.00                      新規作成
+ * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/04/19 : 1.01.01  feature-1.00-dev00  リファクタリング対応(FixedCostInfoManageUseCaseから参照系の処理を分離し、クラス名をFixedCostInquiryUseCase にリネーム)
+ * 2026/05/01 : 1.02.00  feature-1.01-dev2   固定費一括更新機能追加に伴う処理追加
+ * 2026/05/07 : 1.02.01  feature-1.01-dev2   固定費合計表示変更(奇数月/偶数月合計→3か月合計)
+ * 2026/05/09 : 1.02.02  feature-1.01-dev2   リファクタリング追加対応(対象年月ドメインの集約)
+ * 2026/08/18 : 1.03.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
@@ -49,14 +50,14 @@ import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCost
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostInfoUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.AbstractFixedCostItemListResponse;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostBulkUpdateResponse;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageActSelectResponse;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageInitResponse;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageUpdateResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.AbstractFixedCostItemListResponse.FixedCostItem;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostBulkUpdateResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostBulkUpdateResponse.BulkUpdateTargetItem;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageActSelectResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageActSelectResponse.SiblingFixedCostItem;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageInitResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageInitResponse.SisyutuItemCodeInfo;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageUpdateResponse;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 import lombok.RequiredArgsConstructor;
@@ -165,13 +166,13 @@ public class FixedCostInquiryUseCase {
 		FixedCostInfoManageActSelectResponse response = FixedCostInfoManageActSelectResponse.getInstance(
 				FixedCostInfoManageActSelectResponse.SelectFixedCostInfo.from(
 						// 固定費コード
-						searchResult.getFixedCostCode().getValue(),
+						searchResult.getFixedCostCode(),
 						// 支出項目名(＞で区切った値)
-						expenditureItemInfoComponent.getExpenditureItemName(userId, searchResult.getExpenditureItemCode()),
+						expenditureItemInfoComponent.getExpenditureItemNamePath(userId, searchResult.getExpenditureItemCode()),
 						// 支払名
-						searchResult.getFixedCostName().getValue(),
+						searchResult.getFixedCostName(),
 						// 支払内容詳細
-						searchResult.getFixedCostDetailContext().getValue(),
+						searchResult.getFixedCostDetailContext(),
 						// 支払月詳細
 						shiharaiTukiDetailContext,
 						// 支払日
@@ -180,10 +181,10 @@ public class FixedCostInquiryUseCase {
 								MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_DAY,
 								// 固定費支払月
 								searchResult.getFixedCostPaymentDay().getValue()),
-						// 支払金額
-						searchResult.getFixedCostPaymentAmount().toFormatString(),
 						// 支払方法名
-						resolver.getPaymentMethodName(searchResult.getPaymentMethodCode())));
+						resolver.getPaymentMethodName(searchResult.getPaymentMethodCode()),
+						// 支払金額
+						searchResult.getFixedCostPaymentAmount()));
 		// 固定費一覧をレスポンスに設定
 		setFixedCostItemList(userId, response);
 
@@ -489,20 +490,21 @@ public class FixedCostInquiryUseCase {
 					SearchQueryUserId.from(userId));
 			TargetYearMonth ym1 = targetYearMonth.plusMonths(1);
 			TargetYearMonth ym2 = targetYearMonth.plusMonths(2);
+			
 			// 固定費一覧情報をレスポンスに設定(支払方法名の解決リゾルバは1回だけ生成)
 			response.addFixedCostItemList(createFixedCostItemList(searchResult, paymentMethodInfoComponent.createResolver(userId)));
 			// 対象月ラベルを設定
-			response.setTargetMonthLabel(targetYearMonth.toDisplayLabel());
+			response.setTargetMonthLabel(targetYearMonth.toFormatString());
 			// 対象月+1ラベルを設定
-			response.setTargetMonthPlus1Label(ym1.toDisplayLabel());
+			response.setTargetMonthPlus1Label(ym1.toFormatString());
 			// 対象月+2ラベルを設定
-			response.setTargetMonthPlus2Label(ym2.toDisplayLabel());
+			response.setTargetMonthPlus2Label(ym2.toFormatString());
 			// 対象月合計を設定
-			response.setTargetMonthGoukei(searchResult.calculateMonthlyTotal(targetYearMonth).toFormatString());
+			response.setTargetMonthGoukei(searchResult.calculateMonthlyTotal(targetYearMonth.getTargetMonth()).toFormatString());
 			// 対象月+1合計を設定
-			response.setTargetMonthPlus1Goukei(searchResult.calculateMonthlyTotal(ym1).toFormatString());
+			response.setTargetMonthPlus1Goukei(searchResult.calculateMonthlyTotal(ym1.getTargetMonth()).toFormatString());
 			// 対象月+2合計を設定
-			response.setTargetMonthPlus2Goukei(searchResult.calculateMonthlyTotal(ym2).toFormatString());
+			response.setTargetMonthPlus2Goukei(searchResult.calculateMonthlyTotal(ym2.getTargetMonth()).toFormatString());
 		}
 	}
 	
@@ -557,7 +559,9 @@ public class FixedCostInquiryUseCase {
 				paymentMethodInfoComponent.getFixedCostPaymentMethodOptions(userId));
 		
 		// 支出項目名(＞で区切った値)を取得しレスポンスに設定
-		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, ExpenditureItemCode.from(inputForm.getSisyutuItemCode())));
+		response.setSisyutuItemName(expenditureItemInfoComponent
+				.getExpenditureItemNamePath(userId, ExpenditureItemCode.from(inputForm.getSisyutuItemCode()))
+				.toFormatString());
 		
 		return response;
 		
@@ -576,11 +580,11 @@ public class FixedCostInquiryUseCase {
 		return searchResult.getValues().stream().map(domain ->
 			AbstractFixedCostItemListResponse.FixedCostItem.from(
 				// 固定費コード
-				domain.getFixedCostCode().getValue(),
+				domain.getFixedCostCode(),
 				// 支出項目名
-				domain.getExpenditureItemName().getValue(),
+				domain.getExpenditureItemName(),
 				// 支払名：固定費名を設定を設定
-				domain.getFixedCostName().getValue(),
+				domain.getFixedCostName(),
 				// 支払月：固定費支払月の値をコード変換して設定
 				codeTableItem.getCodeValue(
 						// コード区分：固定費支払月
@@ -593,12 +597,12 @@ public class FixedCostInquiryUseCase {
 						MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_DAY,
 						// 固定費支払日
 						domain.getFixedCostPaymentDay().getValue()),
-				// 支払金額
-				domain.getFixedCostPaymentAmount().toFormatString(),
-				// その他任意詳細：固定費支払月任意詳細
-				domain.getFixedCostTargetPaymentMonthOptionalContext().getValue(),
 				// 支払方法名
-				resolver.getPaymentMethodName(domain.getPaymentMethodCode()))
+				resolver.getPaymentMethodName(domain.getPaymentMethodCode()),
+				// 支払金額
+				domain.getFixedCostPaymentAmount(),
+				// その他任意詳細：固定費支払月任意詳細
+				domain.getFixedCostTargetPaymentMonthOptionalContext())
 		).collect(Collectors.toUnmodifiableList());
 	}
 
@@ -632,8 +636,9 @@ public class FixedCostInquiryUseCase {
 					.collect(Collectors.toList()));
 
 		// 支出項目名(＞で区切った値)を取得しレスポンスに設定
-		response.setSisyutuItemName(
-				expenditureItemInfoComponent.getExpenditureItemName(userId, expenditureItemCode));
+		response.setSisyutuItemName(expenditureItemInfoComponent
+				.getExpenditureItemNamePath(userId, expenditureItemCode)
+				.toFormatString());
 
 		// 同一支出項目の全固定費一覧を取得して設定
 		FixedCostInquiryList siblingList = fixedCostRepository.findByExpenditureItemCode(
@@ -666,9 +671,9 @@ public class FixedCostInquiryUseCase {
 			// 兄弟固定費明細情報を生成して返却
 			return SiblingFixedCostItem.from(
 					// 固定費コード
-					domain.getFixedCostCode().getValue(),
+					domain.getFixedCostCode(),
 					// 支払名
-					domain.getFixedCostName().getValue(),
+					domain.getFixedCostName(),
 					// 支払月：固定費支払月の値をコード変換して設定
 					codeTableItem.getCodeValue(
 							MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_TUKI,
@@ -679,10 +684,10 @@ public class FixedCostInquiryUseCase {
 					codeTableItem.getCodeValue(
 							MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_DAY,
 							domain.getFixedCostPaymentDay().getValue()),
-					// 支払金額：固定費支払金額の値をフォーマットして設定
-					domain.getFixedCostPaymentAmount().toFormatString(),
 					// 支払方法名
-					resolver.getPaymentMethodName(domain.getPaymentMethodCode()));
+					resolver.getPaymentMethodName(domain.getPaymentMethodCode()),
+					// 支払金額：固定費支払金額の値をフォーマットして設定
+					domain.getFixedCostPaymentAmount());
 		}).collect(Collectors.toUnmodifiableList());
 	}
 
@@ -709,9 +714,9 @@ public class FixedCostInquiryUseCase {
 			// 一括更新対象固定費明細情報を生成して返却
 			return BulkUpdateTargetItem.from(
 					// 固定費コード
-					domain.getFixedCostCode().getValue(),
+					domain.getFixedCostCode(),
 					// 支払名
-					domain.getFixedCostName().getValue(),
+					domain.getFixedCostName(),
 					// 支払月：固定費支払月の値をコード変換して設定
 					codeTableItem.getCodeValue(
 							MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_TUKI,
@@ -722,10 +727,10 @@ public class FixedCostInquiryUseCase {
 					codeTableItem.getCodeValue(
 							MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_DAY,
 							domain.getFixedCostPaymentDay().getValue()),
-					// 支払金額：固定費支払金額の値をフォーマットして設定
-					domain.getFixedCostPaymentAmount().toFormatString(),
 					// 支払方法名
-					resolver.getPaymentMethodName(domain.getPaymentMethodCode()));
+					resolver.getPaymentMethodName(domain.getPaymentMethodCode()),
+					// 支払金額：固定費支払金額の値をフォーマットして設定
+					domain.getFixedCostPaymentAmount());
 		}).collect(Collectors.toUnmodifiableList());
 	}
 }

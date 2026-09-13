@@ -219,10 +219,10 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 				dto.getFixedCostShiharaiTukiOptionalContext(),
 				// 固定費支払日(支払日)
 				dto.getFixedCostShiharaiDay(),
-				// 支払金額
-				dto.getShiharaiKingaku(),
 				// 支払方法コード
-				dto.getPaymentMethodCode());
+				dto.getPaymentMethodCode(),
+				// 支払金額
+				dto.getShiharaiKingaku());
 	}
 
 	/**
@@ -283,10 +283,10 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 				dto.getFixedCostShiharaiTukiOptionalContext(),
 				// 固定費支払日(支払日)
 				dto.getFixedCostShiharaiDay(),
-				// 支払金額
-				dto.getShiharaiKingaku(),
 				// 支払方法コード
-				dto.getPaymentMethodCode());
+				dto.getPaymentMethodCode(),
+				// 支払金額
+				dto.getShiharaiKingaku());
 	}
 	
 	/**

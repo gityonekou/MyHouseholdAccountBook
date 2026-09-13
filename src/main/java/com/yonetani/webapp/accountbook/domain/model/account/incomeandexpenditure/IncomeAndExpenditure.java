@@ -3,9 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2025/12/05 : 1.00.00  新規作成
- * 2026/04/16 : 1.02.00  IncomeAndExpenditureItemを統合（登録・更新機能を追加）
+ * 日付       : version  ブランチ            コメントなど
+ * 2025/12/05 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/04/16 : 1.00.01  feature-1.00-dev00  IncomeAndExpenditureItemを統合（登録・更新機能を追加）
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure;
@@ -208,9 +208,9 @@ public class IncomeAndExpenditure {
 				// ユーザID
 				userId.getValue(),
 				// 対象年
-				yearMonth.getYear(),
+				yearMonth.getTargetYear().getValue(),
 				// 対象月
-				yearMonth.getMonth(),
+				yearMonth.getTargetMonth().getValue(),
 				// 収入金額(積立金取崩金額以外の収入金額)
 				regularIncomeAmount.getValue(),
 				// 積立金取崩金額
@@ -254,9 +254,9 @@ public class IncomeAndExpenditure {
 				// ユーザID
 				userId.getValue(),
 				// 対象年
-				yearMonth.getYear(),
+				yearMonth.getTargetYear().getValue(),
 				// 対象月
-				yearMonth.getMonth(),
+				yearMonth.getTargetMonth().getValue(),
 				// 収入金額(積立金取崩金額以外の収入金額)
 				regularIncomeAmount.getValue(),
 				// 積立金取崩金額
@@ -305,9 +305,9 @@ public class IncomeAndExpenditure {
 				// ユーザID
 				userId.getValue(),
 				// 対象年
-				targetYearMonth.getYear(),
+				targetYearMonth.getTargetYear().getValue(),
 				// 対象月
-				targetYearMonth.getMonth(),
+				targetYearMonth.getTargetMonth().getValue(),
 				// 収入金額(積立金取崩金額以外の収入金額)
 				regularIncomeAmount.getValue(),
 				// 積立金取崩金額
@@ -343,9 +343,9 @@ public class IncomeAndExpenditure {
 				// ユーザID
 				userId.getValue(),
 				// 対象年
-				targetYearMonth.getYear(),
+				targetYearMonth.getTargetYear().getValue(),
 				// 対象月
-				targetYearMonth.getMonth(),
+				targetYearMonth.getTargetMonth().getValue(),
 				// 収入金額(積立金取崩金額以外の収入金額)
 				regularIncomeAmount.getValue(),
 				// 積立金取崩金額

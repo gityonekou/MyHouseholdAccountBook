@@ -9,8 +9,7 @@
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
@@ -171,18 +170,18 @@ class FixedCostMonthlyDetailUseCaseIntegrationTest {
 	 * 【検証内容】
 	 * ・1月の前月が12月にラップすること（prevMonth="12"）
 	 * ・nextMonth="02"
-	 * ・displayMonthLabel="1月"（先頭0なし）
+	 * ・displayMonthLabel="01月"
 	 * ・4件、合計=98,590円
 	 *</pre>
 	 */
 	@Test
-	@DisplayName("④ month=01（年初ラップ） → prevMonth=12・displayMonthLabel=1月（先頭0なし）")
+	@DisplayName("④ month=01（年初ラップ） → prevMonth=12・displayMonthLabel=01月")
 	void testReadMonthlyDetail_年初ラップ() {
 		FixedCostMonthlyDetailResponse response = useCase.readMonthlyDetail(USER01, "01");
 
 		// 1月の前月は12月にラップ
 		assertFalse(response.hasMessages(), "メッセージなし");
-		assertEquals("1月", response.getDisplayMonthLabel(), "displayMonthLabel=1月（先頭0なし）");
+		assertEquals("01月", response.getDisplayMonthLabel(), "displayMonthLabel=01月");
 		assertEquals("01",  response.getCurrentMonth(),      "currentMonth=01");
 		assertEquals("12",  response.getPrevMonth(),          "prevMonth=12（年初ラップ）");
 		assertEquals("02",  response.getNextMonth(),          "nextMonth=02");
@@ -195,21 +194,21 @@ class FixedCostMonthlyDetailUseCaseIntegrationTest {
 
 	/**
 	 *<pre>
-	 * テスト⑤：month="05"（奇数月）→ displayMonthLabel="5月"（先頭0なし）、月ナビ・合計が正しいこと
+	 * テスト⑤：month="05"（奇数月）→ displayMonthLabel="05月"、月ナビ・合計が正しいこと
 	 *
 	 * 【検証内容】
-	 * ・displayMonthLabel="5月"（"05月"ではなく先頭0なし）
+	 * ・displayMonthLabel="05月"
 	 * ・currentMonth="05", prevMonth="04", nextMonth="06"
 	 * ・4件、合計=98,590円
 	 *</pre>
 	 */
 	@Test
-	@DisplayName("⑤ month=05（奇数月）→ displayMonthLabel=5月（先頭0なし）・月ナビ確認")
+	@DisplayName("⑤ month=05（奇数月）→ displayMonthLabel=05月・月ナビ確認")
 	void testReadMonthlyDetail_5月() {
 		FixedCostMonthlyDetailResponse response = useCase.readMonthlyDetail(USER01, "05");
 
 		assertFalse(response.hasMessages(), "メッセージなし");
-		assertEquals("5月", response.getDisplayMonthLabel(), "displayMonthLabel=5月（先頭0なし）");
+		assertEquals("05月", response.getDisplayMonthLabel(), "displayMonthLabel=05月");
 		assertEquals("05",  response.getCurrentMonth(),      "currentMonth=05");
 		assertEquals("04",  response.getPrevMonth(),          "prevMonth=04");
 		assertEquals("06",  response.getNextMonth(),          "nextMonth=06");

@@ -285,6 +285,8 @@ public class ShoppingRegistTableDataSource implements ShoppingRegistTableReposit
 				// クーポン金額
 				ShoppingCouponPrice.from(dto.getShoppingCouponPrice()),
 				// 買い物合計金額
-				ShoppingTotalAmount.from(dto.getShoppingTotalAmount()));
+				ShoppingTotalAmount.from(dto.getShoppingTotalAmount()),
+				// 支払方法コード
+				PaymentMethodCode.from(dto.getPaymentMethodCode()));
 	}
 }

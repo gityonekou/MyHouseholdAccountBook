@@ -443,6 +443,8 @@ CREATE TABLE IF NOT EXISTS PAYMENT_METHOD_TABLE (
 	PAYMENT_METHOD_CODE      CHAR(3),
 	-- 支払方法名
 	PAYMENT_METHOD_NAME      VARCHAR(50) NOT NULL,
+	-- 支払方法メモ(dev2のクレジットカードポイント減算で、設定値がある場合のみ画面表示)
+	PAYMENT_METHOD_MEMO      VARCHAR(400),
 	-- 支払方法種別(1:現金 2:口座振替 3:クレジットカード 4:デビットカード 5:電子マネー(前払い式))
 	PAYMENT_METHOD_KUBUN     CHAR(1) NOT NULL,
 	-- 銀行口座コード(種別により要否が異なる。口座振替/クレジットカード/デビットカードは必須、現金/電子マネー(前払い式)はNULL可)

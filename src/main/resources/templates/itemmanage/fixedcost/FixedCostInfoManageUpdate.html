@@ -69,6 +69,13 @@
  					<p class="invalid-feedback" th:errors="*{shiharaiDay}"></p>
 				</div>
 				<div class="mb-3">
+					<label for="paymentMethodCode" class="form-label">■支払方法</label>
+					<select class="form-select w20" th:errorclass="is-invalid" th:field="*{paymentMethodCode}" required>
+						<option th:each="item : ${paymentMethodSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+					</select>
+ 					<p class="invalid-feedback" th:errors="*{paymentMethodCode}"></p>
+				</div>
+				<div class="mb-3">
 					<label for="shiharaiKingaku" class="form-label w10">■支払金額</label>
 					<div class="input-group w10">
  						<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{shiharaiKingaku}" required>円
@@ -76,13 +83,6 @@
  					</div>
 					<!--/* 固定費区分=2（予定支払い金額）の場合0円不可チェックの結果を出力 */-->
 					<p class="invalid-feedback" th:errors="*{validShiharaiKingakuForKubun}" style="display: block;"></p>
-				</div>
-				<div class="mb-3">
-					<label for="paymentMethodCode" class="form-label">■支払方法</label>
-					<select class="form-select w20" th:errorclass="is-invalid" th:field="*{paymentMethodCode}" required>
-						<option th:each="item : ${paymentMethodSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
-					</select>
- 					<p class="invalid-feedback" th:errors="*{paymentMethodCode}"></p>
 				</div>
 				<div class="mb-3">
 					<button class="btn btn-primary" name="actionAdd" type="submit" th:if="*{#strings.equals(action, 'add')}">登録</button>

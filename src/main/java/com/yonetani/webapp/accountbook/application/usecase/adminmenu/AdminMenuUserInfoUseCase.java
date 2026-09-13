@@ -6,9 +6,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2023/11/11 : 1.00.00  新規作成
- * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
+ * 日付       : version  ブランチ            コメントなど
+ * 2023/11/11 : 1.00.00                      新規作成
+ * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.adminmenu;
@@ -38,8 +38,6 @@ import com.yonetani.webapp.accountbook.domain.repository.adminmenu.AdminMenuUser
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.ShopBaseTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.SisyutuItemBaseTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.common.AccountBookUserRepository;
-import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
-import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.type.common.UserName;
@@ -166,8 +164,8 @@ public class AdminMenuUserInfoUseCase {
 			// 家計簿利用ユーザ情報
 			AccountBookUser accountBookUser = AccountBookUser.from(
 					UserId.from(userInfoForm.getUserId()),
-					TargetYear.from(domainTypeYearMonth.getYear()),
-					TargetMonth.from(domainTypeYearMonth.getMonth()),
+					domainTypeYearMonth.getTargetYear(),
+					domainTypeYearMonth.getTargetMonth(),
 					UserName.from(userInfoForm.getUserName()));
 			
 			// 新規登録の場合
@@ -230,6 +228,7 @@ public class AdminMenuUserInfoUseCase {
 						accountBookUser.getUserId().getValue(),
 						MyHouseholdAccountBookContent.PAYMENT_METHOD_CODE_NONE_VALUE,
 						"支払方法がない",
+						null,
 						MyHouseholdAccountBookContent.PAYMENT_METHOD_KUBUN_CASH_SELECTED_VALUE,
 						null,
 						null,
@@ -245,6 +244,7 @@ public class AdminMenuUserInfoUseCase {
 						accountBookUser.getUserId().getValue(),
 						"001",
 						"現金",
+						null,
 						MyHouseholdAccountBookContent.PAYMENT_METHOD_KUBUN_CASH_SELECTED_VALUE,
 						null,
 						null,

@@ -109,8 +109,7 @@
 							</thead>
 							<tbody>
 								<th:block th:each="item, itemStat : ${shoppingItemList}">
-								<th:block th:if="${itemStat.odd}"><tr th:data-href="@{/myhacbook/managebaseinfo/shoppingiteminfo/select(shoppingItemCode=${item.shoppingItemCode})}"></th:block>
-								<th:block th:if="${itemStat.even}"><tr class="table-warning" th:data-href="@{/myhacbook/managebaseinfo/shoppingiteminfo/select(shoppingItemCode=${item.shoppingItemCode})}"></th:block>
+								<tr th:class="${itemStat.odd} ? 'table-warning' : ''" th:data-href="@{/myhacbook/managebaseinfo/shoppingiteminfo/select(shoppingItemCode=${item.shoppingItemCode})}">
 									<td th:text="${item.shoppingItemKubunName}">商品区分名</td>
 									<td th:text="${item.shoppingItemNameText}">商品名(内容量/カロリー)</td>
 									<td th:text="${item.sisyutuItemName}">支出項目名</td>

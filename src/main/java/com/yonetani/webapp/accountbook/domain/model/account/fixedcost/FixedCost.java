@@ -3,9 +3,10 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/05/27 : 1.00.00  新規作成
- * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/05/27 : 1.00.00                      新規作成
+ * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.fixedcost;
@@ -65,10 +66,10 @@ public class FixedCost {
 	private final FixedCostTargetPaymentMonthOptionalContext fixedCostTargetPaymentMonthOptionalContext;
 	// 固定費支払日(支払日)
 	private final FixedCostPaymentDay fixedCostPaymentDay;
-	// 支払金額
-	private final FixedCostPaymentAmount fixedCostPaymentAmount;
 	// 支払方法コード
 	private final PaymentMethodCode paymentMethodCode;
+	// 支払金額
+	private final FixedCostPaymentAmount fixedCostPaymentAmount;
 
 	/**
 	 *<pre>
@@ -83,8 +84,8 @@ public class FixedCost {
 	 * @param fixedCostTargetPaymentMonth 固定費支払月(支払月)
 	 * @param fixedCostTargetPaymentMonthOptionalContext 固定費支払月任意詳細
 	 * @param fixedCostPaymentDay 固定費支払日(支払日)
-	 * @param fixedCostPaymentAmount 支払金額
 	 * @param paymentMethodCode 支払方法コード
+	 * @param fixedCostPaymentAmount 支払金額
 	 * @return 固定費情報を表すドメインモデル
 	 *
 	 */
@@ -98,8 +99,8 @@ public class FixedCost {
 			String fixedCostTargetPaymentMonth,
 			String fixedCostTargetPaymentMonthOptionalContext,
 			String fixedCostPaymentDay,
-			BigDecimal fixedCostPaymentAmount,
-			String paymentMethodCode) {
+			String paymentMethodCode,
+			BigDecimal fixedCostPaymentAmount) {
 		return new FixedCost(
 				UserId.from(userId),
 				FixedCostCode.from(fixedCostCode),
@@ -110,8 +111,8 @@ public class FixedCost {
 				FixedCostTargetPaymentMonth.from(fixedCostTargetPaymentMonth),
 				FixedCostTargetPaymentMonthOptionalContext.from(fixedCostTargetPaymentMonthOptionalContext),
 				FixedCostPaymentDay.from(fixedCostPaymentDay),
-				FixedCostPaymentAmount.from(fixedCostPaymentAmount),
-				PaymentMethodCode.from(paymentMethodCode));
+				PaymentMethodCode.from(paymentMethodCode),
+				FixedCostPaymentAmount.from(fixedCostPaymentAmount));
 	}
 
 	/**
@@ -128,8 +129,8 @@ public class FixedCost {
 	 * @param fixedCostTargetPaymentMonth 固定費支払月(支払月)
 	 * @param fixedCostTargetPaymentMonthOptionalContext 固定費支払月任意詳細
 	 * @param fixedCostPaymentDay 固定費支払日(支払日)
-	 * @param fixedCostPaymentAmount 支払金額
 	 * @param paymentMethodCode 支払方法コード
+	 * @param fixedCostPaymentAmount 支払金額
 	 * @return 固定費情報を表すドメインモデル
 	 *
 	 */
@@ -143,8 +144,8 @@ public class FixedCost {
 			String fixedCostTargetPaymentMonth,
 			String fixedCostTargetPaymentMonthOptionalContext,
 			String fixedCostPaymentDay,
-			Integer fixedCostPaymentAmount,
-			String paymentMethodCode) {
+			String paymentMethodCode,
+			Integer fixedCostPaymentAmount) {
 		return new FixedCost(
 				UserId.from(userId),
 				FixedCostCode.from(fixedCostCode),
@@ -155,8 +156,8 @@ public class FixedCost {
 				FixedCostTargetPaymentMonth.from(fixedCostTargetPaymentMonth),
 				FixedCostTargetPaymentMonthOptionalContext.from(fixedCostTargetPaymentMonthOptionalContext),
 				FixedCostPaymentDay.from(fixedCostPaymentDay),
-				FixedCostPaymentAmount.from(fixedCostPaymentAmount),
-				PaymentMethodCode.from(paymentMethodCode));
+				PaymentMethodCode.from(paymentMethodCode),
+				FixedCostPaymentAmount.from(fixedCostPaymentAmount));
 	}
 
 	/**
@@ -180,8 +181,8 @@ public class FixedCost {
 				FixedCostTargetPaymentMonth.from(fixedCostTargetPaymentMonth.getValue()),
 				FixedCostTargetPaymentMonthOptionalContext.from(fixedCostTargetPaymentMonthOptionalContext.getValue()),
 				FixedCostPaymentDay.from(fixedCostPaymentDay),
-				FixedCostPaymentAmount.from(fixedCostPaymentAmount),
-				PaymentMethodCode.from(paymentMethodCode.getValue()));
+				PaymentMethodCode.from(paymentMethodCode.getValue()),
+				FixedCostPaymentAmount.from(fixedCostPaymentAmount));
 	}
 	
 	/**

@@ -67,7 +67,7 @@
 						<th:block th:if="${#lists.size(meisaiInquiryList)}>0">
 						<table class="table table-sm table-borderless">
 							<thead><tr class="table-secondary">
-								<th scope="col" class="w5" style="vertical-align:middle; text-align:center;">年月</th>
+								<th scope="col" class="w5" style="vertical-align:middle; text-align:center;">対象月</th>
 								<th scope="col" class="w10" style="vertical-align:middle; text-align:center;">収入<br>（＋積立取崩）</th>
 								<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">事業経費</th>
 								<th scope="col" class="w8" style="vertical-align:middle; text-align:center;">固定(非課税)</th>
@@ -83,9 +83,8 @@
 							</tr></thead>
 							<tbody>
 								<th:block th:each="item, itemStat : ${meisaiInquiryList}">
-									<th:block th:if="${itemStat.odd}"><tr></th:block>
-									<th:block th:if="${itemStat.even}"><tr class="table-warning"></th:block>
-										<td align="center"><span th:text="${item.month}"></span>月</td>
+									<tr th:class="${itemStat.odd} ? 'table-warning' : ''">
+										<td align="center" th:text="${item.month}">対象月</td>
 										<td align="center" th:if="${#strings.isEmpty(item.withdrewKingaku)}" th:text="${item.syuunyuuKingaku}">収入</td>
 										<td align="center" th:if="!${#strings.isEmpty(item.withdrewKingaku)}"><span th:text="${item.syuunyuuKingaku}"></span><br>（<span th:text="${item.withdrewKingaku}"></span>）</td>
 										<td align="center" th:text="${item.jigyouKeihiKingaku}">事業経費</td>

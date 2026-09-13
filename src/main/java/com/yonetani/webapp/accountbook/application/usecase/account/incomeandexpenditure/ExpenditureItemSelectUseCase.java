@@ -3,8 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/02/25 : 1.00.00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/02/25 : 1.00.00  feature-1.00-dev00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   dev1追加対応(getExpenditureItemNameメソッドの戻り値を値オブジェクトに変更)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -93,7 +94,9 @@ public class ExpenditureItemSelectUseCase {
 		response.setSisyutuItemDetailContext(
 				expenditureItemInfoComponent.getExpenditureItemInfo(userId, expenditureItemCode).getExpenditureItemDetailContext().getValue());
 		// 支出項目コードに対応する支出項目名(＞で区切った値)を設定
-		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, expenditureItemCode));
+		response.setSisyutuItemName(expenditureItemInfoComponent
+				.getExpenditureItemNamePath(userId, expenditureItemCode)
+				.toFormatString());
 
 		// 選択した支出項目のフォームデータを作成
 		ExpenditureSelectItemForm selectForm = new ExpenditureSelectItemForm();

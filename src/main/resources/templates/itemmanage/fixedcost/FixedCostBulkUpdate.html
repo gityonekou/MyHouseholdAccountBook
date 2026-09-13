@@ -6,6 +6,10 @@
 		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
 		crossorigin="anonymous">
 <link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<style>
+.w3{ width:3%; }
+.w8{ width:8%; }
+</style>
 <title>情報管理(固定費)</title>
 </head>
 <body>
@@ -59,10 +63,10 @@
 								<tr class="table-secondary">
 									<th scope="col" class="w3">選択</th>
 									<th scope="col" class="w20">支払名</th>
-									<th scope="col" class="w10">支払月</th>
-									<th scope="col" class="w10">現在の支払日</th>
-									<th scope="col" class="w10">現在の支払金額</th>
-									<th scope="col" class="w10">支払方法</th>
+									<th scope="col" class="w8">支払月</th>
+									<th scope="col" class="w8">現在の支払日</th>
+									<th scope="col" class="w20">支払方法</th>
+									<th scope="col" class="w10" style="text-align:center;">現在の支払金額</th>
 									<th scope="col">その他任意詳細</th>
 								</tr>
 							</thead>
@@ -83,8 +87,8 @@
 									<td th:text="${item.shiharaiName}">支払名</td>
 									<td th:text="${item.shiharaiTukiDetailContext}">支払月</td>
 									<td th:text="${item.shiharaiDay}">支払日</td>
-									<td th:text="${item.shiharaiKingaku}" align="right">支払金額</td>
 									<td th:text="${item.paymentMethodName}">支払方法</td>
+									<td th:text="${item.shiharaiKingaku}" align="right">支払金額</td>
 									<td th:text="${item.shiharaiTukiOptionalContext}"></td>
 								</tr>
 							</tbody>

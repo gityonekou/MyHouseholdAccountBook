@@ -23,67 +23,108 @@
 				</th:block>
 			</div>
 
-			<!-- 支払方法情報入力フォーム -->
-			<form name="PaymentMethodInfoUpdate" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/paymentmethodinfo/update/}" th:object="${paymentMethodInfoForm}">
+			<!-- 支払方法情報 登録・編集エリア -->
 			<div class="card-body">
-				<div class="mb-3">
-					<label for="paymentMethodName" class="form-label">支払方法名</label>
- 					<input type="text" class="form-control w50" th:errorclass="is-invalid" th:field="*{paymentMethodName}" required>
- 					<p class="invalid-feedback" th:errors="*{paymentMethodName}"></p>
-				</div>
-				<div class="mb-3">
-					<label for="paymentMethodKubun" class="form-label">支払方法種別</label>
-					<select id="paymentMethodKubun" class="form-select w20" th:errorclass="is-invalid" th:field="*{paymentMethodKubun}" required>
-						<option th:each="item : ${paymentMethodKubunOptions}"
-								th:value="${item.value}" th:text="${item.text}"
-								th:attr="data-requires-account=${item.requiresAccount}, data-requires-closing-day=${item.requiresClosingDay}"></option>
-					</select>
-					<p class="invalid-feedback" th:errors="*{paymentMethodKubun}"></p>
-					<p class="form-text">電子マネーでも、紐づけたクレジットカードから支払いを行う場合（クレジットカード払い）は「クレジットカード」として登録してください。「電子マネー(前払い式)」は、電子マネーの残高から支払った場合のみ選択します。</p>
-				</div>
-				<div class="mb-3" id="bankAccountArea">
-					<label for="bankAccountCode" class="form-label">銀行口座</label>
-					<select class="form-select w20" th:errorclass="is-invalid" th:field="*{bankAccountCode}">
-						<option th:each="item : ${bankAccount.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
-					</select>
-					<p class="invalid-feedback" th:errors="*{bankAccountCode}"></p>
-				</div>
-				<div class="mb-3" id="closingDayArea">
-					<label for="closingDay" class="form-label">集計開始日</label>
- 					<input type="text" class="form-control w10" th:errorclass="is-invalid" th:field="*{closingDay}">
- 					<p class="invalid-feedback" th:errors="*{closingDay}"></p>
-				</div>
-				<div class="mb-3">
-					<label for="paymentMethodSort" class="form-label">表示順</label>
- 					<input type="text" class="form-control w10" th:errorclass="is-invalid" th:field="*{paymentMethodSort}">
- 					<p class="invalid-feedback" th:errors="*{paymentMethodSort}"></p>
-				</div>
-				<div class="mb-3 form-check">
-					<input type="checkbox" class="form-check-input" th:field="*{enableFlg}">
-					<label for="enableFlg" class="form-check-label">有効</label>
-				</div>
-				<div class="mb-3">
-					<button class="btn btn-primary" type="submit">登録</button>
-					<input type="hidden" th:field="*{action}" />
-					<input type="hidden" th:field="*{paymentMethodCode}" />
-					<input type="hidden" th:field="*{paymentMethodSortBefore}" />
+				<div class="card">
+				
+					<!-- 支払方法情報入力フォーム -->
+					<form name="PaymentMethodInfoUpdate" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/paymentmethodinfo/update/}" th:object="${paymentMethodInfoForm}">
+					<div class="card-body">
+						<p class="h6">■ 登録・編集エリア ■</p>
+						<div class="mb-3">
+							<label for="paymentMethodName" class="form-label">支払方法名</label>
+		 					<input type="text" class="form-control w20" th:errorclass="is-invalid" th:field="*{paymentMethodName}" required>
+		 					<p class="invalid-feedback" th:errors="*{paymentMethodName}"></p>
+						</div>
+						<div class="mb-3">
+							<label for="paymentMethodMemo" class="form-label">支払方法メモ（クレカポイント減算入力画面でのみ表示される項目です）</label>
+							<textarea rows="4" cols="100" class="form-control w50" th:errorclass="is-invalid" th:field="*{paymentMethodMemo}" placeholder="クレカポイント減算入力画面でポイント計算式などを別途表示する場合、ここに入力してください。"></textarea>
+							<p class="invalid-feedback" th:errors="*{paymentMethodMemo}"></p>
+						</div>
+						<div class="mb-3">
+							<label for="paymentMethodKubun" class="form-label">支払方法種別</label>
+							<select id="paymentMethodKubun" class="form-select w15" th:errorclass="is-invalid" th:field="*{paymentMethodKubun}" required>
+								<option th:each="item : ${paymentMethodKubunOptions}"
+										th:value="${item.value}" th:text="${item.text}"
+										th:attr="data-requires-account=${item.requiresAccount}, data-requires-closing-day=${item.requiresClosingDay}"></option>
+							</select>
+							<p class="invalid-feedback" th:errors="*{paymentMethodKubun}"></p>
+							<p class="form-text">「電子マネー(前払い式)」は、電子マネーの残高から支払う支払方法の場合のみ選択します。<br>
+							その他の電子マネー支払いは紐づけたクレジットカードでの支払いとなるため、「クレジットカード」を選択してください。</p>
+						</div>
+						<div class="mb-3" id="bankAccountArea">
+							<label for="bankAccountCode" class="form-label">銀行口座</label>
+							<select class="form-select w20" th:errorclass="is-invalid" th:field="*{bankAccountCode}">
+								<option th:each="item : ${bankAccount.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
+							</select>
+							<p class="invalid-feedback" th:errors="*{bankAccountCode}"></p>
+						</div>
+						<div class="mb-3" id="closingDayArea">
+							<label for="closingDay" class="form-label">集計開始日</label>
+		 					<input type="text" class="form-control w10" th:errorclass="is-invalid" th:field="*{closingDay}">
+		 					<p class="invalid-feedback" th:errors="*{closingDay}"></p>
+						</div>
+						<div class="mb-3">
+							<label for="paymentMethodSort" class="form-label">表示順</label>
+		 					<input type="text" class="form-control w10" th:errorclass="is-invalid" th:field="*{paymentMethodSort}">
+		 					<p class="invalid-feedback" th:errors="*{paymentMethodSort}"></p>
+						</div>
+						<div class="mb-3 form-check">
+							<input type="checkbox" class="form-check-input" th:field="*{enableFlg}">
+							<label for="enableFlg" class="form-check-label">有効</label>
+						</div>
+						<div class="mb-3">
+							<button class="btn btn-primary" type="submit">登録</button>
+							<input type="hidden" th:field="*{action}" />
+							<input type="hidden" th:field="*{paymentMethodCode}" />
+							<input type="hidden" th:field="*{paymentMethodSortBefore}" />
+						</div>
+					</div>
+					</form>
 				</div>
 			</div>
-			</form>
-
-			<!-- 支払方法一覧表示エリア -->
-			<div class="list-group">
-				<a class="list-group-item list-group-item-secondary">表示順&emsp;支払方法名&emsp;：種別&emsp;：銀行口座&emsp;：集計開始日&emsp;：状態&emsp;&emsp;※更新する場合は対象行をクリックしてください</a>
-				<a th:each="paymentMethodItem : ${paymentMethodList}" th:href="@{/myhacbook/managebaseinfo/paymentmethodinfo/updateload(paymentMethodCode=${paymentMethodItem.paymentMethodCode})}"
-					th:class="${paymentMethodItem.enableFlg} ? 'list-group-item list-group-item-action' : 'list-group-item list-group-item-action list-group-item-light'">
-					<span th:text="${paymentMethodItem.paymentMethodSort}"></span>&emsp;<span th:text="${paymentMethodItem.paymentMethodName}"></span>&emsp;：<span th:text="${paymentMethodItem.paymentMethodKubunName}"></span>&emsp;：<span th:text="${paymentMethodItem.bankAccountName}"></span>&emsp;：<span th:text="${paymentMethodItem.closingDay}"></span>&emsp;：<span th:text="${paymentMethodItem.enableFlg} ? '有効' : '無効'"></span>
-				</a>
+			
+			<!-- 登録済み支払方法一覧表示エリア -->
+			<div class="card-body">
+				<div class="card">
+				
+					<!-- 支払方法一覧表示エリア -->
+					<div class="card-body">
+						<p class="h6">■ 登録済み支払方法一覧 ■</p>
+						<p class="card-text">更新する場合は対象行をクリックしてください。</p>
+						<table class="table table-sm table-bordered table-hover">
+							<thead>
+								<tr class="table-secondary">
+									<th scope="col" class="w5">表示順</th>
+									<th scope="col" class="w20">支払方法名</th>
+									<th scope="col" class="w15">種別</th>
+									<th scope="col" class="w20">銀行口座</th>
+									<th scope="col">集計開始日</th>
+									<th scope="col" class="w5">状態</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="paymentMethodItem : ${paymentMethodList}" th:data-href="@{/myhacbook/managebaseinfo/paymentmethodinfo/updateload(paymentMethodCode=${paymentMethodItem.paymentMethodCode})}">
+									<td th:text="${paymentMethodItem.paymentMethodSort}">表示順</td>
+									<td th:text="${paymentMethodItem.paymentMethodName}">支払方法名</td>
+									<td th:text="${paymentMethodItem.paymentMethodKubunName}">種別</td>
+									<td th:text="${paymentMethodItem.bankAccountName}">銀行口座</td>
+									<td th:text="${paymentMethodItem.closingDay}">集計開始日</td>
+									<td th:text="${paymentMethodItem.enableFlg} ? '有効' : '無効'">状態</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
-
+	
 	<!--/* フッター共通jsのインクルード) */-->
 	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
-
+	<!--/* jqueryでテーブル行の選択時アクションを実行 */-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script type="text/javascript" th:src="@{/js/table_tr_click_script.js}"></script>
+	
 </body>
 </html>

@@ -3,8 +3,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/05/23 : 1.01.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/05/23 : 1.00.00  feature-1.01-dev3   新規作成
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
@@ -107,17 +107,16 @@ public class FixedCostAnnualSummaryUseCase {
 	 */
 	private AnnualSummaryRowItem createDataRow(MonthlyRow row) {
 		return AnnualSummaryRowItem.createDataRow(
-				String.format("%02d月", row.getMonth()),
-				row.getAmount(AnnualSummaryColumn.JIGYOU_KEIHI).toZeroDashString(),
-				row.getAmount(AnnualSummaryColumn.HIKOZEI).toZeroDashString(),
-				row.getAmount(AnnualSummaryColumn.SEIKATSUHI).toZeroDashString(),
-				row.getAmount(AnnualSummaryColumn.TSUMITATE_TOUSHI).toZeroDashString(),
-				row.getAmount(AnnualSummaryColumn.TSUMITATE_KIN).toZeroDashString(),
-				row.getAmount(AnnualSummaryColumn.IRUI_JUKYO).toZeroDashString(),
-				row.getAmount(AnnualSummaryColumn.INSHOKU).toZeroDashString(),
-				row.getAmount(AnnualSummaryColumn.SHUMI).toZeroDashString(),
-				row.getMonthTotal().toZeroDashString(),
-				String.format("%02d", row.getMonth()));
+				row.getMonth(),
+				row.getAmount(AnnualSummaryColumn.JIGYOU_KEIHI),
+				row.getAmount(AnnualSummaryColumn.HIKOZEI),
+				row.getAmount(AnnualSummaryColumn.SEIKATSUHI),
+				row.getAmount(AnnualSummaryColumn.TSUMITATE_TOUSHI),
+				row.getAmount(AnnualSummaryColumn.TSUMITATE_KIN),
+				row.getAmount(AnnualSummaryColumn.IRUI_JUKYO),
+				row.getAmount(AnnualSummaryColumn.INSHOKU),
+				row.getAmount(AnnualSummaryColumn.SHUMI),
+				row.getMonthTotal());
 	}
 
 	/**
@@ -131,14 +130,14 @@ public class FixedCostAnnualSummaryUseCase {
 	 */
 	private AnnualSummaryRowItem createTotalRow(YearlyRow yearlyRow) {
 		return AnnualSummaryRowItem.createTotalRow(
-				yearlyRow.getAmount(AnnualSummaryColumn.JIGYOU_KEIHI).toZeroDashString(),
-				yearlyRow.getAmount(AnnualSummaryColumn.HIKOZEI).toZeroDashString(),
-				yearlyRow.getAmount(AnnualSummaryColumn.SEIKATSUHI).toZeroDashString(),
-				yearlyRow.getAmount(AnnualSummaryColumn.TSUMITATE_TOUSHI).toZeroDashString(),
-				yearlyRow.getAmount(AnnualSummaryColumn.TSUMITATE_KIN).toZeroDashString(),
-				yearlyRow.getAmount(AnnualSummaryColumn.IRUI_JUKYO).toZeroDashString(),
-				yearlyRow.getAmount(AnnualSummaryColumn.INSHOKU).toZeroDashString(),
-				yearlyRow.getAmount(AnnualSummaryColumn.SHUMI).toZeroDashString(),
-				yearlyRow.getYearTotal().toZeroDashString());
+				yearlyRow.getAmount(AnnualSummaryColumn.JIGYOU_KEIHI),
+				yearlyRow.getAmount(AnnualSummaryColumn.HIKOZEI),
+				yearlyRow.getAmount(AnnualSummaryColumn.SEIKATSUHI),
+				yearlyRow.getAmount(AnnualSummaryColumn.TSUMITATE_TOUSHI),
+				yearlyRow.getAmount(AnnualSummaryColumn.TSUMITATE_KIN),
+				yearlyRow.getAmount(AnnualSummaryColumn.IRUI_JUKYO),
+				yearlyRow.getAmount(AnnualSummaryColumn.INSHOKU),
+				yearlyRow.getAmount(AnnualSummaryColumn.SHUMI),
+				yearlyRow.getYearTotal());
 	}
 }

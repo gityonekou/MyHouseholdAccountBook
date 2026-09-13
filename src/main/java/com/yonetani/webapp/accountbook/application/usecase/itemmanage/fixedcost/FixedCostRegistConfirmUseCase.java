@@ -7,9 +7,10 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/04/19 : 1.01.00  新規作成（リファクタリング対応 FixedCostInfoManageUseCaseから更新系の処理を分離）
- * 2026/05/01 : 1.01.01  固定費情報一括更新処理を追加
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/04/19 : 1.01.00  feature-1.00-dev00  新規作成（リファクタリング対応 FixedCostInfoManageUseCaseから更新系の処理を分離）
+ * 2026/05/01 : 1.02.00  feature-1.01-dev2   固定費情報一括更新処理を追加
+ * 2026/08/18 : 1.03.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
@@ -55,7 +56,7 @@ import lombok.extern.log4j.Log4j2;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.01)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Service
@@ -315,7 +316,9 @@ public class FixedCostRegistConfirmUseCase {
 				paymentMethodInfoComponent.getFixedCostPaymentMethodOptions(userId));
 
 		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
-		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, ExpenditureItemCode.from(inputForm.getSisyutuItemCode())));
+		response.setSisyutuItemName(expenditureItemInfoComponent
+				.getExpenditureItemNamePath(userId, ExpenditureItemCode.from(inputForm.getSisyutuItemCode()))
+				.toFormatString());
 
 		return response;
 	}
@@ -349,9 +352,9 @@ public class FixedCostRegistConfirmUseCase {
 				inputForm.getShiharaiTukiOptionalContext(),
 				// 固定費支払日(支払日)
 				inputForm.getShiharaiDay(),
-				// 支払金額
-				inputForm.getShiharaiKingaku(),
 				// 支払方法コード
-				inputForm.getPaymentMethodCode());
+				inputForm.getPaymentMethodCode(),
+				// 支払金額
+				inputForm.getShiharaiKingaku());
 	}
 }

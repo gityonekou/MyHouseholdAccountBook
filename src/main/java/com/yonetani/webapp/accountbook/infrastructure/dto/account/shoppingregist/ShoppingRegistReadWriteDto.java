@@ -108,9 +108,9 @@ public class ShoppingRegistReadWriteDto {
 				// ユーザID
 				domain.getUserId().getValue(),
 				// 対象年
-				domain.getTargetYearMonth().getYear(),
+				domain.getTargetYearMonth().getTargetYear().getValue(),
 				// 対象月
-				domain.getTargetYearMonth().getMonth(),
+				domain.getTargetYearMonth().getTargetMonth().getValue(),
 				// 買い物登録コード
 				domain.getShoppingRegistCode().getValue(),
 				// 店舗区分コード

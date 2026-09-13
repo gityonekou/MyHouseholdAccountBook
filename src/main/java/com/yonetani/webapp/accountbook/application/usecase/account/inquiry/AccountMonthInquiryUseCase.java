@@ -5,11 +5,12 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2023/09/23 : 1.00.00  新規作成
- * 2025/12/21 : 1.01.00  リファクタリング対応(DDD適応)
- * 2026/05/09 : 1.01.01  リファクタリング追加対応(対象年月ドメインの集約)
- * 2026/06/13 : 1.02.00  支出別一覧追加対応(ExpenditureTableRepository追加・viewType対応・execRead処理順番見直し)
+ * 日付       : version  ブランチ            コメントなど
+ * 2023/09/23 : 1.00.00                      新規作成
+ * 2025/12/21 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/05/09 : 1.02.00  feature-1.01-dev1   リファクタリング追加対応(対象年月ドメインの集約)
+ * 2026/06/13 : 1.03.00  feature-1.02-dev1   支出別一覧追加対応(ExpenditureTableRepository追加・viewType対応・execRead処理順番見直し)
+ * 2026/08/18 : 1.04.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.inquiry;
@@ -18,7 +19,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
-
 import org.springframework.util.StringUtils;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent;
@@ -325,8 +325,8 @@ public class AccountMonthInquiryUseCase {
 							domain.getExpenditureAmount().toFormatString(),
 							StringUtils.hasLength(domain.getExpenditureDetailContext().getValue())
 									? domain.getExpenditureDetailContext().getValue() : "",
-							resolver.getPaymentMethodName(domain.getPaymentMethodCode()),
-							resolver.getBankAccountName(domain.getPaymentMethodCode()));
+							resolver.getPaymentMethodName(domain.getPaymentMethodCode()).getValue(),
+							resolver.getBankAccountName(domain.getPaymentMethodCode()).getValue());
 				})
 				.collect(Collectors.toUnmodifiableList());
 	}

@@ -4,8 +4,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/08/19 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/08/19 : 1.00.00  feature-1.03-dev1   新規作成
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.component;
@@ -29,6 +29,8 @@ import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.Payment
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -78,10 +80,10 @@ public class PaymentMethodInfoComponent {
 	 *</pre>
 	 * @param userId 対象のユーザID
 	 * @param code 支払方法コード
-	 * @return 支払方法名(システム予約値・未登録の場合は「－」)
+	 * @return 支払方法名（解決済み）の値オブジェクト(システム予約値・未登録の場合は「－」)
 	 *
 	 */
-	public String getPaymentMethodName(UserId userId, PaymentMethodCode code) {
+	public ResolvedPaymentMethodName getPaymentMethodName(UserId userId, PaymentMethodCode code) {
 		return createResolver(userId).getPaymentMethodName(code);
 	}
 
@@ -92,10 +94,10 @@ public class PaymentMethodInfoComponent {
 	 *</pre>
 	 * @param userId 対象のユーザID
 	 * @param code 支払方法コード
-	 * @return 銀行口座名(システム予約値・銀行口座なし・未登録の場合は「－」)
+	 * @return 銀行口座名（解決済み）の値オブジェクト(システム予約値・銀行口座なし・未登録の場合は「－」)
 	 *
 	 */
-	public String getBankAccountName(UserId userId, PaymentMethodCode code) {
+	public ResolvedBankAccountName getBankAccountName(UserId userId, PaymentMethodCode code) {
 		return createResolver(userId).getBankAccountName(code);
 	}
 
@@ -174,15 +176,17 @@ public class PaymentMethodInfoComponent {
 		 * システム予約値(999等)、またはマスタに存在しないコードの場合は「－」を返します。
 		 *</pre>
 		 * @param code 支払方法コード
-		 * @return 支払方法名、解決できない場合は「－」
+		 * @return 支払方法名（解決済み）の値オブジェクト。解決できない場合の値オブジェクト格納値は「－」
 		 *
 		 */
-		public String getPaymentMethodName(PaymentMethodCode code) {
+		public ResolvedPaymentMethodName getPaymentMethodName(PaymentMethodCode code) {
 			if(code == null || code.isSystemReserved()) {
-				return "－";
+				return ResolvedPaymentMethodName.UNRESOLVED;
 			}
 			PaymentMethod paymentMethod = paymentMethodMap.get(code);
-			return paymentMethod == null ? "－" : paymentMethod.getPaymentMethodName().getValue();
+			return paymentMethod == null ? 
+					ResolvedPaymentMethodName.UNRESOLVED : 
+						ResolvedPaymentMethodName.from(paymentMethod.getPaymentMethodName().getValue());
 		}
 
 		/**
@@ -192,19 +196,84 @@ public class PaymentMethodInfoComponent {
 		 * またはマスタに存在しないコードの場合は「－」を返します。
 		 *</pre>
 		 * @param code 支払方法コード
-		 * @return 銀行口座名、解決できない場合は「－」
+		 * @return 銀行口座名（解決済み）の値オブジェクト。解決できない場合は「－」
 		 *
 		 */
-		public String getBankAccountName(PaymentMethodCode code) {
+		public ResolvedBankAccountName getBankAccountName(PaymentMethodCode code) {
 			if(code == null || code.isSystemReserved()) {
-				return "－";
+				return ResolvedBankAccountName.UNRESOLVED;
 			}
 			PaymentMethod paymentMethod = paymentMethodMap.get(code);
 			if(paymentMethod == null || paymentMethod.getBankAccountCode() == null) {
-				return "－";
+				return ResolvedBankAccountName.UNRESOLVED;
 			}
 			BankAccount bankAccount = bankAccountMap.get(paymentMethod.getBankAccountCode());
-			return bankAccount == null ? "－" : bankAccount.getBankName().getValue();
+			return bankAccount == null ? 
+					ResolvedBankAccountName.UNRESOLVED :
+						ResolvedBankAccountName.from(bankAccount.getBankName().getValue());
+		}
+	}
+	
+	/**
+	 *<pre>
+	 * 支払方法コードに対応する支払方法名を解決した結果を保持する値オブジェクトです
+	 *
+	 *</pre>
+	 *
+	 * @author ：Kouki Yonetani
+	 * @since 家計簿アプリ(1.03)
+	 *
+	 */
+	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+	@Getter
+	public static class ResolvedPaymentMethodName {
+		// 解決できない場合の値オブジェクト
+		public static final ResolvedPaymentMethodName UNRESOLVED = new ResolvedPaymentMethodName("－");
+		// 支払方法名（解決済み）
+		private final String value;
+		
+		/**
+		 *<pre>
+		 * 支払方法名（解決済み）の値オブジェクトを生成します。
+		 *</pre>
+		 * @param value 支払方法名（解決済み）
+		 * @return 支払方法名（解決済み）値オブジェクト「ResolvedPaymentMethodName」
+		 *
+		 */
+		private static ResolvedPaymentMethodName from(String value) {
+			return new ResolvedPaymentMethodName(value);
+		}
+	}
+	
+	/**
+	 *<pre>
+	 * 支払方法コードに対応する銀行口座名を解決した結果を保持する値オブジェクトです
+	 *
+	 *</pre>
+	 *
+	 * @author ：Kouki Yonetani
+	 * @since 家計簿アプリ(1.03)
+	 *
+	 */
+	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+	@Getter
+	public static class ResolvedBankAccountName {
+		// 解決できない場合の値オブジェクト
+		public static final ResolvedBankAccountName UNRESOLVED = new ResolvedBankAccountName("－");
+		// 銀行口座名（解決済み）
+		private final String value;
+		
+		/**
+		 *<pre>
+		 * 銀行口座名（解決済み）の値オブジェクトを生成します。
+		 *</pre>
+		 * @param value 銀行口座名（解決済み）
+		 * @return 銀行口座名（解決済み）値オブジェクト「ResolvedBankAccountName」
+		 *
+		 */
+		private static ResolvedBankAccountName from(String value) {
+			return new ResolvedBankAccountName(value);
 		}
 	}
 }
+

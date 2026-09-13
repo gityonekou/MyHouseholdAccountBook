@@ -83,7 +83,7 @@ class FixedCostAnnualSummaryListTest {
 		assertEquals(12, rows.size(), "12行生成されること");
 		for (int i = 0; i < 12; i++) {
 			MonthlyRow row = rows.get(i);
-			assertEquals(i + 1, row.getMonth(), (i + 1) + "月のmonth値");
+			assertEquals(i + 1, row.getMonth().intValue(), (i + 1) + "月のmonth値");
 			for (AnnualSummaryColumn col : AnnualSummaryColumn.values()) {
 				assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(col), (i + 1) + "月 " + col + " はZERO");
 			}

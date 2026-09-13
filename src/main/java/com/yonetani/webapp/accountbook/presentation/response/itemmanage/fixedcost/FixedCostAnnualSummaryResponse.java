@@ -6,6 +6,7 @@
  * 日付       : version  コメントなど
  * 2026/05/23 : 1.01.00  新規作成
  * 2026/05/27 : 1.01.01  targetMonth フィールド削除（月別固定費一覧タブリンクをセッション管理に変更）
+ * 2026/09/12 : 1.03.00  リファクタリング対応(Feature1.03 dev1)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost;
@@ -14,6 +15,8 @@ import java.util.List;
 
 import org.springframework.web.servlet.ModelAndView;
 
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
 import lombok.AccessLevel;
@@ -70,7 +73,7 @@ public class FixedCostAnnualSummaryResponse extends AbstractResponse {
 		 *<pre>
 		 * 引数の値から年間固定費合計行データを生成して返します（データ行用）。
 		 *</pre>
-		 * @param monthLabel 月ラベル
+		 * @param month 対象月
 		 * @param jigyouKeihi 事業経費
 		 * @param hikozei 固定費(非課税)
 		 * @param seikatsuhi 固定費(生活費)
@@ -80,18 +83,29 @@ public class FixedCostAnnualSummaryResponse extends AbstractResponse {
 		 * @param inshoku 飲食日用品
 		 * @param shumiGoraku 趣味娯楽
 		 * @param monthTotal 月合計
-		 * @param detailMonth 月番号文字列（"01"〜"12"）
 		 * @return 年間固定費合計行データ
 		 *
 		 */
 		public static AnnualSummaryRowItem createDataRow(
-				String monthLabel, String jigyouKeihi, String hikozei, String seikatsuhi,
-				String tsumitateToushi, String tsumitateKin, String iruiJukyo,
-				String inshoku, String shumiGoraku, String monthTotal, String detailMonth) {
-			int month = Integer.parseInt(detailMonth);
-			return new AnnualSummaryRowItem(monthLabel, jigyouKeihi, hikozei, seikatsuhi,
-					tsumitateToushi, tsumitateKin, iruiJukyo, inshoku, shumiGoraku,
-					monthTotal, detailMonth, month % 2 == 0, false);
+				TargetMonth month, FixedCostPaymentTotalAmount jigyouKeihi, FixedCostPaymentTotalAmount hikozei,
+				FixedCostPaymentTotalAmount seikatsuhi, FixedCostPaymentTotalAmount tsumitateToushi,
+				FixedCostPaymentTotalAmount tsumitateKin, FixedCostPaymentTotalAmount iruiJukyo,
+				FixedCostPaymentTotalAmount inshoku, FixedCostPaymentTotalAmount shumiGoraku,
+				FixedCostPaymentTotalAmount monthTotal) {
+			return new AnnualSummaryRowItem(
+					month.toFormatString(),
+					jigyouKeihi.toZeroDashString(),
+					hikozei.toZeroDashString(),
+					seikatsuhi.toZeroDashString(),
+					tsumitateToushi.toZeroDashString(),
+					tsumitateKin.toZeroDashString(),
+					iruiJukyo.toZeroDashString(),
+					inshoku.toZeroDashString(),
+					shumiGoraku.toZeroDashString(),
+					monthTotal.toZeroDashString(),
+					month.getValue(),
+					month.intValue() % 2 == 0,
+					false);
 		}
 
 		/**
@@ -111,12 +125,25 @@ public class FixedCostAnnualSummaryResponse extends AbstractResponse {
 		 *
 		 */
 		public static AnnualSummaryRowItem createTotalRow(
-				String jigyouKeihi, String hikozei, String seikatsuhi,
-				String tsumitateToushi, String tsumitateKin, String iruiJukyo,
-				String inshoku, String shumiGoraku, String monthTotal) {
-			return new AnnualSummaryRowItem("合計", jigyouKeihi, hikozei, seikatsuhi,
-					tsumitateToushi, tsumitateKin, iruiJukyo, inshoku, shumiGoraku,
-					monthTotal, null, false, true);
+				FixedCostPaymentTotalAmount jigyouKeihi, FixedCostPaymentTotalAmount hikozei,
+				FixedCostPaymentTotalAmount seikatsuhi, FixedCostPaymentTotalAmount tsumitateToushi,
+				FixedCostPaymentTotalAmount tsumitateKin, FixedCostPaymentTotalAmount iruiJukyo,
+				FixedCostPaymentTotalAmount inshoku, FixedCostPaymentTotalAmount shumiGoraku,
+				FixedCostPaymentTotalAmount monthTotal) {
+			return new AnnualSummaryRowItem(
+					"合計",
+					jigyouKeihi.toZeroDashString(),
+					hikozei.toZeroDashString(),
+					seikatsuhi.toZeroDashString(),
+					tsumitateToushi.toZeroDashString(),
+					tsumitateKin.toZeroDashString(),
+					iruiJukyo.toZeroDashString(),
+					inshoku.toZeroDashString(),
+					shumiGoraku.toZeroDashString(),
+					monthTotal.toZeroDashString(),
+					null,
+					false,
+					true);
 		}
 	}
 

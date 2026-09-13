@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2026/05/01 : 1.01.00  新規作成
+ * 2026/08/18 : 1.03.00  支払方法・銀行口座管理追加対応(Feature1.03 dev1)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost;
@@ -16,6 +17,10 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent.ResolvedPaymentMethodName;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostName;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentAmount;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostBulkUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
@@ -62,10 +67,10 @@ public class FixedCostBulkUpdateResponse extends AbstractResponse {
 		private final String shiharaiTukiOptionalContext;
 		// 現在の支払日（コード変換済み）
 		private final String shiharaiDay;
-		// 現在の支払金額（フォーマット済み）
-		private final String shiharaiKingaku;
 		// 支払方法名（解決済み。表示のみ、一括更新の対象にはしない。5.4.2節）
 		private final String paymentMethodName;
+		// 現在の支払金額（フォーマット済み）
+		private final String shiharaiKingaku;
 
 		/**
 		 *<pre>
@@ -76,16 +81,29 @@ public class FixedCostBulkUpdateResponse extends AbstractResponse {
 		 * @param shiharaiTukiDetailContext 支払月（コード変換済み）
 		 * @param shiharaiTukiOptionalContext 支払月任意詳細
 		 * @param shiharaiDay 現在の支払日（コード変換済み）
-		 * @param shiharaiKingaku 現在の支払金額（フォーマット済み）
 		 * @param paymentMethodName 支払方法名（解決済み）
+		 * @param shiharaiKingaku 現在の支払金額（フォーマット済み）
 		 * @return 一括更新対象の固定費明細情報
 		 *
 		 */
-		public static BulkUpdateTargetItem from(String fixedCostCode, String shiharaiName,
-				String shiharaiTukiDetailContext, String shiharaiTukiOptionalContext,
-				String shiharaiDay, String shiharaiKingaku, String paymentMethodName) {
-			return new BulkUpdateTargetItem(fixedCostCode, shiharaiName,
-					shiharaiTukiDetailContext, shiharaiTukiOptionalContext, shiharaiDay, shiharaiKingaku, paymentMethodName);
+		public static BulkUpdateTargetItem from(FixedCostCode fixedCostCode, FixedCostName shiharaiName,
+				String shiharaiTukiDetailContext, String shiharaiTukiOptionalContext, String shiharaiDay,
+				ResolvedPaymentMethodName paymentMethodName, FixedCostPaymentAmount shiharaiKingaku) {
+			return new BulkUpdateTargetItem(
+					// 固定費コード
+					fixedCostCode.getValue(),
+					// 支払名
+					shiharaiName.getValue(),
+					// 支払月（コード変換済み）
+					shiharaiTukiDetailContext,
+					// 支払月任意詳細（その他任意選択時のみ値あり）
+					shiharaiTukiOptionalContext,
+					// 現在の支払日（コード変換済み）
+					shiharaiDay,
+					// 支払方法名（解決済み。表示のみ、一括更新の対象にはしない。5.4.2節）
+					paymentMethodName.getValue(),
+					// 現在の支払金額（フォーマット済み）
+					shiharaiKingaku.toFormatString());
 		}
 	}
 

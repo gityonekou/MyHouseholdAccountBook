@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  コメントなど
  * 2023/10/12 : 1.00.00  新規作成
+ * 2026/09/09 : 1.00.01  リファクタリング対応(年項目ロジックの集約)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
@@ -25,7 +26,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -66,6 +67,18 @@ public class TargetYear {
 		
 		// 「年」項目ドメインタイプを返却
 		return new TargetYear(year);
+	}
+	
+	/**
+	 *<pre>
+	 * "YYYY年" 形式のフォーマット値を返します。
+	 * 
+	 *</pre>
+	 * @return YYYY年 形式のフォーマット値
+	 *
+	 */
+	public String toFormatString() {
+		return value + "年";
 	}
 	
 	/**
