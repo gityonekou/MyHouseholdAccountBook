@@ -14,8 +14,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/01/05 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/01/05 : 1.00.00  feature-1.00-dev00  新規作成
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
@@ -41,7 +41,7 @@ import lombok.EqualsAndHashCode;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @EqualsAndHashCode(callSuper = true)

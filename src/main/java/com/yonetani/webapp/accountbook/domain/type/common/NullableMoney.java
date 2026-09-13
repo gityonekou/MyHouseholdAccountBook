@@ -4,9 +4,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2025/12/22 : 1.00.00  新規作成
- * 2026/05/23 : 1.01.01  年間固定費合計画面新規追加対応でtoZeroDashString()メソッド追加
+ * 日付       : version  ブランチ            コメントなど
+ * 2025/12/22 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/05/23 : 1.01.00  feature-1.01-dev3   年間固定費合計画面新規追加対応でtoZeroDashString()メソッド追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;

@@ -3,9 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/09/08 : 1.00.00  新規作成
- * 2026/03/15 : 1.01.00  クラス名をSisyutuNameからExpenditureNameにリネーム
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/09/08 : 1.00.00                      新規作成
+ * 2026/03/15 : 1.01.00  feature-1.00-dev00  クラス名をSisyutuNameからExpenditureNameにリネーム
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.expenditure;

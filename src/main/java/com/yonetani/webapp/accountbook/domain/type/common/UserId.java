@@ -3,9 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2023/09/24 : 1.00.00  新規作成
- * 2025/11/25 : 1.00.00  Identifier抽象クラスを継承するようリファクタリング
+ * 日付       : version  ブランチ            コメントなど
+ * 2023/09/24 : 1.00.00                      新規作成
+ * 2025/11/25 : 1.01.00  feature-1.00-dev00  Identifier抽象クラスを継承するようリファクタリング
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
@@ -26,7 +26,7 @@ import lombok.EqualsAndHashCode;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.00)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @EqualsAndHashCode(callSuper = true)
