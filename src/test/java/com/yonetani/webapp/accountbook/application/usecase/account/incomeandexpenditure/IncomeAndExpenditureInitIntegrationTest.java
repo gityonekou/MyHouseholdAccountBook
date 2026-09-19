@@ -4,10 +4,10 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/01/12 : 1.00.00  新規作成
- * 2026/06/14 : 1.02.00  テストシナリオ⑭をreadRegistCheckValidateInfoに変更、⑮⑯を追加
- * 2026/06/14 : 1.02.01  テストシナリオ⑰を追加（0円NON_UPDATEはバリデーション通過）
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/01/12 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/06/14 : 1.01.00  feature-1.02-dev2   テストシナリオ⑭をreadRegistCheckValidateInfoに変更、⑮⑯を追加
+ * 2026/06/14 : 1.01.01  feature-1.02-dev2   テストシナリオ⑰を追加（0円NON_UPDATEはバリデーション通過）
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;

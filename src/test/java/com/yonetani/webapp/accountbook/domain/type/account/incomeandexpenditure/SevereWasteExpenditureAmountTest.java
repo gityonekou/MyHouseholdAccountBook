@@ -3,9 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2025/12/23 : 1.00.00  新規作成
- * 2025/12/28 : 1.01.00  クラス名変更(SisyutuKingakuCTest → SevereWasteExpenditureAmountTest)
+ * 日付       : version  ブランチ            コメントなど
+ * 2025/12/23 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2025/12/28 : 1.00.01  feature-1.00-dev00  クラス名変更(SisyutuKingakuCTest → SevereWasteExpenditureAmountTest)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure;

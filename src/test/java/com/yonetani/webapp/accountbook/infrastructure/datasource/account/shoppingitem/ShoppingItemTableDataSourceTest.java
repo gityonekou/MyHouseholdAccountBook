@@ -4,8 +4,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/06/09 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/06/09 : 1.00.00                      新規作成
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingitem;

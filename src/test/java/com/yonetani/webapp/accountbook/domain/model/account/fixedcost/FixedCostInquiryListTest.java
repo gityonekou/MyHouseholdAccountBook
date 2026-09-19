@@ -3,9 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/05/07 : 1.01.00  新規作成
- * 2026/05/27 : 1.01.01  getValuesForMonth テスト追加
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/05/07 : 1.00.00  feature-1.01-dev1   新規作成
+ * 2026/05/27 : 1.01.00  feature-1.01-dev2   getValuesForMonth テスト追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.fixedcost;

@@ -24,8 +24,8 @@
  * </pre>
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/04/19 : 1.01.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/04/19 : 1.00.00  feature-1.00-dev00  新規作成
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
@@ -60,7 +60,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.01)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @SpringBootTest
