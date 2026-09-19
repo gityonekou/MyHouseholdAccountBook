@@ -3,9 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/05/27 : 1.01.00  新規作成
- * 2026/09/12 : 1.03.00  リファクタリング対応(Feature1.03 dev1)
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/05/27 : 1.00.00  feature-1.01-dev3   新規作成
+ * 2026/09/12 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost;
@@ -61,7 +61,7 @@ public class FixedCostMonthlyDetailResponse extends AbstractResponse {
 	 *<pre>
 	 * 引数の値からレスポンス情報を生成して返します。
 	 *</pre>
-	 * @param displayMonthLabel 表示中の月
+	 * @param currentMonth 現在の月
 	 * @param prevMonth 前月
 	 * @param nextMonth 次月
 	 * @return 月別固定費一覧画面表示情報

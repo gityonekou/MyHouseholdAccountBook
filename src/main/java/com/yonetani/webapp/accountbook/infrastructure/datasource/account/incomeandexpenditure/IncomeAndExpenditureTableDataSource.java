@@ -3,10 +3,10 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2023/10/12 : 1.00.00  新規作成
- * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
- * 2026/04/16 : 1.02.00  IncomeAndExpenditureItem統合に伴う修正
+ * 日付       : version  ブランチ            コメントなど
+ * 2023/10/12 : 1.00.00                      新規作成
+ * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/04/16 : 1.01.01  feature-1.00-dev00  リファクタリング追加対応(IncomeAndExpenditureItem統合に伴う修正)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.incomeandexpenditure;

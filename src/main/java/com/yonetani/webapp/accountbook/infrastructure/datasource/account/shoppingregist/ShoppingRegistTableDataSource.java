@@ -3,9 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/11/23 : 1.00.00  新規作成
- * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/11/23 : 1.00.00                      新規作成
+ * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingregist;

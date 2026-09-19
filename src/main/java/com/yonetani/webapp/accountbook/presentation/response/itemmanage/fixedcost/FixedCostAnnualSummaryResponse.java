@@ -3,10 +3,10 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/05/23 : 1.01.00  新規作成
- * 2026/05/27 : 1.01.01  targetMonth フィールド削除（月別固定費一覧タブリンクをセッション管理に変更）
- * 2026/09/12 : 1.03.00  リファクタリング対応(Feature1.03 dev1)
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/05/23 : 1.00.00  feature-1.01-dev3   新規作成
+ * 2026/05/27 : 1.00.01  feature-1.01-dev3   targetMonth フィールド削除（月別固定費一覧タブリンクをセッション管理に変更）
+ * 2026/09/12 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost;
@@ -31,7 +31,7 @@ import lombok.Setter;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00)
+ * @since 家計簿アプリ(1.01)
  *
  */
 public class FixedCostAnnualSummaryResponse extends AbstractResponse {

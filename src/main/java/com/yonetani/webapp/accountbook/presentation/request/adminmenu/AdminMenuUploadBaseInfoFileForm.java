@@ -3,8 +3,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2023/12/31 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2023/12/31 : 1.00.00                      新規作成
  *
  */
 package com.yonetani.webapp.accountbook.presentation.request.adminmenu;
@@ -22,7 +22,7 @@ import lombok.Data;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Data

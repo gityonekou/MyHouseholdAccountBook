@@ -30,11 +30,11 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/06/16 : 1.00.00  新規作成
- * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
- * 2026/06/13 : 1.02.00  支出別一覧追加対応(expenditurecorrectloadエンドポイント追加)
- * 2026/06/14 : 1.02.00  固定費0円対応: getRegistCheckLoad()をreadRegistCheckValidateInfo()経由に変更（UseCaseに検証ロジック集約）
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/06/16 : 1.00.00                      新規作成
+ * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/06/13 : 1.02.00  feature-1.02-dev1   支出別一覧追加対応(expenditurecorrectloadエンドポイント追加)
+ * 2026/06/14 : 1.02.01  feature-1.02-dev1   固定費0円対応: getRegistCheckLoad()をreadRegistCheckValidateInfo()経由に変更（UseCaseに検証ロジック集約）
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.account.regist;

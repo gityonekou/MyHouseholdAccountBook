@@ -4,9 +4,10 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/05/22 : 1.00.00  新規作成
- * 2026/06/14 : 1.02.00  固定費0円対応: @Min(1)→@Min(0)、@AssertTrue isValidShiharaiKingakuForKubun()追加
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/05/22 : 1.00.00                      新規作成
+ * 2026/06/14 : 1.01.00  feature-1.02-dev2   固定費0円対応: @Min(1)→@Min(0)、@AssertTrue isValidShiharaiKingakuForKubun()追加
+ * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.presentation.request.itemmanage;
@@ -39,7 +40,7 @@ import lombok.Data;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Data

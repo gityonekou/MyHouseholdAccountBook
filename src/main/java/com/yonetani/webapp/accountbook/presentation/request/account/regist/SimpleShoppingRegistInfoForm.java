@@ -3,9 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/11/04 : 1.00.00  新規作成
- * 2026/08/18 : 1.03.00  支払方法・銀行口座管理追加対応(Feature1.03 dev1)
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/11/04 : 1.00.00                      新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.presentation.request.account.regist;
@@ -34,7 +34,7 @@ import lombok.Data;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Data

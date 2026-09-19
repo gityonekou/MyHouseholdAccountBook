@@ -6,8 +6,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2023/08/27 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2023/08/27 : 1.00.00                      新規作成
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.account.regist;

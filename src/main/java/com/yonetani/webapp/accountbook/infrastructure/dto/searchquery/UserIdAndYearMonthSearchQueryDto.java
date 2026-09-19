@@ -6,8 +6,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2023/09/30 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2023/09/30 : 1.00.00                      新規作成
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.searchquery;
@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
