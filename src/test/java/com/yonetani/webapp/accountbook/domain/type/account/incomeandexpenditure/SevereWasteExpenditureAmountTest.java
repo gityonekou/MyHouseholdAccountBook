@@ -117,7 +117,7 @@ class SevereWasteExpenditureAmountTest {
 
 		// 実行
 		SevereWasteExpenditureAmount result = amount1.add(amount2);
-
+		
 		// 検証（null as zero扱い）
 		assertEquals(new BigDecimal("10000.00"), result.getValue());
 	}

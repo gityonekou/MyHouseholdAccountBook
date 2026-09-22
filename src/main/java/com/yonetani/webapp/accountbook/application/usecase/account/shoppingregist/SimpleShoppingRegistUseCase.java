@@ -6,7 +6,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2024/11/03 : 1.00.00                      新規作成
  * 2025/12/28 : 1.01.00  feature-1.00-dev00  リファクタリング対応（DDD適応) 
- * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応、追加リファクタリング対応(買い物登録ドメインの見直し)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist;
@@ -36,7 +36,6 @@ import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.Sever
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.ShoppingClothes;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.ShoppingConsumerGoods;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.ShoppingDineOut;
-import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.ShoppingFood;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.ShoppingHouseEquipment;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.ShoppingRegist;
 import com.yonetani.webapp.accountbook.domain.model.account.shoppingregist.ShoppingWork;
@@ -51,8 +50,9 @@ import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableR
 import com.yonetani.webapp.accountbook.domain.repository.account.shoppingregist.ShoppingRegistTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpenditureTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenditureItem.ShoppingFoodItemExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingRegistCode;
+import com.yonetani.webapp.accountbook.domain.type.common.CouponAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
@@ -188,9 +188,9 @@ public class SimpleShoppingRegistUseCase {
 		// 備考
 		inputForm.setShoppingRemarks(result.getShoppingRemarks().getValue());
 		// 食料品(必須)
-		inputForm.setShoppingFoodExpenses(DomainCommonUtils.convertInteger(result.getShoppingFoodExpenditureAmount().getValue()));
+		inputForm.setShoppingFoodExpenses(result.getShoppingFoodExpenditureItem().getShoppingFoodExpenditureAmount().toIntegerValue());
 		// 消費税：食料品(必須)
-		inputForm.setShoppingFoodTaxExpenses(DomainCommonUtils.convertInteger(result.getShoppingFoodTaxExpenses().getValue()));
+		inputForm.setShoppingFoodTaxExpenses(result.getShoppingFoodExpenditureItem().getShoppingFoodTaxExpenses().toIntegerValue());
 		// 食料品B(無駄遣い)
 		inputForm.setShoppingFoodBExpenses(DomainCommonUtils.convertInteger(result.getShoppingFoodBExpenses().getValue()));
 		// 消費税：食料品B(無駄遣い)
@@ -354,20 +354,20 @@ public class SimpleShoppingRegistUseCase {
 			}
 			
 			// クーポン金額を取得
-			ShoppingCouponPrice couponResidualValue = addData.getShoppingCouponPrice();
+			CouponAmount couponResidualValue = addData.getShoppingCouponPrice().toCouponAmount();
 			
 			// 支出テーブル情報を更新
 			// 飲食(無駄づかいなし)
-			ShoppingFood food = ShoppingFood.from(addData.getShoppingFoodExpenditureAmount(), addData.getShoppingFoodTaxExpenses(), couponResidualValue);
+			ShoppingFoodItemExpenditureAmount food = addData.getShoppingFoodExpenditureItem().applyCoupon(couponResidualValue);
 			if(food.hasExpenditureAmount()) {
 				// 飲食(無駄づかいなし)の支出テーブル情報を作成
-				ExpenditureItem updFoodExpenditureItem = beforeFoodItem.addSisyutuKingaku(food.getValue());
+				ExpenditureItem updFoodExpenditureItem = beforeFoodItem.addSisyutuKingaku(food.getExpenditureAmount());
 				// 更新対象の支出テーブル情報に追加
 				updExpenditureItemList.add(updFoodExpenditureItem);
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
 				expenditureAmountItemHolder.update(beforeFoodItem, updFoodExpenditureItem);
 			}
-			couponResidualValue = food.getResidualCouponPrice();
+			couponResidualValue = food.getResidualCouponAmount();
 			
 			// 食料品(無駄遣い（軽度）) 項目のドメインを生成し、支出金額を持つ場合は「支出項目：飲食」の無駄遣い（軽度）＝ 飲食(無駄遣いB)として登録
 			MinorWasteShoppingFood foodB = MinorWasteShoppingFood.from(addData.getShoppingFoodBExpenses(), addData.getShoppingFoodBTaxExpenses(), couponResidualValue);
@@ -491,20 +491,20 @@ public class SimpleShoppingRegistUseCase {
 			
 			
 			// クーポン金額を取得
-			ShoppingCouponPrice beforeCouponResidualValue = beforeData.getShoppingCouponPrice();
-			ShoppingCouponPrice afterCouponResidualValue = updData.getShoppingCouponPrice();
+			CouponAmount beforeCouponResidualValue = beforeData.getShoppingCouponPrice().toCouponAmount();
+			CouponAmount afterCouponResidualValue = updData.getShoppingCouponPrice().toCouponAmount();
 			
 			/* 支出テーブル情報を更新 */
 			// 飲食(無駄づかいなし)
-			ShoppingFood beforeFood = ShoppingFood.from(beforeData.getShoppingFoodExpenditureAmount(), beforeData.getShoppingFoodTaxExpenses(), beforeCouponResidualValue);
-			ShoppingFood afterFood = ShoppingFood.from(updData.getShoppingFoodExpenditureAmount(), updData.getShoppingFoodTaxExpenses(), afterCouponResidualValue);
-			beforeCouponResidualValue = beforeFood.getResidualCouponPrice();
-			afterCouponResidualValue = afterFood.getResidualCouponPrice();
+			ShoppingFoodItemExpenditureAmount beforeFood = beforeData.getShoppingFoodExpenditureItem().applyCoupon(beforeCouponResidualValue);
+			ShoppingFoodItemExpenditureAmount afterFood = updData.getShoppingFoodExpenditureItem().applyCoupon(afterCouponResidualValue);
+			beforeCouponResidualValue = beforeFood.getResidualCouponAmount();
+			afterCouponResidualValue = afterFood.getResidualCouponAmount();
 			BeforeAndAfterShoppingSisyutuKingakuData updFood = BeforeAndAfterShoppingSisyutuKingakuData.from(
 					// 更新前の飲食(無駄づかいなし)設定値
-					beforeFood.getValue(),
+					beforeFood.getExpenditureAmount(),
 					// 更新後の飲食(無駄づかいなし)設定値
-					afterFood.getValue(),
+					afterFood.getExpenditureAmount(),
 					// 更新前の飲食(無駄づかいなし)の支出テーブル情報
 					beforeFoodItem);
 			if(updFood.isUpdated()) {

@@ -6,7 +6,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2024/12/28 : 1.00.00                      新規作成
- * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応、追加リファクタリング対応(買い物登録ドメインの見直し)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist;
@@ -79,7 +79,7 @@ public class SimpleShoppingRegistListComponent {
 						// 支払方法名(解決済み)
 						paymentMethodNameResolver.getPaymentMethodName(domain.getPaymentMethodCode()),
 						// 食料品(必須)
-						domain.getShoppingFoodItem(),
+						domain.getShoppingFoodExpenditureItem(),
 						// 食料品B(無駄遣い)
 						domain.getShoppingFoodBItem(),
 						// 食料品C(お酒類)

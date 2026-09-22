@@ -6,6 +6,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2024/11/23 : 1.00.00                      新規作成
  * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/09/21 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応、追加リファクタリング対応(買い物登録のドメイン見直し)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
@@ -21,16 +22,17 @@ import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.Shoppi
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDate;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutTaxExpenses;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodBExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodBTaxExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCTaxExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodTaxExpenses;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentTaxExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingRegistCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingRemarks;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingTaxExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkTaxExpenses;
@@ -74,18 +76,16 @@ public class ShoppingRegist {
 	private final ShopKubunCode shopKubunCode;
 	// 店舗コード
 	private final ShopCode shopCode;
+	// 支払方法コード
+	private final PaymentMethodCode paymentMethodCode;
 	// 買い物日
 	private final ShoppingDate shoppingDate;
 	// 備考
 	private final ShoppingRemarks shoppingRemarks;
-	// 支払方法コード
-	private final PaymentMethodCode paymentMethodCode;
-
+	
 	// 登録データ(金額)
-	// 食料品(必須)金額
-	private final ShoppingFoodExpenditureAmount shoppingFoodExpenditureAmount;
-	// 消費税:食料品(必須)金額
-	private final ShoppingFoodTaxExpenses shoppingFoodTaxExpenses;
+	// 食料品(必須)
+	private final ShoppingFoodExpenditureItem shoppingFoodExpenditureItem;
 	// 食料品B(無駄遣い)金額
 	private final ShoppingFoodBExpenses shoppingFoodBExpenses;
 	// 消費税:食料品B(無駄遣い)金額
@@ -132,11 +132,10 @@ public class ShoppingRegist {
 	 * @param shoppingRegistCode 買い物登録コード
 	 * @param shopKubunCode 店舗区分コード
 	 * @param shopCode 店舗コード
+	 * @param paymentMethodCode 支払方法コード
 	 * @param shoppingDate 買い物日
 	 * @param shoppingRemarks 備考
-	 * @param paymentMethodCode 支払方法コード
-	 * @param shoppingFoodExpenditureAmount 食料品(必須)金額
-	 * @param shoppingFoodTaxExpenses 消費税:食料品(必須)金額
+	 * @param shoppingFoodExpenditureItem 食料品(必須)
 	 * @param shoppingFoodBExpenses 食料品B(無駄遣い)金額
 	 * @param shoppingFoodBTaxExpenses 消費税:食料品B(無駄遣い)金額
 	 * @param shoppingFoodCExpenses 食料品C(お酒類)金額
@@ -164,11 +163,10 @@ public class ShoppingRegist {
 			ShoppingRegistCode shoppingRegistCode,
 			ShopKubunCode shopKubunCode,
 			ShopCode shopCode,
+			PaymentMethodCode paymentMethodCode,
 			ShoppingDate shoppingDate,
 			ShoppingRemarks shoppingRemarks,
-			PaymentMethodCode paymentMethodCode,
-			ShoppingFoodExpenditureAmount shoppingFoodExpenditureAmount,
-			ShoppingFoodTaxExpenses shoppingFoodTaxExpenses,
+			ShoppingFoodExpenditureItem shoppingFoodExpenditureItem,
 			ShoppingFoodBExpenses shoppingFoodBExpenses,
 			ShoppingFoodBTaxExpenses shoppingFoodBTaxExpenses,
 			ShoppingFoodCExpenses shoppingFoodCExpenses,
@@ -194,11 +192,10 @@ public class ShoppingRegist {
 				shoppingRegistCode,
 				shopKubunCode,
 				shopCode,
+				paymentMethodCode,
 				shoppingDate,
 				shoppingRemarks,
-				paymentMethodCode,
-				shoppingFoodExpenditureAmount,
-				shoppingFoodTaxExpenses,
+				shoppingFoodExpenditureItem,
 				shoppingFoodBExpenses,
 				shoppingFoodBTaxExpenses,
 				shoppingFoodCExpenses,
@@ -244,16 +241,19 @@ public class ShoppingRegist {
 				ShopKubunCode.from(inputForm.getShopKubunCode()),
 				// 店舗コード
 				ShopCode.from(inputForm.getShopCode()),
+				// 支払方法コード
+				PaymentMethodCode.from(inputForm.getPaymentMethodCode()),
 				// 買い物日
 				ShoppingDate.from(inputForm.getShoppingDate(), targetYearMonth),
 				// 備考
 				ShoppingRemarks.from(inputForm.getShoppingRemarks()),
-				// 支払方法コード
-				PaymentMethodCode.from(inputForm.getPaymentMethodCode()),
-				// 食料品(必須)金額
-				ShoppingFoodExpenditureAmount.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingFoodExpenses())),
-				// 消費税:食料品(必須)金額
-				ShoppingFoodTaxExpenses.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingFoodTaxExpenses())),
+				// 食料品(必須)
+				ShoppingFoodExpenditureItem.from(
+						// 食料品(必須)金額
+						ShoppingExpenditureAmount.from(inputForm.getShoppingFoodExpenses()),
+						// 消費税:食料品(必須)金額
+						ShoppingTaxExpenses.from(inputForm.getShoppingFoodTaxExpenses())
+					),
 				// 食料品B(無駄遣い)金額
 				ShoppingFoodBExpenses.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingFoodBExpenses())),
 				// 消費税:食料品B(無駄遣い)金額

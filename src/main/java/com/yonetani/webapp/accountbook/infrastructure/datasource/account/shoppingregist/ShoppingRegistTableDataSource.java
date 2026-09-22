@@ -6,6 +6,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2024/11/23 : 1.00.00                      新規作成
  * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingregist;
@@ -36,20 +37,20 @@ import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.Shoppi
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutTaxExpenses;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodBExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodBItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodBTaxExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCTaxExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodTaxExpenses;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentTaxExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingRegistCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingRemarks;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingTaxExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkItem;
@@ -166,16 +167,18 @@ public class ShoppingRegistTableDataSource implements ShoppingRegistTableReposit
 				ShopKubunCode.from(dto.getShopKubunCode()),
 				// 店舗コード
 				ShopCode.from(dto.getShopCode()),
+				// 支払方法コード
+				PaymentMethodCode.from(dto.getPaymentMethodCode()),
 				// 買い物日
 				ShoppingDate.from(dto.getShoppingDate(), targetYearMonth),
 				// 備考
 				ShoppingRemarks.from(dto.getShoppingRemarks()),
-				// 支払方法コード
-				PaymentMethodCode.from(dto.getPaymentMethodCode()),
-				// 食料品(必須)金額
-				ShoppingFoodExpenditureAmount.from(dto.getShoppingFoodExpenses()),
-				// 消費税:食料品(必須)金額
-				ShoppingFoodTaxExpenses.from(dto.getShoppingFoodTaxExpenses()),
+				// 食料品(必須)
+				ShoppingFoodExpenditureItem.from(
+						// 食料品(必須)金額
+						ShoppingExpenditureAmount.from(dto.getShoppingFoodExpenses()),
+						// 消費税:食料品(必須)金額
+						ShoppingTaxExpenses.from(dto.getShoppingFoodTaxExpenses())),
 				// 食料品B(無駄遣い)金額
 				ShoppingFoodBExpenses.from(dto.getShoppingFoodBExpenses()),
 				// 消費税:食料品B(無駄遣い)金額
@@ -232,14 +235,16 @@ public class ShoppingRegistTableDataSource implements ShoppingRegistTableReposit
 				ShoppingRegistCode.from(dto.getShoppingRegistCode()),
 				// 店舗名
 				ShopName.from(dto.getShopName()),
+				// 支払方法コード
+				PaymentMethodCode.from(dto.getPaymentMethodCode()),
 				// 買い物日
 				ShoppingDate.from(dto.getShoppingDate(), targetYearMonth),
 				// 食料品(必須)
-				ShoppingFoodItem.from(
+				ShoppingFoodExpenditureItem.from(
 						// 食料品(必須)金額
-						ShoppingFoodExpenditureAmount.from(dto.getShoppingFoodExpenses()),
+						ShoppingExpenditureAmount.from(dto.getShoppingFoodExpenses()),
 						// 消費税:食料品(必須)金額
-						ShoppingFoodTaxExpenses.from(dto.getShoppingFoodTaxExpenses())),
+						ShoppingTaxExpenses.from(dto.getShoppingFoodTaxExpenses())),
 				// 食料品B(無駄遣い)
 				ShoppingFoodBItem.from(
 						// 食料品B(無駄遣い)金額
@@ -285,8 +290,6 @@ public class ShoppingRegistTableDataSource implements ShoppingRegistTableReposit
 				// クーポン金額
 				ShoppingCouponPrice.from(dto.getShoppingCouponPrice()),
 				// 買い物合計金額
-				ShoppingTotalAmount.from(dto.getShoppingTotalAmount()),
-				// 支払方法コード
-				PaymentMethodCode.from(dto.getPaymentMethodCode()));
+				ShoppingTotalAmount.from(dto.getShoppingTotalAmount()));
 	}
 }

@@ -26,7 +26,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.Shoppi
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodBItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingRegistCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingTotalAmount;
@@ -126,7 +126,7 @@ public abstract class AbstractSimpleShoppingRegistListResponse extends AbstractR
 				ShoppingDate shoppingDay,
 				ShopName shopName,
 				ResolvedPaymentMethodName paymentMethodName,
-				ShoppingFoodItem shoppingFood,
+				ShoppingFoodExpenditureItem shoppingFood,
 				ShoppingFoodBItem shoppingFoodB,
 				ShoppingFoodCItem shoppingFoodC,
 				ShoppingDineOutItem shoppingDineOut,

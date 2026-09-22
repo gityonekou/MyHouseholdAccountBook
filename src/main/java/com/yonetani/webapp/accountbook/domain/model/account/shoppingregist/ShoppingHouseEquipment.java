@@ -14,9 +14,9 @@ package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
 import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentTaxExpenses;
+import com.yonetani.webapp.accountbook.domain.type.common.CouponAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 
 import lombok.AccessLevel;
@@ -42,7 +42,7 @@ public class ShoppingHouseEquipment {
 	// 住居設備金額
 	private final ExpenditureAmount value;
 	// 残クーポン額
-	private final ShoppingCouponPrice residualCouponPrice;
+	private final CouponAmount residualCouponPrice;
 	
 	/**
 	 *<pre>
@@ -65,7 +65,7 @@ public class ShoppingHouseEquipment {
 	 * @return 「住居設備」項目ドメイン
 	 *
 	 */
-	public static ShoppingHouseEquipment from(ShoppingHouseEquipmentExpenses expenses, ShoppingHouseEquipmentTaxExpenses taxExpenses, ShoppingCouponPrice couponPrice) {
+	public static ShoppingHouseEquipment from(ShoppingHouseEquipmentExpenses expenses, ShoppingHouseEquipmentTaxExpenses taxExpenses, CouponAmount couponPrice) {
 		// ガード節(「住居設備金額」項目がnull)
 		if(expenses == null) {
 			throw new MyHouseholdAccountBookRuntimeException("「住居設備金額」項目にnullが指定されました。管理者に問い合わせてください。");
@@ -93,7 +93,7 @@ public class ShoppingHouseEquipment {
 
 		// クーポン指定なしなら割引適応なしで住居設備を生成
 		if(couponPrice.getValue() == null) {
-			return new ShoppingHouseEquipment(ExpenditureAmount.from(foodValue), ShoppingCouponPrice.from(null));
+			return new ShoppingHouseEquipment(ExpenditureAmount.from(foodValue), CouponAmount.ZERO);
 		}
 
 		// 住居設備金額からクーポン金額を割引
@@ -102,14 +102,14 @@ public class ShoppingHouseEquipment {
 		// 割引後の金額がマイナス値)：住居設備金額は割引適応でなし。残クーポン値は住居設備金額の値(マイナス値)
 		int compareToValue = BigDecimal.ZERO.compareTo(discountValue);
 		if (compareToValue > 0) {
-			return new ShoppingHouseEquipment(ExpenditureAmount.ZERO, ShoppingCouponPrice.from(discountValue));
+			return new ShoppingHouseEquipment(ExpenditureAmount.ZERO, CouponAmount.from(discountValue));
 		}
 		// 割引後の金額が0)：住居設備金額は割引適応でなし。残クーポン値もなし
 		if (compareToValue == 0) {
-			return new ShoppingHouseEquipment(ExpenditureAmount.ZERO, ShoppingCouponPrice.from(null));
+			return new ShoppingHouseEquipment(ExpenditureAmount.ZERO, CouponAmount.ZERO);
 		}
 		// 割引後の金額が0より大きい)：住居設備金額は割引適応後の値。残クーポン値はなし
-		return new ShoppingHouseEquipment(ExpenditureAmount.from(discountValue), ShoppingCouponPrice.from(null));
+		return new ShoppingHouseEquipment(ExpenditureAmount.from(discountValue), CouponAmount.ZERO);
 	}
 	
 	/**

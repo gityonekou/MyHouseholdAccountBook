@@ -460,7 +460,7 @@ class NullableMoneyTest {
 		assertEquals(Integer.valueOf(12346), amount1.toIntegerValue());
 		assertEquals(Integer.valueOf(12345), amount2.toIntegerValue()); // 0.44 -> 切り捨て
 		assertEquals(Integer.valueOf(12345), amount3.toIntegerValue()); // 0.50 -> 切り捨て
-		assertEquals(Integer.valueOf(0), amount4.toIntegerValue()); // null値は0
+		assertNull(amount4.toIntegerValue()); // null値はnull
 	}
 	
 	@Test
@@ -472,7 +472,7 @@ class NullableMoneyTest {
 
 		// 検証（カンマ区切りなしの整数値文字列）
 		assertEquals("12346", amount1.toIntegerString());
-		assertEquals("0", amount2.toIntegerString()); // null値は"0"
+		assertEquals("", amount2.toIntegerString()); // null値は"0"
 	}
 
 	@Test

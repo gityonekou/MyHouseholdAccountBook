@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2024/11/23 : 1.00.00                      新規作成
+ * 2026/08/18 : 1.02.00  feature-1.03-dev1   追加リファクタリング対応(買い物登録のドメイン見直し)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
@@ -20,7 +21,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.Shoppi
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodBItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkItem;
@@ -47,7 +48,7 @@ public class SimpleShoppingRegistItemInquiryList {
 	private final List<SimpleShoppingRegistItem> values;
 	
 	// 食料品(必須)合計
-	private final ShoppingFoodItem totalShoppingFoodItem;
+	private final ShoppingFoodExpenditureItem totalShoppingFoodItem;
 	// 食料品B(無駄遣い)合計
 	private final ShoppingFoodBItem totalShoppingFoodBItem;
 	// 食料品C(お酒類)合計
@@ -81,7 +82,7 @@ public class SimpleShoppingRegistItemInquiryList {
 					// 買い物登録情報のリスト(空)
 					Collections.emptyList(),
 					// 食料品(必須)合計
-					ShoppingFoodItem.nullValue(),
+					ShoppingFoodExpenditureItem.NULL,
 					// 食料品B(無駄遣い)合計
 					ShoppingFoodBItem.nullValue(),
 					// 食料品C(お酒類)合計
@@ -97,12 +98,12 @@ public class SimpleShoppingRegistItemInquiryList {
 					// 住居設備合計
 					ShoppingHouseEquipmentItem.nullValue(),
 					// クーポン金額合計
-					ShoppingCouponPrice.from(null),
+					ShoppingCouponPrice.NULL,
 					// 月度買い物合計金額
 					ShoppingTotalAmount.ZERO);
 		} else {
 			// 食料品(必須)合計
-			ShoppingFoodItem foodSum = ShoppingFoodItem.nullValue();
+			ShoppingFoodExpenditureItem foodSum = ShoppingFoodExpenditureItem.NULL;
 			// 食料品B(無駄遣い)合計
 			ShoppingFoodBItem foodBSum = ShoppingFoodBItem.nullValue();
 			// 食料品C(お酒類)合計
@@ -118,13 +119,13 @@ public class SimpleShoppingRegistItemInquiryList {
 			// 住居設備合計
 			ShoppingHouseEquipmentItem houseEquipmentSum = ShoppingHouseEquipmentItem.nullValue();
 			// クーポン金額合計
-			ShoppingCouponPrice couponPriceSum = ShoppingCouponPrice.from(null);
+			ShoppingCouponPrice couponPriceSum = ShoppingCouponPrice.NULL;
 			// 月度買い物合計金額
 			ShoppingTotalAmount monthTotalAmountSum = ShoppingTotalAmount.ZERO;
 			
 			// 対象データありの場合、各種項目の合計値を加算
 			for(SimpleShoppingRegistItem item : values) {
-				foodSum = foodSum.add(item.getShoppingFoodItem());
+				foodSum = foodSum.add(item.getShoppingFoodExpenditureItem());
 				foodBSum = foodBSum.add(item.getShoppingFoodBItem());
 				foodCSum = foodCSum.add(item.getShoppingFoodCItem());
 				dineOutSum = dineOutSum.add(item.getShoppingDineOutItem());

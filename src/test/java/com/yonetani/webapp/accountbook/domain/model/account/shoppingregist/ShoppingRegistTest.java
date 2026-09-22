@@ -89,7 +89,7 @@ class ShoppingRegistTest {
 
 		ShoppingRegist domain = ShoppingRegist.createShoppingRegist(UserId.from("user01"), form);
 
-		assertEquals(0, new java.math.BigDecimal("3000.00").compareTo(domain.getShoppingFoodExpenditureAmount().getValue()));
+		assertEquals(0, new java.math.BigDecimal("3300.00").compareTo(domain.getShoppingFoodExpenditureItem().getValue()));
 		assertEquals(0, new java.math.BigDecimal("4950.00").compareTo(domain.getTotalPurchasePrice().getValue()));
 		assertEquals(0, new java.math.BigDecimal("4950.00").compareTo(domain.getShoppingTotalAmount().getValue()));
 	}

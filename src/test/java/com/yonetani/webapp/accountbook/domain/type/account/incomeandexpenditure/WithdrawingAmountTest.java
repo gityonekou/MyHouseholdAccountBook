@@ -185,11 +185,11 @@ class WithdrawingAmountTest {
 	void testAdd_正常系_null値との加算() {
 		// 準備
 		WithdrawingAmount totalAmount = WithdrawingAmount.from(new BigDecimal("5000.00"));
-		WithdrawingAmount addValue = WithdrawingAmount.from((BigDecimal)null);
+		WithdrawingAmount nullValue = WithdrawingAmount.from((BigDecimal)null);
 
 		// 実行
-		WithdrawingAmount result = totalAmount.add(addValue);
-
+		WithdrawingAmount result = totalAmount.add(nullValue);
+		
 		// 検証
 		assertNotNull(result);
 		assertEquals(new BigDecimal("5000.00"), result.getValue());

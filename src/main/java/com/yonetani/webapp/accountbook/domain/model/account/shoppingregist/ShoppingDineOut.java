@@ -14,9 +14,9 @@ package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
 import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutTaxExpenses;
+import com.yonetani.webapp.accountbook.domain.type.common.CouponAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 
 import lombok.AccessLevel;
@@ -42,7 +42,7 @@ public class ShoppingDineOut {
 	// 外食金額
 	private final ExpenditureAmount value;
 	// 残クーポン額
-	private final ShoppingCouponPrice residualCouponPrice;
+	private final CouponAmount residualCouponPrice;
 	
 	/**
 	 *<pre>
@@ -65,7 +65,7 @@ public class ShoppingDineOut {
 	 * @return 「外食」項目ドメイン
 	 *
 	 */
-	public static ShoppingDineOut from(ShoppingDineOutExpenses expenses, ShoppingDineOutTaxExpenses taxExpenses, ShoppingCouponPrice couponPrice) {
+	public static ShoppingDineOut from(ShoppingDineOutExpenses expenses, ShoppingDineOutTaxExpenses taxExpenses, CouponAmount couponPrice) {
 		// ガード節(「外食金額」項目がnull)
 		if(expenses == null) {
 			throw new MyHouseholdAccountBookRuntimeException("「外食金額」項目にnullが指定されました。管理者に問い合わせてください。");
@@ -93,7 +93,7 @@ public class ShoppingDineOut {
 
 		// クーポン指定なしなら割引適応なしで外食を生成
 		if(couponPrice.getValue() == null) {
-			return new ShoppingDineOut(ExpenditureAmount.from(dineOutValue), ShoppingCouponPrice.from(null));
+			return new ShoppingDineOut(ExpenditureAmount.from(dineOutValue), CouponAmount.ZERO);
 		}
 
 		// 外食金額からクーポン金額を割引
@@ -102,14 +102,14 @@ public class ShoppingDineOut {
 		// 割引後の金額がマイナス値)：外食金額は割引適応でなし。残クーポン値は外食金額の値(マイナス値)
 		int compareToValue = BigDecimal.ZERO.compareTo(discountValue);
 		if (compareToValue > 0) {
-			return new ShoppingDineOut(ExpenditureAmount.ZERO, ShoppingCouponPrice.from(discountValue));
+			return new ShoppingDineOut(ExpenditureAmount.ZERO, CouponAmount.from(discountValue));
 		}
 		// 割引後の金額が0)：外食金額は割引適応でなし。残クーポン値もなし
 		if (compareToValue == 0) {
-			return new ShoppingDineOut(ExpenditureAmount.ZERO, ShoppingCouponPrice.from(null));
+			return new ShoppingDineOut(ExpenditureAmount.ZERO, CouponAmount.ZERO);
 		}
 		// 割引後の金額が0より大きい)：外食金額は割引適応後の値。残クーポン値はなし
-		return new ShoppingDineOut(ExpenditureAmount.from(discountValue), ShoppingCouponPrice.from(null));
+		return new ShoppingDineOut(ExpenditureAmount.from(discountValue), CouponAmount.ZERO);
 		
 	}
 	

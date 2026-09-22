@@ -59,15 +59,11 @@
 								</select>
 			 					<p class="invalid-feedback" th:errors="*{shopCode}"></p>
 							</div>
-							<div class="mb-3" th:with="paymentMethodSelectable=${#strings.isEmpty(simpleShoppingRegistInfoForm.paymentMethodCode) or !#lists.isEmpty(paymentMethodSelectList.optionList.?[value == simpleShoppingRegistInfoForm.paymentMethodCode])}">
+							<div class="mb-3">
 								<label for="validationServer01" class="form-label">■支払方法</label>
-								<select th:if="${paymentMethodSelectable}" class="form-select w30" th:errorclass="is-invalid" th:field="*{paymentMethodCode}" required>
+								<select class="form-select w30" th:errorclass="is-invalid" th:field="*{paymentMethodCode}" required>
 									<option th:each="item : ${paymentMethodSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
 								</select>
-								<select th:unless="${paymentMethodSelectable}" class="form-select w30" disabled>
-									<option th:text="*{paymentMethodCode}"></option>
-								</select>
-								<input th:unless="${paymentMethodSelectable}" type="hidden" th:field="*{paymentMethodCode}">
 			 					<p class="invalid-feedback" th:errors="*{paymentMethodCode}"></p>
 							</div>
 							<div class="mb-3">

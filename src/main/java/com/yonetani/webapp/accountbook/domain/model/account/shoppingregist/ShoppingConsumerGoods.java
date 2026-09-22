@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsTaxExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
+import com.yonetani.webapp.accountbook.domain.type.common.CouponAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 
 import lombok.AccessLevel;
@@ -42,7 +42,7 @@ public class ShoppingConsumerGoods {
 	// 日用品金額
 	private final ExpenditureAmount value;
 	// 残クーポン額
-	private final ShoppingCouponPrice residualCouponPrice;
+	private final CouponAmount residualCouponPrice;
 	
 	/**
 	 *<pre>
@@ -65,7 +65,7 @@ public class ShoppingConsumerGoods {
 	 * @return 「日用品」項目ドメイン
 	 *
 	 */
-	public static ShoppingConsumerGoods from(ShoppingConsumerGoodsExpenses expenses, ShoppingConsumerGoodsTaxExpenses taxExpenses, ShoppingCouponPrice couponPrice) {
+	public static ShoppingConsumerGoods from(ShoppingConsumerGoodsExpenses expenses, ShoppingConsumerGoodsTaxExpenses taxExpenses, CouponAmount couponPrice) {
 		// ガード節(「日用品金額」項目がnull)
 		if(expenses == null) {
 			throw new MyHouseholdAccountBookRuntimeException("「日用品金額」項目にnullが指定されました。管理者に問い合わせてください。");
@@ -93,7 +93,7 @@ public class ShoppingConsumerGoods {
 
 		// クーポン指定なしなら割引適応なしで日用品を生成
 		if(couponPrice.getValue() == null) {
-			return new ShoppingConsumerGoods(ExpenditureAmount.from(consumerGoodsValue), ShoppingCouponPrice.from(null));
+			return new ShoppingConsumerGoods(ExpenditureAmount.from(consumerGoodsValue), CouponAmount.ZERO);
 		}
 
 		// 日用品金額からクーポン金額を割引
@@ -102,14 +102,14 @@ public class ShoppingConsumerGoods {
 		// 割引後の金額がマイナス値)：日用品金額は割引適応でなし。残クーポン値は日用品金額の値(マイナス値)
 		int compareToValue = BigDecimal.ZERO.compareTo(discountValue);
 		if (compareToValue > 0) {
-			return new ShoppingConsumerGoods(ExpenditureAmount.ZERO, ShoppingCouponPrice.from(discountValue));
+			return new ShoppingConsumerGoods(ExpenditureAmount.ZERO, CouponAmount.from(discountValue));
 		}
 		// 割引後の金額が0)：日用品金額は割引適応でなし。残クーポン値もなし
 		if (compareToValue == 0) {
-			return new ShoppingConsumerGoods(ExpenditureAmount.ZERO, ShoppingCouponPrice.from(null));
+			return new ShoppingConsumerGoods(ExpenditureAmount.ZERO, CouponAmount.ZERO);
 		}
 		// 割引後の金額が0より大きい)：日用品金額は割引適応後の値。残クーポン値はなし
-		return new ShoppingConsumerGoods(ExpenditureAmount.from(discountValue), ShoppingCouponPrice.from(null));
+		return new ShoppingConsumerGoods(ExpenditureAmount.from(discountValue), CouponAmount.ZERO);
 		
 	}
 	

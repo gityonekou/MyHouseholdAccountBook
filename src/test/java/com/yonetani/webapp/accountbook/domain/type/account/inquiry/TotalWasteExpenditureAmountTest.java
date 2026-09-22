@@ -183,10 +183,12 @@ class TotalWasteExpenditureAmountTest {
 		);
 
 		// 実行
-		TotalWasteExpenditureAmount result = amount1.add(amount2);
-
+		TotalWasteExpenditureAmount result1 = amount1.add(amount2);
+		TotalWasteExpenditureAmount result2 = amount2.add(amount1);
+		
 		// 検証（null as zero扱い）
-		assertEquals(new BigDecimal("15000.00"), result.getValue());
+		assertEquals(new BigDecimal("15000.00"), result1.getValue());
+		assertEquals(new BigDecimal("15000.00"), result2.getValue());
 	}
 
 	@Test

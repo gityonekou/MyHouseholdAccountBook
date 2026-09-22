@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesTaxExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
+import com.yonetani.webapp.accountbook.domain.type.common.CouponAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 
 import lombok.AccessLevel;
@@ -42,7 +42,7 @@ public class ShoppingClothes {
 	// 衣料品(私服)金額
 	private final ExpenditureAmount value;
 	// 残クーポン額
-	private final ShoppingCouponPrice residualCouponPrice;
+	private final CouponAmount residualCouponPrice;
 	
 	/**
 	 *<pre>
@@ -65,7 +65,7 @@ public class ShoppingClothes {
 	 * @return 「衣料品(私服)」項目ドメイン
 	 *
 	 */
-	public static ShoppingClothes from(ShoppingClothesExpenses expenses, ShoppingClothesTaxExpenses taxExpenses, ShoppingCouponPrice couponPrice) {
+	public static ShoppingClothes from(ShoppingClothesExpenses expenses, ShoppingClothesTaxExpenses taxExpenses, CouponAmount couponPrice) {
 		// ガード節(「衣料品(私服)金額」項目がnull)
 		if(expenses == null) {
 			throw new MyHouseholdAccountBookRuntimeException("「衣料品(私服)金額」項目にnullが指定されました。管理者に問い合わせてください。");
@@ -93,7 +93,7 @@ public class ShoppingClothes {
 		
 		// クーポン指定なしなら割引適応なしで衣料品(私服)を生成
 		if(couponPrice.getValue() == null) {
-			return new ShoppingClothes(ExpenditureAmount.from(clothesValue), ShoppingCouponPrice.from(null));
+			return new ShoppingClothes(ExpenditureAmount.from(clothesValue), CouponAmount.ZERO);
 		}
 		
 		// 衣料品(私服)金額からクーポン金額を割引
@@ -102,14 +102,14 @@ public class ShoppingClothes {
 		// 割引後の金額がマイナス値)：衣料品(私服)金額は割引適応でなし。残クーポン値は衣料品(私服)金額の値(マイナス値)
 		int compareToValue = BigDecimal.ZERO.compareTo(discountValue);
 		if (compareToValue > 0) {
-			return new ShoppingClothes(ExpenditureAmount.ZERO, ShoppingCouponPrice.from(discountValue));
+			return new ShoppingClothes(ExpenditureAmount.ZERO, CouponAmount.from(discountValue));
 		}
 		// 割引後の金額が0)：衣料品(私服)金額は割引適応でなし。残クーポン値もなし
 		if (compareToValue == 0) {
-			return new ShoppingClothes(ExpenditureAmount.ZERO, ShoppingCouponPrice.from(null));
+			return new ShoppingClothes(ExpenditureAmount.ZERO, CouponAmount.ZERO);
 		}
 		// 割引後の金額が0より大きい)：衣料品(私服)金額は割引適応後の値。残クーポン値はなし
-		return new ShoppingClothes(ExpenditureAmount.from(discountValue), ShoppingCouponPrice.from(null));
+		return new ShoppingClothes(ExpenditureAmount.from(discountValue), CouponAmount.ZERO);
 		
 	}
 	

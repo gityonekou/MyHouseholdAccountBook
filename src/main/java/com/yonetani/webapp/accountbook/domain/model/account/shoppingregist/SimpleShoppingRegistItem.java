@@ -19,7 +19,7 @@ import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.Shoppi
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodBItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingRegistCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingTotalAmount;
@@ -58,7 +58,7 @@ public class SimpleShoppingRegistItem {
 	// 買い物日
 	private final ShoppingDate shoppingDate;
 	// 一覧項目:食料品(必須)
-	private final ShoppingFoodItem shoppingFoodItem;
+	private final ShoppingFoodExpenditureItem shoppingFoodExpenditureItem;
 	// 一覧項目:食料品B(無駄遣い)
 	private final ShoppingFoodBItem shoppingFoodBItem;
 	// 一覧項目:食料品C(お酒類)
@@ -87,7 +87,7 @@ public class SimpleShoppingRegistItem {
 	 * @param shopName 店舗名
 	 * @param paymentMethodCode 支払方法コード
 	 * @param shoppingDate 買い物日
-	 * @param shoppingFoodItem 食料品(必須)
+	 * @param shoppingFoodExpenditureItem 食料品(必須)
 	 * @param shoppingFoodBItem 食料品B(無駄遣い)
 	 * @param shoppingFoodCItem 食料品C(お酒類)
 	 * @param shoppingDineOutItem 外食
@@ -106,7 +106,7 @@ public class SimpleShoppingRegistItem {
 			ShopName shopName,
 			PaymentMethodCode paymentMethodCode,
 			ShoppingDate shoppingDate,
-			ShoppingFoodItem shoppingFoodItem,
+			ShoppingFoodExpenditureItem shoppingFoodExpenditureItem,
 			ShoppingFoodBItem shoppingFoodBItem,
 			ShoppingFoodCItem shoppingFoodCItem,
 			ShoppingDineOutItem shoppingDineOutItem,
@@ -123,7 +123,7 @@ public class SimpleShoppingRegistItem {
 				shopName,
 				paymentMethodCode,
 				shoppingDate,
-				shoppingFoodItem,
+				shoppingFoodExpenditureItem,
 				shoppingFoodBItem,
 				shoppingFoodCItem,
 				shoppingDineOutItem,

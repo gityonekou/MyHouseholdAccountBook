@@ -246,16 +246,30 @@ class WasteExpenditureTotalAmountTest {
 			MinorWasteExpenditureAmount.from(new BigDecimal("10000.00")),
 			SevereWasteExpenditureAmount.from(new BigDecimal("5000.00"))
 		);
-		TotalWasteExpenditureAmount addValue = TotalWasteExpenditureAmount.from(
+		WasteExpenditureTotalAmount nullBase = WasteExpenditureTotalAmount.from(
 			MinorWasteExpenditureAmount.from(null),
 			SevereWasteExpenditureAmount.from(null)
 		);
-
+		TotalWasteExpenditureAmount addValue = TotalWasteExpenditureAmount.from(
+			MinorWasteExpenditureAmount.from(new BigDecimal("10000.00")),
+			SevereWasteExpenditureAmount.from(new BigDecimal("5000.00"))
+		);
+		TotalWasteExpenditureAmount addNullValue = TotalWasteExpenditureAmount.from(
+			MinorWasteExpenditureAmount.from(null),
+			SevereWasteExpenditureAmount.from(null)
+		);
+		
 		// 実行
-		WasteExpenditureTotalAmount result = base.add(addValue);
-
+		WasteExpenditureTotalAmount result1 = base.add(addNullValue);
+		WasteExpenditureTotalAmount result2 = nullBase.add(addValue);
+		WasteExpenditureTotalAmount result3 = nullBase.add(addNullValue);
+		
 		// 検証（null値は0として扱われる）
-		assertEquals(new BigDecimal("15000.00"), result.getValue());
+		assertEquals(new BigDecimal("15000.00"), result1.getValue());
+		assertEquals(new BigDecimal("15000.00"), result2.getValue());
+		assertTrue(result3.isNull());
+		assertTrue(result3.getMinorWasteExpenditureAmount().isNull());
+		assertTrue(result3.getSevereWasteExpenditureAmount().isNull());
 	}
 
 	@Test

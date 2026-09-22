@@ -88,13 +88,16 @@ public class WasteExpenditureTotalAmount extends NullableMoney {
 		}
 
 		// 無駄遣い（軽度）支出金額の設定値がnullの場合、無駄遣い（重度）支出金額の値を設定
-		if(minor.getValue() == null) {
+		if(minor.isNull()) {
+			validate(severe.getValue(), "無駄遣い支出金額合計");
 			return new WasteExpenditureTotalAmount(severe.getValue(), minor, severe);
 		}
 
 		// 無駄遣い（重度）支出金額の設定値がnullでない場合、無駄遣い（軽度）支出金額と無駄遣い（重度）支出金額の合計値を設定
-		if(severe.getValue() != null) {
-			return new WasteExpenditureTotalAmount(minor.getValue().add(severe.getValue()), minor, severe);
+		if(!severe.isNull()) {
+			BigDecimal addValue = minor.getValue().add(severe.getValue());
+			validate(addValue, "無駄遣い支出金額合計");
+			return new WasteExpenditureTotalAmount(addValue, minor, severe);
 		}
 
 		// 無駄遣い（軽度）支出金額の値で無駄遣い支出金額合計ドメインタイプを生成
@@ -112,16 +115,16 @@ public class WasteExpenditureTotalAmount extends NullableMoney {
 	 *
 	 */
 	public WasteExpenditureTotalAmount add(TotalWasteExpenditureAmount addValue) {
-		if(this.getValue() == null) {
-			// thisの値がnullの場合、addValueから新しいWasteExpenditureTotalAmountを生成
-			if(addValue == null || addValue.getValue() == null) {
-				return this;
-			}
-			return WasteExpenditureTotalAmount.from(addValue.getMinorWasteExpenditureAmount(), addValue.getSevereWasteExpenditureAmount());
-		}
-		if(addValue == null || addValue.getValue() == null) {
+		// 加算値がnullなら、自分自身を返す
+		if(addValue == null || addValue.isNull()) {
 			return this;
 		}
+		// 自分自身がnullなら、加算値で新しいドメイン値を生成して返す
+		if(this.isNull()) {
+			// thisの値がnullの場合、addValueから新しいWasteExpenditureTotalAmountを生成
+			return WasteExpenditureTotalAmount.from(addValue.getMinorWasteExpenditureAmount(), addValue.getSevereWasteExpenditureAmount());
+		}
+		// 自分自身と加算値で加算を実施して新しいドメイン値を生成して返す
 		MinorWasteExpenditureAmount addMinor = minorWasteExpenditureAmount.add(addValue.getMinorWasteExpenditureAmount());
 		SevereWasteExpenditureAmount addSevere = severeWasteExpenditureAmount.add(addValue.getSevereWasteExpenditureAmount());
 		return WasteExpenditureTotalAmount.from(addMinor, addSevere);
@@ -147,7 +150,7 @@ public class WasteExpenditureTotalAmount extends NullableMoney {
 		}
 
 		// 無駄遣い支出金額合計の値がnullか0の場合、空文字列を返却
-		if(getValue() == null || ZERO.getValue().compareTo(getValue()) >= 0) {
+		if(isNull() || ZERO.getValue().compareTo(getValue()) >= 0) {
 			return "";
 		}
 
@@ -169,7 +172,7 @@ public class WasteExpenditureTotalAmount extends NullableMoney {
 	 */
 	public String getMinorWasteExpenditurePercentage() {
 		// 無駄遣い支出金額合計の値がnullまたは無駄遣い（軽度）支出金額の値がnullの場合、0を返却
-		if(getValue() == null || minorWasteExpenditureAmount.getValue() == null) {
+		if(isNull() || minorWasteExpenditureAmount.isNull()) {
 			return "0";
 		}
 

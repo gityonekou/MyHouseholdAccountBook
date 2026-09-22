@@ -123,8 +123,7 @@ public class ShoppingFoodBItem {
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
-	public String toString() {
+	public String toFormatString() {
 		// スケール0で四捨五入+カンマ編集した文字列を返却
 		return DomainCommonUtils.formatKingakuAndYen(value);
 	}

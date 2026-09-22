@@ -125,9 +125,9 @@ public class ShoppingRegistReadWriteDto {
 				// 支払方法コード
 				domain.getPaymentMethodCode().getValue(),
 				// 食料品(必須)金額
-				domain.getShoppingFoodExpenditureAmount().getValue(),
+				domain.getShoppingFoodExpenditureItem().getShoppingFoodExpenditureAmount().getValue(),
 				// 消費税:食料品(必須)金額
-				domain.getShoppingFoodTaxExpenses().getValue(),
+				domain.getShoppingFoodExpenditureItem().getShoppingFoodTaxExpenses().getValue(),
 				// 食料品B(無駄遣い)金額
 				domain.getShoppingFoodBExpenses().getValue(),
 				// 消費税:食料品B(無駄遣い)金額

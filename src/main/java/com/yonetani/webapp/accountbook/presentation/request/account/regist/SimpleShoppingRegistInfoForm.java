@@ -5,7 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2024/11/04 : 1.00.00                      新規作成
- * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応(追加リファクタリングで、クーポン金額の入力を0以上に変更、バリデーション追加)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.request.account.regist;
@@ -20,7 +20,7 @@ import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookCont
 import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
 
 import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -56,36 +56,45 @@ public class SimpleShoppingRegistInfoForm {
 	@NotBlank(message = "支払方法を選択してください。")
 	private String paymentMethodCode;
 	// 買い物日
-	@NotNull
+	@NotNull(message = "買い物日を選択してください。")
 	@DateTimeFormat(pattern = "yyyy/MM/dd")
 	private LocalDate shoppingDate;
 
 	// 食料品(必須)
-	@Min(value = 0, message = "食料品(必須)の入力値がマイナスです。0円以上の値を入力してください。")
+	@Digits(integer = 6, fraction = 0, message = "食料品(必須)の購入金額入力値は6桁以内の整数で入力してください")
+	@Min(value = 0, message = "食料品(必須)の購入金額入力値がマイナスです。0円以上の値を入力してください。")
 	private Integer shoppingFoodExpenses;
 	// 食料品B(無駄遣い)
-	@Min(value = 0, message = "食料品B(無駄遣い)の入力値がマイナスです。0円以上の値を入力してください。")
+	@Digits(integer = 6, fraction = 0, message = "食料品B(無駄遣い)の購入金額入力値は6桁以内の整数で入力してください")
+	@Min(value = 0, message = "食料品B(無駄遣い)の購入金額入力値がマイナスです。0円以上の値を入力してください。")
 	private Integer shoppingFoodBExpenses;
 	// 食料品C(お酒類)
-	@Min(value = 0, message = "食料品C(お酒類)の入力値がマイナスです。0円以上の値を入力してください。")
+	@Digits(integer = 6, fraction = 0, message = "食料品C(お酒類)の購入金額入力値は6桁以内の整数で入力してください")
+	@Min(value = 0, message = "食料品C(お酒類)の購入金額入力値がマイナスです。0円以上の値を入力してください。")
 	private Integer shoppingFoodCExpenses;
 	// 外食
-	@Min(value = 0, message = "外食の入力値がマイナスです。0円以上の値を入力してください。")
+	@Digits(integer = 6, fraction = 0, message = "外食の購入金額入力値は6桁以内の整数で入力してください")
+	@Min(value = 0, message = "外食の購入金額入力値がマイナスです。0円以上の値を入力してください。")
 	private Integer shoppingDineOutExpenses;
 	// 日用品
-	@Min(value = 0, message = "日用品の入力値がマイナスです。0円以上の値を入力してください。")
+	@Digits(integer = 6, fraction = 0, message = "日用品の購入金額入力値は6桁以内の整数で入力してください")
+	@Min(value = 0, message = "日用品の購入金額入力値がマイナスです。0円以上の値を入力してください。")
 	private Integer shoppingConsumerGoodsExpenses;
 	// 衣料品(私服)
-	@Min(value = 0, message = "衣料品(私服)の入力値がマイナスです。0円以上の値を入力してください。")
+	@Digits(integer = 6, fraction = 0, message = "衣料品(私服)の購入金額入力値は6桁以内の整数で入力してください")
+	@Min(value = 0, message = "衣料品(私服)の購入金額入力値がマイナスです。0円以上の値を入力してください。")
 	private Integer shoppingClothesExpenses;
 	// 仕事
-	@Min(value = 0, message = "仕事の入力値がマイナスです。0円以上の値を入力してください。")
+	@Digits(integer = 7, fraction = 0, message = "仕事の購入金額入力値は7桁以内の整数で入力してください")
+	@Min(value = 0, message = "仕事の購入金額入力値がマイナスです。0円以上の値を入力してください。")
 	private Integer shoppingWorkExpenses;
 	// 住居設備
-	@Min(value = 0, message = "住居設備の入力値がマイナスです。0円以上の値を入力してください。")
+	@Digits(integer = 7, fraction = 0, message = "住居設備の購入金額入力値は7桁以内の整数で入力してください")
+	@Min(value = 0, message = "住居設備の購入金額入力値がマイナスです。0円以上の値を入力してください。")
 	private Integer shoppingHouseEquipmentExpenses;
 	// クーポン
-	@Max(value = 0, message = "クーポンの入力値が不正です。0円以下(マイナスの値)を入力してください。")
+	@Digits(integer = 6, fraction = 0, message = "クーポン金額の入力値は6桁以内の整数で入力してください")
+	@Min(value = 0, message = "クーポン金額の入力値がマイナスです。0円以上の値を入力してください。")
 	private Integer shoppingCouponPrice;
 	// 購入金額合計(disabled)
 	private Integer totalPurchasePriceView;
@@ -94,28 +103,36 @@ public class SimpleShoppingRegistInfoForm {
 	@Min(value = 0, message = "購入金額合計が0円以下です。正しい値を入力してください。")
 	private Integer totalPurchasePrice;
 	// 消費税：食料品(必須)
-	@Min(value = 0, message = "消費税：食料品(必須)の入力値がマイナスです。0円以上の値を入力してください。")
+	@Digits(integer = 6, fraction = 0, message = "食料品(必須)の消費税入力値は6桁以内の整数で入力してください")
+	@Min(value = 0, message = "食料品(必須)の消費税入力値がマイナスです。0円以上の値を入力してください。")
 	private Integer shoppingFoodTaxExpenses;
 	// 消費税：食料品B(無駄遣い)
-	@Min(value = 0, message = "消費税：食料品B(無駄遣い)の入力値がマイナスです。0円以上の値を入力してください。")
+	@Digits(integer = 6, fraction = 0, message = "食料品B(無駄遣い)の消費税入力値は6桁以内の整数で入力してください")
+	@Min(value = 0, message = "食料品B(無駄遣い)の消費税入力値がマイナスです。0円以上の値を入力してください。")
 	private Integer shoppingFoodBTaxExpenses;
 	// 消費税：食料品C(お酒類)
-	@Min(value = 0, message = "消費税：食料品C(お酒類)の入力値がマイナスです。0円以上の値を入力してください。")
+	@Digits(integer = 6, fraction = 0, message = "食料品C(お酒類)の消費税入力値は6桁以内の整数で入力してください")
+	@Min(value = 0, message = "食料品C(お酒類)の消費税入力値がマイナスです。0円以上の値を入力してください。")
 	private Integer shoppingFoodCTaxExpenses;
 	// 消費税：外食
-	@Min(value = 0, message = "消費税：外食の入力値がマイナスです。0円以上の値を入力してください。")
+	@Digits(integer = 6, fraction = 0, message = "外食の消費税入力値は6桁以内の整数で入力してください")
+	@Min(value = 0, message = "外食の消費税入力値がマイナスです。0円以上の値を入力してください。")
 	private Integer shoppingDineOutTaxExpenses;
 	// 消費税：日用品
-	@Min(value = 0, message = "消費税：日用品の入力値がマイナスです。0円以上の値を入力してください。")
+	@Digits(integer = 6, fraction = 0, message = "日用品の消費税入力値は6桁以内の整数で入力してください")
+	@Min(value = 0, message = "日用品の消費税入力値がマイナスです。0円以上の値を入力してください。")
 	private Integer shoppingConsumerGoodsTaxExpenses;
 	// 消費税：衣料品(私服)
-	@Min(value = 0, message = "消費税：衣料品(私服)の入力値がマイナスです。0円以上の値を入力してください。")
+	@Digits(integer = 6, fraction = 0, message = "衣料品(私服)の消費税入力値は6桁以内の整数で入力してください")
+	@Min(value = 0, message = "衣料品(私服)の消費税入力値がマイナスです。0円以上の値を入力してください。")
 	private Integer shoppingClothesTaxExpenses;
 	// 消費税：仕事
-	@Min(value = 0, message = "消費税：仕事の入力値がマイナスです。0円以上の値を入力してください。")
+	@Digits(integer = 7, fraction = 0, message = "仕事の消費税入力値は7桁以内の整数で入力してください")
+	@Min(value = 0, message = "仕事の消費税入力値がマイナスです。0円以上の値を入力してください。")
 	private Integer shoppingWorkTaxExpenses;
 	// 消費税：住居設備
-	@Min(value = 0, message = "消費税：住居設備の入力値がマイナスです。0円以上の値を入力してください。")
+	@Digits(integer = 7, fraction = 0, message = "住居設備の消費税入力値は7桁以内の整数で入力してください")
+	@Min(value = 0, message = "住居設備の消費税入力値がマイナスです。0円以上の値を入力してください。")
 	private Integer shoppingHouseEquipmentTaxExpenses;
 	// 消費税合計(disabled)
 	private Integer taxTotalPurchasePriceView;

@@ -15,9 +15,9 @@ package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
 import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCTaxExpenses;
+import com.yonetani.webapp.accountbook.domain.type.common.CouponAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 
 import lombok.AccessLevel;
@@ -43,7 +43,7 @@ public class SevereWasteShoppingFood {
 	// 食料品(無駄遣い（重度）)金額
 	private final ExpenditureAmount value;
 	// 残クーポン額
-	private final ShoppingCouponPrice residualCouponPrice;
+	private final CouponAmount residualCouponPrice;
 	
 	/**
 	 *<pre>
@@ -66,7 +66,7 @@ public class SevereWasteShoppingFood {
 	 * @return 「食料品B(必須)」項目ドメイン
 	 *
 	 */
-	public static SevereWasteShoppingFood from(ShoppingFoodCExpenses expenses, ShoppingFoodCTaxExpenses taxExpenses, ShoppingCouponPrice couponPrice) {
+	public static SevereWasteShoppingFood from(ShoppingFoodCExpenses expenses, ShoppingFoodCTaxExpenses taxExpenses, CouponAmount couponPrice) {
 		// ガード節(「食料品(無駄遣い（重度）)金額」項目がnull)
 		if(expenses == null) {
 			throw new MyHouseholdAccountBookRuntimeException("「食料品(無駄遣い（重度）)金額」項目にnullが指定されました。管理者に問い合わせてください。");
@@ -94,7 +94,7 @@ public class SevereWasteShoppingFood {
 
 		// クーポン指定なしなら割引適応なしで食料品(無駄遣い（重度）)を生成
 		if(couponPrice.getValue() == null) {
-			return new SevereWasteShoppingFood(ExpenditureAmount.from(foodValue), ShoppingCouponPrice.from(null));
+			return new SevereWasteShoppingFood(ExpenditureAmount.from(foodValue), CouponAmount.ZERO);
 		}
 
 		// 食料品(無駄遣い（重度）)金額からクーポン金額を割引
@@ -103,14 +103,14 @@ public class SevereWasteShoppingFood {
 		// 割引後の金額がマイナス値)：食料品(無駄遣い（重度）)金額は割引適応でなし。残クーポン値は食料品(無駄遣い（重度）)金額の値(マイナス値)
 		int compareToValue = BigDecimal.ZERO.compareTo(discountValue);
 		if (compareToValue > 0) {
-			return new SevereWasteShoppingFood(ExpenditureAmount.ZERO, ShoppingCouponPrice.from(discountValue));
+			return new SevereWasteShoppingFood(ExpenditureAmount.ZERO, CouponAmount.from(discountValue));
 		}
 		// 割引後の金額が0)：食料品(無駄遣い（重度）)金額は割引適応でなし。残クーポン値もなし
 		if (compareToValue == 0) {
-			return new SevereWasteShoppingFood(ExpenditureAmount.ZERO, ShoppingCouponPrice.from(null));
+			return new SevereWasteShoppingFood(ExpenditureAmount.ZERO, CouponAmount.ZERO);
 		}
 		// 割引後の金額が0より大きい)：食料品(無駄遣い（重度）)金額は割引適応後の値。残クーポン値はなし
-		return new SevereWasteShoppingFood(ExpenditureAmount.from(discountValue), ShoppingCouponPrice.from(null));
+		return new SevereWasteShoppingFood(ExpenditureAmount.from(discountValue), CouponAmount.ZERO);
 		
 	}
 	
