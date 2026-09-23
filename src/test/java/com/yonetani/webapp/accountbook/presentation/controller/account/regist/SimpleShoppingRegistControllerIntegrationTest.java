@@ -6,8 +6,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/08/19 : 1.00.00  feature-1.03-dev1   新規作成
- * 2026/09/23 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(SimpleShoppingRegistUseCaseの照会系・登録系分割に追従し、UseCaseで実施すべきテストを移設。Controller層で実施すべき不足テストの追加、SQLをUseCase層テストのものに統一)
- * 2026/09/23 : 1.01.01  feature-1.03-dev1   不足していたController層テストを追加(changeShopKubun・updateComplete・returndispatchaction系)
+ * 2026/09/23 : 1.00.01  feature-1.03-dev1   追加リファクタリング対応(SimpleShoppingRegistUseCaseの照会系・登録系分割に追従し、UseCaseで実施すべきテストを移設。Controller層で実施すべき不足テストの追加、SQLをUseCase層テストのものに統一)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.account.regist;

@@ -33,7 +33,6 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/09/23 : 1.00.00  feature-1.03-dev1   新規作成
- * 2026/09/23 : 1.01.00  feature-1.03-dev1   ①②以外の必須テスト観点(新規表示デフォルト値、更新時フィールドマッピング、異常系、店舗区分変更、バリデーションエラー、リダイレクト)を追加
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist;
