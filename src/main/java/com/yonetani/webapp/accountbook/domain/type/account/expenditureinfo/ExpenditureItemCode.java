@@ -6,6 +6,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2023/10/07 : 1.00.00                      新規作成
  * 2026/03/15 : 1.01.00  feature-1.00-dev00  リファクタリング対応 クラス名をSisyutuItemCodeからExpenditureItemCodeにリネーム
+ * 2026/09/23 : 1.02.00  feature-1.03-dev1   追加リファクタリング対応(桁数チェックをIdentifierに委譲)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo;
@@ -53,12 +54,9 @@ public class ExpenditureItemCode extends Identifier {
 	 *
 	 */
 	public static ExpenditureItemCode from(String code) {
-		// 基本検証（null、空文字）
-		Identifier.validate(code, "支出項目コード");
-		// ガード節(長さが4桁でない)
-		if(code.length() != 4) {
-			throw new MyHouseholdAccountBookRuntimeException("「支出項目コード」項目の設定値が不正です。管理者に問い合わせてください。[code=" + code + "]");
-		}
+		// 基本検証（null、空文字、長さが4桁でない）
+		Identifier.validate(code, 4, "支出項目コード");
+		
 		// ガード節(数値に変換できない(数値4桁:0パディング))
 		try {
 			Integer.parseInt(code);

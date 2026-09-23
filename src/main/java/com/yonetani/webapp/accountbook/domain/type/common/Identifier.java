@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2025/11/25 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(桁数チェックを行うvalidateメソッドを追加)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
@@ -73,7 +74,43 @@ public abstract class Identifier {
 				String.format("「%s」項目の設定値が空文字です。管理者に問い合わせてください。", typeName));
 		}
 	}
-
+	
+	/**
+	 *<pre>
+	 * IDの値を検証します。
+	 *
+	 * [検証内容]
+	 * ・null値チェック
+	 * ・空文字チェック
+	 * ・桁数チェック
+	 *
+	 * サブクラスで追加の検証が必要な場合は、コンストラクタでこのメソッドを呼び出した後に
+	 * 追加の検証を実行してください。
+	 *</pre>
+	 * @param value 検証対象のID値
+	 * @param length IDの桁数
+	 * @param typeName IDの型名（エラーメッセージ用）
+	 * @throws MyHouseholdAccountBookRuntimeException 検証エラー時
+	 *
+	 */
+	protected static void validate(String value, int length, String typeName) {
+		// ガード節(null)
+		if(value == null) {
+			throw new MyHouseholdAccountBookRuntimeException(
+				String.format("「%s」項目の設定値がnullです。管理者に問い合わせてください。", typeName));
+		}
+		// ガード節(空文字)
+		if(value.isEmpty()) {
+			throw new MyHouseholdAccountBookRuntimeException(
+				String.format("「%s」項目の設定値が空文字です。管理者に問い合わせてください。", typeName));
+		}
+		// ガード節(桁数)
+		if(value.length() != length) {
+			throw new MyHouseholdAccountBookRuntimeException(
+					String.format("「%s」項目の桁数が不正です。管理者に問い合わせてください。[length=%d]", typeName, value.length())); 
+		}
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

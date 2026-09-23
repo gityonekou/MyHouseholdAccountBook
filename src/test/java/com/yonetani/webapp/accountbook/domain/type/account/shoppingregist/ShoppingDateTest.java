@@ -94,20 +94,6 @@ class ShoppingDateTest {
 	}
 
 	@Test
-	@DisplayName("正常系：toString()でISO-8601形式の文字列を取得（デバッグ用）")
-	void testToString() {
-		// 準備
-		TargetYearMonth targetYearMonth = TargetYearMonth.from("202408");
-		ShoppingDate date = ShoppingDate.from(LocalDate.of(2024, 8, 18), targetYearMonth);
-
-		// 実行
-		String result = date.toString();
-
-		// 検証（ISO-8601形式: yyyy-MM-dd）
-		assertEquals("2024-08-18", result);
-	}
-
-	@Test
 	@DisplayName("正常系：equals()で同値性の判定ができる")
 	void testEquals() {
 		// 準備

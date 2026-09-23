@@ -53,13 +53,9 @@ public class BankAccountCode extends Identifier {
 	 */
 	public static BankAccountCode from(String bankAccountCode) {
 
-		// 基本検証（null、空文字）
-		Identifier.validate(bankAccountCode, "銀行口座コード");
-
-		// ガード節(長さが2桁でない)
-		if(bankAccountCode.length() != 2) {
-			throw new MyHouseholdAccountBookRuntimeException("「銀行口座コード」項目の設定値が不正です。管理者に問い合わせてください。[bankAccountCode=" + bankAccountCode + "]");
-		}
+		// 基本検証（null、空文字、長さが2桁でない）
+		Identifier.validate(bankAccountCode, 2, "銀行口座コード");
+		
 		// ガード節(数値に変換できない(数値2桁:0パディング))
 		try {
 			Integer.parseInt(bankAccountCode);

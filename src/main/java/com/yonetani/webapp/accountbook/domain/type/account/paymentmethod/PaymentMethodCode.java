@@ -64,20 +64,16 @@ public class PaymentMethodCode extends Identifier {
 	 */
 	public static PaymentMethodCode from(String paymentMethodCode) {
 
-		// 基本検証（null、空文字）
-		Identifier.validate(paymentMethodCode, "支払方法コード");
-
-		// ガード節(長さが3桁でない)
-		if(paymentMethodCode.length() != 3) {
-			throw new MyHouseholdAccountBookRuntimeException("「支払方法コード」項目の設定値が不正です。管理者に問い合わせてください。[paymentMethodCode=" + paymentMethodCode + "]");
-		}
+		// 基本検証（null、空文字、長さが3桁でない）
+		Identifier.validate(paymentMethodCode, 3, "支払方法コード");
+		
 		// ガード節(数値に変換できない(数値3桁:0パディング))
 		try {
 			Integer.parseInt(paymentMethodCode);
 		} catch(NumberFormatException ex) {
 			throw new MyHouseholdAccountBookRuntimeException("「支払方法コード」項目の設定値が不正です。管理者に問い合わせてください。[paymentMethodCode=" + paymentMethodCode + "]");
 		}
-
+		
 		return new PaymentMethodCode(paymentMethodCode);
 	}
 

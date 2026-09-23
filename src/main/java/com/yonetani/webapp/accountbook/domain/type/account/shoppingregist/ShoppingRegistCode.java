@@ -5,18 +5,15 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2024/11/23 : 1.00.00                      新規作成
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(Identifier継承に変更)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.shoppingregist;
 
-import org.springframework.util.StringUtils;
-
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.common.Identifier;
 
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  *<pre>
@@ -28,12 +25,20 @@ import lombok.RequiredArgsConstructor;
  * @since 家計簿アプリ(1.00)
  *
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-@EqualsAndHashCode
-public class ShoppingRegistCode {
-	// 買い物登録コード
-	private final String value;
+@EqualsAndHashCode(callSuper = true)
+public class ShoppingRegistCode extends Identifier {
+	
+	
+	/**
+	 *<pre>
+	 * ShoppingRegistCodeクラスコンストラクターです。
+	 *</pre>
+	 * @param value 買い物登録コード
+	 *
+	 */
+	private ShoppingRegistCode(String value) {
+		super(value);
+	}
 	
 	/**
 	 *<pre>
@@ -49,14 +54,10 @@ public class ShoppingRegistCode {
 	 *
 	 */
 	public static ShoppingRegistCode from(String shoppingRegistCode) {
-		// ガード節(空文字列)
-		if(!StringUtils.hasLength(shoppingRegistCode)) {
-			throw new MyHouseholdAccountBookRuntimeException("「買い物登録コード」項目の設定値が空文字列です。管理者に問い合わせてください。");
-		}
-		// ガード節(長さが3桁でない)
-		if(shoppingRegistCode.length() != 3) {
-			throw new MyHouseholdAccountBookRuntimeException("「買い物登録コード」項目の設定値が不正です。管理者に問い合わせてください。[shoppingRegistCode=" + shoppingRegistCode + "]");
-		}
+
+		// 基本検証（null、空文字、長さが3桁でない）
+		Identifier.validate(shoppingRegistCode, 3, "買い物登録コード");
+		
 		// ガード節(数値に変換できない(数値3桁:0パディング))
 		try {
 			Integer.parseInt(shoppingRegistCode);
@@ -96,13 +97,5 @@ public class ShoppingRegistCode {
 	 */
 	public static String getNewCode(int count) {
 		return ShoppingRegistCode.from(count).getValue();
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		return value;
 	}
 }

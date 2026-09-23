@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/04/12 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(桁数チェックをNullableIdentifierに委譲)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.expenditure;
@@ -51,6 +52,9 @@ public class ExpenditureEventCode extends NullableIdentifier {
 	 * 支出テーブル情報の「イベントコード」項目の値を表すドメインタイプを生成します。
 	 * 支出テーブル情報の「イベントコード」項目は、NULL、及び、空文字列を許容する項目になります。
 	 * 
+	 * [非ガード節]
+	 * ・NULL値
+	 * ・空文字列
 	 * [ガード節]
 	 * ・長さが4桁でない
 	 * ・数値に変換できない(数値4桁:0パディング)
@@ -67,13 +71,9 @@ public class ExpenditureEventCode extends NullableIdentifier {
 			return new ExpenditureEventCode(null);
 		}
 		
-		// 基本検証（空文字）
-		NullableIdentifier.validate(code, "支出テーブル情報の「イベントコード」項目");
+		// 基本検証（長さが4桁でない）
+		validate(code, 4, "支出テーブル情報の「イベントコード」項目");
 		
-		// ガード節(長さが4桁でない)
-		if(code.length() != 4) {
-			throw new MyHouseholdAccountBookRuntimeException("支出テーブル情報の「イベントコード」項目の設定値が不正です。管理者に問い合わせてください。[eventCode=" + code + "]");
-		}
 		// ガード節(数値に変換できない(数値4桁:0パディング))
 		try {
 			Integer.parseInt(code);

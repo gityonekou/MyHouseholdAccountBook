@@ -7,6 +7,7 @@
  * 2024/11/24 : 1.00.00                      新規作成
  * 2025/12/21 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
  * 2026/09/12 : 1.02.00  feature-1.03-dev1   買い物日の表示形式変更(MM日⇒MM/dd)
+ * 2026/09/23 : 1.02.01  feature-1.03-dev1   追加リファクタリング対応(DateValue継承に変更)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.shoppingregist;
@@ -17,13 +18,11 @@ import java.util.Objects;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.common.DateValue;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  *<pre>
@@ -35,14 +34,22 @@ import lombok.RequiredArgsConstructor;
  * @since 家計簿アプリ(1.00)
  *
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-@EqualsAndHashCode
-public class ShoppingDate {
+@EqualsAndHashCode(callSuper = true)
+public class ShoppingDate extends DateValue {
+
 	// MM/dd形式のフォーマッター
 	private static final DateTimeFormatter MM_SP_DD_FORMAT = DateTimeFormatter.ofPattern("MM/dd");
-	// 買い物日
-	private final LocalDate value;
+	
+	/**
+	 *<pre>
+	 * ShoppingDateクラスコンストラクターです。
+	 *</pre>
+	 * @param value 買い物日
+	 *
+	 */
+	protected ShoppingDate(LocalDate value) {
+		super(value);
+	}
 	
 	/**
 	 *<pre>
@@ -57,10 +64,9 @@ public class ShoppingDate {
 	 *
 	 */
 	public static ShoppingDate from(LocalDate date, TargetYearMonth targetYearMonth) {
-		// ガード節(空文字列)
-		if(date == null) {
-			throw new MyHouseholdAccountBookRuntimeException("「買い物日」項目の設定値がnullです。管理者に問い合わせてください。");
-		}
+		// 基底クラスのバリデーションを実行
+		validate(date, "買い物日");
+		
 		// 入力した買い物日のyyyyMMの値を取得
 		String yearMonth = date.format(MyHouseholdAccountBookContent.YEAR_MONTH_FORMATTER);
 		// ガード節(対象年月の範囲内でない)
@@ -68,6 +74,7 @@ public class ShoppingDate {
 			throw new MyHouseholdAccountBookRuntimeException("「買い物日」項目の設定値の範囲が対象年月の範囲と一致しません。管理者に問い合わせてください。[TargetYearMonth=" 
 					+ targetYearMonth.getValue() + "][value=" + DomainCommonUtils.formatyyyyMMdd(date) +"]");
 		}
+		
 		return new ShoppingDate(date);
 	}
 	
@@ -79,15 +86,6 @@ public class ShoppingDate {
 	 *
 	 */
 	public String toFormatString() {
-		return this.value.format(MM_SP_DD_FORMAT);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		// ISO-8601形式（yyyy-MM-dd）で返却（デバッグ用）
-		return this.value.toString();
+		return getValue().format(MM_SP_DD_FORMAT);
 	}
 }

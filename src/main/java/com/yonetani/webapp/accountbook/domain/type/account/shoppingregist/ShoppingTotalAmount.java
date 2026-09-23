@@ -3,8 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  ブランチ            コメントなどs
+ * 日付       : version  ブランチ            コメントなど
  * 2024/11/26 : 1.00.00                      新規作成
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(Money継承に変更)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.shoppingregist;
@@ -12,12 +13,9 @@ package com.yonetani.webapp.accountbook.domain.type.account.shoppingregist;
 import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
+import com.yonetani.webapp.accountbook.domain.type.common.Money;
 
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  *<pre>
@@ -29,50 +27,52 @@ import lombok.RequiredArgsConstructor;
  * @since 家計簿アプリ(1.00)
  *
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-@EqualsAndHashCode
-public class ShoppingTotalAmount {
-	// 買い物合計金額
-	private final BigDecimal value;
-	
-	// 値が0の「買い物合計金額」項目の値
-	public static final ShoppingTotalAmount ZERO = ShoppingTotalAmount.from(BigDecimal.ZERO.setScale(2));
-	
+@EqualsAndHashCode(callSuper = true)
+public class ShoppingTotalAmount extends Money {
+
+	/** 値が0の「買い物合計金額」項目の値 */
+	public static final ShoppingTotalAmount ZERO = ShoppingTotalAmount.from(Money.MONEY_ZERO);
+
+	/**
+	 *<pre>
+	 * プライベートコンストラクタ
+	 *</pre>
+	 * @param value 買い物合計金額
+	 *
+	 */
+	private ShoppingTotalAmount(BigDecimal value) {
+		super(value);
+	}
+
 	/**
 	 *<pre>
 	 * 「買い物合計金額」項目の値を表すドメインタイプを生成します
-	 * 
+	 *
 	 * [ガード節]
 	 * ・買い物合計金額がnull値
 	 * ・買い物合計金額がマイナス値
 	 * ・買い物合計金額がスケール値が2以外
-	 * 
+	 *
 	 *</pre>
 	 * @param price 買い物合計金額
 	 * @return 「買い物合計金額」項目ドメインタイプ
 	 *
 	 */
 	public static ShoppingTotalAmount from(BigDecimal price) {
-		
-		// ガード節(買い物合計金額がnull値)
-		if (price == null) {
-			throw new MyHouseholdAccountBookRuntimeException("「買い物合計金額」項目の設定値が不正です。管理者に問い合わせてください。[value=null]");
-		}
+
+		// 基底クラスのバリデーションを実行（null非許容、スケール2チェック）
+		validate(price, "買い物合計金額");
+
 		// ガード節(買い物合計金額がマイナス値)
 		if (BigDecimal.ZERO.compareTo(price) > 0) {
-			throw new MyHouseholdAccountBookRuntimeException("「買い物合計金額」項目の設定値が不正です。管理者に問い合わせてください。[value=" + price.intValue() + "]");
+			throw new MyHouseholdAccountBookRuntimeException("「買い物合計金額」項目の設定値がマイナスです。管理者に問い合わせてください。[value=" + price.intValue() + "]");
 		}
-		// ガード節(買い物合計金額のスケール値が2以外)
-		if (price.scale() != 2) {
-			throw new MyHouseholdAccountBookRuntimeException("「買い物合計金額」項目の設定値が不正です。管理者に問い合わせてください。[value=" + price.scale() + "]");
-		}
-		
+
 		// 買い物合計金額項目ドメインタイプを生成
 		return new ShoppingTotalAmount(price);
-		
+
 	}
-	
+
 	/**
 	 *<pre>
 	 * 買い物合計金額の値を指定した買い物合計金額の値で加算(this + addValue)した値を返します。
@@ -82,21 +82,6 @@ public class ShoppingTotalAmount {
 	 *
 	 */
 	public ShoppingTotalAmount add(ShoppingTotalAmount addValue) {
-		if(this.value == null) {
-			// addValueがnullの場合はnullポを投げる
-			return new ShoppingTotalAmount(addValue.getValue());
-		}
-		if(addValue.getValue() == null) {
-			return new ShoppingTotalAmount(this.value);
-		}
-		return new ShoppingTotalAmount(this.value.add(addValue.getValue()));
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public String toFormatString() {
-		// スケール0で四捨五入+カンマ編集した文字列を返却
-		return DomainCommonUtils.formatKingakuAndYen(value);
+		return ShoppingTotalAmount.from(super.add(addValue));
 	}
 }

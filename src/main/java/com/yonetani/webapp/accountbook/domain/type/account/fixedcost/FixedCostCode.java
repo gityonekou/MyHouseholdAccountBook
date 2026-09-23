@@ -6,6 +6,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2024/06/03 : 1.00.00                      新規作成
  * 2026/05/04 : 1.01.00  feature-1.01-dev1   リファクタリング対応(DDD適応)
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(桁数チェックをIdentifierに委譲)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.fixedcost;
@@ -54,13 +55,9 @@ public class FixedCostCode extends Identifier {
 	 */
 	public static FixedCostCode from(String fixedCostCode) {
 		
-		// 基本検証（null、空文字）
-		Identifier.validate(fixedCostCode, "固定費コード");
+		// 基本検証（null、空文字、長さが4桁でない）
+		Identifier.validate(fixedCostCode, 4, "固定費コード");
 		
-		// ガード節(長さが4桁でない)
-		if(fixedCostCode.length() != 4) {
-			throw new MyHouseholdAccountBookRuntimeException("「固定費コード」項目の設定値が不正です。管理者に問い合わせてください。[fixedCostCode=" + fixedCostCode + "]");
-		}
 		// ガード節(数値に変換できない(数値4桁:0パディング))
 		try {
 			Integer.parseInt(fixedCostCode);
