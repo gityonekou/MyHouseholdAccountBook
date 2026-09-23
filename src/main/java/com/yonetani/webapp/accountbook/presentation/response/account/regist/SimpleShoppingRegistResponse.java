@@ -6,6 +6,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2024/11/03 : 1.00.00                      新規作成
  * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/09/23 : 1.01.01  feature-1.03-dev1   UseCase結合テスト対応で@Getterを追加
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.regist;
@@ -25,6 +26,7 @@ import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -38,6 +40,7 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter // テスト検証のために追加(結合テストガイドライン3.2)
 public class SimpleShoppingRegistResponse extends AbstractSimpleShoppingRegistListResponse {
 
 	/**

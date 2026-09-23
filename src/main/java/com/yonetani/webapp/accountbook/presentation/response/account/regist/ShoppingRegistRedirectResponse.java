@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2024/11/03 : 1.00.00                      新規作成
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   UseCase結合テスト対応でredirectUrlに@Getterを追加
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.regist;
@@ -16,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -31,8 +33,9 @@ import lombok.RequiredArgsConstructor;
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ShoppingRegistRedirectResponse extends AbstractResponse {
-	
+
 	// リダイレクト先URL
+	@Getter // テスト検証のために追加(結合テストガイドライン3.2)
 	private final String redirectUrl;
 	// 対象年月
 	private final String targetYearMonth;

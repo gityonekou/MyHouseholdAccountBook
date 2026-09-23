@@ -7,6 +7,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2024/12/28 : 1.00.00                      新規作成
  * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応(Feature1.03 dev1)
+ * 2026/09/23 : 1.01.01  feature-1.03-dev1   UseCase結合テスト対応で@Getterを追加
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.regist;
@@ -156,36 +157,47 @@ public abstract class AbstractSimpleShoppingRegistListResponse extends AbstractR
 	}
 	
 	// 当月の買い物一覧情報
+	@Getter // テスト検証のために追加(結合テストガイドライン3.2)
 	private List<SimpleShoppingRegistListItem> simpleShoppingRegistListItemInfo = new ArrayList<>();
 	// 食料品(必須)合計
 	@Setter
+	@Getter // テスト検証のために追加(結合テストガイドライン3.2)
 	private String totalShoppingFood;
 	// 食料品B(無駄遣い)合計
 	@Setter
+	@Getter // テスト検証のために追加(結合テストガイドライン3.2)
 	private String totalShoppingFoodB;
 	// 食料品C(お酒類)合計
 	@Setter
+	@Getter // テスト検証のために追加(結合テストガイドライン3.2)
 	private String totalShoppingFoodC;
 	// 外食合計
 	@Setter
+	@Getter // テスト検証のために追加(結合テストガイドライン3.2)
 	private String totalShoppingDineOut;
 	// 日用品合計
 	@Setter
+	@Getter // テスト検証のために追加(結合テストガイドライン3.2)
 	private String totalShoppingConsumerGoods;
 	// 衣料品(私服)合計
 	@Setter
+	@Getter // テスト検証のために追加(結合テストガイドライン3.2)
 	private String totalShoppingClothes;
 	// 仕事合計
 	@Setter
+	@Getter // テスト検証のために追加(結合テストガイドライン3.2)
 	private String totalShoppingWork;
 	// 住居設備合計
 	@Setter
+	@Getter // テスト検証のために追加(結合テストガイドライン3.2)
 	private String totalShoppingHouseEquipment;
 	// クーポン金額合計
 	@Setter
+	@Getter // テスト検証のために追加(結合テストガイドライン3.2)
 	private String totalShoppingCouponPrice;
 	// 月度買い物合計金額
 	@Setter
+	@Getter // テスト検証のために追加(結合テストガイドライン3.2)
 	private String shoppingMonthTotalAmount;
 	
 	/**

@@ -140,7 +140,7 @@ Full details: `docs/specifications/06_コーディング規約.md` (must-follow,
    *
    */
   ```
-  Only "日付 : version" is colon-separated; version increments per branch (1.00→1.01→…→99→alphabetic), resets to X.00.00 when the branch major changes (e.g. `feature-2.00.**`). Add a new line per update; never rewrite past lines.
+  Only "日付 : version" is colon-separated; the middle digit increments once per branch (1.00→1.01→…→99→alphabetic) and resets the trailing digit to `.00`; within the same branch, each additional change adds a new line incrementing only the trailing digit (1.01.00→1.01.01→1.01.02…) — same-purpose edits within the same branch may share one line instead of adding a new one per edit, even across different dates (update the line's date to the latest edit when merging). Version resets to X.00.00 when the branch major changes (e.g. `feature-2.00.**`). Add a new line per update; never rewrite past lines.
 - **`@since` tag**: `@since 家計簿アプリ(1.03)` — the version part reflects the branch at class **creation** time only, and never changes afterward (update history above is where later changes are tracked).
 - **Encoding / line endings** (new and edited files):
 

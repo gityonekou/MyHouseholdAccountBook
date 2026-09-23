@@ -6,6 +6,8 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/08/19 : 1.00.00  feature-1.03-dev1   新規作成
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(SimpleShoppingRegistUseCaseの照会系・登録系分割に追従し、UseCaseで実施すべきテストを移設。Controller層で実施すべき不足テストの追加、SQLをUseCase層テストのものに統一)
+ * 2026/09/23 : 1.01.01  feature-1.03-dev1   不足していたController層テストを追加(changeShopKubun・updateComplete・returndispatchaction系)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.account.regist;
@@ -29,7 +31,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist.SimpleShoppingRegistUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist.SimpleShoppingRegistConfirmUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist.SimpleShoppingRegistInquiryUseCase;
 import com.yonetani.webapp.accountbook.presentation.controller.MyHouseholdAccountBookControllerAdvice;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
@@ -62,16 +65,20 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
 @Transactional
 @Sql(scripts = {
 	"/sql/initsql/schema_test.sql",
-	"/com/yonetani/webapp/accountbook/presentation/controller/account/regist/SimpleShoppingRegistControllerIntegrationTest.sql"
+	// UseCase層テスト(SimpleShoppingRegistInquiryUseCaseIntegrationTest)のSQLを再利用(結合テストガイドライン10.9)
+	"/com/yonetani/webapp/accountbook/application/usecase/account/shoppingregist/SimpleShoppingRegistInquiryIntegrationTest.sql"
 }, config = @SqlConfig(encoding = "UTF-8"))
 @DisplayName("買い物登録(簡易タイプ)機能のControllerテスト（統合テスト）")
 class SimpleShoppingRegistControllerIntegrationTest {
 
 	// MVCモック
 	private MockMvc mockMvc;
-	// 買い物登録(簡易タイプ)ユースケース(本物のSpring Bean)
+	// 買い物登録(簡易タイプ)ユースケース(照会系。本物のSpring Bean)
 	@Autowired
-	private SimpleShoppingRegistUseCase usecase;
+	private SimpleShoppingRegistInquiryUseCase inquiryUseCase;
+	// 買い物登録(簡易タイプ)ユースケース(登録系。本物のSpring Bean)
+	@Autowired
+	private SimpleShoppingRegistConfirmUseCase confirmUseCase;
 	// モック:ログインユーザセッション情報
 	@Mock
 	private LoginUserSession mockLoginUserSession;
@@ -79,7 +86,7 @@ class SimpleShoppingRegistControllerIntegrationTest {
 	@BeforeEach
 	void setupMockMvc() {
 		this.mockMvc = MockMvcBuilders
-				.standaloneSetup(new SimpleShoppingRegistController(usecase, mockLoginUserSession))
+				.standaloneSetup(new SimpleShoppingRegistController(inquiryUseCase, confirmUseCase, mockLoginUserSession))
 				.setControllerAdvice(new MyHouseholdAccountBookControllerAdvice(mockLoginUserSession))
 				.build();
 
@@ -100,31 +107,6 @@ class SimpleShoppingRegistControllerIntegrationTest {
 	}
 
 	@Test
-	@DisplayName("正常系：GET / 初期表示の登録済み買い物一覧に支払方法名が解決されて設定される")
-	void testGetInitLoad_ShoppingRegistListPaymentMethodName() throws Exception {
-		var result = mockMvc.perform(get("/myhacbook/accountregist/simpleshoppingregist/")
-				.param("targetYearMonth", "202511")
-				.with(user("user01").password("password").roles("USER"))
-				.with(csrf()))
-			.andExpect(status().isOk())
-			.andReturn();
-
-		@SuppressWarnings("unchecked")
-		var shoppingRegistList = (java.util.List<com.yonetani.webapp.accountbook.presentation.response.account.regist.AbstractSimpleShoppingRegistListResponse.SimpleShoppingRegistListItem>)
-				result.getModelAndView().getModel().get("shoppingRegistList");
-		org.junit.jupiter.api.Assertions.assertEquals(2, shoppingRegistList.size());
-
-		var item001 = shoppingRegistList.stream()
-				.filter(i -> "001".equals(i.getShoppingRegistCode())).findFirst().orElseThrow();
-		org.junit.jupiter.api.Assertions.assertEquals("現金", item001.getPaymentMethodName(), "支払方法コード001は「現金」に解決されること");
-
-		var item002 = shoppingRegistList.stream()
-				.filter(i -> "002".equals(i.getShoppingRegistCode())).findFirst().orElseThrow();
-		org.junit.jupiter.api.Assertions.assertEquals("無効化済み口座振替", item002.getPaymentMethodName(),
-				"無効化された支払方法(003)でも、一覧では実際の支払方法名で表示されること(選択肢から除外されるのはフォームのプルダウンのみ)");
-	}
-
-	@Test
 	@DisplayName("正常系：GET /updateload で既存の支払方法コードがフォームに反映される")
 	void testGetUpdateLoad_NormalCase() throws Exception {
 		mockMvc.perform(get("/myhacbook/accountregist/simpleshoppingregist/updateload")
@@ -135,28 +117,6 @@ class SimpleShoppingRegistControllerIntegrationTest {
 			.andExpect(status().isOk())
 			.andExpect(model().attribute("simpleShoppingRegistInfoForm",
 					org.hamcrest.Matchers.hasProperty("paymentMethodCode", org.hamcrest.Matchers.is("001"))));
-	}
-
-	@Test
-	@DisplayName("正常系：無効化された支払方法を参照する既存行を開いた場合、フォームには値が維持され、選択肢には含まれない(disabled表示の前提条件)")
-	void testGetUpdateLoad_DisabledPaymentMethod() throws Exception {
-		var result = mockMvc.perform(get("/myhacbook/accountregist/simpleshoppingregist/updateload")
-				.param("targetYearMonth", "202511")
-				.param("shoppingRegistCode", "002")
-				.with(user("user01").password("password").roles("USER"))
-				.with(csrf()))
-			.andExpect(status().isOk())
-			.andExpect(model().attribute("simpleShoppingRegistInfoForm",
-					org.hamcrest.Matchers.hasProperty("paymentMethodCode", org.hamcrest.Matchers.is("003"))))
-			.andReturn();
-
-		// 選択肢一覧(findSelectableByUserId()ベース)には無効化された003が含まれないこと
-		var paymentMethodSelectList = (com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem)
-				result.getModelAndView().getModel().get("paymentMethodSelectList");
-		boolean containsDisabledCode = paymentMethodSelectList.getOptionList().stream()
-				.anyMatch(item -> "003".equals(item.getValue()));
-		org.junit.jupiter.api.Assertions.assertFalse(containsDisabledCode,
-				"無効化された支払方法003は選択肢に含まれないこと(テンプレート側でdisabled表示に切り替わる前提条件)");
 	}
 
 	@Test
@@ -195,5 +155,54 @@ class SimpleShoppingRegistControllerIntegrationTest {
 				.with(csrf()))
 			.andExpect(status().is3xxRedirection())
 			.andExpect(redirectedUrlPattern("/myhacbook/accountregist/simpleshoppingregist/updateComplete/**"));
+	}
+
+	@Test
+	@DisplayName("正常系：POST / 店舗区分変更で店名選択肢が切り替わる")
+	void testPostChangeShopKubun_NormalCase() throws Exception {
+		mockMvc.perform(post("/myhacbook/accountregist/simpleshoppingregist/")
+				.param("targetYearMonth", "202511")
+				.param("shopKubunCode", "901")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().isOk())
+			.andExpect(view().name("account/regist/SimpleShoppingRegist"))
+			.andExpect(model().attributeExists("shopNameOptionList"));
+	}
+
+	@Test
+	@DisplayName("正常系：GET /updateComplete/ 登録完了後の画面が表示される")
+	void testGetUpdateComplete_NormalCase() throws Exception {
+		mockMvc.perform(get("/myhacbook/accountregist/simpleshoppingregist/updateComplete/")
+				.param("targetYearMonth", "202511")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().isOk())
+			.andExpect(view().name("account/regist/SimpleShoppingRegist"))
+			.andExpect(model().attributeExists("messages"));
+	}
+
+	@Test
+	@DisplayName("正常系：POST /returndispatchaction/ (ReturnShoppingTop) 買い物登録方法選択画面へリダイレクトされる")
+	void testPostReturnShoppingTop_Redirect() throws Exception {
+		mockMvc.perform(post("/myhacbook/accountregist/simpleshoppingregist/returndispatchaction/")
+				.param("targetYearMonth", "202511")
+				.param("ReturnShoppingTop", "")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(redirectedUrlPattern("/myhacbook/accountregist/shoppingtopmenu/**"));
+	}
+
+	@Test
+	@DisplayName("正常系：POST /returndispatchaction/ (ReturnMonth) 各月の収支参照画面へリダイレクトされる")
+	void testPostReturnInquiryMonth_Redirect() throws Exception {
+		mockMvc.perform(post("/myhacbook/accountregist/simpleshoppingregist/returndispatchaction/")
+				.param("targetYearMonth", "202511")
+				.param("ReturnMonth", "")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(redirectedUrlPattern("/myhacbook/accountinquiry/accountmonth/registComplete/**"));
 	}
 }

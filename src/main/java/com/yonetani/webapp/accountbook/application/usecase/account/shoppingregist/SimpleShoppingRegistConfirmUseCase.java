@@ -1,18 +1,18 @@
 /**
- * 簡易タイプの買い物登録を行うユースケースです。買い物登録(簡易タイプ)画面の情報取得、及び、画面入力された買い物情報を登録します。
+ * 簡易タイプの買い物登録を行うユースケース（登録系）です。画面入力された買い物情報の新規登録・更新処理を行います。
+ * ・買い物登録入力フォームの入力値に従ったアクション(登録 or 更新)実行処理
  *
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2024/11/03 : 1.00.00                      新規作成
- * 2025/12/28 : 1.01.00  feature-1.00-dev00  リファクタリング対応（DDD適応) 
+ * 2025/12/28 : 1.01.00  feature-1.00-dev00  リファクタリング対応（DDD適応)
  * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応、追加リファクタリング対応(買い物登録ドメインの見直し)
  * 2026/09/23 : 1.02.01  feature-1.03-dev1   追加リファクタリング対応(SimpleShoppingRegistUseCaseを照会系、登録系に分割)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -57,11 +57,8 @@ import com.yonetani.webapp.accountbook.domain.type.common.CouponAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
-import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.request.account.regist.SimpleShoppingRegistInfoForm;
-import com.yonetani.webapp.accountbook.presentation.response.account.regist.ShoppingRegistRedirectResponse;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.SimpleShoppingRegistResponse;
-import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
@@ -70,7 +67,8 @@ import lombok.extern.log4j.Log4j2;
 
 /**
  *<pre>
- * 簡易タイプの買い物登録を行うユースケースです。買い物登録(簡易タイプ)画面の情報取得、及び、画面入力された買い物情報を登録します。
+ * 簡易タイプの買い物登録を行うユースケース（登録系）です。画面入力された買い物情報の新規登録・更新処理を行います。
+ * ・買い物登録入力フォームの入力値に従ったアクション(登録 or 更新)実行処理
  *
  *</pre>
  *
@@ -81,8 +79,8 @@ import lombok.extern.log4j.Log4j2;
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class SimpleShoppingRegistUseCase {
-	
+public class SimpleShoppingRegistConfirmUseCase {
+
 	// コードテーブル
 	private final CodeTableItemComponent codeTableItem;
 	// 店舗情報取得リポジトリー
@@ -103,175 +101,7 @@ public class SimpleShoppingRegistUseCase {
 	private final ShoppingRegistExpenditureItemComponent expenditureAndSisyutuKingakuComponent;
 	// 支払方法情報取得コンポーネント
 	private final PaymentMethodInfoComponent paymentMethodInfoComponent;
-	
-	/**
-	 *<pre>
-	 * 買い物登録(簡易タイプ)画面情報取得
-	 * 
-	 * 指定した対象年月に応じた買い物登録(簡易タイプ)画面の表示情報を取得します。
-	 * 
-	 *</pre>
-	 * @param user ログインユーザ情報
-	 * @param targetYearMonth  買い物登録を行う対象年月
-	 * @return 買い物登録(簡易タイプ)画面の表示情報
-	 *
-	 */
-	public SimpleShoppingRegistResponse read(LoginUserInfo user, String targetYearMonth) {
-		log.debug("read:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
-		
-		// ユーザーIDのドメインタイプを生成
-		UserId userId = UserId.from(user.getUserId());
-		// 対象年月のドメインタイプを生成
-		TargetYearMonth domainTargetYearMonth = TargetYearMonth.from(targetYearMonth);
-		
-		// デフォルトの簡易タイプ買い物登録情報フォームデータを生成
-		SimpleShoppingRegistInfoForm inputForm = new SimpleShoppingRegistInfoForm();
-		// アクション(新規登録)
-		inputForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_ADD);
-		// 店舗区分は店舗区分で食品・日用品店舗(901)をデフォルト選択する
-		inputForm.setShopKubunCode(MyHouseholdAccountBookContent.SHOP_KUBUN_GROCERIES_SELECTED_VALUE);
-		// 対象年月：ドメインタイプで入力値チェックを行った値を設定
-		inputForm.setTargetYearMonth(domainTargetYearMonth.getValue());
-		// デフォルトのカレンダー日付を設定する(targetYearMonth + 01)
-		inputForm.setShoppingDate(LocalDate.parse(domainTargetYearMonth.getValue() + "01", MyHouseholdAccountBookContent.DATE_TIME_FORMATTER));
-		
-		// 買い物登録(簡易タイプ)画面の表示情報を生成して返却
-		return createResponse(userId, inputForm);
-	}
-	
-	/**
-	 *<pre>
-	 * 買い物登録(簡易タイプ)画面情報取得
-	 * 
-	 * 指定した買い物登録情報に応じた買い物登録(簡易タイプ)画面の表示情報を取得します。
-	 * 
-	 *</pre>
-	 * @param user ログインユーザ情報
-	 * @param targetYearMonth 買い物登録を行う対象年月
-	 * @param shoppingRegistCode 更新対象の買い物登録コード
-	 * @return 買い物登録(簡易タイプ)画面の表示情報
-	 *
-	 */
-	public SimpleShoppingRegistResponse read(LoginUserInfo user, String targetYearMonth, String shoppingRegistCode) {
-		log.debug("read:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",shoppingRegistCode=" + shoppingRegistCode);
-		
-		// ユーザーIDのドメインタイプを生成
-		UserId userId = UserId.from(user.getUserId());
-		// 対象年月のドメインタイプを生成
-		TargetYearMonth domainTargetYearMonth = TargetYearMonth.from(targetYearMonth);
-		// 買い物登録コードのドメインタイプを生成
-		ShoppingRegistCode domainShoppingRegistCode = ShoppingRegistCode.from(shoppingRegistCode);
-		
-		// 登録されている買い物情報を取得
-		ShoppingRegist result = shoppingRegistRepository.findByPrimaryKey(
-				SearchQueryUserIdAndYearMonthAndShoppingRegistCode.from(userId, domainTargetYearMonth, domainShoppingRegistCode));
-		// 選択した買い物登録コードに対応するデータなしの場合、予期しないエラーとする
-		if(result == null) {
-			throw new MyHouseholdAccountBookRuntimeException("更新対象の買い物登録情報が存在しません。管理者に問い合わせてください。[targetYearMonth:" 
-					+ targetYearMonth + "][shoppingRegistCode:" + shoppingRegistCode + "]");
-		}
-		// 取得した買い物情報に対応する簡易タイプ買い物登録情報フォームデータを生成
-		SimpleShoppingRegistInfoForm inputForm = new SimpleShoppingRegistInfoForm();
-		// アクション(更新)
-		inputForm.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE);
-		// 対象年月
-		inputForm.setTargetYearMonth(result.getTargetYearMonth().getValue());
-		// 買い物登録コード
-		inputForm.setShoppingRegistCode(result.getShoppingRegistCode().getValue());
-		// 店舗区分
-		inputForm.setShopKubunCode(result.getShopKubunCode().getValue());
-		// 店舗コード
-		inputForm.setShopCode(result.getShopCode().getValue());
-		// 支払方法コード
-		inputForm.setPaymentMethodCode(result.getPaymentMethodCode().getValue());
-		// 買い物日
-		inputForm.setShoppingDate(result.getShoppingDate().getValue());
-		// 備考
-		inputForm.setShoppingRemarks(result.getShoppingRemarks().getValue());
-		// 食料品(必須)
-		inputForm.setShoppingFoodExpenses(result.getShoppingFoodExpenditureItem().getShoppingFoodExpenditureAmount().toIntegerValue());
-		// 消費税：食料品(必須)
-		inputForm.setShoppingFoodTaxExpenses(result.getShoppingFoodExpenditureItem().getShoppingFoodTaxExpenses().toIntegerValue());
-		// 食料品B(無駄遣い)
-		inputForm.setShoppingFoodBExpenses(result.getShoppingFoodMinorWasteExpenditureItem().getShoppingFoodMinorWasteExpenses().toIntegerValue());
-		// 消費税：食料品B(無駄遣い)
-		inputForm.setShoppingFoodBTaxExpenses(result.getShoppingFoodMinorWasteExpenditureItem().getShoppingFoodMinorWasteTaxExpenses().toIntegerValue());
-		// 食料品C(お酒類)
-		inputForm.setShoppingFoodCExpenses(result.getShoppingFoodSevereWasteExpenditureItem().getShoppingFoodSevereWasteExpenses().toIntegerValue());
-		// 消費税：食料品C(お酒類)
-		inputForm.setShoppingFoodCTaxExpenses(result.getShoppingFoodSevereWasteExpenditureItem().getShoppingFoodSevereWasteTaxExpenses().toIntegerValue());
-		// 外食
-		inputForm.setShoppingDineOutExpenses(result.getShoppingDineOutExpenditureItem().getShoppingDineOutExpenditureAmount().toIntegerValue());
-		// 消費税：外食
-		inputForm.setShoppingDineOutTaxExpenses(result.getShoppingDineOutExpenditureItem().getShoppingDineOutTaxExpenses().toIntegerValue());
-		// 日用品
-		inputForm.setShoppingConsumerGoodsExpenses(result.getShoppingConsumerGoodsExpenditureItem().getShoppingConsumerGoodsExpenditureAmount().toIntegerValue());
-		// 消費税：日用品
-		inputForm.setShoppingConsumerGoodsTaxExpenses(result.getShoppingConsumerGoodsExpenditureItem().getShoppingConsumerGoodsTaxExpenses().toIntegerValue());
-		// 衣料品(私服)
-		inputForm.setShoppingClothesExpenses(result.getShoppingClothesExpenditureItem().getShoppingClothesExpenditureAmount().toIntegerValue());
-		// 消費税：衣料品(私服)
-		inputForm.setShoppingClothesTaxExpenses(result.getShoppingClothesExpenditureItem().getShoppingClothesTaxExpenses().toIntegerValue());
-		// 仕事
-		inputForm.setShoppingWorkExpenses(result.getShoppingWorkExpenditureItem().getShoppingWorkExpenditureAmount().toIntegerValue());
-		// 消費税：仕事
-		inputForm.setShoppingWorkTaxExpenses(result.getShoppingWorkExpenditureItem().getShoppingWorkTaxExpenses().toIntegerValue());
-		// 住居設備
-		inputForm.setShoppingHouseEquipmentExpenses(result.getShoppingHouseEquipmentExpenditureItem().getShoppingHouseEquipmentExpenditureAmount().toIntegerValue());
-		// 消費税：住居設備
-		inputForm.setShoppingHouseEquipmentTaxExpenses(result.getShoppingHouseEquipmentExpenditureItem().getShoppingHouseEquipmentTaxExpenses().toIntegerValue());
-		// クーポン
-		inputForm.setShoppingCouponPrice(result.getShoppingCouponPrice().toIntegerValue());
-		// 購入金額合計
-		inputForm.setTotalPurchasePrice(DomainCommonUtils.convertInteger(result.getTotalPurchasePrice().getValue()));
-		// 購入金額合計(disabled)
-		inputForm.setTotalPurchasePriceView(DomainCommonUtils.convertInteger(result.getTotalPurchasePrice().getValue()));
-		// 消費税合計
-		inputForm.setTaxTotalPurchasePrice(DomainCommonUtils.convertInteger(result.getTaxTotalPurchasePrice().getValue()));
-		// 消費税合計(disabled)
-		inputForm.setTaxTotalPurchasePriceView(DomainCommonUtils.convertInteger(result.getTaxTotalPurchasePrice().getValue()));
-		// 買い物合計金額
-		inputForm.setShoppingTotalAmount(DomainCommonUtils.convertInteger(result.getShoppingTotalAmount().getValue()));
-		// 買い物合計金額(disabled)
-		inputForm.setShoppingTotalAmountView(DomainCommonUtils.convertInteger(result.getShoppingTotalAmount().getValue()));
-		
-		// 買い物登録(簡易タイプ)画面の表示情報を生成して返却
-		return createResponse(userId, inputForm);
-		
-	}
-	
-	/**
-	 *<pre>
-	 * 店舗区分変更時の画面返却データのModelAndViewを生成して返します。
-	 * 
-	 *</pre>
-	 * @param user ログインユーザ情報
-	 * @param registInfoForm 買い物情報(簡易タイプ)入力フォーム
-	 * @return 買い物登録(簡易タイプ)画面の表示情報
-	 *
-	 */
-	public SimpleShoppingRegistResponse readChangeShopKubun(LoginUserInfo user, SimpleShoppingRegistInfoForm registInfoForm) {
-		log.debug("readChangeShopKubun:userid=" + user.getUserId() + ",inputForm=" + registInfoForm);
-		// 買い物登録(簡易タイプ)画面の表示情報を生成して返却
-		return createResponse(UserId.from(user.getUserId()), registInfoForm);
-	}
-	
-	/**
-	 *<pre>
-	 * バリデーションチェックエラー時の入力フォームの値から画面返却データのModelAndViewを生成して返します。
-	 * 
-	 *</pre>
-	 * @param user ログインユーザ情報
-	 * @param registInfoForm 買い物情報(簡易タイプ)入力フォーム
-	 * @return 買い物登録(簡易タイプ)画面の表示情報
-	 *
-	 */
-	public SimpleShoppingRegistResponse readBindingError(LoginUserInfo user, SimpleShoppingRegistInfoForm registInfoForm) {
-		log.debug("readBindingError:userid=" + user.getUserId() + ",inputForm=" + registInfoForm);
-		// 買い物登録(簡易タイプ)画面の表示情報を生成して返却
-		return createResponse(UserId.from(user.getUserId()), registInfoForm);
-	}
-	
+
 	/**
 	 *<pre>
 	 * 買い物登録入力フォームの入力値に従い、アクション(登録 or 更新)を実行します。
@@ -284,15 +114,15 @@ public class SimpleShoppingRegistUseCase {
 	@Transactional
 	public SimpleShoppingRegistResponse execAction(LoginUserInfo user, SimpleShoppingRegistInfoForm inputForm) {
 		log.debug("execAction:userid=" + user.getUserId() + ",inputForm=" + inputForm);
-		
+
 		// ドメインタイプ:ユーザID
 		UserId userId = UserId.from(user.getUserId());
 		// ドメインタイプ:対象年月
 		TargetYearMonth targetYearMonth = TargetYearMonth.from(inputForm.getTargetYearMonth());
-		
+
 		// 支出テーブルの更新情報
 		List<ExpenditureItem> updExpenditureItemList = new ArrayList<>();
-		
+
 		// 簡易タイプ買い物リストの項目に対応する支出テーブル情報と支出金額テーブル情報を取得
 		// 必須データの存在チェックは買い物登録のトップメニューで確認済みなので、ここではもしデータがない場合はNULLポ発生か要素数アクセスエラーで対応する
 		// 支出テーブル情報には外食、仕事のデータ登録なしでOK。データがある場合でも値の更新は不要
@@ -312,21 +142,21 @@ public class SimpleShoppingRegistUseCase {
 		ExpenditureItem beforeWorkItem = expenditureAndSisyutuKingakuComponent.getWorkExpenditureItem(userId, targetYearMonth);
 		// 住居設備
 		ExpenditureItem beforeHouseEquipmentItem = expenditureAndSisyutuKingakuComponent.getHouseEquipmentExpenditureItem(userId, targetYearMonth);
-				
+
 		// 検索条件ドメインを生成(ユーザID、対象年月)
 		SearchQueryUserIdAndYearMonth searchYearMonth = SearchQueryUserIdAndYearMonth.from(userId, targetYearMonth);
-		
+
 		// 対象年月の支出金額テーブル情報を保持したホルダーを生成
 		ExpenditureAmountItemHolder expenditureAmountItemHolder = expenditureAmountItemHolderComponent.build(searchYearMonth);
-		
+
 		// 収支テーブル情報を取得
 		IncomeAndExpenditure beforeSyuusiData = incomeAndExpenditureRepository.findByPrimaryKey(searchYearMonth);
-		// 収支テーブル更新情報		
+		// 収支テーブル更新情報
 		IncomeAndExpenditure updSyuusiData = null;
-		
+
 		// レスポンスを生成
 		SimpleShoppingRegistResponse response = SimpleShoppingRegistResponse.getRedirectInstance(inputForm.getTargetYearMonth());
-		
+
 		// 新規登録の場合
 		if(Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
 
@@ -340,23 +170,23 @@ public class SimpleShoppingRegistUseCase {
 				errorResponse.addErrorMessage("ひと月の買い物登録情報は999件以上登録できません。管理者に問い合わせてください。");
 				return errorResponse;
 			}
-			
+
 			// 買い物登録コードを入力フォームに設定
 			inputForm.setShoppingRegistCode(ShoppingRegistCode.getNewCode(count));
-			
+
 			// 追加する買い物登録情報を作成
 			ShoppingRegist addData = ShoppingRegist.createShoppingRegist(userId, inputForm);
-			
+
 			// 買い物登録情報テーブルに登録
 			int addCount = shoppingRegistRepository.add(addData);
 			// 追加件数が1件以上の場合、業務エラー
 			if(addCount != 1) {
 				throw new MyHouseholdAccountBookRuntimeException("買い物登録情報テーブル:SHOPPING_REGIST_TABLEへの追加件数が不正でした。[件数=" + addCount + "][add data:" + addData + "]");
 			}
-			
+
 			// クーポン金額を取得
 			CouponAmount couponResidualValue = addData.getShoppingCouponPrice().toCouponAmount();
-			
+
 			// 支出テーブル情報を更新
 			// 飲食(無駄づかいなし)
 			ShoppingFoodItemExpenditureAmount food = addData.getShoppingFoodExpenditureItem().applyCoupon(couponResidualValue);
@@ -369,7 +199,7 @@ public class SimpleShoppingRegistUseCase {
 				expenditureAmountItemHolder.update(beforeFoodItem, updFoodExpenditureItem);
 			}
 			couponResidualValue = food.getResidualCouponAmount();
-			
+
 			// 食料品(無駄遣い（軽度）)
 			ShoppingFoodMinorWasteItemExpenditureAmount foodB = addData.getShoppingFoodMinorWasteExpenditureItem().applyCoupon(couponResidualValue);
 			if(foodB.hasExpenditureAmount()) {
@@ -381,8 +211,8 @@ public class SimpleShoppingRegistUseCase {
 				expenditureAmountItemHolder.update(beforeFoodBItem, updFoodBExpenditureItem);
 			}
 			couponResidualValue = foodB.getResidualCouponAmount();
-			
-			// 食料品(無駄遣い（重度）) 
+
+			// 食料品(無駄遣い（重度）)
 			ShoppingFoodSevereWasteItemExpenditureAmount foodC = addData.getShoppingFoodSevereWasteExpenditureItem().applyCoupon(couponResidualValue);
 			if(foodC.hasExpenditureAmount()) {
 				// 飲食(無駄遣いC)の支出テーブル情報を作成
@@ -391,10 +221,10 @@ public class SimpleShoppingRegistUseCase {
 				updExpenditureItemList.add(updFoodCExpenditureItem);
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
 				expenditureAmountItemHolder.update(beforeFoodCItem, updFoodCExpenditureItem);
-				
+
 			}
 			couponResidualValue = foodC.getResidualCouponAmount();
-			
+
 			// 外食
 			ShoppingDineOutItemExpenditureAmount dineOut = addData.getShoppingDineOutExpenditureItem().applyCoupon(couponResidualValue);
 			if(dineOut.hasExpenditureAmount()) {
@@ -404,10 +234,10 @@ public class SimpleShoppingRegistUseCase {
 				updExpenditureItemList.add(updDineOutExpenditureItem);
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
 				expenditureAmountItemHolder.update(beforeDineOutItem, updDineOutExpenditureItem);
-				
+
 			}
 			couponResidualValue = dineOut.getResidualCouponAmount();
-			
+
 			// 日用消耗品
 			ShoppingConsumerGoodsItemExpenditureAmount consumerGoods = addData.getShoppingConsumerGoodsExpenditureItem().applyCoupon(couponResidualValue);
 			if(consumerGoods.hasExpenditureAmount()) {
@@ -417,10 +247,10 @@ public class SimpleShoppingRegistUseCase {
 				updExpenditureItemList.add(updConsumerGoodsExpenditureItem);
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
 				expenditureAmountItemHolder.update(beforeConsumerGoodsItem, updConsumerGoodsExpenditureItem);
-				
+
 			}
 			couponResidualValue = consumerGoods.getResidualCouponAmount();
-			
+
 			// 被服費
 			ShoppingClothesItemExpenditureAmount clothes = addData.getShoppingClothesExpenditureItem().applyCoupon(couponResidualValue);
 			if(clothes.hasExpenditureAmount()) {
@@ -430,9 +260,9 @@ public class SimpleShoppingRegistUseCase {
 				updExpenditureItemList.add(updClothesExpenditureItem);
 				// 更新前・更新後の支出情報をもとに支出金額テーブル情報の情報を更新
 				expenditureAmountItemHolder.update(beforeClothesItem, updClothesExpenditureItem);
-			}	
+			}
 			couponResidualValue = clothes.getResidualCouponAmount();
-			
+
 			// 仕事
 			ShoppingWorkItemExpenditureAmount work = addData.getShoppingWorkExpenditureItem().applyCoupon(couponResidualValue);
 			if(work.hasExpenditureAmount()) {
@@ -444,7 +274,7 @@ public class SimpleShoppingRegistUseCase {
 				expenditureAmountItemHolder.update(beforeWorkItem, updWorkExpenditureItem);
 			}
 			couponResidualValue = work.getResidualCouponAmount();
-			
+
 			// 住居設備
 			ShoppingHouseEquipmentItemExpenditureAmount houseEquipment = addData.getShoppingHouseEquipmentExpenditureItem().applyCoupon(couponResidualValue);
 			if(houseEquipment.hasExpenditureAmount()) {
@@ -456,45 +286,45 @@ public class SimpleShoppingRegistUseCase {
 				expenditureAmountItemHolder.update(beforeHouseEquipmentItem, updHouseEquipmentExpenditureItem);
 			}
 			couponResidualValue = houseEquipment.getResidualCouponAmount();
-			
+
 			// 収支テーブル情報に合計値を設定し更新情報とする
 			updSyuusiData = beforeSyuusiData.addExpenditureAmount(ExpenditureAmount.from(addData.getShoppingTotalAmount().getValue()));
-			
+
 			// 完了メッセージ
 			response.addMessage("買い物情報を新規登録しました。[code:" + addData.getShoppingRegistCode() + "]");
-			
+
 		// 更新の場合
 		} else if (Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
-			
+
 			// 対象年月のドメインタイプを生成
 			TargetYearMonth domainTargetYearMonth = TargetYearMonth.from(inputForm.getTargetYearMonth());
 			// 買い物登録コードのドメインタイプを生成
 			ShoppingRegistCode domainShoppingRegistCode = ShoppingRegistCode.from(inputForm.getShoppingRegistCode());
-			
+
 			// 更新対象のデータを取得(更新前と更新後の差額計算用)
 			ShoppingRegist beforeData = shoppingRegistRepository.findByPrimaryKey(
 					SearchQueryUserIdAndYearMonthAndShoppingRegistCode.from(userId, domainTargetYearMonth, domainShoppingRegistCode));
 			// 買い物登録コードに対応するデータなしの場合、予期しないエラーとする
 			if(beforeData == null) {
-				throw new MyHouseholdAccountBookRuntimeException("更新対象の買い物登録情報が存在しません。管理者に問い合わせてください。[targetYearMonth:" 
+				throw new MyHouseholdAccountBookRuntimeException("更新対象の買い物登録情報が存在しません。管理者に問い合わせてください。[targetYearMonth:"
 						+ domainTargetYearMonth.getValue()+ "][shoppingRegistCode:" + domainShoppingRegistCode.getValue() + "]");
 			}
-			
+
 			// 更新する買い物登録情報を作成
 			ShoppingRegist updData = ShoppingRegist.createShoppingRegist(userId, inputForm);
-			
+
 			// 買い物登録情報テーブルを更新
 			int updCount = shoppingRegistRepository.update(updData);
 			// 更新件数が1件以上の場合、業務エラー
 			if(updCount != 1) {
 				throw new MyHouseholdAccountBookRuntimeException("買い物登録情報テーブル:SHOPPING_REGIST_TABLEの更新件数が不正でした。[件数=" + updCount + "][upd data:" + updData + "]");
 			}
-			
-			
+
+
 			// クーポン金額を取得
 			CouponAmount beforeCouponResidualValue = beforeData.getShoppingCouponPrice().toCouponAmount();
 			CouponAmount afterCouponResidualValue = updData.getShoppingCouponPrice().toCouponAmount();
-			
+
 			/* 支出テーブル情報を更新 */
 			// 飲食(無駄づかいなし)
 			ShoppingFoodItemExpenditureAmount beforeFood = beforeData.getShoppingFoodExpenditureItem().applyCoupon(beforeCouponResidualValue);
@@ -514,7 +344,7 @@ public class SimpleShoppingRegistUseCase {
 			}
 			beforeCouponResidualValue = beforeFood.getResidualCouponAmount();
 			afterCouponResidualValue = afterFood.getResidualCouponAmount();
-			
+
 			// 飲食(無駄遣いB)
 			ShoppingFoodMinorWasteItemExpenditureAmount beforeFoodB = beforeData.getShoppingFoodMinorWasteExpenditureItem().applyCoupon(beforeCouponResidualValue);
 			ShoppingFoodMinorWasteItemExpenditureAmount afterFoodB = updData.getShoppingFoodMinorWasteExpenditureItem().applyCoupon(afterCouponResidualValue);
@@ -533,7 +363,7 @@ public class SimpleShoppingRegistUseCase {
 			}
 			beforeCouponResidualValue = beforeFoodB.getResidualCouponAmount();
 			afterCouponResidualValue = afterFoodB.getResidualCouponAmount();
-			
+
 			// 飲食(無駄遣いC)
 			ShoppingFoodSevereWasteItemExpenditureAmount beforeFoodC = beforeData.getShoppingFoodSevereWasteExpenditureItem().applyCoupon(beforeCouponResidualValue);
 			ShoppingFoodSevereWasteItemExpenditureAmount afterFoodC = updData.getShoppingFoodSevereWasteExpenditureItem().applyCoupon(afterCouponResidualValue);
@@ -552,7 +382,7 @@ public class SimpleShoppingRegistUseCase {
 			}
 			beforeCouponResidualValue = beforeFoodC.getResidualCouponAmount();
 			afterCouponResidualValue = afterFoodC.getResidualCouponAmount();
-			
+
 			// 外食
 			ShoppingDineOutItemExpenditureAmount beforeDineOut = beforeData.getShoppingDineOutExpenditureItem().applyCoupon(beforeCouponResidualValue);
 			ShoppingDineOutItemExpenditureAmount afterDineOut = updData.getShoppingDineOutExpenditureItem().applyCoupon(afterCouponResidualValue);
@@ -571,7 +401,7 @@ public class SimpleShoppingRegistUseCase {
 			}
 			beforeCouponResidualValue = beforeDineOut.getResidualCouponAmount();
 			afterCouponResidualValue = afterDineOut.getResidualCouponAmount();
-			
+
 			// 日用消耗品
 			ShoppingConsumerGoodsItemExpenditureAmount beforeConsumerGoods = beforeData.getShoppingConsumerGoodsExpenditureItem().applyCoupon(beforeCouponResidualValue);
 			ShoppingConsumerGoodsItemExpenditureAmount afterConsumerGoods = updData.getShoppingConsumerGoodsExpenditureItem().applyCoupon(afterCouponResidualValue);
@@ -590,7 +420,7 @@ public class SimpleShoppingRegistUseCase {
 			}
 			beforeCouponResidualValue = beforeConsumerGoods.getResidualCouponAmount();
 			afterCouponResidualValue = afterConsumerGoods.getResidualCouponAmount();
-			
+
 			// 被服費
 			ShoppingClothesItemExpenditureAmount beforeClothes = beforeData.getShoppingClothesExpenditureItem().applyCoupon(beforeCouponResidualValue);
 			ShoppingClothesItemExpenditureAmount afterClothes = updData.getShoppingClothesExpenditureItem().applyCoupon(afterCouponResidualValue);
@@ -609,7 +439,7 @@ public class SimpleShoppingRegistUseCase {
 			}
 			beforeCouponResidualValue = beforeClothes.getResidualCouponAmount();
 			afterCouponResidualValue = afterClothes.getResidualCouponAmount();
-			
+
 			// 仕事
 			ShoppingWorkItemExpenditureAmount beforeWork = beforeData.getShoppingWorkExpenditureItem().applyCoupon(beforeCouponResidualValue);
 			ShoppingWorkItemExpenditureAmount afterWork = updData.getShoppingWorkExpenditureItem().applyCoupon(afterCouponResidualValue);
@@ -628,7 +458,7 @@ public class SimpleShoppingRegistUseCase {
 			}
 			beforeCouponResidualValue = beforeWork.getResidualCouponAmount();
 			afterCouponResidualValue = afterWork.getResidualCouponAmount();
-			
+
 			// 住居設備
 			ShoppingHouseEquipmentItemExpenditureAmount beforeHouseEquipment = beforeData.getShoppingHouseEquipmentExpenditureItem().applyCoupon(beforeCouponResidualValue);
 			ShoppingHouseEquipmentItemExpenditureAmount afterHouseEquipment = updData.getShoppingHouseEquipmentExpenditureItem().applyCoupon(afterCouponResidualValue);
@@ -647,7 +477,7 @@ public class SimpleShoppingRegistUseCase {
 			}
 			beforeCouponResidualValue = beforeHouseEquipment.getResidualCouponAmount();
 			afterCouponResidualValue = afterHouseEquipment.getResidualCouponAmount();
-			
+
 			// 更新前・更新後の合計金額差額を収支テーブルの支出金額の値に反映
 			int comp = beforeData.getShoppingTotalAmount().getValue().compareTo(updData.getShoppingTotalAmount().getValue());
 			// 支出金額増減値
@@ -658,14 +488,14 @@ public class SimpleShoppingRegistUseCase {
 			if(comp < 0) {
 				updSyuusiData = beforeSyuusiData.addExpenditureAmount(zougenti);
 			}
-			
+
 			// 完了メッセージ
 			response.addMessage("買い物情報を更新しました。[code:" + updData.getShoppingRegistCode() + "]");
-			
+
 		} else {
 			throw new MyHouseholdAccountBookRuntimeException("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + inputForm.getAction());
 		}
-		
+
 		// 支出テーブル情報を更新
 		for(ExpenditureItem updExpenditureData : updExpenditureItemList) {
 			int updCount = expenditureRepository.update(updExpenditureData);
@@ -674,7 +504,7 @@ public class SimpleShoppingRegistUseCase {
 				throw new MyHouseholdAccountBookRuntimeException("支出テーブル：EXPENDITURE_TABLEへの更新件数が不正でした。[件数=" + updCount + "][update data:" + updExpenditureData + "]");
 			}
 		}
-		
+
 		// ホルダーから新規追加データの支出金額テーブル情報を取得し対象件数分データを追加
 		expenditureAmountItemHolder.getAddList().forEach(addData -> {
 			// 支出金額テーブルに登録
@@ -693,7 +523,7 @@ public class SimpleShoppingRegistUseCase {
 				throw new MyHouseholdAccountBookRuntimeException("支出金額テーブル:SISYUTU_KINGAKU_TABLEへの更新件数が不正でした。[件数=" + updCount + "][add data:" + updData + "]");
 			}
 		});
-		
+
 		// 収支テーブル更新ありの場合、更新データで収支テーブルを更新
 		if(updSyuusiData != null) {
 			int updCount = incomeAndExpenditureRepository.update(updSyuusiData);
@@ -709,45 +539,13 @@ public class SimpleShoppingRegistUseCase {
 				throw new MyHouseholdAccountBookRuntimeException("該当月の支出情報が一致しません。管理者に問い合わせてください。[yearMonth=" + searchYearMonth.getYearMonth() + "]");
 			}
 		}
-		
+
 		// トランザクション完了
 		response.setTransactionSuccessFull();
-		
+
 		return response;
 	}
-	
-	/**
-	 *<pre>
-	 * 買い物登録方法選択画面(メニュー選択画面)にリダイレクトするための情報を設定します。
-	 *</pre>
-	 * @param user ログインユーザ情報
-	 * @param targetYearMonth 表示対象の対象年月
-	 * @return 買い物登録方法選択画面(メニュー選択画面)リダイレクト情報
-	 *
-	 */
-	public AbstractResponse readReturnShoppingTopRedirectInfo(LoginUserInfo user, String targetYearMonth) {
-		log.debug("readReturnShoppingTopRedirectInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
-		ShoppingRegistRedirectResponse response
-			= ShoppingRegistRedirectResponse.getReturnShoppingTopRedirectInstance(targetYearMonth);
-		return response;
-	}
-	
-	/**
-	 *<pre>
-	 * 各月の収支参照画面にリダイレクトするための情報を設定します。
-	 *</pre>
-	 * @param user ログインユーザ情報
-	 * @param targetYearMonth 表示対象の対象年月
-	 * @return 各月の収支参照画面リダイレクト情報
-	 *
-	 */
-	public AbstractResponse readReturnInquiryMonthRedirectInfo(LoginUserInfo user, String targetYearMonth) {
-		log.debug("readReturnInquiryMonthRedirectInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
-		ShoppingRegistRedirectResponse response
-			= ShoppingRegistRedirectResponse.getReturnInquiryMonthRedirectInstance(targetYearMonth);
-		return response;
-	}
-	
+
 	/**
 	 *<pre>
 	 * 買い物登録(簡易タイプ)画面の表示情報を生成して返します。
@@ -758,7 +556,7 @@ public class SimpleShoppingRegistUseCase {
 	 *
 	 */
 	private SimpleShoppingRegistResponse createResponse(UserId userId, SimpleShoppingRegistInfoForm registInfoForm) {
-		
+
 		// コードテーブルから店舗区分情報を取得
 		List<CodeAndValuePair> shopKubunCodeList = codeTableItem.getCodeValues(MyHouseholdAccountBookContent.CODE_DEFINES_SHOP_KUBUN);
 		if(shopKubunCodeList == null) {
@@ -767,7 +565,7 @@ public class SimpleShoppingRegistUseCase {
 		// 店舗区分情報から店舗区分のオプションリスト情報を作成
 		List<OptionItem> shopKubunOptionItemList = shopKubunCodeList.stream().map(pair ->
 			OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toUnmodifiableList());
-		
+
 		// 選択した店舗区分に属する店舗情報を取得
 		ShopInquiryList shopSearchResult = shopRepository.findById(SearchQueryUserIdAndShopKubunCode.from(userId, ShopKubunCode.from(registInfoForm.getShopKubunCode())));
 		// 店舗情報ありの場合、店舗名選択肢のリストを作成(デフォルト支払方法をdata属性経由でJSに渡すため、5.6節)
@@ -789,14 +587,14 @@ public class SimpleShoppingRegistUseCase {
 			// 店舗情報が0件の場合、メッセージを設定
 			response.addMessage("選択した店舗区分に属する店舗情報が0件です。店舗区分を再選択してください。");
 		}
-		
+
 		// 対象月の登録されている買い物情報を取得しレスポンスに設定
 		simpleShoppingRegistListComponent.setSimpleShoppingRegistList(
 				// 検索条件:ユーザID、対象年月
 				SearchQueryUserIdAndYearMonth.from(userId, TargetYearMonth.from(registInfoForm.getTargetYearMonth())),
 				// 値を設定するレスポンス
 				response);
-		
+
 		return response;
 	}
 }

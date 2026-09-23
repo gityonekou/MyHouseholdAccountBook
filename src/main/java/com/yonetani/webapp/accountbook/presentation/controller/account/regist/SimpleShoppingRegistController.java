@@ -7,6 +7,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2024/11/03 : 1.00.00                      新規作成
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(SimpleShoppingRegistUseCaseの照会系・登録系分割に伴うDI変更)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.account.regist;
@@ -22,7 +23,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist.SimpleShoppingRegistUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist.SimpleShoppingRegistConfirmUseCase;
+import com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist.SimpleShoppingRegistInquiryUseCase;
 import com.yonetani.webapp.accountbook.presentation.request.account.regist.SimpleShoppingRegistInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserSession;
@@ -48,8 +50,10 @@ import lombok.extern.log4j.Log4j2;
 @RequiredArgsConstructor
 public class SimpleShoppingRegistController {
 	
-	// UseCase
-	private final SimpleShoppingRegistUseCase usecase;
+	// UseCase(照会系)
+	private final SimpleShoppingRegistInquiryUseCase inquiryUseCase;
+	// UseCase(登録系)
+	private final SimpleShoppingRegistConfirmUseCase confirmUseCase;
 	// ユーザーセッション
 	private final LoginUserSession loginUserSession;
 	
@@ -66,7 +70,7 @@ public class SimpleShoppingRegistController {
 	public ModelAndView getInitLoad(@RequestParam("targetYearMonth") String targetYearMonth) {
 		log.debug("getInitLoad:targetYearMonth="+ targetYearMonth);
 		// 画面表示データ読込
-		return usecase.read(loginUserSession.getLoginUserInfo(), targetYearMonth)
+		return inquiryUseCase.read(loginUserSession.getLoginUserInfo(), targetYearMonth)
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
@@ -88,7 +92,7 @@ public class SimpleShoppingRegistController {
 			@RequestParam("shoppingRegistCode") String shoppingRegistCode) {
 		log.debug("getUpdateLoad:targetYearMonth="+ targetYearMonth + ",shoppingRegistCode=" + shoppingRegistCode);
 		// 画面表示データ読込
-		return usecase.read(loginUserSession.getLoginUserInfo(), targetYearMonth, shoppingRegistCode)
+		return inquiryUseCase.read(loginUserSession.getLoginUserInfo(), targetYearMonth, shoppingRegistCode)
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
@@ -107,7 +111,7 @@ public class SimpleShoppingRegistController {
 	public ModelAndView changeShopKubun(@ModelAttribute SimpleShoppingRegistInfoForm registInfoForm) {
 		log.debug("changeShopKubun: input=" + registInfoForm);
 		// 画面表示データ読込
-		return this.usecase.readChangeShopKubun(loginUserSession.getLoginUserInfo(), registInfoForm)
+		return this.inquiryUseCase.readChangeShopKubun(loginUserSession.getLoginUserInfo(), registInfoForm)
 				// レスポンスにログインユーザ名を設定(AbstractResponseの同メソッドをオーバーライド済み)
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
@@ -134,18 +138,18 @@ public class SimpleShoppingRegistController {
 		// チェック結果エラーの場合
 		if(bindingResult.hasErrors()) {
 			// 初期表示情報を取得し、入力チェックエラーを設定
-			return this.usecase.readBindingError(loginUserSession.getLoginUserInfo(), registInfoForm)
+			return this.inquiryUseCase.readBindingError(loginUserSession.getLoginUserInfo(), registInfoForm)
 					// バリデーションチェック結果でデフォルト表示されないメッセージをメッセージ表示エリアに追加
 					.addBindingErrorMessage(bindingResult)
 					// レスポンスにログインユーザ名を設定(AbstractResponseの同メソッドをオーバーライド済み)
 					.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 					// レスポンスからModelAndViewを生成
 					.build();
-			
+
 		// チェック結果OKの場合
 		} else {
 			// actionに従い、処理を実行
-			return this.usecase.execAction(loginUserSession.getLoginUserInfo(), registInfoForm).buildRedirect(redirectAttributes);
+			return this.confirmUseCase.execAction(loginUserSession.getLoginUserInfo(), registInfoForm).buildRedirect(redirectAttributes);
 		}
 	}
 	
@@ -164,7 +168,7 @@ public class SimpleShoppingRegistController {
 			@ModelAttribute CompleteRedirectMessages redirectMessages) {
 		log.debug("updateComplete: targetYearMonth=" + targetYearMonth + ",message=" + redirectMessages);
 		// 画面表示情報を取得
-		return usecase.read(loginUserSession.getLoginUserInfo(), targetYearMonth)
+		return inquiryUseCase.read(loginUserSession.getLoginUserInfo(), targetYearMonth)
 				// レスポンスにログインユーザ名を設定
 				.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 				// レスポンスからModelAndViewを生成
@@ -184,9 +188,9 @@ public class SimpleShoppingRegistController {
 	public ModelAndView getReturnShoppingTopRedirectLoad(
 			@RequestParam("targetYearMonth") String targetYearMonth, RedirectAttributes redirectAttributes) {
 		log.debug("getReturnShoppingTopRedirectLoad:targetYearMonth=" + targetYearMonth);
-		
+
 		// 画面表示情報を取得
-		return this.usecase.readReturnShoppingTopRedirectInfo(loginUserSession.getLoginUserInfo(), targetYearMonth)
+		return this.inquiryUseCase.readReturnShoppingTopRedirectInfo(loginUserSession.getLoginUserInfo(), targetYearMonth)
 			// レスポンスにログインユーザ名を設定
 			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 			// 買い物登録画面へリダイレクト
@@ -206,9 +210,9 @@ public class SimpleShoppingRegistController {
 	public ModelAndView getReturnInquiryMonthRedirectLoad(
 			@RequestParam("targetYearMonth") String targetYearMonth, RedirectAttributes redirectAttributes) {
 		log.debug("getReturnInquiryMonthRedirectLoad:targetYearMonth=" + targetYearMonth);
-		
+
 		// 画面表示情報を取得
-		return this.usecase.readReturnInquiryMonthRedirectInfo(loginUserSession.getLoginUserInfo(), targetYearMonth)
+		return this.inquiryUseCase.readReturnInquiryMonthRedirectInfo(loginUserSession.getLoginUserInfo(), targetYearMonth)
 			// レスポンスにログインユーザ名を設定
 			.setLoginUserName(loginUserSession.getLoginUserInfo().getUserName())
 			// 買い物登録画面へリダイレクト
