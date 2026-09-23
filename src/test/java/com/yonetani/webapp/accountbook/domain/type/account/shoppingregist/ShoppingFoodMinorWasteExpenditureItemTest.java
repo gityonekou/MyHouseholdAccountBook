@@ -1,10 +1,10 @@
 /**
- * ShoppingFoodExpenditureItem(食料品(必須))のテストクラスです。
+ * ShoppingFoodMinorWasteExpenditureItem(食料品B(無駄遣い))のテストクラスです。
  *
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
- * 2026/09/20 : 1.00.00  feature-1.03-dev1   新規作成
+ * 2026/09/23 : 1.00.00  feature-1.03-dev1   新規作成
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.shoppingregist;
@@ -17,13 +17,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenditureItem.ShoppingFoodItemExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodMinorWasteExpenditureItem.ShoppingFoodMinorWasteItemExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.CouponAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 
 /**
  *<pre>
- * ShoppingFoodExpenditureItem(食料品(必須))のテストクラスです。
+ * ShoppingFoodMinorWasteExpenditureItem(食料品B(無駄遣い))のテストクラスです。
  *
  *</pre>
  *
@@ -31,9 +31,9 @@ import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
  * @since 家計簿アプリ(1.03)
  *
  */
-@DisplayName("食料品(必須)(ShoppingFoodExpenditureItem)のテスト")
-class ShoppingFoodExpenditureItemTest {
-	
+@DisplayName("食料品B(無駄遣い)(ShoppingFoodMinorWasteExpenditureItem)のテスト")
+class ShoppingFoodMinorWasteExpenditureItemTest {
+
 	@Test
 	@DisplayName("正常系：from(ShoppingExpenditureAmount, ShoppingTaxExpenses)メソッドで正常に生成")
 	void testFrom_Success() {
@@ -42,13 +42,13 @@ class ShoppingFoodExpenditureItemTest {
 		ShoppingTaxExpenses taxExpenses = ShoppingTaxExpenses.from(new BigDecimal("7000.00"));
 
 		// 実行
-		ShoppingFoodExpenditureItem result = ShoppingFoodExpenditureItem.from(expenditureAmount, taxExpenses);
+		ShoppingFoodMinorWasteExpenditureItem result = ShoppingFoodMinorWasteExpenditureItem.from(expenditureAmount, taxExpenses);
 
 		// 検証
 		assertNotNull(result);
 		assertEquals(new BigDecimal("10000.00"), result.getValue()); // 購入金額 + 消費税
-		assertEquals(expenditureAmount, result.getShoppingFoodExpenditureAmount());
-		assertEquals(taxExpenses, result.getShoppingFoodTaxExpenses());
+		assertEquals(expenditureAmount, result.getShoppingFoodMinorWasteExpenses());
+		assertEquals(taxExpenses, result.getShoppingFoodMinorWasteTaxExpenses());
 		assertEquals("10000.00", result.toString());
 		assertEquals("10,000円", result.toFormatString());
 	}
@@ -57,14 +57,14 @@ class ShoppingFoodExpenditureItemTest {
 	@DisplayName("正常系：NULL定数が使用できる")
 	void testNULL() {
 		// 準備
-		ShoppingFoodExpenditureItem nullValue = ShoppingFoodExpenditureItem.from(ShoppingExpenditureAmount.NULL, ShoppingTaxExpenses.NULL);
-		
+		ShoppingFoodMinorWasteExpenditureItem nullValue = ShoppingFoodMinorWasteExpenditureItem.from(ShoppingExpenditureAmount.NULL, ShoppingTaxExpenses.NULL);
+
 		// 検証
-		assertNotNull(ShoppingFoodExpenditureItem.NULL);
-		assertNull(ShoppingFoodExpenditureItem.NULL.getValue());
-		assertEquals(ShoppingFoodExpenditureItem.NULL, nullValue);
+		assertNotNull(ShoppingFoodMinorWasteExpenditureItem.NULL);
+		assertNull(ShoppingFoodMinorWasteExpenditureItem.NULL.getValue());
+		assertEquals(ShoppingFoodMinorWasteExpenditureItem.NULL, nullValue);
 	}
-	
+
 	@Test
 	@DisplayName("異常系：expenditureAmount値がnullで例外発生")
 	void testFrom_MinorNull() {
@@ -74,10 +74,10 @@ class ShoppingFoodExpenditureItemTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> ShoppingFoodExpenditureItem.from(null, taxExpenses));
+			() -> ShoppingFoodMinorWasteExpenditureItem.from(null, taxExpenses));
 
 		// エラーメッセージ検証
-		assertTrue(exception.getMessage().contains("食料品(必須)購入金額"));
+		assertTrue(exception.getMessage().contains("食料品B(無駄遣い)購入金額"));
 		assertTrue(exception.getMessage().contains("null"));
 	}
 
@@ -90,13 +90,13 @@ class ShoppingFoodExpenditureItemTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> ShoppingFoodExpenditureItem.from(expenditureAmount, null));
+			() -> ShoppingFoodMinorWasteExpenditureItem.from(expenditureAmount, null));
 
 		// エラーメッセージ検証
-		assertTrue(exception.getMessage().contains("食料品(必須)消費税"));
+		assertTrue(exception.getMessage().contains("食料品B(無駄遣い)消費税"));
 		assertTrue(exception.getMessage().contains("null"));
 	}
-	
+
 	@Test
 	@DisplayName("異常系：購入金額がnull値、消費税が値ありで例外発生")
 	void testFrom_ExpenditureNullValue_TaxHasValue() {
@@ -108,13 +108,13 @@ class ShoppingFoodExpenditureItemTest {
 		// 実行 & 検証
 		MyHouseholdAccountBookRuntimeException exception = assertThrows(
 			MyHouseholdAccountBookRuntimeException.class,
-			() -> ShoppingFoodExpenditureItem.from(expenditureAmount, taxExpenses));
+			() -> ShoppingFoodMinorWasteExpenditureItem.from(expenditureAmount, taxExpenses));
 
 		// エラーメッセージ検証
-		assertTrue(exception.getMessage().contains("「食料品(必須)」項目"));
+		assertTrue(exception.getMessage().contains("「食料品B(無駄遣い)」項目"));
 		assertTrue(exception.getMessage().contains("設定値が不正"));
 	}
-	
+
 	@Test
 	@DisplayName("正常系：購入金額が値あり、消費税がnull値で生成")
 	void testFrom_MinorHasValue_SevereNullValue() {
@@ -123,13 +123,13 @@ class ShoppingFoodExpenditureItemTest {
 		ShoppingTaxExpenses taxExpenses = ShoppingTaxExpenses.NULL;
 
 		// 実行
-		ShoppingFoodExpenditureItem result = ShoppingFoodExpenditureItem.from(expenditureAmount, taxExpenses);
+		ShoppingFoodMinorWasteExpenditureItem result = ShoppingFoodMinorWasteExpenditureItem.from(expenditureAmount, taxExpenses);
 
 		// 検証
 		assertNotNull(result);
 		assertEquals(new BigDecimal("10000.00"), result.getValue()); // 購入金額の値
-		assertEquals(expenditureAmount, result.getShoppingFoodExpenditureAmount());
-		assertEquals(taxExpenses, result.getShoppingFoodTaxExpenses());
+		assertEquals(expenditureAmount, result.getShoppingFoodMinorWasteExpenses());
+		assertEquals(taxExpenses, result.getShoppingFoodMinorWasteTaxExpenses());
 	}
 
 	@Test
@@ -140,51 +140,51 @@ class ShoppingFoodExpenditureItemTest {
 		ShoppingTaxExpenses taxExpenses = ShoppingTaxExpenses.NULL;
 
 		// 実行
-		ShoppingFoodExpenditureItem result = ShoppingFoodExpenditureItem.from(expenditureAmount, taxExpenses);
+		ShoppingFoodMinorWasteExpenditureItem result = ShoppingFoodMinorWasteExpenditureItem.from(expenditureAmount, taxExpenses);
 
 		// 検証
 		assertNotNull(result);
 		assertNull(result.getValue());
-		assertEquals(expenditureAmount, result.getShoppingFoodExpenditureAmount());
-		assertEquals(taxExpenses, result.getShoppingFoodTaxExpenses());
+		assertEquals(expenditureAmount, result.getShoppingFoodMinorWasteExpenses());
+		assertEquals(taxExpenses, result.getShoppingFoodMinorWasteTaxExpenses());
 		assertEquals("", result.toString());
 		assertEquals("", result.toFormatString());
 	}
-	
+
 	@Test
-	@DisplayName("正常系：add(ShoppingFoodExpenditureItem)メソッドで加算")
+	@DisplayName("正常系：add(ShoppingFoodMinorWasteExpenditureItem)メソッドで加算")
 	void testAdd_Success() {
 		// 準備
-		ShoppingFoodExpenditureItem base = ShoppingFoodExpenditureItem.from(
+		ShoppingFoodMinorWasteExpenditureItem base = ShoppingFoodMinorWasteExpenditureItem.from(
 			ShoppingExpenditureAmount.from(new BigDecimal("2000.00")),
 			ShoppingTaxExpenses.from(new BigDecimal("3000.00"))
 		);
-		ShoppingFoodExpenditureItem addValue = ShoppingFoodExpenditureItem.from(
+		ShoppingFoodMinorWasteExpenditureItem addValue = ShoppingFoodMinorWasteExpenditureItem.from(
 			ShoppingExpenditureAmount.from(new BigDecimal("1000.00")),
 			ShoppingTaxExpenses.from(new BigDecimal("2000.00"))
 		);
 
 		// 実行
-		ShoppingFoodExpenditureItem result = base.add(addValue);
+		ShoppingFoodMinorWasteExpenditureItem result = base.add(addValue);
 
 		// 検証
 		assertNotNull(result);
 		assertEquals(0, new BigDecimal("8000.00").compareTo(result.getValue()));
-		assertEquals(0, new BigDecimal("3000.00").compareTo(result.getShoppingFoodExpenditureAmount().getValue()));
-		assertEquals(0, new BigDecimal("5000.00").compareTo(result.getShoppingFoodTaxExpenses().getValue()));
+		assertEquals(0, new BigDecimal("3000.00").compareTo(result.getShoppingFoodMinorWasteExpenses().getValue()));
+		assertEquals(0, new BigDecimal("5000.00").compareTo(result.getShoppingFoodMinorWasteTaxExpenses().getValue()));
 	}
 
 	@Test
-	@DisplayName("正常系：add(ShoppingFoodExpenditureItem)でnullオブジェクトを加算")
+	@DisplayName("正常系：add(ShoppingFoodMinorWasteExpenditureItem)でnullオブジェクトを加算")
 	void testAdd_NullObject() {
 		// 準備
-		ShoppingFoodExpenditureItem base = ShoppingFoodExpenditureItem.from(
+		ShoppingFoodMinorWasteExpenditureItem base = ShoppingFoodMinorWasteExpenditureItem.from(
 			ShoppingExpenditureAmount.from(new BigDecimal("5000.00")),
 			ShoppingTaxExpenses.from(new BigDecimal("3000.00"))
 		);
 
 		// 実行
-		ShoppingFoodExpenditureItem result = base.add(null);
+		ShoppingFoodMinorWasteExpenditureItem result = base.add(null);
 
 		// 検証（nullの場合は元の値がそのまま返される）
 		assertNotNull(result);
@@ -196,49 +196,49 @@ class ShoppingFoodExpenditureItemTest {
 	@DisplayName("正常系：add()でnull値との加算")
 	void testAdd_WithNullValue() {
 		// 準備
-		ShoppingFoodExpenditureItem base = ShoppingFoodExpenditureItem.from(
+		ShoppingFoodMinorWasteExpenditureItem base = ShoppingFoodMinorWasteExpenditureItem.from(
 			ShoppingExpenditureAmount.from(new BigDecimal("10000.00")),
 			ShoppingTaxExpenses.from(new BigDecimal("5000.00"))
 		);
-		ShoppingFoodExpenditureItem nullBase = ShoppingFoodExpenditureItem.from(
+		ShoppingFoodMinorWasteExpenditureItem nullBase = ShoppingFoodMinorWasteExpenditureItem.from(
 			ShoppingExpenditureAmount.NULL,
 			ShoppingTaxExpenses.NULL
 		);
-		ShoppingFoodExpenditureItem addValue = ShoppingFoodExpenditureItem.from(
+		ShoppingFoodMinorWasteExpenditureItem addValue = ShoppingFoodMinorWasteExpenditureItem.from(
 			ShoppingExpenditureAmount.from(new BigDecimal("10000.00")),
 			ShoppingTaxExpenses.from(new BigDecimal("5000.00"))
 		);
-		ShoppingFoodExpenditureItem addNullValue = ShoppingFoodExpenditureItem.from(
+		ShoppingFoodMinorWasteExpenditureItem addNullValue = ShoppingFoodMinorWasteExpenditureItem.from(
 			ShoppingExpenditureAmount.NULL,
 			ShoppingTaxExpenses.NULL
 		);
-		
+
 		// 実行
-		ShoppingFoodExpenditureItem result1 = base.add(addNullValue);
-		ShoppingFoodExpenditureItem result2 = nullBase.add(addValue);
-		ShoppingFoodExpenditureItem result3 = nullBase.add(addNullValue);
-		
+		ShoppingFoodMinorWasteExpenditureItem result1 = base.add(addNullValue);
+		ShoppingFoodMinorWasteExpenditureItem result2 = nullBase.add(addValue);
+		ShoppingFoodMinorWasteExpenditureItem result3 = nullBase.add(addNullValue);
+
 		// 検証（null値は0として扱われる）
 		assertEquals(new BigDecimal("15000.00"), result1.getValue());
 		assertEquals(new BigDecimal("15000.00"), result2.getValue());
 		assertTrue(result3.isNull());
-		assertTrue(result3.getShoppingFoodExpenditureAmount().isNull());
-		assertTrue(result3.getShoppingFoodTaxExpenses().isNull());
+		assertTrue(result3.getShoppingFoodMinorWasteExpenses().isNull());
+		assertTrue(result3.getShoppingFoodMinorWasteTaxExpenses().isNull());
 	}
-	
+
 	@Test
 	@DisplayName("正常系：equalsメソッドのテスト")
 	void testEquals() {
 		// 準備
-		ShoppingFoodExpenditureItem value1 = ShoppingFoodExpenditureItem.from(
+		ShoppingFoodMinorWasteExpenditureItem value1 = ShoppingFoodMinorWasteExpenditureItem.from(
 			ShoppingExpenditureAmount.from(new BigDecimal("5000.00")),
 			ShoppingTaxExpenses.from(new BigDecimal("5000.00"))
 		);
-		ShoppingFoodExpenditureItem value2 = ShoppingFoodExpenditureItem.from(
+		ShoppingFoodMinorWasteExpenditureItem value2 = ShoppingFoodMinorWasteExpenditureItem.from(
 			ShoppingExpenditureAmount.from(new BigDecimal("5000.00")),
 			ShoppingTaxExpenses.from(new BigDecimal("5000.00"))
 		);
-		ShoppingFoodExpenditureItem value3 = ShoppingFoodExpenditureItem.from(
+		ShoppingFoodMinorWasteExpenditureItem value3 = ShoppingFoodMinorWasteExpenditureItem.from(
 			ShoppingExpenditureAmount.from(new BigDecimal("3000.00")),
 			ShoppingTaxExpenses.from(new BigDecimal("7000.00"))
 		);
@@ -252,7 +252,7 @@ class ShoppingFoodExpenditureItemTest {
 	@DisplayName("異常系：applyCoupon(CouponAmount)でクーポンがnullで例外発生")
 	void testApplyCoupon_CouponNull() {
 		// 準備
-		ShoppingFoodExpenditureItem base = ShoppingFoodExpenditureItem.from(
+		ShoppingFoodMinorWasteExpenditureItem base = ShoppingFoodMinorWasteExpenditureItem.from(
 			ShoppingExpenditureAmount.from(new BigDecimal("8000.00")),
 			ShoppingTaxExpenses.from(new BigDecimal("2000.00"))
 		);
@@ -268,17 +268,17 @@ class ShoppingFoodExpenditureItemTest {
 	}
 
 	@Test
-	@DisplayName("正常系：applyCoupon(CouponAmount)で食料品(必須)金額が0円の場合は支出金額0円・クーポンはそのまま残る")
+	@DisplayName("正常系：applyCoupon(CouponAmount)で食料品B(無駄遣い)金額が0円の場合は支出金額0円・クーポンはそのまま残る")
 	void testApplyCoupon_ItemZero() {
 		// 準備
-		ShoppingFoodExpenditureItem base = ShoppingFoodExpenditureItem.from(
+		ShoppingFoodMinorWasteExpenditureItem base = ShoppingFoodMinorWasteExpenditureItem.from(
 			ShoppingExpenditureAmount.NULL,
 			ShoppingTaxExpenses.NULL
 		);
 		CouponAmount coupon = CouponAmount.from(new BigDecimal("500.00"));
 
 		// 実行
-		ShoppingFoodItemExpenditureAmount result = base.applyCoupon(coupon);
+		ShoppingFoodMinorWasteItemExpenditureAmount result = base.applyCoupon(coupon);
 
 		// 検証
 		assertEquals(ExpenditureAmount.ZERO, result.getExpenditureAmount());
@@ -287,16 +287,16 @@ class ShoppingFoodExpenditureItemTest {
 	}
 
 	@Test
-	@DisplayName("正常系：applyCoupon(CouponAmount)でクーポンが0円の場合は割引なしで食料品(必須)金額がそのまま支出金額となる")
+	@DisplayName("正常系：applyCoupon(CouponAmount)でクーポンが0円の場合は割引なしで食料品B(無駄遣い)金額がそのまま支出金額となる")
 	void testApplyCoupon_CouponZero() {
 		// 準備
-		ShoppingFoodExpenditureItem base = ShoppingFoodExpenditureItem.from(
+		ShoppingFoodMinorWasteExpenditureItem base = ShoppingFoodMinorWasteExpenditureItem.from(
 			ShoppingExpenditureAmount.from(new BigDecimal("8000.00")),
 			ShoppingTaxExpenses.from(new BigDecimal("2000.00"))
 		);
 
 		// 実行
-		ShoppingFoodItemExpenditureAmount result = base.applyCoupon(CouponAmount.ZERO);
+		ShoppingFoodMinorWasteItemExpenditureAmount result = base.applyCoupon(CouponAmount.ZERO);
 
 		// 検証
 		assertEquals(ExpenditureAmount.from(new BigDecimal("10000.00")), result.getExpenditureAmount());
@@ -305,17 +305,17 @@ class ShoppingFoodExpenditureItemTest {
 	}
 
 	@Test
-	@DisplayName("正常系：applyCoupon(CouponAmount)でクーポン金額が食料品(必須)金額を上回る場合は支出金額0円・差額が残クーポン額となる")
+	@DisplayName("正常系：applyCoupon(CouponAmount)でクーポン金額が食料品B(無駄遣い)金額を上回る場合は支出金額0円・差額が残クーポン額となる")
 	void testApplyCoupon_CouponGreaterThanItem() {
 		// 準備
-		ShoppingFoodExpenditureItem base = ShoppingFoodExpenditureItem.from(
+		ShoppingFoodMinorWasteExpenditureItem base = ShoppingFoodMinorWasteExpenditureItem.from(
 			ShoppingExpenditureAmount.from(new BigDecimal("4000.00")),
 			ShoppingTaxExpenses.from(new BigDecimal("1000.00"))
 		);
 		CouponAmount coupon = CouponAmount.from(new BigDecimal("8000.00"));
 
 		// 実行
-		ShoppingFoodItemExpenditureAmount result = base.applyCoupon(coupon);
+		ShoppingFoodMinorWasteItemExpenditureAmount result = base.applyCoupon(coupon);
 
 		// 検証
 		assertEquals(ExpenditureAmount.ZERO, result.getExpenditureAmount());
@@ -324,17 +324,17 @@ class ShoppingFoodExpenditureItemTest {
 	}
 
 	@Test
-	@DisplayName("正常系：applyCoupon(CouponAmount)でクーポン金額が食料品(必須)金額とちょうど同額の場合は支出金額0円・残クーポン額もなし")
+	@DisplayName("正常系：applyCoupon(CouponAmount)でクーポン金額が食料品B(無駄遣い)金額とちょうど同額の場合は支出金額0円・残クーポン額もなし")
 	void testApplyCoupon_CouponEqualsItem() {
 		// 準備
-		ShoppingFoodExpenditureItem base = ShoppingFoodExpenditureItem.from(
+		ShoppingFoodMinorWasteExpenditureItem base = ShoppingFoodMinorWasteExpenditureItem.from(
 			ShoppingExpenditureAmount.from(new BigDecimal("4000.00")),
 			ShoppingTaxExpenses.from(new BigDecimal("1000.00"))
 		);
 		CouponAmount coupon = CouponAmount.from(new BigDecimal("5000.00"));
 
 		// 実行
-		ShoppingFoodItemExpenditureAmount result = base.applyCoupon(coupon);
+		ShoppingFoodMinorWasteItemExpenditureAmount result = base.applyCoupon(coupon);
 
 		// 検証
 		assertEquals(ExpenditureAmount.ZERO, result.getExpenditureAmount());
@@ -343,17 +343,17 @@ class ShoppingFoodExpenditureItemTest {
 	}
 
 	@Test
-	@DisplayName("正常系：applyCoupon(CouponAmount)でクーポン金額が食料品(必須)金額を下回る場合は割引後の金額が支出金額となり残クーポン額はなし")
+	@DisplayName("正常系：applyCoupon(CouponAmount)でクーポン金額が食料品B(無駄遣い)金額を下回る場合は割引後の金額が支出金額となり残クーポン額はなし")
 	void testApplyCoupon_CouponLessThanItem() {
 		// 準備
-		ShoppingFoodExpenditureItem base = ShoppingFoodExpenditureItem.from(
+		ShoppingFoodMinorWasteExpenditureItem base = ShoppingFoodMinorWasteExpenditureItem.from(
 			ShoppingExpenditureAmount.from(new BigDecimal("8000.00")),
 			ShoppingTaxExpenses.from(new BigDecimal("2000.00"))
 		);
 		CouponAmount coupon = CouponAmount.from(new BigDecimal("3000.00"));
 
 		// 実行
-		ShoppingFoodItemExpenditureAmount result = base.applyCoupon(coupon);
+		ShoppingFoodMinorWasteItemExpenditureAmount result = base.applyCoupon(coupon);
 
 		// 検証
 		assertEquals(ExpenditureAmount.from(new BigDecimal("7000.00")), result.getExpenditureAmount());

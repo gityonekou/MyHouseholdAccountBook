@@ -6,7 +6,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2024/11/23 : 1.00.00                      新規作成
  * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
- * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応、買い物登録ドメインタイプリファクタリング対応
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.account.shoppingregist;
@@ -129,33 +129,33 @@ public class ShoppingRegistReadWriteDto {
 				// 消費税:食料品(必須)金額
 				domain.getShoppingFoodExpenditureItem().getShoppingFoodTaxExpenses().getValue(),
 				// 食料品B(無駄遣い)金額
-				domain.getShoppingFoodBExpenses().getValue(),
+				domain.getShoppingFoodMinorWasteExpenditureItem().getShoppingFoodMinorWasteExpenses().getValue(),
 				// 消費税:食料品B(無駄遣い)金額
-				domain.getShoppingFoodBTaxExpenses().getValue(),
+				domain.getShoppingFoodMinorWasteExpenditureItem().getShoppingFoodMinorWasteTaxExpenses().getValue(),
 				// 食料品C(お酒類)金額
-				domain.getShoppingFoodCExpenses().getValue(),
+				domain.getShoppingFoodSevereWasteExpenditureItem().getShoppingFoodSevereWasteExpenses().getValue(),
 				// 消費税:食料品C(お酒類)金額
-				domain.getShoppingFoodCTaxExpenses().getValue(),
+				domain.getShoppingFoodSevereWasteExpenditureItem().getShoppingFoodSevereWasteTaxExpenses().getValue(),
 				// 外食金額
-				domain.getShoppingDineOutExpenses().getValue(),
+				domain.getShoppingDineOutExpenditureItem().getShoppingDineOutExpenditureAmount().getValue(),
 				// 消費税:外食金額
-				domain.getShoppingDineOutTaxExpenses().getValue(),
+				domain.getShoppingDineOutExpenditureItem().getShoppingDineOutTaxExpenses().getValue(),
 				// 日用品金額
-				domain.getShoppingConsumerGoodsExpenses().getValue(),
+				domain.getShoppingConsumerGoodsExpenditureItem().getShoppingConsumerGoodsExpenditureAmount().getValue(),
 				// 消費税:日用品金額
-				domain.getShoppingConsumerGoodsTaxExpenses().getValue(),
+				domain.getShoppingConsumerGoodsExpenditureItem().getShoppingConsumerGoodsTaxExpenses().getValue(),
 				// 衣料品(私服)金額
-				domain.getShoppingClothesExpenses().getValue(),
+				domain.getShoppingClothesExpenditureItem().getShoppingClothesExpenditureAmount().getValue(),
 				// 消費税:衣料品(私服)金額
-				domain.getShoppingClothesTaxExpenses().getValue(),
+				domain.getShoppingClothesExpenditureItem().getShoppingClothesTaxExpenses().getValue(),
 				// 仕事金額
-				domain.getShoppingWorkExpenses().getValue(),
+				domain.getShoppingWorkExpenditureItem().getShoppingWorkExpenditureAmount().getValue(),
 				// 消費税:仕事金額
-				domain.getShoppingWorkTaxExpenses().getValue(),
+				domain.getShoppingWorkExpenditureItem().getShoppingWorkTaxExpenses().getValue(),
 				// 住居設備金額
-				domain.getShoppingHouseEquipmentExpenses().getValue(),
+				domain.getShoppingHouseEquipmentExpenditureItem().getShoppingHouseEquipmentExpenditureAmount().getValue(),
 				// 消費税:住居設備金額
-				domain.getShoppingHouseEquipmentTaxExpenses().getValue(),
+				domain.getShoppingHouseEquipmentExpenditureItem().getShoppingHouseEquipmentTaxExpenses().getValue(),
 				// クーポン金額
 				domain.getShoppingCouponPrice().getValue(),
 				// 購入金額合計

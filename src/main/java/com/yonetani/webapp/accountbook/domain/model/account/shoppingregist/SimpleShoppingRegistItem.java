@@ -12,18 +12,18 @@ package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
 
 import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDate;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodBItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodMinorWasteExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodSevereWasteExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenditureItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingRegistCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 
 import lombok.AccessLevel;
@@ -60,19 +60,19 @@ public class SimpleShoppingRegistItem {
 	// 一覧項目:食料品(必須)
 	private final ShoppingFoodExpenditureItem shoppingFoodExpenditureItem;
 	// 一覧項目:食料品B(無駄遣い)
-	private final ShoppingFoodBItem shoppingFoodBItem;
+	private final ShoppingFoodMinorWasteExpenditureItem shoppingFoodMinorWasteExpenditureItem;
 	// 一覧項目:食料品C(お酒類)
-	private final ShoppingFoodCItem shoppingFoodCItem;
+	private final ShoppingFoodSevereWasteExpenditureItem shoppingFoodSevereWasteExpenditureItem;
 	// 一覧項目:外食
-	private final ShoppingDineOutItem shoppingDineOutItem;
+	private final ShoppingDineOutExpenditureItem shoppingDineOutExpenditureItem;
 	// 一覧項目:日用品
-	private final ShoppingConsumerGoodsItem shoppingConsumerGoodsItem;
+	private final ShoppingConsumerGoodsExpenditureItem shoppingConsumerGoodsExpenditureItem;
 	// 一覧項目:衣料品(私服)
-	private final ShoppingClothesItem shoppingClothesItem;
+	private final ShoppingClothesExpenditureItem shoppingClothesExpenditureItem;
 	// 一覧項目:仕事
-	private final ShoppingWorkItem shoppingWorkItem;
+	private final ShoppingWorkExpenditureItem shoppingWorkExpenditureItem;
 	// 一覧項目:住居設備
-	private final ShoppingHouseEquipmentItem shoppingHouseEquipmentItem;
+	private final ShoppingHouseEquipmentExpenditureItem shoppingHouseEquipmentExpenditureItem;
 	// クーポン金額
 	private final ShoppingCouponPrice shoppingCouponPrice;
 	// 買い物合計金額
@@ -88,13 +88,13 @@ public class SimpleShoppingRegistItem {
 	 * @param paymentMethodCode 支払方法コード
 	 * @param shoppingDate 買い物日
 	 * @param shoppingFoodExpenditureItem 食料品(必須)
-	 * @param shoppingFoodBItem 食料品B(無駄遣い)
-	 * @param shoppingFoodCItem 食料品C(お酒類)
-	 * @param shoppingDineOutItem 外食
-	 * @param shoppingConsumerGoodsItem 日用品
-	 * @param shoppingClothesItem 衣料品(私服)
-	 * @param shoppingWorkItem 仕事
-	 * @param shoppingHouseEquipmentItem 住居設備
+	 * @param shoppingFoodMinorWasteExpenditureItem 食料品B(無駄遣い)
+	 * @param shoppingFoodSevereWasteExpenditureItem 食料品C(お酒類)
+	 * @param shoppingDineOutExpenditureItem 外食
+	 * @param shoppingConsumerGoodsExpenditureItem 日用品
+	 * @param shoppingClothesExpenditureItem 衣料品(私服)
+	 * @param shoppingWorkExpenditureItem 仕事
+	 * @param shoppingHouseEquipmentExpenditureItem 住居設備
 	 * @param shoppingCouponPrice クーポン金額
 	 * @param shoppingTotalAmount 買い物合計金額
 	 * @return 買い物登録一覧情報(簡易タイプ)を表すドメインモデル
@@ -107,13 +107,13 @@ public class SimpleShoppingRegistItem {
 			PaymentMethodCode paymentMethodCode,
 			ShoppingDate shoppingDate,
 			ShoppingFoodExpenditureItem shoppingFoodExpenditureItem,
-			ShoppingFoodBItem shoppingFoodBItem,
-			ShoppingFoodCItem shoppingFoodCItem,
-			ShoppingDineOutItem shoppingDineOutItem,
-			ShoppingConsumerGoodsItem shoppingConsumerGoodsItem,
-			ShoppingClothesItem shoppingClothesItem,
-			ShoppingWorkItem shoppingWorkItem,
-			ShoppingHouseEquipmentItem shoppingHouseEquipmentItem,
+			ShoppingFoodMinorWasteExpenditureItem shoppingFoodMinorWasteExpenditureItem,
+			ShoppingFoodSevereWasteExpenditureItem shoppingFoodSevereWasteExpenditureItem,
+			ShoppingDineOutExpenditureItem shoppingDineOutExpenditureItem,
+			ShoppingConsumerGoodsExpenditureItem shoppingConsumerGoodsExpenditureItem,
+			ShoppingClothesExpenditureItem shoppingClothesExpenditureItem,
+			ShoppingWorkExpenditureItem shoppingWorkExpenditureItem,
+			ShoppingHouseEquipmentExpenditureItem shoppingHouseEquipmentExpenditureItem,
 			ShoppingCouponPrice shoppingCouponPrice,
 			ShoppingTotalAmount shoppingTotalAmount) {
 
@@ -124,13 +124,13 @@ public class SimpleShoppingRegistItem {
 				paymentMethodCode,
 				shoppingDate,
 				shoppingFoodExpenditureItem,
-				shoppingFoodBItem,
-				shoppingFoodCItem,
-				shoppingDineOutItem,
-				shoppingConsumerGoodsItem,
-				shoppingClothesItem,
-				shoppingWorkItem,
-				shoppingHouseEquipmentItem,
+				shoppingFoodMinorWasteExpenditureItem,
+				shoppingFoodSevereWasteExpenditureItem,
+				shoppingDineOutExpenditureItem,
+				shoppingConsumerGoodsExpenditureItem,
+				shoppingClothesExpenditureItem,
+				shoppingWorkExpenditureItem,
+				shoppingHouseEquipmentExpenditureItem,
 				shoppingCouponPrice,
 				shoppingTotalAmount);
 	}

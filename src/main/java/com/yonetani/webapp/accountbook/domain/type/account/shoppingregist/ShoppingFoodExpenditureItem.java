@@ -1,6 +1,6 @@
 /**
  * 「食料品(必須)」項目の値を表すドメインタイプです。
- * 食料品(必須)購入金額「商品購入金額の値」、食料品(必須)消費税の値の合計値となります。
+ * 食料品(必須)購入金額、食料品(必須)消費税の値の合計値となります。
  * 
  * 注意：買い物した品物単品ではなく、カテゴリごとの総額なので、購入金額ではなく、(ExpenditureAmount:支出金額)がより正しいドメイン名となります。
  *
@@ -28,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 /**
  *<pre>
  * 「食料品(必須)」項目の値を表すドメインタイプです。
- * 食料品(必須)購入金額「商品購入金額の値」、食料品(必須)消費税の値の合計値となります。
+ * 食料品(必須)購入金額、食料品(必須)消費税の値の合計値となります。
  *
  *</pre>
  *
@@ -39,12 +39,13 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @EqualsAndHashCode(callSuper = true)
 public class ShoppingFoodExpenditureItem extends NullableMoney {
+	
 	/** 値がnullの「食料品(必須)」項目の値 */
 	public static final ShoppingFoodExpenditureItem NULL = ShoppingFoodExpenditureItem.from(ShoppingExpenditureAmount.NULL, ShoppingTaxExpenses.NULL);
 	
-	// 食料品(必須)金額
+	// 食料品(必須)購入金額
 	private final ShoppingExpenditureAmount shoppingFoodExpenditureAmount;
-	// 消費税:食料品(必須)金額
+	// 食料品(必須)消費税
 	private final ShoppingTaxExpenses shoppingFoodTaxExpenses;
 	
 	/**
@@ -54,7 +55,7 @@ public class ShoppingFoodExpenditureItem extends NullableMoney {
 	 *</pre>
 	 *
 	 * @author ：Kouki Yonetani
-	 * @since 家計簿アプリ(9.99)
+	 * @since 家計簿アプリ(1.03)
 	 *
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -85,8 +86,8 @@ public class ShoppingFoodExpenditureItem extends NullableMoney {
 	 * ShoppingFoodItemクラスコンストラクターです。
 	 *</pre>
 	 * @param value 食料品(必須)項目の金額値(購入金額と消費税の合算値)
-	 * @param expenditureAmount 食料品(必須)項目の購入金額(支出金額)の値
-	 * @param taxExpenses 食料品(必須)項目の消費税の値
+	 * @param expenditureAmount 食料品(必須)購入金額
+	 * @param taxExpenses 食料品(必須)消費税
 	 *
 	 */
 	private ShoppingFoodExpenditureItem(BigDecimal value, ShoppingExpenditureAmount expenditureAmount, ShoppingTaxExpenses taxExpenses) {
@@ -98,35 +99,35 @@ public class ShoppingFoodExpenditureItem extends NullableMoney {
 	/**
 	 *<pre>
 	 * 「食料品(必須)」項目の値を表すドメインタイプを生成します。
-	 * 「食料品(必須)金額」項目と「消費税:食料品(必須)金額」項目の加算値となります。
+	 * 食料品(必須)購入金額、食料品(必須)消費税の値の合計値となります。
 	 * 
 	 * [非ガード節]
-	 * ・食料品(必須)金額がnull値
+	 * ・食料品(必須)購入金額の値がnull値
 	 * [ガード節]
-	 * ・「食料品(必須)金額」項目がnull
-	 * ・「消費税:食料品(必須)金額」項目がnull
-	 * ・消費税:食料品(必須)金額の値ありの場合で、食料品(必須)金額がnull値の場合
+	 * ・食料品(必須)購入金額がnull
+	 * ・食料品(必須)消費税がnull
+	 * ・食料品(必須)消費税の値ありの場合で、食料品(必須)購入金額の値がnull値の場合
 	 *</pre>
-	 * @param amount 「食料品(必須)金額」項目の値
-	 * @param taxAmount 「消費税:食料品(必須)金額」項目の値
+	 * @param amount 食料品(必須)購入金額
+	 * @param taxAmount 食料品(必須)消費税
 	 * @return 「食料品(必須)」項目ドメインタイプ
 	 *
 	 */
 	public static ShoppingFoodExpenditureItem from(ShoppingExpenditureAmount amount, ShoppingTaxExpenses taxAmount) {
-		// ガード節(「食料品(必須)金額」項目がnull)
+		// ガード節(「食料品(必須)購入金額」項目がnull)
 		if(amount == null) {
-			throw new MyHouseholdAccountBookRuntimeException("「食料品(必須)金額」項目にnullが指定されました。管理者に問い合わせてください。");
+			throw new MyHouseholdAccountBookRuntimeException("「食料品(必須)購入金額」項目にnullが指定されました。管理者に問い合わせてください。");
 		}
-		// ガード節(「消費税:食料品(必須)金額」項目がnull)
+		// ガード節(「食料品(必須)消費税」項目がnull)
 		if(taxAmount == null) {
-			throw new MyHouseholdAccountBookRuntimeException("「消費税:食料品(必須)金額」項目にnullが指定されました。管理者に問い合わせてください。");
+			throw new MyHouseholdAccountBookRuntimeException("「食料品(必須)消費税」項目にnullが指定されました。管理者に問い合わせてください。");
 		}
-		// ガード節(消費税:食料品(必須)金額の値ありの場合で、食料品(必須)金額がnull値)
+		// ガード節(食料品(必須)消費税の値ありの場合で、食料品(必須)購入金額の値がnull値)
 		if(amount.isNull() && !taxAmount.isNull()) {
 			throw new MyHouseholdAccountBookRuntimeException("「食料品(必須)」項目の設定値が不正です。管理者に問い合わせてください。[amountValue=null][taxAmountValue=" + taxAmount.toString() + "]");
 		}
 		
-		// 食料品(必須)金額がnull値の場合、null値を持った「食料品(必須)」項目を生成
+		// 食料品(必須)購入金額の値がnull値の場合、null値を持った「食料品(必須)」項目を生成
 		if(amount.isNull()) {
 			validate(amount.getValue(), "食料品(必須)");
 			return new ShoppingFoodExpenditureItem(
@@ -135,12 +136,12 @@ public class ShoppingFoodExpenditureItem extends NullableMoney {
 					ShoppingTaxExpenses.NULL);
 		}
 		
-		// 消費税:食料品(必須)金額がnull値の場合、食料品(必須)金額の値で「食料品(必須)」項目を生成
+		// 食料品(必須)消費税の値がnull値の場合、食料品(必須)購入金額の値で「食料品(必須)」項目を生成
 		if(taxAmount.isNull()) {
 			validate(amount.getValue(), "食料品(必須)");
 			return new ShoppingFoodExpenditureItem(amount.getValue(), amount, taxAmount);
 		}
-		// 食料品(必須)金額と消費税:食料品(必須)金額を加算した値で「食料品(必須)」項目を生成
+		// 食料品(必須)購入金額と食料品(必須)消費税を加算した値で「食料品(必須)」項目を生成
 		BigDecimal addValue = amount.getValue().add(taxAmount.getValue());
 		validate(addValue, "食料品(必須)");
 		return new ShoppingFoodExpenditureItem(addValue, amount, taxAmount);
@@ -208,16 +209,16 @@ public class ShoppingFoodExpenditureItem extends NullableMoney {
 		// 食料品(必須)金額からクーポン金額を割引（支出金額 - クーポン金額）
 		BigDecimal discountValue = getValue().subtract(coupon.getValue());
 
-		// 割引後の金額がマイナス値)：食料品(必須)金額は割引適応でなし。差額を残のクーポン金額へ
+		// 割引後の金額がマイナス値の場合、食料品(必須)金額は割引適応で0円を設定。差額を残のクーポン金額へ
 		int compareToValue = discountValue.compareTo(BigDecimal.ZERO);
 		if (compareToValue < 0) {
 			return new ShoppingFoodItemExpenditureAmount(ExpenditureAmount.ZERO, CouponAmount.from(discountValue.abs()));
 		}
-		// 割引後の金額が0)：食料品(必須)金額は割引適応でなし。残クーポン値もなし
+		// 割引後の金額が0の場合、食料品(必須)金額は割引適応で0円を設定。残クーポン値もなし
 		if (compareToValue == 0) {
 			return new ShoppingFoodItemExpenditureAmount(ExpenditureAmount.ZERO, CouponAmount.ZERO);
 		}
-		// 割引後の金額が0より大きい)：食料品(必須)金額は割引適応後の値。残クーポン値はなし
+		// 割引後の金額が0より大きい場合、食料品(必須)金額は割引適応後の値。残クーポン値はなし
 		return new ShoppingFoodItemExpenditureAmount(ExpenditureAmount.from(discountValue),  CouponAmount.ZERO);
 	}
 }

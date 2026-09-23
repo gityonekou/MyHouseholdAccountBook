@@ -5,7 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2024/11/23 : 1.00.00                      新規作成
- * 2026/08/18 : 1.02.00  feature-1.03-dev1   追加リファクタリング対応(買い物登録のドメイン見直し)
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(買い物登録のドメイン見直し)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
@@ -15,16 +15,16 @@ import java.util.List;
 
 import org.springframework.util.CollectionUtils;
 
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodBItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenditureItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodMinorWasteExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodSevereWasteExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkExpenditureItem;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -50,19 +50,19 @@ public class SimpleShoppingRegistItemInquiryList {
 	// 食料品(必須)合計
 	private final ShoppingFoodExpenditureItem totalShoppingFoodItem;
 	// 食料品B(無駄遣い)合計
-	private final ShoppingFoodBItem totalShoppingFoodBItem;
+	private final ShoppingFoodMinorWasteExpenditureItem totalShoppingFoodMinorWasteItem;
 	// 食料品C(お酒類)合計
-	private final ShoppingFoodCItem totalShoppingFoodCItem;
+	private final ShoppingFoodSevereWasteExpenditureItem totalShoppingFoodSevereWasteItem;
 	// 外食合計
-	private final ShoppingDineOutItem totalShoppingDineOutItem;
+	private final ShoppingDineOutExpenditureItem totalShoppingDineOutItem;
 	// 日用品合計
-	private final ShoppingConsumerGoodsItem totalShoppingConsumerGoodsItem;
+	private final ShoppingConsumerGoodsExpenditureItem totalShoppingConsumerGoodsItem;
 	// 衣料品(私服)合計
-	private final ShoppingClothesItem totalShoppingClothesItem;
+	private final ShoppingClothesExpenditureItem totalShoppingClothesItem;
 	// 仕事合計
-	private final ShoppingWorkItem totalShoppingWorkItem;
+	private final ShoppingWorkExpenditureItem totalShoppingWorkItem;
 	// 住居設備合計
-	private final ShoppingHouseEquipmentItem totalShoppingHouseEquipmentItem;
+	private final ShoppingHouseEquipmentExpenditureItem totalShoppingHouseEquipmentItem;
 	// クーポン金額合計
 	private final ShoppingCouponPrice totalShoppingCouponPrice;
 	// 月度買い物合計金額
@@ -84,19 +84,19 @@ public class SimpleShoppingRegistItemInquiryList {
 					// 食料品(必須)合計
 					ShoppingFoodExpenditureItem.NULL,
 					// 食料品B(無駄遣い)合計
-					ShoppingFoodBItem.nullValue(),
+					ShoppingFoodMinorWasteExpenditureItem.NULL,
 					// 食料品C(お酒類)合計
-					ShoppingFoodCItem.nullValue(),
+					ShoppingFoodSevereWasteExpenditureItem.NULL,
 					// 外食合計
-					ShoppingDineOutItem.nullValue(),
+					ShoppingDineOutExpenditureItem.NULL,
 					// 日用品合計
-					ShoppingConsumerGoodsItem.nullValue(),
+					ShoppingConsumerGoodsExpenditureItem.NULL,
 					// 衣料品(私服)合計
-					ShoppingClothesItem.nullValue(),
+					ShoppingClothesExpenditureItem.NULL,
 					// 仕事合計
-					ShoppingWorkItem.nullValue(),
+					ShoppingWorkExpenditureItem.NULL,
 					// 住居設備合計
-					ShoppingHouseEquipmentItem.nullValue(),
+					ShoppingHouseEquipmentExpenditureItem.NULL,
 					// クーポン金額合計
 					ShoppingCouponPrice.NULL,
 					// 月度買い物合計金額
@@ -105,19 +105,19 @@ public class SimpleShoppingRegistItemInquiryList {
 			// 食料品(必須)合計
 			ShoppingFoodExpenditureItem foodSum = ShoppingFoodExpenditureItem.NULL;
 			// 食料品B(無駄遣い)合計
-			ShoppingFoodBItem foodBSum = ShoppingFoodBItem.nullValue();
+			ShoppingFoodMinorWasteExpenditureItem foodBSum = ShoppingFoodMinorWasteExpenditureItem.NULL;
 			// 食料品C(お酒類)合計
-			ShoppingFoodCItem foodCSum = ShoppingFoodCItem.nullValue();
+			ShoppingFoodSevereWasteExpenditureItem foodCSum = ShoppingFoodSevereWasteExpenditureItem.NULL;
 			// 外食合計
-			ShoppingDineOutItem dineOutSum = ShoppingDineOutItem.nullValue();
+			ShoppingDineOutExpenditureItem dineOutSum = ShoppingDineOutExpenditureItem.NULL;
 			// 日用品合計
-			ShoppingConsumerGoodsItem consumerGoodsSum = ShoppingConsumerGoodsItem.nullValue();
+			ShoppingConsumerGoodsExpenditureItem consumerGoodsSum = ShoppingConsumerGoodsExpenditureItem.NULL;
 			// 衣料品(私服)合計
-			ShoppingClothesItem clothesSum = ShoppingClothesItem.nullValue();
+			ShoppingClothesExpenditureItem clothesSum = ShoppingClothesExpenditureItem.NULL;
 			// 仕事合計
-			ShoppingWorkItem workSum = ShoppingWorkItem.nullValue();
+			ShoppingWorkExpenditureItem workSum = ShoppingWorkExpenditureItem.NULL;
 			// 住居設備合計
-			ShoppingHouseEquipmentItem houseEquipmentSum = ShoppingHouseEquipmentItem.nullValue();
+			ShoppingHouseEquipmentExpenditureItem houseEquipmentSum = ShoppingHouseEquipmentExpenditureItem.NULL;
 			// クーポン金額合計
 			ShoppingCouponPrice couponPriceSum = ShoppingCouponPrice.NULL;
 			// 月度買い物合計金額
@@ -126,13 +126,13 @@ public class SimpleShoppingRegistItemInquiryList {
 			// 対象データありの場合、各種項目の合計値を加算
 			for(SimpleShoppingRegistItem item : values) {
 				foodSum = foodSum.add(item.getShoppingFoodExpenditureItem());
-				foodBSum = foodBSum.add(item.getShoppingFoodBItem());
-				foodCSum = foodCSum.add(item.getShoppingFoodCItem());
-				dineOutSum = dineOutSum.add(item.getShoppingDineOutItem());
-				consumerGoodsSum = consumerGoodsSum.add(item.getShoppingConsumerGoodsItem());
-				clothesSum = clothesSum.add(item.getShoppingClothesItem());
-				workSum = workSum.add(item.getShoppingWorkItem());
-				houseEquipmentSum = houseEquipmentSum.add(item.getShoppingHouseEquipmentItem());
+				foodBSum = foodBSum.add(item.getShoppingFoodMinorWasteExpenditureItem());
+				foodCSum = foodCSum.add(item.getShoppingFoodSevereWasteExpenditureItem());
+				dineOutSum = dineOutSum.add(item.getShoppingDineOutExpenditureItem());
+				consumerGoodsSum = consumerGoodsSum.add(item.getShoppingConsumerGoodsExpenditureItem());
+				clothesSum = clothesSum.add(item.getShoppingClothesExpenditureItem());
+				workSum = workSum.add(item.getShoppingWorkExpenditureItem());
+				houseEquipmentSum = houseEquipmentSum.add(item.getShoppingHouseEquipmentExpenditureItem());
 				couponPriceSum = couponPriceSum.add(item.getShoppingCouponPrice());
 				monthTotalAmountSum = monthTotalAmountSum.add(item.getShoppingTotalAmount());
 			}

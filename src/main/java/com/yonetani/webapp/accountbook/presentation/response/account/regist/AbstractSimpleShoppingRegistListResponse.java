@@ -19,18 +19,18 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent.ResolvedPaymentMethodName;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDate;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodBItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodMinorWasteExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodSevereWasteExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenditureItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingRegistCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 
 import lombok.AccessLevel;
@@ -127,13 +127,13 @@ public abstract class AbstractSimpleShoppingRegistListResponse extends AbstractR
 				ShopName shopName,
 				ResolvedPaymentMethodName paymentMethodName,
 				ShoppingFoodExpenditureItem shoppingFood,
-				ShoppingFoodBItem shoppingFoodB,
-				ShoppingFoodCItem shoppingFoodC,
-				ShoppingDineOutItem shoppingDineOut,
-				ShoppingConsumerGoodsItem shoppingConsumerGoods,
-				ShoppingClothesItem shoppingClothes,
-				ShoppingWorkItem shoppingWork,
-				ShoppingHouseEquipmentItem shoppingHouseEquipment,
+				ShoppingFoodMinorWasteExpenditureItem shoppingFoodB,
+				ShoppingFoodSevereWasteExpenditureItem shoppingFoodC,
+				ShoppingDineOutExpenditureItem shoppingDineOut,
+				ShoppingConsumerGoodsExpenditureItem shoppingConsumerGoods,
+				ShoppingClothesExpenditureItem shoppingClothes,
+				ShoppingWorkExpenditureItem shoppingWork,
+				ShoppingHouseEquipmentExpenditureItem shoppingHouseEquipment,
 				ShoppingCouponPrice shoppingCoupon,
 				ShoppingTotalAmount shoppingTotalAmount) {
 			return new SimpleShoppingRegistListItem(

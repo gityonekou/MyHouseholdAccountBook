@@ -6,7 +6,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2024/11/23 : 1.00.00                      新規作成
  * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
- * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応、買い物登録ドメインタイプリファクタリング対応
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.shoppingregist;
@@ -26,35 +26,21 @@ import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.Payment
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesTaxExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsTaxExpenses;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDate;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutTaxExpenses;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodBExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodBItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodBTaxExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCTaxExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenditureItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentTaxExpenses;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodMinorWasteExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodSevereWasteExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingRegistCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingRemarks;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingTaxExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkTaxExpenses;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.TaxTotalPurchasePrice;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.TotalPurchasePrice;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
@@ -175,38 +161,52 @@ public class ShoppingRegistTableDataSource implements ShoppingRegistTableReposit
 				ShoppingRemarks.from(dto.getShoppingRemarks()),
 				// 食料品(必須)
 				ShoppingFoodExpenditureItem.from(
-						// 食料品(必須)金額
+						// 食料品(必須)購入金額
 						ShoppingExpenditureAmount.from(dto.getShoppingFoodExpenses()),
-						// 消費税:食料品(必須)金額
+						// 食料品(必須)消費税
 						ShoppingTaxExpenses.from(dto.getShoppingFoodTaxExpenses())),
-				// 食料品B(無駄遣い)金額
-				ShoppingFoodBExpenses.from(dto.getShoppingFoodBExpenses()),
-				// 消費税:食料品B(無駄遣い)金額
-				ShoppingFoodBTaxExpenses.from(dto.getShoppingFoodBTaxExpenses()),
-				// 食料品C(お酒類)金額
-				ShoppingFoodCExpenses.from(dto.getShoppingFoodCExpenses()),
-				// 消費税:食料品C(お酒類)金額
-				ShoppingFoodCTaxExpenses.from(dto.getShoppingFoodCTaxExpenses()),
-				// 外食金額
-				ShoppingDineOutExpenses.from(dto.getShoppingDineOutExpenses()),
-				// 消費税:外食金額
-				ShoppingDineOutTaxExpenses.from(dto.getShoppingDineOutTaxExpenses()),
-				// 日用品金額
-				ShoppingConsumerGoodsExpenses.from(dto.getShoppingConsumerGoodsExpenses()),
-				// 消費税:日用品金額
-				ShoppingConsumerGoodsTaxExpenses.from(dto.getShoppingConsumerGoodsTaxExpenses()),
-				// 衣料品(私服)金額
-				ShoppingClothesExpenses.from(dto.getShoppingClothesExpenses()),
-				// 消費税:衣料品(私服)金額
-				ShoppingClothesTaxExpenses.from(dto.getShoppingClothesTaxExpenses()),
-				// 仕事金額
-				ShoppingWorkExpenses.from(dto.getShoppingWorkExpenses()),
-				// 消費税:仕事金額
-				ShoppingWorkTaxExpenses.from(dto.getShoppingWorkTaxExpenses()),
-				// 住居設備金額
-				ShoppingHouseEquipmentExpenses.from(dto.getShoppingHouseEquipmentExpenses()),
-				// 消費税:住居設備金額
-				ShoppingHouseEquipmentTaxExpenses.from(dto.getShoppingHouseEquipmentTaxExpenses()),
+				// 食料品B(無駄遣い)
+				ShoppingFoodMinorWasteExpenditureItem.from(
+						// 食料品B(無駄遣い)購入金額
+						ShoppingExpenditureAmount.from(dto.getShoppingFoodBExpenses()),
+						// 食料品B(無駄遣い)消費税
+						ShoppingTaxExpenses.from(dto.getShoppingFoodBTaxExpenses())),
+				// 食料品C(お酒類)
+				ShoppingFoodSevereWasteExpenditureItem.from(
+						// 食料品C(お酒類)購入金額
+						ShoppingExpenditureAmount.from(dto.getShoppingFoodCExpenses()),
+						// 食料品BC(お酒類)消費税
+						ShoppingTaxExpenses.from(dto.getShoppingFoodCTaxExpenses())),
+				// 外食
+				ShoppingDineOutExpenditureItem.from(
+						// 外食購入金額
+						ShoppingExpenditureAmount.from(dto.getShoppingDineOutExpenses()),
+						// 外食消費税
+						ShoppingTaxExpenses.from(dto.getShoppingDineOutTaxExpenses())),
+				// 日用品
+				ShoppingConsumerGoodsExpenditureItem.from(
+						// 日用品購入金額
+						ShoppingExpenditureAmount.from(dto.getShoppingConsumerGoodsExpenses()),
+						// 日用品消費税
+						ShoppingTaxExpenses.from(dto.getShoppingConsumerGoodsTaxExpenses())),
+				// 衣料品(私服)
+				ShoppingClothesExpenditureItem.from(
+						// 衣料品(私服)購入金額
+						ShoppingExpenditureAmount.from(dto.getShoppingClothesExpenses()),
+						// 衣料品(私服)消費税
+						ShoppingTaxExpenses.from(dto.getShoppingClothesTaxExpenses())),
+				// 仕事
+				ShoppingWorkExpenditureItem.from(
+						// 仕事購入金額
+						ShoppingExpenditureAmount.from(dto.getShoppingWorkExpenses()),
+						// 仕事消費税
+						ShoppingTaxExpenses.from(dto.getShoppingWorkTaxExpenses())),
+				// 住居設備
+				ShoppingHouseEquipmentExpenditureItem.from(
+						// 住居設備購入金額
+						ShoppingExpenditureAmount.from(dto.getShoppingHouseEquipmentExpenses()),
+						// 住居設備消費税
+						ShoppingTaxExpenses.from(dto.getShoppingHouseEquipmentTaxExpenses())),
 				// クーポン金額
 				ShoppingCouponPrice.from(dto.getShoppingCouponPrice()),
 				// 購入金額合計
@@ -241,52 +241,52 @@ public class ShoppingRegistTableDataSource implements ShoppingRegistTableReposit
 				ShoppingDate.from(dto.getShoppingDate(), targetYearMonth),
 				// 食料品(必須)
 				ShoppingFoodExpenditureItem.from(
-						// 食料品(必須)金額
+						// 食料品(必須)購入金額
 						ShoppingExpenditureAmount.from(dto.getShoppingFoodExpenses()),
-						// 消費税:食料品(必須)金額
+						// 食料品(必須)消費税
 						ShoppingTaxExpenses.from(dto.getShoppingFoodTaxExpenses())),
 				// 食料品B(無駄遣い)
-				ShoppingFoodBItem.from(
-						// 食料品B(無駄遣い)金額
-						ShoppingFoodBExpenses.from(dto.getShoppingFoodBExpenses()),
-						// 消費税:食料品B(無駄遣い)金額
-						ShoppingFoodBTaxExpenses.from(dto.getShoppingFoodBTaxExpenses())),
+				ShoppingFoodMinorWasteExpenditureItem.from(
+						// 食料品B(無駄遣い)購入金額
+						ShoppingExpenditureAmount.from(dto.getShoppingFoodBExpenses()),
+						// 食料品B(無駄遣い)消費税
+						ShoppingTaxExpenses.from(dto.getShoppingFoodBTaxExpenses())),
 				// 食料品C(お酒類)
-				ShoppingFoodCItem.from(
-						// 食料品C(お酒類)金額
-						ShoppingFoodCExpenses.from(dto.getShoppingFoodCExpenses()),
-						// 消費税:食料品C(お酒類)金額
-						ShoppingFoodCTaxExpenses.from(dto.getShoppingFoodCTaxExpenses())),
+				ShoppingFoodSevereWasteExpenditureItem.from(
+						// 食料品C(お酒類)購入金額
+						ShoppingExpenditureAmount.from(dto.getShoppingFoodCExpenses()),
+						// 食料品C(お酒類)消費税
+						ShoppingTaxExpenses.from(dto.getShoppingFoodCTaxExpenses())),
 				// 外食
-				ShoppingDineOutItem.from(
-						// 外食金額
-						ShoppingDineOutExpenses.from(dto.getShoppingDineOutExpenses()),
-						// 消費税:外食金額
-						ShoppingDineOutTaxExpenses.from(dto.getShoppingDineOutTaxExpenses())),
+				ShoppingDineOutExpenditureItem.from(
+						// 外食購入金額
+						ShoppingExpenditureAmount.from(dto.getShoppingDineOutExpenses()),
+						// 外食消費税
+						ShoppingTaxExpenses.from(dto.getShoppingDineOutTaxExpenses())),
 				// 日用品
-				ShoppingConsumerGoodsItem.from(
-						// 日用品金額
-						ShoppingConsumerGoodsExpenses.from(dto.getShoppingConsumerGoodsExpenses()),
-						// 消費税:日用品金額
-						ShoppingConsumerGoodsTaxExpenses.from(dto.getShoppingConsumerGoodsTaxExpenses())),
+				ShoppingConsumerGoodsExpenditureItem.from(
+						// 日用品購入金額
+						ShoppingExpenditureAmount.from(dto.getShoppingConsumerGoodsExpenses()),
+						// 日用品消費税
+						ShoppingTaxExpenses.from(dto.getShoppingConsumerGoodsTaxExpenses())),
 				// 衣料品(私服)
-				ShoppingClothesItem.from(
-						// 衣料品(私服)金額
-						ShoppingClothesExpenses.from(dto.getShoppingClothesExpenses()),
-						// 消費税:衣料品(私服)金額
-						ShoppingClothesTaxExpenses.from(dto.getShoppingClothesTaxExpenses())),
+				ShoppingClothesExpenditureItem.from(
+						// 衣料品(私服)購入金額
+						ShoppingExpenditureAmount.from(dto.getShoppingClothesExpenses()),
+						// 衣料品(私服)消費税
+						ShoppingTaxExpenses.from(dto.getShoppingClothesTaxExpenses())),
 				// 仕事
-				ShoppingWorkItem.from(
-						// 仕事金額
-						ShoppingWorkExpenses.from(dto.getShoppingWorkExpenses()),
-						// 消費税:仕事金額
-						ShoppingWorkTaxExpenses.from(dto.getShoppingWorkTaxExpenses())),
+				ShoppingWorkExpenditureItem.from(
+						// 仕事購入金額
+						ShoppingExpenditureAmount.from(dto.getShoppingWorkExpenses()),
+						// 仕事消費税
+						ShoppingTaxExpenses.from(dto.getShoppingWorkTaxExpenses())),
 				// 住居設備
-				ShoppingHouseEquipmentItem.from(
-						// 仕事金額
-						ShoppingHouseEquipmentExpenses.from(dto.getShoppingHouseEquipmentExpenses()),
-						// 消費税:仕事金額
-						ShoppingHouseEquipmentTaxExpenses.from(dto.getShoppingHouseEquipmentTaxExpenses())),
+				ShoppingHouseEquipmentExpenditureItem.from(
+						// 住居設備購入金額
+						ShoppingExpenditureAmount.from(dto.getShoppingHouseEquipmentExpenses()),
+						// 住居設備金消費税
+						ShoppingTaxExpenses.from(dto.getShoppingHouseEquipmentTaxExpenses())),
 				// クーポン金額
 				ShoppingCouponPrice.from(dto.getShoppingCouponPrice()),
 				// 買い物合計金額

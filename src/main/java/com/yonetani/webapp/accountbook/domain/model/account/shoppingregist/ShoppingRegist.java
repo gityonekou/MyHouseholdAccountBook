@@ -14,28 +14,21 @@ package com.yonetani.webapp.accountbook.domain.model.account.shoppingregist;
 import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesTaxExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsTaxExpenses;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingClothesExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingConsumerGoodsExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDate;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutTaxExpenses;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodBExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodBTaxExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodCTaxExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenditureItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentTaxExpenses;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodMinorWasteExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodSevereWasteExpenditureItem;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingRegistCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingRemarks;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingTaxExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingTotalAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkExpenses;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkTaxExpenses;
+import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.TaxTotalPurchasePrice;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.TotalPurchasePrice;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
@@ -86,34 +79,20 @@ public class ShoppingRegist {
 	// 登録データ(金額)
 	// 食料品(必須)
 	private final ShoppingFoodExpenditureItem shoppingFoodExpenditureItem;
-	// 食料品B(無駄遣い)金額
-	private final ShoppingFoodBExpenses shoppingFoodBExpenses;
-	// 消費税:食料品B(無駄遣い)金額
-	private final ShoppingFoodBTaxExpenses shoppingFoodBTaxExpenses;
-	// 食料品C(お酒類)金額
-	private final ShoppingFoodCExpenses shoppingFoodCExpenses;
-	// 消費税:食料品C(お酒類)金額
-	private final ShoppingFoodCTaxExpenses shoppingFoodCTaxExpenses;
+	// 食料品B(無駄遣い)
+	private final ShoppingFoodMinorWasteExpenditureItem shoppingFoodMinorWasteExpenditureItem;
+	// 食料品C(お酒類)
+	private final ShoppingFoodSevereWasteExpenditureItem shoppingFoodSevereWasteExpenditureItem;
 	// 外食金額
-	private final ShoppingDineOutExpenses shoppingDineOutExpenses;
-	// 消費税:外食金額
-	private final ShoppingDineOutTaxExpenses shoppingDineOutTaxExpenses;
+	private final ShoppingDineOutExpenditureItem shoppingDineOutExpenditureItem;
 	// 日用品金額
-	private final ShoppingConsumerGoodsExpenses shoppingConsumerGoodsExpenses;
-	// 消費税:日用品金額
-	private final ShoppingConsumerGoodsTaxExpenses shoppingConsumerGoodsTaxExpenses;
-	// 衣料品(私服)金額
-	private final ShoppingClothesExpenses shoppingClothesExpenses;
-	// 消費税:衣料品(私服)金額
-	private final ShoppingClothesTaxExpenses shoppingClothesTaxExpenses;
+	private final ShoppingConsumerGoodsExpenditureItem shoppingConsumerGoodsExpenditureItem;
+	// 衣料品(私服)
+	private final ShoppingClothesExpenditureItem shoppingClothesExpenditureItem;
 	// 仕事金額
-	private final ShoppingWorkExpenses shoppingWorkExpenses;
-	// 消費税:仕事金額
-	private final ShoppingWorkTaxExpenses shoppingWorkTaxExpenses;
-	// 住居設備金額
-	private final ShoppingHouseEquipmentExpenses shoppingHouseEquipmentExpenses;
-	// 消費税:住居設備金額
-	private final ShoppingHouseEquipmentTaxExpenses shoppingHouseEquipmentTaxExpenses;
+	private final ShoppingWorkExpenditureItem shoppingWorkExpenditureItem;
+	// 住居設備
+	private final ShoppingHouseEquipmentExpenditureItem shoppingHouseEquipmentExpenditureItem;
 	// クーポン金額
 	private final ShoppingCouponPrice shoppingCouponPrice;
 	// 購入金額合計
@@ -136,20 +115,13 @@ public class ShoppingRegist {
 	 * @param shoppingDate 買い物日
 	 * @param shoppingRemarks 備考
 	 * @param shoppingFoodExpenditureItem 食料品(必須)
-	 * @param shoppingFoodBExpenses 食料品B(無駄遣い)金額
-	 * @param shoppingFoodBTaxExpenses 消費税:食料品B(無駄遣い)金額
-	 * @param shoppingFoodCExpenses 食料品C(お酒類)金額
-	 * @param shoppingFoodCTaxExpenses 消費税:食料品C(お酒類)金額
-	 * @param shoppingDineOutExpenses 外食金額
-	 * @param shoppingDineOutTaxExpenses 消費税:外食金額
-	 * @param shoppingConsumerGoodsExpenses 日用品金額
-	 * @param shoppingConsumerGoodsTaxExpenses 消費税:日用品金額
-	 * @param shoppingClothesExpenses 衣料品(私服)金額
-	 * @param shoppingClothesTaxExpenses 消費税:衣料品(私服)金額
-	 * @param shoppingWorkExpenses 仕事金額
-	 * @param shoppingWorkTaxExpenses 消費税:仕事金額
-	 * @param shoppingHouseEquipmentExpenses 住居設備金額
-	 * @param shoppingHouseEquipmentTaxExpenses 消費税:住居設備金額
+	 * @param shoppingFoodMinorWasteExpenditureItem 食料品B(無駄遣い)
+	 * @param shoppingFoodSevereWasteExpenditureItem 食料品C(お酒類)
+	 * @param shoppingDineOutExpenditureItem 外食
+	 * @param shoppingConsumerGoodsExpenditureItem 日用品
+	 * @param shoppingClothesExpenditureItem 衣料品(私服)
+	 * @param shoppingWorkExpenditureItem 仕事
+	 * @param shoppingHouseEquipmentExpenditureItem 住居設備
 	 * @param shoppingCouponPrice クーポン金額
 	 * @param totalPurchasePrice 購入金額合計
 	 * @param taxTotalPurchasePrice 消費税合計
@@ -167,20 +139,13 @@ public class ShoppingRegist {
 			ShoppingDate shoppingDate,
 			ShoppingRemarks shoppingRemarks,
 			ShoppingFoodExpenditureItem shoppingFoodExpenditureItem,
-			ShoppingFoodBExpenses shoppingFoodBExpenses,
-			ShoppingFoodBTaxExpenses shoppingFoodBTaxExpenses,
-			ShoppingFoodCExpenses shoppingFoodCExpenses,
-			ShoppingFoodCTaxExpenses shoppingFoodCTaxExpenses,
-			ShoppingDineOutExpenses shoppingDineOutExpenses,
-			ShoppingDineOutTaxExpenses shoppingDineOutTaxExpenses,
-			ShoppingConsumerGoodsExpenses shoppingConsumerGoodsExpenses,
-			ShoppingConsumerGoodsTaxExpenses shoppingConsumerGoodsTaxExpenses,
-			ShoppingClothesExpenses shoppingClothesExpenses,
-			ShoppingClothesTaxExpenses shoppingClothesTaxExpenses,
-			ShoppingWorkExpenses shoppingWorkExpenses,
-			ShoppingWorkTaxExpenses shoppingWorkTaxExpenses,
-			ShoppingHouseEquipmentExpenses shoppingHouseEquipmentExpenses,
-			ShoppingHouseEquipmentTaxExpenses shoppingHouseEquipmentTaxExpenses,
+			ShoppingFoodMinorWasteExpenditureItem shoppingFoodMinorWasteExpenditureItem,
+			ShoppingFoodSevereWasteExpenditureItem shoppingFoodSevereWasteExpenditureItem,
+			ShoppingDineOutExpenditureItem shoppingDineOutExpenditureItem,
+			ShoppingConsumerGoodsExpenditureItem shoppingConsumerGoodsExpenditureItem,
+			ShoppingClothesExpenditureItem shoppingClothesExpenditureItem,
+			ShoppingWorkExpenditureItem shoppingWorkExpenditureItem,
+			ShoppingHouseEquipmentExpenditureItem shoppingHouseEquipmentExpenditureItem,
 			ShoppingCouponPrice shoppingCouponPrice,
 			TotalPurchasePrice totalPurchasePrice,
 			TaxTotalPurchasePrice taxTotalPurchasePrice,
@@ -196,20 +161,13 @@ public class ShoppingRegist {
 				shoppingDate,
 				shoppingRemarks,
 				shoppingFoodExpenditureItem,
-				shoppingFoodBExpenses,
-				shoppingFoodBTaxExpenses,
-				shoppingFoodCExpenses,
-				shoppingFoodCTaxExpenses,
-				shoppingDineOutExpenses,
-				shoppingDineOutTaxExpenses,
-				shoppingConsumerGoodsExpenses,
-				shoppingConsumerGoodsTaxExpenses,
-				shoppingClothesExpenses,
-				shoppingClothesTaxExpenses,
-				shoppingWorkExpenses,
-				shoppingWorkTaxExpenses,
-				shoppingHouseEquipmentExpenses,
-				shoppingHouseEquipmentTaxExpenses,
+				shoppingFoodMinorWasteExpenditureItem,
+				shoppingFoodSevereWasteExpenditureItem,
+				shoppingDineOutExpenditureItem,
+				shoppingConsumerGoodsExpenditureItem,
+				shoppingClothesExpenditureItem,
+				shoppingWorkExpenditureItem,
+				shoppingHouseEquipmentExpenditureItem,
 				shoppingCouponPrice,
 				totalPurchasePrice,
 				taxTotalPurchasePrice,
@@ -249,39 +207,52 @@ public class ShoppingRegist {
 				ShoppingRemarks.from(inputForm.getShoppingRemarks()),
 				// 食料品(必須)
 				ShoppingFoodExpenditureItem.from(
-						// 食料品(必須)金額
+						// 食料品(必須)購入金額
 						ShoppingExpenditureAmount.from(inputForm.getShoppingFoodExpenses()),
-						// 消費税:食料品(必須)金額
-						ShoppingTaxExpenses.from(inputForm.getShoppingFoodTaxExpenses())
-					),
-				// 食料品B(無駄遣い)金額
-				ShoppingFoodBExpenses.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingFoodBExpenses())),
-				// 消費税:食料品B(無駄遣い)金額
-				ShoppingFoodBTaxExpenses.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingFoodBTaxExpenses())),
-				// 食料品C(お酒類)金額
-				ShoppingFoodCExpenses.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingFoodCExpenses())),
-				// 消費税:食料品C(お酒類)金額
-				ShoppingFoodCTaxExpenses.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingFoodCTaxExpenses())),
-				// 外食金額
-				ShoppingDineOutExpenses.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingDineOutExpenses())),
-				// 消費税:外食金額
-				ShoppingDineOutTaxExpenses.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingDineOutTaxExpenses())),
-				// 日用品金額
-				ShoppingConsumerGoodsExpenses.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingConsumerGoodsExpenses())),
-				// 消費税:日用品金額
-				ShoppingConsumerGoodsTaxExpenses.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingConsumerGoodsTaxExpenses())),
-				// 衣料品(私服)金額
-				ShoppingClothesExpenses.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingClothesExpenses())),
-				// 消費税:衣料品(私服)金額
-				ShoppingClothesTaxExpenses.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingClothesTaxExpenses())),
-				// 仕事金額
-				ShoppingWorkExpenses.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingWorkExpenses())),
-				// 消費税:仕事金額
-				ShoppingWorkTaxExpenses.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingWorkTaxExpenses())),
-				// 住居設備金額
-				ShoppingHouseEquipmentExpenses.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingHouseEquipmentExpenses())),
-				// 消費税:住居設備金額
-				ShoppingHouseEquipmentTaxExpenses.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingHouseEquipmentTaxExpenses())),
+						// 食料品(必須)消費税
+						ShoppingTaxExpenses.from(inputForm.getShoppingFoodTaxExpenses())),
+				// 食料品B(無駄遣い)
+				ShoppingFoodMinorWasteExpenditureItem.from(
+						// 食料品B(無駄遣い)購入金額
+						ShoppingExpenditureAmount.from(inputForm.getShoppingFoodBExpenses()),
+						// 食料品B(無駄遣い)消費税
+						ShoppingTaxExpenses.from(inputForm.getShoppingFoodBTaxExpenses())),
+				// 食料品C(お酒類)
+				ShoppingFoodSevereWasteExpenditureItem.from(
+						// 食料品C(お酒類)購入金額
+						ShoppingExpenditureAmount.from(inputForm.getShoppingFoodCExpenses()),
+						// 食料品C(お酒類)消費税
+						ShoppingTaxExpenses.from(inputForm.getShoppingFoodCTaxExpenses())),
+				// 外食
+				ShoppingDineOutExpenditureItem.from(
+						// 外食購入金額
+						ShoppingExpenditureAmount.from(inputForm.getShoppingDineOutExpenses()),
+						// 外食消費税
+						ShoppingTaxExpenses.from(inputForm.getShoppingDineOutTaxExpenses())),
+				// 日用品
+				ShoppingConsumerGoodsExpenditureItem.from(
+						// 日用品購入金額
+						ShoppingExpenditureAmount.from(inputForm.getShoppingConsumerGoodsExpenses()),
+						// 日用品消費税
+						ShoppingTaxExpenses.from(inputForm.getShoppingConsumerGoodsTaxExpenses())),
+				// 衣料品(私服)
+				ShoppingClothesExpenditureItem.from(
+						// 衣料品(私服)購入金額
+						ShoppingExpenditureAmount.from(inputForm.getShoppingClothesExpenses()),
+						// 衣料品(私服)消費税
+						ShoppingTaxExpenses.from(inputForm.getShoppingClothesTaxExpenses())),
+				// 仕事
+				ShoppingWorkExpenditureItem.from(
+						// 仕事購入金額
+						ShoppingExpenditureAmount.from(inputForm.getShoppingWorkExpenses()),
+						// 仕事消費税
+						ShoppingTaxExpenses.from(inputForm.getShoppingWorkTaxExpenses())),
+				// 住居設備
+				ShoppingHouseEquipmentExpenditureItem.from(
+						// 住居設備購入金額
+						ShoppingExpenditureAmount.from(inputForm.getShoppingHouseEquipmentExpenses()),
+						// 住居設備消費税
+						ShoppingTaxExpenses.from(inputForm.getShoppingHouseEquipmentTaxExpenses())),
 				// クーポン金額
 				ShoppingCouponPrice.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingCouponPrice())),
 				// 購入金額合計

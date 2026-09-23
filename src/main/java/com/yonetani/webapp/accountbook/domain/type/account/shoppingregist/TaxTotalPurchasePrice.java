@@ -12,7 +12,6 @@ package com.yonetani.webapp.accountbook.domain.type.account.shoppingregist;
 import java.math.BigDecimal;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
-import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -88,14 +87,5 @@ public class TaxTotalPurchasePrice {
 			return new TaxTotalPurchasePrice(this.value);
 		}
 		return new TaxTotalPurchasePrice(this.value.add(addValue.getValue()));
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		// スケール0で四捨五入+カンマ編集した文字列を返却
-		return DomainCommonUtils.formatKingakuAndYen(value);
 	}
 }

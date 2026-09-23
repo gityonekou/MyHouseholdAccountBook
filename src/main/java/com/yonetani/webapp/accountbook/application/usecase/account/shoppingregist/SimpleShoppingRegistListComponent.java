@@ -81,19 +81,19 @@ public class SimpleShoppingRegistListComponent {
 						// 食料品(必須)
 						domain.getShoppingFoodExpenditureItem(),
 						// 食料品B(無駄遣い)
-						domain.getShoppingFoodBItem(),
+						domain.getShoppingFoodMinorWasteExpenditureItem(),
 						// 食料品C(お酒類)
-						domain.getShoppingFoodCItem(),
+						domain.getShoppingFoodSevereWasteExpenditureItem(),
 						// 外食
-						domain.getShoppingDineOutItem(),
+						domain.getShoppingDineOutExpenditureItem(),
 						// 日用品
-						domain.getShoppingConsumerGoodsItem(),
+						domain.getShoppingConsumerGoodsExpenditureItem(),
 						// 衣料品(私服)
-						domain.getShoppingClothesItem(),
+						domain.getShoppingClothesExpenditureItem(),
 						// 仕事
-						domain.getShoppingWorkItem(),
+						domain.getShoppingWorkExpenditureItem(),
 						// 住居設備
-						domain.getShoppingHouseEquipmentItem(),
+						domain.getShoppingHouseEquipmentExpenditureItem(),
 						// クーポン金額
 						domain.getShoppingCouponPrice(),
 						// 買い物合計金額
@@ -104,9 +104,9 @@ public class SimpleShoppingRegistListComponent {
 			// 食料品(必須)合計
 			response.setTotalShoppingFood(resultList.getTotalShoppingFoodItem().toFormatString());
 			// 食料品B(無駄遣い)合計
-			response.setTotalShoppingFoodB(resultList.getTotalShoppingFoodBItem().toFormatString());
+			response.setTotalShoppingFoodB(resultList.getTotalShoppingFoodMinorWasteItem().toFormatString());
 			// 食料品C(お酒類)合計
-			response.setTotalShoppingFoodC(resultList.getTotalShoppingFoodCItem().toFormatString());
+			response.setTotalShoppingFoodC(resultList.getTotalShoppingFoodSevereWasteItem().toFormatString());
 			// 外食合計
 			response.setTotalShoppingDineOut(resultList.getTotalShoppingDineOutItem().toFormatString());
 			// 日用品合計
