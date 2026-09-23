@@ -202,7 +202,7 @@ public class ShoppingFoodMinorWasteExpenditureItem extends NullableMoney {
 			return new ShoppingFoodMinorWasteItemExpenditureAmount(ExpenditureAmount.ZERO, coupon);
 		}
 		// クーポン指定なしなら割引適応なしで食料品B(無駄遣い)を生成
-		if(coupon.isZero()) {
+		if(!coupon.hasDiscount()) {
 			return new ShoppingFoodMinorWasteItemExpenditureAmount(ExpenditureAmount.from(getNullSafeValue()), coupon);
 		}
 

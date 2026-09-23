@@ -202,7 +202,7 @@ public class ShoppingFoodExpenditureItem extends NullableMoney {
 			return new ShoppingFoodItemExpenditureAmount(ExpenditureAmount.ZERO, coupon);
 		}
 		// クーポン指定なしなら割引適応なしで食料品(必須)を生成
-		if(coupon.isZero()) {
+		if(!coupon.hasDiscount()) {
 			return new ShoppingFoodItemExpenditureAmount(ExpenditureAmount.from(getNullSafeValue()), coupon);
 		}
 

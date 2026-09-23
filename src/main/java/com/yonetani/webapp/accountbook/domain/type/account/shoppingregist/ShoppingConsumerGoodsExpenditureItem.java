@@ -201,7 +201,7 @@ public class ShoppingConsumerGoodsExpenditureItem extends NullableMoney {
 			return new ShoppingConsumerGoodsItemExpenditureAmount(ExpenditureAmount.ZERO, coupon);
 		}
 		// クーポン指定なしなら割引適応なしで日用品を生成
-		if(coupon.isZero()) {
+		if(!coupon.hasDiscount()) {
 			return new ShoppingConsumerGoodsItemExpenditureAmount(ExpenditureAmount.from(getNullSafeValue()), coupon);
 		}
 

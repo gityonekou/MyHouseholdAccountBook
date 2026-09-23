@@ -201,7 +201,7 @@ public class ShoppingClothesExpenditureItem extends NullableMoney {
 			return new ShoppingClothesItemExpenditureAmount(ExpenditureAmount.ZERO, coupon);
 		}
 		// クーポン指定なしなら割引適応なしで衣料品(私服)を生成
-		if(coupon.isZero()) {
+		if(!coupon.hasDiscount()) {
 			return new ShoppingClothesItemExpenditureAmount(ExpenditureAmount.from(getNullSafeValue()), coupon);
 		}
 

@@ -200,7 +200,7 @@ public class ShoppingDineOutExpenditureItem extends NullableMoney {
 			return new ShoppingDineOutItemExpenditureAmount(ExpenditureAmount.ZERO, coupon);
 		}
 		// クーポン指定なしなら割引適応なしで外食を生成
-		if(coupon.isZero()) {
+		if(!coupon.hasDiscount()) {
 			return new ShoppingDineOutItemExpenditureAmount(ExpenditureAmount.from(getNullSafeValue()), coupon);
 		}
 

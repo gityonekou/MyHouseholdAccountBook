@@ -286,7 +286,15 @@ public class SimpleShoppingRegistConfirmUseCase {
 				expenditureAmountItemHolder.update(beforeHouseEquipmentItem, updHouseEquipmentExpenditureItem);
 			}
 			couponResidualValue = houseEquipment.getResidualCouponAmount();
-
+			
+			// クーポン残高ありの場合、予期しないエラーとする
+			// 理由：画面入力値の計算(js側処理)でマイナスの場合はバリデーションチェックでエラーとなるのにエラーにならずに未適応のクーポン金額があるのは
+			// 　　　予期しない不整合が発生しているため
+			if(couponResidualValue.hasDiscount()) {
+				throw new MyHouseholdAccountBookRuntimeException("買い物登録の計算で予期しない不整合が発生しました。管理者に問い合わせてください。[targetYearMonth:"
+						+ targetYearMonth.getValue()+ "][inputForm:" + inputForm + "]");
+			}
+			
 			// 収支テーブル情報に合計値を設定し更新情報とする
 			updSyuusiData = beforeSyuusiData.addExpenditureAmount(ExpenditureAmount.from(addData.getShoppingTotalAmount().getValue()));
 
@@ -478,6 +486,14 @@ public class SimpleShoppingRegistConfirmUseCase {
 			beforeCouponResidualValue = beforeHouseEquipment.getResidualCouponAmount();
 			afterCouponResidualValue = afterHouseEquipment.getResidualCouponAmount();
 
+			// クーポン残高ありの場合、予期しないエラーとする
+			// 理由：画面入力値の計算(js側処理)でマイナスの場合はバリデーションチェックでエラーとなるのにエラーにならずに未適応のクーポン金額があるのは
+			// 　　　予期しない不整合が発生しているため
+			if(beforeCouponResidualValue.hasDiscount() || afterCouponResidualValue.hasDiscount()) {
+				throw new MyHouseholdAccountBookRuntimeException("買い物登録の計算で予期しない不整合が発生しました。管理者に問い合わせてください。[targetYearMonth:"
+						+ targetYearMonth.getValue()+ "][shoppingRegistCode:" + domainShoppingRegistCode.getValue() + "][inputForm:" + inputForm + "]");
+			}
+			
 			// 更新前・更新後の合計金額差額を収支テーブルの支出金額の値に反映
 			int comp = beforeData.getShoppingTotalAmount().getValue().compareTo(updData.getShoppingTotalAmount().getValue());
 			// 支出金額増減値

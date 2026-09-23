@@ -201,7 +201,7 @@ public class ShoppingHouseEquipmentExpenditureItem extends NullableMoney {
 			return new ShoppingHouseEquipmentItemExpenditureAmount(ExpenditureAmount.ZERO, coupon);
 		}
 		// クーポン指定なしなら割引適応なしで住居設備を生成
-		if(coupon.isZero()) {
+		if(!coupon.hasDiscount()) {
 			return new ShoppingHouseEquipmentItemExpenditureAmount(ExpenditureAmount.from(getNullSafeValue()), coupon);
 		}
 

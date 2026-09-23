@@ -201,7 +201,7 @@ public class ShoppingFoodSevereWasteExpenditureItem extends NullableMoney {
 			return new ShoppingFoodSevereWasteItemExpenditureAmount(ExpenditureAmount.ZERO, coupon);
 		}
 		// クーポン指定なしなら割引適応なしで食料品C(お酒類)を生成
-		if(coupon.isZero()) {
+		if(!coupon.hasDiscount()) {
 			return new ShoppingFoodSevereWasteItemExpenditureAmount(ExpenditureAmount.from(getNullSafeValue()), coupon);
 		}
 

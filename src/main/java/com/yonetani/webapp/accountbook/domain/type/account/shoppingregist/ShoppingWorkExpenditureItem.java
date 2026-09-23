@@ -201,7 +201,7 @@ public class ShoppingWorkExpenditureItem extends NullableMoney {
 			return new ShoppingWorkItemExpenditureAmount(ExpenditureAmount.ZERO, coupon);
 		}
 		// クーポン指定なしなら割引適応なしで仕事を生成
-		if(coupon.isZero()) {
+		if(!coupon.hasDiscount()) {
 			return new ShoppingWorkItemExpenditureAmount(ExpenditureAmount.from(getNullSafeValue()), coupon);
 		}
 
