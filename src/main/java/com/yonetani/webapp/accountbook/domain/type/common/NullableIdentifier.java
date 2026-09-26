@@ -56,7 +56,7 @@ public abstract class NullableIdentifier {
 	 * IDの値を検証します。
 	 *
 	 * [検証内容]
-	 * ・null値チェック
+	 * ・null値チェック(nullは許容)
 	 * ・空文字チェック
 	 *
 	 * サブクラスで追加の検証が必要な場合は、コンストラクタでこのメソッドを呼び出した後に
@@ -84,7 +84,7 @@ public abstract class NullableIdentifier {
 	 * IDの値を検証します。
 	 *
 	 * [検証内容]
-	 * ・null値チェック
+	 * ・null値チェック(nullは許容)
 	 * ・空文字チェック
 	 * ・桁数チェック
 	 *
