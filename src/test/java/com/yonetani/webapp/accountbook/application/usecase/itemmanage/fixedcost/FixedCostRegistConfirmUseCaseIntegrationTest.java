@@ -26,6 +26,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/04/19 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
@@ -110,7 +111,7 @@ class FixedCostRegistConfirmUseCaseIntegrationTest {
 		assertNotNull(response, "レスポンスがnullでないこと");
 		assertTrue(response.isTransactionSuccessFull(), "トランザクション完了フラグがtrueであること");
 		assertEquals(1, response.getMessagesList().size(), "完了メッセージが1件であること");
-		assertEquals("指定の固定費を削除しました。[code:0003]国民年金保険", response.getMessagesList().get(0),
+		assertEquals("指定の固定費を削除しました。[code:0003]国民年金保険支払（奇数月）", response.getMessagesList().get(0),
 				"完了メッセージが正しく設定されていること");
 
 		// DB確認: 論理削除されていること
@@ -195,6 +196,7 @@ class FixedCostRegistConfirmUseCaseIntegrationTest {
 		assertEquals("00", added.get("FIXED_COST_SHIHARAI_TUKI"), "支払月が設定されていること");
 		assertEquals("27", added.get("FIXED_COST_SHIHARAI_DAY"), "支払日が設定されていること");
 		assertEquals(new BigDecimal("30000.00"), added.get("SHIHARAI_KINGAKU"), "支払金額が設定されていること");
+		assertEquals("001", added.get("PAYMENT_METHOD_CODE"), "支払方法が設定されていること");
 		assertEquals(Boolean.FALSE, added.get("DELETE_FLG"), "DELETE_FLGがfalseであること");
 	}
 
@@ -233,7 +235,7 @@ class FixedCostRegistConfirmUseCaseIntegrationTest {
 		form.setShiharaiTukiOptionalContext(null);
 		form.setShiharaiDay("27");
 		form.setShiharaiKingaku(15000);
-		form.setPaymentMethodCode("001");
+		form.setPaymentMethodCode("002");
 
 		// 実行
 		FixedCostInfoManageUpdateResponse response = useCase.execUpdate(TEST_USER, form);
@@ -251,7 +253,8 @@ class FixedCostRegistConfirmUseCaseIntegrationTest {
 		assertEquals("電気代(更新後)", after.get("FIXED_COST_NAME"), "固定費名が更新されていること");
 		assertEquals(new BigDecimal("15000.00"), after.get("SHIHARAI_KINGAKU"), "支払金額が15000に更新されていること");
 		assertEquals("1", after.get("FIXED_COST_KUBUN"), "固定費区分が更新されていること");
-
+		assertEquals("002", after.get("PAYMENT_METHOD_CODE"), "支払方法が更新されていること");
+		
 		// 総件数が変わらないこと
 		assertEquals(5, countAllFixedCost("user01"), "更新後も5件のままであること");
 	}

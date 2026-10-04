@@ -22,6 +22,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/05/02 : 1.00.00  feature-1.01-dev1   新規作成
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
@@ -136,6 +137,7 @@ class FixedCostRegistConfirmUseCaseBulkUpdateIntegrationTest {
 		assertEquals("家賃", after0001.get("FIXED_COST_NAME"), "0001の固定費名が変わらないこと");
 		assertEquals("0030", after0001.get("SISYUTU_ITEM_CODE"), "0001の支出項目コードが変わらないこと");
 		assertEquals("00", after0001.get("FIXED_COST_SHIHARAI_TUKI"), "0001の支払月が変わらないこと");
+		assertEquals("001", after0001.get("PAYMENT_METHOD_CODE"), "0001の支払方法コードが変わらないこと");
 
 		// DB確認: 0002が更新されていること
 		Map<String, Object> after0002 = findFixedCostByCode("user01", "0002");

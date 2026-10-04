@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/05/27 : 1.00.00  feature-1.01-dev3   新規作成
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
@@ -91,14 +92,22 @@ class FixedCostMonthlyDetailUseCaseIntegrationTest {
 		assertEquals("10",   response.getPrevMonth(),          "prevMonth");
 		assertEquals("12",   response.getNextMonth(),          "nextMonth");
 
-		// 4件・DB取得順の確認
+		// 4件・DB取得順の確認(固定費コードでDB取得結果順が正しいことを確認)
 		List<FixedCostItem> items = response.getFixedCostItemList();
 		assertEquals(4, items.size(), "11月: 4件");
-		assertEquals("0003", items.get(0).getFixedCostCode(), "index0=国民年金保険");
+		FixedCostItem item = items.get(0);
+		assertEquals("0003", item.getFixedCostCode(), "index0=国民年金保険");
 		assertEquals("0001", items.get(1).getFixedCostCode(), "index1=家賃");
 		assertEquals("0002", items.get(2).getFixedCostCode(), "index2=電気代概算");
 		assertEquals("0004", items.get(3).getFixedCostCode(), "index3=その他任意テスト");
-
+		// 明細確認
+		assertEquals("国民年金保険", item.getSisyutuItemName(), "index0=支出項目名");
+		assertEquals("国民年金保険支払（奇数月）", item.getShiharaiName(), "index0=支払名");
+		assertEquals("奇数月", item.getShiharaiTuki(), "index0=支払月");
+		assertEquals("月初営業日", item.getShiharaiDay(), "index0=支払日");
+		assertEquals("みんなのテスト＠銀行　口座振替", item.getPaymentMethodName(), "index0=支払方法名（解決済み）");
+		assertEquals("16,590円", item.getShiharaiKingaku(), "index0=支払金額");
+		assertNull(item.getOptionalContext(), "index0=その他任意詳細");
 		// 当月合計
 		assertEquals("98,590円", response.getMonthlyTotal(), "11月合計");
 	}

@@ -349,7 +349,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testReadUpdateBindingErrorSetInfo() {
 		// テスト用フォームデータを作成
-		ShopInfoForm form = inputUpdateShopInfoForm(null);
+		ShopInfoForm form = inputUpdateShopInfoForm(null, null);
 		
 		// 検索条件に対応する店舗情報6件でバリデーションチェックエラー時画面表示情報を取得
 		ShopInfoManageResponse res = service.readUpdateBindingErrorSetInfo(TEST_USER, form);
@@ -369,7 +369,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql(scripts = "ReadShopInfoQueryNotFoundTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddType1Action() {
 		// 新規追加テスト用フォームデータを作成(表示順=null:表示順は自動採番)
-		ShopInfoForm form = inputAddShopInfoForm(null);
+		ShopInfoForm form = inputAddShopInfoForm(null, null);
 		
 		// 検索条件に対応する店舗情報6件で新規の店舗情報を登録
 		ShopInfoManageResponse res = service.execAction(TEST_USER, form);
@@ -392,6 +392,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 		assertEquals("001", dto.getShopCode(), "店舗コードが001であること");
 		assertEquals("904", dto.getShopKubunCode(), "店舗区分コードが904であること");
 		assertEquals("靴店舗(新規追加)", dto.getShopName(), "店舗名が靴店舗(新規追加)であること");
+		assertNull(dto.getDefaultPaymentMethodCode(), "デフォルト支払方法コードがnullであること");
 		assertEquals("001", dto.getShopSort(), "店舗表示順が001であること");
 	}
 
@@ -407,7 +408,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql(scripts = "ReadShopInfoQueryNonEditResultOneTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddType2Action() {
 		// 新規追加テスト用フォームデータを作成(表示順=002)
-		ShopInfoForm form = inputAddShopInfoForm("002");
+		ShopInfoForm form = inputAddShopInfoForm("", "002");
 		
 		// 検索条件に対応する店舗情報6件で新規の店舗情報を登録
 		ShopInfoManageResponse res = service.execAction(TEST_USER, form);
@@ -424,6 +425,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 		assertEquals("001", dto.getShopCode(), "店舗コードが001であること");
 		assertEquals("904", dto.getShopKubunCode(), "店舗区分コードが904であること");
 		assertEquals("靴店舗(新規追加)", dto.getShopName(), "店舗名が靴店舗(新規追加)であること");
+		assertNull(dto.getDefaultPaymentMethodCode(), "デフォルト支払方法コードがnullであること");
 		assertEquals("001", dto.getShopSort(), "店舗表示順が001であること");
 	}
 	
@@ -440,7 +442,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddType3Action() {
 		// 新規追加テスト用フォームデータを作成(表示順=null:表示順は自動採番)
-		ShopInfoForm form = inputAddShopInfoForm(null);
+		ShopInfoForm form = inputAddShopInfoForm("002", null);
 		
 		// 検索条件に対応する店舗情報6件で新規の店舗情報を登録
 		ShopInfoManageResponse res = service.execAction(TEST_USER, form);
@@ -457,6 +459,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 		assertEquals("004", dto.getShopCode(), "店舗コードが004であること");
 		assertEquals("904", dto.getShopKubunCode(), "店舗区分コードが904であること");
 		assertEquals("靴店舗(新規追加)", dto.getShopName(), "店舗名が靴店舗(新規追加)であること");
+		assertEquals("002", dto.getDefaultPaymentMethodCode(), "デフォルト支払方法コードが002であること");
 		assertEquals("004", dto.getShopSort(), "店舗表示順が004であること");
 		// 3件目、5件目の表示順の値が更新されていないこと
 		assertEquals("003", resultList.get(2).getShopSort(), "店舗表示順が003であること");
@@ -476,7 +479,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddType4Action() {
 		// 新規追加テスト用フォームデータを作成(表示順=001)
-		ShopInfoForm form = inputAddShopInfoForm("001");
+		ShopInfoForm form = inputAddShopInfoForm("003","001");
 		
 		// 検索条件に対応する店舗情報6件で新規の店舗情報を登録
 		ShopInfoManageResponse res = service.execAction(TEST_USER, form);
@@ -490,6 +493,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 		assertEquals(7, resultList.size(), "検索結果が7件であること");
 		ShopReadWriteDto dto = resultList.get(3);
 		assertEquals("004", dto.getShopCode(), "店舗コードが004であること");
+		assertEquals("003", dto.getDefaultPaymentMethodCode(), "デフォルト支払方法コードが003であること");
 		assertEquals("001", dto.getShopSort(), "店舗表示順が001であること");
 		// 1件目～3件目の表示順が+1され、5件目の表示順の値が更新されていないこと
 		assertEquals("002", resultList.get(0).getShopSort(), "店舗表示順が002であること");
@@ -512,7 +516,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddType5Action() {
 		// 新規追加テスト用フォームデータを作成(表示順=002)
-		ShopInfoForm form = inputAddShopInfoForm("002");
+		ShopInfoForm form = inputAddShopInfoForm("003", "002");
 		
 		// 検索条件に対応する店舗情報6件で新規の店舗情報を登録
 		ShopInfoManageResponse res = service.execAction(TEST_USER, form);
@@ -547,7 +551,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddType6Action() {
 		// 新規追加テスト用フォームデータを作成(表示順=004)
-		ShopInfoForm form = inputAddShopInfoForm("004");
+		ShopInfoForm form = inputAddShopInfoForm("003", "004");
 		
 		// 検索条件に対応する店舗情報6件で新規の店舗情報を登録
 		ShopInfoManageResponse res = service.execAction(TEST_USER, form);
@@ -580,7 +584,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddType7Action() {
 		// 新規追加テスト用フォームデータを作成(表示順=005)
-		ShopInfoForm form = inputAddShopInfoForm("005");
+		ShopInfoForm form = inputAddShopInfoForm("003", "005");
 		
 		// 検索条件に対応する店舗情報6件で新規の店舗情報を登録
 		ShopInfoManageResponse res = service.execAction(TEST_USER, form);
@@ -609,7 +613,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateType1Action() {
 		// 更新テスト用フォームデータを作成
-		ShopInfoForm form = inputUpdateShopInfoForm("002");
+		ShopInfoForm form = inputUpdateShopInfoForm(null, "002");
 		
 		// 検索条件に対応する店舗情報6件で指定の店舗情報を更新
 		ShopInfoManageResponse res = service.execAction(TEST_USER, form);
@@ -664,7 +668,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateType2Action() {
 		// 更新テスト用フォームデータを作成(表示順:001)
-		ShopInfoForm form = inputUpdateShopInfoForm("001");
+		ShopInfoForm form = inputUpdateShopInfoForm("002", "001");
 		// 検索条件に対応する店舗情報6件で指定の店舗情報を更新
 		ShopInfoManageResponse res = service.execAction(TEST_USER, form);
 		// 更新完了のメッセージが設定されていること
@@ -687,6 +691,8 @@ class ShopInfoManageUseCaseIntegrationTest {
 		assertEquals("904", actualData.getShopKubunCode(), "店舗区分コード(SHOP_KUBUN_CODE)の更新後の値が正しいこと");
 		// 更新データと等しいこと：店舗名
 		assertEquals("靴店舗に更新(ホームセンター更新後)", actualData.getShopName(), "店舗名(SHOP_NAME)の更新後の値が正しいこと");
+		// 更新データと等しいこと：デフォルト支払方法コード(002)
+		assertEquals("002", actualData.getDefaultPaymentMethodCode(), "デフォルト支払方法コード(DEFAULT_PAYMENT_METHOD_CODE)の更新後の値が正しいこと");
 		// 更新データと等しいこと：店舗表示順(=001)
 		assertEquals("001", actualData.getShopSort(), "店舗表示順(SHOP_SORT)の更新後の値が正しいこと");
 		
@@ -711,7 +717,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateType3Action() {
 		// 更新テスト用フォームデータを作成(表示順:003)
-		ShopInfoForm form = inputUpdateShopInfoForm("003");
+		ShopInfoForm form = inputUpdateShopInfoForm("", "003");
 		// 検索条件に対応する店舗情報6件で指定の店舗情報を更新
 		ShopInfoManageResponse res = service.execAction(TEST_USER, form);
 		// 更新完了のメッセージが設定されていること
@@ -724,6 +730,11 @@ class ShopInfoManageUseCaseIntegrationTest {
 		assertTrue(res.isTransactionSuccessFull(), "トランザクションが完了のステータスになっていること");
 		
 		// DBデータの表示順の値更新結果が正しいこと
+		// 更新されたデータをロード
+		ShopReadWriteDto actualData = execQueryUpdateShop();
+		// 更新データと等しいこと：デフォルト支払方法コード(指定なし(null)
+		assertNull(actualData.getDefaultPaymentMethodCode(), "デフォルト支払方法コード(DEFAULT_PAYMENT_METHOD_CODE)の更新後の値が正しいこと");
+		
 		// 登録されたデータをロード
 		List<ShopReadWriteDto> resultList = execQueryAllShopList();
 		// 2件目データと3件目データの表示順が変わっていること
@@ -744,7 +755,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateType4Action() {
 		// 更新テスト用フォームデータを作成(表示順:004)
-		ShopInfoForm form = inputUpdateShopInfoForm("004");
+		ShopInfoForm form = inputUpdateShopInfoForm("", "004");
 		// 検索条件に対応する店舗情報6件で指定の店舗情報を更新
 		ShopInfoManageResponse res = service.execAction(TEST_USER, form);
 		// 更新完了のメッセージが設定されていること
@@ -777,7 +788,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateType5Action() {
 		// 更新テスト用フォームデータを作成(表示順:null)
-		ShopInfoForm form = inputUpdateShopInfoForm(null);
+		ShopInfoForm form = inputUpdateShopInfoForm("", null);
 		// 検索条件に対応する店舗情報6件で指定の店舗情報を更新
 		ShopInfoManageResponse res = service.execAction(TEST_USER, form);
 		// 更新完了のメッセージが設定されていること
@@ -809,7 +820,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateType6Action() {
 		// 更新テスト用フォームデータを作成(表示順:003)
-		ShopInfoForm form = inputUpdateShopInfoForm("003");
+		ShopInfoForm form = inputUpdateShopInfoForm("", "003");
 		// 更新データの店舗コードを001に変更
 		form.setShopCode("001");
 		// 更新データの旧表示順を001に変更
@@ -837,7 +848,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateType7Action() {
 		// 更新テスト用フォームデータを作成(表示順:001)
-		ShopInfoForm form = inputUpdateShopInfoForm("001");
+		ShopInfoForm form = inputUpdateShopInfoForm("", "001");
 		// 更新データの店舗コードを003に変更
 		form.setShopCode("003");
 		// 更新データの旧表示順を003に変更
@@ -866,7 +877,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateShopSortBeforeEmptyAction() {
 		// 更新テスト用フォームデータを作成
-		ShopInfoForm form = inputUpdateShopInfoForm("002");
+		ShopInfoForm form = inputUpdateShopInfoForm("", "002");
 		// 更新前表示順の値にnullを設定
 		form.setShopSortBefore(null);
 		
@@ -890,7 +901,7 @@ class ShopInfoManageUseCaseIntegrationTest {
 	@Sql(scripts = "ReadShopInfoQueryResultSixTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateActionFailValueAction() {
 		// 更新テスト用フォームデータを作成
-		ShopInfoForm form = inputUpdateShopInfoForm("002");
+		ShopInfoForm form = inputUpdateShopInfoForm("", "002");
 		// アクションに削除を設定
 		form.setAction(MyHouseholdAccountBookContent.ACTION_TYPE_DELETE);
 		// 更新前表示順の値にnullを設定
@@ -941,11 +952,12 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 *<pre>
 	 * 追加テスト用の店舗情報フォームデータを取得
 	 *</pre>
+	 * @param paymentMethodCode
 	 * @param shopSort
 	 * @return
 	 *
 	 */
-	private ShopInfoForm inputAddShopInfoForm(String shopSort) {
+	private ShopInfoForm inputAddShopInfoForm(String paymentMethodCode, String shopSort) {
 		// 店舗情報のformデータ
 		ShopInfoForm form = new ShopInfoForm();
 		// アクション
@@ -955,6 +967,8 @@ class ShopInfoManageUseCaseIntegrationTest {
 		form.setShopKubun("904");
 		// 店舗名
 		form.setShopName("靴店舗(新規追加)");
+		// デフォルト支払方法
+		form.setDefaultPaymentMethodCode(paymentMethodCode);
 		// 表示順:値がnullの場合、表示順の値は自動採番される
 		if(shopSort != null) {
 			form.setShopSort(Integer.parseInt(shopSort));
@@ -969,11 +983,12 @@ class ShopInfoManageUseCaseIntegrationTest {
 	 * 更新テスト用の店舗情報フォームデータを取得
 	 * (更新項目：店舗区分、店舗名、表示順(値nullの場合、値の変更なし)
 	 *</pre>
+	 * @param paymentMethodCode
 	 * @param shopSort
 	 * @return
 	 *
 	 */
-	private ShopInfoForm inputUpdateShopInfoForm(String shopSort) {
+	private ShopInfoForm inputUpdateShopInfoForm(String paymentMethodCode, String shopSort) {
 		// 店舗情報のformデータ
 		ShopInfoForm form = new ShopInfoForm();
 		// アクション
@@ -984,6 +999,8 @@ class ShopInfoManageUseCaseIntegrationTest {
 		form.setShopKubun("904");
 		// 店舗名
 		form.setShopName("靴店舗に更新(ホームセンター更新後)");
+		// デフォルト支払方法
+		form.setDefaultPaymentMethodCode(paymentMethodCode);
 		// 表示順
 		if(shopSort != null) {
 			form.setShopSort(Integer.parseInt(shopSort));

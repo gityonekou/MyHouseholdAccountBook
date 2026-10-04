@@ -47,12 +47,12 @@ public class ShopInfoForm {
 	@NotBlank
 	@Size(min = 1, max = 50)
 	private String shopName;
+	// デフォルト支払方法コード(任意)
+	private String defaultPaymentMethodCode;
 	// 表示順
 	@Min(1)
 	@Max(899)
 	private Integer shopSort;
-	// デフォルト支払方法コード(任意)
-	private String defaultPaymentMethodCode;
 
 	/**
 	 *<pre>

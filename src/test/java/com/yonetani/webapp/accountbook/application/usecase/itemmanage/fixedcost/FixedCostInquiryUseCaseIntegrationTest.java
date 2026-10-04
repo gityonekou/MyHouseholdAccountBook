@@ -29,7 +29,7 @@
  *
  * [テストデータ]
  * 固定費5件: 0001:家賃(0030,毎月,27日,60000), 0002:電気代概算(0037,毎月,27日,12000),
- *            0003:国民年金保険(0015,奇数月,月初,16590), 0004:その他任意テスト(0038,その他任意,27日,10000),
+ *            0003:国民年金保険支払（奇数月）(0015,奇数月,月初,16590), 0004:その他任意テスト(0038,その他任意,27日,10000),
  *            0005:電気代夏季割増(0037,偶数月,27日,8000)
  * NOW_TARGET_MONTH=11 → 3か月合計: 2025/11=98,590円, 2025/12=90,000円, 2026/01=98,590円
  * </pre>
@@ -38,6 +38,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2026/04/19 : 1.00.00  feature-1.00-dev00  新規作成
  * 2026/05/07 : 1.01.00  feature-1.01-dev2   奇数/偶数月合計→3か月合計対応、固定費5件データに更新
+ * 2026/09/23 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
@@ -58,11 +59,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostInfoUpdateForm;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.AbstractFixedCostItemListResponse.FixedCostItem;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageActSelectResponse;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageActSelectResponse.SelectFixedCostInfo;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageInitResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageUpdateResponse;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.AbstractFixedCostItemListResponse.FixedCostItem;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageActSelectResponse.SelectFixedCostInfo;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
 /**
@@ -143,7 +144,7 @@ class FixedCostInquiryUseCaseIntegrationTest {
 	 * ・支出項目一覧トップレベル（Level1）が6件（SISYUTU_ITEM_SORT昇順）で取得されること
 	 * ・固定費5件が ORDER BY SISYUTU_ITEM_SORT, FIXED_COST_SHIHARAI_TUKI の複合ソート順で取得されること
 	 *   DB取得順:
-	 *     index0: 0003 国民年金保険 (sort=0201010000, TUKI=20)
+	 *     index0: 0003 国民年金保険支払（奇数月） (sort=0201010000, TUKI=20)
 	 *     index1: 0001 家賃         (sort=0303010000, TUKI=00)
 	 *     index2: 0002 電気代概算   (sort=0306010000, TUKI=00)
 	 *     index3: 0005 電気代夏季割増(sort=0306010000, TUKI=30) ← 同SORTでTUKI後
@@ -181,41 +182,57 @@ class FixedCostInquiryUseCaseIntegrationTest {
 		// index0: 0003 国民年金保険 (sort=0201010000, TUKI=20)
 		FixedCostItem item0 = fixedCostItemList.get(0);
 		assertEquals("0003", item0.getFixedCostCode(), "index0の固定費コードが0003であること");
-		assertEquals("国民年金保険", item0.getShiharaiName(), "index0の支払名が国民年金保険であること");
+		assertEquals("国民年金保険", item0.getSisyutuItemName(), "index0の支出項目名が国民年金保険であること");
+		assertEquals("国民年金保険支払（奇数月）", item0.getShiharaiName(), "index0の支払名が国民年金保険支払（奇数月）であること");
 		assertEquals("奇数月", item0.getShiharaiTuki(), "index0の支払月が奇数月であること");
 		assertEquals("月初営業日", item0.getShiharaiDay(), "index0の支払日が月初営業日であること");
+		assertEquals("みんなのテスト＠銀行　口座振替", item0.getPaymentMethodName(), "index0の支払方法名（解決済み）が－であること");
 		assertEquals("16,590円", item0.getShiharaiKingaku(), "index0の支払金額が16,590円であること");
+		assertNull(item0.getOptionalContext(), "index0のその他任意詳細");
+		
 
 		// index1: 0001 家賃 (sort=0303010000, TUKI=00)
 		FixedCostItem item1 = fixedCostItemList.get(1);
 		assertEquals("0001", item1.getFixedCostCode(), "index1の固定費コードが0001であること");
+		assertEquals("家賃", item1.getSisyutuItemName(), "index1の支出項目名が家賃であること");
 		assertEquals("家賃", item1.getShiharaiName(), "index1の支払名が家賃であること");
 		assertEquals("毎月", item1.getShiharaiTuki(), "index1の支払月が毎月であること");
 		assertEquals("27日", item1.getShiharaiDay(), "index1の支払日が27日であること");
+		assertEquals("現金", item1.getPaymentMethodName(), "index1の支払方法名（解決済み）が現金であること");
 		assertEquals("60,000円", item1.getShiharaiKingaku(), "index1の支払金額が60,000円であること");
-
+		assertNull(item1.getOptionalContext(), "index1のその他任意詳細");
+		
 		// index2: 0002 電気代概算 (sort=0306010000, TUKI=00)
 		FixedCostItem item2 = fixedCostItemList.get(2);
 		assertEquals("0002", item2.getFixedCostCode(), "index2の固定費コードが0002であること");
+		assertEquals("電気代", item2.getSisyutuItemName(), "index2の支出項目名が電気代であること");
 		assertEquals("電気代概算", item2.getShiharaiName(), "index2の支払名が電気代概算であること");
 		assertEquals("毎月", item2.getShiharaiTuki(), "index2の支払月が毎月であること");
+		assertEquals("○○クレジットカード", item2.getPaymentMethodName(), "index2の支払方法名（解決済み）が○○クレジットカードであること");
 		assertEquals("12,000円", item2.getShiharaiKingaku(), "index2の支払金額が12,000円であること");
-
+		assertNull(item2.getOptionalContext(), "index2のその他任意詳細");
+		
 		// index3: 0005 電気代夏季割増 (sort=0306010000, TUKI=30) ← 0002と同SORTでTUKI後
 		FixedCostItem item3 = fixedCostItemList.get(3);
 		assertEquals("0005", item3.getFixedCostCode(), "index3の固定費コードが0005であること");
+		assertEquals("電気代", item3.getSisyutuItemName(), "index3の支出項目名が電気代であること");
 		assertEquals("電気代夏季割増", item3.getShiharaiName(), "index3の支払名が電気代夏季割増であること");
 		assertEquals("偶数月", item3.getShiharaiTuki(), "index3の支払月が偶数月であること");
 		assertEquals("27日", item3.getShiharaiDay(), "index3の支払日が27日であること");
+		assertEquals("○○クレジットカード", item3.getPaymentMethodName(), "index3の支払方法名（解決済み）が○○クレジットカードであること");
 		assertEquals("8,000円", item3.getShiharaiKingaku(), "index3の支払金額が8,000円であること");
-
+		assertNull(item3.getOptionalContext(), "index3のその他任意詳細");
+		
 		// index4: 0004 その他任意テスト (sort=0306020000, TUKI=40)
 		FixedCostItem item4 = fixedCostItemList.get(4);
 		assertEquals("0004", item4.getFixedCostCode(), "index4の固定費コードが0004であること");
+		assertEquals("ガス代", item4.getSisyutuItemName(), "index4の支出項目名がガス代であること");
 		assertEquals("その他任意テスト", item4.getShiharaiName(), "index4の支払名がその他任意テストであること");
 		assertEquals("その他任意", item4.getShiharaiTuki(), "index4の支払月がその他任意であること");
+		assertEquals("－", item4.getPaymentMethodName(), "index4の支払方法名（解決済み）が－であること");
 		assertEquals("10,000円", item4.getShiharaiKingaku(), "index4の支払金額が10,000円であること");
-
+		assertEquals("不定期の支払です", item4.getOptionalContext(), "index4のその他任意詳細が不定期の支払ですであること");
+		
 		// 3か月合計・ラベルの確認
 		assertEquals("2025年11月", response.getTargetMonthLabel(), "対象月ラベルが2025年11月であること");
 		assertEquals("2025年12月", response.getTargetMonthPlus1Label(), "対象月+1ラベルが2025年12月であること");

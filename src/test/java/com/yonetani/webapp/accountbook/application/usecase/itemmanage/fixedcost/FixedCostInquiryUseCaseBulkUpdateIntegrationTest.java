@@ -36,6 +36,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2026/05/02 : 1.00.00  feature-1.01-dev1   新規作成
  * 2026/05/07 : 1.00.01  feature-1.01-dev1   0002の支払月を毎月→奇数月に変更、anyMatch→インデックスアクセスに変更、3か月合計検証追加
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
@@ -56,8 +57,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.FixedCostBulkUpdateForm;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostBulkUpdateResponse;
-import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageActSelectResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostBulkUpdateResponse.BulkUpdateTargetItem;
+import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageActSelectResponse;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.FixedCostInfoManageActSelectResponse.SiblingFixedCostItem;
 import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 
@@ -120,14 +121,19 @@ class FixedCostInquiryUseCaseBulkUpdateIntegrationTest {
 		assertEquals("0001", item0.getFixedCostCode(), "index0の固定費コードが0001(家賃)であること");
 		assertEquals("家賃", item0.getShiharaiName(), "index0の支払名が家賃であること");
 		assertEquals("毎月", item0.getShiharaiTukiDetailContext(), "index0の支払月が毎月であること");
-		assertEquals("60,000円", item0.getShiharaiKingaku(), "index0の支払金額が60,000円であること");
 		assertEquals("", item0.getShiharaiTukiOptionalContext(), "index0の任意詳細が空であること");
+		assertEquals("27日", item0.getShiharaiDay(), "index0の支払日が27日であること");
+		assertEquals("現金", item0.getPaymentMethodName(), "index0の支払方法名（解決済み）が現金であること");
+		assertEquals("60,000円", item0.getShiharaiKingaku(), "index0の支払金額が60,000円であること");
+		
 
 		// index1: 0002 共益費 (TUKI=20)
 		SiblingFixedCostItem item1 = siblingList.get(1);
 		assertEquals("0002", item1.getFixedCostCode(), "index1の固定費コードが0002(共益費)であること");
 		assertEquals("共益費", item1.getShiharaiName(), "index1の支払名が共益費であること");
 		assertEquals("奇数月", item1.getShiharaiTukiDetailContext(), "index1の支払月が奇数月であること");
+		assertEquals("27日", item1.getShiharaiDay(), "index1の支払日が27日であること");
+		assertEquals("○○クレジットカード", item1.getPaymentMethodName(), "index1の支払方法名（解決済み）が○○クレジットカードであること");
 		assertEquals("8,000円", item1.getShiharaiKingaku(), "index1の支払金額が8,000円であること");
 
 		// 選択固定費の情報が正しく設定されていること

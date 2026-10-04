@@ -106,12 +106,29 @@ INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, S
 ('user01', '0060','小規模企業共済','小規模企業共済詳細を入力','0013','2','0203000000', false);
 
 -- ----------------------------------------
--- 3. 固定費テーブルデータ（3件）
+-- 3. 銀行口座マスタデータ：BANK_ACCOUNT_TABLE
+-- ----------------------------------------
+INSERT INTO BANK_ACCOUNT_TABLE VALUES
+	('user01', '01', 'みんなのテスト＠銀行', 'みんなのテスト＠銀行 めも①', '01', true),
+	('user01', '02', 'てすと２銀行', 'テスト銀行②めも', '02', true);
+	
+-- ----------------------------------------
+-- 4. 支払方法マスタデータ：PAYMENT_METHOD_TABLE
+-- ----------------------------------------
+INSERT INTO PAYMENT_METHOD_TABLE VALUES
+	('user01', '001', '現金', NULL, '1', NULL, NULL, '001', true, true),
+	('user01', '002', '○○クレジットカード', 'スペシャルポイント = 合計金額 × 9.5％ ÷ 5\n当月ポイント=スペシャルポイント＋基本の1000円1ポイント', '3', '02', '16', '002', true, true),
+	('user01', '003', 'みんなのテスト＠銀行　口座振替', NULL, '2', '01', NULL, '003', true, true),
+	('user01', '999', '支払方法がない', NULL, '1', null, null, '999', true, false);
+	
+	
+-- ----------------------------------------
+-- 5. 固定費テーブルデータ（3件）
 -- ※ 0001と0002が同じSISYUTU_ITEM_CODE=0030(家賃)に属する兄弟固定費
 -- ----------------------------------------
 -- DB取得順(SISYUTU_ITEM_SORT昇順): 0001(0303010000)→0002(0303010000)→0003(0306010000)
 -- ※ 同一SORTは FIXED_COST_CODE 昇順(H2デフォルト)
 INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, SISYUTU_ITEM_CODE, FIXED_COST_KUBUN, FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT, FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU, PAYMENT_METHOD_CODE, DELETE_FLG) VALUES
 ('user01', '0001', '家賃',    '毎月27日引き落とし', '0030', '1', '00', NULL, '27', 60000.00, '001', false),
-('user01', '0002', '共益費',  '奇数月27日引き落とし', '0030', '1', '20', NULL, '27',  8000.00, '001', false),
+('user01', '0002', '共益費',  '奇数月27日引き落とし', '0030', '1', '20', NULL, '27',  8000.00, '002', false),
 ('user01', '0003', '電気代概算', '概算で登録',     '0037', '2', '00', NULL, '27', 12000.00, '001', false);
