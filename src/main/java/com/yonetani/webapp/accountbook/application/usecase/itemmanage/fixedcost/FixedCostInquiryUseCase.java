@@ -351,10 +351,10 @@ public class FixedCostInquiryUseCase {
 		updateForm.setShiharaiTukiOptionalContext(searchResult.getFixedCostTargetPaymentMonthOptionalContext().getValue());
 		// 支払日
 		updateForm.setShiharaiDay(searchResult.getFixedCostPaymentDay().getValue());
-		// 支払金額
-		updateForm.setShiharaiKingaku(searchResult.getFixedCostPaymentAmount().toIntegerValue());
 		// 支払方法コード
 		updateForm.setPaymentMethodCode(searchResult.getPaymentMethodCode().getValue());
+		// 支払金額
+		updateForm.setShiharaiKingaku(searchResult.getFixedCostPaymentAmount().toIntegerValue());
 		// 支払い月選択ボックス、支出項目名をレスポンスに設定し返却
 		return getUpdateResponse(userId, updateForm);
 	}

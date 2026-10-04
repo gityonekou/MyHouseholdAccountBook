@@ -9,6 +9,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2025/01/19 : 1.00.00                      新規作成
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop;
@@ -35,8 +36,12 @@ import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ModelMap;
 
+import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent.ResolvedPaymentMethodName;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopSort;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.shop.ShopReadWriteDto;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
@@ -139,25 +144,21 @@ class ShopInfoManageUseCaseIntegrationTest {
 			assertEquals("店舗情報取得結果が0件です。", res.getMessagesList().get(0), "検索結果なしのメッセージが設定されていること");	
 		}
 		
-		// 画面表示情報からviewを生成し、Modelマップを取得
-		ModelMap modelMap = res.build().getModelMap();
-		
 		// 店舗グループの選択ボックス情報の設定値が想定通りであること
-		SelectViewItem shopKubunItem = (SelectViewItem)modelMap.getAttribute("shopKubun");
+		SelectViewItem shopKubunItem = res.getShopKubunItem();
 		assertIterableEquals(shopKubunSelectList(), shopKubunItem.getOptionList(), "店舗グループの選択ボックス情報がコード定義内容と等しいこと");
 		
 		// 店舗一覧情報の明細リストを取得
-		@SuppressWarnings("unchecked")
-		List<ShopListItem> shopList = (List<ShopListItem>)modelMap.getAttribute("shopList");
-		@SuppressWarnings("unchecked")
-		List<ShopListItem> nonEditShopList = (List<ShopListItem>)modelMap.getAttribute("nonEditShopList");
+		List<ShopListItem> shopList = res.getShopList();
+		List<ShopListItem> nonEditShopList = res.getNonEditShopList();
+		
 		// 店舗一覧情報の明細リストが0件であること
 		assertNotNull(shopList, "店舗一覧情報の明細データ(変更可能分)がnullでないこと");
 		assertEquals(0, shopList.size(), "店舗一覧情報の明細データ(変更可能分)が0件であること");
 		assertNotNull(nonEditShopList, "店舗一覧情報の明細データ(変更不可分)がnullでないこと");
 		assertEquals(0, nonEditShopList.size(), "舗一覧情報の明細データ(変更不可分)が0件であること");
 		// 店舗情報入力フォームに空データが設定されていること
-		ShopInfoForm shopInfoForm = (ShopInfoForm)modelMap.getAttribute("shopInfoForm");
+		ShopInfoForm shopInfoForm = res.getShopInfoForm();
 		assertNotNull(shopInfoForm, "店舗情報入力フォームがnullでないこと");
 		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, shopInfoForm.getAction(), "アクションが新規登録であること");
 		assertNull(shopInfoForm.getShopCode(), "店舗コードがnullであること");
@@ -180,16 +181,22 @@ class ShopInfoManageUseCaseIntegrationTest {
 		ShopInfoManageResponse res = service.readShopInfo(TEST_USER);
 		assertEquals(0, res.getMessagesList().size(), "エラーメッセージが設定されていないこと");
 		
-		// 画面表示情報からviewを生成し、Modelマップを取得
-		ModelMap modelMap = res.build().getModelMap();
 		// 店舗一覧情報の明細リストを取得
-		@SuppressWarnings("unchecked")
-		List<ShopListItem> shopList = (List<ShopListItem>)modelMap.getAttribute("shopList");
-		@SuppressWarnings("unchecked")
-		List<ShopListItem> nonEditShopList = (List<ShopListItem>)modelMap.getAttribute("nonEditShopList");
+		List<ShopListItem> shopList = res.getShopList();
+		List<ShopListItem> nonEditShopList = res.getNonEditShopList();
+		
 		// 店舗一覧情報の明細リストが1件であること
 		assertNotNull(shopList, "店舗一覧情報の明細データ(変更可能分)がnullでないこと");
-		assertIterableEquals(shopListOne(), shopList, "店舗一覧情報の明細データ1件の内容が等しいこと");
+		assertEquals(1, shopList.size(), "店舗一覧情報の明細データ(変更可能分)が1件であること");
+		
+		// 店舗一覧情報の明細データ1件の内容が等しいこと
+		ShopListItem listItem = shopList.get(0);
+		assertEquals("001", listItem.getShopCode(), "店舗コード");
+		assertEquals("食品・日用品店舗", listItem.getShopKubunName(), "店舗区分名称");
+		assertEquals("テストユーザ登録店舗０１", listItem.getShopName(), "店舗名");
+		assertEquals("－", listItem.getDefaultPaymentMethodName(), "デフォルト支払方法名");
+		assertEquals("001", listItem.getShopSort(), "店舗表示順");
+		
 		assertNotNull(nonEditShopList, "店舗一覧情報の明細データ(変更不可分)がnullでないこと");
 		assertEquals(0, nonEditShopList.size(), "舗一覧情報の明細データ(変更不可分)が0件であること");
 	}
@@ -206,18 +213,24 @@ class ShopInfoManageUseCaseIntegrationTest {
 		ShopInfoManageResponse res = service.readShopInfo(TEST_USER);
 		assertEquals(0, res.getMessagesList().size(), "エラーメッセージが設定されていないこと");
 		
-		// 画面表示情報からviewを生成し、Modelマップを取得
-		ModelMap modelMap = res.build().getModelMap();
 		// 店舗一覧情報の明細リストを取得
-		@SuppressWarnings("unchecked")
-		List<ShopListItem> shopList = (List<ShopListItem>)modelMap.getAttribute("shopList");
-		@SuppressWarnings("unchecked")
-		List<ShopListItem> nonEditShopList = (List<ShopListItem>)modelMap.getAttribute("nonEditShopList");
+		List<ShopListItem> shopList = res.getShopList();
+		List<ShopListItem> nonEditShopList = res.getNonEditShopList();
+		
 		// 店舗一覧情報の明細リストが1件であること
 		assertNotNull(shopList, "店舗一覧情報の明細データ(変更可能分)がnullでないこと");
 		assertEquals(0, shopList.size(), "店舗一覧情報の明細データ(変更可能分)が0件であること");
 		assertNotNull(nonEditShopList, "店舗一覧情報の明細データ(変更不可分)がnullでないこと");
-		assertIterableEquals(nonEditShopListOne(), nonEditShopList, "店舗一覧情報の明細データ1件の内容が等しいこと");
+		assertEquals(1, nonEditShopList.size(), "店舗一覧情報の明細データ(変更不可分)が1件であること");
+		
+		// 店舗一覧情報の明細データ1件の内容が等しいこと
+		ShopListItem listItem = nonEditShopList.get(0);
+		assertEquals("901", listItem.getShopCode(), "店舗コード");
+		assertEquals("食品・日用品店舗", listItem.getShopKubunName(), "店舗区分名称");
+		assertEquals("食品・日用品店舗(その他)", listItem.getShopName(), "店舗名");
+		assertEquals("－", listItem.getDefaultPaymentMethodName(), "デフォルト支払方法名");
+		assertEquals("901", listItem.getShopSort(), "店舗表示順");
+		
 	}
 	
 	/**
@@ -232,18 +245,47 @@ class ShopInfoManageUseCaseIntegrationTest {
 		ShopInfoManageResponse res = service.readShopInfo(TEST_USER);
 		assertEquals(0, res.getMessagesList().size(), "エラーメッセージが設定されていないこと");
 		
-		// 画面表示情報からviewを生成し、Modelマップを取得
-		ModelMap modelMap = res.build().getModelMap();
 		// 店舗一覧情報の明細リストを取得
-		@SuppressWarnings("unchecked")
-		List<ShopListItem> shopList = (List<ShopListItem>)modelMap.getAttribute("shopList");
-		@SuppressWarnings("unchecked")
-		List<ShopListItem> nonEditShopList = (List<ShopListItem>)modelMap.getAttribute("nonEditShopList");
+		List<ShopListItem> shopList = res.getShopList();
+		List<ShopListItem> nonEditShopList = res.getNonEditShopList();
+		
 		// 店舗一覧情報の明細リストが1件であること
 		assertNotNull(shopList, "店舗一覧情報の明細データ(変更可能分)がnullでないこと");
-		assertIterableEquals(shopListThree(), shopList, "店舗一覧情報(変更可能分)の明細データ3件の内容が等しいこと");
+		assertEquals(3, shopList.size(), "店舗一覧情報の明細データ(変更可能分)が3件であること");
 		assertNotNull(nonEditShopList, "店舗一覧情報の明細データ(変更不可分)がnullでないこと");
-		assertIterableEquals(nonEditShopListThree(), nonEditShopList, "店舗一覧情報(変更不可分)の明細データ3件の内容が等しいこと");
+		assertEquals(3, nonEditShopList.size(), "店舗一覧情報の明細データ(変更不可分)が3件であること");
+		
+		// 店舗一覧情報(変更可能分)内容確認(3件の内容が正しいこと)
+		ShopListItem listItem1 = shopList.get(0);
+		assertEquals("001", listItem1.getShopCode(), "店舗コード");
+		assertEquals("食品・日用品店舗", listItem1.getShopKubunName(), "店舗区分名称");
+		assertEquals("テストユーザ登録店舗０１", listItem1.getShopName(), "店舗名");
+		assertEquals("みんなのテスト＠銀行　口座振替", listItem1.getDefaultPaymentMethodName(), "デフォルト支払方法名");
+		assertEquals("001", listItem1.getShopSort(), "店舗表示順");
+		ShopListItem listItem2 = shopList.get(1);
+		assertEquals("002", listItem2.getShopCode(), "店舗コード");
+		assertEquals("ホームセンター", listItem2.getShopKubunName(), "店舗区分名称");
+		assertEquals("テストユーザ登録店舗０２", listItem2.getShopName(), "店舗名");
+		assertEquals("－", listItem2.getDefaultPaymentMethodName(), "デフォルト支払方法名");
+		assertEquals("002", listItem2.getShopSort(), "店舗表示順");
+		ShopListItem listItem3 = shopList.get(2);
+		assertEquals("003", listItem3.getShopCode(), "店舗コード");
+		
+		// 店舗一覧情報(変更不可分)内容確認(3件の内容が正しいこと)
+		ShopListItem listNItem1 = nonEditShopList.get(0);
+		assertEquals("901", listNItem1.getShopCode(), "店舗コード");
+		assertEquals("食品・日用品店舗", listNItem1.getShopKubunName(), "店舗区分名称");
+		assertEquals("食品・日用品店舗(その他)", listNItem1.getShopName(), "店舗名");
+		assertEquals("－", listNItem1.getDefaultPaymentMethodName(), "デフォルト支払方法名");
+		assertEquals("901", listNItem1.getShopSort(), "店舗表示順");
+		ShopListItem listNItem2 = nonEditShopList.get(1);
+		assertEquals("902", listNItem2.getShopCode(), "店舗コード");
+		assertEquals("ホームセンター", listNItem2.getShopKubunName(), "店舗区分名称");
+		assertEquals("ホームセンター(その他)", listNItem2.getShopName(), "店舗名");
+		assertEquals("－", listNItem2.getDefaultPaymentMethodName(), "デフォルト支払方法名");
+		assertEquals("902", listNItem2.getShopSort(), "店舗表示順");
+		ShopListItem listNItem3 = nonEditShopList.get(2);
+		assertEquals("903", listNItem3.getShopCode(), "店舗コード");
 	}
 	
 	/**
@@ -897,62 +939,6 @@ class ShopInfoManageUseCaseIntegrationTest {
 	
 	/**
 	 *<pre>
-	 * 店舗一覧情報の明細テストデータ1件(変更可能分)を取得
-	 *</pre>
-	 * @return
-	 *
-	 */
-	private List<ShopListItem> shopListOne() {
-		List<ShopListItem> shopList = new ArrayList<>();
-		shopList.add(ShopListItem.from("001", "テストユーザ登録店舗０１", "食品・日用品店舗", "001", "－"));
-		return shopList;
-	}
-	
-	/**
-	 *<pre>
-	 * 店舗一覧情報の明細テストデータ3件(変更可能分)を取得
-	 *</pre>
-	 * @return
-	 *
-	 */
-	private List<ShopListItem> shopListThree() {
-		List<ShopListItem> shopList = new ArrayList<>();
-		shopList.add(ShopListItem.from("001", "テストユーザ登録店舗０１", "食品・日用品店舗", "001", "－"));
-		shopList.add(ShopListItem.from("002", "テストユーザ登録店舗０２", "ホームセンター", "002", "－"));
-		shopList.add(ShopListItem.from("003", "テストユーザ登録店舗０３", "衣類店舗", "003", "－"));
-		return shopList;
-	}
-	
-	/**
-	 *<pre>
-	 * 店舗一覧情報の明細テストデータ1件(変更不可分)を取得
-	 *</pre>
-	 * @return
-	 *
-	 */
-	private List<ShopListItem> nonEditShopListOne() {
-		List<ShopListItem> shopList = new ArrayList<>();
-		shopList.add(ShopListItem.from("901", "食品・日用品店舗(その他)", "食品・日用品店舗", "901", "－"));
-		return shopList;
-	}
-	
-	/**
-	 *<pre>
-	 * 店舗一覧情報の明細テストデータ3件(変更不可分)を取得
-	 *</pre>
-	 * @return
-	 *
-	 */
-	private List<ShopListItem> nonEditShopListThree() {
-		List<ShopListItem> shopList = new ArrayList<>();
-		shopList.add(ShopListItem.from("901", "食品・日用品店舗(その他)", "食品・日用品店舗", "901", "－"));
-		shopList.add(ShopListItem.from("902", "ホームセンター(その他)", "ホームセンター", "902", "－"));
-		shopList.add(ShopListItem.from("903", "衣類店舗(その他)", "衣類店舗", "903", "－"));
-		return shopList;
-	}
-	
-	/**
-	 *<pre>
 	 * 追加テスト用の店舗情報フォームデータを取得
 	 *</pre>
 	 * @param shopSort
@@ -1050,6 +1036,28 @@ class ShopInfoManageUseCaseIntegrationTest {
 				),
 				// ShopReadWriteDtoのRowMapper
 				new DataClassRowMapper<>(ShopReadWriteDto.class));
+	}
+	
+	/**
+	 *<pre>
+	 * レスポンスデータクラス（ShopListItem）を生成するヘルパーです。
+	 * デフォルト支払方法は「解決できない場合の値オブジェクト」である「－」が選択されます。
+	 * その他のデフォルト支払方法を設定する場合は呼び出し元にてリゾルバーを用いて設定してください。
+	 *</pre>
+	 * @param shopCode
+	 * @param shopKubunName
+	 * @param shopName
+	 * @param shopSort
+	 * @return
+	 *
+	 */
+	private ShopListItem shopListItemHelper(String shopCode, String shopKubunName, String shopName, String shopSort) {
+		return ShopListItem.from(
+				ShopCode.from(shopCode),
+				shopKubunName,
+				ShopName.from(shopName),
+				ResolvedPaymentMethodName.UNRESOLVED,
+				ShopSort.from(shopSort));
 	}
 	
 }

@@ -1,9 +1,5 @@
 /**
  * 支出テーブル情報の「イベントコード」項目の値を表すドメインタイプです。
- * 
- * [注意]
- * 支出テーブル情報の「イベントコード」項目は他のID系のドメインタイプと違い空文字列を許容するため
- * Identifier、NullableIdentifierの継承不可となります。
  *
  *------------------------------------------------
  * 更新履歴
@@ -17,11 +13,9 @@ package com.yonetani.webapp.accountbook.domain.type.account.expenditure;
 import org.springframework.util.StringUtils;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.common.NullableIdentifier;
 
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  *<pre>
@@ -30,10 +24,6 @@ import lombok.RequiredArgsConstructor;
  * イベントコード項目の値が空文字列となるパターン
  * ・登録済みの固定費一覧情報からセッションに設定する支出登録情報登録時（IncomeAndExpenditureInitUseCase）クラスのreadInitInfoメソッド参照
  * ・画面のリクエストパラメータ受け取り時(空文字列が設定されている場合)
- * 
- * [注意]
- *　支出テーブル情報の「イベントコード」項目は他のID系のドメインタイプと違い空文字列を許容するため
- *　Identifier、NullableIdentifierの継承不可となります。
  *
  *</pre>
  *
@@ -41,16 +31,22 @@ import lombok.RequiredArgsConstructor;
  * @since 家計簿アプリ(1.00)
  *
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-@EqualsAndHashCode
-public class ExpenditureEventCode {
+@EqualsAndHashCode(callSuper = true)
+public class ExpenditureEventCode extends NullableIdentifier {
 	
 	/** 値がnullの支出テーブル情報の「イベントコード」項目の値 */
 	public static final ExpenditureEventCode NULL = ExpenditureEventCode.from(null);
 	
-	// IDの値
-	private final String value;
+	/**
+	 *<pre>
+	 * ExpenditureEventCodeクラスコンストラクターです。
+	 *</pre>
+	 * @param value 支出テーブル情報の「イベントコード」項目の値
+	 *
+	 */
+	private ExpenditureEventCode(String value) {
+		super(value);
+	}
 	
 	/**
 	 *<pre>
@@ -71,36 +67,18 @@ public class ExpenditureEventCode {
 	 */
 	public static ExpenditureEventCode from(String code) {
 		
-		// null値、または空文字列の場合は、null値の「イベントコード」項目ドメインタイプを返す
-		if(!StringUtils.hasLength(code)) {
-			return new ExpenditureEventCode(null);
-		}
-		
-		// ガード節(桁数)
-		if(code.length() != 4) {
-			throw new MyHouseholdAccountBookRuntimeException(
-					String.format("「支出テーブル情報の「イベントコード」」項目の桁数が不正です。管理者に問い合わせてください。[length=%d]", code.length())); 
-		}
+		// 基本検証（null・空文字列は許可、長さが4桁でない）
+		validate(code, 4, "支出テーブル情報の「イベントコード」");
 		
 		// ガード節(数値に変換できない(数値4桁:0パディング))
 		try {
-			Integer.parseInt(code);
+			if(StringUtils.hasLength(code)) {
+				Integer.parseInt(code);
+			}
 		} catch(NumberFormatException ex) {
 			throw new MyHouseholdAccountBookRuntimeException("支出テーブル情報の「イベントコード」項目の設定値が不正です。管理者に問い合わせてください。[eventCode=" + code + "]");
 		}
 		
 		return new ExpenditureEventCode(code);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		// null値の場合は空文字列を返却
-		if(value == null) {
-			return "";
-		}
-		return value;
 	}
 }

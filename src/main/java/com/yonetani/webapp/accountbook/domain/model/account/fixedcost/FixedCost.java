@@ -7,11 +7,10 @@
  * 2024/05/27 : 1.00.00                      新規作成
  * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
  * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/09/23 : 1.02.01  feature-1.03-dev1   追加リファクタリング対応
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.fixedcost;
-
-import java.math.BigDecimal;
 
 import org.springframework.util.StringUtils;
 
@@ -90,75 +89,24 @@ public class FixedCost {
 	 *
 	 */
 	public static FixedCost from(
-			String userId,
-			String fixedCostCode,
-			String fixedCostName,
-			String fixedCostDetailContext,
-			String expenditureItemCode,
-			String fixedCostKubun,
-			String fixedCostTargetPaymentMonth,
-			String fixedCostTargetPaymentMonthOptionalContext,
-			String fixedCostPaymentDay,
-			String paymentMethodCode,
-			BigDecimal fixedCostPaymentAmount) {
+			UserId userId,
+			FixedCostCode fixedCostCode,
+			FixedCostName fixedCostName,
+			FixedCostDetailContext fixedCostDetailContext,
+			ExpenditureItemCode expenditureItemCode,
+			FixedCostKubun fixedCostKubun,
+			FixedCostTargetPaymentMonth fixedCostTargetPaymentMonth,
+			FixedCostTargetPaymentMonthOptionalContext fixedCostTargetPaymentMonthOptionalContext,
+			FixedCostPaymentDay fixedCostPaymentDay,
+			PaymentMethodCode paymentMethodCode,
+			FixedCostPaymentAmount fixedCostPaymentAmount) {
 		return new FixedCost(
-				UserId.from(userId),
-				FixedCostCode.from(fixedCostCode),
-				FixedCostName.from(fixedCostName),
-				FixedCostDetailContext.from(fixedCostDetailContext),
-				ExpenditureItemCode.from(expenditureItemCode),
-				FixedCostKubun.from(fixedCostKubun),
-				FixedCostTargetPaymentMonth.from(fixedCostTargetPaymentMonth),
-				FixedCostTargetPaymentMonthOptionalContext.from(fixedCostTargetPaymentMonthOptionalContext),
-				FixedCostPaymentDay.from(fixedCostPaymentDay),
-				PaymentMethodCode.from(paymentMethodCode),
-				FixedCostPaymentAmount.from(fixedCostPaymentAmount));
+				userId, 	fixedCostCode, fixedCostName, fixedCostDetailContext, expenditureItemCode, fixedCostKubun,
+				fixedCostTargetPaymentMonth, fixedCostTargetPaymentMonthOptionalContext, fixedCostPaymentDay,
+				paymentMethodCode, fixedCostPaymentAmount);
 	}
 
-	/**
-	 *<pre>
-	 * 引数の値から固定費情報を表すドメインモデルを生成して返します。
-	 * 入力フォームからドメインを生成する際にこのメソッドを使用することを想定しています。
-	 *</pre>
-	 * @param userId ユーザID
-	 * @param fixedCostCode 固定費コード
-	 * @param fixedCostName 固定費名(支払名)
-	 * @param fixedCostDetailContext 固定費内容詳細(支払内容詳細)
-	 * @param expenditureItemCode 支出項目コード
-	 * @param fixedCostKubun 固定費区分
-	 * @param fixedCostTargetPaymentMonth 固定費支払月(支払月)
-	 * @param fixedCostTargetPaymentMonthOptionalContext 固定費支払月任意詳細
-	 * @param fixedCostPaymentDay 固定費支払日(支払日)
-	 * @param paymentMethodCode 支払方法コード
-	 * @param fixedCostPaymentAmount 支払金額
-	 * @return 固定費情報を表すドメインモデル
-	 *
-	 */
-	public static FixedCost from(
-			String userId,
-			String fixedCostCode,
-			String fixedCostName,
-			String fixedCostDetailContext,
-			String expenditureItemCode,
-			String fixedCostKubun,
-			String fixedCostTargetPaymentMonth,
-			String fixedCostTargetPaymentMonthOptionalContext,
-			String fixedCostPaymentDay,
-			String paymentMethodCode,
-			Integer fixedCostPaymentAmount) {
-		return new FixedCost(
-				UserId.from(userId),
-				FixedCostCode.from(fixedCostCode),
-				FixedCostName.from(fixedCostName),
-				FixedCostDetailContext.from(fixedCostDetailContext),
-				ExpenditureItemCode.from(expenditureItemCode),
-				FixedCostKubun.from(fixedCostKubun),
-				FixedCostTargetPaymentMonth.from(fixedCostTargetPaymentMonth),
-				FixedCostTargetPaymentMonthOptionalContext.from(fixedCostTargetPaymentMonthOptionalContext),
-				FixedCostPaymentDay.from(fixedCostPaymentDay),
-				PaymentMethodCode.from(paymentMethodCode),
-				FixedCostPaymentAmount.from(fixedCostPaymentAmount));
-	}
+
 
 	/**
 	 *<pre>
@@ -170,7 +118,7 @@ public class FixedCost {
 	 * @return 一括更新項目（支払日、支払金額）の値を更新した新しい固定費情報を表すドメインモデル
 	 *
 	 */
-	public FixedCost updateBulkUpdateItem(String fixedCostPaymentDay, Integer fixedCostPaymentAmount) {
+	public FixedCost updateBulkUpdateItem(FixedCostPaymentDay fixedCostPaymentDay, FixedCostPaymentAmount fixedCostPaymentAmount) {
 		return new FixedCost(
 				UserId.from(userId.getValue()),
 				FixedCostCode.from(fixedCostCode.getValue()),
@@ -180,9 +128,9 @@ public class FixedCost {
 				FixedCostKubun.from(fixedCostKubun.getValue()),
 				FixedCostTargetPaymentMonth.from(fixedCostTargetPaymentMonth.getValue()),
 				FixedCostTargetPaymentMonthOptionalContext.from(fixedCostTargetPaymentMonthOptionalContext.getValue()),
-				FixedCostPaymentDay.from(fixedCostPaymentDay),
+				fixedCostPaymentDay,
 				PaymentMethodCode.from(paymentMethodCode.getValue()),
-				FixedCostPaymentAmount.from(fixedCostPaymentAmount));
+				fixedCostPaymentAmount);
 	}
 	
 	/**

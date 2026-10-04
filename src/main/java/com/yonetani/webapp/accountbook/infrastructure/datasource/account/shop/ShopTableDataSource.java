@@ -6,6 +6,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2024/01/10 : 1.00.00                      新規作成
  * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/09/23 : 1.01.01  feature-1.03-dev1   追加リファクタリング対応
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.shop;
@@ -24,6 +25,12 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSort;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSortBetweenAB;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopDefaultPaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopSort;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.shop.ShopReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopKubunCodeListSearchQueryDto;
@@ -200,17 +207,17 @@ public class ShopTableDataSource implements ShopTableRepository {
 	private Shop createShop(ShopReadWriteDto dto) {
 		return Shop.from(
 				// ユーザID
-				dto.getUserId(),
+				UserId.from(dto.getUserId()),
 				// 店舗コード
-				dto.getShopCode(),
+				ShopCode.from(dto.getShopCode()),
 				// 店舗区分コード
-				dto.getShopKubunCode(),
+				ShopKubunCode.from(dto.getShopKubunCode()),
 				// 店舗名
-				dto.getShopName(),
-				// 店舗表示順
-				dto.getShopSort(),
+				ShopName.from(dto.getShopName()),
 				// デフォルト支払方法コード
-				dto.getDefaultPaymentMethodCode());
+				ShopDefaultPaymentMethodCode.from(dto.getDefaultPaymentMethodCode()),
+				// 店舗表示順
+				ShopSort.from(dto.getShopSort()));
 	}
 	
 	/**
@@ -234,6 +241,6 @@ public class ShopTableDataSource implements ShopTableRepository {
 				// 店舗表示順
 				data.getShopSort().getValue(),
 				// デフォルト支払方法コード
-				data.getDefaultPaymentMethodCode() == null ? null : data.getDefaultPaymentMethodCode().getValue());
+				data.getDefaultPaymentMethodCode().getValue());
 	}
 }

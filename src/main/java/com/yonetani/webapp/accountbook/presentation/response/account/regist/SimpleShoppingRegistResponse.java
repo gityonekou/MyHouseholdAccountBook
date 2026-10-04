@@ -20,6 +20,9 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopDefaultPaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
 import com.yonetani.webapp.accountbook.presentation.request.account.regist.SimpleShoppingRegistInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
@@ -68,15 +71,31 @@ public class SimpleShoppingRegistResponse extends AbstractSimpleShoppingRegistLi
 		 *<pre>
 		 * 引数の値から店名選択肢の明細データを生成して返します。
 		 *</pre>
-		 * @param value 店舗コード
-		 * @param text 店舗名
-		 * @param defaultPaymentMethodCode デフォルト支払方法コード(未設定の場合はnull可)
+		 * @param code 店舗コード
+		 * @param name 店舗名
+		 * @param defaultPaymentMethodCode デフォルト支払方法コード
 		 * @return 店名選択肢の明細データ
 		 *
 		 */
-		public static ShopOptionItem from(String value, String text, String defaultPaymentMethodCode) {
-			return new ShopOptionItem(value, text,
-					defaultPaymentMethodCode == null ? "" : defaultPaymentMethodCode);
+		public static ShopOptionItem from(ShopCode code, ShopName name, ShopDefaultPaymentMethodCode defaultPaymentMethodCode) {
+			return new ShopOptionItem(
+					code.getValue(),
+					name.getValue(),
+					defaultPaymentMethodCode.toString());
+		}
+		
+		/**
+		 *<pre>
+		 * 引数の値から店名選択肢の明細データを生成して返します。
+		 *</pre>
+		 * @param value 店舗コード
+		 * @param text 店舗名
+		 * @param defaultPaymentMethodCode デフォルト支払方法コード
+		 * @return 店名選択肢の明細データ
+		 *
+		 */
+		private static ShopOptionItem from(String value, String text, String defaultPaymentMethodCode) {
+			return new ShopOptionItem(value, text, defaultPaymentMethodCode);
 		}
 	}
 

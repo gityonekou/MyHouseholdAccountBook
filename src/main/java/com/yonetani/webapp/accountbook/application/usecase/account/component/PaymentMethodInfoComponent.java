@@ -26,6 +26,7 @@ import com.yonetani.webapp.accountbook.domain.repository.account.bankaccount.Ban
 import com.yonetani.webapp.accountbook.domain.repository.account.paymentmethod.PaymentMethodTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.bankaccount.BankAccountCode;
 import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopDefaultPaymentMethodCode;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 
@@ -173,14 +174,14 @@ public class PaymentMethodInfoComponent {
 		/**
 		 *<pre>
 		 * 支払方法コードに対応する支払方法名を解決します。
-		 * システム予約値(999等)、またはマスタに存在しないコードの場合は「－」を返します。
+		 * システム予約値(999等)場合は「－」を返します。
 		 *</pre>
 		 * @param code 支払方法コード
 		 * @return 支払方法名（解決済み）の値オブジェクト。解決できない場合の値オブジェクト格納値は「－」
 		 *
 		 */
 		public ResolvedPaymentMethodName getPaymentMethodName(PaymentMethodCode code) {
-			if(code == null || code.isSystemReserved()) {
+			if(code.isSystemReserved()) {
 				return ResolvedPaymentMethodName.UNRESOLVED;
 			}
 			PaymentMethod paymentMethod = paymentMethodMap.get(code);
@@ -189,6 +190,28 @@ public class PaymentMethodInfoComponent {
 						ResolvedPaymentMethodName.from(paymentMethod.getPaymentMethodName().getValue());
 		}
 
+		/**
+		 *<pre>
+		 * 店舗デフォルト支払方法コードに対応する支払方法名を解決します。
+		 *</pre>
+		 * @param code 店舗デフォルト支払方法コード
+		 * @return 支払方法名（解決済み）の値オブジェクト。解決できない場合の値オブジェクト格納値は「－」
+		 *
+		 */
+		public ResolvedPaymentMethodName getPaymentMethodName(ShopDefaultPaymentMethodCode code) {
+			// 店舗デフォルト支払方法コードの値がnullの場合は解決できないため「－」を返す
+			if(code.isNull()) {
+				return ResolvedPaymentMethodName.UNRESOLVED;
+			}
+			// 店舗デフォルト支払方法コードを支払方法コードに変換
+			PaymentMethodCode paymentMethodCode = PaymentMethodCode.from(code.getValue());
+			
+			PaymentMethod paymentMethod = paymentMethodMap.get(paymentMethodCode);
+			return paymentMethod == null ? 
+					ResolvedPaymentMethodName.UNRESOLVED : 
+						ResolvedPaymentMethodName.from(paymentMethod.getPaymentMethodName().getValue());
+		}
+		
 		/**
 		 *<pre>
 		 * 支払方法コードに対応する銀行口座名を解決します。
@@ -200,7 +223,7 @@ public class PaymentMethodInfoComponent {
 		 *
 		 */
 		public ResolvedBankAccountName getBankAccountName(PaymentMethodCode code) {
-			if(code == null || code.isSystemReserved()) {
+			if(code.isSystemReserved()) {
 				return ResolvedBankAccountName.UNRESOLVED;
 			}
 			PaymentMethod paymentMethod = paymentMethodMap.get(code);

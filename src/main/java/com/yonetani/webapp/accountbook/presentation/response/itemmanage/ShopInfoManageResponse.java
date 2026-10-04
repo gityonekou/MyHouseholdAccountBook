@@ -17,6 +17,10 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent.ResolvedPaymentMethodName;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopSort;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
@@ -38,6 +42,7 @@ import lombok.RequiredArgsConstructor;
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 public class ShopInfoManageResponse extends AbstractResponse {
 	
 	/**
@@ -47,7 +52,7 @@ public class ShopInfoManageResponse extends AbstractResponse {
 	 *</pre>
 	 *
 	 * @author ：Kouki Yonetani
-	 * @since 家計簿アプリ(1.00.A)
+	 * @since 家計簿アプリ(1.00)
 	 *
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -56,30 +61,40 @@ public class ShopInfoManageResponse extends AbstractResponse {
 	public static class ShopListItem {
 		// 店舗コード
 		private final String shopCode;
-		// 店舗名
-		private final String shopName;
 		// 店舗区分名称
 		private final String shopKubunName;
-		// 店舗表示順
-		private final String shopSort;
+		// 店舗名
+		private final String shopName;
 		// デフォルト支払方法名(表示用に解決済み文字列。未設定の場合は「－」)
 		private final String defaultPaymentMethodName;
+		// 店舗表示順
+		private final String shopSort;
 
 		/**
 		 *<pre>
 		 * 引数の値から店舗一覧情報の明細データを生成して返します。
 		 *</pre>
 		 * @param shopCode 店舗コード
-		 * @param shopName 店舗名
 		 * @param shopKubunName 店舗区分名称
-		 * @param shopSort 店舗表示順
+		 * @param shopName 店舗名
 		 * @param defaultPaymentMethodName デフォルト支払方法名
+		 * @param shopSort 店舗表示順
 		 * @return 店舗一覧情報の明細データ
 		 *
 		 */
-		public static ShopListItem from(String shopCode, String shopName, String shopKubunName, String shopSort,
-				String defaultPaymentMethodName) {
-			return new ShopListItem(shopCode, shopName, shopKubunName, shopSort, defaultPaymentMethodName);
+		public static ShopListItem from(ShopCode shopCode, String shopKubunName, ShopName shopName,
+				ResolvedPaymentMethodName defaultPaymentMethodName, ShopSort shopSort) {
+			return new ShopListItem(
+					// 店舗コード
+					shopCode.getValue(),
+					// 店舗区分名称
+					shopKubunName,
+					// 店舗名
+					shopName.getValue(),
+					// デフォルト支払方法名
+					defaultPaymentMethodName.getValue(),
+					// 店舗表示順
+					shopSort.getValue());
 		}
 	}
 

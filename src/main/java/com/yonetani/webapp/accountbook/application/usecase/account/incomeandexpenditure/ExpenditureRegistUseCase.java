@@ -6,7 +6,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/02/25 : 1.00.00  feature-1.00-dev00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
- * 2026/08/18 : 1.01.00  feature-1.03-dev1   Feature1.03 dev1追加対応(getExpenditureItemNameメソッドの戻り値を値オブジェクトに変更)
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(getExpenditureItemNameメソッドの戻り値を値オブジェクトに変更)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;

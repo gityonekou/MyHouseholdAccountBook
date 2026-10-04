@@ -6,7 +6,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2024/04/17 : 1.00.00                      新規作成
  * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
- * 2026/09/06 : 1.02.00  feature-1.03-dev1   リファクタリング対応(getExpenditureItemNameメソッドの戻り値を値オブジェクトに変更)
+ * 2026/09/06 : 1.02.00  feature-1.03-dev1   追加リファクタリング対応(getExpenditureItemNameメソッドの戻り値を値オブジェクトに変更)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.common;

@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2025/02/11 : 1.00.00                      新規作成
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.shop;
@@ -37,6 +38,9 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSort;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSortBetweenAB;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopSort;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm;
@@ -472,12 +476,12 @@ class ShopInfoManageUseCaseUnitTest {
 		// 表示順検索結果のリストを設定
 		List<Shop> shopList = new ArrayList<>();
 		shopList.add(Shop.from(
-				"TESTUSER001",
-				form.getShopCode(),
-				form.getShopKubun(),
-				form.getShopName(),
-				"003",
-				null));
+				UserId.from("TESTUSER001"),
+				ShopCode.from(form.getShopCode()),
+				ShopKubunCode.from(form.getShopKubun()),
+				ShopName.from(form.getShopName()),
+				null,
+				ShopSort.from("003")));
 		// 店舗表示順A～店舗表示順B間の検索処理のモックを設定
 		doReturn(ShopInquiryList.from(shopList)).when(shopRepository).findById(
 				SearchQueryUserIdAndShopSortBetweenAB.from(

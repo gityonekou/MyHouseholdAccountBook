@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/04/25 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/09/23 : 1.00.01  feature-1.03-dev1   追加リファクタリング対応
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.fixedcost;
@@ -28,6 +29,17 @@ import org.springframework.test.context.jdbc.SqlConfig;
 
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCost;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostKubun;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostName;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentDay;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonth;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonthOptionalContext;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.fixedcost.FixedCostTableMapper;
 
 /**
@@ -92,7 +104,7 @@ class FixedCostTableDataSourceTest {
 	@DisplayName("add:固定費テーブルへの新規登録テスト(全カラム確認)")
 	void testAdd() {
 		/* 全項目の登録チェック（FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXTあり） */
-		FixedCost addData = FixedCost.from(
+		FixedCost addData = helper(
 				"TEST-USER-ID", "0001", "家賃", "毎月27日引き落とし",
 				"0030", "1", "00", "任意詳細テスト", "27", "001",
 				new BigDecimal("60000.00"));
@@ -119,7 +131,7 @@ class FixedCostTableDataSourceTest {
 				"同じデータを登録した場合、一意制約違反となること");
 
 		/* null可項目の登録チェック（FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT=null） */
-		FixedCost addNullData = FixedCost.from(
+		FixedCost addNullData = helper(
 				"TEST-USER-ID", "0002", "電気代概算", "概算で登録",
 				"0037", "2", "00", null, "27", "001",
 				new BigDecimal("12000.00"));
@@ -161,7 +173,7 @@ class FixedCostTableDataSourceTest {
 		/* 全項目の更新チェック
 		 * 意図的にSISYUTU_ITEM_CODEに別の値("9999")をセット（更新されないことを確認）
 		 * FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXTに値をセット（更新されることを確認） */
-		FixedCost updateData = FixedCost.from(
+		FixedCost updateData = helper(
 				"TEST-USER-ID", "0001", "更新後支払名", "更新後詳細",
 				"9999", "2", "20", "更新後任意詳細", "00", "001",
 				new BigDecimal("35000.00"));
@@ -184,14 +196,14 @@ class FixedCostTableDataSourceTest {
 				"支出項目コード(SISYUTU_ITEM_CODE)が更新されていないこと");
 
 		/* 対象データなしの場合、0件が返ること */
-		FixedCost notFound = FixedCost.from(
+		FixedCost notFound = helper(
 				"TEST-USER-ID", "9999", "対象なし", "",
 				"0001", "1", "00", null, "27", "001",
 				new BigDecimal("0.00"));
 		assertEquals(0, repository.update(notFound), "対象データなしの場合、0件であること");
 
 		/* null可項目の更新チェック（FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT=nullに更新） */
-		FixedCost updateNullData = FixedCost.from(
+		FixedCost updateNullData = helper(
 				"TEST-USER-ID", "0001", "更新後支払名(null可)", "更新後詳細(null可)",
 				"9999", "1", "00", null, "27", "001",
 				new BigDecimal("40000.00"));
@@ -224,7 +236,7 @@ class FixedCostTableDataSourceTest {
 	@DisplayName("delete:固定費テーブルの論理削除テスト(DELETE_FLG=TRUEの確認)")
 	void testDelete() {
 		/* 論理削除チェック */
-		FixedCost deleteData = FixedCost.from(
+		FixedCost deleteData = helper(
 				"TEST-USER-ID", "0001", "削除対象支払名", "削除対象詳細",
 				"0002", "1", "40", "削除対象任意詳細", "15", "001",
 				new BigDecimal("30000.00"));
@@ -247,10 +259,54 @@ class FixedCostTableDataSourceTest {
 		assertEquals(new BigDecimal("30000.00"), actual.get("SHIHARAI_KINGAKU"),                   "支払金額(SHIHARAI_KINGAKU)が変更されていないこと");
 
 		/* 対象データなしの場合、0件が返ること */
-		FixedCost notFound = FixedCost.from(
+		FixedCost notFound = helper(
 				"TEST-USER-ID", "9999", "対象なし", "",
 				"0001", "1", "00", null, "27", "001",
 				new BigDecimal("0.00"));
 		assertEquals(0, repository.delete(notFound), "対象データなしの場合、0件であること");
+	}
+	
+	/**
+	 *<pre>
+	 * FixedCost生成を行うヘルパーです
+	 *</pre>
+	 * @param userId
+	 * @param fixedCostCode
+	 * @param fixedCostName
+	 * @param fixedCostDetailContext
+	 * @param expenditureItemCode
+	 * @param fixedCostKubun
+	 * @param fixedCostTargetPaymentMonth
+	 * @param fixedCostTargetPaymentMonthOptionalContext
+	 * @param fixedCostPaymentDay
+	 * @param paymentMethodCode
+	 * @param fixedCostPaymentAmount
+	 * @return
+	 *
+	 */
+	private FixedCost helper(String userId,
+			String fixedCostCode,
+			String fixedCostName,
+			String fixedCostDetailContext,
+			String expenditureItemCode,
+			String fixedCostKubun,
+			String fixedCostTargetPaymentMonth,
+			String fixedCostTargetPaymentMonthOptionalContext,
+			String fixedCostPaymentDay,
+			String paymentMethodCode,
+			BigDecimal fixedCostPaymentAmount) {
+		return FixedCost.from(
+				UserId.from(userId),
+				FixedCostCode.from(fixedCostCode),
+				FixedCostName.from(fixedCostName),
+				FixedCostDetailContext.from(fixedCostDetailContext),
+				ExpenditureItemCode.from(expenditureItemCode),
+				FixedCostKubun.from(fixedCostKubun),
+				FixedCostTargetPaymentMonth.from(fixedCostTargetPaymentMonth),
+				FixedCostTargetPaymentMonthOptionalContext.from(fixedCostTargetPaymentMonthOptionalContext),
+				FixedCostPaymentDay.from(fixedCostPaymentDay),
+				PaymentMethodCode.from(paymentMethodCode),
+				FixedCostPaymentAmount.from(fixedCostPaymentAmount));
+		
 	}
 }

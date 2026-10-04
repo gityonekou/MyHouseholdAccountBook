@@ -72,14 +72,14 @@ public class FixedCostInfoUpdateForm {
 	// 支払日
 	@NotBlank
 	private String shiharaiDay;
+	// 支払方法コード(固定費登録画面のみ、買い物集計8項目に限りシステム予約値「支払方法がない」を許容する)
+	@NotBlank
+	private String paymentMethodCode;
 	// 支払金額
 	@NotNull
 	@Min(0)
 	private Integer shiharaiKingaku;
-	// 支払方法コード(固定費登録画面のみ、買い物集計8項目に限りシステム予約値「支払方法がない」を許容する)
-	@NotBlank
-	private String paymentMethodCode;
-
+	
 
 	/**
 	 * 相関チェック(支払月でその他任意を選択した場合、支払月任意詳細は必須)

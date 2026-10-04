@@ -5,18 +5,15 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2024/01/28 : 1.00.00                      新規作成
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(Identifier継承に変更)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.shop;
 
-import org.springframework.util.StringUtils;
-
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.common.Identifier;
 
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  *<pre>
@@ -28,12 +25,19 @@ import lombok.RequiredArgsConstructor;
  * @since 家計簿アプリ(1.00)
  *
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-@Getter
-@EqualsAndHashCode
-public class ShopKubunCode {
-	// 店舗区分コード
-	private final String value;
+@EqualsAndHashCode(callSuper = true)
+public class ShopKubunCode extends Identifier {
+	
+	/**
+	 *<pre>
+	 * ShopKubunCodeクラスコンストラクターです。
+	 *</pre>
+	 * @param value 店舗区分コード
+	 *
+	 */
+	private ShopKubunCode(String value) {
+		super(value);
+	}
 	
 	/**
 	 *<pre>
@@ -49,14 +53,10 @@ public class ShopKubunCode {
 	 *
 	 */
 	public static ShopKubunCode from(String code) {
-		// ガード節(空文字列)
-		if(!StringUtils.hasLength(code)) {
-			throw new MyHouseholdAccountBookRuntimeException("「店舗区分コード」項目の設定値が空文字列です。管理者に問い合わせてください。");
-		}
-		// ガード節(長さが3桁でない)
-		if(code.length() != 3) {
-			throw new MyHouseholdAccountBookRuntimeException("「店舗区分コード」項目の設定値が不正です。管理者に問い合わせてください。[shopKubunCode=" + code + "]");
-		}
+		
+		// 基本検証（null、空文字、長さが3桁でない）
+		validate(code, 3, "店舗区分コード");
+		
 		// ガード節(数値に変換できない(数値3桁:0パディング))
 		try {
 			Integer.parseInt(code);
@@ -64,13 +64,5 @@ public class ShopKubunCode {
 			throw new MyHouseholdAccountBookRuntimeException("「店舗区分コード」項目の設定値が不正です。管理者に問い合わせてください。[shopKubunCode=" + code + "]");
 		}
 		return new ShopKubunCode(code);
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		return value;
 	}
 }

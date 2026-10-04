@@ -56,7 +56,7 @@ public class ShoppingRegistCode extends Identifier {
 	public static ShoppingRegistCode from(String shoppingRegistCode) {
 
 		// 基本検証（null、空文字、長さが3桁でない）
-		Identifier.validate(shoppingRegistCode, 3, "買い物登録コード");
+		validate(shoppingRegistCode, 3, "買い物登録コード");
 		
 		// ガード節(数値に変換できない(数値3桁:0パディング))
 		try {
@@ -84,7 +84,7 @@ public class ShoppingRegistCode extends Identifier {
 		if(code <= 0 || code >= 1000) {
 			throw new MyHouseholdAccountBookRuntimeException("「買い物登録コード」項目の設定値が不正です。管理者に問い合わせてください。[shoppingRegistCode=" + code + "]");
 		}
-		return new ShoppingRegistCode(String.format("%03d", code));
+		return ShoppingRegistCode.from(String.format("%03d", code));
 	}
 	
 	/**

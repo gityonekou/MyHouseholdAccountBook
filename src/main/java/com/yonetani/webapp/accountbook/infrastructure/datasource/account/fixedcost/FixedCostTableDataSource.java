@@ -8,6 +8,7 @@
  * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
  * 2026/05/23 : 1.02.00  feature-1.01-dev3   年間固定費合計画面新規追加対応
  * 2026/08/18 : 1.03.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/09/23 : 1.03.01  feature-1.03-dev1   追加リファクタリング対応
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.fixedcost;
@@ -26,8 +27,18 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndFixedCostTargetPaymentMonthList;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemName;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostKubun;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostName;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentDay;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonth;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonthOptionalContext;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostAnnualSummaryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostInquiryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost.FixedCostReadWriteDto;
@@ -203,27 +214,27 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	private FixedCost createFixedCost(FixedCostReadWriteDto dto) {
 		return FixedCost.from(
 				// ユーザID
-				dto.getUserId(),
+				UserId.from(dto.getUserId()),
 				// 固定費コード
-				dto.getFixedCostCode(),
+				FixedCostCode.from(dto.getFixedCostCode()),
 				// 固定費名(支払名)
-				dto.getFixedCostName(),
+				FixedCostName.from(dto.getFixedCostName()),
 				// 固定費内容詳細(支払内容詳細)
-				dto.getFixedCostDetailContext(),
+				FixedCostDetailContext.from(dto.getFixedCostDetailContext()),
 				// 支出項目コード
-				dto.getSisyutuItemCode(),
+				ExpenditureItemCode.from(dto.getSisyutuItemCode()),
 				// 固定費区分
-				dto.getFixedCostKubun(),
+				FixedCostKubun.from(dto.getFixedCostKubun()),
 				// 固定費支払月(支払月)
-				dto.getFixedCostShiharaiTuki(),
+				FixedCostTargetPaymentMonth.from(dto.getFixedCostShiharaiTuki()),
 				// 固定費支払月任意詳細
-				dto.getFixedCostShiharaiTukiOptionalContext(),
+				FixedCostTargetPaymentMonthOptionalContext.from(dto.getFixedCostShiharaiTukiOptionalContext()),
 				// 固定費支払日(支払日)
-				dto.getFixedCostShiharaiDay(),
+				FixedCostPaymentDay.from(dto.getFixedCostShiharaiDay()),
 				// 支払方法コード
-				dto.getPaymentMethodCode(),
+				PaymentMethodCode.from(dto.getPaymentMethodCode()),
 				// 支払金額
-				dto.getShiharaiKingaku());
+				FixedCostPaymentAmount.from(dto.getShiharaiKingaku()));
 	}
 
 	/**
@@ -271,23 +282,23 @@ public class FixedCostTableDataSource implements FixedCostTableRepository {
 	private FixedCostInquiryList.FixedCostInquiryItem createFixedCostInquiryItem(FixedCostInquiryReadDto dto) {
 		return FixedCostInquiryList.FixedCostInquiryItem.from(
 				// 固定費コード
-				dto.getFixedCostCode(),
+				FixedCostCode.from(dto.getFixedCostCode()),
 				// 固定費名(支払名)
-				dto.getFixedCostName(),
+				FixedCostName.from(dto.getFixedCostName()),
 				// 固定費内容詳細(支払内容詳細)
-				dto.getFixedCostDetailContext(),
+				FixedCostDetailContext.from(dto.getFixedCostDetailContext()),
 				// 支出項目名
-				dto.getSisyutuItemName(),
+				ExpenditureItemName.from(dto.getSisyutuItemName()),
 				// 固定費支払月(支払月)
-				dto.getFixedCostShiharaiTuki(),
+				FixedCostTargetPaymentMonth.from(dto.getFixedCostShiharaiTuki()),
 				// 固定費支払月任意詳細
-				dto.getFixedCostShiharaiTukiOptionalContext(),
+				FixedCostTargetPaymentMonthOptionalContext.from(dto.getFixedCostShiharaiTukiOptionalContext()),
 				// 固定費支払日(支払日)
-				dto.getFixedCostShiharaiDay(),
+				FixedCostPaymentDay.from(dto.getFixedCostShiharaiDay()),
 				// 支払方法コード
-				dto.getPaymentMethodCode(),
+				PaymentMethodCode.from(dto.getPaymentMethodCode()),
 				// 支払金額
-				dto.getShiharaiKingaku());
+				FixedCostPaymentAmount.from(dto.getShiharaiKingaku()));
 	}
 	
 	/**

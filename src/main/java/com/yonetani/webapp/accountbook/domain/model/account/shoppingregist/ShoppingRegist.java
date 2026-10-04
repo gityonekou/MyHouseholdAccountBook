@@ -19,22 +19,18 @@ import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.Shoppi
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingCouponPrice;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDate;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingDineOutExpenditureItem;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodMinorWasteExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingFoodSevereWasteExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingHouseEquipmentExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingRegistCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingRemarks;
-import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingTaxExpenses;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingWorkExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.TaxTotalPurchasePrice;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.TotalPurchasePrice;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
-import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
-import com.yonetani.webapp.accountbook.presentation.request.account.regist.SimpleShoppingRegistInfoForm;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -172,94 +168,5 @@ public class ShoppingRegist {
 				totalPurchasePrice,
 				taxTotalPurchasePrice,
 				shoppingTotalAmount);
-	}
-	
-	/**
-	 *<pre>
-	 * 買い物登録フォームデータから買い物登録情報(ドメイン)を生成して返します。
-	 *</pre>
-	 * @param userId ユーザID
-	 * @param inputForm 買い物登録フォームデータ
-	 * @return 買い物登録情報(ドメイン)
-	 *
-	 */
-	public static ShoppingRegist createShoppingRegist(UserId userId,  SimpleShoppingRegistInfoForm inputForm) {
-		
-		// 対象年月(YYYYMM)のドメインを生成
-		TargetYearMonth targetYearMonth = TargetYearMonth.from(inputForm.getTargetYearMonth());
-		
-		return ShoppingRegist.from(
-				// ユーザID
-				userId,
-				// 対象年月(YYYYMM)
-				targetYearMonth,
-				// 買い物登録コード
-				ShoppingRegistCode.from(inputForm.getShoppingRegistCode()),
-				// 店舗区分コード
-				ShopKubunCode.from(inputForm.getShopKubunCode()),
-				// 店舗コード
-				ShopCode.from(inputForm.getShopCode()),
-				// 支払方法コード
-				PaymentMethodCode.from(inputForm.getPaymentMethodCode()),
-				// 買い物日
-				ShoppingDate.from(inputForm.getShoppingDate(), targetYearMonth),
-				// 備考
-				ShoppingRemarks.from(inputForm.getShoppingRemarks()),
-				// 食料品(必須)
-				ShoppingFoodExpenditureItem.from(
-						// 食料品(必須)購入金額
-						ShoppingExpenditureAmount.from(inputForm.getShoppingFoodExpenses()),
-						// 食料品(必須)消費税
-						ShoppingTaxExpenses.from(inputForm.getShoppingFoodTaxExpenses())),
-				// 食料品B(無駄遣い)
-				ShoppingFoodMinorWasteExpenditureItem.from(
-						// 食料品B(無駄遣い)購入金額
-						ShoppingExpenditureAmount.from(inputForm.getShoppingFoodBExpenses()),
-						// 食料品B(無駄遣い)消費税
-						ShoppingTaxExpenses.from(inputForm.getShoppingFoodBTaxExpenses())),
-				// 食料品C(お酒類)
-				ShoppingFoodSevereWasteExpenditureItem.from(
-						// 食料品C(お酒類)購入金額
-						ShoppingExpenditureAmount.from(inputForm.getShoppingFoodCExpenses()),
-						// 食料品C(お酒類)消費税
-						ShoppingTaxExpenses.from(inputForm.getShoppingFoodCTaxExpenses())),
-				// 外食
-				ShoppingDineOutExpenditureItem.from(
-						// 外食購入金額
-						ShoppingExpenditureAmount.from(inputForm.getShoppingDineOutExpenses()),
-						// 外食消費税
-						ShoppingTaxExpenses.from(inputForm.getShoppingDineOutTaxExpenses())),
-				// 日用品
-				ShoppingConsumerGoodsExpenditureItem.from(
-						// 日用品購入金額
-						ShoppingExpenditureAmount.from(inputForm.getShoppingConsumerGoodsExpenses()),
-						// 日用品消費税
-						ShoppingTaxExpenses.from(inputForm.getShoppingConsumerGoodsTaxExpenses())),
-				// 衣料品(私服)
-				ShoppingClothesExpenditureItem.from(
-						// 衣料品(私服)購入金額
-						ShoppingExpenditureAmount.from(inputForm.getShoppingClothesExpenses()),
-						// 衣料品(私服)消費税
-						ShoppingTaxExpenses.from(inputForm.getShoppingClothesTaxExpenses())),
-				// 仕事
-				ShoppingWorkExpenditureItem.from(
-						// 仕事購入金額
-						ShoppingExpenditureAmount.from(inputForm.getShoppingWorkExpenses()),
-						// 仕事消費税
-						ShoppingTaxExpenses.from(inputForm.getShoppingWorkTaxExpenses())),
-				// 住居設備
-				ShoppingHouseEquipmentExpenditureItem.from(
-						// 住居設備購入金額
-						ShoppingExpenditureAmount.from(inputForm.getShoppingHouseEquipmentExpenses()),
-						// 住居設備消費税
-						ShoppingTaxExpenses.from(inputForm.getShoppingHouseEquipmentTaxExpenses())),
-				// クーポン金額
-				ShoppingCouponPrice.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingCouponPrice())),
-				// 購入金額合計
-				TotalPurchasePrice.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getTotalPurchasePrice())),
-				// 消費税合計
-				TaxTotalPurchasePrice.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getTaxTotalPurchasePrice())),
-				// 買い物合計金額
-				ShoppingTotalAmount.from(DomainCommonUtils.convertKingakuBigDecimal(inputForm.getShoppingTotalAmount())));
 	}
 }

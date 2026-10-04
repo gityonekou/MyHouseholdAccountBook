@@ -311,9 +311,9 @@ public class SimpleShoppingRegistInquiryUseCase {
 			// 店舗情報をレスポンスに設定
 			shopNameOptionItemList = shopSearchResult.getValues().stream().map(domain ->
 				SimpleShoppingRegistResponse.ShopOptionItem.from(
-						domain.getShopCode().getValue(),
-						domain.getShopName().getValue(),
-						domain.getDefaultPaymentMethodCode() == null ? null : domain.getDefaultPaymentMethodCode().getValue()))
+						domain.getShopCode(),
+						domain.getShopName(),
+						domain.getDefaultPaymentMethodCode()))
 				.collect(Collectors.toUnmodifiableList());
 		}
 		// 支出テーブルに該当項目の支出データが登録されていることを確認

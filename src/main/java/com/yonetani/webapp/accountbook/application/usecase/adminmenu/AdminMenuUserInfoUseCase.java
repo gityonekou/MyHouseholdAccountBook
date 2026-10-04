@@ -9,6 +9,8 @@
  * 日付       : version  ブランチ            コメントなど
  * 2023/11/11 : 1.00.00                      新規作成
  * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/09/23 : 1.02.01  feature-1.03-dev1   追加リファクタリング対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.adminmenu;
@@ -38,6 +40,9 @@ import com.yonetani.webapp.accountbook.domain.repository.adminmenu.AdminMenuUser
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.ShopBaseTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.SisyutuItemBaseTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.common.AccountBookUserRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopDefaultPaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopSort;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.type.common.UserName;
@@ -206,13 +211,14 @@ public class AdminMenuUserInfoUseCase {
 				ShopBaseList shopBaseList = shopBaseTableRepository.findAll();
 				shopBaseList.getValues().forEach(baseData -> {
 						// 登録する店舗テーブル情報を生成
+						String shopCode = baseData.getShopCode().getValue();
 						Shop addData = Shop.from(
-								accountBookUser.getUserId().getValue(),
-								baseData.getShopCode().getValue(),
-								baseData.getShopCode().getValue(),
-								baseData.getShopName().getValue(),
-								baseData.getShopCode().getValue(),
-								null);
+								accountBookUser.getUserId(),
+								baseData.getShopCode(),
+								ShopKubunCode.from(shopCode),
+								baseData.getShopName(),
+								ShopDefaultPaymentMethodCode.NULL,
+								ShopSort.from(shopCode));
 						// データを登録
 						int addCount = shopTableRepository.add(addData);
 						// 追加件数が1件以上の場合、業務エラー

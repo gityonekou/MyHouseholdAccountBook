@@ -6,13 +6,13 @@
  * 日付       : version  ブランチ            コメントなど
  * 2026/05/07 : 1.00.00  feature-1.01-dev1   新規作成
  * 2026/05/27 : 1.01.00  feature-1.01-dev2   getValuesForMonth テスト追加
+ * 2026/09/23 : 1.02.00  feature-1.03-dev1   追加リファクタリング対応
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.fixedcost;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +21,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostInquiryList.FixedCostInquiryItem;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemName;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostName;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentDay;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonth;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonthOptionalContext;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 
@@ -68,9 +77,15 @@ class FixedCostInquiryListTest {
 
 	private FixedCostInquiryItem item(String tuki, int amount) {
 		return FixedCostInquiryItem.from(
-				"0001", "テスト固定費", "", "テスト支出項目",
-				tuki, null, "27","001",
-				new BigDecimal(amount).setScale(2));
+				FixedCostCode.from("0001"),
+				FixedCostName.from("テスト固定費"),
+				FixedCostDetailContext.from(""),
+				ExpenditureItemName.from("テスト支出項目"),
+				FixedCostTargetPaymentMonth.from(tuki),
+				FixedCostTargetPaymentMonthOptionalContext.from(null),
+				FixedCostPaymentDay.from("27"),
+				PaymentMethodCode.from("001"),
+				FixedCostPaymentAmount.from(amount));
 	}
 
 	/**

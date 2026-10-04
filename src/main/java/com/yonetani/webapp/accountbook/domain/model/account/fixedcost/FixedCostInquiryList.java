@@ -8,11 +8,11 @@
  * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
  * 2026/05/07 : 1.02.00  feature-1.01-dev2   合計フィールド廃止・calculateMonthlyTotal()メソッド追加
  * 2026/08/18 : 1.03.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/09/23 : 1.03.01  feature-1.03-dev1   追加リファクタリング対応
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.fixedcost;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -103,26 +103,19 @@ public class FixedCostInquiryList {
 		 *
 		 */
 		public static FixedCostInquiryItem from(
-				String fixedCostCode,
-				String fixedCostName,
-				String fixedCostDetailContext,
-				String expenditureItemName,
-				String fixedCostTargetPaymentMonth,
-				String fixedCostTargetPaymentMonthOptionalContext,
-				String fixedCostPaymentDay,
-				String paymentMethodCode,
-				BigDecimal fixedCostPaymentAmount
+				FixedCostCode fixedCostCode,
+				FixedCostName fixedCostName,
+				FixedCostDetailContext fixedCostDetailContext,
+				ExpenditureItemName expenditureItemName,
+				FixedCostTargetPaymentMonth fixedCostTargetPaymentMonth,
+				FixedCostTargetPaymentMonthOptionalContext fixedCostTargetPaymentMonthOptionalContext,
+				FixedCostPaymentDay fixedCostPaymentDay,
+				PaymentMethodCode paymentMethodCode,
+				FixedCostPaymentAmount fixedCostPaymentAmount
 				) {
 			return new FixedCostInquiryItem(
-						FixedCostCode.from(fixedCostCode),
-						FixedCostName.from(fixedCostName),
-						FixedCostDetailContext.from(fixedCostDetailContext),
-						ExpenditureItemName.from(expenditureItemName),
-						FixedCostTargetPaymentMonth.from(fixedCostTargetPaymentMonth),
-						FixedCostTargetPaymentMonthOptionalContext.from(fixedCostTargetPaymentMonthOptionalContext),
-						FixedCostPaymentDay.from(fixedCostPaymentDay),
-						PaymentMethodCode.from(paymentMethodCode),
-						FixedCostPaymentAmount.from(fixedCostPaymentAmount));
+					fixedCostCode, fixedCostName, fixedCostDetailContext, expenditureItemName, fixedCostTargetPaymentMonth,
+					fixedCostTargetPaymentMonthOptionalContext, fixedCostPaymentDay, paymentMethodCode, fixedCostPaymentAmount);
 		}
 	}
 
