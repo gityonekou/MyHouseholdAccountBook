@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent;
-import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent.PaymentMethodNameResolver;
+import com.yonetani.webapp.accountbook.domain.service.account.paymentmethod.PaymentMethodNameResolver;
 import com.yonetani.webapp.accountbook.application.usecase.common.CodeTableItemComponent;
 import com.yonetani.webapp.accountbook.application.usecase.common.ExpenditureItemInfoComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;

@@ -17,7 +17,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent.ResolvedPaymentMethodName;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.ResolvedPaymentMethodName;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostName;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentAmount;

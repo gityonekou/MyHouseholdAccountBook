@@ -17,6 +17,7 @@
 | 改訂10 | `Feature1_03_dev1_設計書_要件突合レビュー_3次確認.md`（2次レビュー対応の検証で新規判明した指摘AA〜AE）を反映。**指摘AA（重大）**：`@AssertTrue`メソッドが域内型の`from()`ファクトリを直接呼ぶと、不正値送信時に例外が検証エラーに変換されず500エラーになる問題を修正。ユーザー提案の代替案（例外を投げない`tryFrom(String): Optional<T>`入口を型に追加する方式）を採用し、レガシー型（`FixedCostName`・`ExpenditureItemCode`等）はAPIを変更せず共通ユーティリティ`domain/type/common/SafeDomainFactory.tryCreate(Supplier<T>)`で包み、新規型（`PaymentMethodCode`・`PaymentMethodKubun`）には`tryFrom(String)`を追加（3.2節・3.5節）。5.2・5.3・5.4.1・5.6節の計4箇所の`@AssertTrue`を`tryFrom`/`SafeDomainFactory`ベースに書き換え、あわせて5.4.1節のガード節に欠けていた`fixedCostName`のnullチェックを追加（通常操作での500エラー原因）。**指摘AB**：6.1節ステップ3の`FIXED_COST_TABLE`移行を、`FIXED_COST_NAME`文字列マッチをSQL側で再現する方式から、候補抽出（SELECT）→目視確認→`FIXED_COST_CODE`明示列挙（UPDATE）の方式に変更し、ロジック複製によるSQL改修漏れリスクを回避。**指摘AC**：`FIXED_COST_NAME`文字列マッチへの新規依存箇所（5.4.1節バリデーション・6.1節移行判定の2箇所）をdev5への申し送りとして10章備考・`Feature1_03_dev1_支払方法固定値_設計指針.md`4章に追加。**指摘AD**：3.9節に`ShoppingAggregateSpecification`がSpring管理外（`new`で都度生成）であることを明記。8章に`FixedCostInfoUpdateForm`の`sisyutuItemCode`/`fixedCostName`フィールド実在確認済みである旨を追記（設計変更なし）。**指摘AE**：指摘J・S・X時点の`Feature1_03_dev1_支払方法固定値_設計指針.md`・`ドメイン用語集.md`への反映が実ファイルに存在することを確認済み（レビューファイル側に注記） |
 | 改訂11 | `Feature1_03_dev1_設計書_要件突合レビュー_4次確認.md`（3次レビュー対応の検証で新規判明した指摘AF〜AJ）のうち、実装着手前に片付けるべき指摘AF・AGを反映。**指摘AF**：`Feature1_03_dev1_支払方法固定値_設計指針.md`5章のチェックリストが指摘U・V・Hの内容と未同期だった問題を解消。設計指針5章は「dev1着手時点の方針の記録」として以後更新しない位置づけとし、11章冒頭に「dev1完了時の実際のチェックは本節を正とする」旨を明記（設計指針側にも対応する注記を追加）。**指摘AG**：3次確認レビューファイルの指摘AC対応状況欄に「固定費名変更リスクを設計指針側の追記に含めた」という誤った記載があったことが判明（実際には未反映）。5.4.1節のHTML補足文の箇所に、固定費名の「無駄遣いB」「無駄遣いC」の文言変更で集計区分が画面エラーなく変わりうる旨の注意書きを追加し、3次確認レビューファイル側の誤記載も訂正した。**指摘AH（`Optional.ofNullable()`化）・AI（設計指針の残る未同期4点）・AJ（用語集再検証）はユーザー確認により実装フェーズで対応することとし、本改訂では設計書・設計指針への追加修正を行わない**（4次確認レビューが最終ラウンドである旨の確認を得た） |
 | 改訂12 | 突合レビュー指摘S1・S2（`schema.sql` との突合で判明）へのユーザー回答を反映。**指摘S1**：`EXPENDITURE_TABLE` に `SISYUTU_ITEM_CODE` の一意制約がない件は、アプリ側が8項目の重複登録を例外で弾いているため実データに重複行は存在しないとの回答を得た。ただし重複チェック実装前のデータが本番に残る可能性を考慮し、6.1節ステップ2に「ユーザー×対象年月あたりの抽出件数が8件であることを検証し、不一致なら移行を中断する」ロジックを移行スクリプトに組み込む方針を追加。**指摘S2**：`【更新不可予定額(アプリ更新)】` は支出項目名（`SISYUTU_ITEM_NAME` は `VARCHAR(15)` のため16文字の当該文字列は格納不可）ではなく `FIXED_COST_NAME` に含まれるユーザーの命名規約であり、収支登録処理で `EXPENDITURE_NAME` に引き継がれることが確定。あわせて **dev1着手前のソースを `アプリ更新`／`更新不可予定額` でgrepし、いずれもコード中に存在しないことを確認**したため、3.9節の「文字列依存があれば Specification に置き換える」という条件付き記述を「依存は存在しない（確認済み）」の断定形に変更。6.1節ステップ2・3に実データ例と、当該文字列を目視確認の照合材料としてのみ使い判定条件には入れない旨を明記。`Feature1_03_dev1_支払方法固定値_設計指針.md` 2.6節・`ドメイン用語集.md`「買い物集計8項目」の節にも同内容を反映 |
+| 改訂13 | `PaymentMethodInfoComponent` 関連をソースの現状に合わせて更新（dev1実装中のリファクタリング内容を取込）。**(1)** 内部クラスだった `PaymentMethodNameResolver` を `domain/service/account/paymentmethod/` へ移動し、`@Component` を付与しない通常のクラスとした（コンストラクタは `PaymentMethodInquiryList`・`BankAccountInquiryList` を受け取る）。**(2)** 解決結果の値オブジェクト `ResolvedPaymentMethodName`／`ResolvedBankAccountName` を `domain/type/account/paymentmethod/` へ移動し、「－」の保持をドメイン側に置いた（presentation層のレスポンスDTOが application層の内部クラスを参照していた依存を解消）。**(3)** 3.8節の記載を実装に一致させた（リゾルバの戻り値型の誤記、`getFixedCostPaymentMethodOptions()`・単発解決メソッド・`ShopDefaultPaymentMethodCode` 用オーバーロードの欠落を修正）。3.10節を新設 |
 
 ## 1. 概要
 
@@ -562,49 +563,40 @@ int countByIdAndLessThanReserved(SearchQueryUserId userId);
 
 ### 3.8 新規：`application/usecase/account/component/PaymentMethodInfoComponent.java`
 
-固定費登録・収支登録・買い物登録・月別収支照会など複数のUseCaseから共通利用する「支払方法コード→表示名／銀行口座名」解決ロジックを1箇所に集約するコンポーネント。`CodeTableItemComponent` と同じ `@Component` パターン。
+固定費登録・収支登録・買い物登録・月別収支照会など複数のUseCaseから共通利用する「支払方法コード→表示名／銀行口座名」の解決と選択肢生成を担うコンポーネント。`CodeTableItemComponent` と同じ `@Component` パターンで、**リポジトリからの取得（DBアクセス）を担当する**。名称解決の業務ロジックは持たず、ドメインサービス `PaymentMethodNameResolver`（3.10節）に委譲する。
 
-> **レビュー指摘④反映**：初版は `getPaymentMethodName(userId, code)`／`getBankAccountName(userId, code)` を行ごとに呼び出す設計だったが、これだと一覧1行あたり最大2回DBアクセスが発生し、100明細表示時に最大200回のSQL発行になってしまう。ユーザー単位の支払方法マスタ・銀行口座マスタは（990〜999のシステム予約帯を除いても）せいぜい数十件規模であり全件メモリに載せても問題にならない規模のため、**画面表示の起点で1回だけ全件取得し、以降はメモリ上のMapで解決するリゾルバオブジェクト**に設計変更する。`CodeTableItemComponent` がコードテーブル全体を起動時に1度だけ読み込んでメモリ保持するのと同じ考え方を、リクエスト単位（画面表示単位）で行う。
+> **レビュー指摘④反映**：初版は `getPaymentMethodName(userId, code)`／`getBankAccountName(userId, code)` を行ごとに呼び出す設計だったが、一覧1行あたり最大2回のDBアクセスが発生し、100明細表示時に最大200回のSQL発行になってしまう。ユーザー単位の支払方法マスタ・銀行口座マスタは数十件規模であり全件メモリに載せても問題にならないため、**画面表示の起点で1回だけ全件取得し、以降はメモリ上のMapで解決するリゾルバ**に設計変更した。`CodeTableItemComponent` がコードテーブル全体を起動時に1度だけ読み込んでメモリ保持するのと同じ考え方を、リクエスト単位（画面表示単位）で行う。
 
 ```java
-// 画面表示の起点(UseCaseのread系メソッド)で1回だけ呼び出し、以降は戻り値のリゾルバをループ内で使い回す。
-// 内部で PaymentMethodTableRepository.findByUserId(検索条件) と BankAccountTableRepository.findById(検索条件) を
-// それぞれ1回ずつ(合計2回)呼び出し、Map<PaymentMethodCode, PaymentMethod> / Map<BankAccountCode, BankAccount> を構築する。
-PaymentMethodNameResolver createResolver(UserId userId);
+@Component
+@RequiredArgsConstructor
+public class PaymentMethodInfoComponent {
+    // 支払方法情報取得リポジトリー / 銀行口座情報取得リポジトリー
+    private final PaymentMethodTableRepository paymentMethodRepository;
+    private final BankAccountTableRepository bankAccountRepository;
 
-// ログインユーザの選択可能な支払方法一覧を選択ボックス用に取得(内部でfindSelectableByUserId()を使用。予約値を含まない)
-List<OptionItem> getPaymentMethodOptions(UserId userId);
-// ログインユーザの選択可能な銀行口座一覧を選択ボックス用に取得(内部でBankAccountTableRepository.findSelectableByUserId()を使用。無効行を含まない)
-// 支払方法マスタ管理画面(5.2節)の銀行口座選択で使用する(突合レビュー指摘M)
-List<OptionItem> getBankAccountOptions(UserId userId);
+    // 画面表示の起点(UseCaseのread系メソッド)で1回だけ呼び出し、以降は戻り値のリゾルバをループ内で使い回す。
+    // 内部で PaymentMethodTableRepository.findByUserId() と BankAccountTableRepository.findById() をそれぞれ1回ずつ(合計2回)呼び出し、
+    // PaymentMethodNameResolver を生成して返す。
+    public PaymentMethodNameResolver createResolver(UserId userId);
+
+    // 単発解決(1件だけ表示する画面向けの薄いラッパー)。内部で createResolver() を呼ぶため、一覧・複数行では使用しない(N+1回避)。
+    // 戻り値は解決済みの値オブジェクト(システム予約値・未登録の場合は「－」)
+    public ResolvedPaymentMethodName getPaymentMethodName(UserId userId, PaymentMethodCode code);
+    public ResolvedBankAccountName getBankAccountName(UserId userId, PaymentMethodCode code);
+
+    // 選択肢：収支登録・買い物登録・店舗マスタのデフォルト支払方法（findSelectableByUserId()。システム予約値・無効な支払方法を含まない）
+    public List<OptionItem> getPaymentMethodOptions(UserId userId);
+    // 選択肢：固定費登録画面専用（findEnabledByUserId()。有効であればシステム予約値「支払方法がない」を含む。突合レビュー指摘D5-3）
+    public List<OptionItem> getFixedCostPaymentMethodOptions(UserId userId);
+    // 選択肢：銀行口座（BankAccountTableRepository.findSelectableByUserId()。無効な口座を含まない）。支払方法マスタ管理画面(5.2節)で使用（突合レビュー指摘M）
+    public List<OptionItem> getBankAccountOptions(UserId userId);
+}
 ```
 
 `getBankAccountOptions()` は責務としては「銀行口座マスタの選択肢生成」であり、本来は独立した`BankAccountInfoComponent`に切り出す方が単一責任の原則に沿うが、`PaymentMethodInfoComponent`は既に`createResolver()`内で`BankAccountTableRepository`を参照しており、支払方法マスタ管理画面という単一の利用箇所しか持たない小さなメソッドのために新規コンポーネントを作る非対称さを避けるため、本devでは同居させる。
 
-```java
-// PaymentMethodInfoComponent の内部クラス(またはpackage-privateな別クラス)。
-// 1度構築すれば、以降の名称解決はすべてメモリ上のMap参照のみでDBアクセスを伴わない。
-public class PaymentMethodNameResolver {
-    // 支払方法コード→支払方法名 解決
-    public String getPaymentMethodName(PaymentMethodCode code) {
-        // システム予約値(999)はマスタを引かず「－」を返す。マスタ上の名称(支払方法がない)をそのまま画面に出さない
-        if (code.isSystemReserved()) {
-            return "－";
-        }
-        // ... Map<PaymentMethodCode, PaymentMethod> から解決(DBアクセスなし)
-    }
-    // 支払方法コード→銀行口座名 解決
-    public String getBankAccountName(PaymentMethodCode code) {
-        if (code.isSystemReserved()) {
-            return "－";
-        }
-        // 対応する支払方法のbankAccountCodeがnull(現金・電子マネー(前払い式))の場合も「－」を返す
-        // ... Map<BankAccountCode, BankAccount> から解決(DBアクセスなし)
-    }
-}
-```
-
-[支払方法固定値の設計指針](Claude Codeへの作業インプット/Feature1_03_dev1_支払方法固定値_設計指針.md) 2.5 の指示に従い、**表示変換ロジックは `PaymentMethodNameResolver` の2メソッドのみに集約**する（Thymeleaf側や各UseCaseに個別の変換処理を書かない）点は初版から変更しない。
+[支払方法固定値の設計指針](Claude Codeへの作業インプット/Feature1_03_dev1_支払方法固定値_設計指針.md) 2.5 の指示に従い、**表示変換ロジックは `PaymentMethodNameResolver` の表示変換メソッド（`getPaymentMethodName()`／`getBankAccountName()`）のみに集約**する（Thymeleaf側や各UseCaseに個別の変換処理を書かない）点は初版から変更しない。
 
 対象箇所（[支払方法固定値の設計指針](Claude Codeへの作業インプット/Feature1_03_dev1_支払方法固定値_設計指針.md) 2.5）：月別収支照会（支出別タブ）の「支払方法」「引落先口座」列（5.7節）、固定費関連一覧の「支払方法」列（5.4節）。いずれも `AccountMonthInquiryUseCase.convertExpenditureList()`／`FixedCostInquiryUseCase` 側で `createResolver()` を一覧生成の直前に1回呼び、`stream().map(...)` のループ内では `resolver.getPaymentMethodName(...)` のみを呼ぶ形にする。将来のdev4買い物照会一覧の「支払方法」列も同じ仕組みを再利用する想定。
 
@@ -659,6 +651,36 @@ public class ShoppingAggregateSpecification {
 > **用途が増えたことについて（突合レビュー指摘Y）**：当初はdev1の6.1節・5.5節の2用途のみだったが、指摘T・Vへの対応で5.4.1節・6.1節（FIXED_COST_TABLE側）の2用途が追加され、合計4用途になった。判定を1箇所に集約する（設計指針2.6）意図が効いてくる箇所が増えたということであり、本Specificationを`ShoppingRegistExpenditureItemComponent`から確実に切り出す価値がより高まったと言える。
 
 ---
+
+### 3.10 新規：`domain/service/account/paymentmethod/PaymentMethodNameResolver.java`（3.8節から移動）
+
+支払方法コード→支払方法名・銀行口座名の解決は、「システム予約値は『－』と表示する」「現金・電子マネー(前払い式)は銀行口座名を持たない」という業務ルールであるため、アプリケーション層ではなくドメイン層に置く。DBアクセスを伴わず、取得済みのマスタ情報をMapに載せ替えて参照するだけである。
+
+- **Spring管理対象外**：`@Component`／`@Service`を付与しない通常のクラス。`IncomeAndExpenditureConsistencyService`（`@Service`・リポジトリ注入）とは形式が異なるが、依存を持たず生成は `PaymentMethodInfoComponent.createResolver()` が行うため、Bean化する必要がない。
+- **コンストラクタ**：Mapではなく取得済みの `PaymentMethodInquiryList`・`BankAccountInquiryList` を受け取り、内部で `PaymentMethodCode`／`BankAccountCode` をキーにしたMapを構築する。
+
+```java
+public class PaymentMethodNameResolver {
+    public PaymentMethodNameResolver(PaymentMethodInquiryList paymentMethods, BankAccountInquiryList bankAccounts);
+    // 支払方法コード→支払方法名。システム予約値・未登録は「－」
+    public ResolvedPaymentMethodName getPaymentMethodName(PaymentMethodCode code);
+    // 店舗デフォルト支払方法コード→支払方法名。値がnullの場合は「－」
+    public ResolvedPaymentMethodName getPaymentMethodName(ShopDefaultPaymentMethodCode code);
+    // 支払方法コード→銀行口座名。システム予約値・支払方法の銀行口座コードがnull(現金・電子マネー(前払い式))・未登録は「－」
+    public ResolvedBankAccountName getBankAccountName(PaymentMethodCode code);
+}
+```
+
+値オブジェクトは `domain/type/account/paymentmethod/` に置く。
+
+| クラス | 内容 |
+|--------|------|
+| `ResolvedPaymentMethodName` | 解決済みの支払方法名。`value`（String）、解決できない場合の定数 `UNRESOLVED`（値は「－」）、`from(String)`（public static）。`@RequiredArgsConstructor(access = PRIVATE)`・`@Getter` |
+| `ResolvedBankAccountName` | 解決済みの銀行口座名。構成は `ResolvedPaymentMethodName` と同じ |
+
+「－」を値オブジェクト側の定数として保持する理由は、3.8節・[支払方法固定値の設計指針](Claude Codeへの作業インプット/Feature1_03_dev1_支払方法固定値_設計指針.md) 2.5 のとおり表示変換を1箇所に集約するためである。presentation層のレスポンスDTO（`AbstractSimpleShoppingRegistListResponse`・`AbstractFixedCostItemListResponse`・`ShopInfoManageResponse` など）は、これらの値オブジェクトをドメイン層から import する。
+
+リゾルバの振る舞い（システム予約値・銀行口座なし・未登録の「－」解決）は `PaymentMethodNameResolverTest`（7.1節）で検証する。
 
 ## 4. インフラ層設計
 
@@ -1044,6 +1066,7 @@ private boolean isPaymentMethodCodeValid() {
 
 ### 7.1 ドメイン層（Unit）
 
+- `PaymentMethodNameResolver`：マスタ一覧から直接生成し、システム予約値・銀行口座コードnull・未登録コードがいずれも「－」になること、口座を持つ支払方法が銀行口座名を解決することを検証（DBアクセスなし。改訂13で `PaymentMethodInfoComponentTest` から分離）
 - `BankAccountCode`・`BankAccountSort`・`BankName`・`BankAccountMemo`・`PaymentMethodCode`・`PaymentMethodName`・`ClosingDay`・`PaymentMethodSort`・`EnableFlg` 各ドメインタイプのバリデーション境界値テスト
 - `PaymentMethodKubun`（enum）：`from()` の全コード値網羅、`requiresAccount()`／`requiresClosingDay()` を5種別分すべて検証（電子マネー（前払い式）が `requiresAccount()=false` であることを含む）
 - `BankAccount`／`PaymentMethod` の `from()` テスト（`bankAccountCode`・`closingDay` がnullのケースを含む）
@@ -1091,7 +1114,7 @@ private boolean isPaymentMethodCodeValid() {
 4. 支払方法マスタ：同上（銀行口座マスタ完了後。FK依存のため）。`PaymentMethodCode`は`Identifier`継承＋`isSystemReserved()`、`PaymentMethodSort`は`SortOrder`継承。`findByUserId()`と`findSelectableByUserId()`の使い分けを含む
 5. コードテーブル追加（`CODE_DEFINES_PAYMENT_METHOD_KUBUN`定数、`codetable.csv`更新）
 6. ユーザー初期化処理拡張（`AdminMenuUserInfoUseCase`）とシステム行投入確認
-7. `PaymentMethodInfoComponent` 新規作成（`createResolver()`によるバッチ解決・表示変換の一元化を含む。レビュー指摘④）
+7. `PaymentMethodInfoComponent` 新規作成（`createResolver()`によるバッチ解決・表示変換の一元化を含む。レビュー指摘④）。改訂13で`PaymentMethodNameResolver`・`Resolved*Name`をドメイン層（3.10節）へ移動
 8. `ShoppingRegistExpenditureItemComponent` から `ShoppingAggregateSpecification` を切り出すリファクタリング。**着手時に以下を確認すること（突合レビュー指摘K）**：(a) 3.9節の型名・定数名（`ExpenditureItemCode`／`ExpenditureCategory`／`SISYUTU_ITEM_CODE_INSYOKU_VALUE`等）は仮記載であり、既存コードベースの実際の型名・定数名（ローマ字命名の揺れを含む）と完全に一致させること、(b) `Pair`（8組の組み合わせの保持に使用）がクラスパス上で利用可能か（Apache Commons Lang3 / Spring Framework 等の依存有無）を確認し、なければ専用の小さな値オブジェクトを新設すること
 9. 店舗マスタ拡張（デフォルト支払方法）
 10. 固定費登録画面拡張（`FixedCostInfoUpdateForm`は`findEnabledByUserId()`ベースで「支払方法がない」を選択肢に含める・予約値拒否バリデーションは設けない。`FixedCostBulkUpdateForm`関連画面への支払方法列追加、`AbstractFixedCostItemListResponse.FixedCostItem`等4種のDTO変更。突合レビュー指摘A・レビュー指摘⑥⑦・5.4節参照）。**フィールド存在確認（突合レビュー指摘AD）**：5.4.1節の`isPaymentMethodCodeValid()`が参照する`sisyutuItemCode`（`@NotBlank`）・`fixedCostName`（`@NotBlank @Size(1,100)`）は既存の`FixedCostInfoUpdateForm`に実在することをソース確認済み（既存の`isNeedCheckShiharaiTukiOptionalContext()`等と同じフィールドセット）。設計変更は不要

@@ -11,27 +11,22 @@
 package com.yonetani.webapp.accountbook.application.usecase.account.component;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
-import com.yonetani.webapp.accountbook.domain.model.account.bankaccount.BankAccount;
 import com.yonetani.webapp.accountbook.domain.model.account.bankaccount.BankAccountInquiryList;
-import com.yonetani.webapp.accountbook.domain.model.account.paymentmethod.PaymentMethod;
 import com.yonetani.webapp.accountbook.domain.model.account.paymentmethod.PaymentMethodInquiryList;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.repository.account.bankaccount.BankAccountTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.paymentmethod.PaymentMethodTableRepository;
-import com.yonetani.webapp.accountbook.domain.type.account.bankaccount.BankAccountCode;
+import com.yonetani.webapp.accountbook.domain.service.account.paymentmethod.PaymentMethodNameResolver;
 import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
-import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopDefaultPaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.ResolvedBankAccountName;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.ResolvedPaymentMethodName;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -66,12 +61,7 @@ public class PaymentMethodInfoComponent {
 		PaymentMethodInquiryList paymentMethods = paymentMethodRepository.findByUserId(SearchQueryUserId.from(userId));
 		BankAccountInquiryList bankAccounts = bankAccountRepository.findById(SearchQueryUserId.from(userId));
 
-		Map<PaymentMethodCode, PaymentMethod> paymentMethodMap = paymentMethods.getValues().stream()
-				.collect(Collectors.toMap(PaymentMethod::getPaymentMethodCode, Function.identity()));
-		Map<BankAccountCode, BankAccount> bankAccountMap = bankAccounts.getValues().stream()
-				.collect(Collectors.toMap(BankAccount::getBankAccountCode, Function.identity()));
-
-		return new PaymentMethodNameResolver(paymentMethodMap, bankAccountMap);
+		return new PaymentMethodNameResolver(paymentMethods, bankAccounts);
 	}
 
 	/**
@@ -114,9 +104,7 @@ public class PaymentMethodInfoComponent {
 	 */
 	public List<OptionItem> getPaymentMethodOptions(UserId userId) {
 		PaymentMethodInquiryList list = paymentMethodRepository.findSelectableByUserId(SearchQueryUserId.from(userId));
-		return list.getValues().stream()
-				.map(pm -> OptionItem.from(pm.getPaymentMethodCode().getValue(), pm.getPaymentMethodName().getValue()))
-				.collect(Collectors.toList());
+		return toPaymentMethodOptions(list);
 	}
 
 	/**
@@ -131,6 +119,18 @@ public class PaymentMethodInfoComponent {
 	 */
 	public List<OptionItem> getFixedCostPaymentMethodOptions(UserId userId) {
 		PaymentMethodInquiryList list = paymentMethodRepository.findEnabledByUserId(SearchQueryUserId.from(userId));
+		return toPaymentMethodOptions(list);
+	}
+
+	/**
+	 *<pre>
+	 * 支払方法の一覧を選択ボックス用の選択肢(コード・支払方法名)に変換します。
+	 *</pre>
+	 * @param list 支払方法の一覧
+	 * @return 支払方法の選択肢のリスト
+	 *
+	 */
+	private List<OptionItem> toPaymentMethodOptions(PaymentMethodInquiryList list) {
 		return list.getValues().stream()
 				.map(pm -> OptionItem.from(pm.getPaymentMethodCode().getValue(), pm.getPaymentMethodName().getValue()))
 				.collect(Collectors.toList());
@@ -152,151 +152,4 @@ public class PaymentMethodInfoComponent {
 				.map(ba -> OptionItem.from(ba.getBankAccountCode().getValue(), ba.getBankName().getValue()))
 				.collect(Collectors.toList());
 	}
-
-	/**
-	 *<pre>
-	 * 支払方法コード→支払方法名／銀行口座名 の解決を、DBアクセスなしでメモリ上のMap参照のみで行うリゾルバです。
-	 * PaymentMethodInfoComponent.createResolver()で1度構築すれば、以降の名称解決はすべてこのリゾルバで完結します。
-	 *
-	 *</pre>
-	 *
-	 * @author ：Kouki Yonetani
-	 * @since 家計簿アプリ(1.03)
-	 *
-	 */
-	@RequiredArgsConstructor
-	public static class PaymentMethodNameResolver {
-		// 支払方法コード→支払方法情報のMap
-		private final Map<PaymentMethodCode, PaymentMethod> paymentMethodMap;
-		// 銀行口座コード→銀行口座情報のMap
-		private final Map<BankAccountCode, BankAccount> bankAccountMap;
-
-		/**
-		 *<pre>
-		 * 支払方法コードに対応する支払方法名を解決します。
-		 * システム予約値(999等)場合は「－」を返します。
-		 *</pre>
-		 * @param code 支払方法コード
-		 * @return 支払方法名（解決済み）の値オブジェクト。解決できない場合の値オブジェクト格納値は「－」
-		 *
-		 */
-		public ResolvedPaymentMethodName getPaymentMethodName(PaymentMethodCode code) {
-			if(code.isSystemReserved()) {
-				return ResolvedPaymentMethodName.UNRESOLVED;
-			}
-			PaymentMethod paymentMethod = paymentMethodMap.get(code);
-			return paymentMethod == null ? 
-					ResolvedPaymentMethodName.UNRESOLVED : 
-						ResolvedPaymentMethodName.from(paymentMethod.getPaymentMethodName().getValue());
-		}
-
-		/**
-		 *<pre>
-		 * 店舗デフォルト支払方法コードに対応する支払方法名を解決します。
-		 *</pre>
-		 * @param code 店舗デフォルト支払方法コード
-		 * @return 支払方法名（解決済み）の値オブジェクト。解決できない場合の値オブジェクト格納値は「－」
-		 *
-		 */
-		public ResolvedPaymentMethodName getPaymentMethodName(ShopDefaultPaymentMethodCode code) {
-			// 店舗デフォルト支払方法コードの値がnullの場合は解決できないため「－」を返す
-			if(code.isNull()) {
-				return ResolvedPaymentMethodName.UNRESOLVED;
-			}
-			// 店舗デフォルト支払方法コードを支払方法コードに変換
-			PaymentMethodCode paymentMethodCode = PaymentMethodCode.from(code.getValue());
-			
-			PaymentMethod paymentMethod = paymentMethodMap.get(paymentMethodCode);
-			return paymentMethod == null ? 
-					ResolvedPaymentMethodName.UNRESOLVED : 
-						ResolvedPaymentMethodName.from(paymentMethod.getPaymentMethodName().getValue());
-		}
-		
-		/**
-		 *<pre>
-		 * 支払方法コードに対応する銀行口座名を解決します。
-		 * システム予約値、対応する支払方法の銀行口座コードがnull(現金・電子マネー(前払い式))、
-		 * またはマスタに存在しないコードの場合は「－」を返します。
-		 *</pre>
-		 * @param code 支払方法コード
-		 * @return 銀行口座名（解決済み）の値オブジェクト。解決できない場合は「－」
-		 *
-		 */
-		public ResolvedBankAccountName getBankAccountName(PaymentMethodCode code) {
-			if(code.isSystemReserved()) {
-				return ResolvedBankAccountName.UNRESOLVED;
-			}
-			PaymentMethod paymentMethod = paymentMethodMap.get(code);
-			if(paymentMethod == null || paymentMethod.getBankAccountCode() == null) {
-				return ResolvedBankAccountName.UNRESOLVED;
-			}
-			BankAccount bankAccount = bankAccountMap.get(paymentMethod.getBankAccountCode());
-			return bankAccount == null ? 
-					ResolvedBankAccountName.UNRESOLVED :
-						ResolvedBankAccountName.from(bankAccount.getBankName().getValue());
-		}
-	}
-	
-	/**
-	 *<pre>
-	 * 支払方法コードに対応する支払方法名を解決した結果を保持する値オブジェクトです
-	 *
-	 *</pre>
-	 *
-	 * @author ：Kouki Yonetani
-	 * @since 家計簿アプリ(1.03)
-	 *
-	 */
-	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-	@Getter
-	public static class ResolvedPaymentMethodName {
-		// 解決できない場合の値オブジェクト
-		public static final ResolvedPaymentMethodName UNRESOLVED = new ResolvedPaymentMethodName("－");
-		// 支払方法名（解決済み）
-		private final String value;
-		
-		/**
-		 *<pre>
-		 * 支払方法名（解決済み）の値オブジェクトを生成します。
-		 *</pre>
-		 * @param value 支払方法名（解決済み）
-		 * @return 支払方法名（解決済み）値オブジェクト「ResolvedPaymentMethodName」
-		 *
-		 */
-		private static ResolvedPaymentMethodName from(String value) {
-			return new ResolvedPaymentMethodName(value);
-		}
-	}
-	
-	/**
-	 *<pre>
-	 * 支払方法コードに対応する銀行口座名を解決した結果を保持する値オブジェクトです
-	 *
-	 *</pre>
-	 *
-	 * @author ：Kouki Yonetani
-	 * @since 家計簿アプリ(1.03)
-	 *
-	 */
-	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-	@Getter
-	public static class ResolvedBankAccountName {
-		// 解決できない場合の値オブジェクト
-		public static final ResolvedBankAccountName UNRESOLVED = new ResolvedBankAccountName("－");
-		// 銀行口座名（解決済み）
-		private final String value;
-		
-		/**
-		 *<pre>
-		 * 銀行口座名（解決済み）の値オブジェクトを生成します。
-		 *</pre>
-		 * @param value 銀行口座名（解決済み）
-		 * @return 銀行口座名（解決済み）値オブジェクト「ResolvedBankAccountName」
-		 *
-		 */
-		private static ResolvedBankAccountName from(String value) {
-			return new ResolvedBankAccountName(value);
-		}
-	}
 }
-
