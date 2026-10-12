@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>別チャット指示文：AccountYearInquiryUseCase 型安全性トライアル</title>
+<style>
+  body {
+    font-family: "Segoe UI", "Hiragino Kaku Gothic ProN", "Meiryo", sans-serif;
+    line-height: 1.8;
+    color: #222;
+    background: #fafafa;
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+  }
+  h1 {
+    font-size: 1.5rem;
+    border-bottom: 3px solid #2d6cdf;
+    padding-bottom: 8px;
+  }
+  .meta {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 1.5em;
+  }
+  .tag {
+    display: inline-block;
+    background: #2d6cdf;
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-right: 6px;
+  }
+  .toolbar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+  }
+  button#copyBtn {
+    background: #2d6cdf;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+  button#copyBtn:hover {
+    background: #1a4fa0;
+  }
+  button#copyBtn.copied {
+    background: #2f9e44;
+  }
+  .prompt-box {
+    background: #fff;
+    border: 1px solid #c3d7f7;
+    border-left: 6px solid #2d6cdf;
+    border-radius: 8px;
+    padding: 20px 24px;
+    white-space: pre-wrap;
+    font-size: 0.97rem;
+  }
+  .prompt-box p {
+    margin: 0 0 1.1em 0;
+  }
+  .prompt-box p:last-child {
+    margin-bottom: 0;
+  }
+  .notes {
+    margin-top: 2em;
+  }
+  .notes h2 {
+    font-size: 1.1rem;
+    color: #1a4fa0;
+  }
+  code {
+    font-family: "Consolas", "Courier New", monospace;
+    background: #eef4ff;
+    padding: 1px 5px;
+    border-radius: 4px;
+    font-size: 0.92em;
+  }
+</style>
+</head>
+<body>
+
+<h1>別チャット指示文：AccountYearInquiryUseCase 型安全性トライアル</h1>
+<p class="meta">
+  <span class="tag">対象</span> application/usecase/account/inquiry/AccountYearInquiryUseCase.java<br>
+  <span class="tag">関連規約</span> docs/specifications/06_コーディング規約.md 8章<br>
+  <span class="tag">位置づけ</span> Feature1.03-dev1とは無関係の別件トライアル
+</p>
+
+<div class="toolbar">
+  <button id="copyBtn" onclick="copyPrompt()">指示文をコピー</button>
+</div>
+
+<div class="prompt-box" id="promptText">
+<p><code>AccountYearInquiryUseCase.java</code>（<code>src/main/java/com/yonetani/webapp/accountbook/application/usecase/account/inquiry/AccountYearInquiryUseCase.java</code>）が参照しているドメインモデルとレスポンスDTOに対して、<code>docs/specifications/06_コーディング規約.md</code> の「8. ドメインモデルのファクトリメソッド（from）の型安全性」（8.1〜8.4）に沿った修正をお試しで実施してください。これはFeature1.03-dev1とは関係のない別件の確認作業です。</p>
+
+<p>まず <code>docs/specifications/06_コーディング規約.md</code> の8章を読んで、以下の観点を把握してください。</p>
+<p>- 8.1: ドメインモデルの<code>from()</code>ファクトリは値オブジェクト型を引数に取る（プリミティブ型のオブセッションを避ける）
+- 8.2: witherパターン（一部フィールドのみ変更した新しいインスタンス生成）で、変更しないフィールドまで<code>.getValue()</code>→<code>XXX.from(...)</code>で不要に再生成しない
+- 8.3: 8.1の対応でテストコードがコンパイルエラーになる場合、各テストクラスにプリミティブ引数を受け取り値オブジェクトに変換してからドメインのファクトリを呼ぶprivateヘルパーメソッドを追加する
+- 8.4: ResponseDTOのファクトリも同様に値オブジェクト型を引数に取り、DTO内部で<code>.toFormatString()</code>等の表示文字列変換を行う形にする。ただし業務計算（パーセンテージ算出等）の実体コードをResponseDTO側に書いてはいけない（判定基準は「呼び出し位置」ではなく「計算ロジックの実装場所」）</p>
+
+<p>次に、<code>AccountYearInquiryUseCase.java</code>が参照しているドメインモデル（<code>IncomeAndExpenditureInquiryList</code>、<code>AccountYearMeisaiInquiryList</code>等とその要素の型）とレスポンスDTO（<code>AccountYearMageInquiryResponse</code>、<code>AccountYearMeisaiInquiryResponse</code>、<code>AccountYearInquiryRedirectResponse</code>、<code>AccountYearInquiryTargetYearInfo</code>等）を調査し、上記8.1〜8.4の観点で現状がどうなっているか（対応済み/未対応/一部のみ対応）を一覧で報告してください。特に<code>AccountYearInquiryUseCase.convertMageList()</code>/<code>convertMeisaiList()</code>内で<code>.toFormatString()</code>をUseCase側で呼んでからResponseDTOに渡している箇所は、8.4の観点で未対応の可能性があるので確認してください。</p>
+
+<p>調査結果を報告した上で、どこから着手するか私（ユーザー）と相談しながら進めてください。一度に全部変更せず、1クラスずつ確認・修正・ビルド確認（<code>mvn clean test-compile</code>→関連テスト実行→最終的に<code>mvn test</code>でフルスイート確認）を行ってください。また、修正したクラスが<code>AccountYearInquiryUseCase</code>以外の箇所（他のUseCase・他の画面）からも参照されていないか確認し、影響範囲があれば先に教えてください。</p>
+</div>
+
+<div class="notes">
+  <h2>指示文のポイント</h2>
+  <p>①規約の該当章を読ませる、②対象範囲（UseCaseが参照するドメインモデル・ResponseDTO）を明示する、③現状調査→一覧報告→相談しながら着手、という進め方を指定している。一度に全部まとめて修正させず、都度確認しながら進めさせるのが狙い。</p>
+</div>
+
+<script>
+function copyPrompt() {
+  var text = document.getElementById('promptText').innerText;
+  var btn = document.getElementById('copyBtn');
+  function done() {
+    var original = '指示文をコピー';
+    btn.textContent = 'コピーしました';
+    btn.classList.add('copied');
+    setTimeout(function() {
+      btn.textContent = original;
+      btn.classList.remove('copied');
+    }, 1500);
+  }
+  try {
+    navigator.clipboard.writeText(text).then(done, fallbackCopy);
+  } catch (e) {
+    fallbackCopy();
+  }
+  function fallbackCopy() {
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      done();
+    } catch (e) {}
+  }
+}
+</script>
+
+</body>
+</html>
