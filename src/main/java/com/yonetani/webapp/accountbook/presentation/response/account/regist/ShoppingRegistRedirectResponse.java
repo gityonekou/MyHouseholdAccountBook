@@ -7,6 +7,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2024/11/03 : 1.00.00                      新規作成
  * 2026/09/23 : 1.01.00  feature-1.03-dev1   UseCase結合テスト対応でredirectUrlに@Getterを追加
+ * 2026/10/12 : 1.01.01  feature-1.03-dev1   追加リファクタリング対応(リダイレクトレスポンスdtoのファクトリ引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.regist;
@@ -14,6 +15,7 @@ package com.yonetani.webapp.accountbook.presentation.response.account.regist;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
 import lombok.AccessLevel;
@@ -48,12 +50,12 @@ public class ShoppingRegistRedirectResponse extends AbstractResponse {
 	 * @return 買い物登録画面にリダイレクトするためのレスポンス情報
 	 *
 	 */
-	public static ShoppingRegistRedirectResponse getShoppingRegistRedirectInstance(String targetYearMonth) {
+	public static ShoppingRegistRedirectResponse getShoppingRegistRedirectInstance(TargetYearMonth targetYearMonth) {
 		ShoppingRegistRedirectResponse response = new ShoppingRegistRedirectResponse(
 				// 買い物登録(簡易タイプ)画面リダイレクトURL
 				"redirect:/myhacbook/accountregist/shoppingregist/",
 				// 対象年月
-				targetYearMonth);
+				targetYearMonth.getValue());
 		response.setTransactionSuccessFull();
 		return response;
 	}
@@ -66,12 +68,12 @@ public class ShoppingRegistRedirectResponse extends AbstractResponse {
 	 * @return 買い物登録(簡易タイプ)画面にリダイレクトするためのレスポンス情報
 	 *
 	 */
-	public static ShoppingRegistRedirectResponse getSimpleShoppingRegistRedirectInstance(String targetYearMonth) {
+	public static ShoppingRegistRedirectResponse getSimpleShoppingRegistRedirectInstance(TargetYearMonth targetYearMonth) {
 		ShoppingRegistRedirectResponse response = new ShoppingRegistRedirectResponse(
 				// 買い物登録(簡易タイプ)画面リダイレクトURL
 				"redirect:/myhacbook/accountregist/simpleshoppingregist/",
 				// 対象年月
-				targetYearMonth);
+				targetYearMonth.getValue());
 		response.setTransactionSuccessFull();
 		return response;
 	}
@@ -84,12 +86,12 @@ public class ShoppingRegistRedirectResponse extends AbstractResponse {
 	 * @return 買い物登録方法選択画面(メニュー選択画面)にリダイレクトするためのレスポンス情報
 	 *
 	 */
-	public static ShoppingRegistRedirectResponse getReturnShoppingTopRedirectInstance(String targetYearMonth) {
+	public static ShoppingRegistRedirectResponse getReturnShoppingTopRedirectInstance(TargetYearMonth targetYearMonth) {
 		ShoppingRegistRedirectResponse response = new ShoppingRegistRedirectResponse(
 				// 買い物登録方法選択画面(メニュー選択画面)リダイレクトURL
 				"redirect:/myhacbook/accountregist/shoppingtopmenu/",
 				// 対象年月
-				targetYearMonth);
+				targetYearMonth.getValue());
 		response.setTransactionSuccessFull();
 		return response;
 	}
@@ -102,12 +104,12 @@ public class ShoppingRegistRedirectResponse extends AbstractResponse {
 	 * @return 各月の収支参照画面にリダイレクトするためのレスポンス情報
 	 *
 	 */
-	public static ShoppingRegistRedirectResponse getReturnInquiryMonthRedirectInstance(String targetYearMonth) {
+	public static ShoppingRegistRedirectResponse getReturnInquiryMonthRedirectInstance(TargetYearMonth targetYearMonth) {
 		ShoppingRegistRedirectResponse response = new ShoppingRegistRedirectResponse(
 				// 各月の収支参照画面リダイレクトURL
 				"redirect:/myhacbook/accountinquiry/accountmonth/registComplete/",
 				// 対象年月
-				targetYearMonth);
+				targetYearMonth.getValue());
 		response.setTransactionSuccessFull();
 		return response;
 	}

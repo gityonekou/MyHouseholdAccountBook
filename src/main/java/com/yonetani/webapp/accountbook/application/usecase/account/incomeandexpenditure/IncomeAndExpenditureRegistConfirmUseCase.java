@@ -104,9 +104,12 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 	public IncomeAndExpenditureRegistCheckResponse readRegistCheckInfo(LoginUserInfo user, String targetYearMonth,
 			List<IncomeRegistItem> incomeRegistItemList, List<ExpenditureRegistItem> expenditureRegistItemList) {
 		log.debug("readRegistCheckInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
-
+		
+		// 対象年月ドメインタイプ
+		TargetYearMonth targetYearMonthDomain = TargetYearMonth.from(targetYearMonth);
+		
 		// レスポンスを生成
-		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(targetYearMonth);
+		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(targetYearMonthDomain);
 		// セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を設定
 		registListComponent.setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
 
@@ -126,13 +129,20 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 	public IncomeAndExpenditureRegistCheckResponse readRegistCancelInfo(LoginUserInfo user, String targetYearMonth,
 			String returnYearMonth) {
 		log.debug("readRegistCancelInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",returnYearMonth=" + returnYearMonth);
-
-		// 戻り対象の対象年月の設定値をチェック
-		TargetYearMonth.from(returnYearMonth);
-
-		// レスポンスを生成
-		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(returnYearMonth);
-		response.addMessage(String.format("%s年%s月度の収支登録をキャンセルしました。", targetYearMonth.substring(0, 4), targetYearMonth.substring(4)));
+		
+		// キャンセル対象の対象年月のドメインタイプを生成
+		TargetYearMonth targetYearMonthDomain = TargetYearMonth.from(targetYearMonth);
+		
+		// 戻り対象の対象年月の設定値よりレスポンスを生成
+		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(TargetYearMonth.from(returnYearMonth));
+		// キャンセルメッセージを生成
+		response.addMessage(String.format("%s年%s月度の収支登録をキャンセルしました。", 
+				// キャンセル対象の対象年月の年の値
+				targetYearMonthDomain.getTargetYear().getValue(),
+				// キャンセル対象の対象年月の月の値
+				targetYearMonthDomain.getTargetMonth().getValue()));
+		
+		// トランザクション完了
 		response.setTransactionSuccessFull();
 
 		return response;
@@ -159,7 +169,7 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 		// 対象年月ドメインタイプ
 		TargetYearMonth targetYearMonth = TargetYearMonth.from(targetYearMonthStr);
 		// レスポンスを生成
-		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(targetYearMonth.getValue());
+		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(targetYearMonth);
 
 		// セッションに登録されている収入情報のリストがない場合、予期しないエラー
 		if(CollectionUtils.isEmpty(incomeRegistItemList)) {

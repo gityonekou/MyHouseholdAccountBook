@@ -6,7 +6,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/02/25 : 1.00.00  feature-1.00-dev00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
- * 2026/08/18 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(getExpenditureItemNameメソッドの戻り値を値オブジェクトに変更)
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(getExpenditureItemNameメソッドの戻り値を値オブジェクトに変更、リダイレクトレスポンスdtoのファクトリ引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -34,6 +34,7 @@ import com.yonetani.webapp.accountbook.domain.repository.account.event.EventItem
 import com.yonetani.webapp.accountbook.domain.service.account.regist.TemporaryCodeGenerator;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
 import com.yonetani.webapp.accountbook.presentation.request.account.regist.ExpenditureItemForm;
@@ -210,7 +211,10 @@ public class ExpenditureRegistUseCase {
 	private IncomeAndExpenditureRegistResponse execExpenditureAdd(String targetYearMonth,
 			ExpenditureItemForm inputForm, List<ExpenditureRegistItem> expenditureRegistItemList) {
 
-		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
+		// 対象年月のドメインタイプを生成
+		TargetYearMonth domainTargetYearMonth = TargetYearMonth.from(targetYearMonth);
+		
+		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(domainTargetYearMonth);
 
 		// 支出金額をbigdecimalに変換
 		BigDecimal expenditureKingaku = DomainCommonUtils.convertKingakuBigDecimal(inputForm.getExpenditureKingaku());
@@ -241,8 +245,11 @@ public class ExpenditureRegistUseCase {
 	 */
 	private IncomeAndExpenditureRegistResponse execExpenditureUpdate(String targetYearMonth,
 			ExpenditureItemForm inputForm, List<ExpenditureRegistItem> expenditureRegistItemList) {
-
-		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
+		
+		// 対象年月のドメインタイプを生成
+		TargetYearMonth domainTargetYearMonth = TargetYearMonth.from(targetYearMonth);
+		
+		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(domainTargetYearMonth);
 
 		// 支出金額をbigdecimalに変換
 		BigDecimal expenditureKingaku = DomainCommonUtils.convertKingakuBigDecimal(inputForm.getExpenditureKingaku());
@@ -292,7 +299,10 @@ public class ExpenditureRegistUseCase {
 	private IncomeAndExpenditureRegistResponse execExpenditureDelete(String targetYearMonth,
 			ExpenditureItemForm inputForm, List<ExpenditureRegistItem> expenditureRegistItemList) {
 
-		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
+		// 対象年月のドメインタイプを生成
+		TargetYearMonth domainTargetYearMonth = TargetYearMonth.from(targetYearMonth);
+		
+		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(domainTargetYearMonth);
 
 		// 支出金額をbigdecimalに変換
 		BigDecimal expenditureKingaku = DomainCommonUtils.convertKingakuBigDecimal(inputForm.getExpenditureKingaku());
@@ -441,10 +451,14 @@ public class ExpenditureRegistUseCase {
 			throw new MyHouseholdAccountBookRuntimeException("コード定義ファイルに「支出区分情報："
 					+ MyHouseholdAccountBookContent.CODE_DEFINES_INCOME_KUBUN + "」が登録されていません。管理者に問い合わせてください");
 		}
+		
+		// 対象年月のドメインタイプを生成
+		TargetYearMonth domainTargetYearMonth = TargetYearMonth.from(targetYearMonth);
+		
 		// レスポンスを生成
 		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(
 				// 収支対象の年月(YYYMM)
-				targetYearMonth,
+				domainTargetYearMonth,
 				// 支出情報入力フォーム
 				expenditureItemForm,
 				// 収入区分選択ボックスの表示情報リストはデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定

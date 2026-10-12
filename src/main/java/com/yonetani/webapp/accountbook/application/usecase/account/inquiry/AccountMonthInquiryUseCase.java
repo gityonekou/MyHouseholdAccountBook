@@ -195,7 +195,7 @@ public class AccountMonthInquiryUseCase {
 	public AbstractResponse readShoppingAddRedirectInfo(LoginUserInfo user, String targetYearMonth) {
 		log.debug("readShoppingAddRedirectInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
 		AccountMonthInquiryRedirectResponse response
-			= AccountMonthInquiryRedirectResponse.getShoppingAddRedirectInstance(targetYearMonth);
+			= AccountMonthInquiryRedirectResponse.getShoppingAddRedirectInstance(TargetYearMonth.from(targetYearMonth));
 		return response;
 	}
 	
@@ -211,7 +211,7 @@ public class AccountMonthInquiryUseCase {
 	public AbstractResponse readAccountMonthUpdateRedirectInfo(LoginUserInfo user, String targetYearMonth) {
 		log.debug("readAccountMonthUpdateRedirectInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
 		AccountMonthInquiryRedirectResponse response
-			= AccountMonthInquiryRedirectResponse.getAccountMonthUpdateRedirectInstance(targetYearMonth);
+			= AccountMonthInquiryRedirectResponse.getAccountMonthUpdateRedirectInstance(TargetYearMonth.from(targetYearMonth));
 		return response;
 	}
 	

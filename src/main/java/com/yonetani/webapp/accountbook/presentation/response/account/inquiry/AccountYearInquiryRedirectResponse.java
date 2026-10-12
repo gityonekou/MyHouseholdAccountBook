@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2025/02/09 : 1.00.00                      新規作成
+ * 2026/10/12 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(getInquiryMonthRedirectInstance()の引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.inquiry;
@@ -13,6 +14,7 @@ package com.yonetani.webapp.accountbook.presentation.response.account.inquiry;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
 import lombok.AccessLevel;
@@ -45,12 +47,12 @@ public class AccountYearInquiryRedirectResponse extends AbstractResponse {
 	 * @return 各月の収支画面にリダイレクトするためのレスポンス情報
 	 *
 	 */
-	public static AccountYearInquiryRedirectResponse getInquiryMonthRedirectInstance(String targetYearMonth) {
+	public static AccountYearInquiryRedirectResponse getInquiryMonthRedirectInstance(TargetYearMonth targetYearMonth) {
 		AccountYearInquiryRedirectResponse response = new AccountYearInquiryRedirectResponse(
 				// 買い物登録画面リダイレクトURL
 				"redirect:/myhacbook/accountinquiry/accountmonth/registComplete/",
 				// 対象年月
-				targetYearMonth);
+				targetYearMonth.getValue());
 		response.setTransactionSuccessFull();
 		return response;
 	}

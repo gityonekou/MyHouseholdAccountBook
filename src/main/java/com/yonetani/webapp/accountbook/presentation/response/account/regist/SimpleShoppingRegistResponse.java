@@ -7,6 +7,7 @@
  * 2024/11/03 : 1.00.00                      新規作成
  * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  * 2026/09/23 : 1.01.01  feature-1.03-dev1   UseCase結合テスト対応で@Getterを追加
+ * 2026/10/12 : 1.01.02  feature-1.03-dev1   追加リファクタリング対応(リダイレクトレスポンスdtoのファクトリ引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.regist;
@@ -23,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopDefaultPaymentMethodCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.presentation.request.account.regist.SimpleShoppingRegistInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
@@ -112,6 +114,7 @@ public class SimpleShoppingRegistResponse extends AbstractSimpleShoppingRegistLi
 	 *<pre>
 	 * デフォルト値からレスポンス情報を生成して返します。
 	 *</pre>
+	 * @param targetYearMonth 対象年月
 	 * @param addShopKubunList 店舗区分選択ボックスの表示情報リスト
 	 * @param addShopNameList 店名選択肢のリスト(デフォルト支払方法のdata属性付き)
 	 * @param addPaymentMethodList 支払方法選択ボックスの表示情報リスト
@@ -120,6 +123,7 @@ public class SimpleShoppingRegistResponse extends AbstractSimpleShoppingRegistLi
 	 *
 	 */
 	public static SimpleShoppingRegistResponse getInstance(
+			TargetYearMonth targetYearMonth,
 			List<OptionItem> addShopKubunList,
 			List<ShopOptionItem> addShopNameList,
 			List<OptionItem> addPaymentMethodList,
@@ -151,7 +155,7 @@ public class SimpleShoppingRegistResponse extends AbstractSimpleShoppingRegistLi
 				// フォームデータ
 				simpleShoppingRegist);
 		// 対象年月を設定
-		response.setYearMonth(simpleShoppingRegist.getTargetYearMonth());
+		response.setYearMonth(targetYearMonth);
 		// 画面表示情報を返却
 		return response;
 	}

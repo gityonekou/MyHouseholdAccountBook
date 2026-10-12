@@ -6,6 +6,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2024/11/03 : 1.00.00                      新規作成
  * 2026/05/09 : 1.01.00  feature-1.01-dev1   リファクタリング追加対応(対象年月ドメインの集約)
+ * 2026/10/12 : 1.02.00  feature-1.03-dev1   追加リファクタリング対応(リダイレクトレスポンスdtoのファクトリ引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist;
@@ -125,8 +126,12 @@ public class ShoppingRegistTopMenuUseCase {
 	 */
 	public AbstractResponse readShoppingRegistRedirectInfo(LoginUserInfo user, String targetYearMonth) {
 		log.debug("readShoppingRegistRedirectInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+		
+		// 対象年月のドメインタイプを生成
+		TargetYearMonth domainTargetYearMonth = TargetYearMonth.from(targetYearMonth);
+		
 		ShoppingRegistRedirectResponse response
-			= ShoppingRegistRedirectResponse.getShoppingRegistRedirectInstance(targetYearMonth);
+			= ShoppingRegistRedirectResponse.getShoppingRegistRedirectInstance(domainTargetYearMonth);
 		return response;
 	}
 	
@@ -141,8 +146,12 @@ public class ShoppingRegistTopMenuUseCase {
 	 */
 	public AbstractResponse readSimpleShoppingRegistRedirectInfo(LoginUserInfo user, String targetYearMonth) {
 		log.debug("readSimpleShoppingRegistRedirectInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+		
+		// 対象年月のドメインタイプを生成
+		TargetYearMonth domainTargetYearMonth = TargetYearMonth.from(targetYearMonth);
+		
 		ShoppingRegistRedirectResponse response
-			= ShoppingRegistRedirectResponse.getSimpleShoppingRegistRedirectInstance(targetYearMonth);
+			= ShoppingRegistRedirectResponse.getSimpleShoppingRegistRedirectInstance(domainTargetYearMonth);
 		return response;
 	}
 	
@@ -157,8 +166,12 @@ public class ShoppingRegistTopMenuUseCase {
 	 */
 	public AbstractResponse readReturnInquiryMonthRedirectInfo(LoginUserInfo user, String targetYearMonth) {
 		log.debug("readReturnInquiryMonthRedirectInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+		
+		// 対象年月のドメインタイプを生成
+		TargetYearMonth domainTargetYearMonth = TargetYearMonth.from(targetYearMonth);
+		
 		ShoppingRegistRedirectResponse response
-			= ShoppingRegistRedirectResponse.getReturnInquiryMonthRedirectInstance(targetYearMonth);
+			= ShoppingRegistRedirectResponse.getReturnInquiryMonthRedirectInstance(domainTargetYearMonth);
 		return response;
 	}
 	

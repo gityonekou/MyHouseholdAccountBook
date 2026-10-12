@@ -7,14 +7,14 @@
  * 日付       : version  ブランチ            コメントなど
  * 2024/12/01 : 1.00.00                      新規作成
  * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/10/12 : 1.02.00  feature-1.03-dev1   追加リファクタリング対応(レスポンスdtoのファクトリ引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.regist;
 
-import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
 import lombok.AccessLevel;
@@ -62,13 +62,10 @@ public abstract class AbstractRegistResponse extends AbstractResponse {
 	 * @param targetYearMonth 対象年月(yyyyMM)
 	 *
 	 */
-	protected void setYearMonth(String targetYearMonth) {
-		if(!StringUtils.hasLength(targetYearMonth) || targetYearMonth.length() != 6) {
-			throw new MyHouseholdAccountBookRuntimeException("対象年月の値が不正です。管理者に問い合わせてください。[targetYearMonth=" + targetYearMonth + "]");
-		}
+	protected void setYearMonth(TargetYearMonth targetYearMonth) {
 		// yyyyMMのyyyyの値を設定(年の値を設定)
-		viewYear = targetYearMonth.substring(0, 4);
+		viewYear = targetYearMonth.getTargetYear().getValue();
 		// yyyyMMのMMの値を設定(月の値を設定)
-		viewMonth = targetYearMonth.substring(4);
+		viewMonth = targetYearMonth.getTargetMonth().getValue();
 	}
 }

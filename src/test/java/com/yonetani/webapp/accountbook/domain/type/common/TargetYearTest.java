@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/09/10 : 1.00.00  feature-1.03-dev1   新規作成
+ * 2026/10/12 : 1.00.01  feature-1.03-dev1   plusYear()のテストを追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
@@ -21,6 +22,7 @@ import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRu
  * TargetYear（年）のテストクラスです。
  * C1（分岐網羅）で以下メソッドを検証します。
  * ・from(String year) ：ガード節3分岐＋正常系
+ * ・plusYear：0加算・正の加算・負の加算・上限/下限超過での例外
  * ・toFormatString：4桁年（yyyy年）
  * ・toString：正常系
  * ・equals / hashCode：同値・異値
@@ -120,6 +122,75 @@ class TargetYearTest {
 		);
 	}
 	
+	// ===========================================================
+	// plusYear(int years)
+	// ===========================================================
+
+	@Test
+	@DisplayName("plusYear：0加算は同じ年を返す")
+	void testPlusYear_0加算() {
+		// 準備
+		TargetYear year = TargetYear.from("2025");
+
+		// 実行
+		TargetYear result = year.plusYear(0);
+
+		// 検証
+		assertEquals("2025", result.getValue());
+	}
+
+	@Test
+	@DisplayName("plusYear：正の値で翌年を返す")
+	void testPlusYear_正の加算() {
+		// 準備
+		TargetYear year = TargetYear.from("2025");
+
+		// 実行
+		TargetYear result = year.plusYear(1);
+
+		// 検証
+		assertEquals("2026", result.getValue());
+	}
+
+	@Test
+	@DisplayName("plusYear：負の値で前年を返す")
+	void testPlusYear_負の加算() {
+		// 準備
+		TargetYear year = TargetYear.from("2025");
+
+		// 実行
+		TargetYear result = year.plusYear(-1);
+
+		// 検証
+		assertEquals("2024", result.getValue());
+	}
+
+	@Test
+	@DisplayName("plusYear：下限(1900年)を下回ると例外が発生する")
+	void testPlusYear_異常系_下限未満() {
+		// 準備
+		TargetYear year = TargetYear.from("1900");
+
+		// 実行 & 検証
+		assertThrows(
+			MyHouseholdAccountBookRuntimeException.class,
+			() -> year.plusYear(-1)
+		);
+	}
+
+	@Test
+	@DisplayName("plusYear：上限(2200年)を超えると例外が発生する")
+	void testPlusYear_異常系_上限超過() {
+		// 準備
+		TargetYear year = TargetYear.from("2200");
+
+		// 実行 & 検証
+		assertThrows(
+			MyHouseholdAccountBookRuntimeException.class,
+			() -> year.plusYear(1)
+		);
+	}
+
 	// ===========================================================
 	// toFormatString()
 	// ===========================================================

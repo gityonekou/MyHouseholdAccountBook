@@ -13,7 +13,7 @@
  * 2024/11/03 : 1.00.00                      新規作成
  * 2025/12/28 : 1.01.00  feature-1.00-dev00  リファクタリング対応（DDD適応)
  * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応、追加リファクタリング対応(買い物登録ドメインの見直し)
- * 2026/09/23 : 1.02.01  feature-1.03-dev1   追加リファクタリング対応(SimpleShoppingRegistUseCaseを照会系、登録系に分割)
+ * 2026/09/23 : 1.02.01  feature-1.03-dev1   追加リファクタリング対応(SimpleShoppingRegistUseCaseを照会系、登録系に分割、リダイレクトレスポンスdtoのファクトリ引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist;
@@ -262,8 +262,12 @@ public class SimpleShoppingRegistInquiryUseCase {
 	 */
 	public AbstractResponse readReturnShoppingTopRedirectInfo(LoginUserInfo user, String targetYearMonth) {
 		log.debug("readReturnShoppingTopRedirectInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+		
+		// 対象年月のドメインタイプを生成
+		TargetYearMonth domainTargetYearMonth = TargetYearMonth.from(targetYearMonth);
+		
 		ShoppingRegistRedirectResponse response
-			= ShoppingRegistRedirectResponse.getReturnShoppingTopRedirectInstance(targetYearMonth);
+			= ShoppingRegistRedirectResponse.getReturnShoppingTopRedirectInstance(domainTargetYearMonth);
 		return response;
 	}
 
@@ -278,8 +282,12 @@ public class SimpleShoppingRegistInquiryUseCase {
 	 */
 	public AbstractResponse readReturnInquiryMonthRedirectInfo(LoginUserInfo user, String targetYearMonth) {
 		log.debug("readReturnInquiryMonthRedirectInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+		
+		// 対象年月のドメインタイプを生成
+		TargetYearMonth domainTargetYearMonth = TargetYearMonth.from(targetYearMonth);
+		
 		ShoppingRegistRedirectResponse response
-			= ShoppingRegistRedirectResponse.getReturnInquiryMonthRedirectInstance(targetYearMonth);
+			= ShoppingRegistRedirectResponse.getReturnInquiryMonthRedirectInstance(domainTargetYearMonth);
 		return response;
 	}
 
@@ -316,10 +324,20 @@ public class SimpleShoppingRegistInquiryUseCase {
 						domain.getDefaultPaymentMethodCode()))
 				.collect(Collectors.toUnmodifiableList());
 		}
+		
 		// 支出テーブルに該当項目の支出データが登録されていることを確認
 		// レスポンスを生成
-		SimpleShoppingRegistResponse response = SimpleShoppingRegistResponse.getInstance(shopKubunOptionItemList, shopNameOptionItemList,
-				paymentMethodInfoComponent.getPaymentMethodOptions(userId), registInfoForm);
+		SimpleShoppingRegistResponse response = SimpleShoppingRegistResponse.getInstance(
+				// 対象年月
+				TargetYearMonth.from(registInfoForm.getTargetYearMonth()),
+				// 店舗区分選択ボックスの表示情報リス
+				shopKubunOptionItemList,
+				// 店名選択肢のリスト(デフォルト支払方法のdata属性付き)
+				shopNameOptionItemList,
+				// 支払方法選択ボックスの表示情報リスト
+				paymentMethodInfoComponent.getPaymentMethodOptions(userId),
+				// 簡易タイプ買い物登録情報フォームデータ
+				registInfoForm);
 		if(shopSearchResult.isEmpty()) {
 			// 店舗情報が0件の場合、メッセージを設定
 			response.addMessage("選択した店舗区分に属する店舗情報が0件です。店舗区分を再選択してください。");

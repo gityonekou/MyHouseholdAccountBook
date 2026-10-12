@@ -6,14 +6,13 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2024/06/16 : 1.00.00                      新規作成
+ * 2026/10/12 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(from()の引数をドメインタイプに変更、前年・翌年の算出をLocalDateによるカレンダー計算からTargetYear.plusYear()呼び出しに変更)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.inquiry;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
-import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -48,28 +47,23 @@ public class AccountYearInquiryTargetYearInfo {
 	 *<pre>
 	 * 引数の値から表示する年の対象年月情報を生成して返します。
 	 *</pre>
-	 * @param targetYear 表示対象の年(YYYY) 
-	 * @param targetYearMonth 各月の収支画面に戻る場合に表示する年月の値
+	 * @param targetYear 表示対象の年(YYYY)
+	 * @param returnYearMonth 各月の収支画面に戻る場合に表示する年月の値
 	 * @return 表示する月の対象年月情報
 	 *
 	 */
-	public static AccountYearInquiryTargetYearInfo from(String targetYear, String targetYearMonth) {
-		
-		// 現在の対象年月からカレンダーを生成(前年・翌年の値取得用)
-		LocalDate yearCalendar = LocalDate.parse(targetYear + "0101", MyHouseholdAccountBookContent.DATE_TIME_FORMATTER);
-		DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy");
-		
+	public static AccountYearInquiryTargetYearInfo from(TargetYear targetYear, TargetYearMonth returnYearMonth) {
+
 		return new AccountYearInquiryTargetYearInfo(
 				// 対象年
-				targetYear,
+				targetYear.getValue(),
 				// 対象年月
-				targetYearMonth,
+				returnYearMonth.getValue(),
 				// 各月の収支画面に戻る場合の表示対象年月
-				targetYearMonth,
+				returnYearMonth.getValue(),
 				// 前年
-				yearCalendar.minusYears(1).format(format),
+				targetYear.plusYear(-1).getValue(),
 				// 翌年
-				yearCalendar.plusYears(1).format(format)
-				);
+				targetYear.plusYear(1).getValue());
 	}
 }

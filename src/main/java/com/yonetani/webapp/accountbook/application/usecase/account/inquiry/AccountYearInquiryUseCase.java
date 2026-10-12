@@ -8,7 +8,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2023/10/09 : 1.00.00                      新規作成
  * 2025/12/28 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
- * 2026/09/23 : 1.02.00  feature-1.03-dev1   追加リファクタリング対応(レスポンスdtoのファクトリ、ドメインモデルのファクトリの引数をドメインタイプに変更)
+ * 2026/10/12 : 1.02.00  feature-1.03-dev1   追加リファクタリング対応(レスポンスdtoのファクトリ、ドメインモデルのファクトリの引数をドメインタイプに変更)
  *
  */
 
@@ -79,38 +79,42 @@ public class AccountYearInquiryUseCase {
 		UserId userId = UserId.from(user.getUserId());
 		// ドメインタイプ:年
 		TargetYear targetYear = TargetYear.from(targetYearStr);
-		
-		// レスポンスを生成
-		AccountYearMageInquiryResponse response = AccountYearMageInquiryResponse.getInstance(
-				AccountYearInquiryTargetYearInfo.from(targetYearStr, returnYearMonthStr));
-		
+		// 表示する年の対象年月情報
+		AccountYearInquiryTargetYearInfo targetYearInfo = AccountYearInquiryTargetYearInfo.from(targetYear, TargetYearMonth.from(returnYearMonthStr));
+
 		/* ユーザID,入力された対象年度を条件に年間収支(マージ)のリストを取得 */
 		// フォームオブジェクトからドメインオブジェクトに変換
 		SearchQueryUserIdAndYear inquiryModel = SearchQueryUserIdAndYear.from(userId, targetYear);
-		
+
 		// ユーザID、対象年度を条件に年間収支(マージ)のリスト(ドメインモデル)を取得
 		IncomeAndExpenditureInquiryList resultList = repositoryMage.select(inquiryModel);
-		// 年間収支(マージ)のリスト(ドメインモデル)をレスポンスに設定
+		// 年間収支(マージ)のリスト(ドメインモデル)が0件の場合、表示金額なしとなるレスポンスにメッセージを設定して返却
 		if(resultList.isEmpty()) {
+			// レスポンスを生成
+			AccountYearMageInquiryResponse response = AccountYearMageInquiryResponse.getInstance(targetYearInfo);
 			// 件数が0件の場合、メッセージを設定
 			response.addMessage("年間収支(マージ)取得結果が0件です。");
 			return response;
 		}
+
+		// 合計金額情報からレスポンスを生成
+		AccountYearMageInquiryResponse response = AccountYearMageInquiryResponse.getInstance(
+				// 表示する年の対象年月情報
+				targetYearInfo,
+				// 収入金額合計(積立金取崩金額以外の収入金額合計)
+				resultList.getRegularIncomeTotalAmount(),
+				// 積立金取崩金額合計
+				resultList.getWithdrawingTotalAmount(),
+				// 支出予定金額合計
+				resultList.getExpectedExpenditureTotalAmount(),
+				// 支出金額合計
+				resultList.getExpenditureTotalAmount(),
+				// 収支合計
+				resultList.getBalanceTotalAmount());
 		
 		// 年間収支(マージ)(ドメインモデル)から年間収支(マージ)(レスポンス)への変換
 		response.addMageInquiryList(convertMageList(resultList));
-		/* 合計値を設定 */
-		// 収入金額合計(積立金取崩金額以外の収入金額合計)
-		response.setSyuunyuuKingakuGoukei(resultList.getRegularIncomeTotalAmount().toFormatString());
-		// 積立金取崩金額合計
-		response.setWithdrewKingakuGoukei(resultList.getWithdrawingTotalAmount().toFormatString());
-		// 支出予定金額合計
-		response.setSisyutuYoteiKingakuGoukei(resultList.getExpectedExpenditureTotalAmount().toFormatString());
-		// 支出金額合計
-		response.setSisyutuKingakuGoukei(resultList.getExpenditureTotalAmount().toFormatString());
-		// 収支合計
-		response.setSyuusiKingakuGoukei(resultList.getBalanceTotalAmount().toFormatString());
-		
+
 		return response;
 	}
 	
@@ -126,11 +130,11 @@ public class AccountYearInquiryUseCase {
 		return resultList.getValues().stream().map(domain ->
 			AccountYearMageInquiryResponse.MageInquiryListItem.from(
 					domain.getTargetYearMonth().getTargetMonth(),
-					domain.getRegularIncomeAmount().toFormatString(),
-					domain.getWithdrawingAmount().toFormatString(),
-					domain.getExpectedExpenditureAmount().toFormatString(),
-					domain.getExpenditureAmount().toFormatString(),
-					domain.getBalanceAmount().toFormatString())
+					domain.getRegularIncomeAmount(),
+					domain.getWithdrawingAmount(),
+					domain.getExpectedExpenditureAmount(),
+					domain.getExpenditureAmount(),
+					domain.getBalanceAmount())
 		).collect(Collectors.toUnmodifiableList());
 	}
 
@@ -151,49 +155,52 @@ public class AccountYearInquiryUseCase {
 		UserId userId = UserId.from(user.getUserId());
 		// ドメインタイプ:年
 		TargetYear targetYear = TargetYear.from(targetYearStr);
-		
-		// レスポンスを生成
-		AccountYearMeisaiInquiryResponse response = AccountYearMeisaiInquiryResponse.getInstance(
-				AccountYearInquiryTargetYearInfo.from(targetYearStr, returnYearMonthStr));
-		
+		// 表示する年の対象年月情報
+		AccountYearInquiryTargetYearInfo targetYearInfo = AccountYearInquiryTargetYearInfo.from(targetYear, TargetYearMonth.from(returnYearMonthStr));
+
 		/* ユーザID,入力された対象年度を条件に年間収支(明細)のリストを取得 */
 		// フォームオブジェクトからドメインオブジェクトに変換
 		SearchQueryUserIdAndYear inquiryModel = SearchQueryUserIdAndYear.from(userId, targetYear);
 		// ユーザID、対象年度を条件に年間収支(明細)のリスト(ドメインモデル)を取得
 		AccountYearMeisaiInquiryList resultList = repositoryMeisai.select(inquiryModel);
-		// 年間収支(明細)のリスト(ドメインモデル)をレスポンスに設定
+		// 年間収支(明細)のリスト(ドメインモデル)が0件の場合、表示金額なしとなるレスポンスにメッセージを設定して返却
 		if(resultList.isEmpty()) {
+			// レスポンスを生成
+			AccountYearMeisaiInquiryResponse response = AccountYearMeisaiInquiryResponse.getInstance(targetYearInfo);
 			// 件数が0件の場合、メッセージを設定
 			response.addMessage("年間収支(明細)取得結果が0件です。");
-		} else {
-			// 年間収支(マージ)(ドメインモデル)から年間収支(マージ)(レスポンス)への変換
-			response.addMeisaiInquiryList(convertMeisaiList(resultList));
-			/* 合計値を設定 */
-			// 収入金額合計(積立金取崩金額以外の収入金額合計)
-			response.setSyuunyuuKingakuGoukei(resultList.getRegularIncomeTotalAmount().toFormatString());
-			// 積立金取崩金額合計
-			response.setWithdrewKingakuGoukei(resultList.getWithdrawingTotalAmount().toFormatString());
-			// 事業経費合計
-			response.setJigyouKeihiKingakuGoukei(resultList.getJigyouKeihiKingakuGoukei().toString());
-			// 固定(非課税)合計
-			response.setKoteiHikazeiKingakuGoukei(resultList.getKoteiHikazeiKingakuGoukei().toString());
-			// 固定(課税)合計
-			response.setKoteiKazeiKingakuGoukei(resultList.getKoteiKazeiKingakuGoukei().toString());
-			// 衣類住居設備合計
-			response.setIruiJyuukyoSetubiKingakuGoukei(resultList.getIruiJyuukyoSetubiKingakuGoukei().toString());
-			// 飲食日用品合計
-			response.setInsyokuNitiyouhinKingakuGoukei(resultList.getInsyokuNitiyouhinKingakuGoukei().toString());
-			// 趣味娯楽合計
-			response.setSyumiGotakuKingakuGoukei(resultList.getSyumiGotakuKingakuGoukei().toString());
-			// 無駄遣い合計支出金額合計
-			response.setSisyutuKingakuBCGoukei(resultList.getWasteExpenditureTotalAmount().toFormatString());
-			// 無駄遣い合計支出金額合計のうち、無駄遣い（軽度）支出金額合計の割合
-			response.setPercentageBGoukei(resultList.getWasteExpenditureTotalAmount().getMinorWasteExpenditurePercentage());
-			// 支出金額合計
-			response.setSisyutuKingakuGoukei(resultList.getExpenditureTotalAmount().toFormatString());
-			// 収支金額合計
-			response.setSyuusiKingakuGoukei(resultList.getBalanceTotalAmount().toFormatString());
+			return response;
 		}
+
+		// 合計金額情報からレスポンスを生成
+		AccountYearMeisaiInquiryResponse response = AccountYearMeisaiInquiryResponse.getInstance(
+				targetYearInfo,
+				// 収入金額合計(積立金取崩金額以外の収入金額合計)
+				resultList.getRegularIncomeTotalAmount(),
+				// 積立金取崩金額合計
+				resultList.getWithdrawingTotalAmount(),
+				// 事業経費合計
+				resultList.getJigyouKeihiKingakuGoukei(),
+				// 固定(非課税)合計
+				resultList.getKoteiHikazeiKingakuGoukei(),
+				// 固定(課税)合計
+				resultList.getKoteiKazeiKingakuGoukei(),
+				// 衣類住居設備合計
+				resultList.getIruiJyuukyoSetubiKingakuGoukei(),
+				// 飲食日用品合計
+				resultList.getInsyokuNitiyouhinKingakuGoukei(),
+				// 趣味娯楽合計
+				resultList.getSyumiGotakuKingakuGoukei(),
+				// 無駄遣い合計支出金額合計(支出BC合計・支出B合計の割合)
+				resultList.getWasteExpenditureTotalAmount(),
+				// 支出金額合計
+				resultList.getExpenditureTotalAmount(),
+				// 収支金額合計
+				resultList.getBalanceTotalAmount());
+		
+		// 年間収支(マージ)(ドメインモデル)から年間収支(マージ)(レスポンス)への変換
+		response.addMeisaiInquiryList(convertMeisaiList(resultList));
+
 		return response;
 	}
 
@@ -208,19 +215,18 @@ public class AccountYearInquiryUseCase {
 	private List<MeisaiInquiryListItem> convertMeisaiList(AccountYearMeisaiInquiryList resultList) {
 		return resultList.getValues().stream().map(domain ->
 			AccountYearMeisaiInquiryResponse.MeisaiInquiryListItem.from(
-					domain.getMonth().toFormatString(),
-					domain.getRegularIncomeAmount().toFormatString(),
-					domain.getWithdrawingAmount().toFormatString(),
-					domain.getJigyouKeihiKingaku().toString(),
-					domain.getKoteiHikazeiKingaku().toString(),
-					domain.getKoteiKazeiKingaku().toString(),
-					domain.getIruiJyuukyoSetubiKingaku().toString(),
-					domain.getInsyokuNitiyouhinKingaku().toString(),
-					domain.getSyumiGotakuKingaku().toString(),
-					domain.getTotalWasteExpenditureAmount().toFormatString(),
-					domain.getTotalWasteExpenditureAmount().getMinorWasteExpenditurePercentage(),
-					domain.getExpenditureAmount().toFormatString(),
-					domain.getBalanceAmount().toFormatString())
+					domain.getMonth(),
+					domain.getRegularIncomeAmount(),
+					domain.getWithdrawingAmount(),
+					domain.getJigyouKeihiKingaku(),
+					domain.getKoteiHikazeiKingaku(),
+					domain.getKoteiKazeiKingaku(),
+					domain.getIruiJyuukyoSetubiKingaku(),
+					domain.getInsyokuNitiyouhinKingaku(),
+					domain.getSyumiGotakuKingaku(),
+					domain.getTotalWasteExpenditureAmount(),
+					domain.getExpenditureAmount(),
+					domain.getBalanceAmount())
 		).collect(Collectors.toUnmodifiableList());
 	}
 	
@@ -242,7 +248,7 @@ public class AccountYearInquiryUseCase {
 				TargetYear.from(targetYear).getValue() + TargetMonth.from(targetMonth).getValue());
 		// 各月の収支画面にリダイレクトするためのリダイレクト情報を生成して返却
 		AccountYearInquiryRedirectResponse response
-			= AccountYearInquiryRedirectResponse.getInquiryMonthRedirectInstance(targetYearMonth.getValue());
+			= AccountYearInquiryRedirectResponse.getInquiryMonthRedirectInstance(targetYearMonth);
 		return response;
 		
 	}

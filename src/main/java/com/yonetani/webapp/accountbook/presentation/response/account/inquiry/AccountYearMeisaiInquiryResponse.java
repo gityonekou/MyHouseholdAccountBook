@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2023/10/09 : 1.00.00                      新規作成
+ * 2026/10/12 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(MeisaiInquiryListItem.from()の引数をドメインタイプに変更し、表示文字列変換・割合算出呼び出しをDTO内部に移動)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.inquiry;
@@ -15,13 +16,29 @@ import java.util.List;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.BalanceTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpenditureTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.RegularIncomeTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.WithdrawingAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.WithdrawingTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.InsyokuNitiyouhinKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.IruiJyuukyoSetubiKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.JigyouKeihiKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.KoteiHikazeiKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.KoteiKazeiKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.SyumiGotakuKingaku;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.TotalWasteExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.inquiry.WasteExpenditureTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 
 /**
  *<pre>
@@ -50,8 +67,10 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 	@Getter
 	@EqualsAndHashCode
 	public static class MeisaiInquiryListItem {
-		// 対象月
+		// 対象月(表示用。"MM月"形式)
 		private final String month;
+		// 対象月(リンクパラメータ用。"MM"形式)
+		private final String monthValue;
 		// 収入金額
 		private final String syuunyuuKingaku;
 		// 積立金取崩金額
@@ -90,95 +109,163 @@ public class AccountYearMeisaiInquiryResponse extends AbstractResponse {
 		 * @param iruiJyuukyoSetubiKingaku 衣類住居設備
 		 * @param insyokuNitiyouhinKingaku 飲食日用品
 		 * @param syumiGotakuKingaku 趣味娯楽
-		 * @param sisyutuKingakuBC 支出BC
-		 * @param percentageB 支出Bの割合
+		 * @param sisyutuKingakuBC 支出BC(無駄遣い合計支出金額)
 		 * @param sisyutuKingaku 支出
 		 * @param syuusiKingaku 収支
 		 * @return 年間収支(明細)情報の明細データ
 		 *
 		 */
 		public static MeisaiInquiryListItem from(
-				String month,
-				String syuunyuuKingaku,
-				String withdrewKingaku,
-				String jigyouKeihiKingaku,
-				String koteiHikazeiKingaku,
-				String koteiKazeiKingaku,
-				String iruiJyuukyoSetubiKingaku,
-				String insyokuNitiyouhinKingaku,
-				String syumiGotakuKingaku,
-				String sisyutuKingakuBC,
-				String percentageB,
-				String sisyutuKingaku,
-				String syuusiKingaku) {
+				TargetMonth month,
+				RegularIncomeAmount syuunyuuKingaku,
+				WithdrawingAmount withdrewKingaku,
+				JigyouKeihiKingaku jigyouKeihiKingaku,
+				KoteiHikazeiKingaku koteiHikazeiKingaku,
+				KoteiKazeiKingaku koteiKazeiKingaku,
+				IruiJyuukyoSetubiKingaku iruiJyuukyoSetubiKingaku,
+				InsyokuNitiyouhinKingaku insyokuNitiyouhinKingaku,
+				SyumiGotakuKingaku syumiGotakuKingaku,
+				TotalWasteExpenditureAmount sisyutuKingakuBC,
+				ExpenditureAmount sisyutuKingaku,
+				BalanceAmount syuusiKingaku) {
 			return new MeisaiInquiryListItem(
-					month,
-					syuunyuuKingaku,
-					withdrewKingaku,
-					jigyouKeihiKingaku,
-					koteiHikazeiKingaku,
-					koteiKazeiKingaku,
-					iruiJyuukyoSetubiKingaku,
-					insyokuNitiyouhinKingaku,
-					syumiGotakuKingaku,
-					sisyutuKingakuBC,
-					percentageB,
-					sisyutuKingaku,
-					syuusiKingaku);
+					month.toFormatString(),
+					month.getValue(),
+					syuunyuuKingaku.toFormatString(),
+					withdrewKingaku.toFormatString(),
+					jigyouKeihiKingaku.toString(),
+					koteiHikazeiKingaku.toString(),
+					koteiKazeiKingaku.toString(),
+					iruiJyuukyoSetubiKingaku.toString(),
+					insyokuNitiyouhinKingaku.toString(),
+					syumiGotakuKingaku.toString(),
+					sisyutuKingakuBC.toFormatString(),
+					sisyutuKingakuBC.getMinorWasteExpenditurePercentage(),
+					sisyutuKingaku.toFormatString(),
+					syuusiKingaku.toFormatString());
 		}
 	}
 	// 表示する年の対象年月情報
 	private final AccountYearInquiryTargetYearInfo targetYearInfo;
+	// 収入金額合計
+	private final String syuunyuuKingakuGoukei;
+	// 積立金取崩金額合計
+	private final String withdrewKingakuGoukei;
+	// 事業経費合計
+	private final String jigyouKeihiKingakuGoukei;
+	// 固定(非課税)合計
+	private final String koteiHikazeiKingakuGoukei;
+	// 固定(課税)合計
+	private final String koteiKazeiKingakuGoukei;
+	// 衣類住居設備合計
+	private final String iruiJyuukyoSetubiKingakuGoukei;
+	// 飲食日用品合計
+	private final String insyokuNitiyouhinKingakuGoukei;
+	// 趣味娯楽合計
+	private final String syumiGotakuKingakuGoukei;
+	// 支出BC合計
+	private final String sisyutuKingakuBCGoukei;
+	// 支出BC合計のうち、支出B合計の割合
+	private final String percentageBGoukei;
+	// 支出合計
+	private final String sisyutuKingakuGoukei;
+	// 収支合計
+	private final String syuusiKingakuGoukei;
+
 	// 年間収支(明細)情報のリストです。
 	private List<MeisaiInquiryListItem> meisaiInquiryList = new ArrayList<>();
 	
-	// 収入金額合計
-	@Setter
-	private String syuunyuuKingakuGoukei;
-	// 積立金取崩金額合計
-	@Setter
-	private String withdrewKingakuGoukei;
-	// 事業経費合計
-	@Setter
-	private String jigyouKeihiKingakuGoukei;
-	// 固定(非課税)合計
-	@Setter
-	private String koteiHikazeiKingakuGoukei;
-	// 固定(課税)合計
-	@Setter
-	private String koteiKazeiKingakuGoukei;
-	// 衣類住居設備合計
-	@Setter
-	private String iruiJyuukyoSetubiKingakuGoukei;
-	// 飲食日用品合計
-	@Setter
-	private String insyokuNitiyouhinKingakuGoukei;
-	// 趣味娯楽合計
-	@Setter
-	private String syumiGotakuKingakuGoukei;
-	// 支出BC合計
-	@Setter
-	private String sisyutuKingakuBCGoukei;
-	// 支出BC合計のうち、支出B合計の割合
-	@Setter
-	private String percentageBGoukei;
-	// 支出合計
-	@Setter
-	private String sisyutuKingakuGoukei;
-	// 収支合計
-	@Setter
-	private String syuusiKingakuGoukei;
-	
 	/**
 	 *<pre>
-	 *  指定年の収支取得用リクエスト情報からレスポンス情報を生成して返します。
+	 *  指定年の収支取得用リクエスト情報から表示金額なしとなるレスポンス情報を生成して返します。
 	 *</pre>
 	 * @param targetYearInfo 表示する対象年月情報
 	 * @return マイ家計簿の年間収支(明細)画面表示情報
 	 *
 	 */
 	public static AccountYearMeisaiInquiryResponse getInstance(AccountYearInquiryTargetYearInfo targetYearInfo) {
-		return new AccountYearMeisaiInquiryResponse(targetYearInfo);
+		return new AccountYearMeisaiInquiryResponse(
+				// 表示する年の対象年月情報
+				targetYearInfo,
+				// 収入金額合計
+				null,
+				// 積立金取崩金額合計
+				null,
+				// 事業経費合計
+				null,
+				// 固定(非課税)合計
+				null,
+				// 固定(課税)合計
+				null,
+				// 衣類住居設備合計
+				null,
+				// 飲食日用品合計
+				null,
+				// 趣味娯楽合計
+				null,
+				// 支出BC合計
+				null,
+				// 支出BC合計のうち、支出B合計の割合
+				null,
+				// 支出合計
+				null,
+				// 収支合計
+				null);
+	}
+
+	/**
+	 *<pre>
+	 *  指定年の収支取得用リクエスト情報と合計金額情報からレスポンス情報を生成して返します。
+	 *</pre>
+	 * @param targetYearInfo 表示する対象年月情報
+	 * @param syuunyuuKingakuGoukei 収入金額合計(積立金取崩金額以外の収入金額合計)
+	 * @param withdrewKingakuGoukei 積立金取崩金額合計
+	 * @param jigyouKeihiKingakuGoukei 事業経費合計
+	 * @param koteiHikazeiKingakuGoukei 固定(非課税)合計
+	 * @param koteiKazeiKingakuGoukei 固定(課税)合計
+	 * @param iruiJyuukyoSetubiKingakuGoukei 衣類住居設備合計
+	 * @param insyokuNitiyouhinKingakuGoukei 飲食日用品合計
+	 * @param syumiGotakuKingakuGoukei 趣味娯楽合計
+	 * @param wasteExpenditureTotalAmount 無駄遣い合計支出金額合計(支出BC合計・支出B合計の割合)
+	 * @param sisyutuKingakuGoukei 支出金額合計
+	 * @param syuusiKingakuGoukei 収支金額合計
+	 * @return マイ家計簿の年間収支(明細)画面表示情報
+	 *
+	 */
+	public static AccountYearMeisaiInquiryResponse getInstance(AccountYearInquiryTargetYearInfo targetYearInfo,
+			RegularIncomeTotalAmount syuunyuuKingakuGoukei, WithdrawingTotalAmount withdrewKingakuGoukei,
+			JigyouKeihiKingaku jigyouKeihiKingakuGoukei, KoteiHikazeiKingaku koteiHikazeiKingakuGoukei,
+			KoteiKazeiKingaku koteiKazeiKingakuGoukei, IruiJyuukyoSetubiKingaku iruiJyuukyoSetubiKingakuGoukei,
+			InsyokuNitiyouhinKingaku insyokuNitiyouhinKingakuGoukei, SyumiGotakuKingaku syumiGotakuKingakuGoukei,
+			WasteExpenditureTotalAmount wasteExpenditureTotalAmount, ExpenditureTotalAmount sisyutuKingakuGoukei,
+			BalanceTotalAmount syuusiKingakuGoukei) {
+		return new AccountYearMeisaiInquiryResponse(
+				// 表示する年の対象年月情報
+				targetYearInfo,
+				// 収入金額合計
+				syuunyuuKingakuGoukei.toFormatString(),
+				// 積立金取崩金額合計
+				withdrewKingakuGoukei.toFormatString(),
+				// 事業経費合計
+				jigyouKeihiKingakuGoukei.toString(),
+				// 固定(非課税)合計
+				koteiHikazeiKingakuGoukei.toString(),
+				// 固定(課税)合計
+				koteiKazeiKingakuGoukei.toString(),
+				// 衣類住居設備合計
+				iruiJyuukyoSetubiKingakuGoukei.toString(),
+				// 飲食日用品合計
+				insyokuNitiyouhinKingakuGoukei.toString(),
+				// 趣味娯楽合計
+				syumiGotakuKingakuGoukei.toString(),
+				// 支出BC合計
+				wasteExpenditureTotalAmount.toFormatString(),
+				// 支出BC合計のうち、支出B合計の割合
+				wasteExpenditureTotalAmount.getMinorWasteExpenditurePercentage(),
+				// 支出合計
+				sisyutuKingakuGoukei.toFormatString(),
+				// 収支合計
+				syuusiKingakuGoukei.toFormatString());
 	}
 	
 	/**

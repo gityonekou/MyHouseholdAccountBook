@@ -7,6 +7,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2023/10/12 : 1.00.00                      新規作成
  * 2025/12/28 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/10/12 : 1.02.00  feature-1.03-dev1   追加リファクタリング対応(MeisaiInquiryListItem.from()の引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
@@ -65,7 +66,7 @@ public class AccountYearMeisaiInquiryList {
 	 *</pre>
 	 *
 	 * @author ：Kouki Yonetani
-	 * @since 家計簿アプリ(1.00.A)
+	 * @since 家計簿アプリ(1.00)
 	 *
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -119,33 +120,33 @@ public class AccountYearMeisaiInquiryList {
 		 *
 		 */
 		public static MeisaiInquiryListItem from(
-				String month,
-				BigDecimal regularIncomeAmount,
-				BigDecimal withdrawingAmount,
-				BigDecimal jigyouKeihiKingaku,
-				BigDecimal koteiHikazeiKingaku,
-				BigDecimal koteiKazeiKingaku,
-				BigDecimal iruiJyuukyoSetubiKingaku,
-				BigDecimal insyokuNitiyouhinKingaku,
-				BigDecimal syumiGotakuKingaku,
-				BigDecimal minorWasteExpenditureAmount,
-				BigDecimal severeWasteExpenditureAmount,
-				BigDecimal expenditureAmount,
-				BigDecimal balanceAmount
+				TargetMonth month,
+				RegularIncomeAmount regularIncomeAmount,
+				WithdrawingAmount withdrawingAmount,
+				JigyouKeihiKingaku jigyouKeihiKingaku,
+				KoteiHikazeiKingaku koteiHikazeiKingaku,
+				KoteiKazeiKingaku koteiKazeiKingaku,
+				IruiJyuukyoSetubiKingaku iruiJyuukyoSetubiKingaku,
+				InsyokuNitiyouhinKingaku insyokuNitiyouhinKingaku,
+				SyumiGotakuKingaku syumiGotakuKingaku,
+				MinorWasteExpenditureAmount minorWasteExpenditureAmount,
+				SevereWasteExpenditureAmount severeWasteExpenditureAmount,
+				ExpenditureAmount expenditureAmount,
+				BalanceAmount balanceAmount
 				) {
 			return new MeisaiInquiryListItem(
-					TargetMonth.from(month),
-					RegularIncomeAmount.from(regularIncomeAmount),
-					WithdrawingAmount.from(withdrawingAmount),
-					JigyouKeihiKingaku.from(jigyouKeihiKingaku),
-					KoteiHikazeiKingaku.from(koteiHikazeiKingaku),
-					KoteiKazeiKingaku.from(koteiKazeiKingaku),
-					IruiJyuukyoSetubiKingaku.from(iruiJyuukyoSetubiKingaku),
-					InsyokuNitiyouhinKingaku.from(insyokuNitiyouhinKingaku),
-					SyumiGotakuKingaku.from(syumiGotakuKingaku),
-					TotalWasteExpenditureAmount.from(MinorWasteExpenditureAmount.from(minorWasteExpenditureAmount), SevereWasteExpenditureAmount.from(severeWasteExpenditureAmount)),
-					ExpenditureAmount.from(expenditureAmount),
-					BalanceAmount.from(balanceAmount));
+					month,
+					regularIncomeAmount,
+					withdrawingAmount,
+					jigyouKeihiKingaku,
+					koteiHikazeiKingaku,
+					koteiKazeiKingaku,
+					iruiJyuukyoSetubiKingaku,
+					insyokuNitiyouhinKingaku,
+					syumiGotakuKingaku,
+					TotalWasteExpenditureAmount.from(minorWasteExpenditureAmount, severeWasteExpenditureAmount),
+					expenditureAmount,
+					balanceAmount);
 		}
 	}
 	

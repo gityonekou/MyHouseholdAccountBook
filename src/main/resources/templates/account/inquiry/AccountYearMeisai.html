@@ -96,7 +96,7 @@
 										<td align="center"><span th:text="${item.sisyutuKingakuBC}"></span>（<span th:text="${item.percentageB}"></span>%）</td>
 										<td align="center" th:text="${item.sisyutuKingaku}">支出</td>
 										<td align="center" th:text="${item.syuusiKingaku}">収支</td>
-										<td align="center"><a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/accountinquiry/accountyear/dispatchtmonthinquiry(targetYear=*{targetYear},targetMonth=${item.month})}">詳細へ</a></td>
+										<td align="center"><a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/accountinquiry/accountyear/dispatchtmonthinquiry(targetYear=*{targetYear},targetMonth=${item.monthValue})}">詳細へ</a></td>
 										<td></td>
 									</tr>
 								</th:block>

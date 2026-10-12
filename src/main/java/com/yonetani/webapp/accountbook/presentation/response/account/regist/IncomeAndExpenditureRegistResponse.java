@@ -8,6 +8,7 @@
  * 2024/06/23 : 1.00.00                      新規作成
  * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
  * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/10/12 : 1.02.01  feature-1.03-dev1   追加リファクタリング対応(リダイレクトレスポンスdtoのファクトリ引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.regist;
@@ -19,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.presentation.request.account.regist.ExpenditureItemForm;
 import com.yonetani.webapp.accountbook.presentation.request.account.regist.IncomeItemForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
@@ -79,7 +81,7 @@ public class IncomeAndExpenditureRegistResponse extends AbstractIncomeAndExpendi
 	 * @return 収支登録画面表示情報
 	 *
 	 */
-	public static IncomeAndExpenditureRegistResponse getInstance(String targetYearMonth) {
+	public static IncomeAndExpenditureRegistResponse getInstance(TargetYearMonth targetYearMonth) {
 		// 収入入力フォーム、収入区分選択ボックス、支出入力フォーム、支出区分選択ボックス、支払方法選択ボックスなしで画面を表示
 		IncomeAndExpenditureRegistResponse response = new IncomeAndExpenditureRegistResponse(null, null, null, null, null);
 		response.setYearMonth(targetYearMonth);
@@ -97,7 +99,7 @@ public class IncomeAndExpenditureRegistResponse extends AbstractIncomeAndExpendi
 	 * @return 収支登録画面表示情報
 	 *
 	 */
-	public static IncomeAndExpenditureRegistResponse getInstance(String targetYearMonth,
+	public static IncomeAndExpenditureRegistResponse getInstance(TargetYearMonth targetYearMonth,
 			IncomeItemForm incomeItemForm, List<OptionItem> addIncomeKubunList) {
 		
 		// 収入情報フォームデータがnullなら空データを設定(アクションなしで処理継続となるので、後の登録ではエラーになる：継続処理可能)
@@ -129,7 +131,7 @@ public class IncomeAndExpenditureRegistResponse extends AbstractIncomeAndExpendi
 	 * @return 収支登録画面表示情報
 	 *
 	 */
-	public static IncomeAndExpenditureRegistResponse getInstance(String targetYearMonth,
+	public static IncomeAndExpenditureRegistResponse getInstance(TargetYearMonth targetYearMonth,
 			ExpenditureItemForm expenditureItemForm, List<OptionItem> addExpenditureKubunList,
 			List<OptionItem> addPaymentMethodList) {
 

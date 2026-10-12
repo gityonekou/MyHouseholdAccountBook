@@ -6,12 +6,15 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2024/08/31 : 1.00.00                      新規作成
+ * 2026/10/12 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(レスポンスdtoのファクトリ引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.regist;
 
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -40,9 +43,9 @@ public class IncomeAndExpenditureRegistCheckResponse extends AbstractIncomeAndEx
 	 * @return 収支登録内容確認画面表示情報
 	 *
 	 */
-	public static IncomeAndExpenditureRegistCheckResponse getInstance(String targetYearMonth) {
+	public static IncomeAndExpenditureRegistCheckResponse getInstance(TargetYearMonth targetYearMonth) {
 		// 収入入力フォーム、収入区分選択ボックス、支出入力フォーム、支出区分選択ボックスなしで画面を表示
-		IncomeAndExpenditureRegistCheckResponse response = new IncomeAndExpenditureRegistCheckResponse(targetYearMonth);
+		IncomeAndExpenditureRegistCheckResponse response = new IncomeAndExpenditureRegistCheckResponse(targetYearMonth.getValue());
 		response.setYearMonth(targetYearMonth);
 		return response;
 	}
