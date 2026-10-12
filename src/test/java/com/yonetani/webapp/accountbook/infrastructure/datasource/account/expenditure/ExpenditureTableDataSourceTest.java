@@ -29,6 +29,20 @@ import org.springframework.test.context.jdbc.SqlConfig;
 
 import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureEventCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureName;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.common.DeleteFlg;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.expenditure.ExpenditureTableMapper;
 
 /**
@@ -102,7 +116,7 @@ class ExpenditureTableDataSourceTest {
 	void testAdd() {
 		/* 全項目の登録チェック */
 		// テストデータ：全項目あり
-		ExpenditureItem addData = ExpenditureItem.from(
+		ExpenditureItem addData = helper(
 				"TEST-USER-ID", "2025", "12", "001", "0001", "0001",
 				"食費（外食）", "1", "外食詳細", LocalDate.of(2025, 12, 10),
 				new BigDecimal("12000.00"), new BigDecimal("10000.00"), "001", false);
@@ -134,7 +148,7 @@ class ExpenditureTableDataSourceTest {
 				"同じデータを登録した場合、一意制約違反となること");
 
 		/* null可項目の登録チェック(EVENT_CODE=null, EXPENDITURE_DETAIL_CONTEXT=null, SIHARAI_DATE=null) */
-		ExpenditureItem addNullData = ExpenditureItem.from(
+		ExpenditureItem addNullData = helper(
 				"TEST-USER-ID", "2025", "12", "002", "0001", null,
 				"食費（日用品）", "1", null, null,
 				new BigDecimal("5000.00"), new BigDecimal("4800.00"), "001", false);
@@ -183,7 +197,7 @@ class ExpenditureTableDataSourceTest {
 
 		// 更新データ：EXPENDITURE_NAME, EXPENDITURE_KUBUN, EXPENDITURE_DETAIL_CONTEXT, SIHARAI_DATE, EXPENDITURE_KINGAKUを変更
 		// 意図的にSISYUTU_ITEM_CODE, EVENT_CODE, EXPENDITURE_ESTIMATE_KINGAKUに別の値をセット(更新されないことを確認)
-		ExpenditureItem updateData = ExpenditureItem.from(
+		ExpenditureItem updateData = helper(
 				"TEST-USER-ID", "2025", "12", "001", "9999", "9999",
 				"更新後支出名", "2", "更新後詳細", LocalDate.of(2025, 12, 20),
 				new BigDecimal("99999.00"), new BigDecimal("35000.00"), "001", false);
@@ -210,14 +224,14 @@ class ExpenditureTableDataSourceTest {
 				"支出予定金額(EXPENDITURE_ESTIMATE_KINGAKU)が更新されていないこと");
 
 		/* 対象データなしの場合、0件が返ること */
-		ExpenditureItem notFoundData = ExpenditureItem.from(
+		ExpenditureItem notFoundData = helper(
 				"TEST-USER-ID", "2025", "12", "999", "0001", null,
 				"対象なし", "1", null, null,
 				new BigDecimal("0.00"), new BigDecimal("0.00"), "001", false);
 		assertEquals(0, repository.update(notFoundData), "対象データなしの場合、0件であること");
 
 		/* null可項目の更新チェック(EXPENDITURE_DETAIL_CONTEXT=null, SIHARAI_DATE=null) */
-		ExpenditureItem updateNullData = ExpenditureItem.from(
+		ExpenditureItem updateNullData = helper(
 				"TEST-USER-ID", "2025", "12", "001", "9999", "9999",
 				"更新後支出名(null可)", "3", null, null,
 				new BigDecimal("99999.00"), new BigDecimal("30000.00"), "001", false);
@@ -254,7 +268,7 @@ class ExpenditureTableDataSourceTest {
 	void testDelete() {
 		/* 論理削除チェック */
 		// 削除対象データ
-		ExpenditureItem deleteData = ExpenditureItem.from(
+		ExpenditureItem deleteData = helper(
 				"TEST-USER-ID", "2025", "12", "001", "0001", "0001",
 				"削除対象支出名", "1", "削除対象詳細", LocalDate.of(2025, 12, 5),
 				new BigDecimal("50000.00"), new BigDecimal("40000.00"), "001", false);
@@ -276,7 +290,7 @@ class ExpenditureTableDataSourceTest {
 		assertEquals(new BigDecimal("40000.00"),    actualDataMap.get("EXPENDITURE_KINGAKU"),        "支出金額(EXPENDITURE_KINGAKU)が変更されていないこと");
 
 		/* 対象データなしの場合、0件が返ること */
-		ExpenditureItem notFoundData = ExpenditureItem.from(
+		ExpenditureItem notFoundData = helper(
 				"TEST-USER-ID", "2025", "12", "999", "0001", null,
 				"対象なし", "1", null, null,
 				new BigDecimal("0.00"), new BigDecimal("0.00"), "001", false);
@@ -293,5 +307,57 @@ class ExpenditureTableDataSourceTest {
 	 */
 	private static LocalDate toLocalDate(Object value) {
 		return value == null ? null : ((java.sql.Date) value).toLocalDate();
+	}
+
+	/**
+	 *<pre>
+	 * ExpenditureItem生成を行うヘルパーです
+	 *</pre>
+	 * @param userId
+	 * @param targetYear
+	 * @param targetMonth
+	 * @param expenditureCode
+	 * @param expenditureItemCode
+	 * @param expenditureEventCode
+	 * @param expenditureName
+	 * @param expenditureCategory
+	 * @param expenditureDetailContext
+	 * @param paymentDate
+	 * @param expectedExpenditureAmount
+	 * @param expenditureAmount
+	 * @param paymentMethodCode
+	 * @param deleteFlg
+	 * @return
+	 *
+	 */
+	private ExpenditureItem helper(String userId,
+			String targetYear,
+			String targetMonth,
+			String expenditureCode,
+			String expenditureItemCode,
+			String expenditureEventCode,
+			String expenditureName,
+			String expenditureCategory,
+			String expenditureDetailContext,
+			LocalDate paymentDate,
+			BigDecimal expectedExpenditureAmount,
+			BigDecimal expenditureAmount,
+			String paymentMethodCode,
+			boolean deleteFlg) {
+		return ExpenditureItem.from(
+				UserId.from(userId),
+				TargetYear.from(targetYear),
+				TargetMonth.from(targetMonth),
+				ExpenditureCode.from(expenditureCode),
+				ExpenditureItemCode.from(expenditureItemCode),
+				ExpenditureEventCode.from(expenditureEventCode),
+				ExpenditureName.from(expenditureName),
+				ExpenditureCategory.from(expenditureCategory),
+				ExpenditureDetailContext.from(expenditureDetailContext),
+				PaymentDate.from(paymentDate),
+				ExpectedExpenditureAmount.from(expectedExpenditureAmount),
+				ExpenditureAmount.from(expenditureAmount),
+				PaymentMethodCode.from(paymentMethodCode),
+				DeleteFlg.from(deleteFlg));
 	}
 }

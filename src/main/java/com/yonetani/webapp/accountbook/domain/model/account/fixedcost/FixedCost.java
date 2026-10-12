@@ -120,16 +120,16 @@ public class FixedCost {
 	 */
 	public FixedCost updateBulkUpdateItem(FixedCostPaymentDay fixedCostPaymentDay, FixedCostPaymentAmount fixedCostPaymentAmount) {
 		return new FixedCost(
-				UserId.from(userId.getValue()),
-				FixedCostCode.from(fixedCostCode.getValue()),
-				FixedCostName.from(fixedCostName.getValue()),
-				FixedCostDetailContext.from(fixedCostDetailContext.getValue()),
-				ExpenditureItemCode.from(expenditureItemCode.getValue()),
-				FixedCostKubun.from(fixedCostKubun.getValue()),
-				FixedCostTargetPaymentMonth.from(fixedCostTargetPaymentMonth.getValue()),
-				FixedCostTargetPaymentMonthOptionalContext.from(fixedCostTargetPaymentMonthOptionalContext.getValue()),
+				userId,
+				fixedCostCode,
+				fixedCostName,
+				fixedCostDetailContext,
+				expenditureItemCode,
+				fixedCostKubun,
+				fixedCostTargetPaymentMonth,
+				fixedCostTargetPaymentMonthOptionalContext,
 				fixedCostPaymentDay,
-				PaymentMethodCode.from(paymentMethodCode.getValue()),
+				paymentMethodCode,
 				fixedCostPaymentAmount);
 	}
 	

@@ -8,6 +8,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2023/09/30 : 1.00.00                      新規作成
  * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/09/23 : 1.02.00  feature-1.03-dev1   追加リファクタリング対応(ドメインモデルのファクトリの引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.sisyutukingaku;
@@ -27,6 +28,13 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.SisyutuKingakuTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemLevel;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemName;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.MinorWasteExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.SevereWasteExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.incomeandexpenditure.IncomeAndExpenditureReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.inquiry.AccountYearMeisaiInquiryReadDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.sisyutukingaku.SisyutuKingakuAndSisyutuItemReadDto;
@@ -174,13 +182,14 @@ public class SisyutuKingakuTableDataSource implements SisyutuKingakuTableReposit
 	private AccountMonthInquiryExpenditureItemList convertExpenditureItemList(List<SisyutuKingakuAndSisyutuItemReadDto> resultDto) {
 		return AccountMonthInquiryExpenditureItemList.from(resultDto.stream().map(dto -> 
 		AccountMonthInquiryExpenditureItemList.ExpenditureListItem.from(
-					dto.getSisyutuItemCode(),
-					dto.getSisyutuItemName(),
-					dto.getSisyutuItemLevel(),
-					dto.getSisyutuKingaku(),
-					dto.getSisyutuKingakuB(),
-					dto.getSisyutuKingakuC(),
-					dto.getSisyutuSiharaiDate())).collect(Collectors.toUnmodifiableList()));
+				ExpenditureItemCode.from(dto.getSisyutuItemCode()),
+				ExpenditureItemName.from(dto.getSisyutuItemName()),
+				ExpenditureItemLevel.from(dto.getSisyutuItemLevel()),
+				ExpenditureAmount.from(dto.getSisyutuKingaku()),
+				MinorWasteExpenditureAmount.from(dto.getSisyutuKingakuB()),
+				SevereWasteExpenditureAmount.from(dto.getSisyutuKingakuC()),
+				PaymentDate.from(dto.getSisyutuSiharaiDate()))
+		).collect(Collectors.toUnmodifiableList()));
 	}
 	
 	/**

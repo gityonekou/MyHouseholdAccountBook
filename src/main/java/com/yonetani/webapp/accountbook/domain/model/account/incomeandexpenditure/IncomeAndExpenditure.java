@@ -6,15 +6,14 @@
  * 日付       : version  ブランチ            コメントなど
  * 2025/12/05 : 1.00.00  feature-1.00-dev00  新規作成
  * 2026/04/16 : 1.00.01  feature-1.00-dev00  IncomeAndExpenditureItemを統合（登録・更新機能を追加）
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(ファクトリの引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure;
 
-import java.math.BigDecimal;
 import java.util.Objects;
 
 import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureAmount;
-import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.TotalAvailableFunds;
 import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.WithdrawingAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
@@ -75,8 +74,7 @@ public class IncomeAndExpenditure {
 	 * 引数の値から収支テーブル情報のドメインモデルを生成して返します。
 	 *</pre>
 	 * @param userId ユーザID
-	 * @param targetYear 対象年
-	 * @param targetMonth 対象月
+	 * @param targetYearMonth 対象年月
 	 * @param regularIncomeAmount 収入金額(積立金取崩金額以外の収入金額)
 	 * @param withdrawingAmount 積立金取崩金額
 	 * @param expectedExpenditureAmount 支出予定金額
@@ -86,22 +84,28 @@ public class IncomeAndExpenditure {
 	 *
 	 */
 	public static IncomeAndExpenditure from(
-			String userId,
-			String targetYear,
-			String targetMonth,
-			BigDecimal regularIncomeAmount,
-			BigDecimal withdrawingAmount,
-			BigDecimal expectedExpenditureAmount,
-			BigDecimal expenditureAmount,
-			BigDecimal balanceAmount) {
+			UserId userId,
+			TargetYearMonth targetYearMonth,
+			RegularIncomeAmount regularIncomeAmount,
+			WithdrawingAmount withdrawingAmount,
+			ExpectedExpenditureAmount expectedExpenditureAmount,
+			ExpenditureAmount expenditureAmount,
+			BalanceAmount balanceAmount) {
 		return new IncomeAndExpenditure(
-				UserId.from(userId),
-				TargetYearMonth.from(targetYear, targetMonth),
-				RegularIncomeAmount.from(regularIncomeAmount),
-				WithdrawingAmount.from(withdrawingAmount),
-				ExpectedExpenditureAmount.from(expectedExpenditureAmount),
-				ExpenditureAmount.from(expenditureAmount),
-				BalanceAmount.from(balanceAmount));
+				// ユーザID
+				userId,
+				// 対象年月
+				targetYearMonth,
+				// 収入金額(積立金取崩金額以外の収入金額)
+				regularIncomeAmount,
+				// 積立金取崩金額
+				withdrawingAmount,
+				// 支出予定金額
+				expectedExpenditureAmount,
+				// 支出金額
+				expenditureAmount,
+				// 収支金額
+				balanceAmount);
 	}
 
 	/**
@@ -132,14 +136,20 @@ public class IncomeAndExpenditure {
 		Objects.requireNonNull(targetYearMonth, "targetYearMonth must not be null");
 
 		return new IncomeAndExpenditure(
-			userId,
-			targetYearMonth,
-			regularIncomeAmount,
-			withdrawingAmount,
-			estimatedExpenditureAmount,
-			expenditureAmount,
-			balanceAmount
-		);
+				// ユーザID
+				userId,
+				// 対象年月
+				targetYearMonth,
+				// 収入金額(積立金取崩金額以外の収入金額)
+				regularIncomeAmount,
+				// 積立金取崩金額
+				withdrawingAmount,
+				// 支出予定金額
+				estimatedExpenditureAmount,
+				// 支出金額
+				expenditureAmount,
+				// 収支金額
+				balanceAmount);
 	}
 
 	/**
@@ -157,14 +167,20 @@ public class IncomeAndExpenditure {
 		Objects.requireNonNull(targetYearMonth, "targetYearMonth must not be null");
 
 		return new IncomeAndExpenditure(
-			userId,
-			targetYearMonth,
-			null,  // regularIncomeAmount
-			null,  // withdrawingAmount
-			null,  // estimatedExpenditureAmount
-			null,  // expenditureAmount
-			null   // balanceAmount
-		);
+				// ユーザID
+				userId,
+				// 対象年月
+				targetYearMonth,
+				// 収入金額(積立金取崩金額以外の収入金額)
+				null,
+				// 積立金取崩金額
+				null,
+				// 支出予定金額
+				null,
+				// 支出金額
+				null,
+				// 収支金額
+				null);
 	}
 
 	/**
@@ -183,7 +199,7 @@ public class IncomeAndExpenditure {
 	 * 対象月の収支テーブル情報を新規追加する場合の収支集約を生成して返します。
 	 *</pre>
 	 * @param userId ユーザID
-	 * @param yearMonth 対象年月(ドメイン)
+	 * @param targetYearMonth 対象年月(ドメイン)
 	 * @param regularIncomeAmount 対象月の収入金額(積立金取崩金額以外の収入金額)
 	 * @param withdrawingAmount 対象月の積立金取崩金額
 	 * @param expectedExpenditureAmount 対象月の支出予定金額
@@ -193,7 +209,7 @@ public class IncomeAndExpenditure {
 	 */
 	public static IncomeAndExpenditure createForAdd(
 			UserId userId,
-			TargetYearMonth yearMonth,
+			TargetYearMonth targetYearMonth,
 			RegularIncomeAmount regularIncomeAmount,
 			WithdrawingAmount withdrawingAmount,
 			ExpectedExpenditureAmount expectedExpenditureAmount,
@@ -206,21 +222,19 @@ public class IncomeAndExpenditure {
 
 		return IncomeAndExpenditure.from(
 				// ユーザID
-				userId.getValue(),
-				// 対象年
-				yearMonth.getTargetYear().getValue(),
-				// 対象月
-				yearMonth.getTargetMonth().getValue(),
+				userId,
+				// 対象年月
+				targetYearMonth,
 				// 収入金額(積立金取崩金額以外の収入金額)
-				regularIncomeAmount.getValue(),
+				regularIncomeAmount,
 				// 積立金取崩金額
-				withdrawingAmount.getValue(),
+				withdrawingAmount,
 				// 支出予定金額
-				expectedExpenditureAmount.getValue(),
+				expectedExpenditureAmount,
 				// 支出金額
-				expenditureAmount.getValue(),
+				expenditureAmount,
 				// 収支金額
-				balance.getValue());
+				balance);
 	}
 
 	/**
@@ -231,7 +245,7 @@ public class IncomeAndExpenditure {
 	 * (支出予定金額は0円で設定され、DB更新時に該当項目を更新しません)
 	 *</pre>
 	 * @param userId ユーザID
-	 * @param yearMonth 対象年月(ドメイン)
+	 * @param targetYearMonth 対象年月(ドメイン)
 	 * @param regularIncomeAmount 対象月の収入金額(積立金取崩金額以外の収入金額)
 	 * @param withdrawingAmount 対象月の積立金取崩金額
 	 * @param expenditureAmount 対象月の支出金額
@@ -240,7 +254,7 @@ public class IncomeAndExpenditure {
 	 */
 	public static IncomeAndExpenditure createForUpdate(
 			UserId userId,
-			TargetYearMonth yearMonth,
+			TargetYearMonth targetYearMonth,
 			RegularIncomeAmount regularIncomeAmount,
 			WithdrawingAmount withdrawingAmount,
 			ExpenditureAmount expenditureAmount) {
@@ -252,21 +266,19 @@ public class IncomeAndExpenditure {
 
 		return IncomeAndExpenditure.from(
 				// ユーザID
-				userId.getValue(),
-				// 対象年
-				yearMonth.getTargetYear().getValue(),
-				// 対象月
-				yearMonth.getTargetMonth().getValue(),
-				// 収入金額(積立金取崩金額以外の収入金額)
-				regularIncomeAmount.getValue(),
+				userId,
+				// 対象年月
+				targetYearMonth,
+				// (積立金取崩金額以外の収入金額)
+				regularIncomeAmount,
 				// 積立金取崩金額
-				withdrawingAmount.getValue(),
+				withdrawingAmount,
 				// 支出予定金額
-				ExpectedExpenditureTotalAmount.ZERO.getValue(),
+				ExpectedExpenditureAmount.ZERO,
 				// 支出金額
-				expenditureAmount.getValue(),
+				expenditureAmount,
 				// 収支金額
-				balance.getValue());
+				balance);
 	}
 
 	/**
@@ -303,21 +315,19 @@ public class IncomeAndExpenditure {
 
 		return IncomeAndExpenditure.from(
 				// ユーザID
-				userId.getValue(),
-				// 対象年
-				targetYearMonth.getTargetYear().getValue(),
-				// 対象月
-				targetYearMonth.getTargetMonth().getValue(),
+				userId,
+				// 対象年月
+				targetYearMonth,
 				// 収入金額(積立金取崩金額以外の収入金額)
-				regularIncomeAmount.getValue(),
+				regularIncomeAmount,
 				// 積立金取崩金額
-				withdrawingAmount.getValue(),
+				withdrawingAmount,
 				// 支出予定金額
-				expectedExpenditureAmount.getValue(),
+				expectedExpenditureAmount,
 				// 支出金額
-				updExpenditureAmount.getValue(),
+				updExpenditureAmount,
 				// 収支金額
-				balance.getValue());
+				balance);
 	}
 
 	/**
@@ -341,21 +351,19 @@ public class IncomeAndExpenditure {
 
 		return IncomeAndExpenditure.from(
 				// ユーザID
-				userId.getValue(),
-				// 対象年
-				targetYearMonth.getTargetYear().getValue(),
-				// 対象月
-				targetYearMonth.getTargetMonth().getValue(),
+				userId,
+				// 対象年月
+				targetYearMonth,
 				// 収入金額(積立金取崩金額以外の収入金額)
-				regularIncomeAmount.getValue(),
+				regularIncomeAmount,
 				// 積立金取崩金額
-				withdrawingAmount.getValue(),
+				withdrawingAmount,
 				// 支出予定金額
-				expectedExpenditureAmount.getValue(),
+				expectedExpenditureAmount,
 				// 支出金額
-				updExpenditureAmount.getValue(),
+				updExpenditureAmount,
 				// 収支金額
-				balance.getValue());
+				balance);
 	}
 
 	/**

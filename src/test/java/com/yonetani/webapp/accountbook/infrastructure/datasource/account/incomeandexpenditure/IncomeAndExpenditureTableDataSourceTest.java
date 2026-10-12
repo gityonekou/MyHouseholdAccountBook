@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/02/23 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(ドメインモデルのファクトリの引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.incomeandexpenditure;
@@ -28,6 +29,13 @@ import org.springframework.test.context.jdbc.SqlConfig;
 
 import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure.IncomeAndExpenditure;
 import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.WithdrawingAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.infrastructure.mapper.account.incomeandexpenditure.IncomeAndExpenditureTableMapper;
 
 /**
@@ -98,7 +106,7 @@ class IncomeAndExpenditureTableDataSourceTest {
 		/* 全項目の登録チェック */
 		// テストデータ：全項目あり(WITHDREW_KINGAKU=15000:取崩しあり)
 		// 収支金額 = (380000 + 15000) - 38000 = 357000
-		IncomeAndExpenditure addData = IncomeAndExpenditure.from(
+		IncomeAndExpenditure addData = createHelper(
 				"TEST-USER-ID", "2025", "12",
 				new BigDecimal("380000.00"), new BigDecimal("15000.00"),
 				new BigDecimal("50000.00"), new BigDecimal("38000.00"),
@@ -127,7 +135,7 @@ class IncomeAndExpenditureTableDataSourceTest {
 
 		/* null可項目の登録チェック(WITHDREW_KINGAKU=null:取崩しなし) */
 		// 収支金額 = 250000 - 30000 = 220000
-		IncomeAndExpenditure addNullData = IncomeAndExpenditure.from(
+		IncomeAndExpenditure addNullData = createHelper(
 				"TEST-USER-ID", "2025", "11",
 				new BigDecimal("250000.00"), null,
 				new BigDecimal("40000.00"), new BigDecimal("30000.00"),
@@ -174,7 +182,7 @@ class IncomeAndExpenditureTableDataSourceTest {
 		// 更新データ：INCOME_KINGAKU, WITHDREW_KINGAKU, EXPENDITURE_KINGAKU, INCOME_AND_EXPENDITURE_KINGAKUを変更
 		// 意図的にEXPENDITURE_ESTIMATE_KINGAKUに別の値をセット(更新されないことを確認)
 		// 収支金額 = (375000 + 55000) - 69500 = 360500
-		IncomeAndExpenditure updateData = IncomeAndExpenditure.from(
+		IncomeAndExpenditure updateData = createHelper(
 				"TEST-USER-ID", "2025", "12",
 				new BigDecimal("375000.00"), new BigDecimal("55000.00"),
 				new BigDecimal("99999.00"), new BigDecimal("69500.00"),
@@ -197,7 +205,7 @@ class IncomeAndExpenditureTableDataSourceTest {
 				"支出予定金額(EXPENDITURE_ESTIMATE_KINGAKU)が更新されていないこと");
 
 		/* 対象データなしの場合、0件が返ること */
-		IncomeAndExpenditure notFoundData = IncomeAndExpenditure.from(
+		IncomeAndExpenditure notFoundData = createHelper(
 				"TEST-USER-ID", "2025", "01",
 				new BigDecimal("0.00"), null,
 				new BigDecimal("0.00"), new BigDecimal("0.00"),
@@ -206,7 +214,7 @@ class IncomeAndExpenditureTableDataSourceTest {
 
 		/* null可項目の更新チェック(WITHDREW_KINGAKU=nullに更新) */
 		// 収支金額 = 350000 - 40000 = 310000
-		IncomeAndExpenditure updateNullData = IncomeAndExpenditure.from(
+		IncomeAndExpenditure updateNullData = createHelper(
 				"TEST-USER-ID", "2025", "12",
 				new BigDecimal("350000.00"), null,
 				new BigDecimal("99999.00"), new BigDecimal("40000.00"),
@@ -226,5 +234,40 @@ class IncomeAndExpenditureTableDataSourceTest {
 		// EXPENDITURE_ESTIMATE_KINGAKUはnull可更新後も変わらないこと
 		assertEquals(beforeEstimateKingaku, actualNullDataMap.get("EXPENDITURE_ESTIMATE_KINGAKU"),
 				"支出予定金額(EXPENDITURE_ESTIMATE_KINGAKU)が更新されていないこと(null可更新後も)");
+	}
+	
+	/**
+	 *<pre>
+	 * 収支（IncomeAndExpenditure）のドメインモデルを生成するヘルパーメソッドです。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param targetYear 対象年
+	 * @param targetMonth 対象月
+	 * @param regularIncomeAmount 収入金額(積立金取崩金額以外の収入金額)
+	 * @param withdrawingAmount 積立金取崩金額
+	 * @param expectedExpenditureAmount 支出予定金額
+	 * @param expenditureAmount 支出金額
+	 * @param balanceAmount 収支金額
+	 * @return 収支集約
+	 *
+	 */
+	private IncomeAndExpenditure createHelper(String userId, String targetYear, String targetMonth,
+			BigDecimal regularIncomeAmount, BigDecimal withdrawingAmount, BigDecimal expectedExpenditureAmount,
+			BigDecimal expenditureAmount, BigDecimal balanceAmount) {
+		return IncomeAndExpenditure.from(
+				// ユーザID
+				UserId.from(userId),
+				// 対象年月
+				TargetYearMonth.from(targetYear + targetMonth),
+				// 収入金額(積立金取崩金額以外の収入金額)
+				RegularIncomeAmount.from(regularIncomeAmount),
+				// 積立金取崩金額
+				WithdrawingAmount.from(withdrawingAmount),
+				// 支出予定金額
+				ExpectedExpenditureAmount.from(expectedExpenditureAmount),
+				// 支出金額
+				ExpenditureAmount.from(expenditureAmount),
+				// 収支金額
+				BalanceAmount.from(balanceAmount));
 	}
 }

@@ -7,6 +7,7 @@
  * 2023/10/12 : 1.00.00                      新規作成
  * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
  * 2026/04/16 : 1.01.01  feature-1.00-dev00  リファクタリング追加対応(IncomeAndExpenditureItem統合に伴う修正)
+ * 2026/09/23 : 1.02.00  feature-1.03-dev1   追加リファクタリング対応(ドメインモデルのファクトリの引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.incomeandexpenditure;
@@ -21,6 +22,13 @@ import com.yonetani.webapp.accountbook.domain.model.account.incomeandexpenditure
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYear;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.WithdrawingAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.incomeandexpenditure.IncomeAndExpenditureReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearSearchQueryDto;
@@ -106,20 +114,18 @@ public class IncomeAndExpenditureTableDataSource implements IncomeAndExpenditure
 	private IncomeAndExpenditure createIncomeAndExpenditure(IncomeAndExpenditureReadWriteDto dto) {
 		return IncomeAndExpenditure.from(
 				// ユーザID
-				dto.getUserId(),
-				// 対象年
-				dto.getTargetYear(),
-				// 対象月
-				dto.getTargetMonth(),
+				UserId.from(dto.getUserId()),
+				// 対象年月
+				TargetYearMonth.from(dto.getTargetYear(), dto.getTargetMonth()),
 				// 収入金額
-				dto.getIncomeKingaku(),
+				RegularIncomeAmount.from(dto.getIncomeKingaku()),
 				// 積立金取崩金額
-				dto.getWithdrewKingaku(),
+				WithdrawingAmount.from(dto.getWithdrewKingaku()),
 				// 支出予定金額
-				dto.getExpenditureEstimateKingaku(),
+				ExpectedExpenditureAmount.from(dto.getExpenditureEstimateKingaku()),
 				// 支出金額
-				dto.getExpenditureKingaku(),
+				ExpenditureAmount.from(dto.getExpenditureKingaku()),
 				// 収支金額
-				dto.getIncomeAndExpenditureKingaku());
+				BalanceAmount.from(dto.getIncomeAndExpenditureKingaku()));
 	}
 }

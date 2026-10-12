@@ -22,6 +22,19 @@ import org.junit.jupiter.api.Test;
 import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureEventCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureName;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.common.DeleteFlg;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
 /**
  *<pre>
@@ -42,13 +55,20 @@ class AccountMonthInquiryExpenditureListTest {
 	private ExpenditureItem createItem(String code, String name, String category,
 			LocalDate paymentDate, int amount, String detail) {
 		return ExpenditureItem.from(
-				"user01", "2025", "11", code, "0002", null,
-				name, category, detail,
-				paymentDate,
-				BigDecimal.valueOf(amount).setScale(2),
-				BigDecimal.valueOf(amount).setScale(2),
-				"001",
-				false);
+				UserId.from("user01"),
+				TargetYear.from("2025"),
+				TargetMonth.from("11"),
+				ExpenditureCode.from(code),
+				ExpenditureItemCode.from("0002"),
+				ExpenditureEventCode.from(null),
+				ExpenditureName.from(name),
+				ExpenditureCategory.from(category),
+				ExpenditureDetailContext.from(detail),
+				PaymentDate.from(paymentDate),
+				ExpectedExpenditureAmount.from(BigDecimal.valueOf(amount).setScale(2)),
+				ExpenditureAmount.from(BigDecimal.valueOf(amount).setScale(2)),
+				PaymentMethodCode.from("001"),
+				DeleteFlg.from(false));
 	}
 
 	// ========================================

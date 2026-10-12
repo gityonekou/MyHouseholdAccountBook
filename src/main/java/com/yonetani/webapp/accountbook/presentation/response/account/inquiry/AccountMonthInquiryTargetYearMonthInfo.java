@@ -6,17 +6,12 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2024/10/26 : 1.00.00                      新規作成
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(ファクトリの引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.inquiry;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
-import org.springframework.util.StringUtils;
-
-import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
-import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -60,31 +55,23 @@ public class AccountMonthInquiryTargetYearMonthInfo {
 	 * @return 表示する月の対象年月情報
 	 *
 	 */
-	public static AccountMonthInquiryTargetYearMonthInfo from(String targetYearMonth, String returnYearMonth) {
-		// 念のため、ここで入力値チェックを行う
-		if(!StringUtils.hasLength(targetYearMonth) || targetYearMonth.length() != 6) {
-			throw new MyHouseholdAccountBookRuntimeException("対象年月の値が不正です。管理者に問い合わせてください。[targetYearMonth=" + targetYearMonth + "]");
-		}
-		// 現在の対象年月からカレンダーを生成(前月・翌月の値取得用)
-		LocalDate yearMonthCalendar = LocalDate.parse(targetYearMonth + "01", MyHouseholdAccountBookContent.DATE_TIME_FORMATTER);
-		DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyyMM");
-		
+	public static AccountMonthInquiryTargetYearMonthInfo from(TargetYearMonth targetYearMonth, TargetYearMonth returnYearMonth) {
 		return new AccountMonthInquiryTargetYearMonthInfo(
 				// 対象年月
-				targetYearMonth,
+				targetYearMonth.getValue(),
 				// 戻り時の表示対象年月
-				returnYearMonth,
+				returnYearMonth.getValue(),
 				// 対象年
-				targetYearMonth.substring(0, 4),
+				targetYearMonth.getTargetYear().getValue(),
 				// 前月
-				yearMonthCalendar.minusMonths(1).format(format),
+				//yearMonthCalendar.minusMonths(1).format(format),
+				targetYearMonth.plusMonths(-1).getValue(),
 				// 翌月
-				yearMonthCalendar.plusMonths(1).format(format),
+				targetYearMonth.plusMonths(1).getValue(),
 				// 「yyyy年MM月度」の年の値
-				targetYearMonth.substring(0, 4),
+				targetYearMonth.getTargetYear().getValue(),
 				// 「yyyy年MM月度」の月の値
-				targetYearMonth.substring(4)
-				);
+				targetYearMonth.getTargetMonth().getValue());
 	}
 	
 	/**
@@ -96,7 +83,7 @@ public class AccountMonthInquiryTargetYearMonthInfo {
 	 * @return 表示する月の対象年月情報
 	 *
 	 */
-	public static AccountMonthInquiryTargetYearMonthInfo from(String targetYearMonth) {
+	public static AccountMonthInquiryTargetYearMonthInfo from(TargetYearMonth targetYearMonth) {
 		return AccountMonthInquiryTargetYearMonthInfo.from(targetYearMonth, targetYearMonth);
 	}
 }

@@ -8,6 +8,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/02/26 : 1.00.00  feature-1.00-dev00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
+ * 2026/10/12 : 1.01.00  feature-1.03-dev1   ExpenditureItem.createExpenditureItem()のシグネチャ変更に伴う対応(セッションDTOからドメインタイプへの変換をUseCase側に集約)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -33,11 +34,18 @@ import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.Exp
 import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.SisyutuKingakuTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCategory;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureEventCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureName;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeCode;
 import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.WithdrawingAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
 import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
@@ -348,7 +356,7 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 			} else if (Objects.equals(expenditureRegistData.getDataType(), MyHouseholdAccountBookContent.DATA_TYPE_NEW)) {
 
 				// セッションの支出登録情報と新規発番した支出コードをもとに支出テーブル情報(ドメイン)を生成
-				ExpenditureItem addExpenditureData = ExpenditureItem.createExpenditureItem(
+				ExpenditureItem addExpenditureData = createExpenditureItem(
 						// 初期登録かどうかのフラグ
 						initFlg,
 						// ユーザID
@@ -389,7 +397,7 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 							SearchQueryUserIdAndYearMonthAndExpenditureCode.from(userId, targetYearMonth, sisyutuCode));
 
 					// セッションの支出登録情報から支出テーブル情報(ドメイン)を生成
-					ExpenditureItem updExpenditureData = ExpenditureItem.createExpenditureItem(
+					ExpenditureItem updExpenditureData = createExpenditureItem(
 							// 初期登録かどうかのフラグ
 							initFlg,
 							// ユーザID
@@ -427,7 +435,7 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 							SearchQueryUserIdAndYearMonthAndExpenditureCode.from(userId, targetYearMonth, sisyutuCode));
 
 					// セッションの支出登録情報から支出テーブル情報(ドメイン)を生成
-					ExpenditureItem delExpenditureData = ExpenditureItem.createExpenditureItem(
+					ExpenditureItem delExpenditureData = createExpenditureItem(
 							// 初期登録かどうかのフラグ
 							initFlg,
 							// ユーザID
@@ -463,6 +471,51 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 		}
 
 		return new ExpenditureProcessResult(expenditureUpdateFlg, expenditureAmount, expectedExpenditureAmount);
+	}
+
+	/**
+	 *<pre>
+	 * セッションの支出登録情報から支出テーブル情報(ドメイン)を生成して返します。
+	 * セッションDTOの各項目をドメインタイプに変換してから、ドメイン層のExpenditureItem.createExpenditureItem()に渡します
+	 * (ドメイン層がプレゼンテーション層のセッションDTOに依存しないようにするため)。
+	 *</pre>
+	 * @param initFlg 初期登録かどうかのフラグ
+	 * @param userId ユーザID
+	 * @param targetYearMonth 対象年月
+	 * @param expenditureCode 支出コード
+	 * @param expenditureRegistData 支出登録情報(セッション)
+	 * @return 支出テーブル情報(ドメイン)
+	 *
+	 */
+	private ExpenditureItem createExpenditureItem(boolean initFlg, UserId userId, TargetYearMonth targetYearMonth,
+			ExpenditureCode expenditureCode, ExpenditureRegistItem expenditureRegistData) {
+		return ExpenditureItem.createExpenditureItem(
+				// 初期登録かどうかのフラグ
+				initFlg,
+				// ユーザID
+				userId,
+				// 対象年月
+				targetYearMonth,
+				// 支出コード
+				expenditureCode,
+				// 支出項目コード
+				ExpenditureItemCode.from(expenditureRegistData.getExpenditureItemCode()),
+				// イベントコード
+				ExpenditureEventCode.from(expenditureRegistData.getEventCode()),
+				// 支出名称
+				ExpenditureName.from(expenditureRegistData.getExpenditureName()),
+				// 支出区分
+				ExpenditureCategory.from(expenditureRegistData.getExpenditureCategory()),
+				// 支出詳細
+				ExpenditureDetailContext.from(expenditureRegistData.getExpenditureDetailContext()),
+				// 支払日
+				PaymentDate.from(targetYearMonth.getValue(), expenditureRegistData.getSiharaiDate()),
+				// 支払金額
+				ExpenditureAmount.from(expenditureRegistData.getExpenditureKingaku()),
+				// 0円開始設定フラグ
+				expenditureRegistData.isClearStartFlg(),
+				// 支払方法コード
+				PaymentMethodCode.from(expenditureRegistData.getPaymentMethodCode()));
 	}
 
 	/**

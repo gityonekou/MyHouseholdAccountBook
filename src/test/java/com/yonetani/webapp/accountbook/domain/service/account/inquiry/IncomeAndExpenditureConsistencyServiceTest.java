@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -34,12 +35,24 @@ import com.yonetani.webapp.accountbook.domain.model.account.inquiry.AccountMonth
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonth;
 import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureEventCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureName;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpenditureTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.TotalAvailableFunds;
 import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.WithdrawingAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
 import com.yonetani.webapp.accountbook.domain.type.common.BalanceAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.DeleteFlg;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
 import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 
@@ -321,7 +334,7 @@ class IncomeAndExpenditureConsistencyServiceTest {
 		AccountMonthInquiryExpenditureItemList expenditureItemList =
 			AccountMonthInquiryExpenditureItemList.from(Collections.emptyList());
 		// 支出リスト：データあり（不整合）
-		ExpenditureItem expenditureItem = ExpenditureItem.from(
+		ExpenditureItem expenditureItem = helper(
 			"user01", "2025", "09", "001", "0001", null,
 			"テスト支出", "1", "", null,
 			BigDecimal.valueOf(10000).setScale(2),
@@ -440,5 +453,57 @@ class IncomeAndExpenditureConsistencyServiceTest {
 		// 両方のチェックが呼ばれる
 		verify(incomeRepository, times(1)).getTotalAvailableFunds(searchCondition);
 		verify(expenditureRepository, times(1)).getExpenditureTotalAmount(searchCondition);
+	}
+
+	/**
+	 *<pre>
+	 * ExpenditureItem生成を行うヘルパーです
+	 *</pre>
+	 * @param userId
+	 * @param targetYear
+	 * @param targetMonth
+	 * @param expenditureCode
+	 * @param expenditureItemCode
+	 * @param expenditureEventCode
+	 * @param expenditureName
+	 * @param expenditureCategory
+	 * @param expenditureDetailContext
+	 * @param paymentDate
+	 * @param expectedExpenditureAmount
+	 * @param expenditureAmount
+	 * @param paymentMethodCode
+	 * @param deleteFlg
+	 * @return
+	 *
+	 */
+	private ExpenditureItem helper(String userId,
+			String targetYear,
+			String targetMonth,
+			String expenditureCode,
+			String expenditureItemCode,
+			String expenditureEventCode,
+			String expenditureName,
+			String expenditureCategory,
+			String expenditureDetailContext,
+			LocalDate paymentDate,
+			BigDecimal expectedExpenditureAmount,
+			BigDecimal expenditureAmount,
+			String paymentMethodCode,
+			boolean deleteFlg) {
+		return ExpenditureItem.from(
+				UserId.from(userId),
+				TargetYear.from(targetYear),
+				TargetMonth.from(targetMonth),
+				ExpenditureCode.from(expenditureCode),
+				ExpenditureItemCode.from(expenditureItemCode),
+				ExpenditureEventCode.from(expenditureEventCode),
+				ExpenditureName.from(expenditureName),
+				ExpenditureCategory.from(expenditureCategory),
+				ExpenditureDetailContext.from(expenditureDetailContext),
+				PaymentDate.from(paymentDate),
+				ExpectedExpenditureAmount.from(expectedExpenditureAmount),
+				ExpenditureAmount.from(expenditureAmount),
+				PaymentMethodCode.from(paymentMethodCode),
+				DeleteFlg.from(deleteFlg));
 	}
 }

@@ -15,6 +15,7 @@ import java.util.List;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
 import lombok.AccessLevel;
@@ -66,7 +67,7 @@ public class AccountYearMageInquiryResponse extends AbstractResponse {
 		 *<pre>
 		 * 引数の値から年間収支(マージ)情報の明細データを生成して返します。
 		 *</pre>
-		 * @param month 対象月(TARGET_MONTH)
+		 * @param targetMonth 対象月(TARGET_MONTH)
 		 * @param syuunyuuKingaku 収入金額(INCOME_KINGAKU)
 		 * @param withdrewKingaku 積立金取崩金額(WITHDREW_KINGAKU)
 		 * @param sisyutuYoteiKingaku 支出予定金額(EXPENDITURE_ESTIMATE_KINGAKU)
@@ -76,14 +77,14 @@ public class AccountYearMageInquiryResponse extends AbstractResponse {
 		 *
 		 */
 		public static MageInquiryListItem from(
-				String month,
+				TargetMonth targetMonth,
 				String syuunyuuKingaku,
 				String withdrewKingaku,
 				String sisyutuYoteiKingaku,
 				String sisyutuKingaku,
 				String syuusiKingaku) {
 			return new MageInquiryListItem(
-					month,
+					targetMonth.toFormatString(),
 					syuunyuuKingaku,
 					withdrewKingaku,
 					sisyutuYoteiKingaku,

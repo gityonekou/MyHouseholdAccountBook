@@ -8,6 +8,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2023/10/09 : 1.00.00                      新規作成
  * 2025/12/28 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/09/23 : 1.02.00  feature-1.03-dev1   追加リファクタリング対応(レスポンスdtoのファクトリ、ドメインモデルのファクトリの引数をドメインタイプに変更)
  *
  */
 
@@ -93,21 +94,22 @@ public class AccountYearInquiryUseCase {
 		if(resultList.isEmpty()) {
 			// 件数が0件の場合、メッセージを設定
 			response.addMessage("年間収支(マージ)取得結果が0件です。");
-		} else {
-			// 年間収支(マージ)(ドメインモデル)から年間収支(マージ)(レスポンス)への変換
-			response.addMageInquiryList(convertMageList(resultList));
-			/* 合計値を設定 */
-			// 収入金額合計(積立金取崩金額以外の収入金額合計)
-			response.setSyuunyuuKingakuGoukei(resultList.getRegularIncomeTotalAmount().toFormatString());
-			// 積立金取崩金額合計
-			response.setWithdrewKingakuGoukei(resultList.getWithdrawingTotalAmount().toFormatString());
-			// 支出予定金額合計
-			response.setSisyutuYoteiKingakuGoukei(resultList.getExpectedExpenditureTotalAmount().toFormatString());
-			// 支出金額合計
-			response.setSisyutuKingakuGoukei(resultList.getExpenditureTotalAmount().toFormatString());
-			// 収支合計
-			response.setSyuusiKingakuGoukei(resultList.getBalanceTotalAmount().toFormatString());
+			return response;
 		}
+		
+		// 年間収支(マージ)(ドメインモデル)から年間収支(マージ)(レスポンス)への変換
+		response.addMageInquiryList(convertMageList(resultList));
+		/* 合計値を設定 */
+		// 収入金額合計(積立金取崩金額以外の収入金額合計)
+		response.setSyuunyuuKingakuGoukei(resultList.getRegularIncomeTotalAmount().toFormatString());
+		// 積立金取崩金額合計
+		response.setWithdrewKingakuGoukei(resultList.getWithdrawingTotalAmount().toFormatString());
+		// 支出予定金額合計
+		response.setSisyutuYoteiKingakuGoukei(resultList.getExpectedExpenditureTotalAmount().toFormatString());
+		// 支出金額合計
+		response.setSisyutuKingakuGoukei(resultList.getExpenditureTotalAmount().toFormatString());
+		// 収支合計
+		response.setSyuusiKingakuGoukei(resultList.getBalanceTotalAmount().toFormatString());
 		
 		return response;
 	}
@@ -123,7 +125,7 @@ public class AccountYearInquiryUseCase {
 	private List<MageInquiryListItem> convertMageList(IncomeAndExpenditureInquiryList resultList) {
 		return resultList.getValues().stream().map(domain ->
 			AccountYearMageInquiryResponse.MageInquiryListItem.from(
-					domain.getTargetYearMonth().getTargetMonth().toFormatString(),
+					domain.getTargetYearMonth().getTargetMonth(),
 					domain.getRegularIncomeAmount().toFormatString(),
 					domain.getWithdrawingAmount().toFormatString(),
 					domain.getExpectedExpenditureAmount().toFormatString(),

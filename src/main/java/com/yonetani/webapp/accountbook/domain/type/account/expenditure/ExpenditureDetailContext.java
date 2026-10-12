@@ -46,6 +46,21 @@ public class ExpenditureDetailContext {
 	}
 
 	/**
+	 *<pre>
+	 * 「支出詳細」項目の値を文字列形式で返却します。
+	 * 値がnullの場合は空文字を返却します。
+	 *</pre>
+	 * @return 文字列形式の「支出詳細」項目の値
+	 *
+	 */
+	public String toFormatString() {
+		if (value == null) {
+			return "";
+		}
+		return value;
+	}
+	
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
