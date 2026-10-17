@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2024/07/07 : 1.00.00                      新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.presentation.request.account.regist;
@@ -59,12 +60,12 @@ public class ExpenditureItemForm {
 	// 支払日
 	@DateTimeFormat(pattern = "yyyy/MM/dd")
 	private LocalDate siharaiDate;
+	// 支払方法コード
+	@NotBlank
+	private String paymentMethodCode;
 	// 支払金額
 	@NotNull
 	@Min(1)
 	private Integer expenditureKingaku;
-	// 支払方法コード
-	@NotBlank
-	private String paymentMethodCode;
 
 }

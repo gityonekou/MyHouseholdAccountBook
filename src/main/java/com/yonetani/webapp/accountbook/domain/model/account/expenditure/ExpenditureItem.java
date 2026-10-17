@@ -70,12 +70,12 @@ public class ExpenditureItem {
 	private final ExpenditureDetailContext expenditureDetailContext;
 	// 支払日
 	private final PaymentDate paymentDate;
+	// 支払方法コード
+	private final PaymentMethodCode paymentMethodCode;
 	// 支出予定金額
 	private final ExpectedExpenditureAmount expectedExpenditureAmount;
 	// 支出金額
 	private final ExpenditureAmount expenditureAmount;
-	// 支払方法コード
-	private final PaymentMethodCode paymentMethodCode;
 	// 削除フラグ
 	private final DeleteFlg deleteFlg;
 
@@ -93,9 +93,9 @@ public class ExpenditureItem {
 	 * @param expenditureCategory 支出区分
 	 * @param expenditureDetailContext 支出詳細
 	 * @param paymentDate 支払日
+	 * @param paymentMethodCode 支払方法コード
 	 * @param expectedExpenditureAmount 支出予定金額
 	 * @param expenditureAmount 支出金額
-	 * @param paymentMethodCode 支払方法コード
 	 * @param deleteFlg 削除フラグ
 	 * @return 支出テーブル情報を表すドメインモデル
 	 *
@@ -111,9 +111,9 @@ public class ExpenditureItem {
 			ExpenditureCategory expenditureCategory,
 			ExpenditureDetailContext expenditureDetailContext,
 			PaymentDate paymentDate,
+			PaymentMethodCode paymentMethodCode,
 			ExpectedExpenditureAmount expectedExpenditureAmount,
 			ExpenditureAmount expenditureAmount,
-			PaymentMethodCode paymentMethodCode,
 			DeleteFlg deleteFlg) {
 
 		// 支出テーブル情報を表すドメインモデルを生成して返却
@@ -138,12 +138,12 @@ public class ExpenditureItem {
 				expenditureDetailContext,
 				// 支払日
 				paymentDate,
+				// 支払方法コード
+				paymentMethodCode,
 				// 支出予定金額
 				expectedExpenditureAmount,
 				// 支出金額
 				expenditureAmount,
-				// 支払方法コード
-				paymentMethodCode,
 				// 削除フラグ
 				deleteFlg);
 
@@ -165,9 +165,9 @@ public class ExpenditureItem {
 	 * @param expenditureCategory 支出区分
 	 * @param expenditureDetailContext 支出詳細
 	 * @param paymentDate 支払日
+	 * @param paymentMethodCode 支払方法コード
 	 * @param expenditureKingaku 支払金額(セッションの支出登録情報の設定値)
 	 * @param clearStartFlg 支払金額の0円開始設定フラグ
-	 * @param paymentMethodCode 支払方法コード
 	 * @return 支出テーブル情報(ドメイン)
 	 *
 	 */
@@ -182,9 +182,9 @@ public class ExpenditureItem {
 			ExpenditureCategory expenditureCategory,
 			ExpenditureDetailContext expenditureDetailContext,
 			PaymentDate paymentDate,
+			PaymentMethodCode paymentMethodCode,
 			ExpenditureAmount expenditureKingaku,
-			boolean clearStartFlg,
-			PaymentMethodCode paymentMethodCode) {
+			boolean clearStartFlg) {
 
 		// 支出予定金額：対象月の新規登録時のみ、支出金額の設定値を支出予定金額として設定。対象月の更新時は新規追加時を含めすべて0を設定
 		ExpectedExpenditureAmount expectedExpenditureAmount = (initFlg)
@@ -214,12 +214,12 @@ public class ExpenditureItem {
 				expenditureDetailContext,
 				// 支払日
 				paymentDate,
+				// 支払方法コード
+				paymentMethodCode,
 				// 支出予定金額
 				expectedExpenditureAmount,
 				// 支出金額
 				sisyutuKingaku,
-				// 支払方法コード
-				paymentMethodCode,
 				// 削除フラグ
 				DeleteFlg.from(false));
 	}
@@ -255,12 +255,12 @@ public class ExpenditureItem {
 				expenditureDetailContext,
 				// 支払日
 				paymentDate,
+				// 支払方法コード(金額調整では変更しない。現在値のままコピー)
+				paymentMethodCode,
 				// 支出予定金額
 				expectedExpenditureAmount,
 				// 支出金額
 				expenditureAmount.add(addValue),
-				// 支払方法コード(金額調整では変更しない。現在値のままコピー)
-				paymentMethodCode,
 				// 削除フラグ
 				deleteFlg);
 
@@ -297,12 +297,12 @@ public class ExpenditureItem {
 				expenditureDetailContext,
 				// 支払日
 				paymentDate,
+				// 支払方法コード(金額調整では変更しない。現在値のままコピー)
+				paymentMethodCode,
 				// 支出予定金額
 				expectedExpenditureAmount,
 				// 支出金額
 				expenditureAmount.subtract(subtractValue),
-				// 支払方法コード(金額調整では変更しない。現在値のままコピー)
-				paymentMethodCode,
 				// 削除フラグ
 				deleteFlg);
 

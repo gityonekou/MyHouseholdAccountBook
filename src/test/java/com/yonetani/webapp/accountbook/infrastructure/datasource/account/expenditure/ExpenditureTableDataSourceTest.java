@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/02/23 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.expenditure;
@@ -119,7 +120,7 @@ class ExpenditureTableDataSourceTest {
 		ExpenditureItem addData = helper(
 				"TEST-USER-ID", "2025", "12", "001", "0001", "0001",
 				"食費（外食）", "1", "外食詳細", LocalDate.of(2025, 12, 10),
-				new BigDecimal("12000.00"), new BigDecimal("10000.00"), "001", false);
+				"001", new BigDecimal("12000.00"), new BigDecimal("10000.00"), false);
 		// データ追加
 		assertEquals(1, repository.add(addData), "登録データが1件であること");
 
@@ -151,7 +152,7 @@ class ExpenditureTableDataSourceTest {
 		ExpenditureItem addNullData = helper(
 				"TEST-USER-ID", "2025", "12", "002", "0001", null,
 				"食費（日用品）", "1", null, null,
-				new BigDecimal("5000.00"), new BigDecimal("4800.00"), "001", false);
+				"001", new BigDecimal("5000.00"), new BigDecimal("4800.00"), false);
 		assertEquals(1, repository.add(addNullData), "null可項目あり:登録データが1件であること");
 
 		// 登録されたデータをロード
@@ -200,7 +201,7 @@ class ExpenditureTableDataSourceTest {
 		ExpenditureItem updateData = helper(
 				"TEST-USER-ID", "2025", "12", "001", "9999", "9999",
 				"更新後支出名", "2", "更新後詳細", LocalDate.of(2025, 12, 20),
-				new BigDecimal("99999.00"), new BigDecimal("35000.00"), "001", false);
+				"001", new BigDecimal("99999.00"), new BigDecimal("35000.00"), false);
 		// データ更新(対象データあり)
 		assertEquals(1, repository.update(updateData), "更新データが1件であること");
 
@@ -227,14 +228,14 @@ class ExpenditureTableDataSourceTest {
 		ExpenditureItem notFoundData = helper(
 				"TEST-USER-ID", "2025", "12", "999", "0001", null,
 				"対象なし", "1", null, null,
-				new BigDecimal("0.00"), new BigDecimal("0.00"), "001", false);
+				"001", new BigDecimal("0.00"), new BigDecimal("0.00"), false);
 		assertEquals(0, repository.update(notFoundData), "対象データなしの場合、0件であること");
 
 		/* null可項目の更新チェック(EXPENDITURE_DETAIL_CONTEXT=null, SIHARAI_DATE=null) */
 		ExpenditureItem updateNullData = helper(
 				"TEST-USER-ID", "2025", "12", "001", "9999", "9999",
 				"更新後支出名(null可)", "3", null, null,
-				new BigDecimal("99999.00"), new BigDecimal("30000.00"), "001", false);
+				"001", new BigDecimal("99999.00"), new BigDecimal("30000.00"), false);
 		assertEquals(1, repository.update(updateNullData), "null可項目更新:更新データが1件であること");
 
 		// 更新されたデータをロード
@@ -271,7 +272,7 @@ class ExpenditureTableDataSourceTest {
 		ExpenditureItem deleteData = helper(
 				"TEST-USER-ID", "2025", "12", "001", "0001", "0001",
 				"削除対象支出名", "1", "削除対象詳細", LocalDate.of(2025, 12, 5),
-				new BigDecimal("50000.00"), new BigDecimal("40000.00"), "001", false);
+				"001", new BigDecimal("50000.00"), new BigDecimal("40000.00"), false);
 		// データ論理削除
 		assertEquals(1, repository.delete(deleteData), "削除データが1件であること");
 
@@ -293,7 +294,7 @@ class ExpenditureTableDataSourceTest {
 		ExpenditureItem notFoundData = helper(
 				"TEST-USER-ID", "2025", "12", "999", "0001", null,
 				"対象なし", "1", null, null,
-				new BigDecimal("0.00"), new BigDecimal("0.00"), "001", false);
+				"001", new BigDecimal("0.00"), new BigDecimal("0.00"), false);
 		assertEquals(0, repository.delete(notFoundData), "対象データなしの場合、0件であること");
 	}
 
@@ -323,9 +324,9 @@ class ExpenditureTableDataSourceTest {
 	 * @param expenditureCategory
 	 * @param expenditureDetailContext
 	 * @param paymentDate
+	 * @param paymentMethodCode
 	 * @param expectedExpenditureAmount
 	 * @param expenditureAmount
-	 * @param paymentMethodCode
 	 * @param deleteFlg
 	 * @return
 	 *
@@ -340,9 +341,9 @@ class ExpenditureTableDataSourceTest {
 			String expenditureCategory,
 			String expenditureDetailContext,
 			LocalDate paymentDate,
+			String paymentMethodCode,
 			BigDecimal expectedExpenditureAmount,
 			BigDecimal expenditureAmount,
-			String paymentMethodCode,
 			boolean deleteFlg) {
 		return ExpenditureItem.from(
 				UserId.from(userId),
@@ -355,9 +356,9 @@ class ExpenditureTableDataSourceTest {
 				ExpenditureCategory.from(expenditureCategory),
 				ExpenditureDetailContext.from(expenditureDetailContext),
 				PaymentDate.from(paymentDate),
+				PaymentMethodCode.from(paymentMethodCode),
 				ExpectedExpenditureAmount.from(expectedExpenditureAmount),
 				ExpenditureAmount.from(expenditureAmount),
-				PaymentMethodCode.from(paymentMethodCode),
 				DeleteFlg.from(deleteFlg));
 	}
 }

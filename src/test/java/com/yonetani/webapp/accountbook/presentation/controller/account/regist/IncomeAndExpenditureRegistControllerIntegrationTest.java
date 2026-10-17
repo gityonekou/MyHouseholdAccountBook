@@ -7,6 +7,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2026/02/25 : 1.00.00  feature-1.00-dev00  新規作成
  * 2026/06/13 : 1.01.00  feature-1.02-dev2   固定費0円対応: 0円固定費初期表示メッセージテスト・内容確認0円チェックテストを追加
+ * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.account.regist;
@@ -160,7 +161,7 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
 				MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				code, sisyutuItemCode, null, name, kubun, detail, null,
-				new BigDecimal(amount), false, "001");
+				"001", new BigDecimal(amount), false);
 	}
 
 	/**
@@ -964,7 +965,7 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"2026011210000001", "0030", null, "家賃", "1", "月額未定", "27",
-				new BigDecimal("0"), false, "001");
+				"001", new BigDecimal("0"), false);
 		when(mockRegistListSession.getExpenditureRegistItemList()).thenReturn(Arrays.asList(zeroAmountAddItem));
 
 		// 画面表示の検証
@@ -1001,7 +1002,7 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
 				MyHouseholdAccountBookContent.ACTION_TYPE_DELETE,
 				"001", "0030", null, "家賃", "1", "月額未定", null,
-				new BigDecimal("0"), false, "001");
+				"001", new BigDecimal("0"), false);
 		when(mockRegistListSession.getExpenditureRegistItemList()).thenReturn(
 				Arrays.asList(zeroAmountDeleteItem));
 

@@ -6,6 +6,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2024/09/08 : 1.00.00                      新規作成
  * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.expenditure;
@@ -214,12 +215,12 @@ public class ExpenditureTableDataSource implements ExpenditureTableRepository {
 				ExpenditureDetailContext.from(dto.getSisyutuDetailContext()),
 				// 支払日
 				PaymentDate.from(dto.getShiharaiDate()),
+				// 支払方法コード
+				PaymentMethodCode.from(dto.getPaymentMethodCode()),
 				// 支出予定金額
 				ExpectedExpenditureAmount.from(dto.getSisyutuYoteiKingaku()),
 				// 支出金額
 				ExpenditureAmount.from(dto.getSisyutuKingaku()),
-				// 支払方法コード
-				PaymentMethodCode.from(dto.getPaymentMethodCode()),
 				// 削除フラグ
 				DeleteFlg.from(dto.isDeleteFlg()));
 	}

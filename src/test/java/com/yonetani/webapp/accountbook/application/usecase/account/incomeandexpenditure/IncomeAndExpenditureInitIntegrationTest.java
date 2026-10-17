@@ -8,6 +8,7 @@
  * 2026/01/12 : 1.00.00  feature-1.00-dev00  新規作成
  * 2026/06/14 : 1.01.00  feature-1.02-dev2   テストシナリオ⑭をreadRegistCheckValidateInfoに変更、⑮⑯を追加
  * 2026/06/14 : 1.01.01  feature-1.02-dev2   テストシナリオ⑰を追加（0円NON_UPDATEはバリデーション通過）
+ * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -1090,11 +1091,11 @@ class IncomeAndExpenditureInitIntegrationTest {
 		List<ExpenditureRegistItem> expenditureRegistItemList = new ArrayList<>();
 		expenditureRegistItemList.add(ExpenditureRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, "001", "0001", "", "電気代", "1",
-			"支払詳細", "30", new BigDecimal("12000"), false, "001"));
+			"支払詳細", "30", "001", new BigDecimal("12000"), false));
 		// 削除アクションが設定された支出データ（画面表示から除外されるべき）
 		expenditureRegistItemList.add(ExpenditureRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_DELETE, "002", "0037", "", "削除対象支出", "1",
-			"削除対象詳細", "15", new BigDecimal("5000"), false, "001"));
+			"削除対象詳細", "15", "001", new BigDecimal("5000"), false));
 
 		// When: 収入・支出一覧を再表示
 		IncomeAndExpenditureRegistResponse response = useCase.readIncomeAndExpenditureInfoList(
@@ -1143,7 +1144,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 		List<ExpenditureRegistItem> expenditureRegistItemList = new ArrayList<>();
 		expenditureRegistItemList.add(ExpenditureRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD, "2026011210000001", "0001", "", "電気代", "1",
-			"支払詳細", "20251130", BigDecimal.ZERO, false, "001"));
+			"支払詳細", "30", "001", BigDecimal.ZERO, false));
 
 		// When: 内容確認バリデーション
 		IncomeAndExpenditureRegistResponse response = useCase.readRegistCheckValidateInfo(
@@ -1192,11 +1193,11 @@ class IncomeAndExpenditureInitIntegrationTest {
 		List<ExpenditureRegistItem> expenditureRegistItemList = new ArrayList<>();
 		expenditureRegistItemList.add(ExpenditureRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD, "2026011210000001", "0001", "", "電気代", "1",
-			"支払詳細", "20251130", BigDecimal.ZERO, false, "001"));
+			"支払詳細", "30", "001", BigDecimal.ZERO, false));
 		// DELETE: 0円支出 → チェック除外（メッセージ対象外）
 		expenditureRegistItemList.add(ExpenditureRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_DELETE, "2026011210000002", "0002", "", "ガス代", "1",
-			"", "20251130", BigDecimal.ZERO, false, "001"));
+			"", "30", "001", BigDecimal.ZERO, false));
 
 		// When: 内容確認バリデーション
 		IncomeAndExpenditureRegistResponse response = useCase.readRegistCheckValidateInfo(
@@ -1243,7 +1244,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 		List<ExpenditureRegistItem> expenditureRegistItemList = new ArrayList<>();
 		expenditureRegistItemList.add(ExpenditureRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD, "2026011210000001", "0001", "", "電気代", "1",
-			"支払詳細", "20251130", new BigDecimal("10000"), false, "001"));
+			"支払詳細", "30", "001", new BigDecimal("10000"), false));
 
 		// When: 内容確認バリデーション
 		IncomeAndExpenditureRegistResponse response = useCase.readRegistCheckValidateInfo(
@@ -1287,7 +1288,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 		expenditureRegistItemList.add(ExpenditureRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				"001", "0030", null, "家賃", "1",
-				"家賃支払詳細", "27", BigDecimal.ZERO, false, "001"));
+				"家賃支払詳細", "27", "001", BigDecimal.ZERO, false));
 
 		// When: 内容確認バリデーション
 		IncomeAndExpenditureRegistResponse response = useCase.readRegistCheckValidateInfo(

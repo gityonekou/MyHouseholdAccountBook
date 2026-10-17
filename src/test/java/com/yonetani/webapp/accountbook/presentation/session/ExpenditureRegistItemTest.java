@@ -35,7 +35,7 @@ class ExpenditureRegistItemTest {
 		ExpenditureRegistItem item = ExpenditureRegistItem.from(
 				"LOAD", "update", "001", "0037", "0001",
 				"電気代", "1", "電気代詳細", "30",
-				new BigDecimal("12000"), false, "001");
+				"001", new BigDecimal("12000"), false);
 
 		assertEquals("LOAD", item.getDataType());
 		assertEquals("update", item.getAction());
@@ -57,7 +57,7 @@ class ExpenditureRegistItemTest {
 		ExpenditureRegistItem item = ExpenditureRegistItem.from(
 				"NEW", "add", "20260101120000001", "0051", "",
 				"食費", "1", "食費詳細", "00",
-				new BigDecimal("30000"), true, "999");
+				"999", new BigDecimal("30000"), true);
 
 		assertEquals(2, item.getExpenditureKingaku().scale());
 		assertEquals(new BigDecimal("30000.00"), item.getExpenditureKingaku());
@@ -69,7 +69,7 @@ class ExpenditureRegistItemTest {
 		ExpenditureRegistItem item = ExpenditureRegistItem.from(
 				"NEW", "add", "20260101120000002", "0051", "",
 				"食費(無駄遣いなし)", "1", "食費詳細", "00",
-				new BigDecimal("30000"), true, "999");
+				"999", new BigDecimal("30000"), true);
 
 		assertTrue(item.isClearStartFlg());
 		assertEquals("999", item.getPaymentMethodCode());
@@ -81,11 +81,11 @@ class ExpenditureRegistItemTest {
 		ExpenditureRegistItem item1 = ExpenditureRegistItem.from(
 				"LOAD", "update", "001", "0037", "0001",
 				"電気代", "1", "電気代詳細", "30",
-				new BigDecimal("12000"), false, "001");
+				"001", new BigDecimal("12000"), false);
 		ExpenditureRegistItem item2 = ExpenditureRegistItem.from(
 				"LOAD", "update", "001", "0037", "0001",
 				"電気代", "1", "電気代詳細", "30",
-				new BigDecimal("12000"), false, "001");
+				"001", new BigDecimal("12000"), false);
 
 		assertEquals(item1, item2);
 		assertEquals(item1.hashCode(), item2.hashCode());
@@ -97,11 +97,11 @@ class ExpenditureRegistItemTest {
 		ExpenditureRegistItem item1 = ExpenditureRegistItem.from(
 				"LOAD", "update", "001", "0037", "0001",
 				"電気代", "1", "電気代詳細", "30",
-				new BigDecimal("12000"), false, "001");
+				"001", new BigDecimal("12000"), false);
 		ExpenditureRegistItem item2 = ExpenditureRegistItem.from(
 				"LOAD", "update", "001", "0037", "0001",
 				"電気代", "1", "電気代詳細", "30",
-				new BigDecimal("12000"), false, "002");
+				"002", new BigDecimal("12000"), false);
 
 		assertNotEquals(item1, item2);
 	}

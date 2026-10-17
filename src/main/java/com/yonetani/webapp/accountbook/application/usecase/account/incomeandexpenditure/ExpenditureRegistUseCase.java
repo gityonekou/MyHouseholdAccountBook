@@ -6,7 +6,8 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/02/25 : 1.00.00  feature-1.00-dev00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
- * 2026/08/18 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(getExpenditureItemNameメソッドの戻り値を値オブジェクトに変更、リダイレクトレスポンスdtoのファクトリ引数をドメインタイプに変更)
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/09/06 : 1.01.01  feature-1.03-dev1   追加リファクタリング対応(getExpenditureItemNameメソッドの戻り値を値オブジェクトに変更、リダイレクトレスポンスdtoのファクトリ引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -340,12 +341,12 @@ public class ExpenditureRegistUseCase {
 							session.getExpenditureDetailContext(),
 							// 支払日
 							session.getSiharaiDate(),
+							// 支払方法コード
+							session.getPaymentMethodCode(),
 							// 支払金額
 							session.getExpenditureKingaku(),
 							// 支払金額の0円開始設定フラグ
-							session.isClearStartFlg(),
-							// 支払方法コード
-							session.getPaymentMethodCode()));
+							session.isClearStartFlg()));
 				}
 
 				deleteFlg = true;
@@ -500,12 +501,12 @@ public class ExpenditureRegistUseCase {
 				inputForm.getExpenditureDetailContext(),
 				// 支払日
 				DomainCommonUtils.getDateStr(inputForm.getSiharaiDate()),
+				// 支払方法コード
+				inputForm.getPaymentMethodCode(),
 				// 支払金額
 				DomainCommonUtils.convertKingakuBigDecimal(inputForm.getExpenditureKingaku()),
 				// 支払金額の0円開始設定フラグ
-				inputForm.isClearStartFlg(),
-				// 支払方法コード
-				inputForm.getPaymentMethodCode());
+				inputForm.isClearStartFlg());
 	}
 
 	/**

@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/01/25 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -116,9 +117,10 @@ class ExpenditureRegistIntegrationTest {
 			"1",    // 無駄遣いなし
 			"テスト電気代詳細",
 			"25",   // 支払日（日のみ）
+			"001",  // 支払方法
 			new BigDecimal("5000.00"),
-			false,   // clearStartFlg
-			"001"
+			false   // clearStartFlg
+			
 		));
 		list.add(ExpenditureRegistItem.from(
 			MyHouseholdAccountBookContent.DATA_TYPE_NEW,
@@ -130,9 +132,9 @@ class ExpenditureRegistIntegrationTest {
 			"2",    // 無駄遣いB
 			"テスト食費詳細",
 			"26",   // 支払日（日のみ）
+			"001",  // 支払方法
 			new BigDecimal("3000.00"),
-			false,   // clearStartFlg
-			"001"
+			false   // clearStartFlg
 		));
 		return list;
 	}
@@ -152,9 +154,9 @@ class ExpenditureRegistIntegrationTest {
 			"1",    // 無駄遣いなし
 			"DB登録済み電気代詳細",
 			"15",   // 支払日（日のみ）
+			"001",  // 支払方法
 			new BigDecimal("8000.00"),
-			false,   // clearStartFlg
-			"001"
+			false   // clearStartFlg
 		));
 		list.add(ExpenditureRegistItem.from(
 			MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
@@ -166,9 +168,9 @@ class ExpenditureRegistIntegrationTest {
 			"1",    // 無駄遣いなし
 			"DB登録済み食費詳細",
 			"20",   // 支払日（日のみ）
+			"001",  // 支払方法
 			new BigDecimal("2000.00"),
-			true,    // clearStartFlg=true
-			"001"
+			true    // clearStartFlg=true
 		));
 		return list;
 	}

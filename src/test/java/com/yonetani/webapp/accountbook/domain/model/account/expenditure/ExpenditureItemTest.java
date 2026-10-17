@@ -53,7 +53,7 @@ class ExpenditureItemTest {
 		ExpenditureItem item = helper(
 				"user01", "2025", "11", "001", "0037", "0001",
 				"電気代", "1", "電気代詳細", LocalDate.of(2025, 11, 30),
-				new BigDecimal("12000.00"), new BigDecimal("10000.00"), "001", false);
+				 "001", new BigDecimal("12000.00"), new BigDecimal("10000.00"), false);
 
 		assertEquals("user01", item.getUserId().getValue());
 		assertEquals("2025", item.getTargetYear().getValue());
@@ -76,8 +76,8 @@ class ExpenditureItemTest {
 	void testCreateExpenditureItem_正常系_初期登録時は支出金額を支出予定金額に設定() {
 		ExpenditureRegistItem session = ExpenditureRegistItem.from(
 				"NEW", "add", "20260101120000001", "0037", "",
-				"電気代", "1", "電気代詳細", "30",
-				new BigDecimal("12000"), false, "001");
+				"電気代", "1", "電気代詳細", "30", "001",
+				new BigDecimal("12000"), false);
 
 		ExpenditureItem item = createExpenditureItem(
 				true, UserId.from("user01"), TargetYearMonth.from("202511"),
@@ -93,8 +93,8 @@ class ExpenditureItemTest {
 	void testCreateExpenditureItem_正常系_更新時は支出予定金額に0を設定() {
 		ExpenditureRegistItem session = ExpenditureRegistItem.from(
 				"LOAD", "update", "001", "0037", "",
-				"電気代", "1", "電気代詳細", "30",
-				new BigDecimal("15000"), false, "001");
+				"電気代", "1", "電気代詳細", "30", "001",
+				new BigDecimal("15000"), false);
 
 		ExpenditureItem item = createExpenditureItem(
 				false, UserId.from("user01"), TargetYearMonth.from("202511"),
@@ -109,8 +109,8 @@ class ExpenditureItemTest {
 	void testCreateExpenditureItem_正常系_clearStartFlgがtrueの場合支出金額0() {
 		ExpenditureRegistItem session = ExpenditureRegistItem.from(
 				"NEW", "add", "20260101120000001", "0051", "",
-				"食費(無駄遣いなし)", "1", "食費詳細", "05",
-				new BigDecimal("30000"), true, "999");
+				"食費(無駄遣いなし)", "1", "食費詳細", "05", "999",
+				new BigDecimal("30000"), true);
 
 		ExpenditureItem item = createExpenditureItem(
 				true, UserId.from("user01"), TargetYearMonth.from("202511"),
@@ -128,7 +128,7 @@ class ExpenditureItemTest {
 		ExpenditureItem before = helper(
 				"user01", "2025", "11", "001", "0051", "",
 				"食費(無駄遣いなし)", "1", "食費詳細", null,
-				new BigDecimal("30000.00"), new BigDecimal("10000.00"), "999", false);
+				"999", new BigDecimal("30000.00"), new BigDecimal("10000.00"), false);
 
 		ExpenditureItem after = before.addSisyutuKingaku(ExpenditureAmount.from(new BigDecimal("3000.00")));
 
@@ -143,7 +143,7 @@ class ExpenditureItemTest {
 		ExpenditureItem before = helper(
 				"user01", "2025", "11", "001", "0051", "",
 				"食費(無駄遣いなし)", "1", "食費詳細", null,
-				new BigDecimal("30000.00"), new BigDecimal("10000.00"), "999", false);
+				 "999", new BigDecimal("30000.00"), new BigDecimal("10000.00"), false);
 
 		ExpenditureItem after = before.subtractSisyutuKingaku(ExpenditureAmount.from(new BigDecimal("2000.00")));
 
@@ -157,11 +157,11 @@ class ExpenditureItemTest {
 		ExpenditureItem item1 = helper(
 				"user01", "2025", "11", "001", "0037", "0001",
 				"電気代", "1", "電気代詳細", LocalDate.of(2025, 11, 30),
-				new BigDecimal("12000.00"), new BigDecimal("10000.00"), "001", false);
+				 "001", new BigDecimal("12000.00"), new BigDecimal("10000.00"), false);
 		ExpenditureItem item2 = helper(
 				"user01", "2025", "11", "001", "0037", "0001",
 				"電気代", "1", "電気代詳細", LocalDate.of(2025, 11, 30),
-				new BigDecimal("12000.00"), new BigDecimal("10000.00"), "001", false);
+				"001", new BigDecimal("12000.00"), new BigDecimal("10000.00"), false);
 
 		assertEquals(item1, item2);
 		assertEquals(item1.hashCode(), item2.hashCode());
@@ -181,9 +181,9 @@ class ExpenditureItemTest {
 	 * @param expenditureCategory
 	 * @param expenditureDetailContext
 	 * @param paymentDate
+	 * @param paymentMethodCode
 	 * @param expectedExpenditureAmount
 	 * @param expenditureAmount
-	 * @param paymentMethodCode
 	 * @param deleteFlg
 	 * @return
 	 *
@@ -198,9 +198,9 @@ class ExpenditureItemTest {
 			String expenditureCategory,
 			String expenditureDetailContext,
 			LocalDate paymentDate,
+			String paymentMethodCode,
 			BigDecimal expectedExpenditureAmount,
 			BigDecimal expenditureAmount,
-			String paymentMethodCode,
 			boolean deleteFlg) {
 		return ExpenditureItem.from(
 				UserId.from(userId),
@@ -213,9 +213,9 @@ class ExpenditureItemTest {
 				ExpenditureCategory.from(expenditureCategory),
 				ExpenditureDetailContext.from(expenditureDetailContext),
 				PaymentDate.from(paymentDate),
+				PaymentMethodCode.from(paymentMethodCode),
 				ExpectedExpenditureAmount.from(expectedExpenditureAmount),
 				ExpenditureAmount.from(expenditureAmount),
-				PaymentMethodCode.from(paymentMethodCode),
 				DeleteFlg.from(deleteFlg));
 	}
 
@@ -244,8 +244,8 @@ class ExpenditureItemTest {
 				ExpenditureCategory.from(session.getExpenditureCategory()),
 				ExpenditureDetailContext.from(session.getExpenditureDetailContext()),
 				PaymentDate.from(targetYearMonth.getValue(), session.getSiharaiDate()),
+				PaymentMethodCode.from(session.getPaymentMethodCode()),
 				ExpenditureAmount.from(session.getExpenditureKingaku()),
-				session.isClearStartFlg(),
-				PaymentMethodCode.from(session.getPaymentMethodCode()));
+				session.isClearStartFlg());
 	}
 }

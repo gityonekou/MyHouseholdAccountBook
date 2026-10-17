@@ -12,7 +12,8 @@
  * 2026/06/07 : 1.01.00  feature-1.02-dev1   支払日(PaymentDate)がnullの場合の処理をPaymentDateの親クラス(NullableDateValue)のtoDayValue()メソッドに集約
  * 2026/06/14 : 1.02.00  feature-1.02-dev2   固定費0円対応: readInitInfo()に0円注意メッセージ追加、readRegistCheckValidateInfo()新規追加（readRegistCheckErrorSetInfo()・readZeroAmountExpenditureCheckErrorSetInfo()を統合）
  * 2026/06/14 : 1.02.01  feature-1.02-dev2   バグ修正: readRegistCheckValidateInfo()の0円チェックからACTION_TYPE_NON_UPDATEを除外（更新フローのclearStart支出誤検知修正）
- * 2026/10/12 : 1.03.00  feature-1.03-dev1   追加リファクタリング対応(リダイレクトレスポンスdtoのファクトリ引数をドメインタイプに変更)
+ * 2026/08/18 : 1.03.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/10/12 : 1.03.01  feature-1.03-dev1   追加リファクタリング対応(リダイレクトレスポンスdtoのファクトリ引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -181,13 +182,13 @@ public class IncomeAndExpenditureInitUseCase {
 							domain.getExpenditureDetailContext(),
 							// 支払日
 							domain.getFixedCostPaymentDay().getShiharaiDayValue(targetYearMonth),
+							// 支払方法コード(固定費から引き継ぐ。買い物集計8項目はここで「支払方法がない」が伝播する)
+							domain.getPaymentMethodCode().getValue(),
 							// 支払金額
 							domain.getFixedCostPaymentAmount().getValue(),
 							// 支払金額の0円開始設定フラグ
-							domain.getFixedCostKubun().isClearStart(),
-							// 支払方法コード(固定費から引き継ぐ。買い物集計8項目はここで「支払方法がない」が伝播する)
-							domain.getPaymentMethodCode().getValue()
-						)).collect(Collectors.toList());
+							domain.getFixedCostKubun().isClearStart())
+					).collect(Collectors.toList());
 
 			// レスポンスにセッションの支出登録情報を設定
 			response.setExpenditureRegistItemList(expenditureRegistItemList);
@@ -286,12 +287,12 @@ public class IncomeAndExpenditureInitUseCase {
 						domain.getExpenditureDetailContext().getValue(),
 						// 支払日(日付からDDの値を取得して設定):DBはnull可
 						domain.getPaymentDate().toDayValue(),
+						// 支払方法コード
+						domain.getPaymentMethodCode().getValue(),
 						// 支払金額
 						domain.getExpenditureAmount().getValue(),
 						// 支払金額の0円開始設定フラグ
-						false,
-						// 支払方法コード
-						domain.getPaymentMethodCode().getValue())
+						false)
 				).collect(Collectors.toList());
 		// レスポンスにセッションの支出登録情報を設定
 		response.setExpenditureRegistItemList(expenditureRegistItemList);

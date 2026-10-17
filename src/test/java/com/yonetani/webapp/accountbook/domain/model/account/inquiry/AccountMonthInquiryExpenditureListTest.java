@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/06/13 : 1.00.00  feature-1.02-dev1   新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
@@ -65,9 +66,9 @@ class AccountMonthInquiryExpenditureListTest {
 				ExpenditureCategory.from(category),
 				ExpenditureDetailContext.from(detail),
 				PaymentDate.from(paymentDate),
+				PaymentMethodCode.from("001"),
 				ExpectedExpenditureAmount.from(BigDecimal.valueOf(amount).setScale(2)),
 				ExpenditureAmount.from(BigDecimal.valueOf(amount).setScale(2)),
-				PaymentMethodCode.from("001"),
 				DeleteFlg.from(false));
 	}
 

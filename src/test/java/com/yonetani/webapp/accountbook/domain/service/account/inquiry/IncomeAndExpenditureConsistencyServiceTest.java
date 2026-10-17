@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/04/16 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */package com.yonetani.webapp.accountbook.domain.service.account.inquiry;
 
@@ -337,9 +338,9 @@ class IncomeAndExpenditureConsistencyServiceTest {
 		ExpenditureItem expenditureItem = helper(
 			"user01", "2025", "09", "001", "0001", null,
 			"テスト支出", "1", "", null,
-			BigDecimal.valueOf(10000).setScale(2),
-			BigDecimal.valueOf(10000).setScale(2),
 			"001",
+			BigDecimal.valueOf(10000).setScale(2),
+			BigDecimal.valueOf(10000).setScale(2),
 			false);
 		AccountMonthInquiryExpenditureList expenditureList =
 			AccountMonthInquiryExpenditureList.from(
@@ -469,9 +470,9 @@ class IncomeAndExpenditureConsistencyServiceTest {
 	 * @param expenditureCategory
 	 * @param expenditureDetailContext
 	 * @param paymentDate
+	 * @param paymentMethodCode
 	 * @param expectedExpenditureAmount
 	 * @param expenditureAmount
-	 * @param paymentMethodCode
 	 * @param deleteFlg
 	 * @return
 	 *
@@ -486,9 +487,9 @@ class IncomeAndExpenditureConsistencyServiceTest {
 			String expenditureCategory,
 			String expenditureDetailContext,
 			LocalDate paymentDate,
+			String paymentMethodCode,
 			BigDecimal expectedExpenditureAmount,
 			BigDecimal expenditureAmount,
-			String paymentMethodCode,
 			boolean deleteFlg) {
 		return ExpenditureItem.from(
 				UserId.from(userId),
@@ -501,9 +502,9 @@ class IncomeAndExpenditureConsistencyServiceTest {
 				ExpenditureCategory.from(expenditureCategory),
 				ExpenditureDetailContext.from(expenditureDetailContext),
 				PaymentDate.from(paymentDate),
+				PaymentMethodCode.from(paymentMethodCode),
 				ExpectedExpenditureAmount.from(expectedExpenditureAmount),
 				ExpenditureAmount.from(expenditureAmount),
-				PaymentMethodCode.from(paymentMethodCode),
 				DeleteFlg.from(deleteFlg));
 	}
 }

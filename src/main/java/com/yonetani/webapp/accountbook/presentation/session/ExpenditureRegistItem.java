@@ -6,6 +6,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2024/07/09 : 1.00.00                      新規作成
  * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.presentation.session;
@@ -55,12 +56,12 @@ public class ExpenditureRegistItem implements Serializable {
 	private final String expenditureDetailContext;
 	// 支払日(DD)
 	private final String siharaiDate;
+	// 支払方法コード
+	private final String paymentMethodCode;
 	// 支払金額
 	private final BigDecimal expenditureKingaku;
 	// 0円開始設定フラグ
 	private final boolean clearStartFlg;
-	// 支払方法コード
-	private final String paymentMethodCode;
 
 	/**
 	 *<pre>
@@ -75,9 +76,9 @@ public class ExpenditureRegistItem implements Serializable {
 	 * @param expenditureCategory 支出区分
 	 * @param expenditureDetailContext 支出詳細
 	 * @param siharaiDate 支払日(DD)
+	 * @param paymentMethodCode 支払方法コード
 	 * @param expenditureKingaku 支払金額
 	 * @param clearStartFlg 支払金額の0円開始設定フラグ
-	 * @param paymentMethodCode 支払方法コード
 	 * @return　支出登録情報
 	 *
 	 */
@@ -91,11 +92,21 @@ public class ExpenditureRegistItem implements Serializable {
 			String expenditureCategory,
 			String expenditureDetailContext,
 			String siharaiDate,
+			String paymentMethodCode,
 			BigDecimal expenditureKingaku,
-			boolean clearStartFlg,
-			String paymentMethodCode) {
-		return new ExpenditureRegistItem(dataType, action, expenditureCode, expenditureItemCode, eventCode, expenditureName,
-				expenditureCategory, expenditureDetailContext, siharaiDate, expenditureKingaku.setScale(2), clearStartFlg,
-				paymentMethodCode);
+			boolean clearStartFlg) {
+		return new ExpenditureRegistItem(
+				dataType,
+				action,
+				expenditureCode,
+				expenditureItemCode,
+				eventCode,
+				expenditureName,
+				expenditureCategory,
+				expenditureDetailContext,
+				siharaiDate,
+				paymentMethodCode,
+				expenditureKingaku.setScale(2),
+				clearStartFlg);
 	}
 }

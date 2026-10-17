@@ -8,7 +8,8 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/02/26 : 1.00.00  feature-1.00-dev00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
- * 2026/10/12 : 1.01.00  feature-1.03-dev1   ExpenditureItem.createExpenditureItem()のシグネチャ変更に伴う対応(セッションDTOからドメインタイプへの変換をUseCase側に集約)
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/10/12 : 1.01.01  feature-1.03-dev1   ExpenditureItem.createExpenditureItem()のシグネチャ変更に伴う対応(セッションDTOからドメインタイプへの変換をUseCase側に集約)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -520,12 +521,12 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 				ExpenditureDetailContext.from(expenditureRegistData.getExpenditureDetailContext()),
 				// 支払日
 				PaymentDate.from(targetYearMonth.getValue(), expenditureRegistData.getSiharaiDate()),
+				// 支払方法コード
+				PaymentMethodCode.from(expenditureRegistData.getPaymentMethodCode()),
 				// 支払金額
 				ExpenditureAmount.from(expenditureRegistData.getExpenditureKingaku()),
 				// 0円開始設定フラグ
-				expenditureRegistData.isClearStartFlg(),
-				// 支払方法コード
-				PaymentMethodCode.from(expenditureRegistData.getPaymentMethodCode()));
+				expenditureRegistData.isClearStartFlg());
 	}
 
 	/**
