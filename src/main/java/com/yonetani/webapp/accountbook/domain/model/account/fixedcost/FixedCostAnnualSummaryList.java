@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/05/23 : 1.00.00  feature-1.01-dev3   新規作成
+ * 2026/10/18 : 1.01.00  feature-1.03-dev1   支払月判定ロジック重複解消対応 shouldAdd削除、FixedCostTargetPaymentMonth#appliesToMonthに移譲
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.fixedcost;
@@ -257,7 +258,7 @@ public class FixedCostAnnualSummaryList {
 		// 該当項目を列挙型(AnnualSummaryColumn)で判定し、金額を加算
 		for (FixedCostAnnualSummaryItem item : values) {
 			// 指定した月に加算すべき固定費情報かどうかを判定
-			if (shouldAdd(item.getFixedCostTargetPaymentMonth().getValue(), month)) {
+			if (item.getFixedCostTargetPaymentMonth().appliesToMonth(month)) {
 				// 列挙型(AnnualSummaryColumn)で判定して金額を加算
 				AnnualSummaryColumn col = determineColumn(item);
 				amounts.put(col, amounts.get(col).add(item.getFixedCostPaymentAmount()));
@@ -343,40 +344,6 @@ public class FixedCostAnnualSummaryList {
 			// 想定外コード(予防的フォールバック): 生活費として分類
 			default:
 				return AnnualSummaryColumn.SEIKATSUHI;
-		}
-	}
-	
-	/**
-	 *<pre>
-	 * 固定費支払月コードと対象月の値から、その月に支払いが発生するかどうかを返します。
-	 * FixedCostInquiryList.shouldAdd() と同一ロジックになります。
-	 *</pre>
-	 * @param shiharaiTukiCode 固定費支払月コード（"00"=毎月, "20"=奇数月, "30"=偶数月, "40"=任意, "01"〜"12"=特定月）
-	 * @param monthValue 対象月（1〜12）
-	 * @return 指定した月に支払いが発生する場合true、そうでない場合false
-	 *
-	 */
-	private static boolean shouldAdd(String shiharaiTukiCode, int monthValue) {
-		
-		// 固定費支払月コードに応じて、指定した月に支払いが発生するかどうかを判定
-		switch (shiharaiTukiCode) {
-		
-			// "00" 毎月 と "40" その他任意 は常に支払いが発生(trueを返す)
-			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_EVERY_SELECTED_VALUE:
-			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE:
-				return true;
-				
-			// "20" 奇数月
-			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_ODD_SELECTED_VALUE:
-				return monthValue % 2 == 1;
-				
-			// "30" 偶数月
-			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_AN_EVEN_SELECTED_VALUE:
-				return monthValue % 2 == 0;
-				
-			// それ以外は "01"〜"12" の特定月指定と想定し、整数値に変換して比較
-			default:
-				return Integer.parseInt(shiharaiTukiCode) == monthValue;
 		}
 	}
 }

@@ -18,12 +18,12 @@
  * 2026/05/07 : 1.02.01  feature-1.01-dev2   固定費合計表示変更(奇数月/偶数月合計→3か月合計)
  * 2026/05/09 : 1.02.02  feature-1.01-dev2   リファクタリング追加対応(対象年月ドメインの集約)
  * 2026/08/18 : 1.03.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/10/18 : 1.03.01  feature-1.03-dev1   支払月判定ロジック重複解消対応 「その他任意」判定をFixedCostTargetPaymentMonth#isOptionalに移譲
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -149,12 +149,7 @@ public class FixedCostInquiryUseCase {
 				// 固定費支払月
 				searchResult.getFixedCostTargetPaymentMonth().getValue());
 		// 固定費支払月の値が「その他任意」の場合、支払月詳細の値に「"(" ＋ 「固定費支払月任意詳細」＋")"」を追加
-		if(Objects.equals(
-				// 固定費支払月の値
-				searchResult.getFixedCostTargetPaymentMonth().getValue(),
-				// コード区分：固定費支払月：その他任意(40)
-				MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE
-			)) {
+		if(searchResult.getFixedCostTargetPaymentMonth().isOptional()) {
 			// 支払月詳細の値 =「固定費支払月の値をコード変換した値」＋"(" ＋ 「固定費支払月任意詳細」＋")"
 			shiharaiTukiDetailContext += "(" + searchResult.getFixedCostTargetPaymentMonthOptionalContext().getValue() + ")";
 		}
@@ -663,9 +658,7 @@ public class FixedCostInquiryUseCase {
 			// 支払月任意詳細の値は固定費支払月の値の値に応じて以下値を設定
 			// ・「その他任意」の場合は「固定費支払月任意詳細」の値を設定
 			// ・「その他任意」以外の場合は空文字を設定
-			String shiharaiTukiOptionalContext = Objects.equals(
-					domain.getFixedCostTargetPaymentMonth().getValue(),
-					MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE)
+			String shiharaiTukiOptionalContext = domain.getFixedCostTargetPaymentMonth().isOptional()
 					? domain.getFixedCostTargetPaymentMonthOptionalContext().getValue()
 					: "";
 			// 兄弟固定費明細情報を生成して返却
@@ -706,9 +699,7 @@ public class FixedCostInquiryUseCase {
 			// 支払月任意詳細の値は固定費支払月の値の値に応じて以下値を設定
 			// ・「その他任意」の場合は「固定費支払月任意詳細」の値を設定
 			// ・「その他任意」以外の場合は空文字を設定
-			String shiharaiTukiOptionalContext = Objects.equals(
-					domain.getFixedCostTargetPaymentMonth().getValue(),
-					MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE)
+			String shiharaiTukiOptionalContext = domain.getFixedCostTargetPaymentMonth().isOptional()
 					? domain.getFixedCostTargetPaymentMonthOptionalContext().getValue()
 					: "";
 			// 一括更新対象固定費明細情報を生成して返却

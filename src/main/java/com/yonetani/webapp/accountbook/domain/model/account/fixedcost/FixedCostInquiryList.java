@@ -9,6 +9,7 @@
  * 2026/05/07 : 1.02.00  feature-1.01-dev2   合計フィールド廃止・calculateMonthlyTotal()メソッド追加
  * 2026/08/18 : 1.03.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  * 2026/09/23 : 1.03.01  feature-1.03-dev1   追加リファクタリング対応
+ * 2026/10/18 : 1.03.02  feature-1.03-dev1   支払月判定ロジック重複解消対応 shouldAdd削除、FixedCostTargetPaymentMonth#appliesToMonthに移譲
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.fixedcost;
@@ -19,7 +20,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.util.CollectionUtils;
 
-import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemName;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostDetailContext;
@@ -154,7 +154,7 @@ public class FixedCostInquiryList {
 		int monthValue = targetMonth.intValue();
 		FixedCostPaymentTotalAmount total = FixedCostPaymentTotalAmount.ZERO;
 		for (FixedCostInquiryItem item : values) {
-			if (shouldAdd(item.getFixedCostTargetPaymentMonth().getValue(), monthValue)) {
+			if (item.getFixedCostTargetPaymentMonth().appliesToMonth(monthValue)) {
 				total = total.add(item.getFixedCostPaymentAmount());
 			}
 		}
@@ -175,39 +175,8 @@ public class FixedCostInquiryList {
 			return Collections.emptyList();
 		}
 		return values.stream()
-				.filter(item -> shouldAdd(item.getFixedCostTargetPaymentMonth().getValue(), monthValue.intValue()))
+				.filter(item -> item.getFixedCostTargetPaymentMonth().appliesToMonth(monthValue.intValue()))
 				.collect(Collectors.toList());
-	}
-
-	/**
-	 * 固定費支払月コードと対象月の値から、その月に支払いが発生するかどうかを返します。
-	 * 
-	 * @param shiharaiTukiCode 固定費支払月コード（"00"=毎月, "20"=奇数月, "30"=偶数月, "40"=任意, "01"〜"12"=特定月）
-	 * @param monthValue 対象月（1〜12）
-	 * @return 指定した月に支払いが発生する場合true、そうでない場合false
-	 */
-	private static boolean shouldAdd(String shiharaiTukiCode, int monthValue) {
-		
-		// 固定費支払月コードに応じて、対象月に支払いが発生するかどうかを判定
-		switch (shiharaiTukiCode) {
-		
-			// "00" 毎月 と "40" その他任意 は常に支払いが発生(trueを返す)
-			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_EVERY_SELECTED_VALUE:
-			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE:
-				return true;
-				
-			// "20" 奇数月
-			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_ODD_SELECTED_VALUE:
-				return monthValue % 2 == 1;
-				
-			// "30" 偶数月
-			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_AN_EVEN_SELECTED_VALUE:
-				return monthValue % 2 == 0;
-				
-			// それ以外は "01"〜"12" の特定月指定と想定し、整数値に変換して比較
-			default:
-				return Integer.parseInt(shiharaiTukiCode) == monthValue;
-		}
 	}
 
 	/**
