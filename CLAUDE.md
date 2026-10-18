@@ -8,6 +8,14 @@ MyHouseholdAccountBook is a personal household account book web application buil
 
 **Tech Stack**: Spring Boot 3.0.7, Spring Security 6.0.7, MyBatis 3.0.2, Thymeleaf, Lombok, MariaDB (production), H2 (test)
 
+## Must-Follow Specifications（絶対順守）
+
+Before starting any implementation or modification work, read these in full. They are binding across all chats/sessions on this project — not passive reference material. Add new documents here as they are promoted to must-follow status.
+
+- `docs/specifications/05_DDD設計方針書.md` - DDD design policy (layering rules, aggregate boundaries, design decisions)
+- `docs/specifications/06_コーディング規約.md` - Coding conventions (file header update-history format, `@since` versioning, encoding/line-ending standard per file type, indent/brace style, Javadoc style, import order, field comments, domain factory method (`from()`) type-safety rules)
+- `docs/specifications/07_テスト方針書.md` - Project-wide test strategy (coverage targets, naming conventions, quality standards)
+
 ## Build Commands
 
 ```bash
@@ -117,40 +125,11 @@ Phase 1-5 refactoring (DDD準拠リファクタリング) is complete. Documents
 - `docs/test-data-design-rules.md` - Test data conventions
 - `docs/integration-test-guidelines.md` - UseCase integration test detailed guidelines (response verification, assertion rules, session/DB patterns)
 - `docs/DDD設計_金額クラス統合判断基準.md` - Money class design decisions
-- `docs/specifications/06_コーディング規約.md` - Coding conventions: Java file header update-history format, `@since` versioning rule, encoding/line-ending standard per file type
-- `docs/specifications/07_テスト方針書.md` - Project-wide test strategy (coverage targets, naming conventions, quality standards)
 - `docs/archive/income-expenditure-refactoring/` - Archived Phase 1-5 refactoring documents
 - `docs/archive/fixedcost/` - Archived fixed cost feature documents (Feature1.01: UseCase分割・機能追加, Feature1.02: 0円固定費対応)
 - `docs/archive/account-month-inquiry/` - Archived monthly account inquiry feature documents (Feature1.02: 支出別一覧追加)
 
-## Coding Conventions
-
-Full details: `docs/specifications/06_コーディング規約.md` (must-follow, applies across all chats/sessions on this project).
-
-- **Javaファイルヘッダの更新履歴** (java files only; other source files and .js files have no update-history header):
-  ```java
-  /**
-   * クラスの概要説明
-   *
-   *------------------------------------------------
-   * 更新履歴
-   * 日付       : version  ブランチ            コメントなど
-   * 2026/05/27 : 1.00.00  feature-1.01-dev4   新規作成
-   * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
-   *
-   */
-  ```
-  Only "日付 : version" is colon-separated; the middle digit increments once per branch (1.00→1.01→…→99→alphabetic) and resets the trailing digit to `.00`; within the same branch, each additional change adds a new line incrementing only the trailing digit (1.01.00→1.01.01→1.01.02…) — same-purpose edits within the same branch may share one line instead of adding a new one per edit, even across different dates (update the line's date to the latest edit when merging). Version resets to X.00.00 when the branch major changes (e.g. `feature-2.00.**`). Add a new line per update; never rewrite past lines.
-- **`@since` tag**: `@since 家計簿アプリ(1.03)` — the version part reflects the branch at class **creation** time only, and never changes afterward (update history above is where later changes are tracked).
-- **Encoding / line endings** (new and edited files):
-
-  | Type | Encoding | Line ending |
-  |---|---|---|
-  | java | UTF-8 | CRLF |
-  | sql | UTF-8 | LF |
-  | css | UTF-8 | LF |
-  | js | UTF-8 | LF |
-  | html | UTF-8 | CRLF |
+(`docs/specifications/05_DDD設計方針書.md` / `06_コーディング規約.md` / `07_テスト方針書.md` moved to **Must-Follow Specifications** above)
 
 ## Japanese Conventions
 
