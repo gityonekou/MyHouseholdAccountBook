@@ -16,6 +16,10 @@ Before starting any implementation or modification work, read these in full. The
 - `docs/specifications/06_コーディング規約.md` - Coding conventions (file header update-history format, `@since` versioning, encoding/line-ending standard per file type, indent/brace style, Javadoc style, import order, field comments, domain factory method (`from()`) type-safety rules)
 - `docs/specifications/07_テスト方針書.md` - Project-wide test strategy (coverage targets, naming conventions, quality standards)
 
+### Updating these specifications
+
+If work on this project surfaces something that should be added to or corrected in any of the three documents above, or in a document they reference (e.g. `docs/integration-test-guidelines.md`, `docs/test-data-design-rules.md`), do not edit it directly. Propose the specific change (what, where, why) to the user first, and apply it only after the user explicitly approves.
+
 ## Build Commands
 
 ```bash

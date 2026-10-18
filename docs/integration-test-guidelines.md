@@ -100,6 +100,20 @@ private LoginUserInfo createLoginUser() {
 }
 ```
 
+### 2.4 機能別テストクラス分離の基準
+
+1つのUseCase/Controllerクラスが複数の独立した機能（例: 通常CRUD系と一括更新系）を持ち、かつ検証に必要なテストデータSQLフィクスチャが機能ごとに異なる場合は、1クラス1ファイルにまとめず`{本体クラス名}{機能名}IntegrationTest`という命名で機能別にテストクラスを分離してよい。
+
+**分離の判断基準**:
+- 対象メソッド/エンドポイント群が機能として独立している
+- 検証に専用のテストSQLフィクスチャが必要（通常系と共用しない）
+
+**命名例**:
+- `FixedCostInquiryUseCaseIntegrationTest`（通常機能）／`FixedCostInquiryUseCaseBulkUpdateIntegrationTest`（一括更新機能のみ）
+- `FixedCostInfoManageControllerIntegrationTest`（通常機能）／`FixedCostInfoManageBulkUpdateControllerIntegrationTest`（一括更新機能のみ）
+
+分離した場合も、各テストクラスのJavadoc（セクション9）には対象メソッドを明記し、どちらのクラスがどの機能を担当するかを明確にする。
+
 ---
 
 ## 3. レスポンス検証ルール
@@ -288,6 +302,27 @@ SearchQueryUserIdAndYearMonth searchQuery = createSearchQuery("202512");
 int incomeCount = incomeRepository.countById(searchQuery);
 assertEquals(2, incomeCount, "INCOME_TABLEに2件登録されていること");
 ```
+
+### 6.1.1 代替パターン：NamedParameterJdbcTemplateによるカラム単位検証
+
+リポジトリのfind系メソッドがドメインモデル経由でしか値を公開しない場合（論理削除フラグ`DELETE_FLG`の確認、更新対象外カラムが変更されていないことの確認など）は、`@Autowired NamedParameterJdbcTemplate`で生SQLを実行し、結果を`Map<String,Object>`としてカラム名で直接検証してよい（セクション3.4.4のDataSourceテストと同じ考え方）。
+
+```java
+@Autowired
+private NamedParameterJdbcTemplate namedParamTemplate;
+
+private Map<String, Object> findFixedCostByCode(String userId, String fixedCostCode) {
+    return namedParamTemplate.queryForMap(
+        "SELECT * FROM FIXED_COST_TABLE WHERE USER_ID = :userId AND FIXED_COST_CODE = :fixedCostCode",
+        new MapSqlParameterSource().addValue("userId", userId).addValue("fixedCostCode", fixedCostCode));
+}
+
+// 論理削除フラグの確認
+Map<String, Object> after = findFixedCostByCode("user01", "0003");
+assertEquals(true, after.get("DELETE_FLG"), "論理削除によりDELETE_FLG=trueになること");
+```
+
+テスト専用のリポジトリメソッドを追加するより、検証用のprivateヘルパーメソッド（上記`findFixedCostByCode()`等）をテストクラス内に用意する方を優先する（実例: `FixedCostRegistConfirmUseCaseIntegrationTest`、`FixedCostBulkUpdateRollbackTest`）。
 
 ### 6.2 金額計算の整合性検証
 
@@ -583,6 +618,20 @@ updateList.add(IncomeRegistItem.from(NEW, ADD, null, "3", "", "取崩", 15000));
 // DELETE: 論理削除（集計から除外）
 updateList.add(IncomeRegistItem.from(LOAD, DELETE, "04", "3", "", "削除対象", 10000));
 ```
+
+### 8.9 複数件一括処理（bulk update等）のテスト観点
+
+複数件をまとめて処理するUseCase/Controllerでは、単一レコードのCRUD観点（セクション8.1）に加えて以下を検証する。
+
+| 観点 | 内容 | 例 |
+|---|---|---|
+| 部分選択 | 全件でなく一部のみ選択した場合に、選択分のみ処理されること | 2件中1件のみ選択して更新 |
+| 対象外データの不変性 | 処理対象に含まれないデータが変更されないこと | 兄弟固定費でない項目は変更なし |
+| 選択必須のバリデーション | チェックボックス等の選択リストが空の場合にエラーになること | `@NotEmpty`、未選択時のエラー確認 |
+| ループ処理中の原子性（ロールバック） | N件ループ中の一部でキー不存在等の例外が発生した場合、既に処理済みの件も含め全件ロールバックされること。`@Transactional`付きテストクラスでは証明できないため、セクション6.5のロールバック専用テストクラス分離パターンで検証する | `FixedCostBulkUpdateRollbackTest` |
+| 処理件数を含む完了メッセージ | 完了メッセージに実際の処理件数が反映されること | `"固定費を一括更新しました。[2件]"` |
+
+テストクラスの分離基準はセクション2.4を参照（一括更新機能は専用のテストSQLフィクスチャが必要になることが多いため、通常系とは別クラスに分離するのが基本）。
 
 ---
 
@@ -903,3 +952,4 @@ void testPostIncomeUpdate_ValidationError_ShowsView() throws Exception {
 | 2026-02-24 | セクション6.5「ロールバックテストのクラス分離パターン」追加（IncomeAndExpenditureRegistRollbackTestの実績から）。セクション8.5〜8.8（収入kubun別金額マッピング、clearStartFlg制御、SISYUTU_KINGAKU_TABLE集計ルール、混合アクション網羅）追加（IncomeAndExpenditureRegistConfirmIntegrationTestの実績から） |
 | 2026-02-25 | タイトル・適用範囲をController層テストを含む形に更新。目次にセクション10追加。セクション1.2適用範囲を更新（対象外からController層を削除し対象として追記）。セクション10「Controller層テストガイドライン」新規追加（standaloneSetupパターン・UseCase vs Sessionモック戦略・@BeforeEachデフォルト設定・actionフィールド注意・モデルキー名・null検証・mvn clean test必須・SQL再利用・テストケース観点）（IncomeAndExpenditureRegistControllerIntegrationTestの実績から） |
 | 2026-04-21 | セクション3.1の禁止パターンに `build() → ModelMap経由` を明示追加（`response.build().getModelMap()` パターンも禁止対象であることを明確化）（FixedCostInfoManageUseCaseIntegrationTestの実績から） |
+| 2026-10-18 | セクション2.4「機能別テストクラス分離の基準」、6.1.1「NamedParameterJdbcTemplateによるカラム単位検証」、8.9「複数件一括処理（bulk update等）のテスト観点」を新規追加（固定費管理機能のfixedcost関連UseCase/Controller統合テストの実績から） |

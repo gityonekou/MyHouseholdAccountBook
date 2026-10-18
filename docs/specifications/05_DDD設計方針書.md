@@ -1,8 +1,8 @@
 # マイ家計簿アプリケーション DDD設計方針書
 
 **作成日**: 2024年11月  
-**更新日**: 2025年11月27日（固定費管理の設計を追加）  
-**対象**: リファクタリングプロジェクト全体
+**更新日**: 2026年10月18日（固定費関連の記述を実装に合わせて修正。集約3・5.5節・7.3節。1.2節のコンテキスト図を支払方法・銀行口座管理の追加、買い物管理の実装状況に合わせて修正）  
+**対象**: 本プロジェクト全体（新規機能開発・既存コードのリファクタリングを問わない）
 
 ---
 
@@ -39,7 +39,7 @@
 
 1. **収支管理コンテキスト** - 月次・年次の収支管理、固定費管理
 2. **買い物管理コンテキスト** - 日々の買い物記録
-3. **マスタ管理コンテキスト** - 支出項目、店舗、イベント
+3. **マスタ管理コンテキスト** - 支出項目、店舗、イベント、支払方法、銀行口座
 
 #### コンテキスト図
 
@@ -57,8 +57,10 @@
 ┌─────────────────────────────────────┐
 │   買い物管理コンテキスト            │
 │                                     │
-│  ・買い物（Shopping）               │
+│  ・買い物（Shopping）※目指す設計    │
 │  ・買い物明細（ShoppingDetail）     │
+│    ※目指す設計。可変件数の明細を    │
+│      持つ構造は未実装               │
 │                                     │
 └─────────────────────────────────────┘
 
@@ -68,6 +70,8 @@
 │  ・支出項目（ExpenditureCategory）  │
 │  ・店舗（Shop）                     │
 │  ・イベント（Event）                │
+│  ・支払方法（PaymentMethod）        │
+│  ・銀行口座（BankAccount）          │
 │                                     │
 └─────────────────────────────────────┘
 ```
@@ -76,6 +80,15 @@
 - 固定費の主な目的は「支出の自動生成」
 - 収支管理機能と密接に関連
 - 単純なCRUDではなくビジネスロジック（スケジュール判定、支出生成）を持つ
+
+**支払方法・銀行口座がマスタ管理コンテキストに属する理由**:
+- 支出・固定費・買い物登録から「選択される参照用マスタ」であり、スケジュール判定のような複雑な業務ロジックを持たない
+- 店舗・イベントと同様、業務の主役ではなく他の機能から参照される位置づけ
+- （参考）実装上のパッケージは`domain.model.account.paymentmethod`/`bankaccount`に置かれており、収支管理コンテキストのパッケージ配下にあるが、コンテキストとしての位置づけはマスタ管理である（feature-1.03-dev1で追加）
+
+**買い物管理コンテキストの現状（2026年10月時点）**:
+- 現在実装されているのは「買い物登録（簡易）」（`SimpleShoppingRegistItem`、`domain.model.account.shoppingregist`配下）のみ。食料品・外食・日用品・衣料品など**固定8カテゴリの金額**を1件の登録データで保持する簡易設計であり、`Shopping`集約・可変件数の`ShoppingDetail`という本来の設計（4.2節「集約2: Shopping」参照）はまだ実装されていない
+- 4.2節・3節の`Shopping`/`ShoppingDetail`の記述は、今後この領域を拡張する際に目指すべき設計として残している（新規実装時は、簡易設計をそのまま複製するのではなく、この設計に近づける方向で検討すること）
 
 ---
 
@@ -276,70 +289,45 @@ public class Shopping {
 
 ```java
 public class FixedCost {
-    // 集約ルート
-    private FixedCostId id;
-    private UserId userId;
-    
-    // 固定費情報
-    private FixedCostName name;              // 例: "家賃"
-    private ExpenditureAmount amount;        // 例: 100,000円
-    private ExpenditureCategoryId categoryId; // 支出項目ID
-    
-    // スケジュール（重要な業務ルール）
-    private PaymentSchedule schedule;        // 値オブジェクト
-    // - 毎月X日
-    // - 年1回X月X日
-    // - 2ヶ月ごと、など
-    
-    // 有効期間
-    private ValidPeriod validPeriod;         // 値オブジェクト
-    // - 開始年月
-    // - 終了年月（Optional）
-    
+    // 固定費情報（すべて値オブジェクト）
+    private final UserId userId;
+    private final FixedCostCode fixedCostCode;
+    private final FixedCostName fixedCostName;                 // 固定費名(支払名)
+    private final FixedCostDetailContext fixedCostDetailContext;
+    private final ExpenditureItemCode expenditureItemCode;      // 支出項目コード
+    private final FixedCostKubun fixedCostKubun;                // 固定費区分
+    private final FixedCostTargetPaymentMonth fixedCostTargetPaymentMonth;   // 支払月（コード値）
+    private final FixedCostTargetPaymentMonthOptionalContext fixedCostTargetPaymentMonthOptionalContext;
+    private final FixedCostPaymentDay fixedCostPaymentDay;      // 支払日
+    private final PaymentMethodCode paymentMethodCode;
+    private final FixedCostPaymentAmount fixedCostPaymentAmount;
+
     // ビジネスメソッド
-    
+
     /**
-     * 指定月に固定費が発生するか判定
+     * 一括更新項目（支払日、支払金額）のみを更新した新しいインスタンスを返す
      */
-    public boolean shouldGenerateFor(TargetYearMonth yearMonth) {
-        return validPeriod.contains(yearMonth) 
-            && schedule.matchesMonth(yearMonth);
+    public FixedCost updateBulkUpdateItem(
+            FixedCostPaymentDay fixedCostPaymentDay,
+            FixedCostPaymentAmount fixedCostPaymentAmount) {
+        return new FixedCost(userId, fixedCostCode, fixedCostName, fixedCostDetailContext,
+                expenditureItemCode, fixedCostKubun, fixedCostTargetPaymentMonth,
+                fixedCostTargetPaymentMonthOptionalContext, fixedCostPaymentDay,
+                paymentMethodCode, fixedCostPaymentAmount);
     }
-    
+
     /**
-     * 指定月の支出を生成
+     * 支出詳細の表示値（固定費内容詳細＋支払月任意詳細）を組み立てて返す
      */
-    public Expenditure generateExpenditure(
-            TargetYearMonth yearMonth,
-            ExpenditureId newId) {
-        
-        if (!shouldGenerateFor(yearMonth)) {
-            throw new FixedCostNotApplicableException(
-                "この月には固定費は発生しません");
-        }
-        
-        // 支出エンティティを生成
-        return Expenditure.create(
-            newId,
-            ExpenditureName.of(this.name.getValue() + "（固定費）"),
-            this.amount,
-            PaymentDate.fromSchedule(yearMonth, this.schedule),
-            this.categoryId,
-            Optional.empty() // イベントなし
-        );
-    }
+    public String getExpenditureDetailContext() { /* ... */ }
 }
 ```
 
-**不変条件**:
-1. 有効期間内でのみ支出を生成可能
-2. スケジュールに合致する月のみ支出を生成
-3. 生成される支出は固定費の情報を引き継ぐ
-
-**業務ルール**:
-- 固定費は定期的な支出を表す
-- 収支自動生成時に該当月の固定費から支出を生成
-- スケジュールパターン（毎月、年次、隔月など）に応じて判定
+**設計上の判断（当初構想との違い）**:
+- 当初（Phase 3検討時点）は「指定月に固定費が発生するか」を`FixedCost`自身の`shouldGenerateFor()`で判定し、`PaymentSchedule`/`ValidPeriod`という専用の値オブジェクトで支払いパターン・有効期間を表現する構想だった
+- 実際の要件（固定費の支払月パターンは「毎月/奇数月/偶数月/特定月/その他任意」の固定区分で十分に表現でき、有効期間の概念も不要）に対してはこの構想は過剰だったため、支払月を**コード値（`FixedCostTargetPaymentMonth`）**で保持し、月への該当判定はそのVOのメソッドに持たせるシンプルな設計を採用した（8.5節「オーバーエンジニアリングの回避」の実践例）
+- そのため`FixedCost`自身には複雑な不変条件はなく、「指定月に支払いが発生するか」の判定は5.5節の`FixedCostTargetPaymentMonth`が担う
+- 固定費から支出情報への変換（収支登録画面への反映等）は、`IncomeAndExpenditureGenerationService`のような専用ドメインサービスではなく、各UseCase（`FixedCostInquiryUseCase`、`FixedCostAnnualSummaryUseCase`、`IncomeAndExpenditureInitUseCase`等）が`FixedCostTableRepository`から固定費一覧を取得し、`FixedCostTargetPaymentMonth`の判定メソッドやリポジトリの検索条件で対象月分を絞り込む形で行っている（詳細は7.3節）
 
 ### 4.3 集約の境界
 
@@ -520,181 +508,51 @@ public class TargetYearMonth {
 
 ### 5.5 固定費関連の値オブジェクト
 
-固定費のスケジュール管理と有効期間を表す値オブジェクト。
+固定費の「対象月に支払いが発生するか」の判定を担う値オブジェクト。
 
-**注記**:
-- ValidPeriod（有効期間）は将来の拡張性を考慮した設計です
-- 現状の画面では有効期間の入力項目は存在しません
-- Phase 3の固定費管理リファクタリング時に、実際の業務要件に応じて以下を判断します：
-  - ValidPeriodを実装するか
-  - シンプルに開始年月のみで運用するか
-  - 将来の拡張に備えて設計のみ残すか
+**設計の経緯**: Phase 3検討時点では、支払いパターンを`PaymentSchedule`（毎月/年次/隔月などのタイプ＋日付）、有効期間を`ValidPeriod`（開始/終了年月）という専用の値オブジェクトで表現する構想だった。実際の要件では支払月パターンは固定のコード区分（毎月/奇数月/偶数月/特定月/その他任意）で表現でき、有効期間の概念も不要だったため、よりシンプルな`FixedCostTargetPaymentMonth`（コード値＋判定メソッド）に設計を収束させた（8.5節参照）。
 
-#### PaymentSchedule（支払いスケジュール）
+#### FixedCostTargetPaymentMonth（固定費支払月）
 
 ```java
 /**
- * 支払いスケジュール
- * 固定費がいつ発生するかを定義
+ * 「固定費支払月(支払月)」項目の値を表すドメインタイプ
+ * コード値: "00"=毎月, "20"=奇数月, "30"=偶数月, "40"=その他任意, "01"〜"12"=特定月
  */
-public class PaymentSchedule {
-    private final ScheduleType type;  // MONTHLY, YEARLY, BIMONTHLY
-    private final int dayOfMonth;     // 支払日（1-31）
-    private final Optional<Integer> monthOfYear; // 年次の場合の月（1-12）
-    
-    private PaymentSchedule(ScheduleType type, int dayOfMonth, 
-                           Optional<Integer> monthOfYear) {
-        this.type = Objects.requireNonNull(type);
-        
-        if (dayOfMonth < 1 || dayOfMonth > 31) {
-            throw new InvalidValueException("支払日は1-31の範囲");
-        }
-        this.dayOfMonth = dayOfMonth;
-        
-        if (monthOfYear.isPresent()) {
-            int month = monthOfYear.get();
-            if (month < 1 || month > 12) {
-                throw new InvalidValueException("月は1-12の範囲");
-            }
-        }
-        this.monthOfYear = monthOfYear;
-    }
-    
-    /**
-     * 毎月支払いのスケジュール
-     */
-    public static PaymentSchedule monthly(int dayOfMonth) {
-        return new PaymentSchedule(ScheduleType.MONTHLY, dayOfMonth, 
-                                   Optional.empty());
-    }
-    
-    /**
-     * 年1回支払いのスケジュール
-     */
-    public static PaymentSchedule yearly(int month, int dayOfMonth) {
-        return new PaymentSchedule(ScheduleType.YEARLY, dayOfMonth, 
-                                   Optional.of(month));
-    }
-    
-    /**
-     * 2ヶ月ごと支払いのスケジュール
-     */
-    public static PaymentSchedule bimonthly(int dayOfMonth) {
-        return new PaymentSchedule(ScheduleType.BIMONTHLY, dayOfMonth, 
-                                   Optional.empty());
-    }
-    
-    /**
-     * 指定月にこのスケジュールが該当するか判定
-     */
-    public boolean matchesMonth(TargetYearMonth yearMonth) {
-        switch (type) {
-            case MONTHLY:
-                return true;  // 毎月発生
-            case YEARLY:
-                return yearMonth.getMonth() == monthOfYear.get();
-            case BIMONTHLY:
-                return yearMonth.getMonth() % 2 == 0;
-            default:
-                return false;
-        }
-    }
-    
-    public int getDayOfMonth() {
-        return dayOfMonth;
-    }
-}
+public class FixedCostTargetPaymentMonth {
+    private final String value;
 
-/**
- * スケジュールタイプ
- */
-public enum ScheduleType {
-    MONTHLY("毎月"),
-    YEARLY("年1回"),
-    BIMONTHLY("2ヶ月ごと");
-    
-    private final String displayName;
-    
-    ScheduleType(String displayName) {
-        this.displayName = displayName;
+    public static FixedCostTargetPaymentMonth from(String value) {
+        return new FixedCostTargetPaymentMonth(value);
     }
-    
-    public String getDisplayName() {
-        return displayName;
+
+    /**
+     * 指定した月(1〜12)に支払いが発生するかどうかを判定する
+     */
+    public boolean appliesToMonth(int monthValue) {
+        switch (value) {
+            case SHIHARAI_TUKI_EVERY_SELECTED_VALUE:      // "00" 毎月
+            case SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE:   // "40" その他任意
+                return true;
+            case SHIHARAI_TUKI_ODD_SELECTED_VALUE:        // "20" 奇数月
+                return monthValue % 2 == 1;
+            case SHIHARAI_TUKI_AN_EVEN_SELECTED_VALUE:    // "30" 偶数月
+                return monthValue % 2 == 0;
+            default:                                       // "01"〜"12" 特定月
+                return Integer.parseInt(value) == monthValue;
+        }
+    }
+
+    /**
+     * 「その他任意」かどうかを判定する
+     */
+    public boolean isOptional() {
+        return SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE.equals(value);
     }
 }
 ```
 
-#### ValidPeriod（有効期間）
-
-```java
-/**
- * 有効期間
- * 固定費がいつからいつまで有効かを定義
- */
-public class ValidPeriod {
-    private final TargetYearMonth startYearMonth;
-    private final Optional<TargetYearMonth> endYearMonth;
-    
-    private ValidPeriod(TargetYearMonth startYearMonth, 
-                       Optional<TargetYearMonth> endYearMonth) {
-        this.startYearMonth = Objects.requireNonNull(startYearMonth);
-        this.endYearMonth = Objects.requireNonNull(endYearMonth);
-        
-        // 終了年月は開始年月より後でなければならない
-        if (endYearMonth.isPresent()) {
-            if (!endYearMonth.get().isAfter(startYearMonth)) {
-                throw new InvalidValueException(
-                    "終了年月は開始年月より後でなければなりません");
-            }
-        }
-    }
-    
-    /**
-     * 期限なしの有効期間
-     */
-    public static ValidPeriod indefinite(TargetYearMonth startYearMonth) {
-        return new ValidPeriod(startYearMonth, Optional.empty());
-    }
-    
-    /**
-     * 期限ありの有効期間
-     */
-    public static ValidPeriod limited(TargetYearMonth startYearMonth, 
-                                     TargetYearMonth endYearMonth) {
-        return new ValidPeriod(startYearMonth, Optional.of(endYearMonth));
-    }
-    
-    /**
-     * 指定月がこの有効期間に含まれるか判定
-     */
-    public boolean contains(TargetYearMonth yearMonth) {
-        boolean afterStart = !yearMonth.isBefore(startYearMonth);
-        boolean beforeEnd = endYearMonth
-            .map(end -> !yearMonth.isAfter(end))
-            .orElse(true);  // 終了なしの場合は常にtrue
-        
-        return afterStart && beforeEnd;
-    }
-    
-    /**
-     * 有効期間が終了しているか
-     */
-    public boolean isExpired(TargetYearMonth currentYearMonth) {
-        return endYearMonth
-            .map(end -> currentYearMonth.isAfter(end))
-            .orElse(false);  // 終了なしの場合は期限切れにならない
-    }
-    
-    public TargetYearMonth getStartYearMonth() {
-        return startYearMonth;
-    }
-    
-    public Optional<TargetYearMonth> getEndYearMonth() {
-        return endYearMonth;
-    }
-}
-```
+**この設計で解決されたこと**: 以前は「対象月に支払いが発生するか」の判定ロジック（上記switch文相当）が`FixedCostInquiryList`・`FixedCostAnnualSummaryList`という2つのドメインモデルに重複実装され、「その他任意」かどうかの判定もusecase層に生値比較として複数箇所漏れていた。`FixedCostTargetPaymentMonth`に`appliesToMonth()`・`isOptional()`という振る舞いを持たせることで、判定ロジックの実体を値オブジェクトに一元化し、呼び出し側（`FixedCostInquiryList`、`FixedCostAnnualSummaryList`、各UseCase）はこのメソッドを呼ぶだけになっている（5.1節「自己検証・振る舞い」を持つ値オブジェクトの実践例。feature-1.03-dev1で対応）。
 
 ---
 
@@ -861,102 +719,20 @@ public class IncomeAndExpenditureService {
 }
 ```
 
-### 7.3 収支生成サービス（固定費連携）
+### 7.3 固定費と収支・一覧表示の連携（実装: ドメインサービスは使わない方式）
 
-固定費から支出を自動生成する責務を持つドメインサービス。
+**設計の経緯**: Phase 3検討時点では、`FixedCost`集約と`IncomeAndExpenditure`集約を協調させる専用のドメインサービス（`IncomeAndExpenditureGenerationService`）を置く構想だった。実際にはこの粒度のサービスを導入するほどの協調ロジックは発生せず、各UseCaseが直接`FixedCostTableRepository`から固定費一覧を取得し、5.5節の`FixedCostTargetPaymentMonth`の判定メソッド（またはリポジトリの検索条件）で対象月分を絞り込む、という方式に落ち着いている。8.3節「柔軟にする領域」の考え方どおり、協調ロジックが単純な場合はドメインサービスを置かず各UseCaseに委ねている一例。
 
-```java
-// domain/service/IncomeAndExpenditureGenerationService.java
-@Service
-public class IncomeAndExpenditureGenerationService {
-    
-    private final FixedCostRepository fixedCostRepository;
-    
-    public IncomeAndExpenditureGenerationService(
-            FixedCostRepository fixedCostRepository) {
-        this.fixedCostRepository = fixedCostRepository;
-    }
-    
-    /**
-     * 指定月の収支を自動生成（固定費を含む）
-     * 
-     * @param userId ユーザーID
-     * @param yearMonth 対象年月
-     * @return 生成された収支（固定費からの支出を含む）
-     */
-    public IncomeAndExpenditure generateForMonth(
-            UserId userId,
-            TargetYearMonth yearMonth) {
-        
-        // 1. 新しい収支を作成
-        IncomeAndExpenditure incomeAndExpenditure = 
-            IncomeAndExpenditure.create(
-                IncomeAndExpenditureId.of(userId, yearMonth),
-                userId,
-                yearMonth
-            );
-        
-        // 2. ユーザーの固定費を取得
-        List<FixedCost> fixedCosts = 
-            fixedCostRepository.findByUserId(userId);
-        
-        // 3. 該当月に発生する固定費から支出を生成
-        for (FixedCost fixedCost : fixedCosts) {
-            if (fixedCost.shouldGenerateFor(yearMonth)) {
-                
-                // 新しい支出IDを生成
-                ExpenditureId newId = ExpenditureId.generate();
-                
-                // 固定費から支出を生成
-                Expenditure expenditure = 
-                    fixedCost.generateExpenditure(yearMonth, newId);
-                
-                // 収支に支出を追加
-                incomeAndExpenditure.addExpenditure(expenditure);
-            }
-        }
-        
-        return incomeAndExpenditure;
-    }
-    
-    /**
-     * 既存の収支に固定費からの支出を追加
-     * 
-     * @param incomeAndExpenditure 既存の収支
-     */
-    public void addFixedCostExpenditures(
-            IncomeAndExpenditure incomeAndExpenditure) {
-        
-        UserId userId = incomeAndExpenditure.getUserId();
-        TargetYearMonth yearMonth = incomeAndExpenditure.getTargetYearMonth();
-        
-        // ユーザーの固定費を取得
-        List<FixedCost> fixedCosts = 
-            fixedCostRepository.findByUserId(userId);
-        
-        // 該当月に発生する固定費から支出を生成して追加
-        for (FixedCost fixedCost : fixedCosts) {
-            if (fixedCost.shouldGenerateFor(yearMonth)) {
-                ExpenditureId newId = ExpenditureId.generate();
-                Expenditure expenditure = 
-                    fixedCost.generateExpenditure(yearMonth, newId);
-                incomeAndExpenditure.addExpenditure(expenditure);
-            }
-        }
-    }
-}
-```
+**代表的な利用パターン**:
 
-**このサービスの責務**:
-1. FixedCost集約とIncomeAndExpenditure集約の協調
-2. 固定費のスケジュール判定
-3. 支出の自動生成と収支への追加
-4. 両集約のライフサイクルの独立性を保つ
+1. **一覧・集計表示（in-memoryフィルタ）**: `FixedCostInquiryUseCase`（固定費一覧）・`FixedCostAnnualSummaryUseCase`（年間固定費集計）は、`FixedCostTableRepository`でユーザーの固定費を全件取得し、`FixedCostInquiryList`/`FixedCostAnnualSummaryList`（いずれもdomain/model）が内部で`item.getFixedCostTargetPaymentMonth().appliesToMonth(monthValue)`を呼んで対象月の固定費を絞り込む。
 
-**使用シーン**:
-- ユースケース層から呼び出される
-- 収支の新規作成時
-- 月次の収支自動生成バッチ
+2. **収支新規登録時の初期値設定（検索条件による絞り込み）**: `IncomeAndExpenditureInitUseCase`は、対象月に該当し得る支払月コード（毎月"00"／対象月の特定コード／奇数月"20"か偶数月"30"／その他任意"40"）のリストを組み立て、`FixedCostTableRepository.findByFixedCostTargetPaymentMonthList()`の検索条件としてDB側で絞り込む。これは同じ業務ルール（どのコードが対象月に該当するか）をSQL検索条件向けに表現したものであり、`FixedCostTargetPaymentMonth.appliesToMonth()`とは別の実装になっている（将来的な統一・共通化の余地がある箇所として認識している）。
+
+**この設計の責務分担**:
+- 「対象月に支払いが発生するか」の判定ロジックの実体は`FixedCostTargetPaymentMonth`（値オブジェクト）に集約されている
+- 固定費一覧の取得・絞り込みはUseCaseごとに行い、専用のドメインサービスは置かない
+- `FixedCost`集約から`Expenditure`エンティティを直接生成する処理（`generateExpenditure()`相当）は存在しない。固定費の情報は、収支登録画面側のフォーム（`IncomeItemForm`/支出用フォーム）の初期値として引き継がれる形で連携している
 
 ---
 
@@ -1283,4 +1059,4 @@ DDD完全順守
 ---
 
 **作成者**: Claude (Anthropic)  
-**最終更新**: 2025年11月17日
+**最終更新**: 2026年10月18日
