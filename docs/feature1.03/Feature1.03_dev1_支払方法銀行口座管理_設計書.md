@@ -18,6 +18,8 @@
 | 改訂11 | `Feature1_03_dev1_設計書_要件突合レビュー_4次確認.md`（3次レビュー対応の検証で新規判明した指摘AF〜AJ）のうち、実装着手前に片付けるべき指摘AF・AGを反映。**指摘AF**：`Feature1_03_dev1_支払方法固定値_設計指針.md`5章のチェックリストが指摘U・V・Hの内容と未同期だった問題を解消。設計指針5章は「dev1着手時点の方針の記録」として以後更新しない位置づけとし、11章冒頭に「dev1完了時の実際のチェックは本節を正とする」旨を明記（設計指針側にも対応する注記を追加）。**指摘AG**：3次確認レビューファイルの指摘AC対応状況欄に「固定費名変更リスクを設計指針側の追記に含めた」という誤った記載があったことが判明（実際には未反映）。5.4.1節のHTML補足文の箇所に、固定費名の「無駄遣いB」「無駄遣いC」の文言変更で集計区分が画面エラーなく変わりうる旨の注意書きを追加し、3次確認レビューファイル側の誤記載も訂正した。**指摘AH（`Optional.ofNullable()`化）・AI（設計指針の残る未同期4点）・AJ（用語集再検証）はユーザー確認により実装フェーズで対応することとし、本改訂では設計書・設計指針への追加修正を行わない**（4次確認レビューが最終ラウンドである旨の確認を得た） |
 | 改訂12 | 突合レビュー指摘S1・S2（`schema.sql` との突合で判明）へのユーザー回答を反映。**指摘S1**：`EXPENDITURE_TABLE` に `SISYUTU_ITEM_CODE` の一意制約がない件は、アプリ側が8項目の重複登録を例外で弾いているため実データに重複行は存在しないとの回答を得た。ただし重複チェック実装前のデータが本番に残る可能性を考慮し、6.1節ステップ2に「ユーザー×対象年月あたりの抽出件数が8件であることを検証し、不一致なら移行を中断する」ロジックを移行スクリプトに組み込む方針を追加。**指摘S2**：`【更新不可予定額(アプリ更新)】` は支出項目名（`SISYUTU_ITEM_NAME` は `VARCHAR(15)` のため16文字の当該文字列は格納不可）ではなく `FIXED_COST_NAME` に含まれるユーザーの命名規約であり、収支登録処理で `EXPENDITURE_NAME` に引き継がれることが確定。あわせて **dev1着手前のソースを `アプリ更新`／`更新不可予定額` でgrepし、いずれもコード中に存在しないことを確認**したため、3.9節の「文字列依存があれば Specification に置き換える」という条件付き記述を「依存は存在しない（確認済み）」の断定形に変更。6.1節ステップ2・3に実データ例と、当該文字列を目視確認の照合材料としてのみ使い判定条件には入れない旨を明記。`Feature1_03_dev1_支払方法固定値_設計指針.md` 2.6節・`ドメイン用語集.md`「買い物集計8項目」の節にも同内容を反映 |
 | 改訂13 | `PaymentMethodInfoComponent` 関連をソースの現状に合わせて更新（dev1実装中のリファクタリング内容を取込）。**(1)** 内部クラスだった `PaymentMethodNameResolver` を `domain/service/account/paymentmethod/` へ移動し、`@Component` を付与しない通常のクラスとした（コンストラクタは `PaymentMethodInquiryList`・`BankAccountInquiryList` を受け取る）。**(2)** 解決結果の値オブジェクト `ResolvedPaymentMethodName`／`ResolvedBankAccountName` を `domain/type/account/paymentmethod/` へ移動し、「－」の保持をドメイン側に置いた（presentation層のレスポンスDTOが application層の内部クラスを参照していた依存を解消）。**(3)** 3.8節の記載を実装に一致させた（リゾルバの戻り値型の誤記、`getFixedCostPaymentMethodOptions()`・単発解決メソッド・`ShopDefaultPaymentMethodCode` 用オーバーロードの欠落を修正）。3.10節を新設 |
+| 改訂14 | dev1実装後に進められた横断的リファクタリング（ドメインモデル`from()`ファクトリのVO型安全化対応・買い物登録ドメインの見直し等。`06_コーディング規約.md`§8参照）とデグレチェックで判明した差異をソース最新化。**対象は「銀行口座マスタ管理画面」「支払方法マスタ管理画面」「収支登録画面（支出側）」の3画面を除く全セクション**（この3画面はリファクタリング・紙芝居仕様の取込みが未完了のため別途対応する）。**(1)** `PAYMENT_METHOD_TABLE`のDDL（2.1.2節）に`PAYMENT_METHOD_MEMO VARCHAR(400)`列が未反映だったため追加（備考欄には記載済みだがDDL本体に反映漏れがあった）。あわせて2.5節・3.4節・3.5節の`PaymentMethod`関連の記載にも`paymentMethodMemo`を反映。**(2)** `Shop.java`／`FixedCost.java`の`from()`ファクトリが全引数VO型に変更されていた点、`FixedCost.updateBulkUpdateItem()`の引数が`(FixedCostPaymentDay, FixedCostPaymentAmount)`に変わっていた点を3.7節・5.4.2節に反映。**(3)** `ExpenditureItem.createExpenditureItem()`が`ExpenditureRegistItem`（presentation層のセッションDTO）を直接受け取らなくなり、呼び出し元（UseCase）側でドメイン型に変換してから渡す方式に修正されていた点（ドメイン→presentation依存違反の解消）を3.7節に反映。**(4)** `ShoppingRegist.createShoppingRegist(userId, inputForm)`は買い物登録ドメインの見直し（別軸のリファクタリング）により`ShoppingRegist.from(...)`（カテゴリ別の値オブジェクトを多数引数に取る形）へ置き換わっていたため3.7節・5.6節の記載を修正（買い物登録ドメイン全体の再設計は本書のスコープ外のため詳細は踏み込まない）。**(5)** `SimpleShoppingRegistUseCase`は照会系`SimpleShoppingRegistInquiryUseCase`と登録・更新系`SimpleShoppingRegistConfirmUseCase`に分割されていたため、1.3節・5.6節・7.2節の参照をすべて修正。**(6)** 3.9節の`ShoppingAggregateSpecification`のコード例が`Pair.of(...)`のままだったが、実装では`Pair`依存がなかったため標準APIの`Map.entry(...)`に差し替えられていた（8章の実装順序が当初から想定していた代替手段どおり）ことを反映。**(7)** 8章実装順序の項目8（`ShoppingRegistExpenditureItemComponent`から`ShoppingAggregateSpecification`を切り出すリファクタリング）は現時点でも未着手であることをソースで再確認（変更なし、既知の残課題として維持） |
+| 改訂15 | 疎通確認で「紙芝居と実装画面の不一致（支払方法・引落先口座の項目欠落／順序違い）が多数あった」との報告を受け、対象画面（3画面を除く）すべてについて紙芝居・実ソースを再度突合した。**結論**：5.7節の列順記載の誤り（下記）以外に実装側の不具合は見つからず、トップ画面リンク追加・固定費関連5画面・店舗マスタ・買い物登録2画面・月別収支照会はいずれも紙芝居どおりに実装済みであることを確認した。**(1)** 5.7節の列順「支出名(区分)/支払方法/支払日/支出金額/引落先口座」が誤りだったことが判明。根拠：紙芝居`AccountBookMonth_支出別.html`のコメント（172行目）はこの順序を記載しているが、同ファイルの実際の`<th>`タグおよび実装済みソースは「支出名(区分)/**支払日**/**支払方法**/支出金額/引落先口座」の順（支払日が支払方法より先）であり、コメントと実マークアップ自体が矛盾していた。実装は実マークアップどおりで正しいため、本書を実態に合わせて訂正した。`Feature1.03_要件定義書.md`3.3節も同様に訂正。**(2)** 5.8節（新設）に、対象画面すべて（トップ画面・固定費関連5画面・店舗登録・買い物登録トップメニュー・買い物登録簡易タイプ・月別収支照会）の「ソースパス／紙芝居パス／支払方法・引落先口座の追加位置」対応表を追加し、紙芝居との突合結果（確認済み・不一致なし）を記録した。**(3)** 10章に、トップ画面へのリンク追加漏れ（紙芝居作成時の考慮漏れ）の経緯を追記。**(4)** `Feature1.03_要件定義書.md`3.2節に、「固定費登録」「買い物登録」が実際には複数の画面に分かれることの内訳表を追加し、画面の網羅性を改善した |
 
 ## 1. 概要
 
@@ -40,7 +42,7 @@
 | 拡張 | 店舗マスタ管理画面（`ShopInfoManageUseCase`） | デフォルト支払方法項目追加 |
 | 拡張 | 固定費登録画面（`FixedCostRegistConfirmUseCase`／`FixedCostInquiryUseCase`／`FixedCostMonthlyDetailUseCase`） | 支払方法選択追加、一括更新（`FixedCostBulkUpdateForm`）関連画面含む固定費関連5画面への支払方法列表示追加（5.4節） |
 | 拡張 | 収支登録画面（支出側）（`ExpenditureRegistUseCase`, `IncomeAndExpenditureInitUseCase`, `IncomeAndExpenditureRegistConfirmUseCase`） | 支払方法選択追加、固定費からの引き継ぎ、システム予約値の訂正フォーム表示制御 |
-| 拡張 | 買い物登録（簡易タイプ）画面（`SimpleShoppingRegistUseCase`） | 支払方法選択追加、店舗のデフォルト支払方法自動設定 |
+| 拡張 | 買い物登録（簡易タイプ）画面（設計時点では`SimpleShoppingRegistUseCase`。**改訂14**：現在は照会系`SimpleShoppingRegistInquiryUseCase`／登録・更新系`SimpleShoppingRegistConfirmUseCase`に分割済み） | 支払方法選択追加、店舗のデフォルト支払方法自動設定 |
 | 拡張 | 月別収支照会画面 支出別タブ（`AccountMonthInquiryUseCase`） | 「支払方法」「引落先口座」列追加 |
 | 拡張 | ユーザー初期化処理（`AdminMenuUserInfoUseCase`） | 「支払方法がない」システム行の登録 |
 
@@ -90,6 +92,8 @@ CREATE TABLE IF NOT EXISTS PAYMENT_METHOD_TABLE (
     PAYMENT_METHOD_CODE      CHAR(3),
     -- 支払方法名
     PAYMENT_METHOD_NAME      VARCHAR(50) NOT NULL,
+    -- 支払方法メモ(dev2のクレジットカードポイント減算で、設定値がある場合のみ画面表示。改訂12/改訂14)
+    PAYMENT_METHOD_MEMO      VARCHAR(400),
     -- 支払方法種別(1:現金 2:口座振替 3:クレジットカード 4:デビットカード 5:電子マネー(前払い式))
     PAYMENT_METHOD_KUBUN     CHAR(1) NOT NULL,
     -- 銀行口座コード(種別により要否が異なる。口座振替/クレジットカード/デビットカードは必須、現金/電子マネー(前払い式)はNULL可)
@@ -242,6 +246,7 @@ PaymentMethod nonePaymentMethod = PaymentMethod.from(
         accountBookUser.getUserId().getValue(),
         MyHouseholdAccountBookContent.PAYMENT_METHOD_CODE_NONE_VALUE, // "999"
         "支払方法がない",
+        null, // PAYMENT_METHOD_MEMO(改訂12/改訂14で追加した引数。システム行には設定しない)
         MyHouseholdAccountBookContent.PAYMENT_METHOD_KUBUN_CASH_SELECTED_VALUE, // "1"仮設定(現金=銀行口座不要のため下記bankAccountCodeはnullでよい)
         null, // BANK_ACCOUNT_CODE
         null, // CLOSING_DAY
@@ -455,6 +460,7 @@ BankAccountInquiryList findSelectableByUserId(SearchQueryUserId userId);
 | `userId` | `UserId` |
 | `paymentMethodCode` | `PaymentMethodCode` |
 | `paymentMethodName` | `PaymentMethodName` |
+| `paymentMethodMemo` | `PaymentMethodMemo`（**null許容**。改訂12/改訂14で追加。3.5節参照） |
 | `paymentMethodKubun` | `PaymentMethodKubun`（新規ドメインタイプ、3.5節参照） |
 | `bankAccountCode` | `BankAccountCode`（3.2で定義した型を再利用、**null許容**） |
 | `closingDay` | `ClosingDay`（null許容の新規ドメインタイプ） |
@@ -462,7 +468,7 @@ BankAccountInquiryList findSelectableByUserId(SearchQueryUserId userId);
 | `enableFlg` | `EnableFlg` |
 | `enableUpdateFlg` | `EnableUpdateFlg` |
 
-ファクトリ：`PaymentMethod.from(...)`（全 `String`/`boolean` 引数、`bankAccountCode`・`closingDay` はnull許容）。
+ファクトリ：`PaymentMethod.from(...)`（全 `String`/`boolean` 引数、`paymentMethodMemo`・`bankAccountCode`・`closingDay` はnull許容）。**`PaymentMethod`自体は06コーディング規約§8のVO型安全化対応（改訂14）の対象にはまだなっておらず、引数は現時点でも`String`/`boolean`のまま**（`Shop`／`FixedCost`等、既にVO型引数化された他クラスとは状況が異なる点に注意。3.7節参照）。
 
 `PaymentMethodKubun` の値により `bankAccountCode`／`closingDay` の要否が変わるバリデーションは **Form側の `@AssertTrue`**（3.5節の `requiresAccount()`／`requiresClosingDay()` 述語を参照して判定）で行い、ドメイン層は単体の制約（`ClosingDay` は 01～28 の2桁数字 or null。レビュー指摘①：29〜31日を起算日とする実在のクレジットカードはないため対象外）のみを持つ（`FixedCostInfoUpdateForm` の相互バリデーションパターンを踏襲）。
 
@@ -474,6 +480,7 @@ BankAccountInquiryList findSelectableByUserId(SearchQueryUserId userId);
 |--------|------|
 | `PaymentMethodCode` | `domain/type/common/Identifier` を継承する3桁数字（`BankAccountCode`と同じ`FixedCostCode`パターン。3.2節参照）。システム予約帯（990〜999）判定述語 `isSystemReserved()`／`isNotApplicable()` をサブクラス独自メソッドとして追加で持つ（詳細は2.1.2節）。**`tryFrom(String)`（`Optional<PaymentMethodCode>`を返す安全な入口。3.2節`SafeDomainFactory`参照。突合レビュー指摘AA対応）も持つ** |
 | `PaymentMethodName` | 非空・50文字以内 |
+| `PaymentMethodMemo` | **null許容**・400文字以内（`BankAccountMemo`と同じnull許容パターン。改訂12/改訂14で追加） |
 | `PaymentMethodKubun` | 下記参照（**enum**） |
 | `ClosingDay` | null許容。値ありの場合は "01"～"28" の2桁数字（レビュー指摘①） |
 | `PaymentMethodSort` | `domain/type/common/SortOrder` を継承する3桁数字（`BankAccountSort`と同じパターン。3.2節参照） |
@@ -553,10 +560,10 @@ int countByIdAndLessThanReserved(SearchQueryUserId userId);
 
 | クラス | 変更内容 |
 |--------|---------|
-| `Shop.java` | フィールド `defaultPaymentMethodCode: PaymentMethodCode`（null許容）追加。`Shop.from(...)` に引数追加 |
-| `FixedCost.java` | フィールド `paymentMethodCode: PaymentMethodCode` 追加。`FixedCost.from(...)`（2種）・`updateBulkUpdateItem()` に引数追加 |
-| `ExpenditureItem.java` | フィールド `paymentMethodCode: PaymentMethodCode` 追加。`ExpenditureItem.createExpenditureItem(...)` に引数追加（`ExpenditureRegistItem` 経由で取得）。**`addSisyutuKingaku(ExpenditureAmount)` および同種の減算メソッド（`ExpenditureItem.java:192-222`付近）も `paymentMethodCode` を現在値のままコピーするよう修正すること**（突合レビュー指摘A。`SimpleShoppingRegistUseCase`が買い物登録のたびにこれらのメソッドで金額のみを増減させてEXPENDITURE_TABLEを更新するため、対応漏れがあると買い物登録の都度、支払方法の値が消える） |
-| `ShoppingRegist.java` | フィールド `paymentMethodCode: PaymentMethodCode` 追加。`ShoppingRegist.createShoppingRegist(...)` に引数追加 |
+| `Shop.java` | フィールド `defaultPaymentMethodCode: PaymentMethodCode`（null許容）追加。`Shop.from(...)` に引数追加。**（改訂14追記）** 設計時点では`String`/`boolean`引数を想定していたが、`06_コーディング規約.md`§8のVO型安全化対応により、現在の`Shop.from(UserId, ShopCode, ShopKubunCode, ShopName, ShopDefaultPaymentMethodCode, ShopSort)`は全引数VO型になっている |
+| `FixedCost.java` | フィールド `paymentMethodCode: PaymentMethodCode` 追加。`FixedCost.from(...)`（2種）・`updateBulkUpdateItem()` に引数追加。**（改訂14追記）** `FixedCost.from(...)`は現在`UserId`/`FixedCostCode`/`FixedCostName`等、全引数VO型（§8対応）。`updateBulkUpdateItem()`も`(FixedCostPaymentDay fixedCostPaymentDay, FixedCostPaymentAmount fixedCostPaymentAmount)`とVO型引数に変更されており（5.4.2節参照）、`paymentMethodCode`等の変更しないフィールドは`.getValue()`で崩して再生成せず既存インスタンスをそのまま再利用する（witherパターンの冗長排除。§8対応と合わせて実施済み） |
+| `ExpenditureItem.java` | フィールド `paymentMethodCode: PaymentMethodCode` 追加。`ExpenditureItem.createExpenditureItem(...)` に引数追加（`ExpenditureRegistItem` 経由で取得）。**`addSisyutuKingaku(ExpenditureAmount)` および同種の減算メソッド（`ExpenditureItem.java:192-222`付近）も `paymentMethodCode` を現在値のままコピーするよう修正すること**（突合レビュー指摘A。`SimpleShoppingRegistConfirmUseCase`が買い物登録のたびにこれらのメソッドで金額のみを増減させてEXPENDITURE_TABLEを更新するため、対応漏れがあると買い物登録の都度、支払方法の値が消える）。**（改訂14追記）** `createExpenditureItem(...)`は現在`ExpenditureRegistItem`（presentation層のセッションDTO）を直接受け取らない形に修正されている（ドメイン層がpresentation層に依存する設計違反の解消）。`paymentMethodCode`は他の項目と同じく呼び出し元（UseCase）が`ExpenditureRegistItem`からドメイン型（`PaymentMethodCode`）へ変換した上で渡す。本項目は収支登録画面（支出側、本書では対象外）側のUseCase実装の話だが、`ExpenditureItem`自体は買い物登録・月別収支照会でも共有されるドメインクラスのため、シグネチャの事実のみ記録する |
+| `ShoppingRegist.java` | フィールド `paymentMethodCode: PaymentMethodCode` 追加。`ShoppingRegist.createShoppingRegist(...)` に引数追加。**（改訂14追記）** `createShoppingRegist(userId, inputForm)`という設計時点のメソッドは、買い物登録ドメインの見直し（本書のスコープ外の別軸のリファクタリング。買い物の各カテゴリをそれぞれ値オブジェクト化：`ShoppingFoodExpenditureItem`等）に伴い`ShoppingRegist.from(...)`（`Form`を直接受け取らず、カテゴリ別の値オブジェクトを個別の引数として受け取る形）に置き換わっている。`paymentMethodCode: PaymentMethodCode`が引数の1つとして存在する点は変更なし |
 | `presentation/session/ExpenditureRegistItem.java` | フィールド `paymentMethodCode: String` 追加。`from(...)` に引数追加（Serializable） |
 
 `AccountMonthInquiryExpenditureList.ExpenditureRow`（`domain/model/account/inquiry/`）にも `paymentMethodCode`／`bankAccountCode` フィールドを追加し、`ExpenditureRow.from(ExpenditureItem item)` で `item.getPaymentMethodCode()` から設定する。ただし支払方法名・口座名への変換（コード→名称）はドメイン層では行わず、UseCase層で `PaymentMethodInfoComponent`（3.8）を介して行う。
@@ -615,25 +622,26 @@ public class PaymentMethodInfoComponent {
 ```java
 public class ShoppingAggregateSpecification {
     // 支出項目コード＋支出区分(無駄遣い区分)の組み合わせ8組を1箇所に列挙する
-    private static final Set<Pair<ExpenditureItemCode, ExpenditureCategory>> TARGETS = Set.of(
-        Pair.of(ExpenditureItemCode.from(SISYUTU_ITEM_CODE_INSYOKU_VALUE), ExpenditureCategory.NON_WASTED),   // 食費(無駄遣いなし)
-        Pair.of(ExpenditureItemCode.from(SISYUTU_ITEM_CODE_INSYOKU_VALUE), ExpenditureCategory.WASTED_B),      // 食費(無駄遣いB)
-        Pair.of(ExpenditureItemCode.from(SISYUTU_ITEM_CODE_INSYOKU_VALUE), ExpenditureCategory.WASTED_C),      // 食費(無駄遣いC)
-        Pair.of(ExpenditureItemCode.from(SISYUTU_ITEM_CODE_NITIYOU_SYOUMOUHIN_VALUE), ExpenditureCategory.NON_WASTED), // 日用消耗品
-        Pair.of(ExpenditureItemCode.from(SISYUTU_ITEM_CODE_HIFUKU_VALUE), ExpenditureCategory.NON_WASTED),     // 衣類・クリーニング・靴
-        Pair.of(ExpenditureItemCode.from(SISYUTU_ITEM_CODE_JYUUKYO_SETUBI_VALUE), ExpenditureCategory.NON_WASTED), // 住居設備
-        Pair.of(ExpenditureItemCode.from(SISYUTU_ITEM_CODE_GAISYOKU_VALUE), ExpenditureCategory.NON_WASTED),   // 外食
-        Pair.of(ExpenditureItemCode.from(SISYUTU_ITEM_CODE_RYUUDOU_KEIHI_VALUE), ExpenditureCategory.NON_WASTED) // 仕事(流動経費)
+    // (Map.Entryを組み合わせの保持に使用。プロジェクトにPair型の依存がなかったため標準APIで代替。改訂14で実装に合わせて修正)
+    private static final Set<Map.Entry<ExpenditureItemCode, ExpenditureCategory>> TARGETS = Set.of(
+        Map.entry(ExpenditureItemCode.from(SISYUTU_ITEM_CODE_INSYOKU_VALUE), ExpenditureCategory.NON_WASTED),   // 食費(無駄遣いなし)
+        Map.entry(ExpenditureItemCode.from(SISYUTU_ITEM_CODE_INSYOKU_VALUE), ExpenditureCategory.WASTED_B),      // 食費(無駄遣いB)
+        Map.entry(ExpenditureItemCode.from(SISYUTU_ITEM_CODE_INSYOKU_VALUE), ExpenditureCategory.WASTED_C),      // 食費(無駄遣いC)
+        Map.entry(ExpenditureItemCode.from(SISYUTU_ITEM_CODE_NITIYOU_SYOUMOUHIN_VALUE), ExpenditureCategory.NON_WASTED), // 日用消耗品
+        Map.entry(ExpenditureItemCode.from(SISYUTU_ITEM_CODE_HIFUKU_VALUE), ExpenditureCategory.NON_WASTED),     // 衣類・クリーニング・靴
+        Map.entry(ExpenditureItemCode.from(SISYUTU_ITEM_CODE_JYUUKYO_SETUBI_VALUE), ExpenditureCategory.NON_WASTED), // 住居設備
+        Map.entry(ExpenditureItemCode.from(SISYUTU_ITEM_CODE_GAISYOKU_VALUE), ExpenditureCategory.NON_WASTED),   // 外食
+        Map.entry(ExpenditureItemCode.from(SISYUTU_ITEM_CODE_RYUUDOU_KEIHI_VALUE), ExpenditureCategory.NON_WASTED) // 仕事(流動経費)
     );
 
     /** 指定の支出項目コード・支出区分の組み合わせが買い物集計8項目に該当するか */
     public boolean isSatisfiedBy(ExpenditureItemCode itemCode, ExpenditureCategory category) {
-        return TARGETS.contains(Pair.of(itemCode, category));
+        return TARGETS.contains(Map.entry(itemCode, category));
     }
 }
 ```
 
-（`ExpenditureItemCode`/`ExpenditureCategory`の8組の実際の値は `ShoppingRegistExpenditureItemComponent` 既存コードの定数定義と完全に一致させること）
+（`ExpenditureItemCode`/`ExpenditureCategory`の8組の実際の値は `ShoppingRegistExpenditureItemComponent` 既存コードの定数定義と完全に一致させること。**改訂14時点で実装済みの内容と一致していることを確認済み**。ただし`ShoppingRegistExpenditureItemComponent`から本Specificationへの委譲リファクタリング自体（8章実装順序の項目8）は未着手のまま）
 
 > **【`【更新不可予定額(アプリ更新)】` への依存は存在しない・突合レビュー指摘S2】** 設計指針2.6・要件定義書3.3/7.3は「項目名に `【更新不可予定額(アプリ更新)】` が付くもの」という文字列ベースの説明を条件付きで残していたが、**dev1着手前のソースを `アプリ更新` / `更新不可予定額` でgrepした結果、いずれの文字列もコード中に存在しないことが確認された**（ユーザー確認済み）。したがって「文字列依存を本Specificationに置き換える」という作業は発生せず、本Specificationは最初から `(支出項目コード, 支出区分)` のみで判定する。
 >
@@ -864,7 +872,7 @@ private boolean isDefaultPaymentMethodCodeValid() {
 
 #### 5.4.1 登録・更新フォーム（`FixedCostInfoUpdateForm`）
 
-> **突合レビュー指摘A反映（運用確認により判明した重要事項）**：買い物集計8項目（3.9節）は`IncomeAndExpenditureRegistConfirmUseCase`が自動生成するものではなく、**固定費として固定費登録画面から登録する運用**（例：`IncomeAndExpenditureInitIntegrationTest_FixedCost_202510_AllRequired.sql`にある8件の固定費データ）である。毎月`IncomeAndExpenditureInitUseCase.readInitInfo()`が当月分の固定費を`ExpenditureRegistItem`として展開し（既存の「固定費から収支を生成する」仕組み）、そのまま`IncomeAndExpenditureRegistConfirmUseCase.execRegistAction()`でEXPENDITURE_TABLEにINSERTされる。**つまりEXPENDITURE_TABLE行への「支払方法がない」の設定は、固定費登録画面で支払方法＝「支払方法がない」を選んで固定費を登録した時点で決まり、固定費からの引き継ぎ（後述）でそのままEXPENDITURE_TABLEまで伝播する。** その後の買い物登録（`SimpleShoppingRegistUseCase`）による金額調整は`ExpenditureItem.addSisyutuKingaku()`等の差分更新のみで、他のフィールド（`paymentMethodCode`含む）は現在値のままコピーされるため、新たな設計対応は不要（フィールド追加時にこれらのメソッドが`paymentMethodCode`もコピーするよう実装すればよい、という実装レベルの注意点のみ）。
+> **突合レビュー指摘A反映（運用確認により判明した重要事項）**：買い物集計8項目（3.9節）は`IncomeAndExpenditureRegistConfirmUseCase`が自動生成するものではなく、**固定費として固定費登録画面から登録する運用**（例：`IncomeAndExpenditureInitIntegrationTest_FixedCost_202510_AllRequired.sql`にある8件の固定費データ）である。毎月`IncomeAndExpenditureInitUseCase.readInitInfo()`が当月分の固定費を`ExpenditureRegistItem`として展開し（既存の「固定費から収支を生成する」仕組み）、そのまま`IncomeAndExpenditureRegistConfirmUseCase.execRegistAction()`でEXPENDITURE_TABLEにINSERTされる。**つまりEXPENDITURE_TABLE行への「支払方法がない」の設定は、固定費登録画面で支払方法＝「支払方法がない」を選んで固定費を登録した時点で決まり、固定費からの引き継ぎ（後述）でそのままEXPENDITURE_TABLEまで伝播する。** その後の買い物登録（`SimpleShoppingRegistConfirmUseCase`。改訂14：設計時点の`SimpleShoppingRegistUseCase`から分割済み）による金額調整は`ExpenditureItem.addSisyutuKingaku()`等の差分更新のみで、他のフィールド（`paymentMethodCode`含む）は現在値のままコピーされるため、新たな設計対応は不要（フィールド追加時にこれらのメソッドが`paymentMethodCode`もコピーするよう実装すればよい、という実装レベルの注意点のみ）。
 >
 > この理解にもとづき、**固定費登録画面のプルダウンにのみ「支払方法がない」を選択肢として含める**（他の画面は5.5節のとおり除外を維持）。
 
@@ -924,7 +932,7 @@ private String baseFixedCostCode;
 ```
 
 - **一括更新の対象に支払方法は含めない**：`FixedCostBulkUpdateForm`に`paymentMethodCode`は追加しない。一括更新は「支払日」「支払金額」の2項目のみをチェック対象の全固定費に一律適用する機能であり、各固定費の支払方法（銀行口座・カード）は個体ごとに異なりうるため、一括で書き換える対象には含めない。
-- `FixedCost.updateBulkUpdateItem(String fixedCostPaymentDay, Integer fixedCostPaymentAmount)`（`FixedCost.java:162-174`）はシグネチャ変更なし。返却する新しい`FixedCost`は他の全フィールド（`paymentMethodCode`含む）を**元の値のまま**コピーする（既存の`sisyutuItemCode`等と同じ扱い。実装時、コピー漏れがないか特に注意する）。
+- `FixedCost.updateBulkUpdateItem(FixedCostPaymentDay fixedCostPaymentDay, FixedCostPaymentAmount fixedCostPaymentAmount)`はシグネチャ変更なし（**改訂14**：引数型は設計時点の`(String, Integer)`から、06コーディング規約§8のVO型安全化対応により`(FixedCostPaymentDay, FixedCostPaymentAmount)`に変わっている。「シグネチャ変更なし」とは本dev着手前後での意味で、本改訂時点の引数型は上記のとおり）。返却する新しい`FixedCost`は他の全フィールド（`paymentMethodCode`含む）を**元の値のまま**コピーする（既存の`sisyutuItemCode`等と同じ扱い。`paymentMethodCode`のようなVO型フィールドは`.getValue()`で崩して再生成せず既存インスタンスをそのまま再利用する。実装時、コピー漏れがないか特に注意する）。
 - **表示のみ対応**：一括更新の対象選択画面では、どの固定費がどの支払方法かをユーザーが確認できるよう、一覧に「支払方法」列を表示する（5.4.3参照）。
 
 #### 5.4.3 固定費関連の一覧・選択画面への「支払方法」列追加（レビュー指摘⑦反映）
@@ -972,7 +980,7 @@ private String baseFixedCostCode;
 ### 5.6 買い物登録（簡易タイプ）画面の拡張
 
 - `SimpleShoppingRegistInfoForm` に `@NotBlank private String paymentMethodCode;` を追加。
-- `SimpleShoppingRegistUseCase.createResponse()`（`:753-789`）で支払方法選択肢（`PaymentMethodInfoComponent.getPaymentMethodOptions()`、`findSelectableByUserId()`ベース）を追加取得しレスポンスに設定。
+- 画面表示情報生成箇所で支払方法選択肢（`PaymentMethodInfoComponent.getPaymentMethodOptions()`、`findSelectableByUserId()`ベース）を追加取得しレスポンスに設定。**（改訂14）** 設計時点では単一の`SimpleShoppingRegistUseCase.createResponse()`を想定していたが、現在は照会系`SimpleShoppingRegistInquiryUseCase`（初期表示`read()`・更新対象選択`read()`オーバーロード等）に実装されている。
 - **サーバー側バリデーション**：5.4節と同様、`SimpleShoppingRegistInfoForm` に `@AssertTrue` を追加する。買い物登録は1回の買い物実績を単一の支払方法で記録する画面であり、5.5節のような「システム予約値を選ばせる必要があるケース」は存在しないため、例外なく拒否してよい。
 
 ```java
@@ -987,7 +995,7 @@ private boolean isPaymentMethodCodeValid() {
             .orElse(true);
 }
 ```
-- `ShoppingRegist.createShoppingRegist(userId, inputForm)` で `PAYMENT_METHOD_CODE` を設定。
+- `ShoppingRegist.createShoppingRegist(userId, inputForm)` で `PAYMENT_METHOD_CODE` を設定。**（改訂14）** 買い物登録ドメインの見直し（本書スコープ外の別軸のリファクタリング）により、このメソッドは`ShoppingRegist.from(...)`（カテゴリ別の値オブジェクトを個別の引数として受け取る形。3.7節参照）に置き換わっている。登録・更新の確定処理は`SimpleShoppingRegistConfirmUseCase.execAction()`が担う。
 - **店舗のデフォルト支払方法自動設定**：G節の調査のとおり、店舗選択はサーバー往復を伴わない（店舗区分変更のみ往復）。そのためクライアントサイドJSで対応する。
   - 店舗 `<option>` 要素に `data-default-payment-method` 属性を埋め込む（`th:attr="data-default-payment-method=${item.defaultPaymentMethodCode}"`）。
   - `SimpleShoppingRegist.js` に店舗 `<select>` の `change` イベントハンドラを追加し、選択された `<option>` の `data-default-payment-method` が空でなければ支払方法 `<select>` の値をそれに設定する。
@@ -1005,15 +1013,28 @@ private boolean isPaymentMethodCodeValid() {
 
 | 現行 | 変更後 |
 |------|--------|
-| 支出名(区分) / 支払日 / 支出金額 / 訂正 / 支出詳細 | 支出名(区分) / **支払方法** / 支払日 / 支出金額 / **引落先口座** / 訂正 / 支出詳細 |
+| 支出名(区分) / 支払日 / 支出金額 / 訂正 / 支出詳細 | 支出名(区分) / 支払日 / **支払方法** / 支出金額 / **引落先口座** / 訂正 / 支出詳細 |
 
-（要件定義書3.3の列順「支出名(区分)/支払方法/支払日/支出金額/引落先口座/訂正/詳細」に合わせる）
+（**改訂14で列順を訂正**：当初「支出名(区分)/支払方法/支払日/支出金額/引落先口座/訂正/詳細」としていたが、これは紙芝居`AccountBookMonth_支出別.html`内のコメント（172行目）の記述に合わせたものだった。しかし同じ紙芝居ファイルの実際の`<th>`タグの並び、および実装済みソース（`AccountMonth.html`）は「支出名(区分)/**支払日**/**支払方法**/支出金額/引落先口座/訂正/詳細」の順になっており、コメントと実際のマークアップが矛盾していた。実装は紙芝居の実マークアップどおりに作られており正しいため、本書の記述を実態に合わせて訂正した。要件定義書3.3節も同様に訂正済み）
 
----
+### 5.8 紙芝居と実装画面の対応表（支払方法・引落先口座関連、改訂14で新設）
 
-## 6. データ移行設計
+疎通確認（2026-10時点）で、紙芝居と実装画面の間に項目の欠落・順序違いが疑われる事例が複数報告されたため、**本書に記載が薄かった画面ごとの具体的な追加位置・レイアウトを本節に一覧化する**。「銀行口座マスタ管理画面」「支払方法マスタ管理画面」「収支登録画面（支出側）」の3画面は別タスクで対応するため対象外。下表はいずれも**改訂14時点でのソース確認の結果、紙芝居どおりに実装済みであることを確認済み**（5.7節の列順以外に実装側の不具合は見つからなかった）。今後の改修でズレが生じた場合の確認基準として使用する。
 
-### 6.1 既存DBデータへの支払方法設定（要件3.4）
+| # | 画面 | ソース | 紙芝居 | 支払方法・引落先口座の追加内容と位置 |
+|---|------|--------|--------|------------------------------------|
+| 1 | トップ画面 | `templates/top/topmenu.html` | `topmenu.html` | データ項目ではなくナビゲーションリンク。「情報管理」メニューの「固定費」の次、「イベント」の後に「・銀行口座登録」「・支払方法登録」の2リンクを追加（紙芝居作成時の考慮漏れで当初リンクがなく、疎通確認で発見・追加した。10章参照） |
+| 2 | 登録済み固定費一覧 | `templates/itemmanage/fixedcost/FixedCostInfoManageInit.html` | `ManageBaseInfo/FixedCost/ManageFixedCost.html` | 一覧テーブルの列順：支出項目名／支払名／支払月／**支払日**／**支払方法**／支払金額／その他任意詳細（支払方法は支払日の次、支払金額の前）。表示のみ |
+| 3 | 月別固定費一覧 | `templates/itemmanage/fixedcost/FixedCostMonthlyDetail.html` | `ManageBaseInfo/FixedCost/FixedCostMonthlyDetail.html` | #2と同一の列順。表示のみ |
+| 4 | 選択固定費処理選択画面 | `templates/itemmanage/fixedcost/FixedCostInfoManageActSelect.html` | `ManageBaseInfo/FixedCost/ManageFixedCostActSelect.html` | 選択中固定費の単項目表示（支払日の次、支払金額の前に「支払方法：〇〇」を表示）。兄弟固定費一覧テーブルは#2と同一の列順。いずれも表示のみ |
+| 5 | 固定費登録（単票の登録・更新フォーム） | `templates/itemmanage/fixedcost/FixedCostInfoManageUpdate.html` | `ManageBaseInfo/FixedCost/ManageFixedCostUpd.html` | 入力フォームの項目順：支出項目名(表示)／支払名／支払内容詳細／固定費区分／支払月／（その他任意詳細）／**支払日**／**支払方法**／支払金額（支払方法は支払日の次、支払金額の前）。5.4.1節参照 |
+| 6 | 固定費登録（一括更新） | `templates/itemmanage/fixedcost/FixedCostBulkUpdate.html` | `ManageBaseInfo/FixedCost/ManageFixedCostBulkUpd.html` | 更新対象一覧テーブルの列順：選択／支払名／支払月／現在の支払日／**現在の支払方法**／現在の支払金額／その他任意詳細（支払方法は支払日の次、支払金額の前）。**一括適用値の入力項目には追加しない**（5.4.2節参照。各固定費の支払方法は個体ごとに異なりうるため） |
+| 7 | 店舗登録 | `templates/itemmanage/ShopInfoManage.html` | `ManageBaseInfo/ManageShop/ManageShop.html` | 登録フォーム：店舗区分／店舗名／**デフォルト支払方法（任意）**／表示順（店舗名の次、表示順の前）。一覧テーブルの列順：表示順／店舗区分／店舗名／**デフォルト支払方法**（店舗名の次、末尾）。引落先口座列は追加しない（デフォルト支払方法名のみで表示を兼ねる） |
+| 8 | 買い物登録トップメニュー画面 | `templates/account/regist/ShoppingRegistTopMenu.html` | `AccountBook/ShoppingRegist/ShoppingRegistInit.html` | 「登録済み買い物一覧」テーブルの列順：日付／店舗名／**支払方法**／食料品(必須)／…／合計金額（支払方法は店舗名の次、食料品(必須)の前）。表示のみ（`SimpleShoppingRegistListComponent`を介して買い物登録簡易タイプ画面と共通のロジックで解決する） |
+| 9 | 買い物登録（簡易タイプ）画面 | `templates/account/regist/SimpleShoppingRegist.html` | `AccountBook/ShoppingRegist/ShoppingRegistKani.html` | 入力フォーム：店舗区分／店舗名／**支払方法**／買い物日（店舗名の次、買い物日の前）。「登録済み買い物一覧」テーブルの列順は#8と同一。5.6節参照 |
+| 10 | 月別収支照会（支出別タブ） | `templates/account/inquiry/AccountMonth.html` | `AccountBook/AccountBookMonth_支出別.html` | 支出一覧テーブルの列順：支出名(区分)／支払日／**支払方法**／支出金額／**引落先口座**／訂正／支出詳細（支払方法は支払日の次、支出金額の前。引落先口座は支出金額の次、訂正の前）。5.7節参照 |
+
+> **引落先口座列について**：「引落先口座」列を独立して追加しているのは月別収支照会（#10）のみ。他の一覧画面（固定費関連・店舗・買い物登録）は「支払方法」列（支払方法名、または店舗のデフォルト支払方法名）のみで、別途「引落先口座」列は追加しない。理由：固定費・買い物登録の各一覧は個々の支払方法名（ユーザーが任意に命名した名称。例「ドコモSMTBネット銀行　口座振替」）がそのまま表示されれば十分であり、月別収支照会（dev2の口座別支払確認の前段として銀行口座ごとの集計が今後必要になる画面）のみ口座名を別列で明示する設計になっている。
 
 `FIXED_COST_TABLE`・`EXPENDITURE_TABLE`・`SHOPPING_REGIST_TABLE` への `PAYMENT_METHOD_CODE NOT NULL` カラム追加に伴い、既存データへの一括設定が必要。
 
@@ -1067,7 +1088,7 @@ private boolean isPaymentMethodCodeValid() {
 ### 7.1 ドメイン層（Unit）
 
 - `PaymentMethodNameResolver`：マスタ一覧から直接生成し、システム予約値・銀行口座コードnull・未登録コードがいずれも「－」になること、口座を持つ支払方法が銀行口座名を解決することを検証（DBアクセスなし。改訂13で `PaymentMethodInfoComponentTest` から分離）
-- `BankAccountCode`・`BankAccountSort`・`BankName`・`BankAccountMemo`・`PaymentMethodCode`・`PaymentMethodName`・`ClosingDay`・`PaymentMethodSort`・`EnableFlg` 各ドメインタイプのバリデーション境界値テスト
+- `BankAccountCode`・`BankAccountSort`・`BankName`・`BankAccountMemo`・`PaymentMethodCode`・`PaymentMethodName`・`PaymentMethodMemo`・`ClosingDay`・`PaymentMethodSort`・`EnableFlg` 各ドメインタイプのバリデーション境界値テスト（`PaymentMethodMemo`は改訂12/改訂14で追加。`PaymentMethodMemoTest`で実装済み）
 - `PaymentMethodKubun`（enum）：`from()` の全コード値網羅、`requiresAccount()`／`requiresClosingDay()` を5種別分すべて検証（電子マネー（前払い式）が `requiresAccount()=false` であることを含む）
 - `BankAccount`／`PaymentMethod` の `from()` テスト（`bankAccountCode`・`closingDay` がnullのケースを含む）
 - `PaymentMethod` の `closingDay`／`bankAccountCode` null許容パターンのテスト
@@ -1088,7 +1109,7 @@ private boolean isPaymentMethodCodeValid() {
 - `IncomeAndExpenditureInitUseCaseIntegrationTest`：固定費→収支登録の支払方法引き継ぎ検証の追加。特に、支払方法「支払方法がない」を設定した固定費（買い物集計8項目相当）から生成された`ExpenditureRegistItem`が`paymentMethodCode=999`を保持することの確認（突合レビュー指摘A）
 - `IncomeAndExpenditureRegistConfirmUseCaseIntegrationTest`：EXPENDITURE_TABLEへの支払方法保存検証の追加。固定費由来の`paymentMethodCode=999`の行がそのままINSERTされることの確認（突合レビュー指摘A）
 - `ExpenditureRegistUseCaseIntegrationTest`：支払方法プルダウンの選択肢にシステム予約値が含まれないことの確認、支払方法コードがシステム予約値の行（DBロード済み・固定費由来の未保存セッション行の両方）を収支登録画面で表示した場合にdisabled表示となり値が維持されることの確認（5.5節・突合レビュー指摘A）、支払方法コードが無効化済み（`ENABLE_FLG=false`）の行を訂正フォームで開いた場合も同様にdisabled表示となることの確認（突合レビュー指摘D）
-- `SimpleShoppingRegistUseCaseIntegrationTest`：支払方法必須チェック・デフォルト支払方法反映（サーバー側で解決した選択肢に含まれるか）の追加、システム予約値を送信した場合にバリデーションエラーになることの確認、**買い物登録（新規・更新）による金額調整後もEXPENDITURE_TABLE行の`paymentMethodCode`（`999`を含む）が変化しないことの確認（突合レビュー指摘A。`ExpenditureItem.addSisyutuKingaku()`等のフィールドコピー漏れ検知）**、無効化された支払方法を参照する既存の買い物登録データを更新フォームで開いた場合にdisabled表示となり値が維持されることの確認（突合レビュー指摘D）
+- `SimpleShoppingRegistConfirmUseCaseIntegrationTest`／`SimpleShoppingRegistInquiryUseCaseIntegrationTest`（**改訂14**：設計時点では単一の`SimpleShoppingRegistUseCaseIntegrationTest`を想定していたが、UseCase分割に合わせてテストクラスも照会系・登録・更新系に分割済み）：支払方法必須チェック・デフォルト支払方法反映（サーバー側で解決した選択肢に含まれるか）の追加、システム予約値を送信した場合にバリデーションエラーになることの確認、**買い物登録（新規・更新）による金額調整後もEXPENDITURE_TABLE行の`paymentMethodCode`（`999`を含む）が変化しないことの確認（突合レビュー指摘A。`ExpenditureItem.addSisyutuKingaku()`等のフィールドコピー漏れ検知）**、無効化された支払方法を参照する既存の買い物登録データを更新フォームで開いた場合にdisabled表示となり値が維持されることの確認（突合レビュー指摘D）
 - `AccountMonthInquiryIntegrationTest`：支出別タブの支払方法・引落先口座名表示の追加、支払方法コードがシステム予約値の行が「－」表示になることの確認
 - `PaymentMethodInfoComponentTest`（新規）：`createResolver()`が1回のDB呼び出し（`findByUserId()`・`BankAccountTableRepository.findById(SearchQueryUserId)`各1回）で複数コードを解決できることの確認（レビュー指摘④。モックのリポジトリ呼び出し回数を検証）
 
@@ -1143,6 +1164,7 @@ private boolean isPaymentMethodCodeValid() {
 
 - フル版買い物登録（`ShoppingRegist.html`／`ShoppingRegistUseCase`）は現状未実装のスタブのため、本devのスコープ外。将来実装時は簡易タイプと同じ拡張方針を適用する。
 - `codetable.csv` はGit管理外の外部ファイルのため、コード変更のみでは支払方法種別の選択肢は反映されない。local/test/prod 各環境のファイル更新を別途実施すること。
+- **【疎通確認指摘・改訂14】トップ画面（`topmenu.html`）に新規画面への遷移リンクが抜けていた**：紙芝居作成工程で、新規作成する銀行口座マスタ管理画面・支払方法マスタ管理画面への遷移リンクをトップ画面に追加する考慮が漏れていた（紙芝居側は疎通確認時にユーザーが追加）。実装側（`templates/top/topmenu.html`）の「情報管理」メニューに「・銀行口座登録」「・支払方法登録」の2リンクを追加して対応済み（5.8節#1参照）。要件定義書3.2節にも追記済み。
 - dev2（クレカポイント減算・口座別支払確認）は本devで登録される支払方法マスタの「クレジットカード種別・集計開始日・銀行口座紐づけ」データを前提とするため、本devの完了後に着手する。
 - **【疎通確認指摘・改訂12】支払方法マスタに「支払方法メモ」項目を追加**：`PAYMENT_METHOD_TABLE`に`PAYMENT_METHOD_MEMO VARCHAR(400)`（null可）を`PAYMENT_METHOD_NAME`と`PAYMENT_METHOD_KUBUN`の間に追加（`PaymentMethodMemo`ドメインタイプ、`BankAccountMemo`と同じパターンで新設）。支払方法マスタ管理画面にtextarea入力欄として実装済み（一覧表示は対象外）。**この項目はdev2の「クレジットカードポイント減算」機能で、設定値がある場合のみ画面表示する用途を想定**しており、dev2設計開始時に紙芝居（クレカポイント減算画面）の再修正が必要（現状の紙芝居より入力項目を増やす方針）。
 - **【dev2への申し送り・突合レビュー指摘N】口座別支払確認（要件4.3）の集計軸と、現金・電子マネー（前払い式）の銀行口座なし設計の関係**：要件4.3の口座別支払確認は「銀行名」を行の軸とする表（口座振替／クレジットカード／現金＋その他の列を持つ）だが、支払方法種別「現金」「電子マネー（前払い式）」は`BANK_ACCOUNT_CODE = NULL`（銀行口座を持たない）ため、これらの支出はどの銀行の行にも属さない。初版では「支払方法がない」行が参照するダミー銀行口座（`BANK_ACCOUNT_CODE="999"`＝「口座なし」システム行）を検討していたが、電子マネー対応（確認事項①の解消）でこの受け皿は廃止した。**本devでは銀行口座マスタにダミーのシステム行を追加する方式は採用しない**（この判断は変更しない）。dev2の設計時に、現金・電子マネーの支出を「（口座なし）」等の独立行として表示するか、口座別集計の対象外（別枠で合計表示等）とするかを決定すること。要件4.3の表自体には現金・電子マネーの受け皿が明記されていない点も、dev2の設計時に要件定義書側の記述を補うことが望ましい。
