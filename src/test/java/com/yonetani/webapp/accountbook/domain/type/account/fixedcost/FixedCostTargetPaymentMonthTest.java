@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/10/18 : 1.00.00  feature-1.03-dev1   新規作成
+ * 2026/10/31 : 1.00.01  feature-1.03-dev1   isDetailRequired()のテストを追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.fixedcost;
@@ -32,6 +33,9 @@ import org.junit.jupiter.api.Test;
  * [テストシナリオ(isOptional)]
  *   ⑦ その他任意(40) → true
  *   ⑧ その他任意以外(00/20/30/11) → false
+ * [テストシナリオ(isDetailRequired)]
+ *   ⑨ その他任意(40) → true
+ *   ⑩ その他任意以外(00) → false
  *
  *</pre>
  *
@@ -149,5 +153,27 @@ class FixedCostTargetPaymentMonthTest {
 		assertFalse(FixedCostTargetPaymentMonth.from("20").isOptional(), "奇数月(20)はfalse");
 		assertFalse(FixedCostTargetPaymentMonth.from("30").isOptional(), "偶数月(30)はfalse");
 		assertFalse(FixedCostTargetPaymentMonth.from("11").isOptional(), "特定月(11)はfalse");
+	}
+
+	/**
+	 *<pre>
+	 * テスト⑨：その他任意(40) → isDetailRequiredはtrue
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("⑨ isDetailRequired: その他任意(40) → true")
+	void testIsDetailRequiredTrue() {
+		assertTrue(FixedCostTargetPaymentMonth.from("40").isDetailRequired(), "その他任意(40)はtrue");
+	}
+
+	/**
+	 *<pre>
+	 * テスト⑩：その他任意以外(00) → isDetailRequiredはfalse
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("⑩ isDetailRequired: その他任意以外(00) → false")
+	void testIsDetailRequiredFalse() {
+		assertFalse(FixedCostTargetPaymentMonth.from("00").isDetailRequired(), "毎月(00)はfalse");
 	}
 }

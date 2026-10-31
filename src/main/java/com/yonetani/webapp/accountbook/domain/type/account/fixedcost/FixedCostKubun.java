@@ -5,14 +5,17 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2024/09/23 : 1.00.00                      新規作成
+ * 2026/10/25 : 1.01.00  feature-1.03-dev1   tryFrom()・requiresPositiveAmount()追加(FixedCostInfoUpdateFormの相関チェックのドメイン層移動対応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.fixedcost;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.common.SafeDomainFactory;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -55,7 +58,20 @@ public class FixedCostKubun {
 		}
 		return new FixedCostKubun(kubun);
 	}
-	
+
+	/**
+	 *<pre>
+	 * 「固定費区分」項目の値を表すドメインタイプの生成を試みます。
+	 * 不正な値(1 or 2以外)の場合は例外を発生させずOptional.empty()を返します。
+	 *</pre>
+	 * @param kubun 固定費区分
+	 * @return 生成に成功した場合は値ありのOptional、不正な値の場合はOptional.empty()
+	 *
+	 */
+	public static Optional<FixedCostKubun> tryFrom(String kubun) {
+		return SafeDomainFactory.tryCreate(() -> FixedCostKubun.from(kubun));
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -63,18 +79,40 @@ public class FixedCostKubun {
 	public String toString() {
 		return value;
 	}
-	
+
 	/**
 	 *<pre>
 	 * 固定費区分の設定内容が「2(予定支払い金額(支出金額は0円で初期登録)」の場合、true、それ以外の場合はfalseを返します。
-	 * 
+	 *
 	 * 月毎の支出情報初期登録時に対象の支出項目の支出金額を0円、支出予定金額を設定されている支出金額にする場合の判定に用います。
-	 * 
+	 *
 	 *</pre>
 	 * @return
 	 *
 	 */
 	public boolean isClearStart() {
+		// 固定費区分の設定内容が「2(予定支払い金額(支出金額は0円で初期登録)」の場合、true
+		if(Objects.equals(value, MyHouseholdAccountBookContent.FIXED_COST_ESTIMATE_SELECTED_VALUE)) {
+			return true;
+		// 上記以外の場合、false
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 *<pre>
+	 * 固定費区分の設定内容が「2(予定支払い金額(支出金額は0円で初期登録)」の場合、true、それ以外の場合はfalseを返します。
+	 *
+	 * 「予定支払い金額」で登録する固定費は支払金額が未確定のまま登録されるため、0円のままでは金額未入力と区別できません。
+	 * そのため、固定費登録・更新画面の入力チェック(支払金額に1円以上の入力を必須とするかどうか)の判定に用います。
+	 * (isClearStart()と条件は同じですが、月次初期登録時の支出金額クリア判定と画面入力チェックという別の業務目的を表すため、
+	 *  意図を明確にする別メソッドとして用意しています)
+	 *</pre>
+	 * @return 固定費区分が「予定支払い金額」の場合、支払金額に0円を許容しない:true、それ以外:false
+	 *
+	 */
+	public boolean requiresPositiveAmount() {
 		// 固定費区分の設定内容が「2(予定支払い金額(支出金額は0円で初期登録)」の場合、true
 		if(Objects.equals(value, MyHouseholdAccountBookContent.FIXED_COST_ESTIMATE_SELECTED_VALUE)) {
 			return true;

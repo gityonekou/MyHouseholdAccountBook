@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2025/12/23 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/10/31 : 1.01.00  feature-1.03-dev1   tryFrom(Integer)のテストを追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.fixedcost;
@@ -12,6 +13,7 @@ package com.yonetani.webapp.accountbook.domain.type.account.fixedcost;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -124,5 +126,24 @@ class FixedCostPaymentAmountTest {
 		);
 		assertTrue(exception.getMessage().contains("支払金額"));
 		assertTrue(exception.getMessage().contains("スケール"));
+	}
+
+	@Test
+	@DisplayName("正常系：tryFrom(Integer)は正の金額・0円で値ありのOptionalを返す")
+	void testTryFrom_正常系() {
+		Optional<FixedCostPaymentAmount> amount = FixedCostPaymentAmount.tryFrom(10000);
+		Optional<FixedCostPaymentAmount> zero = FixedCostPaymentAmount.tryFrom(0);
+
+		assertTrue(amount.isPresent());
+		assertEquals(new BigDecimal("10000.00"), amount.get().getValue());
+		assertTrue(zero.isPresent());
+		assertTrue(zero.get().isZero());
+	}
+
+	@Test
+	@DisplayName("異常系：tryFrom(Integer)はnull値・マイナス値でOptional.empty()を返す")
+	void testTryFrom_異常系() {
+		assertTrue(FixedCostPaymentAmount.tryFrom(null).isEmpty());
+		assertTrue(FixedCostPaymentAmount.tryFrom(-1000).isEmpty());
 	}
 }

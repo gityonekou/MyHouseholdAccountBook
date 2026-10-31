@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/03/15 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/10/31 : 1.01.00  feature-1.03-dev1   isOptional()・isDetailRequired()のテストを追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.income;
@@ -74,5 +75,41 @@ class IncomeCategoryTest {
 	@DisplayName("正常系：toStringは値の文字列表現を返す")
 	void testToString() {
 		assertEquals("1", IncomeCategory.from("1").toString());
+	}
+
+	@Test
+	@DisplayName("正常系：isOptionalはその他任意(9)の場合trueを返す")
+	void testIsOptional_正常系_その他任意() {
+		assertTrue(IncomeCategory.from("9").isOptional());
+	}
+
+	@Test
+	@DisplayName("正常系：isOptionalはその他任意(9)以外の場合falseを返す")
+	void testIsOptional_正常系_その他任意以外() {
+		assertFalse(IncomeCategory.from("1").isOptional());
+	}
+
+	@Test
+	@DisplayName("正常系：isOptionalはnull値の場合falseを返す")
+	void testIsOptional_正常系_null値() {
+		assertFalse(IncomeCategory.from(null).isOptional());
+	}
+
+	@Test
+	@DisplayName("正常系：isDetailRequiredはその他任意(9)の場合trueを返す")
+	void testIsDetailRequired_正常系_その他任意() {
+		assertTrue(IncomeCategory.from("9").isDetailRequired());
+	}
+
+	@Test
+	@DisplayName("正常系：isDetailRequiredはその他任意(9)以外の場合falseを返す")
+	void testIsDetailRequired_正常系_その他任意以外() {
+		assertFalse(IncomeCategory.from("1").isDetailRequired());
+	}
+
+	@Test
+	@DisplayName("正常系：isDetailRequiredはnull値の場合falseを返す")
+	void testIsDetailRequired_正常系_null値() {
+		assertFalse(IncomeCategory.from(null).isDetailRequired());
 	}
 }

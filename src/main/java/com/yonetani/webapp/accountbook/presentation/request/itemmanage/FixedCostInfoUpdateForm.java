@@ -8,22 +8,23 @@
  * 2024/05/22 : 1.00.00                      新規作成
  * 2026/06/14 : 1.01.00  feature-1.02-dev2   固定費0円対応: @Min(1)→@Min(0)、@AssertTrue isValidShiharaiKingakuForKubun()追加
  * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/10/31 : 1.02.01  feature-1.03-dev1   相関チェック3件の判定ロジックをドメイン層(FixedCostTargetPaymentMonth/FixedCostKubun/FixedCostPaymentAmount)に移動。isPaymentMethodCodeValid()はFixedCostName/ExpenditureItemCodeにtryFrom()を追加し置き換え
  *
  */
 package com.yonetani.webapp.accountbook.presentation.request.itemmanage;
 
-import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.util.StringUtils;
 
-import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ShoppingAggregateSpecification;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCategory;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostKubun;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostName;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonth;
 import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
-import com.yonetani.webapp.accountbook.domain.type.common.SafeDomainFactory;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
@@ -84,18 +85,20 @@ public class FixedCostInfoUpdateForm {
 	/**
 	 * 相関チェック(支払月でその他任意を選択した場合、支払月任意詳細は必須)
 	 *
+	 * 支払月任意詳細の入力を必須とするかどうかの判定ロジックの実体はドメイン層の
+	 * {@link FixedCostTargetPaymentMonth#isDetailRequired()}に集約されている(05_DDD設計方針書.md 5.5節参照)。
+	 *
 	 * @return その他任意を選択した場合で支払月任意詳細の設定ありならtrue、空ならfalse
 	 */
 	@AssertTrue(message = "その他任意が未選択か支払月任意詳細が未入力です。")
 	public boolean isNeedCheckShiharaiTukiOptionalContext() {
+		boolean isDetailRequired = FixedCostTargetPaymentMonth.from(shiharaiTuki).isDetailRequired();
 		// 支払月の値がその他任意(40)で支払月任意詳細が未入力の場合、false
-		if(Objects.equals(shiharaiTuki, MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE)
-				&& !StringUtils.hasLength(shiharaiTukiOptionalContext)) {
+		if(isDetailRequired && !StringUtils.hasLength(shiharaiTukiOptionalContext)) {
 			return false;
 		}
-		// 支払月任意詳細が入力ありで支払月の値がその他任意(40)以外の場合、false
-		if(StringUtils.hasLength(shiharaiTukiOptionalContext)
-				&& !Objects.equals(shiharaiTuki, MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE)) {
+		// 支払月の値がその他任意(40)以外で支払月任意詳細が入力ありの場合、false
+		if(!isDetailRequired && StringUtils.hasLength(shiharaiTukiOptionalContext)) {
 			return false;
 		}
 		// 上記以外はチェック結果OK:trueを返却
@@ -105,14 +108,26 @@ public class FixedCostInfoUpdateForm {
 	/**
 	 * 相関チェック(固定費区分が「予定支払い金額」の場合、支払金額に0円は設定不可)
 	 *
+	 * 固定費区分が「予定支払い金額」かどうかの判定ロジックの実体は{@link FixedCostKubun#requiresPositiveAmount()}に、
+	 * 支払金額が0円かどうかの判定ロジックの実体は{@link FixedCostPaymentAmount#isZero()}に集約されている。
+	 *
 	 * @return 固定費区分が予定支払い金額以外の場合、または支払金額が1円以上の場合はtrue、
 	 *         固定費区分が予定支払い金額かつ支払金額が0円の場合はfalse
 	 */
 	@AssertTrue(message = "固定費区分が「予定支払い金額」の場合、支払金額に0円は設定できません。")
 	public boolean isValidShiharaiKingakuForKubun() {
+		if (!StringUtils.hasLength(fixedCostKubun)) {
+			return true; // 未入力は@NotBlank側で検出
+		}
+		// tryFrom()により、不正な形式値でも例外が伝播せず500エラーにならない
+		Optional<FixedCostKubun> kubun = FixedCostKubun.tryFrom(fixedCostKubun);
+		if (kubun.isEmpty() || !kubun.get().requiresPositiveAmount()) {
+			return true; // 形式不正、または予定支払い金額以外はここでは判定不要
+		}
+		// tryFrom()により、null・マイナス値でも例外が伝播せず500エラーにならない(@NotNull/@Min側で検出)
+		Optional<FixedCostPaymentAmount> amount = FixedCostPaymentAmount.tryFrom(shiharaiKingaku);
 		// 固定費区分が「予定支払い金額(2)」かつ支払金額が0円の場合、false
-		if (Objects.equals(fixedCostKubun, MyHouseholdAccountBookContent.FIXED_COST_ESTIMATE_SELECTED_VALUE)
-				&& shiharaiKingaku != null && shiharaiKingaku == 0) {
+		if (amount.isPresent() && amount.get().isZero()) {
 			return false;
 		}
 		// 上記以外はチェック結果OK:trueを返却
@@ -129,7 +144,7 @@ public class FixedCostInfoUpdateForm {
 	 * @return 検証結果
 	 */
 	@AssertTrue(message = "「支払方法がない」は買い物集計8項目専用の固定費にのみ設定できます。")
-	private boolean isPaymentMethodCodeValid() {
+	public boolean isPaymentMethodCodeValid() {
 		// paymentMethodCode・sisyutuItemCode・fixedCostNameの3つとも、このメソッドが参照する可能性がある
 		// (@AssertTrueは他フィールドの@NotBlank違反があっても実行されるため、3つとも明示的にガードする)
 		if (!StringUtils.hasLength(paymentMethodCode)
@@ -143,10 +158,9 @@ public class FixedCostInfoUpdateForm {
 			return true; // 形式不正、または通常の支払方法はここでは判定不要
 		}
 		// システム予約値が選択された場合のみ、対象8項目かどうかを判定する。
-		// FixedCostName・ExpenditureItemCodeは既存(Feature1.03以前)の型でtryFrom()を持たないため、
-		// SafeDomainFactory.tryCreate()で直接包む
-		Optional<FixedCostName> name = SafeDomainFactory.tryCreate(() -> FixedCostName.from(fixedCostName));
-		Optional<ExpenditureItemCode> itemCode = SafeDomainFactory.tryCreate(() -> ExpenditureItemCode.from(sisyutuItemCode));
+		// tryFrom()により、不正な形式値でも例外が伝播せず500エラーにならない
+		Optional<FixedCostName> name = FixedCostName.tryFrom(fixedCostName);
+		Optional<ExpenditureItemCode> itemCode = ExpenditureItemCode.tryFrom(sisyutuItemCode);
 		if (name.isEmpty() || itemCode.isEmpty()) {
 			return true; // 形式不正はsisyutuItemCode/fixedCostNameそれぞれの既存チェックで弾かれる想定
 		}

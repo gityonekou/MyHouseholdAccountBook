@@ -7,6 +7,7 @@
  * 2024/06/03 : 1.00.00                      新規作成
  * 2026/04/05 : 1.01.00  feature-1.00-dev00  リファクタリング対応 クラス名をFixedCostShiharaiTukiからFixedCostTargetPaymentMonthにリネーム
  * 2026/10/18 : 1.02.00  feature-1.03-dev1   支払月判定ロジック重複解消対応 appliesToMonth/isOptionalメソッド追加
+ * 2026/10/31 : 1.02.01  feature-1.03-dev1   isDetailRequired()追加(FixedCostInfoUpdateFormの相関チェックのドメイン層移動対応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.fixedcost;
@@ -87,6 +88,21 @@ public class FixedCostTargetPaymentMonth {
 	 *
 	 */
 	public boolean isOptional() {
+		return MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE.equals(value);
+	}
+
+	/**
+	 *<pre>
+	 * 支払月任意詳細の入力を必須とするかどうかを判定して返します。
+	 *
+	 * 固定費登録・更新画面の入力チェック(支払月任意詳細の入力を必須とするかどうか)の判定に用います。
+	 * (isOptional()と条件は同じですが、支払月の分類判定と画面入力チェックという別の業務目的を表すため、
+	 *  意図を明確にする別メソッドとして用意しています)
+	 *</pre>
+	 * @return 支払月が「その他任意」の場合、支払月任意詳細の入力を必須とする:true、それ以外:false
+	 *
+	 */
+	public boolean isDetailRequired() {
 		return MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE.equals(value);
 	}
 

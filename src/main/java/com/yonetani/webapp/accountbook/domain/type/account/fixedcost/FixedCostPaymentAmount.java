@@ -7,15 +7,18 @@
  * 2024/06/03 : 1.00.00                      新規作成
  * 2025/12/21 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
  * 2026/04/05 : 1.01.01  feature-1.00-dev00  クラス名をShiharaiKingakuからFixedCostPaymentAmountにリネーム
+ * 2026/10/31 : 1.02.00  feature-1.03-dev1   tryFrom(Integer)追加(FixedCostInfoUpdateFormの相関チェックのドメイン層移動対応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.fixedcost;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Optional;
 
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.type.common.Money;
+import com.yonetani.webapp.accountbook.domain.type.common.SafeDomainFactory;
 
 import lombok.EqualsAndHashCode;
 
@@ -112,5 +115,18 @@ public class FixedCostPaymentAmount extends Money {
 		}
 		
 		return new FixedCostPaymentAmount(bigVal);
+	}
+
+	/**
+	 *<pre>
+	 * 「支払金額」項目の値を表すドメインタイプの生成を試みます。
+	 * 不正な値(null・マイナス値)の場合は例外を発生させずOptional.empty()を返します。
+	 *</pre>
+	 * @param kingaku 支払金額
+	 * @return 生成に成功した場合は値ありのOptional、不正な値の場合はOptional.empty()
+	 *
+	 */
+	public static Optional<FixedCostPaymentAmount> tryFrom(Integer kingaku) {
+		return SafeDomainFactory.tryCreate(() -> FixedCostPaymentAmount.from(kingaku));
 	}
 }

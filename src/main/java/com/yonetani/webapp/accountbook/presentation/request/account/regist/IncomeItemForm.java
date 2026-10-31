@@ -6,15 +6,14 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2024/07/06 : 1.00.00                      新規作成
+ * 2026/10/31 : 1.01.00  feature-1.03-dev1   相関チェック(isNeedCheckIncomeDetailContext)の判定ロジックをドメイン層(IncomeCategory)に移動
  *
  */
 package com.yonetani.webapp.accountbook.presentation.request.account.regist;
 
-import java.util.Objects;
-
 import org.springframework.util.StringUtils;
 
-import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
+import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeCategory;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Min;
@@ -56,14 +55,15 @@ public class IncomeItemForm {
 	
 	/**
 	 * 相関チェック(収入区分でその他任意選択の場合必須、収入詳細は必須)
-	 * 
+	 *
+	 * 収入詳細の入力を必須とするかどうかの判定ロジックの実体はドメイン層の{@link IncomeCategory#isDetailRequired()}に集約されている。
+	 *
 	 * @return その他任意を選択した場合で収入詳細の設定ありならtrue、空ならfalse
 	 */
 	@AssertTrue(message = "その他任意を選択した場合、収入詳細は必須入力です。")
 	public boolean isNeedCheckIncomeDetailContext() {
 		// 収入区分の値がその他任意(9)で収入詳細が未入力の場合、false
-		if(Objects.equals(incomeKubun, MyHouseholdAccountBookContent.INCOME_KUBUN_OPTIONAL_SELECTED_VALUE)
-				&& !StringUtils.hasLength(incomeDetailContext)) {
+		if(IncomeCategory.from(incomeKubun).isDetailRequired() && !StringUtils.hasLength(incomeDetailContext)) {
 			return false;
 		}
 		// 上記以外はチェック結果OK:trueを返却

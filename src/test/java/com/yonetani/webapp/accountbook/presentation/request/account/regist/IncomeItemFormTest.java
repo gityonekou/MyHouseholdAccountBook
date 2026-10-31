@@ -16,6 +16,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/04/28 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/10/25 : 1.01.00  feature-1.03-dev1   isNeedCheckIncomeDetailContext()の判定ロジックをドメイン層(IncomeCategory)に移動(振る舞い変化なし、既存テストで回帰確認)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.request.account.regist;

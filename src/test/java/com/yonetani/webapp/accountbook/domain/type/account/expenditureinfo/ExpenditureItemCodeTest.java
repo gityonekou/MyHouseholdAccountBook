@@ -5,11 +5,14 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/03/15 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/10/31 : 1.01.00  feature-1.03-dev1   tryFrom(String)のテストを追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -66,6 +69,22 @@ class ExpenditureItemCodeTest {
 	@DisplayName("異常系：数値に変換できない場合に例外が発生する")
 	void testFromString_異常系_数値変換不可() {
 		assertThrows(MyHouseholdAccountBookRuntimeException.class, () -> ExpenditureItemCode.from("ABCD"));
+	}
+
+	@Test
+	@DisplayName("正常系：tryFromは有効な支出項目コード(4桁)で値ありのOptionalを返す")
+	void testTryFrom_正常系() {
+		Optional<ExpenditureItemCode> code = ExpenditureItemCode.tryFrom("0001");
+		assertTrue(code.isPresent());
+		assertEquals("0001", code.get().getValue());
+	}
+
+	@Test
+	@DisplayName("異常系：tryFromはnull値・桁数不正・数値変換不可でOptional.empty()を返す")
+	void testTryFrom_異常系() {
+		assertTrue(ExpenditureItemCode.tryFrom(null).isEmpty());
+		assertTrue(ExpenditureItemCode.tryFrom("001").isEmpty());
+		assertTrue(ExpenditureItemCode.tryFrom("ABCD").isEmpty());
 	}
 
 	@Test
