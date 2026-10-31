@@ -63,10 +63,13 @@ public class ShopInfoForm {
 	 *
 	 */
 	@AssertTrue(message = "デフォルト支払方法にシステム予約値は指定できません。")
-	private boolean isDefaultPaymentMethodCodeValid() {
+	public boolean isDefaultPaymentMethodCodeValid() {
+		// デフォルト支払方法コードは任意項目のため、未入力の場合は常にtrueを返す(チェック対象外)
 		if(!StringUtils.hasLength(defaultPaymentMethodCode)) {
 			return true;
 		}
+		// tryFrom()により、不正な形式値でも例外が伝播せず500エラーにならない。
+		// 形式不正、またはシステム予約値以外の場合はtrue、システム予約値の場合はfalse
 		return PaymentMethodCode.tryFrom(defaultPaymentMethodCode)
 				.map(code -> !code.isSystemReserved())
 				.orElse(true);
