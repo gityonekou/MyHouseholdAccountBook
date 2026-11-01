@@ -14,6 +14,7 @@
  * 2025/12/28 : 1.01.00  feature-1.00-dev00  リファクタリング対応（DDD適応)
  * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応、追加リファクタリング対応(買い物登録ドメインの見直し)
  * 2026/09/23 : 1.02.01  feature-1.03-dev1   追加リファクタリング対応(SimpleShoppingRegistUseCaseを照会系、登録系に分割、リダイレクトレスポンスdtoのファクトリ引数をドメインタイプに変更)
+ * 2026/10/24 : 1.02.02  feature-1.03-dev1   店舗区分未入力時、画面再表示処理が例外になる不具合を修正(createResponse()でSafeDomainFactory.tryCreate()を使用)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.shoppingregist;
@@ -38,6 +39,7 @@ import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableR
 import com.yonetani.webapp.accountbook.domain.repository.account.shoppingregist.ShoppingRegistTableRepository;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shoppingregist.ShoppingRegistCode;
+import com.yonetani.webapp.accountbook.domain.type.common.SafeDomainFactory;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
@@ -312,7 +314,12 @@ public class SimpleShoppingRegistInquiryUseCase {
 			OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toUnmodifiableList());
 
 		// 選択した店舗区分に属する店舗情報を取得
-		ShopInquiryList shopSearchResult = shopRepository.findById(SearchQueryUserIdAndShopKubunCode.from(userId, ShopKubunCode.from(registInfoForm.getShopKubunCode())));
+		// (バリデーションエラー時の再表示(readBindingError)・店舗区分変更(changeShopKubun、@Validated未付与)の
+		//  両経路からこのメソッドが呼ばれるため、shopKubunCodeが未入力/不正な形式の場合でも例外にせず、
+		//  検索結果0件として扱う。SafeDomainFactory.tryCreate()。PaymentMethodInfoForm等と同じ方針)
+		ShopInquiryList shopSearchResult = SafeDomainFactory.tryCreate(() -> ShopKubunCode.from(registInfoForm.getShopKubunCode()))
+				.map(shopKubunCode -> shopRepository.findById(SearchQueryUserIdAndShopKubunCode.from(userId, shopKubunCode)))
+				.orElseGet(() -> ShopInquiryList.from(null));
 		// 店舗情報ありの場合、店舗名選択肢のリストを作成(デフォルト支払方法をdata属性経由でJSに渡すため、5.6節)
 		List<SimpleShoppingRegistResponse.ShopOptionItem> shopNameOptionItemList = null;
 		if(!shopSearchResult.isEmpty()) {
