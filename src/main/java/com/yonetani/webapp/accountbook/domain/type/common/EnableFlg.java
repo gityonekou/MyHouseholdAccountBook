@@ -34,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @EqualsAndHashCode
 public class EnableFlg {
+	// 有効/無効フラグ
 	private final boolean value;
 
 	/**

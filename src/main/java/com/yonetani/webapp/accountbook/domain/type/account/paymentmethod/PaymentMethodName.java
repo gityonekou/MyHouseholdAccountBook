@@ -48,9 +48,11 @@ public class PaymentMethodName {
 	 *
 	 */
 	public static PaymentMethodName from(String paymentMethodName) {
+		// ガード節(空文字列)
 		if(!StringUtils.hasLength(paymentMethodName)) {
 			throw new MyHouseholdAccountBookRuntimeException("「支払方法名」項目の設定値が空文字列です。管理者に問い合わせてください。");
 		}
+		// ガード節(長さが50文字より大きい)
 		if(paymentMethodName.length() > 50) {
 			throw new MyHouseholdAccountBookRuntimeException("「支払方法名」項目の設定値が50文字より大きい値で指定されています。管理者に問い合わせてください。[length=" + paymentMethodName.length() + "]");
 		}

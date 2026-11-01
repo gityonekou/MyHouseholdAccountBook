@@ -47,6 +47,8 @@
 								<option th:each="item : ${defaultPaymentMethod.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
 							</select>
 							<p class="invalid-feedback" th:errors="*{defaultPaymentMethodCode}"></p>
+							<!--/* デフォルト支払方法にシステム予約値が指定された場合のチェック結果を出力 */-->
+							<p class="invalid-feedback" th:errors="*{defaultPaymentMethodCodeValid}" style="display: block;"></p>
 							<div class="form-text">設定した場合、買い物登録時の支払方法の初期値として使用されます。</div>
 						</div>
 						<div class="mb-3">

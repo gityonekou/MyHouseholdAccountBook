@@ -47,7 +47,9 @@ public class UserIdAndBankAccountCodeSearchQueryDto {
 	 */
 	public static UserIdAndBankAccountCodeSearchQueryDto from(SearchQueryUserIdAndBankAccountCode search) {
 		return new UserIdAndBankAccountCodeSearchQueryDto(
+				// 検索条件:ユーザID
 				search.getUserId().getValue(),
+				// 検索条件:銀行口座コード
 				search.getBankAccountCode().getValue());
 	}
 }

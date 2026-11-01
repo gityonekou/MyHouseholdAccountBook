@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/08/18 : 1.00.00  feature-1.03-dev1   新規作成
+ * 2026/10/18 : 1.00.01  feature-1.03-dev1   BankAccountListItem.from()型安全性対応(06-§8.4)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.itemmanage;
@@ -16,6 +17,11 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.yonetani.webapp.accountbook.domain.type.account.bankaccount.BankAccountCode;
+import com.yonetani.webapp.accountbook.domain.type.account.bankaccount.BankAccountMemo;
+import com.yonetani.webapp.accountbook.domain.type.account.bankaccount.BankAccountSort;
+import com.yonetani.webapp.accountbook.domain.type.account.bankaccount.BankName;
+import com.yonetani.webapp.accountbook.domain.type.common.EnableFlg;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.BankAccountInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
@@ -74,9 +80,19 @@ public class BankAccountInfoManageResponse extends AbstractResponse {
 		 * @return 銀行口座一覧情報の明細データ
 		 *
 		 */
-		public static BankAccountListItem from(String bankAccountCode, String bankName, String bankAccountMemo,
-				String bankAccountSort, boolean enableFlg) {
-			return new BankAccountListItem(bankAccountCode, bankName, bankAccountMemo, bankAccountSort, enableFlg);
+		public static BankAccountListItem from(BankAccountCode bankAccountCode, BankName bankName, BankAccountMemo bankAccountMemo,
+				BankAccountSort bankAccountSort, EnableFlg enableFlg) {
+			return new BankAccountListItem(
+					// 銀行口座コード
+					bankAccountCode.getValue(),
+					// 銀行名
+					bankName.getValue(),
+					// 口座メモ
+					bankAccountMemo.getValue(),
+					// 銀行口座表示順
+					bankAccountSort.getValue(),
+					// 有効/無効フラグ
+					enableFlg.getValue());
 		}
 	}
 

@@ -74,6 +74,8 @@
 						<option th:each="item : ${paymentMethodSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
 					</select>
  					<p class="invalid-feedback" th:errors="*{paymentMethodCode}"></p>
+					<!--/* 「支払方法がない」は買い物集計8項目専用の固定費にのみ設定可能、のチェック結果を出力 */-->
+					<p class="invalid-feedback" th:errors="*{paymentMethodCodeValid}" style="display: block;"></p>
 				</div>
 				<div class="mb-3">
 					<label for="shiharaiKingaku" class="form-label w10">■支払金額</label>

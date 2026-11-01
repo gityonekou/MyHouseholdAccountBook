@@ -22,3 +22,20 @@ document.addEventListener('DOMContentLoaded', function() {
 		select.addEventListener('change', toggleAccountAndClosingDayAreas);
 	}
 });
+
+/**
+ * 「無効化／有効化」ボタン押下時に確認ダイアログを表示し、OK時に有効/無効切替用フォームを送信します。
+ */
+document.addEventListener('DOMContentLoaded', function() {
+	var btnItem = document.getElementById('payment-method-info-action-toggle-btn');
+	if(btnItem != null) {
+		btnItem.addEventListener('click', function() {
+			if(!this.disabled) {
+				if(window.confirm('選択中の支払方法の有効/無効状態を切り替えても宜しいですか？')) {
+					this.disabled = true;
+					document.forms['PaymentMethodInfoToggleEnable'].submit();
+				}
+			}
+		}, false);
+	}
+}, false);

@@ -53,11 +53,14 @@ public class PaymentMethodSort extends SortOrder {
 	 */
 	public static PaymentMethodSort from(String sort) {
 
+		// 基本検証（null、空文字）
 		SortOrder.validate(sort, "支払方法表示順");
 
+		// ガード節(長さが3桁でない)
 		if(sort.length() != 3) {
 			throw new MyHouseholdAccountBookRuntimeException("「支払方法表示順」項目の設定値が不正です。管理者に問い合わせてください。[sort=" + sort + "]");
 		}
+		// ガード節(数値に変換できない(数値3桁:0パディング))
 		try {
 			Integer.parseInt(sort);
 		} catch(NumberFormatException ex) {

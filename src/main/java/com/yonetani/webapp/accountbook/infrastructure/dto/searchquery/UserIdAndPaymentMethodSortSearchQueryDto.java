@@ -47,7 +47,9 @@ public class UserIdAndPaymentMethodSortSearchQueryDto {
 	 */
 	public static UserIdAndPaymentMethodSortSearchQueryDto from(SearchQueryUserIdAndPaymentMethodSort search) {
 		return new UserIdAndPaymentMethodSortSearchQueryDto(
+				// 検索条件:ユーザID
 				search.getUserId().getValue(),
+				// 検索条件:支払方法表示順
 				search.getPaymentMethodSort().getValue());
 	}
 }

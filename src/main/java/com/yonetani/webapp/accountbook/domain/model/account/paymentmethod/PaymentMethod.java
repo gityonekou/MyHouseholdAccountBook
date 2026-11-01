@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/08/19 : 1.00.00  feature-1.03-dev1   新規作成
+ * 2026/10/18 : 1.00.01  feature-1.03-dev1   紙芝居準拠の有効/無効切替対応(toggleEnableFlg追加)、from()型安全性対応(06-§8)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.paymentmethod;
@@ -19,7 +20,6 @@ import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.Payment
 import com.yonetani.webapp.accountbook.domain.type.common.EnableFlg;
 import com.yonetani.webapp.accountbook.domain.type.common.EnableUpdateFlg;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
-import org.springframework.util.StringUtils;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -81,26 +81,30 @@ public class PaymentMethod {
 	 *
 	 */
 	public static PaymentMethod from(
-			String userId,
-			String paymentMethodCode,
-			String paymentMethodName,
-			String paymentMethodMemo,
-			String paymentMethodKubun,
-			String bankAccountCode,
-			String closingDay,
-			String paymentMethodSort,
-			boolean enableFlg,
-			boolean enableUpdateFlg) {
-		return new PaymentMethod(
-				UserId.from(userId),
-				PaymentMethodCode.from(paymentMethodCode),
-				PaymentMethodName.from(paymentMethodName),
-				PaymentMethodMemo.from(paymentMethodMemo),
-				PaymentMethodKubun.from(paymentMethodKubun),
-				StringUtils.hasLength(bankAccountCode) ? BankAccountCode.from(bankAccountCode) : null,
-				ClosingDay.from(closingDay),
-				PaymentMethodSort.from(paymentMethodSort),
-				EnableFlg.from(enableFlg),
-				EnableUpdateFlg.from(enableUpdateFlg));
+			UserId userId,
+			PaymentMethodCode paymentMethodCode,
+			PaymentMethodName paymentMethodName,
+			PaymentMethodMemo paymentMethodMemo,
+			PaymentMethodKubun paymentMethodKubun,
+			BankAccountCode bankAccountCode,
+			ClosingDay closingDay,
+			PaymentMethodSort paymentMethodSort,
+			EnableFlg enableFlg,
+			EnableUpdateFlg enableUpdateFlg) {
+		return new PaymentMethod(userId, paymentMethodCode, paymentMethodName, paymentMethodMemo, paymentMethodKubun,
+				bankAccountCode, closingDay, paymentMethodSort, enableFlg, enableUpdateFlg);
+	}
+
+	/**
+	 *<pre>
+	 * 有効/無効フラグを反転した新しい支払方法テーブル情報を表すドメインモデルを生成して返します。
+	 * 有効/無効フラグ以外の項目は、既存の値オブジェクトインスタンスをそのまま再利用します。
+	 *</pre>
+	 * @return 有効/無効フラグを反転した支払方法テーブル情報を表すドメインモデル
+	 *
+	 */
+	public PaymentMethod toggleEnableFlg() {
+		return new PaymentMethod(userId, paymentMethodCode, paymentMethodName, paymentMethodMemo, paymentMethodKubun,
+				bankAccountCode, closingDay, paymentMethodSort, EnableFlg.from(!enableFlg.getValue()), enableUpdateFlg);
 	}
 }

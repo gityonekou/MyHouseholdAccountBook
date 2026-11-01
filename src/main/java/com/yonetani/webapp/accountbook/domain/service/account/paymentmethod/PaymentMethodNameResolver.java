@@ -55,8 +55,10 @@ public class PaymentMethodNameResolver {
 	 *
 	 */
 	public PaymentMethodNameResolver(PaymentMethodInquiryList paymentMethods, BankAccountInquiryList bankAccounts) {
+		// 支払方法コード→支払方法情報のMapを構築
 		this.paymentMethodMap = paymentMethods.getValues().stream()
 				.collect(Collectors.toMap(PaymentMethod::getPaymentMethodCode, Function.identity()));
+		// 銀行口座コード→銀行口座情報のMapを構築
 		this.bankAccountMap = bankAccounts.getValues().stream()
 				.collect(Collectors.toMap(BankAccount::getBankAccountCode, Function.identity()));
 	}
@@ -71,6 +73,7 @@ public class PaymentMethodNameResolver {
 	 *
 	 */
 	public ResolvedPaymentMethodName getPaymentMethodName(PaymentMethodCode code) {
+		// システム予約値の場合は解決できないため「－」を返す
 		if(code.isSystemReserved()) {
 			return ResolvedPaymentMethodName.UNRESOLVED;
 		}
@@ -121,13 +124,16 @@ public class PaymentMethodNameResolver {
 	 *
 	 */
 	public ResolvedBankAccountName getBankAccountName(PaymentMethodCode code) {
+		// システム予約値の場合は解決できないため「－」を返す
 		if(code.isSystemReserved()) {
 			return ResolvedBankAccountName.UNRESOLVED;
 		}
+		// 支払方法が未登録、または銀行口座コードがnull(現金・電子マネー(前払い式))の場合は「－」を返す
 		PaymentMethod paymentMethod = paymentMethodMap.get(code);
 		if(paymentMethod == null || paymentMethod.getBankAccountCode() == null) {
 			return ResolvedBankAccountName.UNRESOLVED;
 		}
+		// 銀行口座マスタに存在しない場合は「－」、存在する場合は銀行名を解決
 		BankAccount bankAccount = bankAccountMap.get(paymentMethod.getBankAccountCode());
 		return bankAccount == null ?
 				ResolvedBankAccountName.UNRESOLVED :

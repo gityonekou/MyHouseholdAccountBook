@@ -47,7 +47,9 @@ public class UserIdAndPaymentMethodCodeSearchQueryDto {
 	 */
 	public static UserIdAndPaymentMethodCodeSearchQueryDto from(SearchQueryUserIdAndPaymentMethodCode search) {
 		return new UserIdAndPaymentMethodCodeSearchQueryDto(
+				// 検索条件:ユーザID
 				search.getUserId().getValue(),
+				// 検索条件:支払方法コード
 				search.getPaymentMethodCode().getValue());
 	}
 }

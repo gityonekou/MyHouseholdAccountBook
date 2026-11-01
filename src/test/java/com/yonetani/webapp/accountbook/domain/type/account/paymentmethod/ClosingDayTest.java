@@ -87,4 +87,28 @@ class ClosingDayTest {
 		assertEquals(ClosingDay.from("15"), ClosingDay.from("15"));
 		assertEquals(ClosingDay.from(null), ClosingDay.from(null));
 	}
+
+	@Test
+	@DisplayName("toPeriodDisplayString：未設定の場合は「－」を返す")
+	void testToPeriodDisplayString_未設定() {
+		assertEquals("－", ClosingDay.from(null).toPeriodDisplayString());
+	}
+
+	@Test
+	@DisplayName("toPeriodDisplayString：開始日が1日の場合は「1日～月末」を返す")
+	void testToPeriodDisplayString_開始日が1日() {
+		assertEquals("1日～月末", ClosingDay.from("01").toPeriodDisplayString());
+	}
+
+	@Test
+	@DisplayName("toPeriodDisplayString：開始日が2日以上の場合は「N日～翌月(N-1)日」を返す")
+	void testToPeriodDisplayString_開始日が2日以上() {
+		assertEquals("15日～翌月14日", ClosingDay.from("15").toPeriodDisplayString());
+	}
+
+	@Test
+	@DisplayName("toPeriodDisplayString：開始日が28日(境界値)の場合は「28日～翌月27日」を返す")
+	void testToPeriodDisplayString_開始日が28日() {
+		assertEquals("28日～翌月27日", ClosingDay.from("28").toPeriodDisplayString());
+	}
 }

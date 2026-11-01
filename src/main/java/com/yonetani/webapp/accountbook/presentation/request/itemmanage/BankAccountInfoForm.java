@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/08/18 : 1.00.00  feature-1.03-dev1   新規作成
+ * 2026/10/18 : 1.00.01  feature-1.03-dev1   紙芝居準拠の有効/無効切替対応(enableFlgはhidden項目に変更、専用の「無効化／有効化」ボタンで切替)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.request.itemmanage;
@@ -45,6 +46,7 @@ public class BankAccountInfoForm {
 	@Min(1)
 	@Max(99)
 	private Integer bankAccountSort;
-	// 有効/無効フラグ(デフォルトtrue)
+	// 有効/無効フラグ(デフォルトtrue。画面上はhidden項目で現在値を保持するのみで、メイン更新フォームでは編集不可。
+	// 切替は専用の「無効化／有効化」ボタン(別フォーム→toggleEnable/)で行う)
 	private Boolean enableFlg = Boolean.TRUE;
 }

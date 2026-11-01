@@ -58,28 +58,41 @@
 								<option th:each="item : ${bankAccount.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
 							</select>
 							<p class="invalid-feedback" th:errors="*{bankAccountCode}"></p>
+							<!--/* 選択した支払方法種別で銀行口座が必要なのに未設定の場合のチェック結果を出力 */-->
+							<p class="invalid-feedback" th:errors="*{bankAccountValid}" style="display: block;"></p>
 						</div>
 						<div class="mb-3" id="closingDayArea">
 							<label for="closingDay" class="form-label">集計開始日</label>
-		 					<input type="text" class="form-control w10" th:errorclass="is-invalid" th:field="*{closingDay}">
+							<select class="form-select w20" th:errorclass="is-invalid" th:field="*{closingDay}">
+								<option th:each="item : ${closingDayOptions}" th:value="${item.value}" th:text="${item.text}"></option>
+							</select>
 		 					<p class="invalid-feedback" th:errors="*{closingDay}"></p>
+							<!--/* クレジットカード選択時に集計開始日が未設定の場合のチェック結果を出力 */-->
+							<p class="invalid-feedback" th:errors="*{closingDayValid}" style="display: block;"></p>
+							<p class="form-text">集計期間は「開始日 ～ 翌月（開始日の前日）」として算出されます。</p>
 						</div>
 						<div class="mb-3">
 							<label for="paymentMethodSort" class="form-label">表示順</label>
 		 					<input type="text" class="form-control w10" th:errorclass="is-invalid" th:field="*{paymentMethodSort}">
 		 					<p class="invalid-feedback" th:errors="*{paymentMethodSort}"></p>
 						</div>
-						<div class="mb-3 form-check">
-							<input type="checkbox" class="form-check-input" th:field="*{enableFlg}">
-							<label for="enableFlg" class="form-check-label">有効</label>
-						</div>
 						<div class="mb-3">
-							<button class="btn btn-primary" type="submit">登録</button>
+							<button class="btn btn-primary" type="submit" th:text="*{#strings.equals(action,'update')} ? '更新' : '登録'">登録</button>
+							<th:block th:if="*{#strings.equals(action,'update')}">
+								<button class="btn btn-outline-danger" type="button" id="payment-method-info-action-toggle-btn"
+										th:text="*{enableFlg} ? '無効化' : '有効化'">無効化</button>
+								<a class="btn btn-outline-secondary" th:href="@{/myhacbook/managebaseinfo/paymentmethodinfo/initload/}">キャンセル</a>
+							</th:block>
 							<input type="hidden" th:field="*{action}" />
 							<input type="hidden" th:field="*{paymentMethodCode}" />
 							<input type="hidden" th:field="*{paymentMethodSortBefore}" />
+							<input type="hidden" th:field="*{enableFlg}" />
 						</div>
 					</div>
+					</form>
+					<!--/* 有効/無効切替実行時に送信するフォーム */-->
+					<form name="PaymentMethodInfoToggleEnable" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/paymentmethodinfo/toggleEnable/}" th:object="${paymentMethodInfoForm}">
+						<input type="hidden" th:field="*{paymentMethodCode}" />
 					</form>
 				</div>
 			</div>

@@ -47,7 +47,9 @@ public class UserIdAndBankAccountSortSearchQueryDto {
 	 */
 	public static UserIdAndBankAccountSortSearchQueryDto from(SearchQueryUserIdAndBankAccountSort search) {
 		return new UserIdAndBankAccountSortSearchQueryDto(
+				// 検索条件:ユーザID
 				search.getUserId().getValue(),
+				// 検索条件:銀行口座表示順
 				search.getBankAccountSort().getValue());
 	}
 }

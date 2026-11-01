@@ -51,8 +51,11 @@ public class UserIdAndBankAccountSortBetweenABSearchQueryDto {
 	 */
 	public static UserIdAndBankAccountSortBetweenABSearchQueryDto from(SearchQueryUserIdAndBankAccountSortBetweenAB search) {
 		return new UserIdAndBankAccountSortBetweenABSearchQueryDto(
+				// 検索条件:ユーザID
 				search.getUserId().getValue(),
+				// 検索条件:銀行口座表示順A
 				search.getBankAccountSortA().getValue(),
+				// 検索条件:銀行口座表示順B
 				search.getBankAccountSortB().getValue());
 	}
 }

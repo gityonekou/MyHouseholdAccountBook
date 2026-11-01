@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/08/18 : 1.00.00  feature-1.03-dev1   新規作成
+ * 2026/10/18 : 1.00.01  feature-1.03-dev1   紙芝居準拠の有効/無効切替対応(toggleEnableFlg追加)、from()型安全性対応(06-§8)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.bankaccount;
@@ -64,18 +65,25 @@ public class BankAccount {
 	 *
 	 */
 	public static BankAccount from(
-			String userId,
-			String bankAccountCode,
-			String bankName,
-			String bankAccountMemo,
-			String bankAccountSort,
-			boolean enableFlg) {
-		return new BankAccount(
-				UserId.from(userId),
-				BankAccountCode.from(bankAccountCode),
-				BankName.from(bankName),
-				BankAccountMemo.from(bankAccountMemo),
-				BankAccountSort.from(bankAccountSort),
-				EnableFlg.from(enableFlg));
+			UserId userId,
+			BankAccountCode bankAccountCode,
+			BankName bankName,
+			BankAccountMemo bankAccountMemo,
+			BankAccountSort bankAccountSort,
+			EnableFlg enableFlg) {
+		return new BankAccount(userId, bankAccountCode, bankName, bankAccountMemo, bankAccountSort, enableFlg);
+	}
+
+	/**
+	 *<pre>
+	 * 有効/無効フラグを反転した新しい銀行口座テーブル情報を表すドメインモデルを生成して返します。
+	 * 有効/無効フラグ以外の項目は、既存の値オブジェクトインスタンスをそのまま再利用します。
+	 *</pre>
+	 * @return 有効/無効フラグを反転した銀行口座テーブル情報を表すドメインモデル
+	 *
+	 */
+	public BankAccount toggleEnableFlg() {
+		return new BankAccount(userId, bankAccountCode, bankName, bankAccountMemo, bankAccountSort,
+				EnableFlg.from(!enableFlg.getValue()));
 	}
 }

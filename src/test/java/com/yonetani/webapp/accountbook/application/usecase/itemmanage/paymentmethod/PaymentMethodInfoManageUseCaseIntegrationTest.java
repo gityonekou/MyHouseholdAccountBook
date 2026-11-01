@@ -1,12 +1,50 @@
 /**
- * 支払方法情報管理ユースケース(PaymentMethodInfoManageUseCase.java)のインテグレーションテストケースクラスです
- * 以下範囲のテストを実施します。
+ * 支払方法情報管理ユースケース(PaymentMethodInfoManageUseCase.java)のインテグレーションテストケースクラスです。
+ *
+ * <pre>
+ * PaymentMethodInfoManageUseCase の以下メソッドをテストします。
  * service:PaymentMethodInfoManageUseCase⇔レポジトリー:Repository⇔DB
+ *
+ * [対象メソッド]
+ * 1. readPaymentMethodInfo(user)       - 情報管理(支払方法)画面の表示情報取得(初期表示)
+ * 2. readPaymentMethodInfo(user,code)  - 情報管理(支払方法)画面の表示情報取得(対象選択時)
+ * 3. execAction                        - 支払方法情報の追加・更新
+ * 4. execToggleEnableFlg               - 支払方法情報の有効/無効切替
+ *
+ * [テストシナリオ]
+ * readPaymentMethodInfo(user):
+ *   1. 正常系: 検索結果なし(0件、種別選択肢5件は表示)
+ *   2. 正常系: システム予約行(999)は一覧に出ない、口座名解決・集計期間表示を確認
+ * readPaymentMethodInfo(user,code):
+ *   3. 正常系: 指定した支払方法コードの表示情報取得
+ *   4. 正常系: システム予約行(999)への直接アクセスは拒否され初期表示に戻る
+ *   5. 異常系: 存在しない支払方法コード
+ * execAction:
+ *   6. 正常系: 新規追加(現金、銀行口座コード・集計開始日はnull)
+ *   7. 正常系: 新規追加(支払方法メモは任意項目のため未入力でも登録できる)
+ *   8. 正常系: 新規追加(クレジットカード、銀行口座コード・集計開始日が登録される)
+ *   9. 正常系: 新規追加(種別に不要な項目はnullに正規化される)
+ *   10. 正常系: 新規追加(表示順シフトはシステム予約行を巻き込まない)
+ *   11. 正常系: 更新(表示順変更なし)
+ *   12. 異常系: 旧表示順(更新比較用)が未設定
+ *   13. 異常系: 未定義のアクション
+ * execToggleEnableFlg:
+ *   14. 正常系: 有効→無効に切替
+ *   15. 正常系: 無効→有効に切替
+ *   16. 異常系: 存在しない支払方法コード
+ *   17. 異常系: システム予約行(999)への直接アクセスは拒否され初期表示に戻る
+ *
+ * [テストデータ]
+ * ReadPaymentMethodInfoQueryNotFoundTest.sql    : 支払方法情報0件のユーザ
+ * ReadPaymentMethodInfoQueryResultThreeTest.sql : 支払方法情報3件(001:現金,002:口座振替有効,003:クレジットカード無効)
+ *                                                  ＋システム予約行(999)を含むユーザ
+ * </pre>
  *
  *------------------------------------------------
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/08/19 : 1.00.00  feature-1.03-dev1   新規作成
+ * 2026/10/18 : 1.00.01  feature-1.03-dev1   execToggleEnableFlgのテスト追加、PaymentMethodKubunOptionItem.from()型安全性対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.paymentmethod;
@@ -17,6 +55,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,6 +69,7 @@ import org.springframework.ui.ModelMap;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodKubun;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.paymentmethod.PaymentMethodReadWriteDto;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.PaymentMethodInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.PaymentMethodInfoManageResponse;
@@ -52,6 +92,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
+@DisplayName("支払方法情報管理ユースケースのUseCaseテスト（統合テスト）")
 class PaymentMethodInfoManageUseCaseIntegrationTest {
 	@Autowired
 	private PaymentMethodInfoManageUseCase service;
@@ -61,9 +102,19 @@ class PaymentMethodInfoManageUseCaseIntegrationTest {
 	private final LoginUserInfo TEST_USER = LoginUserInfo.from("TESTUSER001", "テストユーザ01");
 
 	/**
-	 * 検索結果なし時、選択肢は5種別分すべて表示され、一覧は0件であることを確認します。
+	 *<pre>
+	 * テスト1：正常系：readPaymentMethodInfo_検索結果なし(0件、種別選択肢5件は表示)
+	 *
+	 * 【検証内容】
+	 * ・支払方法情報が0件の場合、「支払方法情報取得結果が0件です。」のメッセージが設定されること
+	 * ・支払方法一覧情報の明細データが0件であること
+	 * ・支払方法種別選択肢が5種別分(現金・口座振替・クレジットカード・デビットカード・電子マネー(前払い式))表示されること
+	 * ・各種別のrequiresAccount/requiresClosingDayが期待通りであること
+	 * ・入力フォームのアクションが新規登録(ADD)であること
+	 *</pre>
 	 */
 	@Test
+	@DisplayName("1 正常系：readPaymentMethodInfo_検索結果なし(0件、種別選択肢5件は表示)")
 	@Sql(scripts = "ReadPaymentMethodInfoQueryNotFoundTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testReadPaymentMethodInfoQueryNotFound() {
 		PaymentMethodInfoManageResponse res = service.readPaymentMethodInfo(TEST_USER);
@@ -82,20 +133,29 @@ class PaymentMethodInfoManageUseCaseIntegrationTest {
 		@SuppressWarnings("unchecked")
 		List<PaymentMethodKubunOptionItem> kubunOptions = (List<PaymentMethodKubunOptionItem>)modelMap.getAttribute("paymentMethodKubunOptions");
 		assertEquals(5, kubunOptions.size(), "支払方法種別5件分の選択肢が表示されること");
-		assertEquals(PaymentMethodKubunOptionItem.from("1", "現金", false, false), kubunOptions.get(0));
-		assertEquals(PaymentMethodKubunOptionItem.from("2", "口座振替", true, false), kubunOptions.get(1));
-		assertEquals(PaymentMethodKubunOptionItem.from("3", "クレジットカード", true, true), kubunOptions.get(2));
-		assertEquals(PaymentMethodKubunOptionItem.from("4", "デビットカード", true, false), kubunOptions.get(3));
-		assertEquals(PaymentMethodKubunOptionItem.from("5", "電子マネー(前払い式)", false, false), kubunOptions.get(4));
+		assertEquals(PaymentMethodKubunOptionItem.from(PaymentMethodKubun.CASH, "現金", false, false), kubunOptions.get(0));
+		assertEquals(PaymentMethodKubunOptionItem.from(PaymentMethodKubun.BANK_TRANSFER, "口座振替", true, false), kubunOptions.get(1));
+		assertEquals(PaymentMethodKubunOptionItem.from(PaymentMethodKubun.CREDIT_CARD, "クレジットカード", true, true), kubunOptions.get(2));
+		assertEquals(PaymentMethodKubunOptionItem.from(PaymentMethodKubun.DEBIT_CARD, "デビットカード", true, false), kubunOptions.get(3));
+		assertEquals(PaymentMethodKubunOptionItem.from(PaymentMethodKubun.PREPAID_EMONEY, "電子マネー(前払い式)", false, false), kubunOptions.get(4));
 
 		PaymentMethodInfoForm form = (PaymentMethodInfoForm)modelMap.getAttribute("paymentMethodInfoForm");
 		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, form.getAction());
 	}
 
 	/**
-	 * システム予約行(999)は一覧に含まれないことを確認します(確認事項③)。
+	 *<pre>
+	 * テスト2：正常系：readPaymentMethodInfo_システム予約行は一覧に出ない、口座名解決・集計期間表示を確認
+	 *
+	 * 【検証内容】
+	 * ・システム予約行(999)を除いた3件が一覧表示されること(確認事項③)
+	 * ・銀行口座を持つ支払方法(002)は口座名が解決され、持たない支払方法(001)は「－」になること
+	 * ・無効化された支払方法(003)はenableFlg=falseであること
+	 * ・集計開始日は集計期間(開始日～終了日)の表示用文字列であること
+	 *</pre>
 	 */
 	@Test
+	@DisplayName("2 正常系：readPaymentMethodInfo_システム予約行は一覧に出ない、口座名解決・集計期間表示を確認")
 	@Sql(scripts = "ReadPaymentMethodInfoQueryResultThreeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testReadPaymentMethodInfo_システム予約行は一覧に出ない() {
 		PaymentMethodInfoManageResponse res = service.readPaymentMethodInfo(TEST_USER);
@@ -114,13 +174,22 @@ class PaymentMethodInfoManageUseCaseIntegrationTest {
 		assertEquals("口座振替", item002.getPaymentMethodKubunName());
 		PaymentMethodListItem item003 = paymentMethodList.stream().filter(i -> "003".equals(i.getPaymentMethodCode())).findFirst().orElseThrow();
 		assertFalse(item003.isEnableFlg(), "無効化された支払方法はenableFlg=falseであること");
-		assertEquals("15", item003.getClosingDay());
+		assertEquals("15日～翌月14日", item003.getClosingDay(), "集計開始日は集計期間(開始日～終了日)の表示用文字列であること");
 	}
 
 	/**
-	 * 指定した支払方法情報がフォームに設定されることを確認します。
+	 *<pre>
+	 * テスト3：正常系：readPaymentMethodInfo(code)_指定した支払方法コードの表示情報取得
+	 *
+	 * 【検証内容】
+	 * ・「支払方法名「○○」の支払方法を更新します。」のメッセージが設定されること
+	 * ・入力フォームのアクションが更新(UPDATE)であること
+	 * ・入力フォームの各項目に選択した支払方法の値が設定されること(表示順(更新比較用)含む)
+	 * ・テストデータにメモの設定がない場合はnullであること
+	 *</pre>
 	 */
 	@Test
+	@DisplayName("3 正常系：readPaymentMethodInfo(code)_指定した支払方法コードの表示情報取得")
 	@Sql(scripts = "ReadPaymentMethodInfoQueryResultThreeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testReadPaymentMethodInfoFromPaymentMethodCode() {
 		PaymentMethodInfoManageResponse res = service.readPaymentMethodInfo(TEST_USER, "002");
@@ -140,9 +209,16 @@ class PaymentMethodInfoManageUseCaseIntegrationTest {
 	}
 
 	/**
-	 * システム予約行(999)への直接アクセス(URL直叩き等)は更新を許可せず、エラーメッセージ付きで初期表示に戻ることを確認します。
+	 *<pre>
+	 * テスト4：正常系：readPaymentMethodInfo(code)_システム予約行(999)への直接アクセスは拒否され初期表示に戻る
+	 *
+	 * 【検証内容】
+	 * ・URL直叩き等でシステム予約行(999)が指定された場合、更新を許可せずエラーレスポンスになること
+	 * ・更新不可のため初期表示(新規登録用フォーム)に戻ること
+	 *</pre>
 	 */
 	@Test
+	@DisplayName("4 正常系：readPaymentMethodInfo(code)_システム予約行(999)への直接アクセスは拒否され初期表示に戻る")
 	@Sql(scripts = "ReadPaymentMethodInfoQueryResultThreeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testReadPaymentMethodInfo_システム予約行への直接アクセスは拒否() {
 		PaymentMethodInfoManageResponse res = service.readPaymentMethodInfo(TEST_USER, "999");
@@ -154,9 +230,16 @@ class PaymentMethodInfoManageUseCaseIntegrationTest {
 	}
 
 	/**
-	 * 存在しない支払方法コードを指定した場合、例外となることを確認します。
+	 *<pre>
+	 * テスト5：異常系：readPaymentMethodInfo(code)_存在しない支払方法コード
+	 *
+	 * 【検証内容】
+	 * ・存在しない支払方法コードを指定した場合、MyHouseholdAccountBookRuntimeExceptionが発生すること
+	 * ・例外メッセージに指定した支払方法コードが含まれること
+	 *</pre>
 	 */
 	@Test
+	@DisplayName("5 異常系：readPaymentMethodInfo(code)_存在しない支払方法コード")
 	@Sql(scripts = "ReadPaymentMethodInfoQueryResultThreeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testReadPaymentMethodInfoNotFound() {
 		MyHouseholdAccountBookRuntimeException ex = assertThrows(
@@ -166,9 +249,20 @@ class PaymentMethodInfoManageUseCaseIntegrationTest {
 	}
 
 	/**
-	 * 現金で新規追加した場合、銀行口座コード・集計開始日がnullで登録されることを確認します(表示順自動採番)。
+	 *<pre>
+	 * テスト6：正常系：execAction_新規追加(現金、銀行口座コード・集計開始日はnull)
+	 *
+	 * 【検証内容】
+	 * ・「新規支払方法を追加しました。」のメッセージが設定されること
+	 * ・transactionSuccessFullがtrueであること
+	 * ・支払方法テーブルに1件追加され、各項目(コード・メモ・表示順)が入力値通りであること
+	 * ・現金種別のため銀行口座コード・集計開始日はnullであること
+	 * ・表示順未指定の場合、登録件数+1(=1)が自動採番されること
+	 * ・更新可否フラグ(ENABLE_UPDATE_FLG)がtrueであること
+	 *</pre>
 	 */
 	@Test
+	@DisplayName("6 正常系：execAction_新規追加(現金、銀行口座コード・集計開始日はnull)")
 	@Sql(scripts = "ReadPaymentMethodInfoQueryNotFoundTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddAction_現金() {
 		PaymentMethodInfoForm form = inputAddForm("1", null, null, null);
@@ -190,9 +284,16 @@ class PaymentMethodInfoManageUseCaseIntegrationTest {
 	}
 
 	/**
-	 * 支払方法メモは任意項目のため、未入力(null)のまま新規登録できることを確認します。
+	 *<pre>
+	 * テスト7：正常系：execAction_新規追加(支払方法メモは任意項目のため未入力でも登録できる)
+	 *
+	 * 【検証内容】
+	 * ・支払方法メモ未入力(null)のまま新規登録でき、エラーにならないこと
+	 * ・DB上のPAYMENT_METHOD_MEMOがnullであること
+	 *</pre>
 	 */
 	@Test
+	@DisplayName("7 正常系：execAction_新規追加(支払方法メモは任意項目のため未入力でも登録できる)")
 	@Sql(scripts = "ReadPaymentMethodInfoQueryNotFoundTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddAction_支払方法メモは未入力でも登録できる() {
 		PaymentMethodInfoForm form = inputAddForm("1", null, null, null);
@@ -204,9 +305,16 @@ class PaymentMethodInfoManageUseCaseIntegrationTest {
 	}
 
 	/**
-	 * クレジットカードで新規追加した場合、銀行口座コード・集計開始日が登録されることを確認します。
+	 *<pre>
+	 * テスト8：正常系：execAction_新規追加(クレジットカード、銀行口座コード・集計開始日が登録される)
+	 *
+	 * 【検証内容】
+	 * ・transactionSuccessFullがtrueであること
+	 * ・クレジットカード種別のため、入力した銀行口座コード・集計開始日がDBに登録されること
+	 *</pre>
 	 */
 	@Test
+	@DisplayName("8 正常系：execAction_新規追加(クレジットカード、銀行口座コード・集計開始日が登録される)")
 	@Sql(scripts = "ReadPaymentMethodInfoQueryResultThreeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddAction_クレジットカード() {
 		PaymentMethodInfoForm form = inputAddForm("3", "01", "20", null);
@@ -222,10 +330,16 @@ class PaymentMethodInfoManageUseCaseIntegrationTest {
 	}
 
 	/**
-	 * 「不要なのに入力されている」値をUseCase側でnullに正規化することを確認します(突合レビュー指摘F)。
-	 * 種別=現金なのに銀行口座コード・集計開始日が送信された場合、登録後はnullになること。
+	 *<pre>
+	 * テスト9：正常系：execAction_新規追加(種別に不要な項目はnullに正規化される)
+	 *
+	 * 【検証内容】
+	 * ・種別=現金なのに銀行口座コード・集計開始日が送信された場合(JS制御をバイパスした想定)、
+	 *   UseCase側でnullに正規化されて登録されること(突合レビュー指摘F)
+	 *</pre>
 	 */
 	@Test
+	@DisplayName("9 正常系：execAction_新規追加(種別に不要な項目はnullに正規化される)")
 	@Sql(scripts = "ReadPaymentMethodInfoQueryNotFoundTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddAction_不要な項目はnullに正規化される() {
 		PaymentMethodInfoForm form = inputAddForm("1", "01", "20", null);
@@ -240,9 +354,16 @@ class PaymentMethodInfoManageUseCaseIntegrationTest {
 	}
 
 	/**
-	 * 新規追加時、表示順を明示指定した場合に既存データ(システム予約行を除く)の表示順がシフトされることを確認します。
+	 *<pre>
+	 * テスト10：正常系：execAction_新規追加(表示順シフトはシステム予約行を巻き込まない)
+	 *
+	 * 【検証内容】
+	 * ・表示順を明示指定した場合、既存データ(001～003)の表示順が+1シフトされること
+	 * ・システム予約行(999)は表示順シフトの対象に巻き込まれず、999のまま維持されること
+	 *</pre>
 	 */
 	@Test
+	@DisplayName("10 正常系：execAction_新規追加(表示順シフトはシステム予約行を巻き込まない)")
 	@Sql(scripts = "ReadPaymentMethodInfoQueryResultThreeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecAddAction_表示順シフトはシステム予約行を巻き込まない() {
 		PaymentMethodInfoForm form = inputAddForm("1", null, null, "001");
@@ -258,9 +379,18 @@ class PaymentMethodInfoManageUseCaseIntegrationTest {
 	}
 
 	/**
-	 * 更新データが登録されることを確認します(表示順変更なし)。
+	 *<pre>
+	 * テスト11：正常系：execAction_更新(表示順変更なし)
+	 *
+	 * 【検証内容】
+	 * ・「支払方法を更新しました。」のメッセージが設定されること
+	 * ・transactionSuccessFullがtrueであること
+	 * ・DB上の対象データ(支払方法名)が更新値で反映されること
+	 * ・通常の支払方法はENABLE_UPDATE_FLG=trueのまま維持されること
+	 *</pre>
 	 */
 	@Test
+	@DisplayName("11 正常系：execAction_更新(表示順変更なし)")
 	@Sql(scripts = "ReadPaymentMethodInfoQueryResultThreeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateAction() {
 		PaymentMethodInfoForm form = inputUpdateForm("002", "2", "01", null, "002");
@@ -277,9 +407,16 @@ class PaymentMethodInfoManageUseCaseIntegrationTest {
 	}
 
 	/**
-	 * 更新の場合、表示順(更新比較用)の値が未設定の場合予期しないエラーとなること
+	 *<pre>
+	 * テスト12：異常系：execAction_更新時に旧表示順(更新比較用)が未設定
+	 *
+	 * 【検証内容】
+	 * ・表示順(更新比較用)が未設定の場合、MyHouseholdAccountBookRuntimeExceptionが発生すること
+	 * ・例外メッセージに不正値であることが示されること
+	 *</pre>
 	 */
 	@Test
+	@DisplayName("12 異常系：execAction_更新時に旧表示順(更新比較用)が未設定")
 	@Sql(scripts = "ReadPaymentMethodInfoQueryResultThreeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecUpdateSortBeforeEmptyAction() {
 		PaymentMethodInfoForm form = inputUpdateForm("002", "2", "01", null, "002");
@@ -292,9 +429,16 @@ class PaymentMethodInfoManageUseCaseIntegrationTest {
 	}
 
 	/**
-	 * アクションの設定値が新規追加・更新以外の場合予期しないエラーとなること
+	 *<pre>
+	 * テスト13：異常系：execAction_未定義のアクション
+	 *
+	 * 【検証内容】
+	 * ・アクションが新規追加(ADD)・更新(UPDATE)以外の場合、MyHouseholdAccountBookRuntimeExceptionが発生すること
+	 * ・例外メッセージに指定したアクション値が含まれること
+	 *</pre>
 	 */
 	@Test
+	@DisplayName("13 異常系：execAction_未定義のアクション")
 	@Sql(scripts = "ReadPaymentMethodInfoQueryResultThreeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
 	void testExecActionFailValueAction() {
 		PaymentMethodInfoForm form = inputUpdateForm("002", "2", "01", null, "002");
@@ -339,5 +483,99 @@ class PaymentMethodInfoManageUseCaseIntegrationTest {
 				"SELECT * FROM PAYMENT_METHOD_TABLE WHERE USER_ID = :USER_ID ORDER BY PAYMENT_METHOD_CODE",
 				Map.of("USER_ID", TEST_USER.getUserId().toString()),
 				new DataClassRowMapper<>(PaymentMethodReadWriteDto.class));
+	}
+
+	/**
+	 *<pre>
+	 * テスト14：正常系：execToggleEnableFlg_有効→無効に切替
+	 *
+	 * 【検証内容】
+	 * ・transactionSuccessFullがtrueであること
+	 * ・「支払方法名「○○」の支払方法を無効化しました。」のメッセージが設定されること
+	 * ・DB上のENABLE_FLGがfalseに更新されること
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("14 正常系：execToggleEnableFlg_有効→無効に切替")
+	@Sql(scripts = "ReadPaymentMethodInfoQueryResultThreeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
+	void testExecToggleEnableFlgDisable() {
+		PaymentMethodInfoManageResponse res = service.execToggleEnableFlg(TEST_USER, "002");
+		assertTrue(res.isTransactionSuccessFull());
+		assertEquals("支払方法名「〇〇銀行引き落とし」の支払方法を無効化しました。", res.getMessagesList().get(0));
+
+		Map<String, Object> actualDataMap = namedParamTemplete.queryForMap(
+				"SELECT * FROM PAYMENT_METHOD_TABLE WHERE USER_ID=:USER_ID AND PAYMENT_METHOD_CODE=:PAYMENT_METHOD_CODE",
+				Map.of("USER_ID", TEST_USER.getUserId().toString(), "PAYMENT_METHOD_CODE", "002"));
+		assertEquals(Boolean.FALSE, actualDataMap.get("ENABLE_FLG"));
+	}
+
+	/**
+	 *<pre>
+	 * テスト15：正常系：execToggleEnableFlg_無効→有効に切替
+	 *
+	 * 【検証内容】
+	 * ・transactionSuccessFullがtrueであること
+	 * ・「支払方法名「○○」の支払方法を有効化しました。」のメッセージが設定されること
+	 * ・DB上のENABLE_FLGがtrueに更新されること
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("15 正常系：execToggleEnableFlg_無効→有効に切替")
+	@Sql(scripts = "ReadPaymentMethodInfoQueryResultThreeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
+	void testExecToggleEnableFlgEnable() {
+		PaymentMethodInfoManageResponse res = service.execToggleEnableFlg(TEST_USER, "003");
+		assertTrue(res.isTransactionSuccessFull());
+		assertEquals("支払方法名「△△カード」の支払方法を有効化しました。", res.getMessagesList().get(0));
+
+		Map<String, Object> actualDataMap = namedParamTemplete.queryForMap(
+				"SELECT * FROM PAYMENT_METHOD_TABLE WHERE USER_ID=:USER_ID AND PAYMENT_METHOD_CODE=:PAYMENT_METHOD_CODE",
+				Map.of("USER_ID", TEST_USER.getUserId().toString(), "PAYMENT_METHOD_CODE", "003"));
+		assertEquals(Boolean.TRUE, actualDataMap.get("ENABLE_FLG"));
+	}
+
+	/**
+	 *<pre>
+	 * テスト16：異常系：execToggleEnableFlg_存在しない支払方法コード
+	 *
+	 * 【検証内容】
+	 * ・存在しない支払方法コードを指定した場合、MyHouseholdAccountBookRuntimeExceptionが発生すること
+	 * ・例外メッセージに指定した支払方法コードが含まれること
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("16 異常系：execToggleEnableFlg_存在しない支払方法コード")
+	@Sql(scripts = "ReadPaymentMethodInfoQueryResultThreeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
+	void testExecToggleEnableFlgNotFound() {
+		MyHouseholdAccountBookRuntimeException ex = assertThrows(
+				MyHouseholdAccountBookRuntimeException.class,
+				() -> service.execToggleEnableFlg(TEST_USER, "555"));
+		assertEquals("更新対象の支払方法情報が存在しません。管理者に問い合わせてください。paymentMethodCode:555", ex.getLocalizedMessage());
+	}
+
+	/**
+	 *<pre>
+	 * テスト17：異常系：execToggleEnableFlg_システム予約行(999)への直接アクセスは拒否され初期表示に戻る
+	 *
+	 * 【検証内容】
+	 * ・URL直叩き等でシステム予約行(999)が指定された場合、更新を拒否してエラーレスポンスになること
+	 * ・更新不可のため初期表示(新規登録用フォーム)に戻ること
+	 * ・更新が拒否され、DB上のENABLE_FLGは変化しないこと
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("17 異常系：execToggleEnableFlg_システム予約行(999)への直接アクセスは拒否され初期表示に戻る")
+	@Sql(scripts = "ReadPaymentMethodInfoQueryResultThreeTest.sql", config = @SqlConfig(encoding = "UTF-8"))
+	void testExecToggleEnableFlg_システム予約行への直接アクセスは拒否() {
+		PaymentMethodInfoManageResponse res = service.execToggleEnableFlg(TEST_USER, "999");
+
+		assertTrue(res.isErrorResponse());
+		ModelMap modelMap = res.build().getModelMap();
+		PaymentMethodInfoForm form = (PaymentMethodInfoForm)modelMap.getAttribute("paymentMethodInfoForm");
+		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, form.getAction(), "更新不可のため初期表示(新規登録用フォーム)に戻ること");
+
+		Map<String, Object> actualDataMap = namedParamTemplete.queryForMap(
+				"SELECT * FROM PAYMENT_METHOD_TABLE WHERE USER_ID=:USER_ID AND PAYMENT_METHOD_CODE=:PAYMENT_METHOD_CODE",
+				Map.of("USER_ID", TEST_USER.getUserId().toString(), "PAYMENT_METHOD_CODE", "999"));
+		assertEquals(Boolean.TRUE, actualDataMap.get("ENABLE_FLG"), "更新が拒否され、ENABLE_FLGは変化しないこと");
 	}
 }

@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/08/19 : 1.00.00  feature-1.03-dev1   新規作成
+ * 2026/10/18 : 1.00.01  feature-1.03-dev1   PaymentMethod/BankAccount.from()型安全性対応に伴うhelper()追加
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.component;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.util.StringUtils;
 
 import com.yonetani.webapp.accountbook.domain.model.account.bankaccount.BankAccount;
 import com.yonetani.webapp.accountbook.domain.model.account.bankaccount.BankAccountInquiryList;
@@ -30,7 +32,18 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.repository.account.bankaccount.BankAccountTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.paymentmethod.PaymentMethodTableRepository;
 import com.yonetani.webapp.accountbook.domain.service.account.paymentmethod.PaymentMethodNameResolver;
+import com.yonetani.webapp.accountbook.domain.type.account.bankaccount.BankAccountCode;
+import com.yonetani.webapp.accountbook.domain.type.account.bankaccount.BankAccountMemo;
+import com.yonetani.webapp.accountbook.domain.type.account.bankaccount.BankAccountSort;
+import com.yonetani.webapp.accountbook.domain.type.account.bankaccount.BankName;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.ClosingDay;
 import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodKubun;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodMemo;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodName;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodSort;
+import com.yonetani.webapp.accountbook.domain.type.common.EnableFlg;
+import com.yonetani.webapp.accountbook.domain.type.common.EnableUpdateFlg;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 
@@ -64,6 +77,44 @@ class PaymentMethodInfoComponentTest {
 
 	/**
 	 *<pre>
+	 * プリミティブ引数を受け取り値オブジェクトへ変換してからPaymentMethod.from()を呼び出すテスト用ヘルパーメソッドです。
+	 * (06-コーディング規約.md §8.3。from()が値オブジェクト型を要求するため、テストコードから直接プリミティブ値で呼び出せない)
+	 *</pre>
+	 */
+	private PaymentMethod paymentMethodHelper(String userId, String paymentMethodCode, String paymentMethodName, String paymentMethodMemo,
+			String paymentMethodKubun, String bankAccountCode, String closingDay, String paymentMethodSort,
+			boolean enableFlg, boolean enableUpdateFlg) {
+		return PaymentMethod.from(
+				UserId.from(userId),
+				PaymentMethodCode.from(paymentMethodCode),
+				PaymentMethodName.from(paymentMethodName),
+				PaymentMethodMemo.from(paymentMethodMemo),
+				PaymentMethodKubun.from(paymentMethodKubun),
+				StringUtils.hasLength(bankAccountCode) ? BankAccountCode.from(bankAccountCode) : null,
+				ClosingDay.from(closingDay),
+				PaymentMethodSort.from(paymentMethodSort),
+				EnableFlg.from(enableFlg),
+				EnableUpdateFlg.from(enableUpdateFlg));
+	}
+
+	/**
+	 *<pre>
+	 * プリミティブ引数を受け取り値オブジェクトへ変換してからBankAccount.from()を呼び出すテスト用ヘルパーメソッドです。
+	 *</pre>
+	 */
+	private BankAccount bankAccountHelper(String userId, String bankAccountCode, String bankName, String bankAccountMemo,
+			String bankAccountSort, boolean enableFlg) {
+		return BankAccount.from(
+				UserId.from(userId),
+				BankAccountCode.from(bankAccountCode),
+				BankName.from(bankName),
+				BankAccountMemo.from(bankAccountMemo),
+				BankAccountSort.from(bankAccountSort),
+				EnableFlg.from(enableFlg));
+	}
+
+	/**
+	 *<pre>
 	 * createResolver()が支払方法マスタ・銀行口座マスタをそれぞれ1回ずつ(合計2回)しか呼び出さないことを確認します(レビュー指摘④)。
 	 *</pre>
 	 */
@@ -71,9 +122,9 @@ class PaymentMethodInfoComponentTest {
 	@DisplayName("createResolver()はリポジトリを1回ずつしか呼び出さない(N+1回避)")
 	void testCreateResolver_DB呼び出し回数() {
 		when(paymentMethodRepository.findByUserId(any(SearchQueryUserId.class))).thenReturn(PaymentMethodInquiryList.from(List.of(
-				PaymentMethod.from("user01", "001", "現金", null, "1", null, null, "001", true, true))));
+				paymentMethodHelper("user01", "001", "現金", null, "1", null, null, "001", true, true))));
 		when(bankAccountRepository.findById(any(SearchQueryUserId.class))).thenReturn(BankAccountInquiryList.from(List.of(
-				BankAccount.from("user01", "01", "テスト銀行", null, "01", true))));
+				bankAccountHelper("user01", "01", "テスト銀行", null, "01", true))));
 
 		PaymentMethodNameResolver resolver = component.createResolver(TEST_USER_ID);
 		// 複数回名称解決を行っても、リポジトリ呼び出しは構築時の1回のみであること
@@ -94,7 +145,7 @@ class PaymentMethodInfoComponentTest {
 	@DisplayName("getPaymentMethodOptions()はfindSelectableByUserId()の結果から選択肢を生成する")
 	void testGetPaymentMethodOptions() {
 		when(paymentMethodRepository.findSelectableByUserId(any(SearchQueryUserId.class))).thenReturn(PaymentMethodInquiryList.from(List.of(
-				PaymentMethod.from("user01", "001", "現金", null, "1", null, null, "001", true, true))));
+				paymentMethodHelper("user01", "001", "現金", null, "1", null, null, "001", true, true))));
 
 		List<OptionItem> options = component.getPaymentMethodOptions(TEST_USER_ID);
 		assertEquals(1, options.size());
@@ -111,7 +162,7 @@ class PaymentMethodInfoComponentTest {
 	@DisplayName("getFixedCostPaymentMethodOptions()はfindEnabledByUserId()の結果から選択肢を生成する")
 	void testGetFixedCostPaymentMethodOptions() {
 		when(paymentMethodRepository.findEnabledByUserId(any(SearchQueryUserId.class))).thenReturn(PaymentMethodInquiryList.from(List.of(
-				PaymentMethod.from("user01", "999", "支払方法がない", null, "1", null, null, "999", true, false))));
+				paymentMethodHelper("user01", "999", "支払方法がない", null, "1", null, null, "999", true, false))));
 
 		List<OptionItem> options = component.getFixedCostPaymentMethodOptions(TEST_USER_ID);
 		assertEquals(1, options.size());
@@ -127,7 +178,7 @@ class PaymentMethodInfoComponentTest {
 	@DisplayName("getBankAccountOptions()はfindSelectableByUserId()の結果から選択肢を生成する")
 	void testGetBankAccountOptions() {
 		when(bankAccountRepository.findSelectableByUserId(any(SearchQueryUserId.class))).thenReturn(BankAccountInquiryList.from(List.of(
-				BankAccount.from("user01", "01", "〇〇銀行", null, "01", true))));
+				bankAccountHelper("user01", "01", "〇〇銀行", null, "01", true))));
 
 		List<OptionItem> options = component.getBankAccountOptions(TEST_USER_ID);
 		assertEquals(1, options.size());

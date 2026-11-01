@@ -20,6 +20,7 @@
 | 改訂13 | `PaymentMethodInfoComponent` 関連をソースの現状に合わせて更新（dev1実装中のリファクタリング内容を取込）。**(1)** 内部クラスだった `PaymentMethodNameResolver` を `domain/service/account/paymentmethod/` へ移動し、`@Component` を付与しない通常のクラスとした（コンストラクタは `PaymentMethodInquiryList`・`BankAccountInquiryList` を受け取る）。**(2)** 解決結果の値オブジェクト `ResolvedPaymentMethodName`／`ResolvedBankAccountName` を `domain/type/account/paymentmethod/` へ移動し、「－」の保持をドメイン側に置いた（presentation層のレスポンスDTOが application層の内部クラスを参照していた依存を解消）。**(3)** 3.8節の記載を実装に一致させた（リゾルバの戻り値型の誤記、`getFixedCostPaymentMethodOptions()`・単発解決メソッド・`ShopDefaultPaymentMethodCode` 用オーバーロードの欠落を修正）。3.10節を新設 |
 | 改訂14 | dev1実装後に進められた横断的リファクタリング（ドメインモデル`from()`ファクトリのVO型安全化対応・買い物登録ドメインの見直し等。`06_コーディング規約.md`§8参照）とデグレチェックで判明した差異をソース最新化。**対象は「銀行口座マスタ管理画面」「支払方法マスタ管理画面」「収支登録画面（支出側）」の3画面を除く全セクション**（この3画面はリファクタリング・紙芝居仕様の取込みが未完了のため別途対応する）。**(1)** `PAYMENT_METHOD_TABLE`のDDL（2.1.2節）に`PAYMENT_METHOD_MEMO VARCHAR(400)`列が未反映だったため追加（備考欄には記載済みだがDDL本体に反映漏れがあった）。あわせて2.5節・3.4節・3.5節の`PaymentMethod`関連の記載にも`paymentMethodMemo`を反映。**(2)** `Shop.java`／`FixedCost.java`の`from()`ファクトリが全引数VO型に変更されていた点、`FixedCost.updateBulkUpdateItem()`の引数が`(FixedCostPaymentDay, FixedCostPaymentAmount)`に変わっていた点を3.7節・5.4.2節に反映。**(3)** `ExpenditureItem.createExpenditureItem()`が`ExpenditureRegistItem`（presentation層のセッションDTO）を直接受け取らなくなり、呼び出し元（UseCase）側でドメイン型に変換してから渡す方式に修正されていた点（ドメイン→presentation依存違反の解消）を3.7節に反映。**(4)** `ShoppingRegist.createShoppingRegist(userId, inputForm)`は買い物登録ドメインの見直し（別軸のリファクタリング）により`ShoppingRegist.from(...)`（カテゴリ別の値オブジェクトを多数引数に取る形）へ置き換わっていたため3.7節・5.6節の記載を修正（買い物登録ドメイン全体の再設計は本書のスコープ外のため詳細は踏み込まない）。**(5)** `SimpleShoppingRegistUseCase`は照会系`SimpleShoppingRegistInquiryUseCase`と登録・更新系`SimpleShoppingRegistConfirmUseCase`に分割されていたため、1.3節・5.6節・7.2節の参照をすべて修正。**(6)** 3.9節の`ShoppingAggregateSpecification`のコード例が`Pair.of(...)`のままだったが、実装では`Pair`依存がなかったため標準APIの`Map.entry(...)`に差し替えられていた（8章の実装順序が当初から想定していた代替手段どおり）ことを反映。**(7)** 8章実装順序の項目8（`ShoppingRegistExpenditureItemComponent`から`ShoppingAggregateSpecification`を切り出すリファクタリング）は現時点でも未着手であることをソースで再確認（変更なし、既知の残課題として維持） |
 | 改訂15 | 疎通確認で「紙芝居と実装画面の不一致（支払方法・引落先口座の項目欠落／順序違い）が多数あった」との報告を受け、対象画面（3画面を除く）すべてについて紙芝居・実ソースを再度突合した。**結論**：5.7節の列順記載の誤り（下記）以外に実装側の不具合は見つからず、トップ画面リンク追加・固定費関連5画面・店舗マスタ・買い物登録2画面・月別収支照会はいずれも紙芝居どおりに実装済みであることを確認した。**(1)** 5.7節の列順「支出名(区分)/支払方法/支払日/支出金額/引落先口座」が誤りだったことが判明。根拠：紙芝居`AccountBookMonth_支出別.html`のコメント（172行目）はこの順序を記載しているが、同ファイルの実際の`<th>`タグおよび実装済みソースは「支出名(区分)/**支払日**/**支払方法**/支出金額/引落先口座」の順（支払日が支払方法より先）であり、コメントと実マークアップ自体が矛盾していた。実装は実マークアップどおりで正しいため、本書を実態に合わせて訂正した。`Feature1.03_要件定義書.md`3.3節も同様に訂正。**(2)** 5.8節（新設）に、対象画面すべて（トップ画面・固定費関連5画面・店舗登録・買い物登録トップメニュー・買い物登録簡易タイプ・月別収支照会）の「ソースパス／紙芝居パス／支払方法・引落先口座の追加位置」対応表を追加し、紙芝居との突合結果（確認済み・不一致なし）を記録した。**(3)** 10章に、トップ画面へのリンク追加漏れ（紙芝居作成時の考慮漏れ）の経緯を追記。**(4)** `Feature1.03_要件定義書.md`3.2節に、「固定費登録」「買い物登録」が実際には複数の画面に分かれることの内訳表を追加し、画面の網羅性を改善した |
+| 改訂16 | 改訂14で対象外とされていた残り3画面のうち「銀行口座マスタ管理画面」「支払方法マスタ管理画面」について、紙芝居との不一致（有効/無効切替の方式）と`06_コーディング規約.md`§8/§8.4（`from()`型安全性）未対応を是正。**(1) 紙芝居との不一致修正**：初版では有効/無効をメイン更新フォーム内のチェックボックスで切り替える設計だったが、紙芝居（`ManageBankAccount.html`／`ManagePaymentMethod.html`）は編集モード時のみ専用の「無効化／有効化」ボタン（別フォーム`toggleEnable/`へPOST）＋「キャンセル」ボタンを表示し、新規登録モードでは「登録」ボタンのみを表示する設計だった。5.1節・5.2節を紙芝居どおりのボタン方式に書き換え（詳細は両節参照）。あわせて両画面のメイン更新ボタンの文言が常に「登録」固定だった誤りも修正（`action`に応じて「登録」／「更新」を切替）。**(2) `from()`型安全性対応**：`BankAccount.from()`／`PaymentMethod.from()`がプリミティブ引数のままだった問題を、`FixedCost.from()`と同じVO引数方式に修正。呼び出し元（UseCase・DataSource）でプリミティブ→VO変換を実施する方式に統一。あわせて§8.4（ResponseDTO。本来は任意対応だが今回まとめて対応）に従い、`BankAccountListItem`／`PaymentMethodListItem`／`PaymentMethodKubunOptionItem`の各`from()`もVO引数化した。**(3)** 5.8節冒頭の「3画面は別タスクで対応するため対象外」の記載を、本改訂により銀行口座・支払方法の2画面は対応済みである旨に更新（収支登録画面（支出側）のみ引き続き対象外） |
 
 ## 1. 概要
 
@@ -747,7 +748,7 @@ private String bankAccountSortBefore;
 @NotBlank @Size(min=1, max=50) private String bankName;
 @Size(max=100) private String bankAccountMemo; // 任意項目
 @Min(1) @Max(99) private Integer bankAccountSort;
-private Boolean enableFlg; // チェックボックス(デフォルトtrue)
+private Boolean enableFlg; // hidden項目(デフォルトtrue)。切替は専用の「無効化／有効化」ボタン(別フォーム)で行う(改訂16)
 ```
 
 **`BankAccountInfoManageUseCase`**：`ShopInfoManageUseCase` の表示順シフトロジック（`execAction()` の件数キャップ・表示順の再配置）を踏襲するが、上限値は店舗マスタの900件ではなく**99件**（2.1.1参照）。店舗マスタと異なり「区分」選択がない分シンプルになる。
@@ -756,7 +757,9 @@ private Boolean enableFlg; // チェックボックス(デフォルトtrue)
 
 > **突合レビュー指摘O反映**：要件3.1の「無効フラグで一覧から非表示」は、**マスタ管理画面自体の一覧ではなく、各登録画面の選択肢（プルダウン）を指す**という解釈で実装する（要件定義書側もこの解釈に合わせて訂正済み）。銀行口座マスタ管理画面自体の一覧からは無効化した口座を完全に消さない。理由：一覧から完全に消すと再有効化する手段がなくなるため。
 
-**HTML**：新規テンプレート `templates/itemmanage/BankAccountInfoManage.html`（`ShopInfoManage.html` に「口座メモ」テキスト欄・「有効/無効」チェックボックスを追加した構成、`ShopInfoManage.html`と同じく`templates/itemmanage/`直下に配置）。一覧はコード・銀行名・口座メモ・表示順・状態の列を持つリスト。表示/非表示を切り替えるような条件付きJSは不要な画面のため、JSファイルの新規追加はなし。
+> **改訂16反映（紙芝居`ManageBankAccount.html`との不一致を修正）**：有効/無効の切替は、メイン更新フォーム内のチェックボックスではなく、紙芝居どおり**専用の「無効化／有効化」ボタン**（`action=update`の編集モード時のみ表示）で行う。ボタン押下時にJS確認ダイアログを表示し、OKなら対象コードのみを持つ別フォーム（`BankAccountInfoToggleEnable`）を`POST /myhacbook/managebaseinfo/bankaccountinfo/toggleEnable/`へ送信する（`EventInfoManageController`の「イベント終了」ボタン＋`EventInfoDelete`フォームと同じ実装パターン。ただし本画面は行削除ではなく`BankAccount.toggleEnableFlg()`による`ENABLE_FLG`反転更新）。`BankAccountInfoForm.enableFlg`はメイン更新フォームでは編集不可のhidden項目として現在値を保持するのみとし、通常の名称・表示順更新操作で有効/無効状態が意図せず変化しないようにする。ボタンのラベルは現在値に応じて「無効化」（現在有効）／「有効化」（現在無効）を切り替える。
+
+**HTML**：新規テンプレート `templates/itemmanage/BankAccountInfoManage.html`（`ShopInfoManage.html` に「口座メモ」テキスト欄を追加した構成、`ShopInfoManage.html`と同じく`templates/itemmanage/`直下に配置）。一覧はコード・銀行名・口座メモ・表示順・状態の列を持つリスト。登録・編集エリアは紙芝居`ManageBankAccount.html`に準拠し、`action=add`（新規登録モード）では「登録」ボタンのみ、`action=update`（編集モード）では「更新」＋「無効化／有効化」＋「キャンセル」（`initload/`へのリンク。新規登録モードに戻る）の3ボタンを表示する。有効/無効切替ボタンの確認ダイアログ・フォーム送信を行うJSを`static/js/itemmanage/BankAccountInfoManage.js`に新規追加する（`ManageEventInfo.js`と同パターン）。
 
 ### 5.2 支払方法マスタ管理画面（新規）
 
@@ -773,7 +776,7 @@ private String paymentMethodSortBefore;
 private String bankAccountCode;                    // 種別により要否が異なる(下記AssertTrueで判定。現金・電子マネー(前払い式)は不要)
 private String closingDay;                          // クレカのみ必須(下記AssertTrueで判定)
 @Min(1) @Max(989) private Integer paymentMethodSort; // 予約帯990~999は対象外(2.1.2参照)
-private Boolean enableFlg;
+private Boolean enableFlg; // hidden項目(デフォルトtrue)。切替は専用の「無効化／有効化」ボタン(別フォーム)で行う(改訂16)
 // enableUpdateFlgは保持しない(確認事項③回答により、システム行はフォームに読み込まれること自体がない。2.1.2/5.2参照)
 
 @AssertTrue(message = "選択した支払方法種別では、銀行口座の指定が必要です。")
@@ -817,6 +820,8 @@ String normalizedClosingDay = kubun.requiresClosingDay() ? inputForm.getClosingD
 - **無効化（`ENABLE_FLG=false`）した支払方法の一覧表示**（突合レビュー指摘O反映）：システム予約行（上記）とは別の話として、ユーザーが無効化した通常の支払方法は、銀行口座マスタ管理画面（5.1節）と同じ方針で**一覧上「無効」バッジ付きで表示**する（再有効化できるように）。ただし各登録画面のプルダウン（`findSelectableByUserId()`）には出さない。要件3.1の「無効フラグで一覧から非表示」は、マスタ管理画面自体の一覧ではなく各登録画面の選択肢を指す解釈で統一する（要件定義書側もこの解釈に合わせて訂正済み）。
 
 **HTML**：新規テンプレート `templates/itemmanage/PaymentMethodInfoManage.html`（`templates/itemmanage/`直下、`ShopInfoManage.html`と同じ配置）。登録・更新フォームは紙芝居 `ManagePaymentMethod.html` に準拠する（支払方法種別 `<select>` の下に「電子マネーでも、紐づけたクレジットカードから支払いを行う場合（クレジットカード払い）は『クレジットカード』として登録してください。『電子マネー(前払い式)』は、電子マネーの残高から支払った場合のみ選択します。」という補足文を配置）。銀行口座欄・集計開始日欄は、種別＝現金／電子マネー（前払い式）のとき銀行口座欄を非表示、種別＝クレジットカードのときのみ集計開始日欄を表示するJSで制御する（紙芝居の`toggleAccountAndClosingDayAreas()`と同等のロジック）。一覧は予約行を含まない（前述のとおり）。
+
+> **改訂16反映（紙芝居`ManagePaymentMethod.html`との不一致を修正）**：有効/無効の切替は、5.1節の銀行口座マスタ管理画面と同じ方針で、メイン更新フォーム内のチェックボックスではなく**専用の「無効化／有効化」ボタン**（`action=update`の編集モード時のみ表示）で行う。ボタン押下時にJS確認ダイアログを表示し、OKなら対象コードのみを持つ別フォーム（`PaymentMethodInfoToggleEnable`）を`POST /myhacbook/managebaseinfo/paymentmethodinfo/toggleEnable/`へ送信する。`PaymentMethodInfoManageUseCase.execToggleEnableFlg()`は対象を`PaymentMethod.toggleEnableFlg()`で反転更新するが、`readPaymentMethodInfo(user, code)`と同様に対象が`ENABLE_UPDATE_FLG=false`（システム予約行）の場合は更新を拒否し、エラーメッセージを設定して一覧表示に戻す（一覧に出ないため通常操作では発生しないが、URL直叩き等の不正操作に備えた防御）。`PaymentMethodInfoForm.enableFlg`はメイン更新フォームでは編集不可のhidden項目として現在値を保持するのみとする。登録・更新ボタンの文言は`action`に応じて「登録」／「更新」を切替え、`action=update`のときのみ「無効化／有効化」ボタンと「キャンセル」リンク（`initload/`へのリンク。新規登録モードに戻る）を表示する。確認ダイアログ・フォーム送信を行うJSは既存の`static/js/itemmanage/PaymentMethodInfoManage.js`（レビュー指摘⑤で分離済み）に追加する。
 
 > **突合レビュー指摘E反映**：3.5節は「呼び出し側（Form のバリデーション・UseCase・**画面制御JS**）は`requiresAccount()`／`requiresClosingDay()`の2述語のみを参照する」としているが、JSはJavaのenumメソッドを直接呼べないため、紙芝居の`toggleAccountAndClosingDayAreas()`のようにJS側で種別コード（`'1'`,`'3'`,`'5'`等）を直書きすると、Java側の述語とJS側の分岐が二重管理になり、種別追加時にJSの修正漏れが再発しうる（電子マネー対応（改訂2）が防ごうとした問題そのもの）。これを避けるため、**サーバー側で述語を評価した結果をHTMLの`<option>`要素に埋め込み、JSは属性値のみを参照する**方式にする（5.6節`SimpleShoppingRegist.js`の`data-default-payment-method`と同じ手法）。
 
@@ -1019,7 +1024,7 @@ private boolean isPaymentMethodCodeValid() {
 
 ### 5.8 紙芝居と実装画面の対応表（支払方法・引落先口座関連、改訂14で新設）
 
-疎通確認（2026-10時点）で、紙芝居と実装画面の間に項目の欠落・順序違いが疑われる事例が複数報告されたため、**本書に記載が薄かった画面ごとの具体的な追加位置・レイアウトを本節に一覧化する**。「銀行口座マスタ管理画面」「支払方法マスタ管理画面」「収支登録画面（支出側）」の3画面は別タスクで対応するため対象外。下表はいずれも**改訂14時点でのソース確認の結果、紙芝居どおりに実装済みであることを確認済み**（5.7節の列順以外に実装側の不具合は見つからなかった）。今後の改修でズレが生じた場合の確認基準として使用する。
+疎通確認（2026-10時点）で、紙芝居と実装画面の間に項目の欠落・順序違いが疑われる事例が複数報告されたため、**本書に記載が薄かった画面ごとの具体的な追加位置・レイアウトを本節に一覧化する**。「銀行口座マスタ管理画面」「支払方法マスタ管理画面」「収支登録画面（支出側）」の3画面は改訂14時点では別タスクで対応するため対象外としていたが、このうち銀行口座・支払方法の2画面は改訂16で紙芝居との不一致（有効/無効切替の方式）を是正済み（5.1節・5.2節参照）。収支登録画面（支出側）のみ引き続き対象外。下表（収支登録画面を除く）はいずれも**改訂14時点でのソース確認の結果、紙芝居どおりに実装済みであることを確認済み**（5.7節の列順以外に実装側の不具合は見つからなかった）。今後の改修でズレが生じた場合の確認基準として使用する。
 
 | # | 画面 | ソース | 紙芝居 | 支払方法・引落先口座の追加内容と位置 |
 |---|------|--------|--------|------------------------------------|

@@ -6,6 +6,7 @@
 		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
 		crossorigin="anonymous">
 <link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<script th:src="@{/js/itemmanage/BankAccountInfoManage.js}"></script>
 <title>情報管理(銀行口座)</title>
 </head>
 <body>
@@ -45,17 +46,23 @@
 		 					<input type="text" class="form-control w10" th:errorclass="is-invalid" th:field="*{bankAccountSort}">
 		 					<p class="invalid-feedback" th:errors="*{bankAccountSort}"></p>
 						</div>
-						<div class="mb-3 form-check">
-							<input type="checkbox" class="form-check-input" th:field="*{enableFlg}">
-							<label for="enableFlg" class="form-check-label">有効</label>
-						</div>
 						<div class="mb-3">
-							<button class="btn btn-primary" type="submit">登録</button>
+							<button class="btn btn-primary" type="submit" th:text="*{#strings.equals(action,'update')} ? '更新' : '登録'">登録</button>
+							<th:block th:if="*{#strings.equals(action,'update')}">
+								<button class="btn btn-outline-danger" type="button" id="bank-account-info-action-toggle-btn"
+										th:text="*{enableFlg} ? '無効化' : '有効化'">無効化</button>
+								<a class="btn btn-outline-secondary" th:href="@{/myhacbook/managebaseinfo/bankaccountinfo/initload/}">キャンセル</a>
+							</th:block>
 							<input type="hidden" th:field="*{action}" />
 							<input type="hidden" th:field="*{bankAccountCode}" />
 							<input type="hidden" th:field="*{bankAccountSortBefore}" />
+							<input type="hidden" th:field="*{enableFlg}" />
 						</div>
 					</div>
+					</form>
+					<!--/* 有効/無効切替実行時に送信するフォーム */-->
+					<form name="BankAccountInfoToggleEnable" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/bankaccountinfo/toggleEnable/}" th:object="${bankAccountInfoForm}">
+						<input type="hidden" th:field="*{bankAccountCode}" />
 					</form>
 				</div>
 			</div>

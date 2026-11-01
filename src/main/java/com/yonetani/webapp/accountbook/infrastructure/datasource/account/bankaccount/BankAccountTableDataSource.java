@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/08/18 : 1.00.00  feature-1.03-dev1   新規作成
+ * 2026/10/18 : 1.00.01  feature-1.03-dev1   BankAccount.from()型安全性対応(06-§8)に伴うDTO→VO変換の呼び出し元への移動
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.bankaccount;
@@ -21,6 +22,12 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndBankAccountSort;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndBankAccountSortBetweenAB;
 import com.yonetani.webapp.accountbook.domain.repository.account.bankaccount.BankAccountTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.bankaccount.BankAccountCode;
+import com.yonetani.webapp.accountbook.domain.type.account.bankaccount.BankAccountMemo;
+import com.yonetani.webapp.accountbook.domain.type.account.bankaccount.BankAccountSort;
+import com.yonetani.webapp.accountbook.domain.type.account.bankaccount.BankName;
+import com.yonetani.webapp.accountbook.domain.type.common.EnableFlg;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.bankaccount.BankAccountReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndBankAccountCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndBankAccountSortBetweenABSearchQueryDto;
@@ -79,10 +86,13 @@ public class BankAccountTableDataSource implements BankAccountTableRepository {
 	 */
 	@Override
 	public BankAccountInquiryList findById(SearchQueryUserId userId) {
+		// 検索結果を取得
 		List<BankAccountReadWriteDto> searchResult = mapper.findById(UserIdSearchQueryDto.from(userId));
 		if(searchResult == null) {
+			// 検索結果なしの場合、0件データを返却
 			return BankAccountInquiryList.from(null);
 		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
 			return BankAccountInquiryList.from(searchResult.stream().map(dto -> createBankAccount(dto)).collect(Collectors.toUnmodifiableList()));
 		}
 	}
@@ -92,11 +102,14 @@ public class BankAccountTableDataSource implements BankAccountTableRepository {
 	 */
 	@Override
 	public BankAccountInquiryList findById(SearchQueryUserIdAndBankAccountSort search) {
+		// 検索結果を取得
 		List<BankAccountReadWriteDto> searchResult = mapper.findByIdAndBankAccountSort(
 				UserIdAndBankAccountSortSearchQueryDto.from(search));
 		if(searchResult == null) {
+			// 検索結果なしの場合、0件データを返却
 			return BankAccountInquiryList.from(null);
 		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
 			return BankAccountInquiryList.from(searchResult.stream().map(dto -> createBankAccount(dto)).collect(Collectors.toUnmodifiableList()));
 		}
 	}
@@ -106,11 +119,14 @@ public class BankAccountTableDataSource implements BankAccountTableRepository {
 	 */
 	@Override
 	public BankAccountInquiryList findById(SearchQueryUserIdAndBankAccountSortBetweenAB search) {
+		// 検索結果を取得
 		List<BankAccountReadWriteDto> searchResult = mapper.findByIdAndBankAccountSortBetween(
 				UserIdAndBankAccountSortBetweenABSearchQueryDto.from(search));
 		if(searchResult == null) {
+			// 検索結果なしの場合、0件データを返却
 			return BankAccountInquiryList.from(null);
 		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
 			return BankAccountInquiryList.from(searchResult.stream().map(dto -> createBankAccount(dto)).collect(Collectors.toUnmodifiableList()));
 		}
 	}
@@ -120,10 +136,13 @@ public class BankAccountTableDataSource implements BankAccountTableRepository {
 	 */
 	@Override
 	public BankAccount findById(SearchQueryUserIdAndBankAccountCode search) {
+		// 検索結果を取得
 		BankAccountReadWriteDto result = mapper.findByIdAndBankAccountCode(UserIdAndBankAccountCodeSearchQueryDto.from(search));
 		if(result == null) {
+			// 検索結果なしの場合、nullを返却
 			return null;
 		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
 			return createBankAccount(result);
 		}
 	}
@@ -133,6 +152,7 @@ public class BankAccountTableDataSource implements BankAccountTableRepository {
 	 */
 	@Override
 	public int countById(SearchQueryUserId userId) {
+		// ユーザIDで検索し、登録されている銀行口座情報の件数を返す
 		return mapper.countById(UserIdSearchQueryDto.from(userId));
 	}
 
@@ -141,10 +161,13 @@ public class BankAccountTableDataSource implements BankAccountTableRepository {
 	 */
 	@Override
 	public BankAccountInquiryList findSelectableByUserId(SearchQueryUserId userId) {
+		// 検索結果を取得(有効な銀行口座のみ)
 		List<BankAccountReadWriteDto> searchResult = mapper.findSelectableByUserId(UserIdSearchQueryDto.from(userId));
 		if(searchResult == null) {
+			// 検索結果なしの場合、0件データを返却
 			return BankAccountInquiryList.from(null);
 		} else {
+			// 検索結果ありの場合、ドメインに変換して返却
 			return BankAccountInquiryList.from(searchResult.stream().map(dto -> createBankAccount(dto)).collect(Collectors.toUnmodifiableList()));
 		}
 	}
@@ -159,12 +182,18 @@ public class BankAccountTableDataSource implements BankAccountTableRepository {
 	 */
 	private BankAccount createBankAccount(BankAccountReadWriteDto dto) {
 		return BankAccount.from(
-				dto.getUserId(),
-				dto.getBankAccountCode(),
-				dto.getBankName(),
-				dto.getBankAccountMemo(),
-				dto.getBankAccountSort(),
-				dto.isEnableFlg());
+				// ユーザID
+				UserId.from(dto.getUserId()),
+				// 銀行口座コード
+				BankAccountCode.from(dto.getBankAccountCode()),
+				// 銀行名
+				BankName.from(dto.getBankName()),
+				// 銀行口座メモ
+				BankAccountMemo.from(dto.getBankAccountMemo()),
+				// 表示順
+				BankAccountSort.from(dto.getBankAccountSort()),
+				// 有効/無効フラグ
+				EnableFlg.from(dto.isEnableFlg()));
 	}
 
 	/**
@@ -177,11 +206,17 @@ public class BankAccountTableDataSource implements BankAccountTableRepository {
 	 */
 	private BankAccountReadWriteDto createBankAccountReadWriteDto(BankAccount data) {
 		return BankAccountReadWriteDto.from(
+				// ユーザID
 				data.getUserId().getValue(),
+				// 銀行口座コード
 				data.getBankAccountCode().getValue(),
+				// 銀行名
 				data.getBankName().getValue(),
+				// 銀行口座メモ
 				data.getBankAccountMemo().getValue(),
+				// 表示順
 				data.getBankAccountSort().getValue(),
+				// 有効/無効フラグ
 				data.getEnableFlg().getValue());
 	}
 }

@@ -51,8 +51,11 @@ public class UserIdAndPaymentMethodSortBetweenABSearchQueryDto {
 	 */
 	public static UserIdAndPaymentMethodSortBetweenABSearchQueryDto from(SearchQueryUserIdAndPaymentMethodSortBetweenAB search) {
 		return new UserIdAndPaymentMethodSortBetweenABSearchQueryDto(
+				// 検索条件:ユーザID
 				search.getUserId().getValue(),
+				// 検索条件:支払方法表示順A
 				search.getPaymentMethodSortA().getValue(),
+				// 検索条件:支払方法表示順B
 				search.getPaymentMethodSortB().getValue());
 	}
 }

@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/08/19 : 1.00.00  feature-1.03-dev1   新規作成
+ * 2026/10/18 : 1.00.01  feature-1.03-dev1   紙芝居準拠の有効/無効切替対応(enableFlgはhidden項目に変更、専用の「無効化／有効化」ボタンで切替)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.request.itemmanage;
@@ -57,7 +58,8 @@ public class PaymentMethodInfoForm {
 	@Min(1)
 	@Max(989)
 	private Integer paymentMethodSort;
-	// 有効/無効フラグ(デフォルトtrue)
+	// 有効/無効フラグ(デフォルトtrue。画面上はhidden項目で現在値を保持するのみで、メイン更新フォームでは編集不可。
+	// 切替は専用の「無効化／有効化」ボタン(別フォーム→toggleEnable/)で行う)
 	private Boolean enableFlg = Boolean.TRUE;
 	// enableUpdateFlgは保持しない(システム行はフォームに読み込まれること自体がない)
 
@@ -70,7 +72,7 @@ public class PaymentMethodInfoForm {
 	 *
 	 */
 	@AssertTrue(message = "選択した支払方法種別では、銀行口座の指定が必要です。")
-	private boolean isBankAccountValid() {
+	public boolean isBankAccountValid() {
 		return PaymentMethodKubun.tryFrom(paymentMethodKubun)
 				.map(kubun -> !kubun.requiresAccount() || StringUtils.hasLength(bankAccountCode))
 				.orElse(true);
@@ -84,7 +86,7 @@ public class PaymentMethodInfoForm {
 	 *
 	 */
 	@AssertTrue(message = "クレジットカードを選択した場合、集計開始日は必須です。")
-	private boolean isClosingDayValid() {
+	public boolean isClosingDayValid() {
 		return PaymentMethodKubun.tryFrom(paymentMethodKubun)
 				.map(kubun -> !kubun.requiresClosingDay() || StringUtils.hasLength(closingDay))
 				.orElse(true);
