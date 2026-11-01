@@ -71,10 +71,9 @@
 								<div class="input-group w10">
 									<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{shoppingDate}" required>
 									<p class="invalid-feedback" th:errors="*{shoppingDate}"></p>
-									<!--/* isCheckedShoppingDateの結果を出力 */-->
-									<p class="invalid-feedback" th:errors="*{checkedShoppingDate}" style="display: block;"></p>
-									
 								</div>
+								<!--/* isCheckedShoppingDateの結果を出力 */-->
+								<p class="invalid-feedback" th:errors="*{checkedShoppingDate}" style="display: block;"></p>
 							</div>
 							<!-- 買い物情報登録エリア -->
 							<table class="table table-sm table-borderless">

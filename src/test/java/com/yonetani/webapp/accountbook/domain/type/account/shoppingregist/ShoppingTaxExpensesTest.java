@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/09/20 : 1.00.00  feature-1.03-dev1   新規作成
+ * 2026/11/01 : 1.00.01  feature-1.03-dev1   tryFrom(Integer)・hasValueWithoutAmount()のテストを追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.shoppingregist;
@@ -12,6 +13,7 @@ package com.yonetani.webapp.accountbook.domain.type.account.shoppingregist;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -172,5 +174,42 @@ class ShoppingTaxExpensesTest {
 		// 検証（null as zero扱い）
 		assertEquals(new BigDecimal("10000.00"), result.getValue());
 	}
-	
+
+	@Test
+	@DisplayName("正常系：tryFromは正の金額・0円・null値で値ありのOptionalを返す")
+	void testTryFrom_正常系() {
+		assertTrue(ShoppingTaxExpenses.tryFrom(10000).isPresent());
+		assertTrue(ShoppingTaxExpenses.tryFrom(0).isPresent());
+		assertTrue(ShoppingTaxExpenses.tryFrom(null).isPresent());
+	}
+
+	@Test
+	@DisplayName("異常系：tryFromはマイナス値でOptional.empty()を返す")
+	void testTryFrom_異常系() {
+		assertTrue(ShoppingTaxExpenses.tryFrom(-1000).isEmpty());
+	}
+
+	@Test
+	@DisplayName("異常系：hasValueWithoutAmountは消費税に値があり購入金額が未入力の場合trueを返す")
+	void testHasValueWithoutAmount_異常系_消費税のみ入力() {
+		ShoppingTaxExpenses tax = ShoppingTaxExpenses.from(Integer.valueOf(100));
+		ShoppingExpenditureAmount amount = ShoppingExpenditureAmount.from((Integer)null);
+		assertTrue(tax.hasValueWithoutAmount(amount));
+	}
+
+	@Test
+	@DisplayName("正常系：hasValueWithoutAmountは購入金額に値がある場合falseを返す")
+	void testHasValueWithoutAmount_正常系_両方入力あり() {
+		ShoppingTaxExpenses tax = ShoppingTaxExpenses.from(Integer.valueOf(100));
+		ShoppingExpenditureAmount amount = ShoppingExpenditureAmount.from(Integer.valueOf(1000));
+		assertFalse(tax.hasValueWithoutAmount(amount));
+	}
+
+	@Test
+	@DisplayName("正常系：hasValueWithoutAmountは消費税が未入力の場合falseを返す")
+	void testHasValueWithoutAmount_正常系_消費税未入力() {
+		ShoppingTaxExpenses tax = ShoppingTaxExpenses.from((Integer)null);
+		ShoppingExpenditureAmount amount = ShoppingExpenditureAmount.from((Integer)null);
+		assertFalse(tax.hasValueWithoutAmount(amount));
+	}
 }

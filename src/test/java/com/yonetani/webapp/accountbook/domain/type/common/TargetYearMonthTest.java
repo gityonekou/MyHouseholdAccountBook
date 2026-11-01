@@ -6,11 +6,14 @@
  * 日付       : version  コメントなど
  * 2026/05/07 : 1.01.03  新規作成
  * 2026/09/10 : 1.03.00  リファクタリング対応：年項目、月項目のドメインタイプの文字列型返却を廃止、フォーマットメソッド名の変更
+ * 2026/10/31 : 1.04.00  feature-1.03-dev1   tryFrom(String)のテストを追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -324,5 +327,29 @@ class TargetYearMonthTest {
 
 		// 検証
 		assertEquals(ym1.hashCode(), ym2.hashCode());
+	}
+
+	// ===========================================================
+	// tryFrom(String)
+	// ===========================================================
+
+	@Test
+	@DisplayName("正常系：tryFromは有効な年月で値ありのOptionalを返す")
+	void testTryFrom_正常系() {
+		// 実行
+		Optional<TargetYearMonth> result = TargetYearMonth.tryFrom("202511");
+
+		// 検証
+		assertTrue(result.isPresent());
+		assertEquals("202511", result.get().getValue());
+	}
+
+	@Test
+	@DisplayName("異常系：tryFromはnull値・空文字・桁数不正・カレンダー上無効な年月でOptional.empty()を返す")
+	void testTryFrom_異常系() {
+		assertTrue(TargetYearMonth.tryFrom(null).isEmpty());
+		assertTrue(TargetYearMonth.tryFrom("").isEmpty());
+		assertTrue(TargetYearMonth.tryFrom("20251").isEmpty());
+		assertTrue(TargetYearMonth.tryFrom("202513").isEmpty());
 	}
 }

@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/08/19 : 1.00.00  feature-1.03-dev1   新規作成
+ * 2026/11/01 : 1.00.01  feature-1.03-dev1   相関チェック(@AssertTrue)のドメイン層移動に伴うテストを追加・更新(isCheckedShoppingDate/isCheckedShopKubunCodeConsumerGoods/isCheckedTax)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.request.account.regist;
@@ -27,7 +28,7 @@ import org.junit.jupiter.api.Test;
 /**
  *<pre>
  * SimpleShoppingRegistInfoFormクラスのテストクラスです。
- * 相関バリデーション(isCheckedShoppingDate/isCheckedShopKubunCodeMedicalshop/isCheckedShopKubunCodeBarbershop/
+ * 相関バリデーション(isCheckedShoppingDate/isCheckedShopKubunCodeConsumerGoods/
  * isCheckedTax/isPaymentMethodCodeValid)を検証します。
  *
  *</pre>
@@ -90,42 +91,85 @@ class SimpleShoppingRegistInfoFormTest {
 		assertTrue(form.isCheckedShoppingDate());
 	}
 
-	// ========== isCheckedShopKubunCodeMedicalshop / isCheckedShopKubunCodeBarbershop ==========
+	@Test
+	@DisplayName("異常系：targetYearMonthが未入力(null)の場合はfalse(他項目に形式チェックがないため、ここで検出する)")
+	void testIsCheckedShoppingDate_異常系_targetYearMonth未入力() {
+		SimpleShoppingRegistInfoForm form = createValidForm();
+		form.setTargetYearMonth(null);
+		assertFalse(form.isCheckedShoppingDate());
+	}
 
 	@Test
-	@DisplayName("正常系：店舗区分が薬局系以外の場合、日用品未入力でもtrue")
-	void testIsCheckedShopKubunCodeMedicalshop_正常系_対象外区分はtrue() {
+	@DisplayName("異常系：targetYearMonthが不正な形式値の場合はfalse(他項目に形式チェックがないため、ここで検出する)")
+	void testIsCheckedShoppingDate_異常系_targetYearMonth不正形式() {
+		SimpleShoppingRegistInfoForm form = createValidForm();
+		form.setTargetYearMonth("2025");
+		assertFalse(form.isCheckedShoppingDate());
+	}
+
+	// ========== isCheckedShopKubunCodeConsumerGoods ==========
+
+	@Test
+	@DisplayName("正常系：店舗区分が対象外区分(901)の場合、日用品未入力でもtrue")
+	void testIsCheckedShopKubunCodeConsumerGoods_正常系_対象外区分はtrue() {
 		SimpleShoppingRegistInfoForm form = createValidForm();
 		form.setShopKubunCode("901");
 		form.setShoppingConsumerGoodsExpenses(null);
-		assertTrue(form.isCheckedShopKubunCodeMedicalshop());
+		assertTrue(form.isCheckedShopKubunCodeConsumerGoods());
 	}
 
 	@Test
-	@DisplayName("異常系：店舗区分が薬局/薬局複合店/病院かつ日用品未入力の場合はfalse")
-	void testIsCheckedShopKubunCodeMedicalshop_異常系_日用品未入力() {
+	@DisplayName("異常系：店舗区分が薬局/薬局複合店/病院(905)かつ日用品未入力の場合はfalse")
+	void testIsCheckedShopKubunCodeConsumerGoods_異常系_医療系_日用品未入力() {
 		SimpleShoppingRegistInfoForm form = createValidForm();
 		form.setShopKubunCode("905");
 		form.setShoppingConsumerGoodsExpenses(null);
-		assertFalse(form.isCheckedShopKubunCodeMedicalshop());
+		assertFalse(form.isCheckedShopKubunCodeConsumerGoods());
 	}
 
 	@Test
-	@DisplayName("正常系：店舗区分が薬局/薬局複合店/病院かつ日用品入力ありの場合はtrue")
-	void testIsCheckedShopKubunCodeMedicalshop_正常系_日用品入力あり() {
+	@DisplayName("正常系：店舗区分が薬局/薬局複合店/病院(905)かつ日用品入力ありの場合はtrue")
+	void testIsCheckedShopKubunCodeConsumerGoods_正常系_医療系_日用品入力あり() {
 		SimpleShoppingRegistInfoForm form = createValidForm();
 		form.setShopKubunCode("905");
 		form.setShoppingConsumerGoodsExpenses(1000);
-		assertTrue(form.isCheckedShopKubunCodeMedicalshop());
+		assertTrue(form.isCheckedShopKubunCodeConsumerGoods());
 	}
 
 	@Test
-	@DisplayName("異常系：店舗区分が理髪店かつ日用品未入力の場合はfalse")
-	void testIsCheckedShopKubunCodeBarbershop_異常系_日用品未入力() {
+	@DisplayName("異常系：店舗区分が理髪店(908)かつ日用品未入力の場合はfalse")
+	void testIsCheckedShopKubunCodeConsumerGoods_異常系_理髪店_日用品未入力() {
 		SimpleShoppingRegistInfoForm form = createValidForm();
 		form.setShopKubunCode("908");
 		form.setShoppingConsumerGoodsExpenses(null);
-		assertFalse(form.isCheckedShopKubunCodeBarbershop());
+		assertFalse(form.isCheckedShopKubunCodeConsumerGoods());
+	}
+
+	@Test
+	@DisplayName("正常系：店舗区分が理髪店(908)かつ日用品入力ありの場合はtrue")
+	void testIsCheckedShopKubunCodeConsumerGoods_正常系_理髪店_日用品入力あり() {
+		SimpleShoppingRegistInfoForm form = createValidForm();
+		form.setShopKubunCode("908");
+		form.setShoppingConsumerGoodsExpenses(1000);
+		assertTrue(form.isCheckedShopKubunCodeConsumerGoods());
+	}
+
+	@Test
+	@DisplayName("正常系：店舗区分が未入力(空文字)の場合はtrue(@NotBlank側で検出するためチェック対象外)")
+	void testIsCheckedShopKubunCodeConsumerGoods_正常系_未入力() {
+		SimpleShoppingRegistInfoForm form = createValidForm();
+		form.setShopKubunCode("");
+		form.setShoppingConsumerGoodsExpenses(null);
+		assertTrue(form.isCheckedShopKubunCodeConsumerGoods());
+	}
+
+	@Test
+	@DisplayName("正常系：店舗区分が不正な形式値の場合はtrue(tryFrom()でOptional.empty()のためチェック対象外)")
+	void testIsCheckedShopKubunCodeConsumerGoods_正常系_不正形式値() {
+		SimpleShoppingRegistInfoForm form = createValidForm();
+		form.setShopKubunCode("ABC");
+		form.setShoppingConsumerGoodsExpenses(null);
+		assertTrue(form.isCheckedShopKubunCodeConsumerGoods());
 	}
 
 	// ========== isCheckedTax ==========
@@ -147,12 +191,84 @@ class SimpleShoppingRegistInfoFormTest {
 	}
 
 	@Test
-	@DisplayName("異常系：金額が未入力で消費税のみ入力されている場合はfalse")
+	@DisplayName("異常系：金額が未入力で消費税のみ入力されている場合はfalse(食料品(必須))")
 	void testIsCheckedTax_異常系_消費税のみ入力() {
 		SimpleShoppingRegistInfoForm form = createValidForm();
 		form.setShoppingFoodExpenses(null);
 		form.setShoppingFoodTaxExpenses(100);
 		assertFalse(form.isCheckedTax());
+	}
+
+	@Test
+	@DisplayName("異常系：金額が未入力で消費税のみ入力されている場合はfalse(食料品B(無駄遣い))")
+	void testIsCheckedTax_異常系_消費税のみ入力_食料品B() {
+		SimpleShoppingRegistInfoForm form = createValidForm();
+		form.setShoppingFoodBExpenses(null);
+		form.setShoppingFoodBTaxExpenses(100);
+		assertFalse(form.isCheckedTax());
+	}
+
+	@Test
+	@DisplayName("異常系：金額が未入力で消費税のみ入力されている場合はfalse(食料品C(お酒類))")
+	void testIsCheckedTax_異常系_消費税のみ入力_食料品C() {
+		SimpleShoppingRegistInfoForm form = createValidForm();
+		form.setShoppingFoodCExpenses(null);
+		form.setShoppingFoodCTaxExpenses(100);
+		assertFalse(form.isCheckedTax());
+	}
+
+	@Test
+	@DisplayName("異常系：金額が未入力で消費税のみ入力されている場合はfalse(外食)")
+	void testIsCheckedTax_異常系_消費税のみ入力_外食() {
+		SimpleShoppingRegistInfoForm form = createValidForm();
+		form.setShoppingDineOutExpenses(null);
+		form.setShoppingDineOutTaxExpenses(100);
+		assertFalse(form.isCheckedTax());
+	}
+
+	@Test
+	@DisplayName("異常系：金額が未入力で消費税のみ入力されている場合はfalse(日用品)")
+	void testIsCheckedTax_異常系_消費税のみ入力_日用品() {
+		SimpleShoppingRegistInfoForm form = createValidForm();
+		form.setShoppingConsumerGoodsExpenses(null);
+		form.setShoppingConsumerGoodsTaxExpenses(100);
+		assertFalse(form.isCheckedTax());
+	}
+
+	@Test
+	@DisplayName("異常系：金額が未入力で消費税のみ入力されている場合はfalse(衣料品(私服))")
+	void testIsCheckedTax_異常系_消費税のみ入力_衣料品() {
+		SimpleShoppingRegistInfoForm form = createValidForm();
+		form.setShoppingClothesExpenses(null);
+		form.setShoppingClothesTaxExpenses(100);
+		assertFalse(form.isCheckedTax());
+	}
+
+	@Test
+	@DisplayName("異常系：金額が未入力で消費税のみ入力されている場合はfalse(仕事)")
+	void testIsCheckedTax_異常系_消費税のみ入力_仕事() {
+		SimpleShoppingRegistInfoForm form = createValidForm();
+		form.setShoppingWorkExpenses(null);
+		form.setShoppingWorkTaxExpenses(100);
+		assertFalse(form.isCheckedTax());
+	}
+
+	@Test
+	@DisplayName("異常系：金額が未入力で消費税のみ入力されている場合はfalse(住居設備)")
+	void testIsCheckedTax_異常系_消費税のみ入力_住居設備() {
+		SimpleShoppingRegistInfoForm form = createValidForm();
+		form.setShoppingHouseEquipmentExpenses(null);
+		form.setShoppingHouseEquipmentTaxExpenses(100);
+		assertFalse(form.isCheckedTax());
+	}
+
+	@Test
+	@DisplayName("正常系：金額がマイナス値(不正形式)で消費税入力ありの場合はtrue(tryFrom()でOptional.empty()のため@Min側で検出)")
+	void testIsCheckedTax_正常系_金額不正形式() {
+		SimpleShoppingRegistInfoForm form = createValidForm();
+		form.setShoppingFoodExpenses(-1);
+		form.setShoppingFoodTaxExpenses(100);
+		assertTrue(form.isCheckedTax());
 	}
 
 	// ========== paymentMethodCode（@NotBlank / isPaymentMethodCodeValid） ==========

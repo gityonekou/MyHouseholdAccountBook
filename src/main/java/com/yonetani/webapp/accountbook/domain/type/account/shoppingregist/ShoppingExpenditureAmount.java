@@ -8,14 +8,17 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/09/20 : 1.00.00  feature-1.03-dev1   追加リファクタリングにより新規作成（買い物登録の買い物カテゴリ毎にあった購入金額項目を統合）
+ * 2026/11/01 : 1.00.01  feature-1.03-dev1   tryFrom(Integer)追加(SimpleShoppingRegistInfoFormの相関チェックのドメイン層移動対応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.shoppingregist;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Optional;
 
 import com.yonetani.webapp.accountbook.domain.type.common.NullableMoney;
+import com.yonetani.webapp.accountbook.domain.type.common.SafeDomainFactory;
 
 import lombok.EqualsAndHashCode;
 
@@ -103,7 +106,20 @@ public class ShoppingExpenditureAmount extends NullableMoney {
 		// 買い物購入金額項目ドメインタイプを生成
 		return ShoppingExpenditureAmount.from(amount);
 	}
-	
+
+	/**
+	 *<pre>
+	 * Integer値から「買い物購入金額」項目の値を表すドメインタイプの生成を試みます。
+	 * 不正な値(マイナス値)の場合は例外を発生させずOptional.empty()を返します。
+	 *</pre>
+	 * @param intAmount 買い物購入金額入力値
+	 * @return 生成に成功した場合は値ありのOptional、不正な値の場合はOptional.empty()
+	 *
+	 */
+	public static Optional<ShoppingExpenditureAmount> tryFrom(Integer intAmount) {
+		return SafeDomainFactory.tryCreate(() -> ShoppingExpenditureAmount.from(intAmount));
+	}
+
 	/**
 	 *<pre>
 	 * 買い物購入金額の値を指定した買い物購入金額の値で加算(this + addValue)した値を返します。

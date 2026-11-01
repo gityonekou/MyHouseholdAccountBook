@@ -9,6 +9,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2024/12/07 : 1.00.00                      新規作成
  * 2026/09/20 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応（NullableMoneyを継承し、購入金額と消費税を買い物登録の共通ドメインタイプに変更、ShoppingFoodクラスを集約(ShoppingFoodは廃止))
+ * 2026/11/01 : 1.01.01  feature-1.03-dev1   ガード節(消費税のみ入力NG)をShoppingTaxExpenses.hasValueWithoutAmount()に委譲(重複解消)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.shoppingregist;
@@ -123,7 +124,7 @@ public class ShoppingFoodExpenditureItem extends NullableMoney {
 			throw new MyHouseholdAccountBookRuntimeException("「食料品(必須)消費税」項目にnullが指定されました。管理者に問い合わせてください。");
 		}
 		// ガード節(食料品(必須)消費税の値ありの場合で、食料品(必須)購入金額の値がnull値)
-		if(amount.isNull() && !taxAmount.isNull()) {
+		if(taxAmount.hasValueWithoutAmount(amount)) {
 			throw new MyHouseholdAccountBookRuntimeException("「食料品(必須)」項目の設定値が不正です。管理者に問い合わせてください。[amountValue=null][taxAmountValue=" + taxAmount.toString() + "]");
 		}
 		

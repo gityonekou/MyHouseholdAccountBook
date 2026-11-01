@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/09/20 : 1.00.00  feature-1.03-dev1   新規作成
+ * 2026/11/01 : 1.00.01  feature-1.03-dev1   tryFrom(Integer)のテストを追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.shoppingregist;
@@ -170,5 +171,19 @@ class ShoppingExpenditureAmountTest {
 		
 		// 検証（null as zero扱い）
 		assertEquals(new BigDecimal("10000.00"), result.getValue());
+	}
+
+	@Test
+	@DisplayName("正常系：tryFromは正の金額・0円・null値で値ありのOptionalを返す")
+	void testTryFrom_正常系() {
+		assertTrue(ShoppingExpenditureAmount.tryFrom(10000).isPresent());
+		assertTrue(ShoppingExpenditureAmount.tryFrom(0).isPresent());
+		assertTrue(ShoppingExpenditureAmount.tryFrom(null).isPresent());
+	}
+
+	@Test
+	@DisplayName("異常系：tryFromはマイナス値でOptional.empty()を返す")
+	void testTryFrom_異常系() {
+		assertTrue(ShoppingExpenditureAmount.tryFrom(-1000).isEmpty());
 	}
 }
