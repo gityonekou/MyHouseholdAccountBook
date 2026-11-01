@@ -20,6 +20,18 @@ Before starting any implementation or modification work, read these in full. The
 
 If work on this project surfaces something that should be added to or corrected in any of the three documents above, or in a document they reference (e.g. `docs/integration-test-guidelines.md`, `docs/test-data-design-rules.md`), do not edit it directly. Propose the specific change (what, where, why) to the user first, and apply it only after the user explicitly approves.
 
+## Commit Workflow（コミット運用）
+
+実装作業が完了した後、コミット・pushまでは以下の手順を順守する（ユーザから別途「今回はこの手順を省略してよい」等の明示的な指示がない限り、本プロジェクトの全チャット・セッションに適用する）。
+
+1. **ユーザによる実機確認**：ユーザの環境でテスト（疎通確認・ユーザテスト等）を実施してもらう。依頼時にClaude側で確認観点をリストで一覧化してユーザに提示する（一覧化の詳細基準は`docs/manual-verification-guidelines.md`参照）。
+2. **ソース・テストソースのレビュー（Claude側）**：ユーザから実機確認完了の報告を受けたら、今回の作業で変更したソースコード・テストコードを改めてレビューする。問題が見つかった場合は修正し、再度ユーザに確認してもらう。
+3. **ソース・テストソースのレビュー（ユーザ側）**：Claude側のレビューで問題がないことを確認したら、ユーザ自身にも変更したソースコード・テストコードをレビューしてもらい、問題ないことを確認してもらう。ユーザから指摘があった場合は修正し、1または2からやり直す。
+4. **コミット対象ファイルのユーザ確認**：ユーザ側のレビューでも問題がないことを確認したら、コミット対象となるファイル（`git status`等で変更が検知されたファイル）を一覧でユーザに提示し、コミットしてよいか明示的な確認を得る。ユーザが今回の作業で指示していない無関係な変更（既存の未追跡ファイル等）は対象に含めない。
+5. **コミット・push**：ユーザの確認が取れたら、コミットし、その後リモートへpushする。
+
+この手順は、コミット・push実行には明示的な指示が必要という既存の基本方針に対する、本プロジェクトでの具体的な運用手順を定めたものである。
+
 ## Build Commands
 
 ```bash
