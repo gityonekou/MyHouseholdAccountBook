@@ -7,6 +7,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2026/02/26 : 1.00.00  feature-1.00-dev00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
  * 2026/10/12 : 1.02.00  feature-1.03-dev1   追加リファクタリング対応(リダイレクトレスポンスdtoのファクトリ引数をドメインタイプに変更)
+ * 2026/11/08 : 1.02.01  feature-1.03-dev1   セッション登録情報(IncomeRegistItem)生成処理をIncomeAndExpenditureRegistItemFactoryに集約
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -56,6 +57,8 @@ public class IncomeRegistUseCase {
 	private final CodeTableItemComponent codeTableItem;
 	// 収支登録画面 収入・支出一覧情報生成コンポーネント
 	private final IncomeAndExpenditureRegistListComponent registListComponent;
+	// 収支登録画面 セッション登録情報(ExpenditureRegistItem/IncomeRegistItem)生成コンポーネント
+	private final IncomeAndExpenditureRegistItemFactory itemFactory;
 
 	/**
 	 *<pre>
@@ -223,7 +226,7 @@ public class IncomeRegistUseCase {
 		inputForm.setIncomeCode(TemporaryCodeGenerator.generate());
 
 		// 収入情報をセッションに登録(データタイプ：新規を指定)
-		incomeRegistItemList.add(createIncomeRegistItem(MyHouseholdAccountBookContent.DATA_TYPE_NEW, inputForm));
+		incomeRegistItemList.add(itemFactory.createIncomeRegistItemFromForm(MyHouseholdAccountBookContent.DATA_TYPE_NEW, inputForm));
 
 		// セッション情報をレスポンスに設定
 		response.setIncomeRegistItemList(incomeRegistItemList);
@@ -273,7 +276,7 @@ public class IncomeRegistUseCase {
 			if(Objects.equals(inputForm.getIncomeCode(), session.getIncomeCode())) {
 
 				// フォームデータからセッションデータを作成し、対象データを更新
-				incomeRegistItemList.set(i, createIncomeRegistItem(session.getDataType(), inputForm));
+				incomeRegistItemList.set(i, itemFactory.createIncomeRegistItemFromForm(session.getDataType(), inputForm));
 
 				// データありフラグを設定
 				putFlg = true;
@@ -336,19 +339,7 @@ public class IncomeRegistUseCase {
 				if(Objects.equals(session.getDataType(), MyHouseholdAccountBookContent.DATA_TYPE_LOAD)) {
 					// 削除のセッションデータを登録
 					// 注意：セッションデータを作り替えなので、createIncomeRegistItemメソッドは使用しない
-					newIncomeRegistItemList.add(IncomeRegistItem.from(
-							// データタイプ
-							session.getDataType(),
-							// アクション：削除
-							MyHouseholdAccountBookContent.ACTION_TYPE_DELETE,
-							// 収入コード
-							session.getIncomeCode(),
-							// 収入区分
-							session.getIncomeCategory(),
-							// 収入詳細
-							session.getIncomeDetailContext(),
-							// 収入金額
-							session.getIncomeKingaku()));
+					newIncomeRegistItemList.add(itemFactory.createDeletedIncomeRegistItem(session));
 				}
 
 				deleteFlg = true;
@@ -418,31 +409,5 @@ public class IncomeRegistUseCase {
 					OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList()));
 
 		return response;
-	}
-
-	/**
-	 *<pre>
-	 * 収入情報入力フォームの値からセッションに設定する収支登録情報を作成します。
-	 *</pre>
-	 * @param dataTypeNew データタイプ(新規 or DBロード)
-	 * @param inputForm 収入情報入力フォームの値
-	 * @return セッションに設定する収支登録情報
-	 *
-	 */
-	private IncomeRegistItem createIncomeRegistItem(String dataTypeNew, IncomeItemForm inputForm) {
-		// セッションに設定する収支登録情報を作成し返却
-		return IncomeRegistItem.from(
-				// データタイプ：新規
-				dataTypeNew,
-				// アクション
-				inputForm.getAction(),
-				// 収入コード
-				inputForm.getIncomeCode(),
-				// 収入区分
-				inputForm.getIncomeKubun(),
-				// 収入詳細
-				inputForm.getIncomeDetailContext(),
-				// 収入金額
-				DomainCommonUtils.convertKingakuBigDecimal(inputForm.getIncomeKingaku()));
 	}
 }

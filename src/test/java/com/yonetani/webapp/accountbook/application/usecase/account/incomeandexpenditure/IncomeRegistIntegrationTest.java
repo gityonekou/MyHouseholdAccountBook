@@ -6,6 +6,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/01/25 : 1.00.00                      新規作成
+ * 2026/11/08 : 1.01.00  feature-1.03-dev1   セッション登録情報(IncomeRegistItem)のfrom()引数が値オブジェクト型になったことに伴うテストデータ生成処理の修正(型安全性対応。06_コーディング規約.md §8)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -27,6 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.presentation.request.account.regist.IncomeItemForm;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.IncomeAndExpenditureRegistResponse;
 import com.yonetani.webapp.accountbook.presentation.session.ExpenditureRegistItem;
@@ -91,11 +95,30 @@ class IncomeRegistIntegrationTest {
 	}
 
 	/**
+	 *<pre>
+	 * プリミティブ引数を値オブジェクトへ変換してからIncomeRegistItem.from()を呼び出すヘルパーメソッドです。
+	 * from()の引数が値オブジェクト型になったため(06_コーディング規約.md §8)、テストコードから
+	 * 直接プリミティブ値で呼び出せるようにするためのものです(同規約§8.3参照)。
+	 *</pre>
+	 */
+	private IncomeRegistItem incomeRegistItemHelper(
+			String dataType, String action, String incomeCode,
+			String incomeCategory, String incomeDetailContext, BigDecimal incomeKingaku) {
+		return IncomeRegistItem.from(
+				dataType,
+				action,
+				incomeCode,
+				IncomeCategory.from(incomeCategory),
+				IncomeDetailContext.from(incomeDetailContext),
+				IncomeAmount.from(incomeKingaku.setScale(2)));
+	}
+
+	/**
 	 * テスト用の収入登録情報リストを作成します（新規データタイプ）。
 	 */
 	private List<IncomeRegistItem> createTestIncomeRegistItemList() {
 		List<IncomeRegistItem> list = new ArrayList<>();
-		list.add(IncomeRegistItem.from(
+		list.add(incomeRegistItemHelper(
 			MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 			MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 			"20260125120000001",
@@ -103,7 +126,7 @@ class IncomeRegistIntegrationTest {
 			"テスト給料詳細",
 			new BigDecimal("300000.00")
 		));
-		list.add(IncomeRegistItem.from(
+		list.add(incomeRegistItemHelper(
 			MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 			MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 			"20260125120000002",
@@ -119,7 +142,7 @@ class IncomeRegistIntegrationTest {
 	 */
 	private List<IncomeRegistItem> createTestIncomeRegistItemListWithLoadType() {
 		List<IncomeRegistItem> list = new ArrayList<>();
-		list.add(IncomeRegistItem.from(
+		list.add(incomeRegistItemHelper(
 			MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
 			MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, // DBロード時の初期値はデータ変更なし
 			"01", // DBロード時の収入コード形式（INCOME_CODEはCHAR(2)）
@@ -127,7 +150,7 @@ class IncomeRegistIntegrationTest {
 			"DB登録済み給料詳細",
 			new BigDecimal("350000.00")
 		));
-		list.add(IncomeRegistItem.from(
+		list.add(incomeRegistItemHelper(
 			MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
 			MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, // DBロード時の初期値はデータ変更なし
 			"02", // INCOME_CODEはCHAR(2)

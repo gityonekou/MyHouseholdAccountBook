@@ -8,6 +8,8 @@
  * 2026/02/25 : 1.00.00  feature-1.00-dev00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
  * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  * 2026/09/06 : 1.01.01  feature-1.03-dev1   追加リファクタリング対応(getExpenditureItemNameメソッドの戻り値を値オブジェクトに変更、リダイレクトレスポンスdtoのファクトリ引数をドメインタイプに変更)
+ * 2026/11/01 : 1.01.02  feature-1.03-dev1   支払方法・銀行口座管理追加対応(支出一覧に支払方法名・引落先口座名を追加)
+ * 2026/11/08 : 1.01.03  feature-1.03-dev1   セッション登録情報(ExpenditureRegistItem)生成処理をIncomeAndExpenditureRegistItemFactoryに集約
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -35,6 +37,8 @@ import com.yonetani.webapp.accountbook.domain.repository.account.event.EventItem
 import com.yonetani.webapp.accountbook.domain.service.account.regist.TemporaryCodeGenerator;
 import com.yonetani.webapp.accountbook.domain.type.account.event.EventCode;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.ResolvedPaymentMethodName;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.utils.DomainCommonUtils;
@@ -71,6 +75,8 @@ public class ExpenditureRegistUseCase {
 	private final ExpenditureItemInfoComponent expenditureItemInfoComponent;
 	// 収支登録画面 収入・支出一覧情報生成コンポーネント
 	private final IncomeAndExpenditureRegistListComponent registListComponent;
+	// 収支登録画面 セッション登録情報(ExpenditureRegistItem/IncomeRegistItem)生成コンポーネント
+	private final IncomeAndExpenditureRegistItemFactory itemFactory;
 	// イベントテーブル:EVENT_ITEM_TABLEリポジトリー
 	private final EventItemTableRepository eventRepository;
 	// 支払方法情報取得コンポーネント
@@ -193,12 +199,16 @@ public class ExpenditureRegistUseCase {
 			ExpenditureItemForm inputForm, List<ExpenditureRegistItem> expenditureRegistItemList) {
 		log.debug("execExpenditureAction:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",inputForm=" + inputForm);
 
+		// アクション：新規追加の処理を実行
 		if(Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_ADD)) {
 			return execExpenditureAdd(targetYearMonth, inputForm, expenditureRegistItemList);
+		// アクション：更新の処理を実行
 		} else if (Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
 			return execExpenditureUpdate(targetYearMonth, inputForm, expenditureRegistItemList);
+		// アクション：削除の処理を実行
 		} else if (Objects.equals(inputForm.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_DELETE)) {
 			return execExpenditureDelete(targetYearMonth, inputForm, expenditureRegistItemList);
+		// ガード節(未定義のアクション)
 		} else {
 			throw new MyHouseholdAccountBookRuntimeException("未定義のアクションが設定されています。管理者に問い合わせてください。action=" + inputForm.getAction());
 		}
@@ -224,7 +234,7 @@ public class ExpenditureRegistUseCase {
 		inputForm.setExpenditureCode(TemporaryCodeGenerator.generate());
 
 		// 支出情報をセッションに登録(データタイプ：新規を指定)
-		expenditureRegistItemList.add(createExpenditureRegistItem(MyHouseholdAccountBookContent.DATA_TYPE_NEW, inputForm));
+		expenditureRegistItemList.add(itemFactory.createExpenditureRegistItemFromForm(MyHouseholdAccountBookContent.DATA_TYPE_NEW, inputForm));
 
 		// セッション情報をレスポンスに設定
 		response.setExpenditureRegistItemList(expenditureRegistItemList);
@@ -242,6 +252,17 @@ public class ExpenditureRegistUseCase {
 	/**
 	 *<pre>
 	 * 支出情報の仮更新処理を実行します。
+	 * 元々システム予約値でなかった行がリクエスト改変によりシステム予約値に変更されようとしている場合は
+	 * 不正なデータ更新として例外をスローします。
+	 *
+	 * 【なぜここにガードがあるか】同種のチェック(支払方法のシステム予約値拒否)は他画面
+	 * (店舗マスタ・買い物登録等)では{@code ExpenditureItemForm.isPaymentMethodCodeValid()}のような
+	 * Formの{@code @AssertTrue}（バリデーションエラー）で行っているが、本メソッド(action=update)は
+	 * 「更新前の値と比較して、値が変化した場合のみ拒否する」必要があり、Formは更新前の値(セッション上の
+	 * 現在値)を保持していないため、Form側では判定できない。このためUseCase層(本メソッド)でガードしており、
+	 * 入力エラーではなく不正なデータ更新として例外をスローする(バリデーションエラー画面ではなくエラー画面に
+	 * 遷移させる)方式にしている(ユーザー判断)。action=add側の対応は{@code ExpenditureItemForm.isPaymentMethodCodeValid()}
+	 * を参照(新規追加は「更新前の値」という概念がないため、Formの@AssertTrueのみで判定できる)。
 	 *</pre>
 	 */
 	private IncomeAndExpenditureRegistResponse execExpenditureUpdate(String targetYearMonth,
@@ -265,8 +286,17 @@ public class ExpenditureRegistUseCase {
 			// 更新対象の支出情報の場合、値を更新
 			if(Objects.equals(inputForm.getExpenditureCode(), session.getExpenditureCode())) {
 
+				// ガード節(不正なデータ更新：元々システム予約値でなかった行が、リクエスト改変によりシステム予約値に
+				// 変更されようとしている場合はエラー。disabled+hidden併記による既存値の再送信(値が変化しないケース)は
+				// 対象外のため、isPaymentMethodCodeValid()のaction=add限定チェックでは防げないこのケースをここで補う)
+				if(!Objects.equals(inputForm.getPaymentMethodCode(), session.getPaymentMethodCode())
+						&& PaymentMethodCode.tryFrom(inputForm.getPaymentMethodCode()).map(PaymentMethodCode::isSystemReserved).orElse(false)) {
+					throw new MyHouseholdAccountBookRuntimeException(
+							"支払方法をシステム予約値に変更することはできません。管理者に問い合わせてください。[expenditureCode=" + inputForm.getExpenditureCode() + "]");
+				}
+
 				// フォームデータからセッションデータを作成し、対象データを更新
-				expenditureRegistItemList.set(i, createExpenditureRegistItem(session.getDataType(), inputForm));
+				expenditureRegistItemList.set(i, itemFactory.createExpenditureRegistItemFromForm(session.getDataType(), inputForm));
 
 				// データありフラグを設定
 				putFlg = true;
@@ -322,31 +352,7 @@ public class ExpenditureRegistUseCase {
 				if(Objects.equals(session.getDataType(), MyHouseholdAccountBookContent.DATA_TYPE_LOAD)) {
 					// 削除のセッションデータを登録
 					// 注意：セッションデータを作り替えなので、createExpenditureRegistItemメソッドは使用しない
-					newExpenditureRegistItemList.add(ExpenditureRegistItem.from(
-							// データタイプ
-							session.getDataType(),
-							// アクション：削除
-							MyHouseholdAccountBookContent.ACTION_TYPE_DELETE,
-							// 支出コード
-							session.getExpenditureCode(),
-							// 支出項目コード
-							session.getExpenditureItemCode(),
-							// イベントコード
-							session.getEventCode(),
-							// 支出名
-							session.getExpenditureName(),
-							// 支出区分
-							session.getExpenditureCategory(),
-							// 支出詳細
-							session.getExpenditureDetailContext(),
-							// 支払日
-							session.getSiharaiDate(),
-							// 支払方法コード
-							session.getPaymentMethodCode(),
-							// 支払金額
-							session.getExpenditureKingaku(),
-							// 支払金額の0円開始設定フラグ
-							session.isClearStartFlg()));
+					newExpenditureRegistItemList.add(itemFactory.createDeletedExpenditureRegistItem(session));
 				}
 
 				deleteFlg = true;
@@ -455,7 +461,18 @@ public class ExpenditureRegistUseCase {
 		
 		// 対象年月のドメインタイプを生成
 		TargetYearMonth domainTargetYearMonth = TargetYearMonth.from(targetYearMonth);
-		
+
+		// 支払方法欄のdisabled表示用に、フォームの現在値(コード)に対応する支払方法名を解決(現在値が選択肢に含まれる場合は未使用)
+		// 単発解決のため、一覧のN+1回避で使うcreateResolver()ではなく単発解決用のラッパーメソッドを使用する
+		// tryFrom()を使用：本メソッドはバインディングエラー時の再表示(readExpenditureUpdateBindingErrorSetInfo)からも
+		// 呼ばれるため、他の項目が不正なリクエストでpaymentMethodCodeの形式も不正な場合がある。from()を直接呼ぶと
+		// 例外が伝播し500エラーになってしまうため、tryFrom()で安全に解決し、形式不正時は「－」にフォールバックする
+		ResolvedPaymentMethodName paymentMethodCurrentName = StringUtils.hasLength(expenditureItemForm.getPaymentMethodCode())
+				? PaymentMethodCode.tryFrom(expenditureItemForm.getPaymentMethodCode())
+						.map(code -> paymentMethodInfoComponent.getPaymentMethodName(userId, code))
+						.orElse(ResolvedPaymentMethodName.UNRESOLVED)
+				: ResolvedPaymentMethodName.UNRESOLVED;
+
 		// レスポンスを生成
 		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(
 				// 収支対象の年月(YYYMM)
@@ -466,47 +483,11 @@ public class ExpenditureRegistUseCase {
 				expenditureKubunList.stream().map(pair ->
 					OptionItem.from(pair.getCode().getValue(), pair.getCodeValue().getValue())).collect(Collectors.toList()),
 				// 支払方法選択ボックスの表示情報リスト(findSelectableByUserId()ベース。システム予約値は含まない)
-				paymentMethodInfoComponent.getPaymentMethodOptions(userId));
+				paymentMethodInfoComponent.getPaymentMethodOptions(userId),
+				// 支払方法欄のdisabled表示用に解決済みの支払方法名
+				paymentMethodCurrentName);
 
 		return response;
-	}
-
-	/**
-	 *<pre>
-	 * 支出情報入力フォームの値からセッションに設定する支出登録情報を作成します。
-	 *</pre>
-	 * @param dataTypeNew データタイプ(新規 or DBロード)
-	 * @param inputForm 支出情報入力フォームの値
-	 * @return セッションに設定する支出登録情報
-	 *
-	 */
-	private ExpenditureRegistItem createExpenditureRegistItem(String dataTypeNew, ExpenditureItemForm inputForm) {
-		// セッションに設定する支出登録情報を作成し返却
-		return ExpenditureRegistItem.from(
-				// データタイプ
-				dataTypeNew,
-				// アクション
-				inputForm.getAction(),
-				// 支出コード
-				inputForm.getExpenditureCode(),
-				// 支出項目コード
-				inputForm.getSisyutuItemCode(),
-				// イベントコード
-				inputForm.getEventCode(),
-				// 支出名
-				inputForm.getExpenditureName(),
-				// 支出区分
-				inputForm.getExpenditureKubun(),
-				// 支出詳細
-				inputForm.getExpenditureDetailContext(),
-				// 支払日
-				DomainCommonUtils.getDateStr(inputForm.getSiharaiDate()),
-				// 支払方法コード
-				inputForm.getPaymentMethodCode(),
-				// 支払金額
-				DomainCommonUtils.convertKingakuBigDecimal(inputForm.getExpenditureKingaku()),
-				// 支払金額の0円開始設定フラグ
-				inputForm.isClearStartFlg());
 	}
 
 	/**

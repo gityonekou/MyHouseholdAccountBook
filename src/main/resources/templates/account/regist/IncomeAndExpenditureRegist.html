@@ -105,27 +105,42 @@
 				<div class="card">
 					<div class="card-body">
 						<p class="h6">■支出登録エリア■</p>
+						<!-- 支払方法・引落先口座列(紙芝居MonthEndClosingProcess_1.htmlの■支出登録エリア■に合わせたヘッダ行・列構成) -->
 						<table class="table table-sm table-bordered">
+							<thead>
+								<tr class="table-secondary">
+									<th scope="col" class="w20">支出名(区分)</th>
+									<th scope="col" class="w5">支払日</th>
+									<th scope="col" class="w10">支払方法</th>
+									<th scope="col" class="w10" style="vertical-align:middle; text-align:center;">支出金額</th>
+									<th scope="col" class="w10">引落先口座</th>
+									<th scope="col" class="w5">&emsp;</th>
+									<th scope="col">支出詳細</th>
+								</tr>
+							</thead>
 							<tbody>
 								<th:block th:each="item, itemStat : ${expenditureListInfo}">
 									<tr th:class="${itemStat.odd} ? 'table-warning' : ''">
 										<td class="w20" th:text="${item.expenditureName}">支出名と支出区分</td>
+										<td class="w5" th:text="${item.siharaiDate}">支払日</td>
+										<td class="w10" th:text="${item.paymentMethodName}">支払方法</td>
 										<td class="w10" th:text="${item.shiharaiKingaku}" align="right">支出金額</td>
+										<td class="w10" th:text="${item.bankAccountName}">引落先口座</td>
 										<td class="w5" align="center"><a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/accountregist/incomeandexpenditure/expenditureupdateselect(expenditureCode=${item.expenditureCode})}">訂正</a></td>
-										<td class="w10">支払：<span th:text="${item.siharaiDate}">支払日</span></td>
 										<td th:text="${item.expenditureDetailContext}">支出詳細</td>
 									</tr>
 								</th:block>
 								<th:block th:if="${#lists.size(expenditureListInfo)} > 0">
 								<tr class="table-success">
 									<td class="w20">支出合計</td>
+									<td colspan="2"></td>
 									<td class="w10" th:text="${expenditureSumKingaku}" align="right">支出金額合計</td>
 									<td colspan="3"></td>
 								</tr>
 								</th:block>
 								<tr class="table-info">
 									<td class="w20">&emsp;<a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/accountregist/incomeandexpenditure/expenditureaddselect/}">新規追加</a></td>
-									<td colspan="5"></td>
+									<td colspan="6"></td>
 								</tr>
 							</tbody>
 						</table>
@@ -153,17 +168,22 @@
 										支払日　：<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{siharaiDate}">
 										<p class="invalid-feedback" th:errors="*{siharaiDate}"></p>
 									</div>
+									<!-- #vars.expenditureItemFormで参照:SpELのセレクション(.?[...])式内はthis(反復中の各要素)が評価コンテキストになり、
+										無名参照のexpenditureItemFormはOptionItem上のプロパティとして解決されてしまい例外になるため、
+										セレクション式内では文脈に依存しない#vars.経由の参照にする必要がある -->
 									<div class="input-group w25"
-										th:with="paymentMethodSelectable=${#strings.isEmpty(expenditureItemForm.paymentMethodCode) or !#lists.isEmpty(paymentMethodSelectList.optionList.?[value == expenditureItemForm.paymentMethodCode])}">
+										th:with="paymentMethodSelectable=${#strings.isEmpty(expenditureItemForm.paymentMethodCode) or !#lists.isEmpty(paymentMethodSelectList.optionList.?[value == #vars.expenditureItemForm.paymentMethodCode])}">
 										支払方法：
 										<select th:if="${paymentMethodSelectable}" class="form-select" th:errorclass="is-invalid" th:field="*{paymentMethodCode}" required>
 											<option th:each="item : ${paymentMethodSelectList.optionList}" th:value="${item.value}" th:text="${item.text}"></option>
 										</select>
 										<select th:unless="${paymentMethodSelectable}" class="form-select" disabled>
-											<option th:text="*{paymentMethodCode}"></option>
+											<option th:text="${paymentMethodCurrentName}"></option>
 										</select>
 										<input th:unless="${paymentMethodSelectable}" type="hidden" th:field="*{paymentMethodCode}">
 										<p class="invalid-feedback" th:errors="*{paymentMethodCode}"></p>
+										<!--/* システム予約値拒否の相関チェック結果を出力 */-->
+										<p class="invalid-feedback" th:errors="*{paymentMethodCodeValid}" style="display: block;"></p>
 									</div>
 									<div class="input-group w15">
 										支払金額：<input type="text" class="form-control" th:errorclass="is-invalid" th:field="*{expenditureKingaku}" required>円

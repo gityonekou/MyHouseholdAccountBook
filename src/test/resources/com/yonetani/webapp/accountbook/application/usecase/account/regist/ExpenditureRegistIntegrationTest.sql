@@ -105,3 +105,19 @@ INSERT INTO SISYUTU_ITEM_TABLE (USER_ID, SISYUTU_ITEM_CODE, SISYUTU_ITEM_NAME, S
 -- イベントコード="0001"は支出項目コード="0058"（イベント費）に紐付くイベント
 INSERT INTO EVENT_ITEM_TABLE (USER_ID, EVENT_CODE, SISYUTU_ITEM_CODE, EVENT_NAME, EVENT_DETAIL_CONTEXT, EVENT_START_DATE, EVENT_END_DATE, EVENT_EXIT_FLG) VALUES
 ('user01', '0001', '0058', 'テストイベント', 'テストイベント詳細', '2025-01-01', '2025-12-31', false);
+
+-- ----------------------------------------
+-- 4. 銀行口座マスタデータ（支払方法・引落先口座名解決のテスト用）
+-- ----------------------------------------
+INSERT INTO BANK_ACCOUNT_TABLE (USER_ID, BANK_ACCOUNT_CODE, BANK_NAME, BANK_ACCOUNT_MEMO, BANK_ACCOUNT_SORT, ENABLE_FLG) VALUES
+('user01', '01', 'テスト銀行', NULL, '01', true);
+
+-- ----------------------------------------
+-- 5. 支払方法マスタデータ（支払方法・引落先口座名解決のテスト用）
+-- ----------------------------------------
+-- 001:現金(銀行口座なし) / 002:口座振替(銀行口座あり) / 003:無効化済み(選択肢から除外されることの確認用) / 999:支払方法がない(システム予約値)
+INSERT INTO PAYMENT_METHOD_TABLE (USER_ID, PAYMENT_METHOD_CODE, PAYMENT_METHOD_NAME, PAYMENT_METHOD_MEMO, PAYMENT_METHOD_KUBUN, BANK_ACCOUNT_CODE, CLOSING_DAY, PAYMENT_METHOD_SORT, ENABLE_FLG, ENABLE_UPDATE_FLG) VALUES
+('user01', '001', '現金', NULL, '1', NULL, NULL, '001', true, true),
+('user01', '002', 'テスト銀行 口座振替', NULL, '2', '01', NULL, '002', true, true),
+('user01', '003', '無効化済み支払方法', NULL, '1', NULL, NULL, '003', false, true),
+('user01', '999', '支払方法がない', NULL, '1', NULL, NULL, '999', true, false);

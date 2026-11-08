@@ -14,6 +14,7 @@
  * 2026/06/14 : 1.02.01  feature-1.02-dev2   バグ修正: readRegistCheckValidateInfo()の0円チェックからACTION_TYPE_NON_UPDATEを除外（更新フローのclearStart支出誤検知修正）
  * 2026/08/18 : 1.03.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  * 2026/10/12 : 1.03.01  feature-1.03-dev1   追加リファクタリング対応(リダイレクトレスポンスdtoのファクトリ引数をドメインタイプに変更)
+ * 2026/11/08 : 1.03.02  feature-1.03-dev1   セッション登録情報(ExpenditureRegistItem/IncomeRegistItem)生成処理をIncomeAndExpenditureRegistItemFactoryに集約
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -81,6 +82,8 @@ public class IncomeAndExpenditureInitUseCase {
 	private final CodeTableItemComponent codeTableItem;
 	// 収支登録画面 収入・支出一覧情報生成コンポーネント
 	private final IncomeAndExpenditureRegistListComponent registListComponent;
+	// 収支登録画面 セッション登録情報(ExpenditureRegistItem/IncomeRegistItem)生成コンポーネント
+	private final IncomeAndExpenditureRegistItemFactory itemFactory;
 	// 固定費テーブル:FIXED_COST_TABLEリポジトリー
 	private final FixedCostTableRepository fixedCostRepository;
 	// 収入テーブル:INCOME_TABLEリポジトリー
@@ -162,32 +165,13 @@ public class IncomeAndExpenditureInitUseCase {
 			// 仮登録用支出コードの固定値部分(yyyyMMddHHmmss)
 			String nowTimeStr = TemporaryCodeGenerator.generateBase();
 
+			// 固定費一覧情報からセッションの支出登録情報リストを作成
 			List<ExpenditureRegistItem> expenditureRegistItemList = searchResult.getValues().stream().map(
-					domain -> ExpenditureRegistItem.from(
-							// データタイプ(新規)
-							MyHouseholdAccountBookContent.DATA_TYPE_NEW,
-							// アクション(新規追加)
-							MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
+					domain -> itemFactory.createExpenditureRegistItemFromFixedCost(
+							targetYearMonth,
 							// 支出コード(仮登録用支出コード:yyyyMMddHHmmss999)
 							String.format("%s%03d", nowTimeStr, count.getAndIncrement()),
-							// 支出項目コード
-							domain.getExpenditureItemCode().getValue(),
-							// イベントコード:固定費からは登録不可:値設定が必要な場合は収支登録画面で設定する
-							"",
-							// 支出名
-							domain.getFixedCostName().getValue(),
-							// 支出区分:支出名から支出区分を取得
-							ExpenditureCategory.from(domain.getFixedCostName()).getValue(),
-							// 支出詳細
-							domain.getExpenditureDetailContext(),
-							// 支払日
-							domain.getFixedCostPaymentDay().getShiharaiDayValue(targetYearMonth),
-							// 支払方法コード(固定費から引き継ぐ。買い物集計8項目はここで「支払方法がない」が伝播する)
-							domain.getPaymentMethodCode().getValue(),
-							// 支払金額
-							domain.getFixedCostPaymentAmount().getValue(),
-							// 支払金額の0円開始設定フラグ
-							domain.getFixedCostKubun().isClearStart())
+							domain)
 					).collect(Collectors.toList());
 
 			// レスポンスにセッションの支出登録情報を設定
@@ -245,19 +229,7 @@ public class IncomeAndExpenditureInitUseCase {
 		// 収入テーブルから取得した収入情報をセッションの収入登録情報に変換
 		// 注意：セッション情報のリストは編集可とする必要があるので、可変リストで作成する必要あり
 		List<IncomeRegistItem> incomeRegistItemList = incomeList.getValues().stream().map(
-				domain -> IncomeRegistItem.from(
-						// データタイプ(DBロード)
-						MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
-						// アクション(データ更新なし)
-						MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
-						// 収入コード
-						domain.getIncomeCode().getValue(),
-						// 収入区分
-						domain.getIncomeCategory().getValue(),
-						// 収入詳細
-						domain.getIncomeDetailContext().getValue(),
-						// 収入金額
-						domain.getIncomeAmount().getValue())
+				domain -> itemFactory.createIncomeRegistItemFromIncomeItem(domain)
 				).collect(Collectors.toList());
 		// レスポンスにセッションの収入登録情報を設定
 		response.setIncomeRegistItemList(incomeRegistItemList);
@@ -268,31 +240,7 @@ public class IncomeAndExpenditureInitUseCase {
 		// 支出テーブルから取得した支出情報をセッションの支出登録情報に変換
 		// 注意：セッション情報のリストは編集可とする必要があるので、可変リストで作成する必要あり
 		List<ExpenditureRegistItem> expenditureRegistItemList = expenditureList.getValues().stream().map(
-				domain -> ExpenditureRegistItem.from(
-						// データタイプ(DBロード)
-						MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
-						// アクション(データ更新なし)
-						MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
-						// 支出コード
-						domain.getExpenditureCode().getValue(),
-						// 支出項目コード
-						domain.getExpenditureItemCode().getValue(),
-						// イベントコード
-						domain.getExpenditureEventCode().getValue(),
-						// 支出名
-						domain.getExpenditureName().getValue(),
-						// 支出区分
-						domain.getExpenditureCategory().getValue(),
-						// 支出詳細
-						domain.getExpenditureDetailContext().getValue(),
-						// 支払日(日付からDDの値を取得して設定):DBはnull可
-						domain.getPaymentDate().toDayValue(),
-						// 支払方法コード
-						domain.getPaymentMethodCode().getValue(),
-						// 支払金額
-						domain.getExpenditureAmount().getValue(),
-						// 支払金額の0円開始設定フラグ
-						false)
+				domain -> itemFactory.createExpenditureRegistItemFromExpenditureItem(domain)
 				).collect(Collectors.toList());
 		// レスポンスにセッションの支出登録情報を設定
 		response.setExpenditureRegistItemList(expenditureRegistItemList);

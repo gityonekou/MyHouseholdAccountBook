@@ -6,6 +6,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2024/09/07 : 1.00.00                      新規作成
  * 2025/12/28 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/11/08 : 1.02.00  feature-1.03-dev1   createIncomeItem()のシグネチャ変更に伴う対応(セッションDTOからドメインタイプへの変換をUseCase側に集約)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.income;
@@ -21,7 +22,6 @@ import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
-import com.yonetani.webapp.accountbook.presentation.session.IncomeRegistItem;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -100,16 +100,21 @@ public class IncomeItem {
 	
 	/**
 	 *<pre>
-	 * 引数の収支登録情報(セッション)から収入テーブル情報(ドメイン)を生成して返します。
+	 * 引数の値から収入テーブル情報(ドメイン)を生成して返します。
+	 * 呼び出し元(UseCase)で、収入登録情報(セッション)から各項目をドメインタイプに変換してから渡してください
+	 * (ドメイン層がプレゼンテーション層のセッションDTOに依存しないようにするため)。
 	 *</pre>
 	 * @param userId ユーザID
 	 * @param yearMonthDomain 対象年月(ドメイン)
 	 * @param incomeCode 収入コード
-	 * @param incomeData 収支登録情報(セッション)
+	 * @param incomeCategory 収入区分
+	 * @param incomeDetailContext 収入詳細
+	 * @param incomeAmount 収入金額(セッションの収入登録情報の設定値)
 	 * @return 収入テーブル情報(ドメイン)
 	 *
 	 */
-	public static IncomeItem createIncomeItem(UserId userId, TargetYearMonth yearMonthDomain, IncomeCode incomeCode, IncomeRegistItem incomeData) {
+	public static IncomeItem createIncomeItem(UserId userId, TargetYearMonth yearMonthDomain, IncomeCode incomeCode,
+			IncomeCategory incomeCategory, IncomeDetailContext incomeDetailContext, IncomeAmount incomeAmount) {
 		return IncomeItem.from(
 				// ユーザID
 				userId.getValue(),
@@ -120,11 +125,11 @@ public class IncomeItem {
 				// 収入コード
 				incomeCode.getValue(),
 				// 収入区分
-				incomeData.getIncomeCategory(),
+				incomeCategory.getValue(),
 				// 収入詳細
-				incomeData.getIncomeDetailContext(),
+				incomeDetailContext.getValue(),
 				// 収入金額
-				incomeData.getIncomeKingaku(),
+				incomeAmount.getValue(),
 				// 削除フラグ
 				false);
 	}

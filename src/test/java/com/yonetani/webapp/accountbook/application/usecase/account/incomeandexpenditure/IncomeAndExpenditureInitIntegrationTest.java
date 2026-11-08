@@ -9,6 +9,8 @@
  * 2026/06/14 : 1.01.00  feature-1.02-dev2   テストシナリオ⑭をreadRegistCheckValidateInfoに変更、⑮⑯を追加
  * 2026/06/14 : 1.01.01  feature-1.02-dev2   テストシナリオ⑰を追加（0円NON_UPDATEはバリデーション通過）
  * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/11/01 : 1.02.01  feature-1.03-dev1   支払方法・銀行口座管理追加対応(支出一覧に支払方法名・引落先口座名を追加)
+ * 2026/11/08 : 1.02.02  feature-1.03-dev1   セッション登録情報(ExpenditureRegistItem/IncomeRegistItem)のfrom()引数が値オブジェクト型になったことに伴うテストデータ生成処理の修正(型安全性対応。06_コーディング規約.md §8)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -30,6 +32,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureEventCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureName;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.IncomeAndExpenditureRegistResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 import com.yonetani.webapp.accountbook.presentation.session.ExpenditureRegistItem;
@@ -60,6 +72,7 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  *   5. 正常系: 新規登録画面表示_固定費なし（画面表示データ0件確認含む） - 202512
  *   6. 正常系: 新規登録_必須登録データ未登録時メッセージ確認 - 202510
  *   7. 正常系: 新規登録_全必須登録データ登録済みメッセージ確認 - 202510
+ * 7-2. 正常系: 固定費の支払方法「支払方法がない」(999)が収支登録情報に引き継がれること - 202510
  *   8. 正常系: 新規登録_一部必須登録データのみ登録時メッセージ確認 - 202510
  * readUpdateInfo:
  *   9. 正常系: 更新画面表示_セッションデータ検証 - 202511
@@ -98,6 +111,51 @@ class IncomeAndExpenditureInitIntegrationTest {
 	 */
 	private LoginUserInfo createLoginUser() {
 		return LoginUserInfo.from("user01", "テストユーザ01");
+	}
+
+	/**
+	 *<pre>
+	 * プリミティブ引数を値オブジェクトへ変換してからExpenditureRegistItem.from()を呼び出すヘルパーメソッドです。
+	 * from()の引数が値オブジェクト型になったため(06_コーディング規約.md §8)、テストコードから
+	 * 直接プリミティブ値で呼び出せるようにするためのものです(同規約§8.3参照)。
+	 *</pre>
+	 */
+	private ExpenditureRegistItem expenditureRegistItemHelper(
+			String dataType, String action, String expenditureCode, String expenditureItemCode,
+			String eventCode, String expenditureName, String expenditureCategory, String expenditureDetailContext,
+			String siharaiDate, String paymentMethodCode, BigDecimal expenditureKingaku, boolean clearStartFlg) {
+		return ExpenditureRegistItem.from(
+				dataType,
+				action,
+				expenditureCode,
+				ExpenditureItemCode.from(expenditureItemCode),
+				ExpenditureEventCode.from(eventCode),
+				ExpenditureName.from(expenditureName),
+				ExpenditureCategory.from(expenditureCategory),
+				ExpenditureDetailContext.from(expenditureDetailContext),
+				siharaiDate,
+				PaymentMethodCode.from(paymentMethodCode),
+				ExpenditureAmount.from(expenditureKingaku.setScale(2)),
+				clearStartFlg);
+	}
+
+	/**
+	 *<pre>
+	 * プリミティブ引数を値オブジェクトへ変換してからIncomeRegistItem.from()を呼び出すヘルパーメソッドです。
+	 * from()の引数が値オブジェクト型になったため(06_コーディング規約.md §8)、テストコードから
+	 * 直接プリミティブ値で呼び出せるようにするためのものです(同規約§8.3参照)。
+	 *</pre>
+	 */
+	private IncomeRegistItem incomeRegistItemHelper(
+			String dataType, String action, String incomeCode,
+			String incomeCategory, String incomeDetailContext, BigDecimal incomeKingaku) {
+		return IncomeRegistItem.from(
+				dataType,
+				action,
+				incomeCode,
+				IncomeCategory.from(incomeCategory),
+				IncomeDetailContext.from(incomeDetailContext),
+				IncomeAmount.from(incomeKingaku.setScale(2)));
 	}
 
 	// ========================================
@@ -153,7 +211,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, firstItem.getAction()); // アクション設定値は常に'add'
 		assertEquals(17, firstItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
 		assertEquals("0030", firstItem.getExpenditureItemCode()); // 支出項目コード（家賃）
-		assertEquals("", firstItem.getEventCode());  // イベントコード設定値は常に空文字列
+		assertNull(firstItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
 		assertEquals("家賃", firstItem.getExpenditureName()); // 支出名
 		assertEquals("1", firstItem.getExpenditureCategory());  // 支出区分:'1'(無駄遣いなし)
 		assertEquals("家賃支払詳細", firstItem.getExpenditureDetailContext()); // 支出詳細
@@ -171,7 +229,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, secondItem.getAction()); // アクション設定値は常に'add'
 		assertEquals(17, secondItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
 		assertEquals("0040", secondItem.getExpenditureItemCode()); // 支出項目コード（水道代）
-		assertEquals("", secondItem.getEventCode());  // イベントコード設定値は常に空文字列
+		assertNull(secondItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
 		assertEquals("水道代", secondItem.getExpenditureName()); // 支出名
 		assertEquals("1", secondItem.getExpenditureCategory());  // 支出区分:'1'(無駄遣いなし)
 		assertEquals("水道代詳細(無駄遣いB)", secondItem.getExpenditureDetailContext()); // 支出詳細
@@ -188,7 +246,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, thirdItem.getAction()); // アクション設定値は常に'add'
 		assertEquals(17, thirdItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
 		assertEquals("0039", thirdItem.getExpenditureItemCode()); // 支出項目コード（通信費）
-		assertEquals("", thirdItem.getEventCode());  // イベントコード設定値は常に空文字列
+		assertNull(thirdItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
 		assertEquals("通信費(無駄遣いB)", thirdItem.getExpenditureName()); // 支出名
 		assertEquals("2", thirdItem.getExpenditureCategory());  // 支出区分:'2'(無駄遣い（軽度）)
 		assertEquals("携帯電話・インターネット詳細", thirdItem.getExpenditureDetailContext()); // 支出詳細
@@ -205,7 +263,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, fourthItem.getAction()); // アクション設定値は常に'add'
 		assertEquals(17, fourthItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
 		assertEquals("0037", fourthItem.getExpenditureItemCode()); // 支出項目コード（電気代）
-		assertEquals("", fourthItem.getEventCode());  // イベントコード設定値は常に空文字列
+		assertNull(fourthItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
 		assertEquals("電気代(無駄遣いB)", fourthItem.getExpenditureName()); // 支出名
 		assertEquals("2", fourthItem.getExpenditureCategory());  // 支出区分:'2'(無駄遣い（軽度）)
 		assertEquals("電気代詳細", fourthItem.getExpenditureDetailContext()); // 支出詳細
@@ -223,7 +281,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, fifthItem.getAction()); // アクション設定値は常に'add'
 		assertEquals(17, fifthItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
 		assertEquals("0038", fifthItem.getExpenditureItemCode()); // 支出項目コード（ガス代）
-		assertEquals("", fifthItem.getEventCode());  // イベントコード設定値は常に空文字列
+		assertNull(fifthItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
 		assertEquals("ガス代(無駄遣いC)", fifthItem.getExpenditureName()); // 支出名
 		assertEquals("3", fifthItem.getExpenditureCategory());  // 支出区分:'3'(無駄遣い（重度）)
 		assertEquals("ガス代詳細", fifthItem.getExpenditureDetailContext()); // 支出詳細
@@ -391,7 +449,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, firstItem.getAction()); // アクション設定値は常に'add'
 		assertEquals(17, firstItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
 		assertEquals("0030", firstItem.getExpenditureItemCode()); // 支出項目コード（家賃）
-		assertEquals("", firstItem.getEventCode());  // イベントコード設定値は常に空文字列
+		assertNull(firstItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
 		assertEquals("家賃", firstItem.getExpenditureName()); // 支出名
 		assertEquals("1", firstItem.getExpenditureCategory());  // 支出区分:'1'(無駄遣いなし)
 		assertEquals("家賃支払詳細", firstItem.getExpenditureDetailContext()); // 支出詳細
@@ -409,7 +467,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, secondItem.getAction()); // アクション設定値は常に'add'
 		assertEquals(17, secondItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
 		assertEquals("0040", secondItem.getExpenditureItemCode()); // 支出項目コード（水道代）
-		assertEquals("", secondItem.getEventCode());  // イベントコード設定値は常に空文字列
+		assertNull(secondItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
 		assertEquals("水道代", secondItem.getExpenditureName()); // 支出名
 		assertEquals("1", secondItem.getExpenditureCategory());  // 支出区分:'1'(無駄遣いなし) ※FIXED_COST_NAMEで判定
 		assertEquals("水道代詳細(無駄遣いC)", secondItem.getExpenditureDetailContext()); // 支出詳細
@@ -428,7 +486,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, thirdItem.getAction()); // アクション設定値は常に'add'
 		assertEquals(17, thirdItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
 		assertEquals("0039", thirdItem.getExpenditureItemCode()); // 支出項目コード（通信費）
-		assertEquals("", thirdItem.getEventCode());  // イベントコード設定値は常に空文字列
+		assertNull(thirdItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
 		assertEquals("通信費(無駄遣いB)", thirdItem.getExpenditureName()); // 支出名
 		assertEquals("2", thirdItem.getExpenditureCategory());  // 支出区分:'2'(無駄遣い（軽度）)
 		assertEquals("携帯電話・インターネット詳細/11月通信費追加詳細", thirdItem.getExpenditureDetailContext()); // 支出詳細：パターン4
@@ -446,7 +504,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, fourthItem.getAction()); // アクション設定値は常に'add'
 		assertEquals(17, fourthItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
 		assertEquals("0037", fourthItem.getExpenditureItemCode()); // 支出項目コード（電気代）
-		assertEquals("", fourthItem.getEventCode());  // イベントコード設定値は常に空文字列
+		assertNull(fourthItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
 		assertEquals("電気代(無駄遣いC)", fourthItem.getExpenditureName()); // 支出名
 		assertEquals("3", fourthItem.getExpenditureCategory());  // 支出区分:'3'(無駄遣い（重度）)
 		assertEquals("11月電気代任意詳細", fourthItem.getExpenditureDetailContext()); // 支出詳細：パターン3
@@ -464,7 +522,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, fifthItem.getAction()); // アクション設定値は常に'add'
 		assertEquals(17, fifthItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
 		assertEquals("0038", fifthItem.getExpenditureItemCode()); // 支出項目コード（ガス代）
-		assertEquals("", fifthItem.getEventCode());  // イベントコード設定値は常に空文字列
+		assertNull(fifthItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
 		assertEquals("ガス代(無駄遣いC)", fifthItem.getExpenditureName()); // 支出名
 		assertEquals("3", fifthItem.getExpenditureCategory());  // 支出区分:'3'(無駄遣い（重度）)
 		assertEquals("", fifthItem.getExpenditureDetailContext()); // 支出詳細：パターン1（両方NULL→空文字）
@@ -708,6 +766,43 @@ class IncomeAndExpenditureInitIntegrationTest {
 
 		// Then: 必須登録データが全て登録済みのためメッセージが0件
 		assertTrue(response.getMessagesList().isEmpty());
+	}
+
+	/**
+	 *<pre>
+	 * テスト⑦-2：正常系：固定費の支払方法「支払方法がない」(999)が収支登録情報に引き継がれること
+	 *
+	 * 【検証内容】
+	 * ・買い物集計8項目は固定費登録画面経由で支払方法「支払方法がない」(999)を設定して登録する運用である
+	 *   (設計書5.5節・突合レビュー指摘A参照)
+	 * ・固定費の支払方法コードが999の場合、「固定費→収支登録」の引き継ぎ処理で生成される
+	 *   8件のExpenditureRegistItemすべてにpaymentMethodCode=999がそのまま引き継がれること
+	 *</pre>
+	 */
+	@Test
+	@Sql(scripts = {
+		"/sql/initsql/schema_test.sql",
+		"/com/yonetani/webapp/accountbook/application/usecase/account/regist/IncomeAndExpenditureInitIntegrationTest.sql",
+		"/com/yonetani/webapp/accountbook/application/usecase/account/regist/IncomeAndExpenditureInitIntegrationTest_FixedCost_202510_AllRequired_PaymentMethodNone.sql"
+	}, config = @SqlConfig(encoding = "UTF-8"))
+	@DisplayName("正常系：固定費の支払方法「支払方法がない」(999)が収支登録情報に引き継がれること")
+	void testReadInitInfo_NormalCase_PaymentMethodNoneIsCarriedOver() {
+		// Given: テストユーザ、対象年月202510（10月）。固定費8件すべてPAYMENT_METHOD_CODE='999'
+		LoginUserInfo user = createLoginUser();
+		String targetYearMonth = "202510";
+
+		// When: 新規登録画面を表示
+		IncomeAndExpenditureRegistResponse response = useCase.readInitInfo(user, targetYearMonth);
+
+		// Then: 固定費から支出情報が自動生成されている（8件）
+		assertNotNull(response.getExpenditureRegistItemList());
+		assertEquals(8, response.getExpenditureRegistItemList().size());
+
+		// Then: 生成された8件すべてにpaymentMethodCode=999が引き継がれている
+		for(ExpenditureRegistItem item : response.getExpenditureRegistItemList()) {
+			assertEquals("999", item.getPaymentMethodCode(),
+					"支出項目コード=" + item.getExpenditureItemCode() + "のpaymentMethodCodeが999で引き継がれていません");
+		}
 	}
 
 	/**
@@ -1081,19 +1176,19 @@ class IncomeAndExpenditureInitIntegrationTest {
 
 		// セッションデータのモック（収入情報リスト）
 		List<IncomeRegistItem> incomeRegistItemList = new ArrayList<>();
-		incomeRegistItemList.add(IncomeRegistItem.from(
+		incomeRegistItemList.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, "01", "1", "テスト収入詳細", new BigDecimal("350000")));
 		// 削除アクションが設定された収入データ（画面表示から除外されるべき）
-		incomeRegistItemList.add(IncomeRegistItem.from(
+		incomeRegistItemList.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_DELETE, "02", "2", "削除対象収入", new BigDecimal("100000")));
 
 		// セッションデータのモック（支出情報リスト）
 		List<ExpenditureRegistItem> expenditureRegistItemList = new ArrayList<>();
-		expenditureRegistItemList.add(ExpenditureRegistItem.from(
+		expenditureRegistItemList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE, "001", "0001", "", "電気代", "1",
 			"支払詳細", "30", "001", new BigDecimal("12000"), false));
 		// 削除アクションが設定された支出データ（画面表示から除外されるべき）
-		expenditureRegistItemList.add(ExpenditureRegistItem.from(
+		expenditureRegistItemList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_DELETE, "002", "0037", "", "削除対象支出", "1",
 			"削除対象詳細", "15", "001", new BigDecimal("5000"), false));
 
@@ -1142,7 +1237,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 
 		// セッションデータのモック（支出情報リスト: 0円支出を含む）
 		List<ExpenditureRegistItem> expenditureRegistItemList = new ArrayList<>();
-		expenditureRegistItemList.add(ExpenditureRegistItem.from(
+		expenditureRegistItemList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD, "2026011210000001", "0001", "", "電気代", "1",
 			"支払詳細", "30", "001", BigDecimal.ZERO, false));
 
@@ -1184,18 +1279,18 @@ class IncomeAndExpenditureInitIntegrationTest {
 
 		// セッションデータのモック（収入情報リスト: 1件）
 		List<IncomeRegistItem> incomeRegistItemList = new ArrayList<>();
-		incomeRegistItemList.add(IncomeRegistItem.from(
+		incomeRegistItemList.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"01", "1", "", new BigDecimal("100000")));
 
 		// セッションデータのモック（支出情報リスト）
 		// ADD: 0円支出 → エラーメッセージ対象
 		List<ExpenditureRegistItem> expenditureRegistItemList = new ArrayList<>();
-		expenditureRegistItemList.add(ExpenditureRegistItem.from(
+		expenditureRegistItemList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD, "2026011210000001", "0001", "", "電気代", "1",
 			"支払詳細", "30", "001", BigDecimal.ZERO, false));
 		// DELETE: 0円支出 → チェック除外（メッセージ対象外）
-		expenditureRegistItemList.add(ExpenditureRegistItem.from(
+		expenditureRegistItemList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_DELETE, "2026011210000002", "0002", "", "ガス代", "1",
 			"", "30", "001", BigDecimal.ZERO, false));
 
@@ -1236,13 +1331,13 @@ class IncomeAndExpenditureInitIntegrationTest {
 
 		// セッションデータのモック（収入情報リスト: 1件）
 		List<IncomeRegistItem> incomeRegistItemList = new ArrayList<>();
-		incomeRegistItemList.add(IncomeRegistItem.from(
+		incomeRegistItemList.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"01", "1", "", new BigDecimal("100000")));
 
 		// セッションデータのモック（支出情報リスト: 全件1円以上）
 		List<ExpenditureRegistItem> expenditureRegistItemList = new ArrayList<>();
-		expenditureRegistItemList.add(ExpenditureRegistItem.from(
+		expenditureRegistItemList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD, "2026011210000001", "0001", "", "電気代", "1",
 			"支払詳細", "30", "001", new BigDecimal("10000"), false));
 
@@ -1277,7 +1372,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 
 		// セッションデータのモック（収入情報リスト: 1件）
 		List<IncomeRegistItem> incomeRegistItemList = new ArrayList<>();
-		incomeRegistItemList.add(IncomeRegistItem.from(
+		incomeRegistItemList.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				"01", "1", "11月給与", new BigDecimal("350000")));
 
@@ -1285,7 +1380,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 		// NON_UPDATE + 0円: readUpdateInfo()でDBからロードされた固定費区分=2由来の支出を模擬
 		// (固定費区分=2はDBへの書き込み時に金額が0円に変換される仕様のため、更新フローでは0円がロードされる)
 		List<ExpenditureRegistItem> expenditureRegistItemList = new ArrayList<>();
-		expenditureRegistItemList.add(ExpenditureRegistItem.from(
+		expenditureRegistItemList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				"001", "0030", null, "家賃", "1",
 				"家賃支払詳細", "27", "001", BigDecimal.ZERO, false));

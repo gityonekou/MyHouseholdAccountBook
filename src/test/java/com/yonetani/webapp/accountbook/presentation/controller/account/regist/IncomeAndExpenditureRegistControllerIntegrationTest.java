@@ -8,6 +8,8 @@
  * 2026/02/25 : 1.00.00  feature-1.00-dev00  新規作成
  * 2026/06/13 : 1.01.00  feature-1.02-dev2   固定費0円対応: 0円固定費初期表示メッセージテスト・内容確認0円チェックテストを追加
  * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/11/01 : 1.02.01  feature-1.03-dev1   支払方法・銀行口座管理追加対応(支出一覧に支払方法名・引落先口座名を追加)
+ * 2026/11/08 : 1.02.02  feature-1.03-dev1   セッション登録情報(ExpenditureRegistItem)のfrom()引数が値オブジェクト型になったことに伴うテストデータ生成処理の修正(型安全性対応。06_コーディング規約.md §8)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.account.regist;
@@ -43,6 +45,16 @@ import com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpe
 import com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure.IncomeAndExpenditureRegistConfirmUseCase;
 import com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure.IncomeRegistUseCase;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureEventCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureName;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.presentation.controller.MyHouseholdAccountBookControllerAdvice;
 import com.yonetani.webapp.accountbook.presentation.response.fw.CompleteRedirectMessages;
 import com.yonetani.webapp.accountbook.presentation.session.ExpenditureRegistItem;
@@ -149,7 +161,10 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 		return IncomeRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
 				MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
-				code, kubun, detail, new BigDecimal(amount));
+				code,
+				IncomeCategory.from(kubun),
+				IncomeDetailContext.from(detail),
+				IncomeAmount.from(new BigDecimal(amount).setScale(2)));
 	}
 
 	/**
@@ -160,8 +175,16 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 		return ExpenditureRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
 				MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
-				code, sisyutuItemCode, null, name, kubun, detail, null,
-				"001", new BigDecimal(amount), false);
+				code,
+				ExpenditureItemCode.from(sisyutuItemCode),
+				ExpenditureEventCode.from(null),
+				ExpenditureName.from(name),
+				ExpenditureCategory.from(kubun),
+				ExpenditureDetailContext.from(detail),
+				null,
+				PaymentMethodCode.from("001"),
+				ExpenditureAmount.from(new BigDecimal(amount).setScale(2)),
+				false);
 	}
 
 	/**
@@ -573,6 +596,108 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 
 	/**
 	 *<pre>
+	 * 【異常系】POST /myhacbook/accountregist/incomeandexpenditure/expenditureupdate/ (actionUpdate)
+	 * 支出登録_支払方法にシステム予約値(999)を送信した場合、バリデーションエラーになる
+	 * - 500エラーではなく、通常の入力エラー画面として再表示されること(突合レビュー指摘AA同型の対応)
+	 * - ExpenditureItemFormのpaymentMethodCodeValidフィールドにエラーが設定されること
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("異常系：支出登録_支払方法にシステム予約値(999)を送信した場合バリデーションエラー_画面再表示")
+	public void testPostExpenditureUpdate_PaymentMethodCodeSystemReserved_RenderView() throws Exception {
+		mockMvc.perform(post("/myhacbook/accountregist/incomeandexpenditure/expenditureupdate/")
+				.param("actionUpdate", "")
+				.param("action", MyHouseholdAccountBookContent.ACTION_TYPE_ADD)
+				.param("sisyutuItemCode", "0051")
+				.param("expenditureName", "テスト食費")
+				.param("expenditureKubun", "1")
+				.param("expenditureKingaku", "5000")
+				.param("paymentMethodCode", "999")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().isOk())
+			.andExpect(view().name("account/regist/IncomeAndExpenditureRegist"))
+			.andExpect(model().attributeHasFieldErrors("expenditureItemForm", "paymentMethodCodeValid"));
+	}
+
+	/**
+	 *<pre>
+	 * 【異常系】POST /myhacbook/accountregist/incomeandexpenditure/expenditureupdate/ (actionUpdate、action=update)
+	 * 支出更新_元々システム予約値でなかった行の支払方法をシステム予約値(999)に変更しようとするとエラーになる
+	 * - リクエスト改変によるデータ改ざんのガード(ExpenditureRegistUseCase.execExpenditureUpdate()参照)
+	 * - 通常の入力エラー(バリデーションエラー)ではなく、不正なデータ更新のためエラー画面に遷移する
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("異常系：支出更新_通常行の支払方法をシステム予約値に変更しようとするとエラーになる")
+	public void testPostExpenditureUpdate_PaymentMethodCodeTamperedToReserved_ServerError() throws Exception {
+		// セッションに支払方法=001(現金)の既存支出情報を設定
+		when(mockRegistListSession.getExpenditureRegistItemList()).thenReturn(Arrays.asList(
+			createExpenditureItem("001", "0051", "飲食(無駄遣いなし)", "1", "飲食詳細", "10000")
+		));
+
+		// action=update(既存行の訂正)でpaymentMethodCode=999(元の値001から変更)を送信
+		mockMvc.perform(post("/myhacbook/accountregist/incomeandexpenditure/expenditureupdate/")
+				.param("actionUpdate", "")
+				.param("action", MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)
+				.param("expenditureCode", "001")
+				.param("sisyutuItemCode", "0051")
+				.param("expenditureName", "飲食(無駄遣いなし)")
+				.param("expenditureKubun", "1")
+				.param("expenditureKingaku", "10000")
+				.param("paymentMethodCode", "999")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().is5xxServerError());
+	}
+
+	/**
+	 *<pre>
+	 * 【正常系】POST /myhacbook/accountregist/incomeandexpenditure/expenditureupdate/ (actionUpdate、action=update)
+	 * 支出更新_支払方法がシステム予約値(999)の既存行を変更せず再送信してもエラーにならない
+	 * - 買い物集計8項目のような、固定費から引き継いだpaymentMethodCode=999の既存行は、
+	 *   収支登録画面でdisabled表示＋隠しフィールド併記により現在値がそのまま送信される(5.5節)
+	 * - 送信値が既存値から変化していない場合は、ExpenditureRegistUseCase.execExpenditureUpdate()の
+	 *   データ改ざんガードに該当せず、更新が成立すること(回帰防止テスト)
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("正常系：支出更新_支払方法がシステム予約値(999)の既存行を変更せず再送信してもエラーにならない")
+	public void testPostExpenditureUpdate_ExistingPaymentMethodCodeSystemReservedUnchanged_NoError() throws Exception {
+		// セッションに支払方法=999(支払方法がない)の既存支出情報を設定
+		when(mockRegistListSession.getExpenditureRegistItemList()).thenReturn(Arrays.asList(
+			ExpenditureRegistItem.from(
+					MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
+					"001",
+					ExpenditureItemCode.from("0051"),
+					ExpenditureEventCode.from(null),
+					ExpenditureName.from("飲食(無駄遣いなし)"),
+					ExpenditureCategory.from("1"),
+					ExpenditureDetailContext.from("飲食詳細"),
+					null,
+					PaymentMethodCode.from("999"),
+					ExpenditureAmount.from(new BigDecimal("10000").setScale(2)),
+					false)
+		));
+
+		// action=update(既存行の訂正)でpaymentMethodCode=999(変更なし)を送信
+		mockMvc.perform(post("/myhacbook/accountregist/incomeandexpenditure/expenditureupdate/")
+				.param("actionUpdate", "")
+				.param("action", MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)
+				.param("expenditureCode", "001")
+				.param("sisyutuItemCode", "0051")
+				.param("expenditureName", "飲食(無駄遣いなし)")
+				.param("expenditureKubun", "1")
+				.param("expenditureKingaku", "10000")
+				.param("paymentMethodCode", "999")
+				.with(user("user01").password("password").roles("USER"))
+				.with(csrf()))
+			.andExpect(status().is3xxRedirection())
+			.andExpect(redirectedUrl("/myhacbook/accountregist/incomeandexpenditure/updateComplete/"));
+	}
+
+	/**
+	 *<pre>
 	 * 【正常系】POST /myhacbook/accountregist/incomeandexpenditure/expenditureupdate/ (actionDelete)
 	 * 支出削除_バリデーションOK
 	 * - 有効な支出情報を送信した場合、収支登録画面の一覧表示(updateComplete)にリダイレクト
@@ -964,8 +1089,16 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 		ExpenditureRegistItem zeroAmountAddItem = ExpenditureRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
-				"2026011210000001", "0030", null, "家賃", "1", "月額未定", "27",
-				"001", new BigDecimal("0"), false);
+				"2026011210000001",
+				ExpenditureItemCode.from("0030"),
+				ExpenditureEventCode.from(null),
+				ExpenditureName.from("家賃"),
+				ExpenditureCategory.from("1"),
+				ExpenditureDetailContext.from("月額未定"),
+				"27",
+				PaymentMethodCode.from("001"),
+				ExpenditureAmount.from(new BigDecimal("0").setScale(2)),
+				false);
 		when(mockRegistListSession.getExpenditureRegistItemList()).thenReturn(Arrays.asList(zeroAmountAddItem));
 
 		// 画面表示の検証
@@ -1001,8 +1134,16 @@ public class IncomeAndExpenditureRegistControllerIntegrationTest {
 		ExpenditureRegistItem zeroAmountDeleteItem = ExpenditureRegistItem.from(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
 				MyHouseholdAccountBookContent.ACTION_TYPE_DELETE,
-				"001", "0030", null, "家賃", "1", "月額未定", null,
-				"001", new BigDecimal("0"), false);
+				"001",
+				ExpenditureItemCode.from("0030"),
+				ExpenditureEventCode.from(null),
+				ExpenditureName.from("家賃"),
+				ExpenditureCategory.from("1"),
+				ExpenditureDetailContext.from("月額未定"),
+				null,
+				PaymentMethodCode.from("001"),
+				ExpenditureAmount.from(new BigDecimal("0").setScale(2)),
+				false);
 		when(mockRegistListSession.getExpenditureRegistItemList()).thenReturn(
 				Arrays.asList(zeroAmountDeleteItem));
 

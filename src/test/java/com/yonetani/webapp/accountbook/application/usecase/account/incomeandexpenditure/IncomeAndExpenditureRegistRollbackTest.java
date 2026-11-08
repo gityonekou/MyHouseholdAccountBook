@@ -42,6 +42,7 @@
  * 日付       : version  ブランチ            コメントなど
  * 2026/01/25 : 1.00.00  feature-1.00-dev00  新規作成
  * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/11/08 : 1.01.01  feature-1.03-dev1   セッション登録情報(ExpenditureRegistItem/IncomeRegistItem)のfrom()引数が値オブジェクト型になったことに伴うテストデータ生成処理の修正(型安全性対応。06_コーディング規約.md §8)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -67,6 +68,16 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureEventCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureName;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.session.ExpenditureRegistItem;
@@ -129,6 +140,51 @@ class IncomeAndExpenditureRegistRollbackTest {
 	}
 
 	/**
+	 *<pre>
+	 * プリミティブ引数を値オブジェクトへ変換してからExpenditureRegistItem.from()を呼び出すヘルパーメソッドです。
+	 * from()の引数が値オブジェクト型になったため(06_コーディング規約.md §8)、テストコードから
+	 * 直接プリミティブ値で呼び出せるようにするためのものです(同規約§8.3参照)。
+	 *</pre>
+	 */
+	private ExpenditureRegistItem expenditureRegistItemHelper(
+			String dataType, String action, String expenditureCode, String expenditureItemCode,
+			String eventCode, String expenditureName, String expenditureCategory, String expenditureDetailContext,
+			String siharaiDate, String paymentMethodCode, BigDecimal expenditureKingaku, boolean clearStartFlg) {
+		return ExpenditureRegistItem.from(
+				dataType,
+				action,
+				expenditureCode,
+				ExpenditureItemCode.from(expenditureItemCode),
+				ExpenditureEventCode.from(eventCode),
+				ExpenditureName.from(expenditureName),
+				ExpenditureCategory.from(expenditureCategory),
+				ExpenditureDetailContext.from(expenditureDetailContext),
+				siharaiDate,
+				PaymentMethodCode.from(paymentMethodCode),
+				ExpenditureAmount.from(expenditureKingaku.setScale(2)),
+				clearStartFlg);
+	}
+
+	/**
+	 *<pre>
+	 * プリミティブ引数を値オブジェクトへ変換してからIncomeRegistItem.from()を呼び出すヘルパーメソッドです。
+	 * from()の引数が値オブジェクト型になったため(06_コーディング規約.md §8)、テストコードから
+	 * 直接プリミティブ値で呼び出せるようにするためのものです(同規約§8.3参照)。
+	 *</pre>
+	 */
+	private IncomeRegistItem incomeRegistItemHelper(
+			String dataType, String action, String incomeCode,
+			String incomeCategory, String incomeDetailContext, BigDecimal incomeKingaku) {
+		return IncomeRegistItem.from(
+				dataType,
+				action,
+				incomeCode,
+				IncomeCategory.from(incomeCategory),
+				IncomeDetailContext.from(incomeDetailContext),
+				IncomeAmount.from(incomeKingaku.setScale(2)));
+	}
+
+	/**
 	 * テスト用のSearchQueryを作成します。
 	 */
 	private SearchQueryUserIdAndYearMonth createSearchQuery(String yearMonth) {
@@ -142,15 +198,15 @@ class IncomeAndExpenditureRegistRollbackTest {
 	 */
 	private List<IncomeRegistItem> createNewIncomeList() {
 		List<IncomeRegistItem> list = new ArrayList<>();
-		list.add(IncomeRegistItem.from(
+		list.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000001", "1", "12月給与", new BigDecimal("350000")));
-		list.add(IncomeRegistItem.from(
+		list.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000002", "2", "12月副業収入", new BigDecimal("30000")));
-		list.add(IncomeRegistItem.from(
+		list.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000003", "3", "12月積立取崩し", new BigDecimal("15000")));
@@ -186,7 +242,7 @@ class IncomeAndExpenditureRegistRollbackTest {
 		// Given: DATA_TYPE_LOAD + 不正アクション("err") の支出データ
 		// → IncomeAndExpenditureRegistUseCase line 1348 で例外発生（収入INSERT3件の後）
 		List<ExpenditureRegistItem> expenditureList = new ArrayList<>();
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
 				"err",  // 未定義アクション → else節でMyHouseholdAccountBookRuntimeException
 				"001", "0051", "", "テスト食費", "1", "食費詳細", "", "001", new BigDecimal("10000"), false));
@@ -236,26 +292,26 @@ class IncomeAndExpenditureRegistRollbackTest {
 		// Given: 必須8項目のうち0046(被服費)を欠いた支出リスト（7件）
 		// → 全件INSERT完了後の checkExpenditureAndSisyutuKingaku(line 1432)で必須チェック失敗
 		List<ExpenditureRegistItem> expenditureList = new ArrayList<>();
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000001", "0051", "", "飲食(無駄遣いなし)", "1", "飲食詳細", "05", "999", new BigDecimal("10000"), false));
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000002", "0051", "", "飲食(無駄遣いB)", "2", "飲食B詳細", "05", "999", new BigDecimal("2000"), false));
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000003", "0051", "", "飲食(無駄遣いC)", "3", "飲食C詳細", "05", "999", new BigDecimal("1000"), false));
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000004", "0052", "", "一人プチ贅沢・外食", "1", "外食詳細", "10", "999", new BigDecimal("5000"), false));
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000005", "0050", "", "日用消耗品", "1", "日用消耗品詳細", "15", "999", new BigDecimal("3000"), false));
 		// 0046(被服費)は意図的に省略 → checkExpenditureAndSisyutuKingakuで必須チェック失敗
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000006", "0007", "", "流動経費", "1", "流動経費詳細", "10", "999", new BigDecimal("10000"), false));
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000007", "0047", "", "住居設備", "1", "住居設備詳細", "25", "999", new BigDecimal("2000"), false));
 

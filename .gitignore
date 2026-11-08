@@ -34,3 +34,7 @@ build/
 
 ### Environment-specific documents ###
 00_開発環境設定.md
+
+### Never commit (local-only config) ###
+application-prd.yml
+application.yml_bk

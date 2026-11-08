@@ -9,6 +9,7 @@
  * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
  * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  * 2026/10/12 : 1.02.01  feature-1.03-dev1   追加リファクタリング対応(リダイレクトレスポンスdtoのファクトリ引数をドメインタイプに変更)
+ * 2026/11/01 : 1.02.02  feature-1.03-dev1   支払方法・銀行口座管理追加対応(支出一覧に支払方法名・引落先口座名を追加)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.regist;
@@ -20,6 +21,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.ResolvedPaymentMethodName;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.presentation.request.account.regist.ExpenditureItemForm;
 import com.yonetani.webapp.accountbook.presentation.request.account.regist.IncomeItemForm;
@@ -63,6 +65,9 @@ public class IncomeAndExpenditureRegistResponse extends AbstractIncomeAndExpendi
 	// 支払方法選択ボックス(findSelectableByUserId()ベース。システム予約値は含まない)
 	@Getter
 	private final SelectViewItem paymentMethodSelectList;
+	// 支払方法欄のdisabled表示用に解決済みの支払方法名(現在値が選択肢に含まれない場合、コード値ではなく名称を表示するため)
+	@Getter
+	private final String paymentMethodCurrentName;
 
 	// セッション管理する収入登録情報のリストです。
 	@Setter
@@ -82,8 +87,8 @@ public class IncomeAndExpenditureRegistResponse extends AbstractIncomeAndExpendi
 	 *
 	 */
 	public static IncomeAndExpenditureRegistResponse getInstance(TargetYearMonth targetYearMonth) {
-		// 収入入力フォーム、収入区分選択ボックス、支出入力フォーム、支出区分選択ボックス、支払方法選択ボックスなしで画面を表示
-		IncomeAndExpenditureRegistResponse response = new IncomeAndExpenditureRegistResponse(null, null, null, null, null);
+		// 収入入力フォーム、収入区分選択ボックス、支出入力フォーム、支出区分選択ボックス、支払方法選択ボックス、支払方法名(disabled表示用)なしで画面を表示
+		IncomeAndExpenditureRegistResponse response = new IncomeAndExpenditureRegistResponse(null, null, null, null, null, null);
 		response.setYearMonth(targetYearMonth);
 		return response;
 	}
@@ -114,7 +119,7 @@ public class IncomeAndExpenditureRegistResponse extends AbstractIncomeAndExpendi
 		}
 		// 収入入力フォームの表示データを設定して画面を表示
 		IncomeAndExpenditureRegistResponse response = new IncomeAndExpenditureRegistResponse(incomeItemForm,
-				SelectViewItem.from(incomeKubunList), null, null, null);
+				SelectViewItem.from(incomeKubunList), null, null, null, null);
 		response.setYearMonth(targetYearMonth);
 		return response;
 	}
@@ -128,12 +133,13 @@ public class IncomeAndExpenditureRegistResponse extends AbstractIncomeAndExpendi
 	 * @param expenditureItemForm 支出情報が格納されたフォームデータ
 	 * @param addExpenditureKubunList 支出区分選択ボックスの表示情報リスト
 	 * @param addPaymentMethodList 支払方法選択ボックスの表示情報リスト(findSelectableByUserId()ベース)
+	 * @param paymentMethodCurrentName 支払方法欄のdisabled表示用に解決済みの支払方法名(現在値が選択肢に含まれる場合は未使用)
 	 * @return 収支登録画面表示情報
 	 *
 	 */
 	public static IncomeAndExpenditureRegistResponse getInstance(TargetYearMonth targetYearMonth,
 			ExpenditureItemForm expenditureItemForm, List<OptionItem> addExpenditureKubunList,
-			List<OptionItem> addPaymentMethodList) {
+			List<OptionItem> addPaymentMethodList, ResolvedPaymentMethodName paymentMethodCurrentName) {
 
 		// 支出情報フォームデータがnullなら空データを設定(アクションなしで処理継続となるので、後の登録ではエラーになる：継続処理可能)
 		if(expenditureItemForm == null) {
@@ -153,7 +159,9 @@ public class IncomeAndExpenditureRegistResponse extends AbstractIncomeAndExpendi
 		}
 		// 支出入力フォームの表示データを設定して画面を表示
 		IncomeAndExpenditureRegistResponse response = new IncomeAndExpenditureRegistResponse(null, null,
-				expenditureItemForm, SelectViewItem.from(expenditureKubunList), SelectViewItem.from(paymentMethodList));
+				expenditureItemForm, SelectViewItem.from(expenditureKubunList), SelectViewItem.from(paymentMethodList),
+				// 支払方法欄のdisabled表示用に解決済みの支払方法名
+				paymentMethodCurrentName.getValue());
 		response.setYearMonth(targetYearMonth);
 		return response;
 	}
@@ -175,6 +183,8 @@ public class IncomeAndExpenditureRegistResponse extends AbstractIncomeAndExpendi
 		modelAndView.addObject("expenditureKubunSelectList", expenditureKubunSelectList);
 		// 支払方法選択ボックス
 		modelAndView.addObject("paymentMethodSelectList", paymentMethodSelectList);
+		// 支払方法欄のdisabled表示用に解決済みの支払方法名
+		modelAndView.addObject("paymentMethodCurrentName", paymentMethodCurrentName);
 
 		return modelAndView;
 	}

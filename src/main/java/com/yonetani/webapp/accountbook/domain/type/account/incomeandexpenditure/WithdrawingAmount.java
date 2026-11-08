@@ -6,7 +6,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2025/12/28 : 1.00.00  feature-1.00-dev00  リファクタリング対応(DDD適応)により新規作成
- * 
+ * 2026/11/08 : 1.01.00  feature-1.03-dev1   from(IncomeRegistItem)をfrom(IncomeCategory, IncomeAmount)に変更(ドメイン層のプレゼンテーション層セッションDTOへの依存を解消)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure;
@@ -16,8 +16,9 @@ import java.util.Objects;
 
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
+import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeCategory;
+import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.NullableMoney;
-import com.yonetani.webapp.accountbook.presentation.session.IncomeRegistItem;
 
 import lombok.EqualsAndHashCode;
 
@@ -77,27 +78,28 @@ public class WithdrawingAmount extends NullableMoney {
 
 	/**
 	 *<pre>
-	 * 収支登録情報(セッション情報)の値から「積立金取崩金額」項目の値を表すドメインタイプを生成します
+	 * 収入区分・収入金額の値から「積立金取崩金額」項目の値を表すドメインタイプを生成します
 	 *
 	 * [ガード節]
 	 * ・null値
 	 *</pre>
-	 * @param income 収支登録情報(セッション情報)
+	 * @param incomeCategory 収入区分
+	 * @param incomeAmount 収入金額
 	 * @return 「積立金取崩金額」項目ドメインタイプ
 	 *
 	 */
-	public static WithdrawingAmount from(IncomeRegistItem income) {
+	public static WithdrawingAmount from(IncomeCategory incomeCategory, IncomeAmount incomeAmount) {
 		// ガード節(null)
-		if(income == null) {
-			throw new MyHouseholdAccountBookRuntimeException("収支登録情報(セッション情報)の設定値がnullです。管理者に問い合わせてください。");
+		if(incomeCategory == null || incomeAmount == null) {
+			throw new MyHouseholdAccountBookRuntimeException("収入区分・収入金額の設定値がnullです。管理者に問い合わせてください。");
 		}
-		
-		// 収入区分が「積立からの取崩し(3)」の場合、収支登録情報(セッション情報)の収入金額から「積立金取崩金額」項目の値を生成して返却
-		if(Objects.equals(income.getIncomeCategory(), MyHouseholdAccountBookContent.INCOME_KUBUN_WITHDREW_SELECTED_VALUE)) {
-			return new WithdrawingAmount(income.getIncomeKingaku());
+
+		// 収入区分が「積立からの取崩し(3)」の場合、収入金額から「積立金取崩金額」項目の値を生成して返却
+		if(Objects.equals(incomeCategory.getValue(), MyHouseholdAccountBookContent.INCOME_KUBUN_WITHDREW_SELECTED_VALUE)) {
+			return new WithdrawingAmount(incomeAmount.getValue());
 		}
-		
-		// 収入区分が「積立からの取崩し(3)」以外の場合、収入金額の収支登録情報(セッション情報)となるので値nullの積立金取崩金額を生成して返却
+
+		// 収入区分が「積立からの取崩し(3)」以外の場合、通常収入金額となるので値nullの積立金取崩金額を生成して返却
 		return NULL;
 	}
 	

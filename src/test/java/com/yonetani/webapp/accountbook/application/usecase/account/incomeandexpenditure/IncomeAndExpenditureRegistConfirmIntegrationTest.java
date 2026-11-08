@@ -18,6 +18,7 @@
  *    - 支出：9件INSERT(clearStartFlg=false×8/clearStartFlg=true×1)
  *    - EXPENDITURE_TABLE：clearStartFlg=true→YOTEI=入力値/KINGAKU=0、clearStartFlg=false→YOTEI=KINGAKU=入力値確認
  *    - 支出予定金額(EXPENDITURE_ESTIMATE_KINGAKU)確認
+ * ④-2 正常系：固定費由来の支払方法「支払方法がない」(999)がEXPENDITURE_TABLEにそのままINSERTされること（execRegistAction）
  * ⑤ 正常系：更新_混合アクション（execRegistAction）
  *    - 収入：kubun=3を含む各操作（NON_UPDATE/UPDATE/ADD/DELETE/kubun変更）
  *    - 支出：NON_UPDATE×8+UPDATE/DELETE/ADD+無駄遣いB/C(NON_UPDATE/UPDATE増額/UPDATE減額/DELETE/ADD)
@@ -44,6 +45,8 @@
  * 日付       : version  ブランチ            コメントなど
  * 2026/01/25 : 1.00.00  feature-1.00-dev00  新規作成
  * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/11/01 : 1.01.01  feature-1.03-dev1   支払方法・銀行口座管理追加対応(支出一覧に支払方法名・引落先口座名を追加)
+ * 2026/11/08 : 1.01.02  feature-1.03-dev1   セッション登録情報(ExpenditureRegistItem/IncomeRegistItem)のfrom()引数が値オブジェクト型になったことに伴うテストデータ生成処理の修正(型安全性対応。06_コーディング規約.md §8)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -76,7 +79,16 @@ import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.Exp
 import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.SisyutuKingakuTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureEventCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureName;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.response.account.regist.IncomeAndExpenditureRegistCheckResponse;
@@ -129,6 +141,51 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 	}
 
 	/**
+	 *<pre>
+	 * プリミティブ引数を値オブジェクトへ変換してからExpenditureRegistItem.from()を呼び出すヘルパーメソッドです。
+	 * from()の引数が値オブジェクト型になったため(06_コーディング規約.md §8)、テストコードから
+	 * 直接プリミティブ値で呼び出せるようにするためのものです(同規約§8.3参照)。
+	 *</pre>
+	 */
+	private ExpenditureRegistItem expenditureRegistItemHelper(
+			String dataType, String action, String expenditureCode, String expenditureItemCode,
+			String eventCode, String expenditureName, String expenditureCategory, String expenditureDetailContext,
+			String siharaiDate, String paymentMethodCode, BigDecimal expenditureKingaku, boolean clearStartFlg) {
+		return ExpenditureRegistItem.from(
+				dataType,
+				action,
+				expenditureCode,
+				ExpenditureItemCode.from(expenditureItemCode),
+				ExpenditureEventCode.from(eventCode),
+				ExpenditureName.from(expenditureName),
+				ExpenditureCategory.from(expenditureCategory),
+				ExpenditureDetailContext.from(expenditureDetailContext),
+				siharaiDate,
+				PaymentMethodCode.from(paymentMethodCode),
+				ExpenditureAmount.from(expenditureKingaku.setScale(2)),
+				clearStartFlg);
+	}
+
+	/**
+	 *<pre>
+	 * プリミティブ引数を値オブジェクトへ変換してからIncomeRegistItem.from()を呼び出すヘルパーメソッドです。
+	 * from()の引数が値オブジェクト型になったため(06_コーディング規約.md §8)、テストコードから
+	 * 直接プリミティブ値で呼び出せるようにするためのものです(同規約§8.3参照)。
+	 *</pre>
+	 */
+	private IncomeRegistItem incomeRegistItemHelper(
+			String dataType, String action, String incomeCode,
+			String incomeCategory, String incomeDetailContext, BigDecimal incomeKingaku) {
+		return IncomeRegistItem.from(
+				dataType,
+				action,
+				incomeCode,
+				IncomeCategory.from(incomeCategory),
+				IncomeDetailContext.from(incomeDetailContext),
+				IncomeAmount.from(incomeKingaku.setScale(2)));
+	}
+
+	/**
 	 * テスト用のSearchQueryを作成します。
 	 */
 	private SearchQueryUserIdAndYearMonth createSearchQuery(String yearMonth) {
@@ -156,17 +213,17 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 	private List<IncomeRegistItem> createNewIncomeList() {
 		List<IncomeRegistItem> list = new ArrayList<>();
 		// 給与(kubun=1) 350,000円 → INCOME_KINGAKU加算
-		list.add(IncomeRegistItem.from(
+		list.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000001", "1", "12月給与", new BigDecimal("350000")));
 		// 副業(kubun=2) 30,000円 → INCOME_KINGAKU加算
-		list.add(IncomeRegistItem.from(
+		list.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000002", "2", "12月副業収入", new BigDecimal("30000")));
 		// 積立取崩し(kubun=3) 15,000円 → WITHDREW_KINGAKU加算（INCOME_KINGAKUには加算しない）
-		list.add(IncomeRegistItem.from(
+		list.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000003", "3", "12月積立取崩し", new BigDecimal("15000")));
@@ -183,48 +240,48 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 	private List<ExpenditureRegistItem> createNewExpenditureList() {
 		List<ExpenditureRegistItem> list = new ArrayList<>();
 		// 飲食(無駄遣いなし) 0051 kubun=1
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000001", "0051", "", "飲食(無駄遣いなし)", "1", "飲食詳細", "05", "001", new BigDecimal("10000"), false));
 		// 飲食(無駄遣いB) 0051 kubun=2
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000002", "0051", "", "飲食(無駄遣いB)", "2", "飲食B詳細", "05", "001", new BigDecimal("2000"), false));
 		// 飲食(無駄遣いC) 0051 kubun=3
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000003", "0051", "", "飲食(無駄遣いC)", "3", "飲食C詳細", "05", "001", new BigDecimal("1000"), false));
 		// 一人プチ贅沢・外食 0052
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000004", "0052", "", "一人プチ贅沢・外食", "1", "外食詳細", "10", "001", new BigDecimal("5000"), false));
 		// 日用消耗品 0050
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000005", "0050", "", "日用消耗品", "1", "日用消耗品詳細", "15", "001", new BigDecimal("3000"), false));
 		// 被服費 0046
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000006", "0046", "", "被服費", "1", "被服費詳細", "20", "001", new BigDecimal("5000"), false));
 		// 流動経費 0007
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000007", "0007", "", "流動経費", "1", "流動経費詳細", "10", "001", new BigDecimal("10000"), false));
 		// 住居設備 0047
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000008", "0047", "", "住居設備", "1", "住居設備詳細", "25", "001", new BigDecimal("2000"), false));
 		// 電気代 0037 kubun=1 clearStartFlg=true (0円開始)
 		// → EXPENDITURE_ESTIMATE_KINGAKU=12000(入力値)、EXPENDITURE_KINGAKU=0円(clearStartFlg=true)
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000009", "0037", "", "電気代", "1", "電気代詳細", "15", "001", new BigDecimal("12000"), true));
@@ -257,27 +314,27 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 	private List<IncomeRegistItem> createUpdateIncomeList() {
 		List<IncomeRegistItem> list = new ArrayList<>();
 		// NON_UPDATE: code=01, 給与350,000（変更なし）→ regularIncome加算
-		list.add(IncomeRegistItem.from(
+		list.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
 				MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				"01", "1", "11月給与", new BigDecimal("350000")));
 		// UPDATE: code=02, 副業→積立取崩し(kubun=2→3) 40,000 → withdrew加算
-		list.add(IncomeRegistItem.from(
+		list.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
 				MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE,
 				"02", "3", "11月副業→積立取崩し", new BigDecimal("40000")));
 		// ADD: 新規追加 積立取崩し(kubun=3) 15,000 → withdrew加算
-		list.add(IncomeRegistItem.from(
+		list.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251101120000001", "3", "臨時積立取崩し", new BigDecimal("15000")));
 		// UPDATE: code=03, 積立取崩し→副業(kubun=3→2) 25,000 → regularIncome加算
-		list.add(IncomeRegistItem.from(
+		list.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
 				MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE,
 				"03", "2", "11月積立取崩し→副業", new BigDecimal("25000")));
 		// DELETE: code=04, 積立取崩し削除 → 収支計算から除外
-		list.add(IncomeRegistItem.from(
+		list.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
 				MyHouseholdAccountBookContent.ACTION_TYPE_DELETE,
 				"04", "3", "11月積立取崩し(削除)", new BigDecimal("10000")));
@@ -314,67 +371,67 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 	private List<ExpenditureRegistItem> createUpdateExpenditureList() {
 		List<ExpenditureRegistItem> list = new ArrayList<>();
 		// 必須8項目: 全てNON_UPDATE
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				"001", "0051", "", "飲食(無駄遣いなし)", "1", "飲食詳細", "", "999", new BigDecimal("10000"), false));
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				"002", "0051", "", "飲食(無駄遣いB)", "2", "飲食B詳細", "", "999", new BigDecimal("2000"), false));
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				"003", "0051", "", "飲食(無駄遣いC)", "3", "飲食C詳細", "", "999", new BigDecimal("1000"), false));
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				"004", "0052", "", "一人プチ贅沢・外食", "1", "外食詳細", "", "999", new BigDecimal("5000"), false));
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				"005", "0050", "", "日用消耗品", "1", "日用消耗品詳細", "", "999", new BigDecimal("3000"), false));
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				"006", "0046", "", "被服費", "1", "被服費詳細", "", "999", new BigDecimal("5000"), false));
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				"007", "0007", "", "流動経費", "1", "流動経費詳細", "", "999", new BigDecimal("10000"), false));
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				"008", "0047", "", "住居設備", "1", "住居設備詳細", "", "999", new BigDecimal("2000"), false));
 		// UPDATE: 電気代(009) 0037 kubun=1 12,000→15,000 siharaiDate=2025-11-30
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE,
 				"009", "0037", "", "電気代(更新後)", "1", "電気代支払詳細(更新)", "30", "001", new BigDecimal("15000"), false));
 		// DELETE: ガス代(010) 0038 kubun=1 10,000
 		// ※siharaiDate:DB値はnullだが、createExpenditureItemでPaymentDate.from(yearMonth,day)が呼ばれるため
 		//   空文字列は不可（[day=]エラー）。"15"等の有効な2桁日付が必要。
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_DELETE,
 				"010", "0038", "", "ガス代", "1", "ガス代支払詳細", "15", "001", new BigDecimal("10000"), false));
 		// ADD: 水道代 0040 kubun=1 8,000 siharaiDate=2025-11-20
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251101120000001", "0040", "", "水道代", "1", "水道代支払詳細", "20", "001", new BigDecimal("8000"), false));
 		// NON_UPDATE: 交際費B(011) 0056 kubun=2 3,000
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				"011", "0056", "", "交際費B(NON_UPDATE)", "2", "交際費B詳細", "", "001", new BigDecimal("3000"), false));
 		// UPDATE増額: 交際費B(012) 0056 kubun=2 2,000→4,000 siharaiDate=2025-11-25
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE,
 				"012", "0056", "", "交際費B(UPDATE増額)", "2", "交際費B詳細(更新)", "25", "001", new BigDecimal("4000"), false));
 		// UPDATE減額: 趣味娯楽C(013) 0057 kubun=3 1,500→500 siharaiDate=2025-11-01
 		// ※siharaiDate:UPDATE/DELETEはPaymentDate.from(yearMonth,day)が呼ばれるため空文字列は不可。
 		//   "01"を設定 → 0057 SIHARAI_DATE=MAX(null, 2025-11-01)=2025-11-01
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE,
 				"013", "0057", "", "趣味娯楽C(UPDATE減額)", "3", "趣味娯楽C詳細(更新)", "01", "001", new BigDecimal("500"), false));
 		// DELETE: 趣味娯楽C(014) 0057 kubun=3 2,000
 		// ※DELETE: SIHARAI_DATEはholderの現在値(2025-11-01 from "013" UPDATE)を保持
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_DELETE,
 				"014", "0057", "", "趣味娯楽C(DELETE)", "3", "趣味娯楽C詳細", "01", "001", new BigDecimal("2000"), false));
 		// ADD: 趣味娯楽その他B 0059 kubun=2 1,000 siharaiDate=2025-11-10
 		// ※siharaiDate:ADD処理でもcreateExpenditureItemでPaymentDate.from(yearMonth,day)が呼ばれるため
 		//   空文字列は不可。"10"を設定 → 0059 SIHARAI_DATE=2025-11-10
-		list.add(ExpenditureRegistItem.from(
+		list.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251101120000002", "0059", "", "趣味娯楽その他B(ADD)", "2", "趣味娯楽その他B詳細", "10", "001", new BigDecimal("1000"), false));
 		return list;
@@ -403,26 +460,26 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 
 		// Given: 収入セッションリスト（2件）
 		List<IncomeRegistItem> incomeList = new ArrayList<>();
-		incomeList.add(IncomeRegistItem.from(
+		incomeList.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251101120000001", "1", "テスト給与", new BigDecimal("300000")));
-		incomeList.add(IncomeRegistItem.from(
+		incomeList.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251101120000002", "2", "テスト副業", new BigDecimal("50000")));
 
 		// Given: 支出セッションリスト（3件、うち1件DELETE）
 		List<ExpenditureRegistItem> expenditureList = new ArrayList<>();
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251101120000001", "0037", "", "テスト電気代", "1", "電気代詳細", "30", "001", new BigDecimal("12000"), false));
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
 				MyHouseholdAccountBookContent.ACTION_TYPE_DELETE,
 				"009", "0037", "", "削除対象電気代", "1", "削除対象", "", "001", new BigDecimal("5000"), false));
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW,
 				MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251101120000002", "0051", "", "テスト食費", "1", "食費詳細", "", "001", new BigDecimal("8000"), false));
@@ -638,6 +695,53 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 				"0037:支出金額=0(clearStartFlg=true:0円開始)");
 		assertEquals(LocalDate.of(2025, 12, 15), item0037.getPaymentDate().getValue(),
 				"0037:SIHARAI_DATE=2025-12-15(siharaiDate=\"15\")");
+	}
+
+	/**
+	 *<pre>
+	 * テスト④-2：正常系：固定費由来の支払方法「支払方法がない」(999)がEXPENDITURE_TABLEにそのままINSERTされること
+	 *
+	 * 【検証内容】
+	 * ・買い物集計8項目のうち1件(0051:飲食(無駄遣いなし))のpaymentMethodCodeが999(固定費から引き継いだ値)の場合、
+	 *   execRegistAction実行後、EXPENDITURE_TABLEのPAYMENT_METHOD_CODEにも999がそのままINSERTされること
+	 *   (突合レビュー指摘A。ExpenditureItem.createExpenditureItem()はpaymentMethodCodeをそのままコピーするだけの設計)
+	 *</pre>
+	 */
+	@Test
+	@DisplayName("正常系：固定費由来の支払方法「支払方法がない」(999)がEXPENDITURE_TABLEにそのままINSERTされること")
+	void testExecRegistAction_NewRegistration_PaymentMethodNoneIsPersisted() {
+		// Given: テストユーザ、新規月
+		LoginUserInfo user = createLoginUser();
+		String targetYearMonth = "202512";
+
+		// Given: 新規登録用セッションデータ(収入3件+支出9件)のうち、0051(飲食(無駄遣いなし))のpaymentMethodCodeを
+		// 999(固定費から引き継いだ「支払方法がない」)に差し替える
+		List<IncomeRegistItem> incomeList = createNewIncomeList();
+		List<ExpenditureRegistItem> expenditureList = createNewExpenditureList();
+		ExpenditureRegistItem shokuhiItem = expenditureList.get(0);
+		expenditureList.set(0, expenditureRegistItemHelper(
+				shokuhiItem.getDataType(), shokuhiItem.getAction(), shokuhiItem.getExpenditureCode(),
+				shokuhiItem.getExpenditureItemCode(), shokuhiItem.getEventCode(), shokuhiItem.getExpenditureName(),
+				shokuhiItem.getExpenditureCategory(), shokuhiItem.getExpenditureDetailContext(),
+				shokuhiItem.getSiharaiDate(), "999", shokuhiItem.getExpenditureKingaku(), shokuhiItem.isClearStartFlg()));
+
+		// When: DB登録実行
+		IncomeAndExpenditureRegistCheckResponse response = useCase.execRegistAction(
+				user, targetYearMonth, incomeList, expenditureList);
+
+		// Then: レスポンスが正しく返却される
+		assertNotNull(response);
+		assertTrue(response.isTransactionSuccessFull(), "transactionSuccessFull=true");
+
+		// Then: EXPENDITURE_TABLEのPAYMENT_METHOD_CODEに999がそのままINSERTされている
+		// (0051:食費は無駄遣いなし/B/Cの3件が登録されるため、支出区分="1"(無駄遣いなし。差し替えた行)で絞り込む)
+		ExpenditureItemInquiryList expList0051 = expenditureRepository.findByExpenditureItemCode(
+				createExpenditureAmountSearchQuery("202512", "0051"));
+		ExpenditureItem shokuhiNonWaste = expList0051.getValues().stream()
+				.filter(item -> "1".equals(item.getExpenditureCategory().getValue()))
+				.findFirst().orElseThrow(() -> new AssertionError("0051(飲食(無駄遣いなし))のEXPENDITURE_TABLE行が見つかりません"));
+		assertEquals("999", shokuhiNonWaste.getPaymentMethodCode().getValue(),
+				"0051(無駄遣いなし):PAYMENT_METHOD_CODE=999(固定費から引き継いだ値がそのままINSERTされること)");
 	}
 
 	/**
@@ -888,21 +992,21 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 
 		// Given: 全件NON_UPDATEの収入セッションリスト
 		List<IncomeRegistItem> incomeList = new ArrayList<>();
-		incomeList.add(IncomeRegistItem.from(
+		incomeList.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
 				MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				"01", "1", "11月給与", new BigDecimal("350000")));
-		incomeList.add(IncomeRegistItem.from(
+		incomeList.add(incomeRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
 				MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				"02", "2", "11月副業収入", new BigDecimal("30000")));
 
 		// Given: 全件NON_UPDATEの支出セッションリスト（必須8項目）
 		List<ExpenditureRegistItem> expenditureList = new ArrayList<>();
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				"001", "0051", "", "飲食(無駄遣いなし)", "1", "飲食詳細", "", "999", new BigDecimal("10000"), false));
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_LOAD, MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
 				"002", "0051", "", "飲食(無駄遣いB)", "2", "飲食B詳細", "", "999", new BigDecimal("2000"), false));
 
@@ -981,26 +1085,26 @@ class IncomeAndExpenditureRegistConfirmIntegrationTest {
 		// Given: 必須8項目のうち0046(被服費)を欠いた支出リスト（7件）
 		// → checkExpenditureAndSisyutuKingaku(line 1432)で必須チェック失敗
 		List<ExpenditureRegistItem> expenditureList = new ArrayList<>();
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000001", "0051", "", "飲食(無駄遣いなし)", "1", "飲食詳細", "05", "999", new BigDecimal("10000"), false));
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000002", "0051", "", "飲食(無駄遣いB)", "2", "飲食B詳細", "05", "999", new BigDecimal("2000"), false));
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000003", "0051", "", "飲食(無駄遣いC)", "3", "飲食C詳細", "05", "999", new BigDecimal("1000"), false));
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000004", "0052", "", "一人プチ贅沢・外食", "1", "外食詳細", "10", "999", new BigDecimal("5000"), false));
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000005", "0050", "", "日用消耗品", "1", "日用消耗品詳細", "15", "999", new BigDecimal("3000"), false));
 		// 0046(被服費)は意図的に省略
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000006", "0007", "", "流動経費", "1", "流動経費詳細", "10", "999", new BigDecimal("10000"), false));
-		expenditureList.add(ExpenditureRegistItem.from(
+		expenditureList.add(expenditureRegistItemHelper(
 				MyHouseholdAccountBookContent.DATA_TYPE_NEW, MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
 				"20251201120000007", "0047", "", "住居設備", "1", "住居設備詳細", "25", "999", new BigDecimal("2000"), false));
 

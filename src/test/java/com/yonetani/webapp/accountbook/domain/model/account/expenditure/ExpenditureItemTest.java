@@ -5,6 +5,7 @@
  * 更新履歴
  * 日付       : version  ブランチ            コメントなど
  * 2026/08/19 : 1.00.00  feature-1.03-dev1   新規作成
+ * 2026/11/08 : 1.00.01  feature-1.03-dev1   セッション登録情報(ExpenditureRegistItem)のfrom()引数が値オブジェクト型になったことに伴うテストデータ生成処理の修正(型安全性対応。06_コーディング規約.md §8)
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.expenditure;
@@ -74,7 +75,7 @@ class ExpenditureItemTest {
 	@Test
 	@DisplayName("正常系：createExpenditureItemは初期登録時(initFlg=true)、支出金額を支出予定金額として設定する")
 	void testCreateExpenditureItem_正常系_初期登録時は支出金額を支出予定金額に設定() {
-		ExpenditureRegistItem session = ExpenditureRegistItem.from(
+		ExpenditureRegistItem session = sessionHelper(
 				"NEW", "add", "20260101120000001", "0037", "",
 				"電気代", "1", "電気代詳細", "30", "001",
 				new BigDecimal("12000"), false);
@@ -91,7 +92,7 @@ class ExpenditureItemTest {
 	@Test
 	@DisplayName("正常系：createExpenditureItemは更新時(initFlg=false)、支出予定金額に0を設定する")
 	void testCreateExpenditureItem_正常系_更新時は支出予定金額に0を設定() {
-		ExpenditureRegistItem session = ExpenditureRegistItem.from(
+		ExpenditureRegistItem session = sessionHelper(
 				"LOAD", "update", "001", "0037", "",
 				"電気代", "1", "電気代詳細", "30", "001",
 				new BigDecimal("15000"), false);
@@ -107,7 +108,7 @@ class ExpenditureItemTest {
 	@Test
 	@DisplayName("正常系：createExpenditureItemはclearStartFlg=trueの場合、支出金額を0に設定する")
 	void testCreateExpenditureItem_正常系_clearStartFlgがtrueの場合支出金額0() {
-		ExpenditureRegistItem session = ExpenditureRegistItem.from(
+		ExpenditureRegistItem session = sessionHelper(
 				"NEW", "add", "20260101120000001", "0051", "",
 				"食費(無駄遣いなし)", "1", "食費詳細", "05", "999",
 				new BigDecimal("30000"), true);
@@ -217,6 +218,32 @@ class ExpenditureItemTest {
 				ExpectedExpenditureAmount.from(expectedExpenditureAmount),
 				ExpenditureAmount.from(expenditureAmount),
 				DeleteFlg.from(deleteFlg));
+	}
+
+	/**
+	 *<pre>
+	 * プリミティブ引数を値オブジェクトへ変換してからExpenditureRegistItem.from()を呼び出すヘルパーメソッドです。
+	 * from()の引数が値オブジェクト型になったため(06_コーディング規約.md §8)、テストコードから
+	 * 直接プリミティブ値で呼び出せるようにするためのものです(同規約§8.3参照)。
+	 *</pre>
+	 */
+	private ExpenditureRegistItem sessionHelper(
+			String dataType, String action, String expenditureCode, String expenditureItemCode,
+			String eventCode, String expenditureName, String expenditureCategory, String expenditureDetailContext,
+			String siharaiDate, String paymentMethodCode, BigDecimal expenditureKingaku, boolean clearStartFlg) {
+		return ExpenditureRegistItem.from(
+				dataType,
+				action,
+				expenditureCode,
+				ExpenditureItemCode.from(expenditureItemCode),
+				ExpenditureEventCode.from(eventCode),
+				ExpenditureName.from(expenditureName),
+				ExpenditureCategory.from(expenditureCategory),
+				ExpenditureDetailContext.from(expenditureDetailContext),
+				siharaiDate,
+				PaymentMethodCode.from(paymentMethodCode),
+				ExpenditureAmount.from(expenditureKingaku.setScale(2)),
+				clearStartFlg);
 	}
 
 	/**
