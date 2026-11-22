@@ -3,9 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2025/12/25 : 1.00.00  新規作成
- * 2025/12/28 : 1.01.00  クラス名変更(SisyutuKingakuBCTest → TotalWasteExpenditureAmountTest)
+ * 日付       : version  ブランチ            コメントなど
+ * 2025/12/25 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2025/12/28 : 1.00.01  feature-1.00-dev00  クラス名変更(SisyutuKingakuBCTest → TotalWasteExpenditureAmountTest)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.inquiry;
@@ -183,10 +183,12 @@ class TotalWasteExpenditureAmountTest {
 		);
 
 		// 実行
-		TotalWasteExpenditureAmount result = amount1.add(amount2);
-
+		TotalWasteExpenditureAmount result1 = amount1.add(amount2);
+		TotalWasteExpenditureAmount result2 = amount2.add(amount1);
+		
 		// 検証（null as zero扱い）
-		assertEquals(new BigDecimal("15000.00"), result.getValue());
+		assertEquals(new BigDecimal("15000.00"), result1.getValue());
+		assertEquals(new BigDecimal("15000.00"), result2.getValue());
 	}
 
 	@Test

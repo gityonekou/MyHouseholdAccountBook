@@ -8,9 +8,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2025/01/01 : 1.00.00  新規作成
- * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
+ * 日付       : version  ブランチ            コメントなど
+ * 2025/01/01 : 1.00.00                      新規作成
+ * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.searchquery;
@@ -63,9 +63,9 @@ public class UserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubunSearchQueryDto {
 				// 検索条件:ユーザID
 				search.getUserId().toString(),
 				// 検索条件:対象年
-				search.getYearMonth().getYear(),
+				search.getYearMonth().getTargetYear().getValue(),
 				// 検索条件:対象月
-				search.getYearMonth().getMonth(),
+				search.getYearMonth().getTargetMonth().getValue(),
 				// 検索条件:支出項目コード
 				search.getExpenditureItemCode().getValue(),
 				// 検索条件:支出区分

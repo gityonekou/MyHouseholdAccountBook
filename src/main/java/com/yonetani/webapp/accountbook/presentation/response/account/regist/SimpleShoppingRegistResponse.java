@@ -3,8 +3,11 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/11/03 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/11/03 : 1.00.00                      新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/09/23 : 1.01.01  feature-1.03-dev1   UseCase結合テスト対応で@Getterを追加
+ * 2026/10/12 : 1.01.02  feature-1.03-dev1   追加リファクタリング対応(リダイレクトレスポンスdtoのファクトリ引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.regist;
@@ -18,12 +21,17 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopDefaultPaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.presentation.request.account.regist.SimpleShoppingRegistInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem.OptionItem;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -33,59 +41,125 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter // テスト検証のために追加(結合テストガイドライン3.2)
 public class SimpleShoppingRegistResponse extends AbstractSimpleShoppingRegistListResponse {
-	
 
-	
+	/**
+	 *<pre>
+	 * 店名選択肢の明細データです。
+	 * 店舗のデフォルト支払方法をdata属性経由でJSに渡すため、通常のOptionItemではなく専用の型を使用します(5.6節)。
+	 *
+	 *</pre>
+	 *
+	 * @author ：Kouki Yonetani
+	 * @since 家計簿アプリ(1.03)
+	 *
+	 */
+	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+	@lombok.Getter
+	public static class ShopOptionItem {
+		// value属性の値(店舗コード)
+		private final String value;
+		// text属性の値(店舗名)
+		private final String text;
+		// デフォルト支払方法コード(data-default-payment-method属性の値。未設定の場合は空文字)
+		private final String defaultPaymentMethodCode;
+
+		/**
+		 *<pre>
+		 * 引数の値から店名選択肢の明細データを生成して返します。
+		 *</pre>
+		 * @param code 店舗コード
+		 * @param name 店舗名
+		 * @param defaultPaymentMethodCode デフォルト支払方法コード
+		 * @return 店名選択肢の明細データ
+		 *
+		 */
+		public static ShopOptionItem from(ShopCode code, ShopName name, ShopDefaultPaymentMethodCode defaultPaymentMethodCode) {
+			return new ShopOptionItem(
+					code.getValue(),
+					name.getValue(),
+					defaultPaymentMethodCode.toString());
+		}
+		
+		/**
+		 *<pre>
+		 * 引数の値から店名選択肢の明細データを生成して返します。
+		 *</pre>
+		 * @param value 店舗コード
+		 * @param text 店舗名
+		 * @param defaultPaymentMethodCode デフォルト支払方法コード
+		 * @return 店名選択肢の明細データ
+		 *
+		 */
+		private static ShopOptionItem from(String value, String text, String defaultPaymentMethodCode) {
+			return new ShopOptionItem(value, text, defaultPaymentMethodCode);
+		}
+	}
+
 	// 店舗区分選択ボックス
 	private final SelectViewItem shopKubunSelectList;
-	// 店名選択ボックス
-	private final SelectViewItem shopNameSelectList;
+	// 店名選択肢のリスト(デフォルト支払方法のdata属性付き)
+	private final List<ShopOptionItem> shopNameOptionList;
+	// 支払方法選択ボックス(findSelectableByUserId()ベース。システム予約値は含まない)
+	private final SelectViewItem paymentMethodSelectList;
 	// 簡易タイプ買い物登録情報フォームデータ
 	private final SimpleShoppingRegistInfoForm simpleShoppingRegistInfoForm;
-	
+
 	/**
 	 *<pre>
 	 * デフォルト値からレスポンス情報を生成して返します。
 	 *</pre>
+	 * @param targetYearMonth 対象年月
 	 * @param addShopKubunList 店舗区分選択ボックスの表示情報リスト
-	 * @param addShopNameList 店名選択ボックスの表示情報リスト
+	 * @param addShopNameList 店名選択肢のリスト(デフォルト支払方法のdata属性付き)
+	 * @param addPaymentMethodList 支払方法選択ボックスの表示情報リスト
 	 * @param simpleShoppingRegist 簡易タイプ買い物登録情報フォームデータ
 	 * @return 買い物登録(簡易タイプ)画面表示情報
 	 *
 	 */
 	public static SimpleShoppingRegistResponse getInstance(
+			TargetYearMonth targetYearMonth,
 			List<OptionItem> addShopKubunList,
-			List<OptionItem> addShopNameList,
+			List<ShopOptionItem> addShopNameList,
+			List<OptionItem> addPaymentMethodList,
 			SimpleShoppingRegistInfoForm simpleShoppingRegist) {
-		
-		// 店名選択ボックスを生成
-		List<OptionItem> shopNameOtionList = new ArrayList<>();
+
+		// 店名選択肢のリストを生成
+		List<ShopOptionItem> shopNameOtionList = new ArrayList<>();
 		if(CollectionUtils.isEmpty(addShopNameList)) {
-			// 店名選択ボックスが空の場合、空用の店名選択ボックスを生成
-			shopNameOtionList.add(OptionItem.from("", "店舗区分を再選択してください！"));
+			// 店名選択肢が空の場合、空用の店名選択肢を生成
+			shopNameOtionList.add(ShopOptionItem.from("", "店舗区分を再選択してください！", null));
 		} else {
-			// 店名リストありの場合、リスト情報を店名選択ボックスに追加
+			// 店名リストありの場合、リスト情報を店名選択肢に追加
 			shopNameOtionList.addAll(addShopNameList);
+		}
+		// 支払方法選択ボックスを生成
+		List<OptionItem> paymentMethodOptionList = new ArrayList<>();
+		paymentMethodOptionList.add(OptionItem.from("", "支払方法を選択してください"));
+		if(!CollectionUtils.isEmpty(addPaymentMethodList)) {
+			paymentMethodOptionList.addAll(addPaymentMethodList);
 		}
 		// 買い物登録(簡易タイプ)画面表示情報を生成
 		SimpleShoppingRegistResponse  response = new SimpleShoppingRegistResponse(
 				// 店舗区分選択ボックス
 				SelectViewItem.from(addShopKubunList),
-				// 店名選択ボックス
-				SelectViewItem.from(shopNameOtionList),
+				// 店名選択肢のリスト
+				shopNameOtionList,
+				// 支払方法選択ボックス
+				SelectViewItem.from(paymentMethodOptionList),
 				// フォームデータ
 				simpleShoppingRegist);
 		// 対象年月を設定
-		response.setYearMonth(simpleShoppingRegist.getTargetYearMonth());
+		response.setYearMonth(targetYearMonth);
 		// 画面表示情報を返却
 		return response;
 	}
-	
+
 	/**
 	 *<pre>
 	 * 更新完了時のリダイレクト用レスポンス情報を生成して返します。
@@ -99,11 +173,11 @@ public class SimpleShoppingRegistResponse extends AbstractSimpleShoppingRegistLi
 		SimpleShoppingRegistInfoForm formData = new SimpleShoppingRegistInfoForm();
 		formData.setTargetYearMonth(targetYearMonth);
 		// 買い物登録(簡易タイプ)画面表示情報を生成
-		SimpleShoppingRegistResponse  response = new SimpleShoppingRegistResponse(null, null, formData);
+		SimpleShoppingRegistResponse  response = new SimpleShoppingRegistResponse(null, null, null, formData);
 		// 画面表示情報を返却
 		return response;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -113,16 +187,18 @@ public class SimpleShoppingRegistResponse extends AbstractSimpleShoppingRegistLi
 		simpleShoppingRegistInfoForm.setTotalPurchasePriceView(simpleShoppingRegistInfoForm.getTotalPurchasePrice());
 		simpleShoppingRegistInfoForm.setTaxTotalPurchasePriceView(simpleShoppingRegistInfoForm.getTaxTotalPurchasePrice());
 		simpleShoppingRegistInfoForm.setShoppingTotalAmountView(simpleShoppingRegistInfoForm.getShoppingTotalAmount());
-		
+
 		// 買い物登録(簡易タイプ)画面のModelとViewを生成
 		ModelAndView modelAndView = createModelAndView("account/regist/SimpleShoppingRegist");
 		// 店舗区分選択ボックス
 		modelAndView.addObject("shopKubunSelectList", shopKubunSelectList);
-		// 店名選択ボックス
-		modelAndView.addObject("shopNameSelectList", shopNameSelectList);
+		// 店名選択肢のリスト(デフォルト支払方法のdata属性付き)
+		modelAndView.addObject("shopNameOptionList", shopNameOptionList);
+		// 支払方法選択ボックス
+		modelAndView.addObject("paymentMethodSelectList", paymentMethodSelectList);
 		// 簡易タイプの買い物登録入力フォーム
 		modelAndView.addObject("simpleShoppingRegistInfoForm", simpleShoppingRegistInfoForm);
-		
+
 		return modelAndView;
 	}
 	
@@ -138,7 +214,8 @@ public class SimpleShoppingRegistResponse extends AbstractSimpleShoppingRegistLi
 			if(!fieldError.getField().equals("shopKubunCode")
 					&& !fieldError.getField().equals("shopCode")
 					&& !fieldError.getField().equals("shoppingDate")
-					&& !fieldError.getField().equals("checkedShoppingDate")) {
+					&& !fieldError.getField().equals("checkedShoppingDate")
+					&& !fieldError.getField().equals("paymentMethodCode")) {
 				// バリデーションエラーメッセージを表示メッセージに追加
 				addMessage(fieldError.getDefaultMessage());
 			}

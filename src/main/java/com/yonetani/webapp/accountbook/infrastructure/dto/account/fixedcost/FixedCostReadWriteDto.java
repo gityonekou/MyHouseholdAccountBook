@@ -3,8 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/06/06 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/06/06 : 1.00.00                      新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.account.fixedcost;
@@ -22,7 +23,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -48,10 +49,12 @@ public class FixedCostReadWriteDto {
 	private final String fixedCostShiharaiDay;
 	// 支払金額
 	private final BigDecimal shiharaiKingaku;
+	// 支払方法コード
+	private final String paymentMethodCode;
 	// 削除フラグ(論理削除状態にするためのフラグ)
 	// 注意:アプリ側からこの値を直接利用することはありませんSQLで直接値を指定し、検索条件とします
 	private boolean deleteFlg;
-	
+
 	/**
 	 *<pre>
 	 * 引数のパラメータ値をもとにFixedCostReadWriteDtoを生成して返します。
@@ -66,6 +69,7 @@ public class FixedCostReadWriteDto {
 	 * @param fixedCostShiharaiTukiOptionalContext 固定費支払月任意詳細
 	 * @param fixedCostShiharaiDay 固定費支払日(支払日)
 	 * @param shiharaiKingaku 支払金額
+	 * @param paymentMethodCode 支払方法コード
 	 * @return 固定費テーブル:FIXED_COST_TABLE出力情報
 	 *
 	 */
@@ -79,17 +83,19 @@ public class FixedCostReadWriteDto {
 			String fixedCostShiharaiTuki,
 			String fixedCostShiharaiTukiOptionalContext,
 			String fixedCostShiharaiDay,
-			BigDecimal shiharaiKingaku) {
+			BigDecimal shiharaiKingaku,
+			String paymentMethodCode) {
 		return new FixedCostReadWriteDto(
 				userId,
 				fixedCostCode,
 				fixedCostName,
-				fixedCostDetailContext, 
+				fixedCostDetailContext,
 				sisyutuItemCode,
 				fixedCostKubun,
 				fixedCostShiharaiTuki,
 				fixedCostShiharaiTukiOptionalContext,
 				fixedCostShiharaiDay,
-				shiharaiKingaku);
+				shiharaiKingaku,
+				paymentMethodCode);
 	}
 }

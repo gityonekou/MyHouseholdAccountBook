@@ -3,8 +3,10 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2025/12/30 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2025/12/30 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/09/12 : 1.01.00  feature-1.03-dev1   買い物日の表示形式変更
+ * 2026/10/31 : 1.01.01  feature-1.03-dev1   tryFrom(LocalDate, TargetYearMonth)のテストを追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.shoppingregist;
@@ -12,6 +14,7 @@ package com.yonetani.webapp.accountbook.domain.type.account.shoppingregist;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -79,31 +82,17 @@ class ShoppingDateTest {
 	}
 
 	@Test
-	@DisplayName("正常系：toDisplayString()でyyyy/MM/dd形式の文字列を取得")
-	void testToDisplayString() {
+	@DisplayName("正常系：toFormatString()でMM/dd形式の文字列を取得")
+	void testToFormatString() {
 		// 準備
 		TargetYearMonth targetYearMonth = TargetYearMonth.from("202408");
 		ShoppingDate date = ShoppingDate.from(LocalDate.of(2024, 8, 18), targetYearMonth);
 
 		// 実行
-		String result = date.toDisplayString();
+		String result = date.toFormatString();
 
 		// 検証
-		assertEquals("2024/08/18", result);
-	}
-
-	@Test
-	@DisplayName("正常系：toString()でISO-8601形式の文字列を取得（デバッグ用）")
-	void testToString() {
-		// 準備
-		TargetYearMonth targetYearMonth = TargetYearMonth.from("202408");
-		ShoppingDate date = ShoppingDate.from(LocalDate.of(2024, 8, 18), targetYearMonth);
-
-		// 実行
-		String result = date.toString();
-
-		// 検証（ISO-8601形式: yyyy-MM-dd）
-		assertEquals("2024-08-18", result);
+		assertEquals("08/18", result);
 	}
 
 	@Test
@@ -130,5 +119,30 @@ class ShoppingDateTest {
 
 		// 実行 & 検証
 		assertEquals(date1.hashCode(), date2.hashCode());
+	}
+
+	@Test
+	@DisplayName("正常系：tryFromは対象年月の範囲内の日付で値ありのOptionalを返す")
+	void testTryFrom_正常系() {
+		// 準備
+		TargetYearMonth targetYearMonth = TargetYearMonth.from("202408");
+
+		// 実行
+		Optional<ShoppingDate> result = ShoppingDate.tryFrom(LocalDate.of(2024, 8, 18), targetYearMonth);
+
+		// 検証
+		assertTrue(result.isPresent());
+		assertEquals(LocalDate.of(2024, 8, 18), result.get().getValue());
+	}
+
+	@Test
+	@DisplayName("異常系：tryFromはnull値・対象年月の範囲外の日付でOptional.empty()を返す")
+	void testTryFrom_異常系() {
+		// 準備
+		TargetYearMonth targetYearMonth = TargetYearMonth.from("202408");
+
+		// 検証
+		assertTrue(ShoppingDate.tryFrom(null, targetYearMonth).isEmpty());
+		assertTrue(ShoppingDate.tryFrom(LocalDate.of(2024, 9, 1), targetYearMonth).isEmpty());
 	}
 }

@@ -3,10 +3,12 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2023/09/24 : 1.00.00  新規作成
- * 2026/05/07 : 1.01.00  固定費合計表示変更対応(対象年月の加算メソッドとラベル取得メソッドを追加)  
- * 2026/05/09 : 1.01.01  リファクタリング追加対応(対象年月ドメインの集約)
+ * 日付       : version  ブランチ            コメントなど
+ * 2023/09/24 : 1.00.00                      新規作成
+ * 2026/05/07 : 1.01.00  feature-1.01-dev2   固定費合計表示変更対応(対象年月の加算メソッドとラベル取得メソッドを追加)  
+ * 2026/05/09 : 1.01.01  feature-1.01-dev2   リファクタリング追加対応(対象年月ドメインの集約)
+ * 2026/09/10 : 1.02.00  feature-1.03-dev1   リファクタリング対応：年項目、月項目のドメインタイプの文字列型返却を廃止、フォーマットメソッド名の変更
+ * 2026/10/31 : 1.02.01  feature-1.03-dev1   tryFrom(String)追加(SimpleShoppingRegistInfoFormの相関チェックのドメイン層移動対応)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
@@ -14,6 +16,7 @@ package com.yonetani.webapp.accountbook.domain.type.common;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
+import java.util.Optional;
 
 import org.springframework.util.StringUtils;
 
@@ -79,16 +82,29 @@ public class TargetYearMonth {
 		// 「年月」項目ドメインタイプを返却
 		return new TargetYearMonth(yearMonth, yearIns, monthIns);
 	}
-	
+
+	/**
+	 *<pre>
+	 * 「年月」項目の値を表すドメインタイプの生成を試みます。
+	 * 不正な値(空文字列・6桁以外・カレンダー上無効な年月)の場合は例外を発生させずOptional.empty()を返します。
+	 *</pre>
+	 * @param yearMonth 年月
+	 * @return 生成に成功した場合は値ありのOptional、不正な値の場合はOptional.empty()
+	 *
+	 */
+	public static Optional<TargetYearMonth> tryFrom(String yearMonth) {
+		return SafeDomainFactory.tryCreate(() -> TargetYearMonth.from(yearMonth));
+	}
+
 	/**
 	 *<pre>
 	 * 「年月」項目の値を表すドメインタイプを生成します。
-	 * 
+	 *
 	 * [ガード節]
 	 * ・空文字列
 	 * ・長さが6桁以外
 	 * ・年項目、月項目に変換できない
-	 * 
+	 *
 	 *</pre>
 	 * @param year 対象年(YYYY)
 	 * @param month 対象月(MM)
@@ -116,28 +132,6 @@ public class TargetYearMonth {
 	
 	/**
 	 *<pre>
-	 * パッケージしている年(YYYY)の値を文字列で返します。
-	 *</pre>
-	 * @return 年(YYYY)の値
-	 *
-	 */
-	public String getYear() {
-		return targetYear.getValue();
-	}
-	
-	/**
-	 *<pre>
-	 * パッケージしている月(MM)の値を文字列で返します。
-	 *</pre>
-	 * @return getYear 月(MM)の値
-	 *
-	 */
-	public String getMonth() {
-		return targetMonth.getValue();
-	}
-	
-	/**
-	 *<pre>
 	 * 指定した月数後の TargetYearMonth を返します。
 	 *</pre>
 	 * @param months 加算する月数
@@ -152,16 +146,16 @@ public class TargetYearMonth {
 
 	/**
 	 *<pre>
-	 * "YYYY年MM月" 形式の表示ラベルを返します（月の先頭0あり）。
+	 * "YYYY年MM月" 形式のフォーマット値を返します（月の先頭0あり）。
 	 * 例: 2025年11月、2026年01月
 	 *</pre>
-	 * @return 表示ラベル
+	 * @return "YYYY年MM月" 形式のフォーマット値
 	 *
 	 */
-	public String toDisplayLabel() {
+	public String toFormatString() {
 		return targetYear.getValue() + "年" + targetMonth.getValue() + "月";
 	}
-
+	
 	@Override
 	public String toString() {
 		return value;

@@ -3,8 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version     コメントなど
- * 2026/04/12 : 1.00.00     新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/04/12 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(NullableIdentifier継承を廃止)
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.expenditure;
@@ -32,14 +33,15 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = true)
 public class ExpenditureEventCode extends NullableIdentifier {
+	
 	/** 値がnullの支出テーブル情報の「イベントコード」項目の値 */
 	public static final ExpenditureEventCode NULL = ExpenditureEventCode.from(null);
 	
 	/**
 	 *<pre>
-	 * コンストラクタ（privateでファクトリメソッド経由のみ生成可能）
+	 * ExpenditureEventCodeクラスコンストラクターです。
 	 *</pre>
-	 * @param value イベントコード
+	 * @param value 支出テーブル情報の「イベントコード」項目の値
 	 *
 	 */
 	private ExpenditureEventCode(String value) {
@@ -51,6 +53,9 @@ public class ExpenditureEventCode extends NullableIdentifier {
 	 * 支出テーブル情報の「イベントコード」項目の値を表すドメインタイプを生成します。
 	 * 支出テーブル情報の「イベントコード」項目は、NULL、及び、空文字列を許容する項目になります。
 	 * 
+	 * [非ガード節]
+	 * ・NULL値
+	 * ・空文字列
 	 * [ガード節]
 	 * ・長さが4桁でない
 	 * ・数値に変換できない(数値4桁:0パディング)
@@ -62,26 +67,18 @@ public class ExpenditureEventCode extends NullableIdentifier {
 	 */
 	public static ExpenditureEventCode from(String code) {
 		
-		// null値、または空文字列の場合は、null値の「イベントコード」項目ドメインタイプを返す
-		if(!StringUtils.hasLength(code)) {
-			return new ExpenditureEventCode(null);
-		}
+		// 基本検証（null・空文字列は許可、長さが4桁でない）
+		validate(code, 4, "支出テーブル情報の「イベントコード」");
 		
-		// 基本検証（空文字）
-		NullableIdentifier.validate(code, "支出テーブル情報の「イベントコード」項目");
-		
-		// ガード節(長さが4桁でない)
-		if(code.length() != 4) {
-			throw new MyHouseholdAccountBookRuntimeException("支出テーブル情報の「イベントコード」項目の設定値が不正です。管理者に問い合わせてください。[eventCode=" + code + "]");
-		}
 		// ガード節(数値に変換できない(数値4桁:0パディング))
 		try {
-			Integer.parseInt(code);
+			if(StringUtils.hasLength(code)) {
+				Integer.parseInt(code);
+			}
 		} catch(NumberFormatException ex) {
 			throw new MyHouseholdAccountBookRuntimeException("支出テーブル情報の「イベントコード」項目の設定値が不正です。管理者に問い合わせてください。[eventCode=" + code + "]");
 		}
 		
 		return new ExpenditureEventCode(code);
 	}
-
 }

@@ -6,9 +6,10 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/08/16 : 1.00.00  新規作成
- * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/08/16 : 1.00.00                      新規作成
+ * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/09/06 : 1.02.00  feature-1.03-dev1   dev1リファクタリング追加対応(getExpenditureItemNameメソッドの戻り値を値オブジェクトに変更)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.event;
@@ -105,7 +106,9 @@ public class EventInfoManageUseCase {
 		// 支出項目コード
 		inputForm.setSisyutuItemCode(expenditureItemCode.getValue());
 		// 支出項目コードに対応する支出項目名(＞で区切った値)を設定
-		inputForm.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, expenditureItemCode));
+		inputForm.setSisyutuItemName(expenditureItemInfoComponent
+				.getExpenditureItemNamePath(userId, expenditureItemCode)
+				.toFormatString());
 		// イベント名:支出項目名を仮設定
 		inputForm.setEventName(expenditureItemInfo.getExpenditureItemName().getValue());
 		// イベント内容詳細(任意入力項目):支出項目詳細内容を仮設定
@@ -148,7 +151,9 @@ public class EventInfoManageUseCase {
 		// 支出項目コード
 		inputForm.setSisyutuItemCode(eventItem.getExpenditureItemCode().getValue());
 		// 支出項目名(＞で区切った値)
-		inputForm.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, eventItem.getExpenditureItemCode()));
+		inputForm.setSisyutuItemName(expenditureItemInfoComponent
+				.getExpenditureItemNamePath(userId, eventItem.getExpenditureItemCode())
+				.toFormatString());
 		// イベント名
 		inputForm.setEventName(eventItem.getEventName().getValue());
 		// イベント内容詳細(任意入力項目)

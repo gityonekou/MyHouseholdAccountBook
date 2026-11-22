@@ -3,8 +3,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version     コメントなど
- * 2025/01/13 : 1.00.00(A)  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2025/01/13 : 1.00.00                      新規作成
  *
  */
 package com.yonetani.webapp.accountbook.presentation.controller.itemmanage;

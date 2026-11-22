@@ -3,12 +3,18 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/02/03 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/02/03 : 1.00.00                      新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.presentation.request.itemmanage;
 
+import org.springframework.util.StringUtils;
+
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
+
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -22,7 +28,7 @@ import lombok.Data;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Data
@@ -41,8 +47,31 @@ public class ShopInfoForm {
 	@NotBlank
 	@Size(min = 1, max = 50)
 	private String shopName;
+	// デフォルト支払方法コード(任意)
+	private String defaultPaymentMethodCode;
 	// 表示順
 	@Min(1)
 	@Max(899)
 	private Integer shopSort;
+
+	/**
+	 *<pre>
+	 * デフォルト支払方法にシステム予約値が指定されていないかを検証します。
+	 * 任意項目のため、未入力の場合は許容します。
+	 *</pre>
+	 * @return 検証結果
+	 *
+	 */
+	@AssertTrue(message = "デフォルト支払方法にシステム予約値は指定できません。")
+	public boolean isDefaultPaymentMethodCodeValid() {
+		// デフォルト支払方法コードは任意項目のため、未入力の場合は常にtrueを返す(チェック対象外)
+		if(!StringUtils.hasLength(defaultPaymentMethodCode)) {
+			return true;
+		}
+		// tryFrom()により、不正な形式値でも例外が伝播せず500エラーにならない。
+		// 形式不正、またはシステム予約値以外の場合はtrue、システム予約値の場合はfalse
+		return PaymentMethodCode.tryFrom(defaultPaymentMethodCode)
+				.map(code -> !code.isSystemReserved())
+				.orElse(true);
+	}
 }

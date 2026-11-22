@@ -3,8 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2023/10/29 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2023/10/29 : 1.00.00                      新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.itemmanage;
@@ -16,6 +17,10 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.ResolvedPaymentMethodName;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopSort;
 import com.yonetani.webapp.accountbook.presentation.request.itemmanage.ShopInfoForm;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 import com.yonetani.webapp.accountbook.presentation.response.fw.SelectViewItem;
@@ -33,10 +38,11 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 public class ShopInfoManageResponse extends AbstractResponse {
 	
 	/**
@@ -46,7 +52,7 @@ public class ShopInfoManageResponse extends AbstractResponse {
 	 *</pre>
 	 *
 	 * @author ：Kouki Yonetani
-	 * @since 家計簿アプリ(1.00.A)
+	 * @since 家計簿アプリ(1.00)
 	 *
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -55,33 +61,49 @@ public class ShopInfoManageResponse extends AbstractResponse {
 	public static class ShopListItem {
 		// 店舗コード
 		private final String shopCode;
-		// 店舗名
-		private final String shopName;
 		// 店舗区分名称
 		private final String shopKubunName;
+		// 店舗名
+		private final String shopName;
+		// デフォルト支払方法名(表示用に解決済み文字列。未設定の場合は「－」)
+		private final String defaultPaymentMethodName;
 		// 店舗表示順
 		private final String shopSort;
-		
+
 		/**
 		 *<pre>
 		 * 引数の値から店舗一覧情報の明細データを生成して返します。
 		 *</pre>
 		 * @param shopCode 店舗コード
-		 * @param shopName 店舗名
 		 * @param shopKubunName 店舗区分名称
+		 * @param shopName 店舗名
+		 * @param defaultPaymentMethodName デフォルト支払方法名
 		 * @param shopSort 店舗表示順
 		 * @return 店舗一覧情報の明細データ
 		 *
 		 */
-		public static ShopListItem from(String shopCode, String shopName, String shopKubunName, String shopSort) {
-			return new ShopListItem(shopCode, shopName, shopKubunName, shopSort);
+		public static ShopListItem from(ShopCode shopCode, String shopKubunName, ShopName shopName,
+				ResolvedPaymentMethodName defaultPaymentMethodName, ShopSort shopSort) {
+			return new ShopListItem(
+					// 店舗コード
+					shopCode.getValue(),
+					// 店舗区分名称
+					shopKubunName,
+					// 店舗名
+					shopName.getValue(),
+					// デフォルト支払方法名
+					defaultPaymentMethodName.getValue(),
+					// 店舗表示順
+					shopSort.getValue());
 		}
 	}
-	
+
 	// 店舗情報入力フォーム
 	private final ShopInfoForm shopInfoForm;
 	// 店舗グループ
 	private final SelectViewItem shopKubunItem;
+	// 支払方法(デフォルト支払方法選択用)
+	private final SelectViewItem paymentMethodItem;
 	// 店舗一覧情報の明細データ(変更可能分)
 	private List<ShopListItem> shopList = new ArrayList<>();
 	// 店舗一覧情報の明細データ(変更不可分)
@@ -93,17 +115,23 @@ public class ShopInfoManageResponse extends AbstractResponse {
 	 *</pre>
 	 * @param shopInfoForm 店舗情報入力フォーム
 	 * @param addList 店舗グループ表示情報のリスト
+	 * @param paymentMethodOptionList デフォルト支払方法選択肢のリスト
 	 * @return 情報管理(お店)画面表示情報
 	 *
 	 */
-	public static ShopInfoManageResponse getInstance(ShopInfoForm shopInfoForm, List<OptionItem> addList) {
+	public static ShopInfoManageResponse getInstance(ShopInfoForm shopInfoForm, List<OptionItem> addList, List<OptionItem> paymentMethodOptionList) {
 		List<OptionItem> optionList = new ArrayList<>();
 		optionList.add(OptionItem.from("", "グループメニューを開く"));
 		if(!CollectionUtils.isEmpty(addList)) {
 			optionList.addAll(addList);
 		}
+		List<OptionItem> paymentMethodOptions = new ArrayList<>();
+		paymentMethodOptions.add(OptionItem.from("", "設定しない"));
+		if(!CollectionUtils.isEmpty(paymentMethodOptionList)) {
+			paymentMethodOptions.addAll(paymentMethodOptionList);
+		}
 		// グループメニューを開くを選択状態で情報管理(お店)画面表示情報を生成
-		return new ShopInfoManageResponse(shopInfoForm, SelectViewItem.from(optionList));
+		return new ShopInfoManageResponse(shopInfoForm, SelectViewItem.from(optionList), SelectViewItem.from(paymentMethodOptions));
 	}
 	
 	/**
@@ -143,6 +171,8 @@ public class ShopInfoManageResponse extends AbstractResponse {
 		modelAndView.addObject("shopInfoForm", shopInfoForm);
 		// 店舗グループを設定
 		modelAndView.addObject("shopKubun", shopKubunItem);
+		// デフォルト支払方法選択肢を設定
+		modelAndView.addObject("defaultPaymentMethod", paymentMethodItem);
 		// 店舗一覧情報を設定
 		modelAndView.addObject("shopList", shopList);
 		modelAndView.addObject("nonEditShopList", nonEditShopList);

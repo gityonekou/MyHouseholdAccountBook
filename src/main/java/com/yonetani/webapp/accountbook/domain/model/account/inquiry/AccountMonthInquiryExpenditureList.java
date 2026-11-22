@@ -3,8 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/06/13 : 1.02.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/06/13 : 1.00.00  feature-1.02-dev1   新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.inquiry;
@@ -17,10 +18,11 @@ import org.springframework.util.CollectionUtils;
 import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItem;
 import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureItemInquiryList;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCategory;
-import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureName;
 import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpenditureTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
 
@@ -67,6 +69,8 @@ public class AccountMonthInquiryExpenditureList {
 		private final ExpenditureCategory expenditureCategory;
 		// 支払日
 		private final PaymentDate paymentDate;
+		// 支払方法コード
+		private final PaymentMethodCode paymentMethodCode;
 		// 支出金額
 		private final ExpenditureAmount expenditureAmount;
 		// 支出詳細
@@ -86,8 +90,28 @@ public class AccountMonthInquiryExpenditureList {
 					item.getExpenditureName(),
 					item.getExpenditureCategory(),
 					item.getPaymentDate(),
+					item.getPaymentMethodCode(),
 					item.getExpenditureAmount(),
 					item.getExpenditureDetailContext());
+		}
+		
+		/**
+		 *<pre>
+		 * この明細の支出名称に、支出区分に応じた表示名のプレフィックスを付与して返します。
+		 * 
+		 * ・支出名称が"カット代"、支出区分が無駄遣い（重度）の場合 → "【無駄遣いC】カット代"
+		 * ・支出名称が"カット代"、支出区分が無駄遣いなしの場合     → "カット代"
+		 * 
+		 *</pre>
+		 * @return 支出区分に応じた表示名のプレフィックスを付与した支出名称
+		 *
+		 */
+		public String toDisplayName() {
+			// 支出区分に応じた表示名のプレフィックスを生成
+			String label = getExpenditureCategory().toDisplayLabel();
+			String prefix = label.isEmpty() ? "" : "【" + label + "】";
+			// 支出名称にプレフィックスを付与して返す
+			return prefix + getExpenditureName().getValue();
 		}
 	}
 

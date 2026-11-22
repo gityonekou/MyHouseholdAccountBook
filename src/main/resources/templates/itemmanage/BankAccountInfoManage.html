@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+<meta charset="UTF-8">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+		rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+		crossorigin="anonymous">
+<link th:href="@{/css/MyHouseholdAccountBookCommon.css}" rel="stylesheet" type="text/css">
+<script th:src="@{/js/itemmanage/BankAccountInfoManage.js}"></script>
+<title>情報管理(銀行口座)</title>
+</head>
+<body>
+	<!--/* ヘッダー */-->
+	<div id="header" th:insert="~{layout/myhacbookheader::header}">ヘッダー</div>
+
+	<!--/* ボディ部 */-->
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">情報管理(銀行口座)</h5>
+				<th:block th:each="message : ${messages}">
+					<code><span th:text="${message}">何かのメッセージがある場合はここに表示</span></code></br>
+				</th:block>
+			</div>
+
+			<!-- 銀行口座情報 登録・編集エリア -->
+			<div class="card-body">
+				<div class="card">
+				
+					<!-- 銀行口座情報入力フォーム -->
+					<form name="BankAccountInfoUpdate" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/bankaccountinfo/update/}" th:object="${bankAccountInfoForm}">
+					<div class="card-body">
+						<p class="h6">■ 登録・編集エリア ■</p>
+						<div class="mb-3">
+							<label for="bankName" class="form-label">銀行名</label>
+		 					<input type="text" class="form-control w20" th:errorclass="is-invalid" th:field="*{bankName}" required>
+		 					<p class="invalid-feedback" th:errors="*{bankName}"></p>
+						</div>
+						<div class="mb-3">
+							<label for="bankAccountMemo" class="form-label">口座メモ</label>
+		 					<input type="text" class="form-control w50" th:errorclass="is-invalid" th:field="*{bankAccountMemo}">
+		 					<p class="invalid-feedback" th:errors="*{bankAccountMemo}"></p>
+						</div>
+						<div class="mb-3">
+							<label for="bankAccountSort" class="form-label">表示順</label>
+		 					<input type="text" class="form-control w10" th:errorclass="is-invalid" th:field="*{bankAccountSort}">
+		 					<p class="invalid-feedback" th:errors="*{bankAccountSort}"></p>
+						</div>
+						<div class="mb-3">
+							<button class="btn btn-primary" type="submit" th:text="*{#strings.equals(action,'update')} ? '更新' : '登録'">登録</button>
+							<th:block th:if="*{#strings.equals(action,'update')}">
+								<button class="btn btn-outline-danger" type="button" id="bank-account-info-action-toggle-btn"
+										th:text="*{enableFlg} ? '無効化' : '有効化'">無効化</button>
+								<a class="btn btn-outline-secondary" th:href="@{/myhacbook/managebaseinfo/bankaccountinfo/initload/}">キャンセル</a>
+							</th:block>
+							<input type="hidden" th:field="*{action}" />
+							<input type="hidden" th:field="*{bankAccountCode}" />
+							<input type="hidden" th:field="*{bankAccountSortBefore}" />
+							<input type="hidden" th:field="*{enableFlg}" />
+						</div>
+					</div>
+					</form>
+					<!--/* 有効/無効切替実行時に送信するフォーム */-->
+					<form name="BankAccountInfoToggleEnable" class="d-flex" method="post" th:action="@{/myhacbook/managebaseinfo/bankaccountinfo/toggleEnable/}" th:object="${bankAccountInfoForm}">
+						<input type="hidden" th:field="*{bankAccountCode}" />
+					</form>
+				</div>
+			</div>
+			
+			<!-- 登録済み銀行口座一覧表示エリア -->
+			<div class="card-body">
+				<div class="card">
+					<div class="card-body">
+						<p class="h6">■ 登録済み銀行口座一覧 ■</p>
+						<p class="card-text">更新する場合は対象行をクリックしてください。</p>
+						<table class="table table-sm table-bordered table-hover">
+							<thead>
+								<tr class="table-secondary">
+									<th scope="col" class="w5">表示順</th>
+									<th scope="col" class="w20">銀行名</th>
+									<th scope="col">口座メモ</th>
+									<th scope="col" class="w5">状態</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="bankAccountItem : ${bankAccountList}" th:data-href="@{/myhacbook/managebaseinfo/bankaccountinfo/updateload(bankAccountCode=${bankAccountItem.bankAccountCode})}">
+									<td th:text="${bankAccountItem.bankAccountSort}">表示順</td>
+									<td th:text="${bankAccountItem.bankName}">銀行名</td>
+									<td th:text="${bankAccountItem.bankAccountMemo}">口座メモ</td>
+									<td th:text="${bankAccountItem.enableFlg} ? '有効' : '無効'">状態</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--/* フッター共通jsのインクルード) */-->
+	<div id="footer" th:insert="~{layout/myhacbookfooter::footer}">フッター</div>
+	<!--/* jqueryでテーブル行の選択時アクションを実行 */-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script type="text/javascript" th:src="@{/js/table_tr_click_script.js}"></script>
+	
+</body>
+</html>

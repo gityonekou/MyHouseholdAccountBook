@@ -6,9 +6,12 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2023/11/11 : 1.00.00  新規作成
- * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
+ * 日付       : version  ブランチ            コメントなど
+ * 2023/11/11 : 1.00.00                      新規作成
+ * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/09/23 : 1.02.01  feature-1.03-dev1   追加リファクタリング対応
+ * 2026/10/18 : 1.02.02  feature-1.03-dev1   PaymentMethod.from()型安全性対応(06-§8)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.adminmenu;
@@ -23,6 +26,7 @@ import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookCont
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookException;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.expenditureinfo.ExpenditureItemInfo;
+import com.yonetani.webapp.accountbook.domain.model.account.paymentmethod.PaymentMethod;
 import com.yonetani.webapp.accountbook.domain.model.account.shop.Shop;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.AdminMenuUserInfo;
 import com.yonetani.webapp.accountbook.domain.model.adminmenu.AdminMenuUserInfoItemList;
@@ -31,13 +35,23 @@ import com.yonetani.webapp.accountbook.domain.model.adminmenu.SisyutuItemBaseLis
 import com.yonetani.webapp.accountbook.domain.model.common.AccountBookUser;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.repository.account.expenditureinfo.SisyutuItemTableRepository;
+import com.yonetani.webapp.accountbook.domain.repository.account.paymentmethod.PaymentMethodTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.AdminMenuUserInfoRepository;
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.ShopBaseTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.adminmenu.SisyutuItemBaseTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.common.AccountBookUserRepository;
-import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
-import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.ClosingDay;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodKubun;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodMemo;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodName;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodSort;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopDefaultPaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopSort;
+import com.yonetani.webapp.accountbook.domain.type.common.EnableFlg;
+import com.yonetani.webapp.accountbook.domain.type.common.EnableUpdateFlg;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.domain.type.common.UserName;
@@ -77,6 +91,8 @@ public class AdminMenuUserInfoUseCase {
 	private final SisyutuItemTableRepository sisyutuItemTableRepository;
 	// 店舗テーブルデータを登録するリポジトリー
 	private final ShopTableRepository shopTableRepository;
+	// 支払方法テーブルデータを登録するリポジトリー
+	private final PaymentMethodTableRepository paymentMethodTableRepository;
 	/**
 	 *<pre>
 	 * ユーザ情報管理画面の表示情報を取得します。
@@ -152,18 +168,28 @@ public class AdminMenuUserInfoUseCase {
 			
 			// userinfo
 			AdminMenuUserInfo userInfo = AdminMenuUserInfo.from(
+					// ユーザID
 					userInfoForm.getUserId(),
+					// ユーザ名
 					userInfoForm.getUserName(),
+					// ユーザステータス
 					userInfoForm.getUserStatus(),
+					// ユーザ権限
 					userInfoForm.getUserRole(),
+					// ユーザパスワード
 					userInfoForm.getUserPassword(),
+					// 対象年月
 					domainTypeYearMonth.getValue());
-			
+
 			// 家計簿利用ユーザ情報
 			AccountBookUser accountBookUser = AccountBookUser.from(
+					// ユーザID
 					UserId.from(userInfoForm.getUserId()),
-					TargetYear.from(domainTypeYearMonth.getYear()),
-					TargetMonth.from(domainTypeYearMonth.getMonth()),
+					// 対象年
+					domainTypeYearMonth.getTargetYear(),
+					// 対象月
+					domainTypeYearMonth.getTargetMonth(),
+					// ユーザ名
 					UserName.from(userInfoForm.getUserName()));
 			
 			// 新規登録の場合
@@ -183,13 +209,21 @@ public class AdminMenuUserInfoUseCase {
 				sisyutuItemBaseList.getValues().forEach(baseData -> {
 						// 登録する支出項目テーブル情報を生成(更新不可フラグはデフォルトで不可:falseを設定)
 						ExpenditureItemInfo addData = ExpenditureItemInfo.from(
+							// ユーザID
 							accountBookUser.getUserId().getValue(),
+							// 支出項目コード
 							baseData.getExpenditureItemCode().getValue(),
-							baseData.getExpenditureItemName().getValue(), 
+							// 支出項目名
+							baseData.getExpenditureItemName().getValue(),
+							// 支出項目詳細内容
 							baseData.getExpenditureItemDetailContext().getValue(),
+							// 親支出項目コード
 							baseData.getParentExpenditureItemCode().getValue(),
+							// 支出項目レベル
 							baseData.getExpenditureItemLevel().toString(),
+							// 支出項目表示順
 							baseData.getExpenditureItemSortOrder().getValue(),
+							// 更新不可フラグ(デフォルト:不可)
 							false);
 						// データを登録
 						int addCount = sisyutuItemTableRepository.add(addData);
@@ -204,12 +238,20 @@ public class AdminMenuUserInfoUseCase {
 				ShopBaseList shopBaseList = shopBaseTableRepository.findAll();
 				shopBaseList.getValues().forEach(baseData -> {
 						// 登録する店舗テーブル情報を生成
+						String shopCode = baseData.getShopCode().getValue();
 						Shop addData = Shop.from(
-								accountBookUser.getUserId().getValue(),
-								baseData.getShopCode().getValue(),
-								baseData.getShopCode().getValue(),
-								baseData.getShopName().getValue(),
-								baseData.getShopCode().getValue());
+								// ユーザID
+								accountBookUser.getUserId(),
+								// 店舗コード
+								baseData.getShopCode(),
+								// 店舗区分コード(店舗コードと同じ値を設定)
+								ShopKubunCode.from(shopCode),
+								// 店舗名
+								baseData.getShopName(),
+								// デフォルト支払方法コード(未設定)
+								ShopDefaultPaymentMethodCode.NULL,
+								// 店舗表示順(店舗コードと同じ値を設定)
+								ShopSort.from(shopCode));
 						// データを登録
 						int addCount = shopTableRepository.add(addData);
 						// 追加件数が1件以上の場合、業務エラー
@@ -217,7 +259,62 @@ public class AdminMenuUserInfoUseCase {
 							throw new MyHouseholdAccountBookRuntimeException("店舗テーブルへの追加件数が不正でした。[add data:" + addData + "]");
 						}
 					});
-				
+
+				// 支払方法マスタに「支払方法がない」システム行と「現金」を初期投入する(Feature1.03-dev1)
+				// 「支払方法がない」システム行：PAYMENT_METHOD_CODE=999固定値、種別は現金(1)を仮設定、
+				// 銀行口座コードはNULL(現金種別は銀行口座不要)、更新不可(ENABLE_UPDATE_FLG=false)
+				PaymentMethod noneData = PaymentMethod.from(
+						// ユーザID
+						accountBookUser.getUserId(),
+						// 支払方法コード(システム予約値999固定)
+						PaymentMethodCode.from(MyHouseholdAccountBookContent.PAYMENT_METHOD_CODE_NONE_VALUE),
+						// 支払方法名
+						PaymentMethodName.from("支払方法がない"),
+						// 支払方法メモ(未設定)
+						PaymentMethodMemo.from(null),
+						// 支払方法種別(現金を仮設定)
+						PaymentMethodKubun.from(MyHouseholdAccountBookContent.PAYMENT_METHOD_KUBUN_CASH_SELECTED_VALUE),
+						// 銀行口座コード(現金種別のため不要)
+						null,
+						// 集計開始日(未設定)
+						ClosingDay.from(null),
+						// 表示順(コードと同じ値を設定)
+						PaymentMethodSort.from(MyHouseholdAccountBookContent.PAYMENT_METHOD_CODE_NONE_VALUE),
+						// 有効/無効フラグ(有効)
+						EnableFlg.from(true),
+						// 更新可否フラグ(更新不可)
+						EnableUpdateFlg.from(false));
+				int addNoneCount = paymentMethodTableRepository.add(noneData);
+				if(addNoneCount != 1) {
+					throw new MyHouseholdAccountBookRuntimeException("支払方法テーブルへの追加件数が不正でした。[add data:" + noneData + "]");
+				}
+				// 「現金」：通常の支払方法として登録し、更新可能(ENABLE_UPDATE_FLG=true)とする
+				PaymentMethod cashData = PaymentMethod.from(
+						// ユーザID
+						accountBookUser.getUserId(),
+						// 支払方法コード
+						PaymentMethodCode.from("001"),
+						// 支払方法名
+						PaymentMethodName.from("現金"),
+						// 支払方法メモ(未設定)
+						PaymentMethodMemo.from(null),
+						// 支払方法種別(現金)
+						PaymentMethodKubun.from(MyHouseholdAccountBookContent.PAYMENT_METHOD_KUBUN_CASH_SELECTED_VALUE),
+						// 銀行口座コード(現金種別のため不要)
+						null,
+						// 集計開始日(未設定)
+						ClosingDay.from(null),
+						// 表示順
+						PaymentMethodSort.from("001"),
+						// 有効/無効フラグ(有効)
+						EnableFlg.from(true),
+						// 更新可否フラグ(更新可)
+						EnableUpdateFlg.from(true));
+				int addCashCount = paymentMethodTableRepository.add(cashData);
+				if(addCashCount != 1) {
+					throw new MyHouseholdAccountBookRuntimeException("支払方法テーブルへの追加件数が不正でした。[add data:" + cashData + "]");
+				}
+
 				// 完了メッセージ
 				response.addMessage("ユーザを追加しました。[ユーザID:" + userInfo.getUserId() + "][ユーザ名:" + userInfo.getUserName() + "]");
 				
@@ -269,13 +366,21 @@ public class AdminMenuUserInfoUseCase {
 		sisyutuItemBaseList.getValues().forEach(baseData -> {
 				// 登録する支出項目テーブル情報を生成(更新不可フラグはデフォルトで不可:falseを設定)
 				ExpenditureItemInfo addData = ExpenditureItemInfo.from(
+					// ユーザID
 					"koukiyonetani",
+					// 支出項目コード
 					baseData.getExpenditureItemCode().getValue(),
-					baseData.getExpenditureItemName().getValue(), 
+					// 支出項目名
+					baseData.getExpenditureItemName().getValue(),
+					// 支出項目詳細内容
 					baseData.getExpenditureItemDetailContext().getValue(),
+					// 親支出項目コード
 					baseData.getParentExpenditureItemCode().getValue(),
+					// 支出項目レベル
 					baseData.getExpenditureItemLevel().toString(),
+					// 支出項目表示順
 					baseData.getExpenditureItemSortOrder().getValue(),
+					// 更新不可フラグ(デフォルト:不可)
 					false);
 				// データを登録
 				int addCount = sisyutuItemTableRepository.add(addData);
@@ -312,10 +417,15 @@ public class AdminMenuUserInfoUseCase {
 		} else {
 			response.addUserInfoListItems(userInfoList.getValues().stream().map(domain ->
 			AdminMenuUserInfoResponse.UserInfoListItem.from(
+					// ユーザID
 					domain.getUserId().getValue(),
+					// ユーザ名
 					domain.getUserName().getValue(),
+					// ユーザステータス
 					domain.getUserStatus().toString(),
+					// ユーザ権限
 					domain.getUserRole().toViewStringList(),
+					// 対象年月
 					domain.getTargetYearMonth().getValue()
 			)).collect(Collectors.toUnmodifiableList()));
 		}

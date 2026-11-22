@@ -3,8 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/11/03 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/11/03 : 1.00.00                      新規作成
+ * 2026/10/12 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(リダイレクトレスポンスdtoのファクトリ引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.regist;
@@ -24,7 +25,7 @@ import lombok.Setter;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -48,7 +49,7 @@ public class ShoppingRegistTopMenuResponse extends AbstractSimpleShoppingRegistL
 		// 買い物登録方法選択画面表示情報を生成
 		ShoppingRegistTopMenuResponse response = new ShoppingRegistTopMenuResponse(targetYearMonth.getValue());
 		// 対象年月を設定
-		response.setYearMonth(targetYearMonth.getValue());
+		response.setYearMonth(targetYearMonth);
 		// 画面表示情報を返却
 		return response;
 	}

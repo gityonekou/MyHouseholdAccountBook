@@ -3,10 +3,12 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/05/27 : 1.01.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/05/27 : 1.00.00  feature-1.01-dev4   新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
+
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
 
 import java.util.List;
@@ -14,6 +16,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.yonetani.webapp.accountbook.application.usecase.account.component.PaymentMethodInfoComponent;
+import com.yonetani.webapp.accountbook.domain.service.account.paymentmethod.PaymentMethodNameResolver;
 import com.yonetani.webapp.accountbook.application.usecase.common.CodeTableItemComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostInquiryList;
@@ -21,6 +25,7 @@ import com.yonetani.webapp.accountbook.domain.model.account.fixedcost.FixedCostI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserId;
 import com.yonetani.webapp.accountbook.domain.repository.account.fixedcost.FixedCostTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.common.AccountBookUserRepository;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost.AbstractFixedCostItemListResponse;
@@ -53,6 +58,8 @@ public class FixedCostMonthlyDetailUseCase {
 	private final FixedCostTableRepository fixedCostRepository;
 	// 家計簿ユーザーリポジトリー
 	private final AccountBookUserRepository accountBookUserRepository;
+	// 支払方法情報取得コンポーネント
+	private final PaymentMethodInfoComponent paymentMethodInfoComponent;
 
 	/**
 	 *<pre>
@@ -71,25 +78,24 @@ public class FixedCostMonthlyDetailUseCase {
 		UserId userId = UserId.from(user.getUserId());
 
 		// 表示月の決定（月番号を 1〜12 の int で保持）
-		int monthValue;
+		TargetMonth monthValue;
 		if (monthStr != null) {
-			monthValue = Integer.parseInt(monthStr);
+			monthValue = TargetMonth.from(monthStr);
 		} else {
 			TargetYearMonth targetYearMonth = accountBookUserRepository.getTargetYearMonth(
 					SearchQueryUserId.from(userId));
-			monthValue = Integer.parseInt(targetYearMonth.getMonth());
+			monthValue = targetYearMonth.getTargetMonth();
 		}
 
 		// 前月・次月の計算（1↔12 ラップ）
-		int prevMonthValue = (monthValue == 1) ? 12 : monthValue - 1;
-		int nextMonthValue = (monthValue == 12) ? 1 : monthValue + 1;
+		TargetMonth prevMonthValue = monthValue.minus(1);
+		TargetMonth nextMonthValue = monthValue.plus(1);
 
 		// レスポンスを生成
 		FixedCostMonthlyDetailResponse response = FixedCostMonthlyDetailResponse.getInstance(
-				monthValue + "月",
-				String.format("%02d", monthValue),
-				String.format("%02d", prevMonthValue),
-				String.format("%02d", nextMonthValue));
+				monthValue,
+				prevMonthValue,
+				nextMonthValue);
 
 		// 全固定費一覧を取得
 		FixedCostInquiryList allFixedCosts = fixedCostRepository.findByUserId(
@@ -100,12 +106,11 @@ public class FixedCostMonthlyDetailUseCase {
 			// 対象月に支払いが発生する固定費でフィルタリング
 			List<FixedCostInquiryItem> monthItems = allFixedCosts.getValuesForMonth(monthValue);
 			if (!monthItems.isEmpty()) {
-				response.setFixedCostItemList(createFixedCostItemList(monthItems));
+				// 支払方法名の解決リゾルバを1回だけ生成(N+1回避。突合レビュー指摘④)
+				response.setFixedCostItemList(createFixedCostItemList(monthItems, paymentMethodInfoComponent.createResolver(userId)));
 			}
-			// 当月合計（calculateMonthlyTotal は月部分のみ使用するため年は任意値（2000年）を設定
-			response.setMonthlyTotal(
-					allFixedCosts.calculateMonthlyTotal(
-							TargetYearMonth.from(String.format("2000%02d", monthValue))).toFormatString());
+			// 当月合計
+			response.setMonthlyTotal(allFixedCosts.calculateMonthlyTotal(monthValue).toFormatString());
 		}
 		return response;
 	}
@@ -115,18 +120,19 @@ public class FixedCostMonthlyDetailUseCase {
 	 * 固定費一覧明細情報(ドメイン)のリストから、画面表示用の固定費一覧明細情報のリストを生成して返します。
 	 *</pre>
 	 * @param items 固定費一覧明細情報(ドメイン)のリスト
+	 * @param resolver 支払方法名の解決リゾルバ(呼び出し元で1回だけ生成済み)
 	 * @return 画面表示用の固定費一覧明細情報のリスト
 	 *
 	 */
-	private List<FixedCostItem> createFixedCostItemList(List<FixedCostInquiryItem> items) {
+	private List<FixedCostItem> createFixedCostItemList(List<FixedCostInquiryItem> items, PaymentMethodNameResolver resolver) {
 		return items.stream().map(domain ->
 			AbstractFixedCostItemListResponse.FixedCostItem.from(
 				// 固定費コード
-				domain.getFixedCostCode().getValue(),
+				domain.getFixedCostCode(),
 				// 支出項目名
-				domain.getExpenditureItemName().getValue(),
+				domain.getExpenditureItemName(),
 				// 支払名
-				domain.getFixedCostName().getValue(),
+				domain.getFixedCostName(),
 				// 支払月：コード変換
 				codeTableItem.getCodeValue(
 						MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_TUKI,
@@ -135,10 +141,12 @@ public class FixedCostMonthlyDetailUseCase {
 				codeTableItem.getCodeValue(
 						MyHouseholdAccountBookContent.CODE_DEFINES_FIXED_COST_SHIHARAI_DAY,
 						domain.getFixedCostPaymentDay().getValue()),
+				// 支払方法名
+				resolver.getPaymentMethodName(domain.getPaymentMethodCode()),
 				// 支払金額
-				domain.getFixedCostPaymentAmount().toFormatString(),
+				domain.getFixedCostPaymentAmount(),
 				// その他任意詳細
-				domain.getFixedCostTargetPaymentMonthOptionalContext().getValue())
+				domain.getFixedCostTargetPaymentMonthOptionalContext())
 		).collect(Collectors.toUnmodifiableList());
 	}
 }

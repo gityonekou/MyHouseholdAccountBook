@@ -3,13 +3,16 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/01/10 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/01/10 : 1.00.00                      新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/09/23 : 1.01.01  feature-1.03-dev1   追加リファクタリング対応
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.shop;
 
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopDefaultPaymentMethodCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
 import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopSort;
@@ -28,7 +31,7 @@ import lombok.ToString;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -44,9 +47,11 @@ public class Shop {
 	private final ShopKubunCode shopKubunCode;
 	// 店舗名
 	private final ShopName shopName;
+	// デフォルト支払方法コード(null許容)
+	private final ShopDefaultPaymentMethodCode defaultPaymentMethodCode;
 	// 店舗表示順
 	private final ShopSort shopSort;
-	
+
 	/**
 	 *<pre>
 	 * 引数の値から店舗テーブル情報を表すドメインモデルを生成して返します。
@@ -55,16 +60,13 @@ public class Shop {
 	 * @param shopCode 店舗コード
 	 * @param shopKubunCode 店舗区分コード
 	 * @param shopName 店舗名
+	 * @param defaultPaymentMethodCode デフォルト支払方法コード(null許容)
 	 * @param shopSort 店舗表示順
 	 * @return 店舗テーブル情報を表すドメインモデル
 	 *
 	 */
-	public static Shop from(String userId, String shopCode, String shopKubunCode, String shopName, String shopSort) {
-		return new Shop(
-				UserId.from(userId),
-				ShopCode.from(shopCode),
-				ShopKubunCode.from(shopKubunCode),
-				ShopName.from(shopName),
-				ShopSort.from(shopSort));
+	public static Shop from(UserId userId, ShopCode shopCode, ShopKubunCode shopKubunCode, ShopName shopName,
+			ShopDefaultPaymentMethodCode defaultPaymentMethodCode,  ShopSort shopSort) {
+		return new Shop(userId, shopCode, shopKubunCode, shopName, defaultPaymentMethodCode, shopSort);
 	}
 }

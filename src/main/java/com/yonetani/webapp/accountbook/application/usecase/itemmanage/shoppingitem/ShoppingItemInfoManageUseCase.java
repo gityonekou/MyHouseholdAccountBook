@@ -13,9 +13,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2023/10/29 : 1.00.00  新規作成
- * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
+ * 日付       : version  ブランチ            コメントなど
+ * 2023/10/29 : 1.00.00                      新規作成
+ * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.shoppingitem;
@@ -209,7 +209,7 @@ public class ShoppingItemInfoManageUseCase {
 						// 商品JANコード
 						searchResult.getShoppingItemJanCode().getValue(),
 						// 支出項目名(＞で区切った値)
-						expenditureItemInfoComponent.getExpenditureItemName(userId, searchResult.getExpenditureItemCode()),
+						expenditureItemInfoComponent.getExpenditureItemNamePath(userId, searchResult.getExpenditureItemCode()).toFormatString(),
 						// 会社名
 						searchResult.getCompanyName().getValue()));
 		
@@ -285,7 +285,7 @@ public class ShoppingItemInfoManageUseCase {
 		// 基準店舗選択ボックス表示情報を設定したレスポンスを生成
 		ShoppingItemInfoManageUpdateResponse response = createShoppingItemInfoManageUpdateResponse(userId, addItemForm);
 		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
-		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, sisyutuItemCode));
+		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemNamePath(userId, sisyutuItemCode).toFormatString());
 		
 		return response;
 	}
@@ -354,7 +354,7 @@ public class ShoppingItemInfoManageUseCase {
 		// 基準店舗選択ボックス表示情報を設定したレスポンスを生成
 		ShoppingItemInfoManageUpdateResponse response = createShoppingItemInfoManageUpdateResponse(userId, addItemForm);
 		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
-		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, searchResult.getExpenditureItemCode()));
+		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemNamePath(userId, searchResult.getExpenditureItemCode()).toFormatString());
 		
 		// コピーした情報を新規登録する旨をメッセージ表示
 		response.addMessage("「コピーして商品を新規追加」が選択されています。");
@@ -420,7 +420,7 @@ public class ShoppingItemInfoManageUseCase {
 		// 基準店舗選択ボックス表示情報を設定したレスポンスを生成
 		ShoppingItemInfoManageUpdateResponse response = createShoppingItemInfoManageUpdateResponse(userId, updateItemForm);
 		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
-		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, searchResult.getExpenditureItemCode()));
+		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemNamePath(userId, searchResult.getExpenditureItemCode()).toFormatString());
 		
 		return response;
 	}
@@ -542,7 +542,7 @@ public class ShoppingItemInfoManageUseCase {
 		// 基準店舗選択ボックス表示情報を設定したレスポンスを生成
 		ShoppingItemInfoManageUpdateResponse response = createShoppingItemInfoManageUpdateResponse(userId, inputForm);
 		// 支出項目名を取得(＞で区切った値)しレスポンスに設定
-		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemName(userId, sisyutuItemCode));
+		response.setSisyutuItemName(expenditureItemInfoComponent.getExpenditureItemNamePath(userId, sisyutuItemCode).toFormatString());
 		
 		return response;
 	}
@@ -840,7 +840,7 @@ public class ShoppingItemInfoManageUseCase {
 	 */
 	private void execActSearchSisyutuItem(UserId userId, ExpenditureItemCode sisyutuItemCode, AbstractShoppingItemInfoManageSearchResponse response) {
 		// 選択した支出項目名を取得(＞で区切った値)
-		String sisyutuItemName = expenditureItemInfoComponent.getExpenditureItemName(userId, sisyutuItemCode);
+		String sisyutuItemName = expenditureItemInfoComponent.getExpenditureItemNamePath(userId, sisyutuItemCode).toFormatString();
 		
 		// 指定した支出項目コードに属する商品一覧を取得
 		ShoppingItemInquiryList searchResult = shoppingItemRepository.findByIdAndExpenditureItemCode(

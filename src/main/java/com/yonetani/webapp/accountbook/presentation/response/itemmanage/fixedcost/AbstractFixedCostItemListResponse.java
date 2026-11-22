@@ -9,11 +9,12 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/06/08 : 1.00.00  新規作成
- * 2026/05/07 : 1.01.00  固定費合計表示変更(奇数月/偶数月合計→3か月合計)
- * 2026/05/23 : 1.01.01  月別固定費一覧新規追加対応
- * 2026/05/27 : 1.01.02  targetMonthValue フィールド削除（月別固定費一覧タブリンクをセッション管理に変更）
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/06/08 : 1.00.00                      新規作成
+ * 2026/05/07 : 1.01.00  feature-1.01-dev2   固定費合計表示変更(奇数月/偶数月合計→3か月合計)
+ * 2026/05/23 : 1.02.00  feature-1.01-dev3   月別固定費一覧新規追加対応
+ * 2026/05/27 : 1.02.01  feature-1.01-dev3   targetMonthValue フィールド削除（月別固定費一覧タブリンクをセッション管理に変更）
+ * 2026/08/18 : 1.03.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost;
@@ -24,6 +25,12 @@ import java.util.List;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.ResolvedPaymentMethodName;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemName;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostName;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonthOptionalContext;
 import com.yonetani.webapp.accountbook.presentation.response.itemmanage.AbstractExpenditureItemInfoManageResponse;
 
 import lombok.AccessLevel;
@@ -75,11 +82,13 @@ public abstract class AbstractFixedCostItemListResponse extends AbstractExpendit
 		private final String shiharaiTuki;
 		// 支払日
 		private final String shiharaiDay;
+		// 支払方法名（解決済み）
+		private final String paymentMethodName;
 		// 支払金額
 		private final String shiharaiKingaku;
 		// その他任意詳細
 		private final String optionalContext;
-		
+
 		/**
 		 *<pre>
 		 * 引数の値から固定費一覧情報の明細データを生成して返します。
@@ -89,15 +98,33 @@ public abstract class AbstractFixedCostItemListResponse extends AbstractExpendit
 		 * @param shiharaiName 支払名
 		 * @param shiharaiTuki 支払月
 		 * @param shiharaiDay 支払日
+		 * @param paymentMethodName 支払方法名（解決済み）
 		 * @param shiharaiKingaku 支払金額
 		 * @param optionalContext その他任意詳細
 		 * @return 固定費一覧情報の明細データ
 		 *
 		 */
-		public static FixedCostItem from(String fixedCostCode, String sisyutuItemName, String shiharaiName,
-				String shiharaiTuki, String shiharaiDay, String shiharaiKingaku, String optionalContext) {
-			return new FixedCostItem(fixedCostCode, sisyutuItemName, shiharaiName,
-					shiharaiTuki, shiharaiDay, shiharaiKingaku, optionalContext);
+		public static FixedCostItem from(FixedCostCode fixedCostCode, ExpenditureItemName sisyutuItemName,
+				FixedCostName shiharaiName, String shiharaiTuki, String shiharaiDay,
+				ResolvedPaymentMethodName paymentMethodName, FixedCostPaymentAmount shiharaiKingaku,
+				FixedCostTargetPaymentMonthOptionalContext optionalContext) {
+			return new FixedCostItem(
+					// 固定費コード
+					fixedCostCode.getValue(),
+					// 支出項目名
+					sisyutuItemName.getValue(),
+					// 支払名
+					shiharaiName.getValue(),
+					// 支払月
+					shiharaiTuki,
+					// 支払日
+					shiharaiDay,
+					// 支払方法名（解決済み）
+					paymentMethodName.getValue(),
+					// 支払金額
+					shiharaiKingaku.toFormatString(),
+					// その他任意詳細
+					optionalContext.getValue());
 		}
 	}
 	

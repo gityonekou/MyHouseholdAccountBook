@@ -3,9 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2023/10/14 : 1.00.00  新規作成
- * 2025/12/28 : 1.01.00  リファクタリング対応(DDD適応)
+ * 日付       : version  ブランチ            コメントなど
+ * 2023/10/14 : 1.00.00                      新規作成
+ * 2025/12/28 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.account.incomeandexpenditure;
@@ -61,9 +61,9 @@ public class IncomeAndExpenditureReadWriteDto {
 				// ユーザID
 				domain.getUserId().getValue(),
 				// 対象年
-				domain.getTargetYearMonth().getYear(),
+				domain.getTargetYearMonth().getTargetYear().getValue(),
 				// 対象月
-				domain.getTargetYearMonth().getMonth(),
+				domain.getTargetYearMonth().getTargetMonth().getValue(),
 				// 収入金額(積立金取崩金額以外の収入金額)
 				domain.getRegularIncomeAmount().getValue(),
 				// 積立金取崩金額

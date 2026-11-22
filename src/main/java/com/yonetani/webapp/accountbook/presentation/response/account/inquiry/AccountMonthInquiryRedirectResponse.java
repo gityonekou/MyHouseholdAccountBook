@@ -6,8 +6,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/09/16 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/09/16 : 1.00.00                      新規作成
+ * 2026/10/12 : 1.01.00  feature-1.03-dev1   追加リファクタリング対応(getInquiryMonthRedirectInstance()の引数をドメインタイプに変更)
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.account.inquiry;
@@ -15,6 +16,7 @@ package com.yonetani.webapp.accountbook.presentation.response.account.inquiry;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse;
 
 import lombok.AccessLevel;
@@ -30,7 +32,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -49,12 +51,12 @@ public class AccountMonthInquiryRedirectResponse extends AbstractResponse {
 	 * @return 買い物登録画面にリダイレクトするためのレスポンス情報
 	 *
 	 */
-	public static AccountMonthInquiryRedirectResponse getShoppingAddRedirectInstance(String targetYearMonth) {
+	public static AccountMonthInquiryRedirectResponse getShoppingAddRedirectInstance(TargetYearMonth targetYearMonth) {
 		AccountMonthInquiryRedirectResponse response = new AccountMonthInquiryRedirectResponse(
 				// 買い物登録画面リダイレクトURL
 				"redirect:/myhacbook/accountregist/shoppingtopmenu/",
 				// 対象年月
-				targetYearMonth);
+				targetYearMonth.getValue());
 		response.setTransactionSuccessFull();
 		return response;
 	}
@@ -67,12 +69,12 @@ public class AccountMonthInquiryRedirectResponse extends AbstractResponse {
 	 * @return 収支登録画面(更新)にリダイレクトするためのレスポンス情報
 	 *
 	 */
-	public static AccountMonthInquiryRedirectResponse getAccountMonthUpdateRedirectInstance(String targetYearMonth) {
+	public static AccountMonthInquiryRedirectResponse getAccountMonthUpdateRedirectInstance(TargetYearMonth targetYearMonth) {
 		AccountMonthInquiryRedirectResponse response = new AccountMonthInquiryRedirectResponse(
 				// 収支登録画面(更新)リダイレクトURL
 				"redirect:/myhacbook/accountregist/incomeandexpenditure/updateload/",
 				// 対象年月
-				targetYearMonth);
+				targetYearMonth.getValue());
 		response.setTransactionSuccessFull();
 		return response;
 	}

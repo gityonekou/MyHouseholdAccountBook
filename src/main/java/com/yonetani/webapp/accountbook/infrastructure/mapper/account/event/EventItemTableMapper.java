@@ -3,8 +3,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/08/18 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/08/18 : 1.00.00                      新規作成
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.mapper.account.event;
@@ -30,7 +30,7 @@ import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdSear
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Mapper

@@ -3,9 +3,10 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2023/12/02 : 1.00.00  新規作成
- * 2026/05/23 : 1.01.00  年間固定費合計画面新規追加対応
+ * 日付       : version  ブランチ            コメントなど
+ * 2023/12/02 : 1.00.00                      新規作成
+ * 2026/05/23 : 1.01.00  feature-1.01-dev3   年間固定費合計画面新規追加対応
+ * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.common.content;
@@ -167,6 +168,13 @@ public class MyHouseholdAccountBookContent {
 	/** 商品JANコードを検索条件に商品を検索 */
 	public static final String SEARCH_TARGET_SHOPPING_ITEM_JAN_CODE = "janCode";
 	
+	/** コード定義区分(支払方法種別:008) */
+	public static final String CODE_DEFINES_PAYMENT_METHOD_KUBUN = "008";
+	/** 支払方法コード:「支払方法がない」固定値(999) */
+	public static final String PAYMENT_METHOD_CODE_NONE_VALUE = "999";
+	/** コード定義:支払方法種別で現金(1)を選択時 */
+	public static final String PAYMENT_METHOD_KUBUN_CASH_SELECTED_VALUE = "1";
+
 	/** 日付チェック用のフォーマットです */
 	public static final DateTimeFormatter YEAR_MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyyMM");
 	/** 日付チェック用のフォーマットです(うるう年でない年で29日を指定した場合、28日のLocalDateとして判断します */

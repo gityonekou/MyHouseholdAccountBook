@@ -3,8 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/05/22 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/05/22 : 1.00.00                      新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.itemmanage.fixedcost;
@@ -51,11 +52,14 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 	// 支払日選択ボックス
 	@Getter
 	private final SelectViewItem shiharaiDaySelectList;
+	// 支払方法選択ボックス(findEnabledByUserId()ベース。有効な支払方法であれば「支払方法がない」も含む。5.4.1節)
+	@Getter
+	private final SelectViewItem paymentMethodSelectList;
 	// 支出項目名
 	@Getter
 	@Setter
 	private String sisyutuItemName;
-	
+
 	/**
 	 *<pre>
 	 * デフォルト値からレスポンス情報を生成して返します。
@@ -64,11 +68,13 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 	 * @param addKubunList 固定費区分選択ボックスの表示情報リスト
 	 * @param addTukiList 支払月選択ボックスの表示情報リスト
 	 * @param addDayList 支払日選択ボックスの表示情報リスト
+	 * @param addPaymentMethodList 支払方法選択ボックスの表示情報リスト
 	 * @return 情報管理(固定費)更新画面表示情報
 	 *
 	 */
 	public static FixedCostInfoManageUpdateResponse getInstance(FixedCostInfoUpdateForm inputForm,
-			List<OptionItem> addKubunList, List<OptionItem> addTukiList, List<OptionItem> addDayList) {
+			List<OptionItem> addKubunList, List<OptionItem> addTukiList, List<OptionItem> addDayList,
+			List<OptionItem> addPaymentMethodList) {
 		if(inputForm == null) {
 			inputForm = new FixedCostInfoUpdateForm();
 		}
@@ -84,6 +90,12 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 		if(!CollectionUtils.isEmpty(addDayList)) {
 			optionDayList.addAll(addDayList);
 		}
+		// 支払方法選択ボックスの表示情報リストを生成
+		List<OptionItem> optionPaymentMethodList = new ArrayList<>();
+		optionPaymentMethodList.add(OptionItem.from("", "支払方法を選択してください"));
+		if(!CollectionUtils.isEmpty(addPaymentMethodList)) {
+			optionPaymentMethodList.addAll(addPaymentMethodList);
+		}
 		// 入力フォームと各種瀬卓ボックスの表示情報リストを元に情報管理(固定費)更新画面表示情報を生成
 		return new FixedCostInfoManageUpdateResponse(
 				// 固定費情報入力フォーム
@@ -93,7 +105,9 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 				// 支払月選択ボックス表示情報
 				SelectViewItem.from(optionTukiList),
 				// 支払日選択ボックス表示情報
-				SelectViewItem.from(optionDayList));
+				SelectViewItem.from(optionDayList),
+				// 支払方法選択ボックス表示情報
+				SelectViewItem.from(optionPaymentMethodList));
 	}
 	
 	/**
@@ -111,6 +125,8 @@ public class FixedCostInfoManageUpdateResponse extends AbstractResponse {
 		modelAndView.addObject("shiharaiTukiSelectList", shiharaiTukiSelectList);
 		// 支払日選択ボックス
 		modelAndView.addObject("shiharaiDaySelectList", shiharaiDaySelectList);
+		// 支払方法選択ボックス
+		modelAndView.addObject("paymentMethodSelectList", paymentMethodSelectList);
 		// 支出項目名
 		modelAndView.addObject("sisyutuItemName", sisyutuItemName);
 		

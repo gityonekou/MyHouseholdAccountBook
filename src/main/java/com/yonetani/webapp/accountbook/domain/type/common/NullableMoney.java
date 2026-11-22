@@ -4,9 +4,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2025/12/22 : 1.00.00  新規作成
- * 2026/05/23 : 1.01.01  年間固定費合計画面新規追加対応でtoZeroDashString()メソッド追加
+ * 日付       : version  ブランチ            コメントなど
+ * 2025/12/22 : 1.00.00  feature-1.00-dev00  新規作成
+ * 2026/05/23 : 1.01.00  feature-1.01-dev3   年間固定費合計画面新規追加対応でtoZeroDashString()メソッド追加
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.common;
@@ -279,7 +279,7 @@ public abstract class NullableMoney {
 	 *<pre>
 	 * 画面表示・入力用に整数値(Integer型)を取得します。
 	 * スケール0で小数点以下切り捨てした整数値(Integer型)を返却します。
-	 * null値の場合は0を返却します。
+	 * null値の場合はnullを返却します。
 	 *
 	 * [使用例]
 	 * - 画面の入力フィールドへの初期値設定
@@ -289,6 +289,11 @@ public abstract class NullableMoney {
 	 *
 	 */
 	public Integer toIntegerValue() {
+		
+		// nullの場合はnullを返却
+		if(isNull()) {
+			return null;
+		}
 		
 		// スケールを0に設定、小数点以下は切り捨て（HALF_DOWN）で丸める(0.5以上は切り上げ、0.5未満は切り捨て)
 		BigDecimal convertValue = this.getNullSafeValue().setScale(0, RoundingMode.HALF_DOWN);
@@ -301,12 +306,16 @@ public abstract class NullableMoney {
 	 *<pre>
 	 * 画面入力用に整数の文字列を取得します。
 	 * カンマ区切りなしの整数値を返却します。
-	 * null値の場合は"0"を返却します。
+	 * null値の場合は空文字列を返却します。
 	 *</pre>
-	 * @return 整数値の文字列（例: "10000"）。null値の場合は"0"
+	 * @return 整数値の文字列（例: "10000"）。null値の場合は空文字列
 	 *
 	 */
 	public String toIntegerString() {
+		// nullの場合は空文字列を返却
+		if(isNull()) {
+			return "";
+		}
 		return String.valueOf(toIntegerValue());
 	}
 
@@ -321,7 +330,7 @@ public abstract class NullableMoney {
 	 */
 	public String toFormatString() {
 		// null値の場合は空文字列を返却
-		if(value == null) {
+		if(isNull()) {
 			return "";
 		}
 		// スケール0で四捨五入
@@ -339,7 +348,7 @@ public abstract class NullableMoney {
 	 *
 	 */
 	public String toZeroDashString() {
-		if(value == null) {
+		if(isNull()) {
 			return "";
 		}
 		return isZero() ? "ー" : toFormatString();
@@ -352,7 +361,7 @@ public abstract class NullableMoney {
 	public String toString() {
 		// 値の文字列表現を返却（デバッグ用）
 		// null値の場合は空文字列を返却
-		if(value == null) {
+		if(isNull()) {
 			return "";
 		}
 		return value.toString();

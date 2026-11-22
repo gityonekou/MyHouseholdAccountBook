@@ -3,8 +3,10 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/01/10 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/01/10 : 1.00.00                      新規作成
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/09/23 : 1.01.01  feature-1.03-dev1   追加リファクタリング対応
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.shop;
@@ -23,6 +25,12 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSort;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndShopSortBetweenAB;
 import com.yonetani.webapp.accountbook.domain.repository.account.shop.ShopTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopDefaultPaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopKubunCode;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopName;
+import com.yonetani.webapp.accountbook.domain.type.account.shop.ShopSort;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.shop.ShopReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndShopKubunCodeListSearchQueryDto;
@@ -41,7 +49,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @Repository
@@ -199,15 +207,17 @@ public class ShopTableDataSource implements ShopTableRepository {
 	private Shop createShop(ShopReadWriteDto dto) {
 		return Shop.from(
 				// ユーザID
-				dto.getUserId(),
+				UserId.from(dto.getUserId()),
 				// 店舗コード
-				dto.getShopCode(),
+				ShopCode.from(dto.getShopCode()),
 				// 店舗区分コード
-				dto.getShopKubunCode(),
+				ShopKubunCode.from(dto.getShopKubunCode()),
 				// 店舗名
-				dto.getShopName(),
+				ShopName.from(dto.getShopName()),
+				// デフォルト支払方法コード
+				ShopDefaultPaymentMethodCode.from(dto.getDefaultPaymentMethodCode()),
 				// 店舗表示順
-				dto.getShopSort());
+				ShopSort.from(dto.getShopSort()));
 	}
 	
 	/**
@@ -229,6 +239,8 @@ public class ShopTableDataSource implements ShopTableRepository {
 				// 店舗名
 				data.getShopName().getValue(),
 				// 店舗表示順
-				data.getShopSort().getValue());
+				data.getShopSort().getValue(),
+				// デフォルト支払方法コード
+				data.getDefaultPaymentMethodCode().getValue());
 	}
 }

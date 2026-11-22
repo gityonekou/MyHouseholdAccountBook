@@ -7,8 +7,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/11/23 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/11/23 : 1.00.00                      新規作成
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.searchquery;
@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -58,9 +58,9 @@ public class UserIdAndYearMonthAndShoppingRegistCodeSearchQueryDto {
 				// 検索条件:ユーザID
 				search.getUserId().toString(),
 				// 検索条件:対象年
-				search.getYearMonth().getYear(),
+				search.getYearMonth().getTargetYear().getValue(),
 				// 検索条件:対象月
-				search.getYearMonth().getMonth(),
+				search.getYearMonth().getTargetMonth().getValue(),
 				// 検索条件:買い物登録コード
 				search.getShoppingRegistCode().getValue());
 	}

@@ -6,11 +6,12 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version     コメントなど
- * 2025/01/13 : 1.00.00(A)  新規作成
- * 2026/05/09 : 1.01.00     リファクタリング追加対応(対象年月ドメインの集約)
+ * 日付       : version  ブランチ            コメントなど
+ * 2025/01/13 : 1.00.00                      新規作成
+ * 2026/05/09 : 1.01.00  feature-1.01-dev1   リファクタリング追加対応(対象年月ドメインの集約)
  *
  */
+
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.accountingperiodupdate;
 
 import org.springframework.stereotype.Service;
@@ -85,8 +86,8 @@ public class TargetYearMonthUpdManageUseCase {
 			// 表示メッセージを設定
 			response.addErrorMessage(String.format(
 					"現在の対象年月（%s年%s月）の収支情報が未登録です。対象年月を更新できません。",
-					targetYearMonth.getYear(),
-					targetYearMonth.getMonth()));
+					targetYearMonth.getTargetYear().getValue(),
+					targetYearMonth.getTargetMonth().getValue()));
 			return response;
 			
 		} else {
@@ -96,13 +97,13 @@ public class TargetYearMonthUpdManageUseCase {
 			// 対象年月更新可の画面表示情報を生成して返却
 			return TargetYearMonthUpdManageResponse.getUpdateAcceptInstance(
 					// 現在の対象年月の年の値
-					targetYearMonth.getYear(),
+					targetYearMonth.getTargetYear().getValue(),
 					// 現在の対象年月の月の値
-					targetYearMonth.getMonth(),
+					targetYearMonth.getTargetMonth().getValue(),
 					// 更新後の対象年月の年の値
-					nextTargetYearMonth.getYear(),
+					nextTargetYearMonth.getTargetYear().getValue(),
 					// 更新後の対象年月の月の値
-					nextTargetYearMonth.getMonth(),
+					nextTargetYearMonth.getTargetMonth().getValue(),
 					// 更新後の対象年月
 					nextTargetYearMonth.getValue());
 		}
@@ -135,13 +136,13 @@ public class TargetYearMonthUpdManageUseCase {
 		// レスポンスを生成
 		TargetYearMonthUpdManageResponse response = TargetYearMonthUpdManageResponse.getUpdateAcceptInstance(
 				// 現在の対象年月の年の値
-				targetYearMonth.getYear(),
+				targetYearMonth.getTargetYear().getValue(),
 				// 現在の対象年月の月の値
-				targetYearMonth.getMonth(),
+				targetYearMonth.getTargetMonth().getValue(),
 				// 更新後の対象年月の年の値
-				nextTargetYearMonth.getYear(),
+				nextTargetYearMonth.getTargetYear().getValue(),
 				// 更新後の対象年月の月の値
-				nextTargetYearMonth.getMonth(),
+				nextTargetYearMonth.getTargetMonth().getValue(),
 				// 更新後の対象年月
 				nextTargetYearMonth.getValue());
 		

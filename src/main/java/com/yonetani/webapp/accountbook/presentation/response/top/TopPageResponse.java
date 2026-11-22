@@ -3,8 +3,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/05/05 : 1.00.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/05/05 : 1.00.00                      新規作成
  *
  */
 package com.yonetani.webapp.accountbook.presentation.response.top;
@@ -20,7 +20,7 @@ import com.yonetani.webapp.accountbook.presentation.response.fw.AbstractResponse
  *</pre>
  *
  * @author ：Kouki Yonetani
- * @since 家計簿アプリ(1.00.A)
+ * @since 家計簿アプリ(1.00)
  *
  */
 public class TopPageResponse extends AbstractResponse {

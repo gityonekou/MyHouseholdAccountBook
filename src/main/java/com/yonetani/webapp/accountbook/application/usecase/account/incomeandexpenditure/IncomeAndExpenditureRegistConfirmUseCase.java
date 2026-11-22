@@ -6,8 +6,11 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/02/26 : 1.00.00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/02/26 : 1.00.00  feature-1.00-dev00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
+ * 2026/08/18 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/10/12 : 1.01.01  feature-1.03-dev1   ExpenditureItem.createExpenditureItem()のシグネチャ変更に伴う対応(セッションDTOからドメインタイプへの変換をUseCase側に集約)
+ * 2026/11/08 : 1.01.02  feature-1.03-dev1   IncomeItem.createIncomeItem()・RegularIncomeAmount/WithdrawingAmount.from()のシグネチャ変更に伴う対応(セッションDTOからドメインタイプへの変換をUseCase側に集約)
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -19,8 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import com.yonetani.webapp.accountbook.application.usecase.account.component.ShoppingRegistExpenditureItemComponent;
 import com.yonetani.webapp.accountbook.application.usecase.account.component.ExpenditureAmountItemHolderComponent;
+import com.yonetani.webapp.accountbook.application.usecase.account.component.ShoppingRegistExpenditureItemComponent;
 import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.common.exception.MyHouseholdAccountBookRuntimeException;
 import com.yonetani.webapp.accountbook.domain.model.account.expenditure.ExpenditureAmountItemHolder;
@@ -33,11 +36,21 @@ import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.Exp
 import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.SisyutuKingakuTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTableRepository;
 import com.yonetani.webapp.accountbook.domain.repository.account.incomeandexpenditure.IncomeAndExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCategory;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureEventCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureName;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeCategory;
 import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeCode;
+import com.yonetani.webapp.accountbook.domain.type.account.income.IncomeDetailContext;
 import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.WithdrawingAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
 import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.IncomeAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
 import com.yonetani.webapp.accountbook.domain.type.common.RegularIncomeAmount;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
@@ -96,9 +109,12 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 	public IncomeAndExpenditureRegistCheckResponse readRegistCheckInfo(LoginUserInfo user, String targetYearMonth,
 			List<IncomeRegistItem> incomeRegistItemList, List<ExpenditureRegistItem> expenditureRegistItemList) {
 		log.debug("readRegistCheckInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
-
+		
+		// 対象年月ドメインタイプ
+		TargetYearMonth targetYearMonthDomain = TargetYearMonth.from(targetYearMonth);
+		
 		// レスポンスを生成
-		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(targetYearMonth);
+		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(targetYearMonthDomain);
 		// セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を設定
 		registListComponent.setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
 
@@ -118,13 +134,20 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 	public IncomeAndExpenditureRegistCheckResponse readRegistCancelInfo(LoginUserInfo user, String targetYearMonth,
 			String returnYearMonth) {
 		log.debug("readRegistCancelInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth + ",returnYearMonth=" + returnYearMonth);
-
-		// 戻り対象の対象年月の設定値をチェック
-		TargetYearMonth.from(returnYearMonth);
-
-		// レスポンスを生成
-		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(returnYearMonth);
-		response.addMessage(String.format("%s年%s月度の収支登録をキャンセルしました。", targetYearMonth.substring(0, 4), targetYearMonth.substring(4)));
+		
+		// キャンセル対象の対象年月のドメインタイプを生成
+		TargetYearMonth targetYearMonthDomain = TargetYearMonth.from(targetYearMonth);
+		
+		// 戻り対象の対象年月の設定値よりレスポンスを生成
+		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(TargetYearMonth.from(returnYearMonth));
+		// キャンセルメッセージを生成
+		response.addMessage(String.format("%s年%s月度の収支登録をキャンセルしました。", 
+				// キャンセル対象の対象年月の年の値
+				targetYearMonthDomain.getTargetYear().getValue(),
+				// キャンセル対象の対象年月の月の値
+				targetYearMonthDomain.getTargetMonth().getValue()));
+		
+		// トランザクション完了
 		response.setTransactionSuccessFull();
 
 		return response;
@@ -151,7 +174,7 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 		// 対象年月ドメインタイプ
 		TargetYearMonth targetYearMonth = TargetYearMonth.from(targetYearMonthStr);
 		// レスポンスを生成
-		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(targetYearMonth.getValue());
+		IncomeAndExpenditureRegistCheckResponse response = IncomeAndExpenditureRegistCheckResponse.getInstance(targetYearMonth);
 
 		// セッションに登録されている収入情報のリストがない場合、予期しないエラー
 		if(CollectionUtils.isEmpty(incomeRegistItemList)) {
@@ -179,7 +202,9 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 		}
 		// ⑤ 収入情報、支出情報更新ありの場合、収支テーブルを更新しメッセージを設定
 		updateIncomeAndExpenditureAndSetMessage(userId, targetYearMonth, initFlg, incomeResult, expenditureResult, response);
-
+		// ⑥ 登録した収支の整合性をチェック(各月の収支照会画面でもチェックを行うが、トランザクションコミット前でもチェックを行い、問題があればロールバックする)
+		
+		// ⑦ トランザクション完了
 		response.setTransactionSuccessFull();
 
 		return response;
@@ -213,23 +238,23 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 			// アクションが変更なしの場合、収入金額合計を加算するのみ(DBデータ変更なし)
 			if(Objects.equals(incomeRegistData.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE)) {
 
+				// 収入区分・収入金額をドメインタイプに変換(通常収入金額・積立金取崩金額の算出に使用)
+				IncomeCategory incomeCategory = IncomeCategory.from(incomeRegistData.getIncomeCategory());
+				IncomeAmount incomeKingaku = IncomeAmount.from(incomeRegistData.getIncomeKingaku());
 				// 収入金額を加算
-				incomeAmount = incomeAmount.add(RegularIncomeAmount.from(incomeRegistData));
+				incomeAmount = incomeAmount.add(RegularIncomeAmount.from(incomeCategory, incomeKingaku));
 				// 積立金取崩金額を加算
-				withdrawingAmount = withdrawingAmount.add(WithdrawingAmount.from(incomeRegistData));
+				withdrawingAmount = withdrawingAmount.add(WithdrawingAmount.from(incomeCategory, incomeKingaku));
 
 			// データタイプが新規追加の場合、収入テーブルに対象データを追加
 			} else if (Objects.equals(incomeRegistData.getDataType(), MyHouseholdAccountBookContent.DATA_TYPE_NEW)) {
 
 				// セッションの収支登録情報と発番した収入コードをもとに収入テーブル情報(ドメイン)を生成
-				IncomeItem addIncomeData = IncomeItem.createIncomeItem(
-						// ユーザID
+				IncomeItem addIncomeData = createIncomeItem(
 						userId,
-						// 対象年月
 						targetYearMonth,
 						// 収入コード(新規発番)
 						IncomeCode.from(++incomeDataCount),
-						// 収支登録情報(セッション)
 						incomeRegistData);
 				// 収入テーブルに登録
 				int addCount = incomeRepository.add(addIncomeData);
@@ -237,10 +262,10 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 				if(addCount != 1) {
 					throw new MyHouseholdAccountBookRuntimeException("収入テーブル:INCOME_TABLEへの追加件数が不正でした。[件数=" + addCount + "][add data:" + addIncomeData + "]");
 				}
-				// 収入金額を加算
-				incomeAmount = incomeAmount.add(RegularIncomeAmount.from(incomeRegistData));
+				// 収入金額を加算(生成済みのaddIncomeDataから取得。incomeRegistDataからの再変換はしない)
+				incomeAmount = incomeAmount.add(RegularIncomeAmount.from(addIncomeData.getIncomeCategory(), addIncomeData.getIncomeAmount()));
 				// 積立金取崩金額を加算
-				withdrawingAmount = withdrawingAmount.add(WithdrawingAmount.from(incomeRegistData));
+				withdrawingAmount = withdrawingAmount.add(WithdrawingAmount.from(addIncomeData.getIncomeCategory(), addIncomeData.getIncomeAmount()));
 				// 収入情報更新あり
 				incomeUpdateFlg = true;
 
@@ -251,14 +276,11 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 				if (Objects.equals(incomeRegistData.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_UPDATE)) {
 
 					// セッションの収支登録情報から収入テーブル情報(ドメイン)を生成
-					IncomeItem updIncomeData = IncomeItem.createIncomeItem(
-							// ユーザID
+					IncomeItem updIncomeData = createIncomeItem(
 							userId,
-							// 対象年月
 							targetYearMonth,
 							// 収入コード(セッション)
 							IncomeCode.from(incomeRegistData.getIncomeCode()),
-							// 収支登録情報(セッション)
 							incomeRegistData);
 					// 収入テーブルを更新
 					int updCount = incomeRepository.update(updIncomeData);
@@ -266,10 +288,10 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 					if(updCount != 1) {
 						throw new MyHouseholdAccountBookRuntimeException("収入テーブル:INCOME_TABLEへの更新件数が不正でした。[件数=" + updCount + "][update data:" + updIncomeData + "]");
 					}
-					// 収入金額を加算
-					incomeAmount = incomeAmount.add(RegularIncomeAmount.from(incomeRegistData));
+					// 収入金額を加算(生成済みのupdIncomeDataから取得。incomeRegistDataからの再変換はしない)
+					incomeAmount = incomeAmount.add(RegularIncomeAmount.from(updIncomeData.getIncomeCategory(), updIncomeData.getIncomeAmount()));
 					// 積立金取崩金額を加算
-					withdrawingAmount = withdrawingAmount.add(WithdrawingAmount.from(incomeRegistData));
+					withdrawingAmount = withdrawingAmount.add(WithdrawingAmount.from(updIncomeData.getIncomeCategory(), updIncomeData.getIncomeAmount()));
 					// 収入情報更新あり
 					incomeUpdateFlg = true;
 
@@ -277,14 +299,11 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 				} else if (Objects.equals(incomeRegistData.getAction(), MyHouseholdAccountBookContent.ACTION_TYPE_DELETE)) {
 
 					// セッションの収支登録情報から収入テーブル情報(ドメイン)を生成
-					IncomeItem delIncomeData = IncomeItem.createIncomeItem(
-							// ユーザID
+					IncomeItem delIncomeData = createIncomeItem(
 							userId,
-							// 対象年月
 							targetYearMonth,
 							// 収入コード(セッション)
 							IncomeCode.from(incomeRegistData.getIncomeCode()),
-							// 収支登録情報(セッション)
 							incomeRegistData);
 					// 収入テーブルの対象データを論理削除
 					int delCount = incomeRepository.delete(delIncomeData);
@@ -305,6 +324,33 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 		}
 
 		return new IncomeProcessResult(incomeUpdateFlg, incomeAmount, withdrawingAmount);
+	}
+
+	/**
+	 *<pre>
+	 * セッションの収入登録情報から収入テーブル情報(ドメイン)を生成して返します。
+	 * セッションDTOの各項目をドメインタイプに変換してから、ドメイン層のIncomeItem.createIncomeItem()に渡します
+	 * (ドメイン層がプレゼンテーション層のセッションDTOに依存しないようにするため)。
+	 *</pre>
+	 * @param userId ユーザID
+	 * @param targetYearMonth 対象年月
+	 * @param incomeCode 収入コード
+	 * @param incomeRegistData 収入登録情報(セッション)
+	 * @return 収入テーブル情報(ドメイン)
+	 *
+	 */
+	private IncomeItem createIncomeItem(UserId userId, TargetYearMonth targetYearMonth,
+			IncomeCode incomeCode, IncomeRegistItem incomeRegistData) {
+		return IncomeItem.createIncomeItem(
+				userId,
+				targetYearMonth,
+				incomeCode,
+				// 収入区分
+				IncomeCategory.from(incomeRegistData.getIncomeCategory()),
+				// 収入詳細
+				IncomeDetailContext.from(incomeRegistData.getIncomeDetailContext()),
+				// 収入金額
+				IncomeAmount.from(incomeRegistData.getIncomeKingaku()));
 	}
 
 	/**
@@ -346,7 +392,7 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 			} else if (Objects.equals(expenditureRegistData.getDataType(), MyHouseholdAccountBookContent.DATA_TYPE_NEW)) {
 
 				// セッションの支出登録情報と新規発番した支出コードをもとに支出テーブル情報(ドメイン)を生成
-				ExpenditureItem addExpenditureData = ExpenditureItem.createExpenditureItem(
+				ExpenditureItem addExpenditureData = createExpenditureItem(
 						// 初期登録かどうかのフラグ
 						initFlg,
 						// ユーザID
@@ -387,7 +433,7 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 							SearchQueryUserIdAndYearMonthAndExpenditureCode.from(userId, targetYearMonth, sisyutuCode));
 
 					// セッションの支出登録情報から支出テーブル情報(ドメイン)を生成
-					ExpenditureItem updExpenditureData = ExpenditureItem.createExpenditureItem(
+					ExpenditureItem updExpenditureData = createExpenditureItem(
 							// 初期登録かどうかのフラグ
 							initFlg,
 							// ユーザID
@@ -425,7 +471,7 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 							SearchQueryUserIdAndYearMonthAndExpenditureCode.from(userId, targetYearMonth, sisyutuCode));
 
 					// セッションの支出登録情報から支出テーブル情報(ドメイン)を生成
-					ExpenditureItem delExpenditureData = ExpenditureItem.createExpenditureItem(
+					ExpenditureItem delExpenditureData = createExpenditureItem(
 							// 初期登録かどうかのフラグ
 							initFlg,
 							// ユーザID
@@ -461,6 +507,51 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 		}
 
 		return new ExpenditureProcessResult(expenditureUpdateFlg, expenditureAmount, expectedExpenditureAmount);
+	}
+
+	/**
+	 *<pre>
+	 * セッションの支出登録情報から支出テーブル情報(ドメイン)を生成して返します。
+	 * セッションDTOの各項目をドメインタイプに変換してから、ドメイン層のExpenditureItem.createExpenditureItem()に渡します
+	 * (ドメイン層がプレゼンテーション層のセッションDTOに依存しないようにするため)。
+	 *</pre>
+	 * @param initFlg 初期登録かどうかのフラグ
+	 * @param userId ユーザID
+	 * @param targetYearMonth 対象年月
+	 * @param expenditureCode 支出コード
+	 * @param expenditureRegistData 支出登録情報(セッション)
+	 * @return 支出テーブル情報(ドメイン)
+	 *
+	 */
+	private ExpenditureItem createExpenditureItem(boolean initFlg, UserId userId, TargetYearMonth targetYearMonth,
+			ExpenditureCode expenditureCode, ExpenditureRegistItem expenditureRegistData) {
+		return ExpenditureItem.createExpenditureItem(
+				// 初期登録かどうかのフラグ
+				initFlg,
+				// ユーザID
+				userId,
+				// 対象年月
+				targetYearMonth,
+				// 支出コード
+				expenditureCode,
+				// 支出項目コード
+				ExpenditureItemCode.from(expenditureRegistData.getExpenditureItemCode()),
+				// イベントコード
+				ExpenditureEventCode.from(expenditureRegistData.getEventCode()),
+				// 支出名称
+				ExpenditureName.from(expenditureRegistData.getExpenditureName()),
+				// 支出区分
+				ExpenditureCategory.from(expenditureRegistData.getExpenditureCategory()),
+				// 支出詳細
+				ExpenditureDetailContext.from(expenditureRegistData.getExpenditureDetailContext()),
+				// 支払日
+				PaymentDate.from(targetYearMonth.getValue(), expenditureRegistData.getSiharaiDate()),
+				// 支払方法コード
+				PaymentMethodCode.from(expenditureRegistData.getPaymentMethodCode()),
+				// 支払金額
+				ExpenditureAmount.from(expenditureRegistData.getExpenditureKingaku()),
+				// 0円開始設定フラグ
+				expenditureRegistData.isClearStartFlg());
 	}
 
 	/**
@@ -572,11 +663,11 @@ public class IncomeAndExpenditureRegistConfirmUseCase {
 				throw new MyHouseholdAccountBookRuntimeException(msb.toString());
 			}
 
-			response.addMessage(String.format("%s年%s月度の収支情報を登録しました。", targetYearMonth.getYear(), targetYearMonth.getMonth()));
+			response.addMessage(String.format("%s年%s月度の収支情報を登録しました。", targetYearMonth.getTargetYear().getValue(), targetYearMonth.getTargetMonth().getValue()));
 
 		// 収支テーブル更新なしの場合、メッセージを設定
 		} else {
-			response.addMessage(String.format("【注意】%s年%s月度の収支情報の変更箇所がありませんでした。", targetYearMonth.getYear(), targetYearMonth.getMonth()));
+			response.addMessage(String.format("【注意】%s年%s月度の収支情報の変更箇所がありませんでした。", targetYearMonth.getTargetYear().getValue(), targetYearMonth.getTargetMonth().getValue()));
 		}
 	}
 

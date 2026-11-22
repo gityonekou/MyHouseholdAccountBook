@@ -3,9 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/09/08 : 1.00.00  新規作成
- * 2026/03/15 : 1.01.00  クラス名をSisyutuDetailContextからExpenditureDetailContextにリネーム
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/09/08 : 1.00.00                      新規作成
+ * 2026/03/15 : 1.01.00  feature-1.00-dev00  クラス名をSisyutuDetailContextからExpenditureDetailContextにリネーム
  *
  */
 package com.yonetani.webapp.accountbook.domain.type.account.expenditure;
@@ -45,6 +45,21 @@ public class ExpenditureDetailContext {
 		return new ExpenditureDetailContext(context);
 	}
 
+	/**
+	 *<pre>
+	 * 「支出詳細」項目の値を文字列形式で返却します。
+	 * 値がnullの場合は空文字を返却します。
+	 *</pre>
+	 * @return 文字列形式の「支出詳細」項目の値
+	 *
+	 */
+	public String toFormatString() {
+		if (value == null) {
+			return "";
+		}
+		return value;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

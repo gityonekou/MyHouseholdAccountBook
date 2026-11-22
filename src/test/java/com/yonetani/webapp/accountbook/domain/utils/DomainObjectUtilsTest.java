@@ -1,5 +1,10 @@
 /**
  * DomainObjectUtilsのテストクラスです。
+  *
+ *------------------------------------------------
+ * 更新履歴
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/04/16 : 1.00.00  feature-1.00-dev00  新規作成
  *
  */
 package com.yonetani.webapp.accountbook.domain.utils;

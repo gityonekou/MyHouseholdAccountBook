@@ -3,9 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/09/08 : 1.00.00  新規作成
- * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/09/08 : 1.00.00                      新規作成
+ * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.dto.account.expenditure;
@@ -56,9 +56,11 @@ public class ExpenditureReadWriteDto {
 	private final BigDecimal sisyutuYoteiKingaku;
 	// 支出金額
 	private final BigDecimal sisyutuKingaku;
+	// 支払方法コード
+	private final String paymentMethodCode;
 	// 削除フラグ
 	private final boolean deleteFlg;
-	
+
 	/**
 	 *<pre>
 	 * 支出テーブル情報ドメインモデルをもとにExpenditureReadWriteDtoを生成して返します。
@@ -93,6 +95,8 @@ public class ExpenditureReadWriteDto {
 				domain.getExpectedExpenditureAmount().getValue(),
 				// 支出金額
 				domain.getExpenditureAmount().getValue(),
+				// 支払方法コード
+				domain.getPaymentMethodCode().getValue(),
 				// 削除フラグ
 				domain.getDeleteFlg().getValue());
 	}

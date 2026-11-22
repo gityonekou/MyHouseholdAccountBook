@@ -21,6 +21,11 @@
  * - イベントテーブル：0001（イベント費(0058)に紐付くテストイベント）
  * </pre>
  *
+ *------------------------------------------------
+ * 更新履歴
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/01/25 : 1.00.00  feature-1.00-dev00  新規作成
+ *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
 
@@ -45,6 +50,9 @@ import com.yonetani.webapp.accountbook.presentation.session.LoginUserInfo;
  * ExpenditureItemSelectUseCaseについて、
  * UseCase→Component→Repository→DB の結合動作を検証します。
  *</pre>
+ *
+ * @author ：Kouki Yonetani
+ * @since 家計簿アプリ(1.00)
  *
  */
 @SpringBootTest

@@ -8,6 +8,30 @@ MyHouseholdAccountBook is a personal household account book web application buil
 
 **Tech Stack**: Spring Boot 3.0.7, Spring Security 6.0.7, MyBatis 3.0.2, Thymeleaf, Lombok, MariaDB (production), H2 (test)
 
+## Must-Follow Specifications（絶対順守）
+
+Before starting any implementation or modification work, read these in full. They are binding across all chats/sessions on this project — not passive reference material. Add new documents here as they are promoted to must-follow status.
+
+- `docs/specifications/05_DDD設計方針書.md` - DDD design policy (layering rules, aggregate boundaries, design decisions)
+- `docs/specifications/06_コーディング規約.md` - Coding conventions (file header update-history format, `@since` versioning, encoding/line-ending standard per file type, indent/brace style, Javadoc style, import order, field comments, domain factory method (`from()`) type-safety rules)
+- `docs/specifications/07_テスト方針書.md` - Project-wide test strategy (coverage targets, naming conventions, quality standards)
+
+### Updating these specifications
+
+If work on this project surfaces something that should be added to or corrected in any of the three documents above, or in a document they reference (e.g. `docs/integration-test-guidelines.md`, `docs/test-data-design-rules.md`), do not edit it directly. Propose the specific change (what, where, why) to the user first, and apply it only after the user explicitly approves.
+
+## Commit Workflow（コミット運用）
+
+実装作業が完了した後、コミット・pushまでは以下の手順を順守する（ユーザから別途「今回はこの手順を省略してよい」等の明示的な指示がない限り、本プロジェクトの全チャット・セッションに適用する）。
+
+1. **ユーザによる実機確認**：ユーザの環境でテスト（疎通確認・ユーザテスト等）を実施してもらう。依頼時にClaude側で確認観点をリストで一覧化してユーザに提示する（一覧化の詳細基準は`docs/manual-verification-guidelines.md`参照）。
+2. **ソース・テストソースのレビュー（Claude側）**：ユーザから実機確認完了の報告を受けたら、今回の作業で変更したソースコード・テストコードを改めてレビューする。問題が見つかった場合は修正し、再度ユーザに確認してもらう。
+3. **ソース・テストソースのレビュー（ユーザ側）**：Claude側のレビューで問題がないことを確認したら、ユーザ自身にも変更したソースコード・テストコードをレビューしてもらい、問題ないことを確認してもらう。ユーザから指摘があった場合は修正し、1または2からやり直す。
+4. **コミット対象ファイルのユーザ確認**：ユーザ側のレビューでも問題がないことを確認したら、コミット対象となるファイル（`git status`等で変更が検知されたファイル）を一覧でユーザに提示し、コミットしてよいか明示的な確認を得る。ユーザが今回の作業で指示していない無関係な変更（既存の未追跡ファイル等）は対象に含めない。
+5. **コミット・push**：ユーザの確認が取れたら、コミットし、その後リモートへpushする。
+
+この手順は、コミット・push実行には明示的な指示が必要という既存の基本方針に対する、本プロジェクトでの具体的な運用手順を定めたものである。
+
 ## Build Commands
 
 ```bash
@@ -113,13 +137,15 @@ Phase 1-5 refactoring (DDD準拠リファクタリング) is complete. Documents
 
 ## Documentation
 
+- `docs/ドメイン用語集.md` - Domain glossary (収支/支出項目/固定費/支払方法/銀行口座/システム予約値 etc.); update whenever a feature introduces new domain terms
 - `docs/test-data-design-rules.md` - Test data conventions
 - `docs/integration-test-guidelines.md` - UseCase integration test detailed guidelines (response verification, assertion rules, session/DB patterns)
 - `docs/DDD設計_金額クラス統合判断基準.md` - Money class design decisions
-- `docs/specifications/07_テスト方針書.md` - Project-wide test strategy (coverage targets, naming conventions, quality standards)
 - `docs/archive/income-expenditure-refactoring/` - Archived Phase 1-5 refactoring documents
 - `docs/archive/fixedcost/` - Archived fixed cost feature documents (Feature1.01: UseCase分割・機能追加, Feature1.02: 0円固定費対応)
 - `docs/archive/account-month-inquiry/` - Archived monthly account inquiry feature documents (Feature1.02: 支出別一覧追加)
+
+(`docs/specifications/05_DDD設計方針書.md` / `06_コーディング規約.md` / `07_テスト方針書.md` moved to **Must-Follow Specifications** above)
 
 ## Japanese Conventions
 

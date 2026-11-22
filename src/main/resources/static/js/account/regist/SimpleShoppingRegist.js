@@ -8,6 +8,31 @@ $(function() {
 	$("#shoppingDate").datepicker();
 });
 
+// 店舗名の値変更時、選択した店舗のデフォルト支払方法を支払方法欄に自動設定する(5.6節)。
+// 新規登録時(action=add)のみ自動設定し、更新時(action=update)は登録済みの実際の支払方法を優先し上書きしない。
+// ユーザーが自動設定後に手動で支払方法を変更することは妨げない(あくまで初期値のヒント)。
+// デフォルト支払方法が未設定の店舗に切り替えた場合は、支払方法欄を未選択状態に戻す。
+function applyDefaultPaymentMethodFromSelectedShop() {
+	if ($('#SimpleShoppingRegistInfo [name=action]').val() !== 'add') {
+		return;
+	}
+	let defaultPaymentMethodCode = $('#shopCode').find('option:selected').attr('data-default-payment-method');
+	$('#SimpleShoppingRegistInfo [name=paymentMethodCode]').val(defaultPaymentMethodCode ? defaultPaymentMethodCode : '');
+}
+$('#shopCode').change(function() {
+	applyDefaultPaymentMethodFromSelectedShop();
+});
+
+// 初期表示時、店舗名選択欄は先頭の店舗がブラウザにより暗黙的に選択されるため、
+// 支払方法が未選択の場合に限り、先頭店舗のデフォルト支払方法を反映する(新規登録時のみ)。
+// (支払方法が既に選択されている場合はバリデーションエラー再表示等でユーザーの選択値を保持するため上書きしない)
+$(function() {
+	if ($('#SimpleShoppingRegistInfo [name=action]').val() === 'add'
+			&& !$('#SimpleShoppingRegistInfo [name=paymentMethodCode]').val()) {
+		applyDefaultPaymentMethodFromSelectedShop();
+	}
+});
+
 // 店舗区分の値変更時
 $('#shopKubunCode').change(function() {
 	// 買い物登録フォームの送信データをコピー
@@ -86,7 +111,6 @@ $(function(){
 		totalAmountValue = addValue(totalAmountValue, $('#SimpleShoppingRegistInfo [name=shoppingClothesExpenses]'));
 		totalAmountValue = addValue(totalAmountValue, $('#SimpleShoppingRegistInfo [name=shoppingWorkExpenses]'));
 		totalAmountValue = addValue(totalAmountValue, $('#SimpleShoppingRegistInfo [name=shoppingHouseEquipmentExpenses]'));
-		totalAmountValue = addValue(totalAmountValue, $('#SimpleShoppingRegistInfo [name=shoppingCouponPrice]'));
 
 		// 消費税合計を加算していく
 		let taxTotalAmountValue = "";
@@ -108,11 +132,13 @@ $(function(){
 			$('#SimpleShoppingRegistInfo [name=shoppingTotalAmount]').val("");
 			$('#SimpleShoppingRegistInfo [name=shoppingTotalAmountView]').val("");
 		} else if (taxTotalAmountValue === "") {
+			totalAmountValue = subtractValue(totalAmountValue, $('#SimpleShoppingRegistInfo [name=shoppingCouponPrice]'));
 			$('#SimpleShoppingRegistInfo [name=shoppingTotalAmount]').val(totalAmountValue);
 			$('#SimpleShoppingRegistInfo [name=shoppingTotalAmountView]').val(totalAmountValue);
 		} else {
-			$('#SimpleShoppingRegistInfo [name=shoppingTotalAmount]').val(totalAmountValue + taxTotalAmountValue);
-			$('#SimpleShoppingRegistInfo [name=shoppingTotalAmountView]').val(totalAmountValue + taxTotalAmountValue);
+			totalAmountValue = subtractValue(totalAmountValue + taxTotalAmountValue, $('#SimpleShoppingRegistInfo [name=shoppingCouponPrice]'));
+			$('#SimpleShoppingRegistInfo [name=shoppingTotalAmount]').val(totalAmountValue);
+			$('#SimpleShoppingRegistInfo [name=shoppingTotalAmountView]').val(totalAmountValue);
 		}
 	});
 	
@@ -126,7 +152,7 @@ $(function(){
 		element.val(workStr);
 		return workStr;
 	}
-		
+	
 	// 入力エリアの値を数値変換し、amountValueで渡された値に加算した結果を返します。
 	addValue = function(amountValue, element){
 		// 入力エリアの値を取得
@@ -150,7 +176,31 @@ $(function(){
 			return amountValue + numValue;
 		}
 	}
+	
+	// 入力エリアの値を数値変換し、amountValueで渡された値を減算した結果を返します。
+	subtractValue = function(amountValue, element){
+		// 入力エリアの値を取得
+		let elementValue = getElementValue(element);
 		
+		// 引数で渡されたamountValueの値に入力値の数値を加算の場合、渡されたamountValueの値をそのまま返却
+		// (空文字列、全角数値変換後の)入力値が空文字列
+		if(elementValue === "") {
+			return amountValue;
+		}
+		// 入力値を数値に変換
+		let numValue = Number(elementValue);
+		// 数値変換に失敗した場合は渡されたamountValueの値をそのまま返却
+		if(!Number.isFinite(Number(numValue))) {
+			return amountValue;
+		// amountValueの値が空文字列(まだ数値の加算なし)の場合、変換した数値の値を返却
+		} else if(amountValue === "") {
+			return numValue;
+		// 減算した値を返却
+		} else {
+			return amountValue - numValue;
+		}
+	}
+	
 	// 指定のエレメントの値に対応する軽減消費税(8%)の値を返します。
 	reducedSalesTaxValue = function(element){
 		let elementValue = getElementValue(element);

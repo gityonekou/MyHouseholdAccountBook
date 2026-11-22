@@ -3,14 +3,14 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/05/27 : 1.01.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/05/27 : 1.00.00  feature-1.01-dev3   新規作成
+ * 2026/09/23 : 1.01.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.itemmanage.fixedcost;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
@@ -92,14 +92,22 @@ class FixedCostMonthlyDetailUseCaseIntegrationTest {
 		assertEquals("10",   response.getPrevMonth(),          "prevMonth");
 		assertEquals("12",   response.getNextMonth(),          "nextMonth");
 
-		// 4件・DB取得順の確認
+		// 4件・DB取得順の確認(固定費コードでDB取得結果順が正しいことを確認)
 		List<FixedCostItem> items = response.getFixedCostItemList();
 		assertEquals(4, items.size(), "11月: 4件");
-		assertEquals("0003", items.get(0).getFixedCostCode(), "index0=国民年金保険");
+		FixedCostItem item = items.get(0);
+		assertEquals("0003", item.getFixedCostCode(), "index0=国民年金保険");
 		assertEquals("0001", items.get(1).getFixedCostCode(), "index1=家賃");
 		assertEquals("0002", items.get(2).getFixedCostCode(), "index2=電気代概算");
 		assertEquals("0004", items.get(3).getFixedCostCode(), "index3=その他任意テスト");
-
+		// 明細確認
+		assertEquals("国民年金保険", item.getSisyutuItemName(), "index0=支出項目名");
+		assertEquals("国民年金保険支払（奇数月）", item.getShiharaiName(), "index0=支払名");
+		assertEquals("奇数月", item.getShiharaiTuki(), "index0=支払月");
+		assertEquals("月初営業日", item.getShiharaiDay(), "index0=支払日");
+		assertEquals("みんなのテスト＠銀行　口座振替", item.getPaymentMethodName(), "index0=支払方法名（解決済み）");
+		assertEquals("16,590円", item.getShiharaiKingaku(), "index0=支払金額");
+		assertNull(item.getOptionalContext(), "index0=その他任意詳細");
 		// 当月合計
 		assertEquals("98,590円", response.getMonthlyTotal(), "11月合計");
 	}
@@ -171,18 +179,18 @@ class FixedCostMonthlyDetailUseCaseIntegrationTest {
 	 * 【検証内容】
 	 * ・1月の前月が12月にラップすること（prevMonth="12"）
 	 * ・nextMonth="02"
-	 * ・displayMonthLabel="1月"（先頭0なし）
+	 * ・displayMonthLabel="01月"
 	 * ・4件、合計=98,590円
 	 *</pre>
 	 */
 	@Test
-	@DisplayName("④ month=01（年初ラップ） → prevMonth=12・displayMonthLabel=1月（先頭0なし）")
+	@DisplayName("④ month=01（年初ラップ） → prevMonth=12・displayMonthLabel=01月")
 	void testReadMonthlyDetail_年初ラップ() {
 		FixedCostMonthlyDetailResponse response = useCase.readMonthlyDetail(USER01, "01");
 
 		// 1月の前月は12月にラップ
 		assertFalse(response.hasMessages(), "メッセージなし");
-		assertEquals("1月", response.getDisplayMonthLabel(), "displayMonthLabel=1月（先頭0なし）");
+		assertEquals("01月", response.getDisplayMonthLabel(), "displayMonthLabel=01月");
 		assertEquals("01",  response.getCurrentMonth(),      "currentMonth=01");
 		assertEquals("12",  response.getPrevMonth(),          "prevMonth=12（年初ラップ）");
 		assertEquals("02",  response.getNextMonth(),          "nextMonth=02");
@@ -195,21 +203,21 @@ class FixedCostMonthlyDetailUseCaseIntegrationTest {
 
 	/**
 	 *<pre>
-	 * テスト⑤：month="05"（奇数月）→ displayMonthLabel="5月"（先頭0なし）、月ナビ・合計が正しいこと
+	 * テスト⑤：month="05"（奇数月）→ displayMonthLabel="05月"、月ナビ・合計が正しいこと
 	 *
 	 * 【検証内容】
-	 * ・displayMonthLabel="5月"（"05月"ではなく先頭0なし）
+	 * ・displayMonthLabel="05月"
 	 * ・currentMonth="05", prevMonth="04", nextMonth="06"
 	 * ・4件、合計=98,590円
 	 *</pre>
 	 */
 	@Test
-	@DisplayName("⑤ month=05（奇数月）→ displayMonthLabel=5月（先頭0なし）・月ナビ確認")
+	@DisplayName("⑤ month=05（奇数月）→ displayMonthLabel=05月・月ナビ確認")
 	void testReadMonthlyDetail_5月() {
 		FixedCostMonthlyDetailResponse response = useCase.readMonthlyDetail(USER01, "05");
 
 		assertFalse(response.hasMessages(), "メッセージなし");
-		assertEquals("5月", response.getDisplayMonthLabel(), "displayMonthLabel=5月（先頭0なし）");
+		assertEquals("05月", response.getDisplayMonthLabel(), "displayMonthLabel=05月");
 		assertEquals("05",  response.getCurrentMonth(),      "currentMonth=05");
 		assertEquals("04",  response.getPrevMonth(),          "prevMonth=04");
 		assertEquals("06",  response.getNextMonth(),          "nextMonth=06");

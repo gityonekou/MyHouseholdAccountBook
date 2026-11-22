@@ -3,8 +3,8 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/05/23 : 1.01.00  新規作成
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/05/23 : 1.00.00  feature-1.01-dev2   新規作成
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.fixedcost;
@@ -83,7 +83,7 @@ class FixedCostAnnualSummaryListTest {
 		assertEquals(12, rows.size(), "12行生成されること");
 		for (int i = 0; i < 12; i++) {
 			MonthlyRow row = rows.get(i);
-			assertEquals(i + 1, row.getMonth(), (i + 1) + "月のmonth値");
+			assertEquals(i + 1, row.getMonth().intValue(), (i + 1) + "月のmonth値");
 			for (AnnualSummaryColumn col : AnnualSummaryColumn.values()) {
 				assertEquals(FixedCostPaymentTotalAmount.ZERO, row.getAmount(col), (i + 1) + "月 " + col + " はZERO");
 			}

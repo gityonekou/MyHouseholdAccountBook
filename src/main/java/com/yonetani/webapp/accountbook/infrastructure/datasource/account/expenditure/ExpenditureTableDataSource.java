@@ -3,9 +3,10 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/09/08 : 1.00.00  新規作成
- * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/09/08 : 1.00.00                      新規作成
+ * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.datasource.account.expenditure;
@@ -23,7 +24,21 @@ import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserI
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureItemCode;
 import com.yonetani.webapp.accountbook.domain.model.searchquery.SearchQueryUserIdAndYearMonthAndExpenditureItemCodeAndExpenditureCategory;
 import com.yonetani.webapp.accountbook.domain.repository.account.expenditure.ExpenditureTableRepository;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCategory;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureDetailContext;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureEventCode;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureName;
+import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemCode;
+import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpectedExpenditureAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.incomeandexpenditure.ExpenditureTotalAmount;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.common.DeleteFlg;
+import com.yonetani.webapp.accountbook.domain.type.common.ExpenditureAmount;
+import com.yonetani.webapp.accountbook.domain.type.common.PaymentDate;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetYear;
+import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.infrastructure.dto.account.expenditure.ExpenditureReadWriteDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthAndSisyutuCodeSearchQueryDto;
 import com.yonetani.webapp.accountbook.infrastructure.dto.searchquery.UserIdAndYearMonthAndSisyutuItemCodeAndSisyutuKubunSearchQueryDto;
@@ -181,30 +196,32 @@ public class ExpenditureTableDataSource implements ExpenditureTableRepository {
 	private ExpenditureItem createExpenditureItem(ExpenditureReadWriteDto dto) {
 		return ExpenditureItem.from(
 				// ユーザID
-				dto.getUserId(),
+				UserId.from(dto.getUserId()),
 				// 対象年
-				dto.getTargetYear(),
+				TargetYear.from(dto.getTargetYear()),
 				// 対象月
-				dto.getTargetMonth(),
+				TargetMonth.from(dto.getTargetMonth()),
 				// 支出コード
-				dto.getSisyutuCode(),
+				ExpenditureCode.from(dto.getSisyutuCode()),
 				// 支出項目コード
-				dto.getSisyutuItemCode(),
+				ExpenditureItemCode.from(dto.getSisyutuItemCode()),
 				// イベントコード
-				dto.getEventCode(),
+				ExpenditureEventCode.from(dto.getEventCode()),
 				// 支出名称
-				dto.getSisyutuName(),
+				ExpenditureName.from(dto.getSisyutuName()),
 				// 支出区分
-				dto.getSisyutuKubun(),
+				ExpenditureCategory.from(dto.getSisyutuKubun()),
 				// 支出詳細
-				dto.getSisyutuDetailContext(),
+				ExpenditureDetailContext.from(dto.getSisyutuDetailContext()),
 				// 支払日
-				dto.getShiharaiDate(),
+				PaymentDate.from(dto.getShiharaiDate()),
+				// 支払方法コード
+				PaymentMethodCode.from(dto.getPaymentMethodCode()),
 				// 支出予定金額
-				dto.getSisyutuYoteiKingaku(),
+				ExpectedExpenditureAmount.from(dto.getSisyutuYoteiKingaku()),
 				// 支出金額
-				dto.getSisyutuKingaku(),
+				ExpenditureAmount.from(dto.getSisyutuKingaku()),
 				// 削除フラグ
-				dto.isDeleteFlg());
+				DeleteFlg.from(dto.isDeleteFlg()));
 	}
 }

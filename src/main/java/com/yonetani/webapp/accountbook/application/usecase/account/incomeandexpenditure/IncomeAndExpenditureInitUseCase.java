@@ -7,11 +7,14 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2026/02/26 : 1.00.00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
- * 2026/06/07 : 1.02.00  支払日(PaymentDate)がnullの場合の処理をPaymentDateの親クラス(NullableDateValue)のtoDayValue()メソッドに集約
- * 2026/06/14 : 1.02.01  固定費0円対応: readInitInfo()に0円注意メッセージ追加、readRegistCheckValidateInfo()新規追加（readRegistCheckErrorSetInfo()・readZeroAmountExpenditureCheckErrorSetInfo()を統合）
- * 2026/06/14 : 1.02.02  バグ修正: readRegistCheckValidateInfo()の0円チェックからACTION_TYPE_NON_UPDATEを除外（更新フローのclearStart支出誤検知修正）
+ * 日付       : version  ブランチ            コメントなど
+ * 2026/02/26 : 1.00.00  feature-1.00-dev00  新規作成（リファクタリング対応 IncomeAndExpenditureRegistUseCaseからの分離）
+ * 2026/06/07 : 1.01.00  feature-1.02-dev1   支払日(PaymentDate)がnullの場合の処理をPaymentDateの親クラス(NullableDateValue)のtoDayValue()メソッドに集約
+ * 2026/06/14 : 1.02.00  feature-1.02-dev2   固定費0円対応: readInitInfo()に0円注意メッセージ追加、readRegistCheckValidateInfo()新規追加（readRegistCheckErrorSetInfo()・readZeroAmountExpenditureCheckErrorSetInfo()を統合）
+ * 2026/06/14 : 1.02.01  feature-1.02-dev2   バグ修正: readRegistCheckValidateInfo()の0円チェックからACTION_TYPE_NON_UPDATEを除外（更新フローのclearStart支出誤検知修正）
+ * 2026/08/18 : 1.03.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/10/12 : 1.03.01  feature-1.03-dev1   追加リファクタリング対応(リダイレクトレスポンスdtoのファクトリ引数をドメインタイプに変更)
+ * 2026/11/08 : 1.03.02  feature-1.03-dev1   セッション登録情報(ExpenditureRegistItem/IncomeRegistItem)生成処理をIncomeAndExpenditureRegistItemFactoryに集約
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -43,6 +46,7 @@ import com.yonetani.webapp.accountbook.domain.repository.account.income.IncomeTa
 import com.yonetani.webapp.accountbook.domain.service.account.regist.TemporaryCodeGenerator;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditure.ExpenditureCategory;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonth;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
 import com.yonetani.webapp.accountbook.domain.type.common.UserId;
 import com.yonetani.webapp.accountbook.presentation.request.account.regist.IncomeItemForm;
@@ -78,6 +82,8 @@ public class IncomeAndExpenditureInitUseCase {
 	private final CodeTableItemComponent codeTableItem;
 	// 収支登録画面 収入・支出一覧情報生成コンポーネント
 	private final IncomeAndExpenditureRegistListComponent registListComponent;
+	// 収支登録画面 セッション登録情報(ExpenditureRegistItem/IncomeRegistItem)生成コンポーネント
+	private final IncomeAndExpenditureRegistItemFactory itemFactory;
 	// 固定費テーブル:FIXED_COST_TABLEリポジトリー
 	private final FixedCostTableRepository fixedCostRepository;
 	// 収入テーブル:INCOME_TABLEリポジトリー
@@ -120,16 +126,16 @@ public class IncomeAndExpenditureInitUseCase {
 
 		/* 固定費テーブルに登録されている固定費情報から対象年月に合致する固定費一覧を取得 */
 		// 対象の月の値を取得
-		String month = targetYearMonth.getMonth();
+		TargetMonth month = targetYearMonth.getTargetMonth();
 		// 対象月が奇数月(20) or 偶数月(30)かを取得
-		String oddEven = Integer.parseInt(month) % 2 == 1
+		String oddEven = month.intValue() % 2 == 1
 				? MyHouseholdAccountBookContent.SHIHARAI_TUKI_ODD_SELECTED_VALUE
 						: MyHouseholdAccountBookContent.SHIHARAI_TUKI_AN_EVEN_SELECTED_VALUE;
 		List<String> shiharaiTukiList = new ArrayList<>();
 		// 検索条件:毎月(00)
 		shiharaiTukiList.add(MyHouseholdAccountBookContent.SHIHARAI_TUKI_EVERY_SELECTED_VALUE);
 		// 検索条件:指定月
-		shiharaiTukiList.add(month);
+		shiharaiTukiList.add(month.getValue());
 		// 検索条件:奇数月 or 偶数月
 		shiharaiTukiList.add(oddEven);
 		// 検索条件:任意月(40)
@@ -159,31 +165,14 @@ public class IncomeAndExpenditureInitUseCase {
 			// 仮登録用支出コードの固定値部分(yyyyMMddHHmmss)
 			String nowTimeStr = TemporaryCodeGenerator.generateBase();
 
+			// 固定費一覧情報からセッションの支出登録情報リストを作成
 			List<ExpenditureRegistItem> expenditureRegistItemList = searchResult.getValues().stream().map(
-					domain -> ExpenditureRegistItem.from(
-							// データタイプ(新規)
-							MyHouseholdAccountBookContent.DATA_TYPE_NEW,
-							// アクション(新規追加)
-							MyHouseholdAccountBookContent.ACTION_TYPE_ADD,
+					domain -> itemFactory.createExpenditureRegistItemFromFixedCost(
+							targetYearMonth,
 							// 支出コード(仮登録用支出コード:yyyyMMddHHmmss999)
 							String.format("%s%03d", nowTimeStr, count.getAndIncrement()),
-							// 支出項目コード
-							domain.getExpenditureItemCode().getValue(),
-							// イベントコード:固定費からは登録不可:値設定が必要な場合は収支登録画面で設定する
-							"",
-							// 支出名
-							domain.getFixedCostName().getValue(),
-							// 支出区分:支出名から支出区分を取得
-							ExpenditureCategory.from(domain.getFixedCostName()).getValue(),
-							// 支出詳細
-							domain.getExpenditureDetailContext(),
-							// 支払日
-							domain.getFixedCostPaymentDay().getShiharaiDayValue(targetYearMonth),
-							// 支払金額
-							domain.getFixedCostPaymentAmount().getValue(),
-							// 支払金額の0円開始設定フラグ
-							domain.getFixedCostKubun().isClearStart()
-						)).collect(Collectors.toList());
+							domain)
+					).collect(Collectors.toList());
 
 			// レスポンスにセッションの支出登録情報を設定
 			response.setExpenditureRegistItemList(expenditureRegistItemList);
@@ -227,7 +216,7 @@ public class IncomeAndExpenditureInitUseCase {
 		// ドメインタイプ:対象年月
 		TargetYearMonth targetYearMonth = TargetYearMonth.from(targetYearMonthStr);
 		// レスポンスを生成
-		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth.getValue());
+		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
 
 		// 対象年月検索条件
 		SearchQueryUserIdAndYearMonth search = SearchQueryUserIdAndYearMonth.from(userId, targetYearMonth);
@@ -240,19 +229,7 @@ public class IncomeAndExpenditureInitUseCase {
 		// 収入テーブルから取得した収入情報をセッションの収入登録情報に変換
 		// 注意：セッション情報のリストは編集可とする必要があるので、可変リストで作成する必要あり
 		List<IncomeRegistItem> incomeRegistItemList = incomeList.getValues().stream().map(
-				domain -> IncomeRegistItem.from(
-						// データタイプ(DBロード)
-						MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
-						// アクション(データ更新なし)
-						MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
-						// 収入コード
-						domain.getIncomeCode().getValue(),
-						// 収入区分
-						domain.getIncomeCategory().getValue(),
-						// 収入詳細
-						domain.getIncomeDetailContext().getValue(),
-						// 収入金額
-						domain.getIncomeAmount().getValue())
+				domain -> itemFactory.createIncomeRegistItemFromIncomeItem(domain)
 				).collect(Collectors.toList());
 		// レスポンスにセッションの収入登録情報を設定
 		response.setIncomeRegistItemList(incomeRegistItemList);
@@ -263,29 +240,7 @@ public class IncomeAndExpenditureInitUseCase {
 		// 支出テーブルから取得した支出情報をセッションの支出登録情報に変換
 		// 注意：セッション情報のリストは編集可とする必要があるので、可変リストで作成する必要あり
 		List<ExpenditureRegistItem> expenditureRegistItemList = expenditureList.getValues().stream().map(
-				domain -> ExpenditureRegistItem.from(
-						// データタイプ(DBロード)
-						MyHouseholdAccountBookContent.DATA_TYPE_LOAD,
-						// アクション(データ更新なし)
-						MyHouseholdAccountBookContent.ACTION_TYPE_NON_UPDATE,
-						// 支出コード
-						domain.getExpenditureCode().getValue(),
-						// 支出項目コード
-						domain.getExpenditureItemCode().getValue(),
-						// イベントコード
-						domain.getExpenditureEventCode().getValue(),
-						// 支出名
-						domain.getExpenditureName().getValue(),
-						// 支出区分
-						domain.getExpenditureCategory().getValue(),
-						// 支出詳細
-						domain.getExpenditureDetailContext().getValue(),
-						// 支払日(日付からDDの値を取得して設定):DBはnull可
-						domain.getPaymentDate().toDayValue(),
-						// 支払金額
-						domain.getExpenditureAmount().getValue(),
-						// 支払金額の0円開始設定フラグ
-						false)
+				domain -> itemFactory.createExpenditureRegistItemFromExpenditureItem(domain)
 				).collect(Collectors.toList());
 		// レスポンスにセッションの支出登録情報を設定
 		response.setExpenditureRegistItemList(expenditureRegistItemList);
@@ -310,8 +265,13 @@ public class IncomeAndExpenditureInitUseCase {
 	public IncomeAndExpenditureRegistResponse readIncomeAndExpenditureInfoList(LoginUserInfo user, String targetYearMonth,
 			List<IncomeRegistItem> incomeRegistItemList, List<ExpenditureRegistItem> expenditureRegistItemList) {
 		log.debug("readIncomeAndExpenditureInfoList:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
+		
+		// 対象年月のドメインタイプを生成
+		TargetYearMonth domainTargetYearMonth = TargetYearMonth.from(targetYearMonth);
+		
 		// レスポンスを生成
-		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
+		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(domainTargetYearMonth);
+		
 		// セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を設定
 		registListComponent.setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
 
@@ -337,9 +297,12 @@ public class IncomeAndExpenditureInitUseCase {
 	public IncomeAndExpenditureRegistResponse readRegistCheckValidateInfo(LoginUserInfo user, String targetYearMonth,
 			List<IncomeRegistItem> incomeRegistItemList, List<ExpenditureRegistItem> expenditureRegistItemList) {
 		log.debug("readRegistCheckValidateInfo:userid=" + user.getUserId() + ",targetYearMonth=" + targetYearMonth);
-
+		
+		// 対象年月のドメインタイプを生成
+		TargetYearMonth domainTargetYearMonth = TargetYearMonth.from(targetYearMonth);
+		
 		// レスポンスを生成
-		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(targetYearMonth);
+		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(domainTargetYearMonth);
 		// セッションの収入登録情報、支出登録情報をもとに、画面表示する収入一覧情報、支出一覧情報を設定
 		registListComponent.setIncomeAndExpenditureInfoList(UserId.from(user.getUserId()), incomeRegistItemList, expenditureRegistItemList, response);
 
@@ -395,10 +358,14 @@ public class IncomeAndExpenditureInitUseCase {
 			throw new MyHouseholdAccountBookRuntimeException("コード定義ファイルに「収入区分情報："
 					+ MyHouseholdAccountBookContent.CODE_DEFINES_INCOME_KUBUN + "」が登録されていません。管理者に問い合わせてください");
 		}
+		
+		// 対象年月のドメインタイプを生成
+		TargetYearMonth domainTargetYearMonth = TargetYearMonth.from(targetYearMonth);
+		
 		// レスポンスを生成
 		IncomeAndExpenditureRegistResponse response = IncomeAndExpenditureRegistResponse.getInstance(
 				// 収支対象の年月(YYYMM)
-				targetYearMonth,
+				domainTargetYearMonth,
 				// 収入情報入力フォーム
 				incomeItemForm,
 				// 収入区分選択ボックスの表示情報リストはデフォルト値が追加されるので、不変ではなく可変でリストを生成して設定

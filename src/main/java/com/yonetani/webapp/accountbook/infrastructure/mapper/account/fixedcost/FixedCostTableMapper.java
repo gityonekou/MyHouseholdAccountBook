@@ -3,9 +3,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/06/04 : 1.00.00  新規作成
- * 2026/05/23 : 1.01.01  年間固定費合計画面新規追加対応
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/06/04 : 1.00.00                      新規作成
+ * 2026/05/23 : 1.01.00  feature-1.01-dev3   年間固定費合計画面新規追加対応
  *
  */
 package com.yonetani.webapp.accountbook.infrastructure.mapper.account.fixedcost;
@@ -110,9 +110,10 @@ public interface FixedCostTableMapper {
 	/**
 	 *<pre>
 	 * 指定のユーザID、固定費支払月を条件に固定費テーブル:FIXED_COST_TABLEを参照します。
+	 * 支出項目テーブル:SISYUTU_ITEM_TABLEとJOINし、支出項目の表示順(SISYUTU_ITEM_SORT)でソートして返します。
 	 *</pre>
 	 * @param search 検索条件:ユーザID、固定費支払月のリスト(in条件に指定する固定費支払月)
-	 * @return 固定費情報参照結果のリスト
+	 * @return 固定費情報参照結果のリスト(支出項目の表示順)
 	 *
 	 */
 	@Select("sql/account/fixedcost/FixedCostTableListSelectSql01.sql")

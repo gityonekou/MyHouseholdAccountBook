@@ -188,6 +188,7 @@
 										<tr class="table-secondary">
 											<th scope="col" class="w20">支出名(区分)</th>
 											<th scope="col" class="w5">支払日</th>
+											<th scope="col" class="w25">支払方法</th>
 											<th scope="col" class="w10" style="vertical-align:middle; text-align:center;">支出金額</th>
 											<th scope="col" class="w5">&emsp;</th>
 											<th scope="col">支出詳細</th>
@@ -198,6 +199,7 @@
 											<tr th:class="${iterStat.odd} ? 'table-warning' : ''">
 												<td class="w20" th:text="${item.displayName}">支出名(区分)</td>
 												<td class="w5" th:text="${item.paymentDay}">支払日</td>
+												<td class="w25" th:text="${item.paymentMethodName}">支払方法</td>
 												<td class="w10" align="right" th:text="${item.expenditureAmount}">支出金額</td>
 												<td class="w5" align="center">
 													<form method="post"
@@ -213,9 +215,9 @@
 										</th:block>
 										<!-- 支出合計行 -->
 										<tr class="table-success">
-											<td class="w25" colspan="2">支出合計</td>
+											<td class="w25" colspan="3">支出合計</td>
 											<td class="w10" align="right" th:text="${expenditureTotalAmount}">支出合計</td>
-											<td colspan="2"></td>
+											<td colspan="3"></td>
 										</tr>
 									</tbody>
 								</table>
@@ -231,15 +233,6 @@
 								</form>
 							</div>
 						</div>
-					</div>
-					
-					<!-- 年間収支タブエリア -->
-					<div class="tab-pane fade" id="nav-nenkan-syuusi" role="tabpanel" aria-labelledby="nav--nenkan-syuusi-tab">
-						<p class="px-3">これは、<strong>年間収支</strong>に関連付けられたコンテンツのプレースホルダーコンテンツ。[このタブは常に表示されない]</p>
-					</div>
-					<!-- 支払い確認タブエリア -->
-					<div class="tab-pane fade" id="nav-siharai" role="tabpanel" aria-labelledby="nav-siharai-tab">
-						<p class="px-3">これは、<strong>支払い確認</strong>に関連付けられたコンテンツのプレースホルダーコンテンツ。[このタブは常に表示されない]</p>
 					</div>
 					
 				</div>

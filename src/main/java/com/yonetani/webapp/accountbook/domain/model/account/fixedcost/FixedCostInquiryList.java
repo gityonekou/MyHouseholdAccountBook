@@ -3,22 +3,23 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/06/07 : 1.00.00  新規作成
- * 2026/03/20 : 1.01.00  リファクタリング対応(DDD適応)
- * 2026/05/07 : 1.01.01  合計フィールド廃止・calculateMonthlyTotal()メソッド追加
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/06/07 : 1.00.00                      新規作成
+ * 2026/03/20 : 1.01.00  feature-1.00-dev00  リファクタリング対応(DDD適応)
+ * 2026/05/07 : 1.02.00  feature-1.01-dev2   合計フィールド廃止・calculateMonthlyTotal()メソッド追加
+ * 2026/08/18 : 1.03.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
+ * 2026/09/23 : 1.03.01  feature-1.03-dev1   追加リファクタリング対応
+ * 2026/10/18 : 1.03.02  feature-1.03-dev1   支払月判定ロジック重複解消対応 shouldAdd削除、FixedCostTargetPaymentMonth#appliesToMonthに移譲
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.account.fixedcost;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.util.CollectionUtils;
 
-import com.yonetani.webapp.accountbook.common.content.MyHouseholdAccountBookContent;
 import com.yonetani.webapp.accountbook.domain.type.account.expenditureinfo.ExpenditureItemName;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostCode;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostDetailContext;
@@ -28,7 +29,8 @@ import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPa
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostPaymentTotalAmount;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonth;
 import com.yonetani.webapp.accountbook.domain.type.account.fixedcost.FixedCostTargetPaymentMonthOptionalContext;
-import com.yonetani.webapp.accountbook.domain.type.common.TargetYearMonth;
+import com.yonetani.webapp.accountbook.domain.type.account.paymentmethod.PaymentMethodCode;
+import com.yonetani.webapp.accountbook.domain.type.common.TargetMonth;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -57,7 +59,7 @@ public class FixedCostInquiryList {
 	 *</pre>
 	 *
 	 * @author ：Kouki Yonetani
-	 * @since 家計簿アプリ(1.00.A)
+	 * @since 家計簿アプリ(1.00)
 	 *
 	 */
 	@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -79,6 +81,8 @@ public class FixedCostInquiryList {
 		private final FixedCostTargetPaymentMonthOptionalContext fixedCostTargetPaymentMonthOptionalContext;
 		// 固定費支払日(支払日)
 		private final FixedCostPaymentDay fixedCostPaymentDay;
+		// 支払方法コード
+		private final PaymentMethodCode paymentMethodCode;
 		// 支払金額
 		private final FixedCostPaymentAmount fixedCostPaymentAmount;
 
@@ -93,29 +97,25 @@ public class FixedCostInquiryList {
 		 * @param fixedCostTargetPaymentMonth 固定費支払月(支払月)
 		 * @param fixedCostTargetPaymentMonthOptionalContext 固定費支払月任意詳細
 		 * @param fixedCostPaymentDay 固定費支払日(支払日)
+		 * @param paymentMethodCode 支払方法コード
 		 * @param fixedCostPaymentAmount 支払金額
 		 * @return 固定費一覧明細情報を表すドメインモデル
 		 *
 		 */
 		public static FixedCostInquiryItem from(
-				String fixedCostCode,
-				String fixedCostName,
-				String fixedCostDetailContext,
-				String expenditureItemName,
-				String fixedCostTargetPaymentMonth,
-				String fixedCostTargetPaymentMonthOptionalContext,
-				String fixedCostPaymentDay,
-				BigDecimal fixedCostPaymentAmount
+				FixedCostCode fixedCostCode,
+				FixedCostName fixedCostName,
+				FixedCostDetailContext fixedCostDetailContext,
+				ExpenditureItemName expenditureItemName,
+				FixedCostTargetPaymentMonth fixedCostTargetPaymentMonth,
+				FixedCostTargetPaymentMonthOptionalContext fixedCostTargetPaymentMonthOptionalContext,
+				FixedCostPaymentDay fixedCostPaymentDay,
+				PaymentMethodCode paymentMethodCode,
+				FixedCostPaymentAmount fixedCostPaymentAmount
 				) {
 			return new FixedCostInquiryItem(
-					FixedCostCode.from(fixedCostCode),
-					FixedCostName.from(fixedCostName),
-					FixedCostDetailContext.from(fixedCostDetailContext),
-					ExpenditureItemName.from(expenditureItemName),
-					FixedCostTargetPaymentMonth.from(fixedCostTargetPaymentMonth),
-					FixedCostTargetPaymentMonthOptionalContext.from(fixedCostTargetPaymentMonthOptionalContext),
-					FixedCostPaymentDay.from(fixedCostPaymentDay),
-					FixedCostPaymentAmount.from(fixedCostPaymentAmount));
+					fixedCostCode, fixedCostName, fixedCostDetailContext, expenditureItemName, fixedCostTargetPaymentMonth,
+					fixedCostTargetPaymentMonthOptionalContext, fixedCostPaymentDay, paymentMethodCode, fixedCostPaymentAmount);
 		}
 	}
 
@@ -147,14 +147,14 @@ public class FixedCostInquiryList {
 	 * @return 指定した対象月の固定費支払金額合計
 	 *
 	 */
-	public FixedCostPaymentTotalAmount calculateMonthlyTotal(TargetYearMonth targetMonth) {
+	public FixedCostPaymentTotalAmount calculateMonthlyTotal(TargetMonth targetMonth) {
 		if (CollectionUtils.isEmpty(values)) {
 			return FixedCostPaymentTotalAmount.ZERO;
 		}
-		int monthValue = Integer.parseInt(targetMonth.getMonth());
+		int monthValue = targetMonth.intValue();
 		FixedCostPaymentTotalAmount total = FixedCostPaymentTotalAmount.ZERO;
 		for (FixedCostInquiryItem item : values) {
-			if (shouldAdd(item.getFixedCostTargetPaymentMonth().getValue(), monthValue)) {
+			if (item.getFixedCostTargetPaymentMonth().appliesToMonth(monthValue)) {
 				total = total.add(item.getFixedCostPaymentAmount());
 			}
 		}
@@ -170,44 +170,13 @@ public class FixedCostInquiryList {
 	 * @return 指定月に支払いが発生する固定費一覧（DB取得順を維持）
 	 *
 	 */
-	public List<FixedCostInquiryItem> getValuesForMonth(int monthValue) {
+	public List<FixedCostInquiryItem> getValuesForMonth(TargetMonth monthValue) {
 		if (CollectionUtils.isEmpty(values)) {
 			return Collections.emptyList();
 		}
 		return values.stream()
-				.filter(item -> shouldAdd(item.getFixedCostTargetPaymentMonth().getValue(), monthValue))
+				.filter(item -> item.getFixedCostTargetPaymentMonth().appliesToMonth(monthValue.intValue()))
 				.collect(Collectors.toList());
-	}
-
-	/**
-	 * 固定費支払月コードと対象月の値から、その月に支払いが発生するかどうかを返します。
-	 * 
-	 * @param shiharaiTukiCode 固定費支払月コード（"00"=毎月, "20"=奇数月, "30"=偶数月, "40"=任意, "01"〜"12"=特定月）
-	 * @param monthValue 対象月（1〜12）
-	 * @return 指定した月に支払いが発生する場合true、そうでない場合false
-	 */
-	private static boolean shouldAdd(String shiharaiTukiCode, int monthValue) {
-		
-		// 固定費支払月コードに応じて、対象月に支払いが発生するかどうかを判定
-		switch (shiharaiTukiCode) {
-		
-			// "00" 毎月 と "40" その他任意 は常に支払いが発生(trueを返す)
-			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_EVERY_SELECTED_VALUE:
-			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_OPTIONAL_SELECTED_VALUE:
-				return true;
-				
-			// "20" 奇数月
-			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_ODD_SELECTED_VALUE:
-				return monthValue % 2 == 1;
-				
-			// "30" 偶数月
-			case MyHouseholdAccountBookContent.SHIHARAI_TUKI_AN_EVEN_SELECTED_VALUE:
-				return monthValue % 2 == 0;
-				
-			// それ以外は "01"〜"12" の特定月指定と想定し、整数値に変換して比較
-			default:
-				return Integer.parseInt(shiharaiTukiCode) == monthValue;
-		}
 	}
 
 	/**
@@ -216,7 +185,7 @@ public class FixedCostInquiryList {
 	@Override
 	public String toString() {
 		if(values.size() > 0) {
-			StringBuilder buff = new StringBuilder((values.size() + 1) * 385);
+			StringBuilder buff = new StringBuilder((values.size() + 1) * 300);
 			buff.append("固定費一覧:")
 			.append(values.size())
 			.append("件:");

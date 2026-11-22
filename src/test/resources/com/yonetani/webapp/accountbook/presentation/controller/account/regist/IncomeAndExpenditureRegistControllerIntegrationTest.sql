@@ -132,24 +132,24 @@ INSERT INTO INCOME_TABLE (USER_ID, TARGET_YEAR, TARGET_MONTH, INCOME_CODE, INCOM
 -- 009: 電気代(0037) UPDATE 12000→15000, 010: ガス代(0038) DELETE
 -- 011: 交際費B(0056) NON_UPDATE, 012: 交際費B(0056) UPDATE増額 2000→4000
 -- 013: 趣味娯楽C(0057) UPDATE減額 1500→500, 014: 趣味娯楽C(0057) DELETE
-INSERT INTO EXPENDITURE_TABLE (USER_ID, TARGET_YEAR, TARGET_MONTH, EXPENDITURE_CODE, SISYUTU_ITEM_CODE, EVENT_CODE, EXPENDITURE_NAME, EXPENDITURE_KUBUN, EXPENDITURE_DETAIL_CONTEXT, SIHARAI_DATE, EXPENDITURE_ESTIMATE_KINGAKU, EXPENDITURE_KINGAKU, DELETE_FLG) VALUES
+INSERT INTO EXPENDITURE_TABLE (USER_ID, TARGET_YEAR, TARGET_MONTH, EXPENDITURE_CODE, SISYUTU_ITEM_CODE, EVENT_CODE, EXPENDITURE_NAME, EXPENDITURE_KUBUN, EXPENDITURE_DETAIL_CONTEXT, SIHARAI_DATE, EXPENDITURE_ESTIMATE_KINGAKU, EXPENDITURE_KINGAKU, PAYMENT_METHOD_CODE, DELETE_FLG) VALUES
 -- 必須8項目
-('user01', '2025', '11', '001', '0051', null, '飲食(無駄遣いなし)', '1', '飲食詳細', null, 10000.00, 10000.00, false),
-('user01', '2025', '11', '002', '0051', null, '飲食(無駄遣いB)', '2', '飲食B詳細', null, 2000.00, 2000.00, false),
-('user01', '2025', '11', '003', '0051', null, '飲食(無駄遣いC)', '3', '飲食C詳細', null, 1000.00, 1000.00, false),
-('user01', '2025', '11', '004', '0052', null, '一人プチ贅沢・外食', '1', '外食詳細', null, 5000.00, 5000.00, false),
-('user01', '2025', '11', '005', '0050', null, '日用消耗品', '1', '日用消耗品詳細', null, 3000.00, 3000.00, false),
-('user01', '2025', '11', '006', '0046', null, '被服費', '1', '被服費詳細', null, 5000.00, 5000.00, false),
-('user01', '2025', '11', '007', '0007', null, '流動経費', '1', '流動経費詳細', null, 10000.00, 10000.00, false),
-('user01', '2025', '11', '008', '0047', null, '住居設備', '1', '住居設備詳細', null, 2000.00, 2000.00, false),
+('user01', '2025', '11', '001', '0051', null, '飲食(無駄遣いなし)', '1', '飲食詳細', null, 10000.00, 10000.00, '001', false),
+('user01', '2025', '11', '002', '0051', null, '飲食(無駄遣いB)', '2', '飲食B詳細', null, 2000.00, 2000.00, '001', false),
+('user01', '2025', '11', '003', '0051', null, '飲食(無駄遣いC)', '3', '飲食C詳細', null, 1000.00, 1000.00, '001', false),
+('user01', '2025', '11', '004', '0052', null, '一人プチ贅沢・外食', '1', '外食詳細', null, 5000.00, 5000.00, '001', false),
+('user01', '2025', '11', '005', '0050', null, '日用消耗品', '1', '日用消耗品詳細', null, 3000.00, 3000.00, '001', false),
+('user01', '2025', '11', '006', '0046', null, '被服費', '1', '被服費詳細', null, 5000.00, 5000.00, '001', false),
+('user01', '2025', '11', '007', '0007', null, '流動経費', '1', '流動経費詳細', null, 10000.00, 10000.00, '001', false),
+('user01', '2025', '11', '008', '0047', null, '住居設備', '1', '住居設備詳細', null, 2000.00, 2000.00, '001', false),
 -- 更新・削除テスト用（水光熱通費）
-('user01', '2025', '11', '009', '0037', null, '電気代', '1', '電気代支払詳細', '2025-11-30', 12000.00, 12000.00, false),
-('user01', '2025', '11', '010', '0038', null, 'ガス代', '1', 'ガス代支払詳細', null, 10000.00, 10000.00, false),
+('user01', '2025', '11', '009', '0037', null, '電気代', '1', '電気代支払詳細', '2025-11-30', 12000.00, 12000.00, '001', false),
+('user01', '2025', '11', '010', '0038', null, 'ガス代', '1', 'ガス代支払詳細', null, 10000.00, 10000.00, '001', false),
 -- 無駄遣いB(kubun=2)/C(kubun=3)操作テスト用（趣味娯楽）
-('user01', '2025', '11', '011', '0056', null, '交際費B(NON_UPDATE)', '2', '交際費B詳細', null, 3000.00, 3000.00, false),
-('user01', '2025', '11', '012', '0056', null, '交際費B(UPDATE増額)', '2', '交際費B詳細', null, 2000.00, 2000.00, false),
-('user01', '2025', '11', '013', '0057', null, '趣味娯楽C(UPDATE減額)', '3', '趣味娯楽C詳細', null, 1500.00, 1500.00, false),
-('user01', '2025', '11', '014', '0057', null, '趣味娯楽C(DELETE)', '3', '趣味娯楽C詳細', null, 2000.00, 2000.00, false);
+('user01', '2025', '11', '011', '0056', null, '交際費B(NON_UPDATE)', '2', '交際費B詳細', null, 3000.00, 3000.00, '001', false),
+('user01', '2025', '11', '012', '0056', null, '交際費B(UPDATE増額)', '2', '交際費B詳細', null, 2000.00, 2000.00, '001', false),
+('user01', '2025', '11', '013', '0057', null, '趣味娯楽C(UPDATE減額)', '3', '趣味娯楽C詳細', null, 1500.00, 1500.00, '001', false),
+('user01', '2025', '11', '014', '0057', null, '趣味娯楽C(DELETE)', '3', '趣味娯楽C詳細', null, 2000.00, 2000.00, '001', false);
 
 -- ----------------------------------------
 -- 3.4 支出金額テーブル (202511)
@@ -205,5 +205,5 @@ INSERT INTO SISYUTU_KINGAKU_TABLE (USER_ID, TARGET_YEAR, TARGET_MONTH, SISYUTU_I
 -- ・FIXED_COST_SHIHARAI_TUKI='00'（毎月払い）のため、任意月の初期表示で検索対象となる
 -- ・SHIHARAI_KINGAKU=0.00 のため readInitInfo() で0円メッセージが出力される
 -- テスト対象: testPostInitLoad_ZeroAmountFixedCost_ShowsMessage（②のテスト）
-INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, SISYUTU_ITEM_CODE, FIXED_COST_KUBUN, FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT, FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU, DELETE_FLG) VALUES
-('user01', '0001', '家賃', '月額未定のため0円で登録', '0030', '1', '00', NULL, '27', 0.00, false);
+INSERT INTO FIXED_COST_TABLE (USER_ID, FIXED_COST_CODE, FIXED_COST_NAME, FIXED_COST_DETAIL_CONTEXT, SISYUTU_ITEM_CODE, FIXED_COST_KUBUN, FIXED_COST_SHIHARAI_TUKI, FIXED_COST_SHIHARAI_TUKI_OPTIONAL_CONTEXT, FIXED_COST_SHIHARAI_DAY, SHIHARAI_KINGAKU, PAYMENT_METHOD_CODE, DELETE_FLG) VALUES
+('user01', '0001', '家賃', '月額未定のため0円で登録', '0030', '1', '00', NULL, '27', 0.00, '001', false);

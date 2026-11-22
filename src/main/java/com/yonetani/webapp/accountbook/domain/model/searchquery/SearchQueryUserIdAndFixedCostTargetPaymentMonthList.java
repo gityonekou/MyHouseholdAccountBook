@@ -5,9 +5,9 @@
  *
  *------------------------------------------------
  * 更新履歴
- * 日付       : version  コメントなど
- * 2024/08/05 : 1.00.00  新規作成
- * 2026/04/05 : 1.01.00  クラス名をSearchQueryUserIdAndFixedCostShiharaiTukiListからSearchQueryUserIdAndFixedCostTargetPaymentMonthListにリネーム
+ * 日付       : version  ブランチ            コメントなど
+ * 2024/08/05 : 1.00.00                      新規作成
+ * 2026/04/05 : 1.01.00  feature-1.00-dev00  クラス名をSearchQueryUserIdAndFixedCostShiharaiTukiListからSearchQueryUserIdAndFixedCostTargetPaymentMonthListにリネーム
  *
  */
 package com.yonetani.webapp.accountbook.domain.model.searchquery;
