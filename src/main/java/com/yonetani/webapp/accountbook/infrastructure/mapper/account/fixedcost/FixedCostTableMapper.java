@@ -110,9 +110,10 @@ public interface FixedCostTableMapper {
 	/**
 	 *<pre>
 	 * 指定のユーザID、固定費支払月を条件に固定費テーブル:FIXED_COST_TABLEを参照します。
+	 * 支出項目テーブル:SISYUTU_ITEM_TABLEとJOINし、支出項目の表示順(SISYUTU_ITEM_SORT)でソートして返します。
 	 *</pre>
 	 * @param search 検索条件:ユーザID、固定費支払月のリスト(in条件に指定する固定費支払月)
-	 * @return 固定費情報参照結果のリスト
+	 * @return 固定費情報参照結果のリスト(支出項目の表示順)
 	 *
 	 */
 	@Select("sql/account/fixedcost/FixedCostTableListSelectSql01.sql")

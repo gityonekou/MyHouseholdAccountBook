@@ -11,6 +11,7 @@
  * 2026/08/18 : 1.02.00  feature-1.03-dev1   支払方法・銀行口座管理追加対応
  * 2026/11/01 : 1.02.01  feature-1.03-dev1   支払方法・銀行口座管理追加対応(支出一覧に支払方法名・引落先口座名を追加)
  * 2026/11/08 : 1.02.02  feature-1.03-dev1   セッション登録情報(ExpenditureRegistItem/IncomeRegistItem)のfrom()引数が値オブジェクト型になったことに伴うテストデータ生成処理の修正(型安全性対応。06_コーディング規約.md §8)
+ * 2026/11/22 : 1.02.03  feature-1.03-dev1   支出データの表示順修正対応
  *
  */
 package com.yonetani.webapp.accountbook.application.usecase.account.incomeandexpenditure;
@@ -200,7 +201,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 		assertNotNull(response.getExpenditureRegistItemList());
 		assertEquals(5, response.getExpenditureRegistItemList().size());
 
-		// Then: 支出情報の内容を検証（支払日順：00→20→25→31→40）
+		// Then: 支出情報の内容を検証（支出項目の表示順：家賃0030→電気代0037→ガス代0038→通信費0039→水道代0040）
 		//
 		// 【1番目】家賃 - FIXED_COST_SHIHARAI_TUKI='30'(偶数月), DAY='00'(月初め), KUBUN='1'
 		// 固定費名(FIXED_COST_NAME)の値「家賃」に「無駄遣いB」「無駄遣いC」のどちらも含まれない場合、支出区分は'1'：無駄遣いなしが設定される
@@ -219,75 +220,75 @@ class IncomeAndExpenditureInitIntegrationTest {
 		assertEquals(new BigDecimal("62000.00"), firstItem.getExpenditureKingaku()); // 支払金額
 		assertEquals(false, firstItem.isClearStartFlg()); // 0円開始設定フラグ
 
-		// 【2番目】水道代 - FIXED_COST_SHIHARAI_TUKI='10'(10月), DAY='20', KUBUN='2'
-		// 固定費名(FIXED_COST_NAME)の値「水道代」に「無駄遣いB」「無駄遣いC」のどちらも含まれない場合、支出区分は'1'：無駄遣いなしが設定される
-		// 固定費詳細(FIXED_COST_DETAIL_CONTEXT)の値に「無駄遣いB」が含まれているが、支出区分の判定はFIXED_COST_NAMEから行われるため、支出区分は'1'が設定される
-		// 固定費支払日(FIXED_COST_SHIHARAI_DAY)='20'の場合、支払日は'20'が設定される
+		// 【2番目】電気代(無駄遣いB) - FIXED_COST_SHIHARAI_TUKI='00'(毎月), DAY='31', KUBUN='2'
+		// 固定費名(FIXED_COST_NAME)の値「電気代(無駄遣いB)」に「無駄遣いB」が含まれる場合、支出区分は'2'：無駄遣い（軽度）が設定される
+		// 固定費支払日(FIXED_COST_SHIHARAI_DAY)='31'の場合、支払日は'31'が設定される
 		// 固定費区分(FIXED_COST_KUBUN)='2'の場合、0円開始設定フラグはtrueが設定される
 		var secondItem = response.getExpenditureRegistItemList().get(1);
 		assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, secondItem.getDataType()); // データタイプ設定値は常に'new'
 		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, secondItem.getAction()); // アクション設定値は常に'add'
 		assertEquals(17, secondItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
-		assertEquals("0040", secondItem.getExpenditureItemCode()); // 支出項目コード（水道代）
+		assertEquals("0037", secondItem.getExpenditureItemCode()); // 支出項目コード（電気代）
 		assertNull(secondItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
-		assertEquals("水道代", secondItem.getExpenditureName()); // 支出名
-		assertEquals("1", secondItem.getExpenditureCategory());  // 支出区分:'1'(無駄遣いなし)
-		assertEquals("水道代詳細(無駄遣いB)", secondItem.getExpenditureDetailContext()); // 支出詳細
-		assertEquals("20", secondItem.getSiharaiDate()); // 支払日：20→20
-		assertEquals(new BigDecimal("5000.00"), secondItem.getExpenditureKingaku()); // 支払金額
+		assertEquals("電気代(無駄遣いB)", secondItem.getExpenditureName()); // 支出名
+		assertEquals("2", secondItem.getExpenditureCategory());  // 支出区分:'2'(無駄遣い（軽度）)
+		assertEquals("電気代詳細", secondItem.getExpenditureDetailContext()); // 支出詳細
+		assertEquals("31", secondItem.getSiharaiDate()); // 支払日：31→31（10月は31日まで）
+		assertEquals(new BigDecimal("10000.00"), secondItem.getExpenditureKingaku()); // 支払金額
 		assertEquals(true, secondItem.isClearStartFlg()); // 0円開始設定フラグ
 
-		// 【3番目】通信費(無駄遣いB) - FIXED_COST_SHIHARAI_TUKI='40'(その他任意), DAY='25', KUBUN='1'
-		// 固定費名(FIXED_COST_NAME)の値「通信費(無駄遣いB)」に「無駄遣いB」が含まれる場合、支出区分は'2'：無駄遣い（軽度）が設定される
-		// 固定費支払日(FIXED_COST_SHIHARAI_DAY)='25'の場合、支払日は'25'が設定される
+		// 【3番目】ガス代(無駄遣いC) - FIXED_COST_SHIHARAI_TUKI='00'(毎月), DAY='40'(月末), KUBUN='1'
+		// 固定費名(FIXED_COST_NAME)の値「ガス代(無駄遣いC)」に「無駄遣いC」が含まれる場合、支出区分は'3'：無駄遣い（重度）が設定される
+		// 固定費支払日(FIXED_COST_SHIHARAI_DAY)='40'の場合、支払日は'31'が設定される
 		// 固定費区分(FIXED_COST_KUBUN)='1'の場合、0円開始設定フラグはfalseが設定される
+		// メモ：無駄遣いCとKUBUN='2'の組み合わせは11月固定費テストの「【3番目】ガス代(無駄遣いC)」のデータで確認
 		var thirdItem = response.getExpenditureRegistItemList().get(2);
 		assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, thirdItem.getDataType()); // データタイプ設定値は常に'new'
 		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, thirdItem.getAction()); // アクション設定値は常に'add'
 		assertEquals(17, thirdItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
-		assertEquals("0039", thirdItem.getExpenditureItemCode()); // 支出項目コード（通信費）
+		assertEquals("0038", thirdItem.getExpenditureItemCode()); // 支出項目コード（ガス代）
 		assertNull(thirdItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
-		assertEquals("通信費(無駄遣いB)", thirdItem.getExpenditureName()); // 支出名
-		assertEquals("2", thirdItem.getExpenditureCategory());  // 支出区分:'2'(無駄遣い（軽度）)
-		assertEquals("携帯電話・インターネット詳細", thirdItem.getExpenditureDetailContext()); // 支出詳細
-		assertEquals("25", thirdItem.getSiharaiDate()); // 支払日：25→25
-		assertEquals(new BigDecimal("7000.00"), thirdItem.getExpenditureKingaku()); // 支払金額
+		assertEquals("ガス代(無駄遣いC)", thirdItem.getExpenditureName()); // 支出名
+		assertEquals("3", thirdItem.getExpenditureCategory());  // 支出区分:'3'(無駄遣い（重度）)
+		assertEquals("ガス代詳細", thirdItem.getExpenditureDetailContext()); // 支出詳細
+		assertEquals("31", thirdItem.getSiharaiDate()); // 支払日：40→31（10月は31日まで）
+		assertEquals(new BigDecimal("8000.00"), thirdItem.getExpenditureKingaku()); // 支払金額
 		assertEquals(false, thirdItem.isClearStartFlg()); // 0円開始設定フラグ
 
-		// 【4番目】電気代(無駄遣いB) - FIXED_COST_SHIHARAI_TUKI='00'(毎月), DAY='31', KUBUN='2'
-		// 固定費名(FIXED_COST_NAME)の値「電気代(無駄遣いB)」に「無駄遣いB」が含まれる場合、支出区分は'2'：無駄遣い（軽度）が設定される
-		// 固定費支払日(FIXED_COST_SHIHARAI_DAY)='31'の場合、支払日は'31'が設定される
-		// 固定費区分(FIXED_COST_KUBUN)='2'の場合、0円開始設定フラグはtrueが設定される
+		// 【4番目】通信費(無駄遣いB) - FIXED_COST_SHIHARAI_TUKI='40'(その他任意), DAY='25', KUBUN='1'
+		// 固定費名(FIXED_COST_NAME)の値「通信費(無駄遣いB)」に「無駄遣いB」が含まれる場合、支出区分は'2'：無駄遣い（軽度）が設定される
+		// 固定費支払日(FIXED_COST_SHIHARAI_DAY)='25'の場合、支払日は'25'が設定される
+		// 固定費区分(FIXED_COST_KUBUN)='1'の場合、0円開始設定フラグはfalseが設定される
 		var fourthItem = response.getExpenditureRegistItemList().get(3);
 		assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, fourthItem.getDataType()); // データタイプ設定値は常に'new'
 		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, fourthItem.getAction()); // アクション設定値は常に'add'
 		assertEquals(17, fourthItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
-		assertEquals("0037", fourthItem.getExpenditureItemCode()); // 支出項目コード（電気代）
+		assertEquals("0039", fourthItem.getExpenditureItemCode()); // 支出項目コード（通信費）
 		assertNull(fourthItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
-		assertEquals("電気代(無駄遣いB)", fourthItem.getExpenditureName()); // 支出名
+		assertEquals("通信費(無駄遣いB)", fourthItem.getExpenditureName()); // 支出名
 		assertEquals("2", fourthItem.getExpenditureCategory());  // 支出区分:'2'(無駄遣い（軽度）)
-		assertEquals("電気代詳細", fourthItem.getExpenditureDetailContext()); // 支出詳細
-		assertEquals("31", fourthItem.getSiharaiDate()); // 支払日：31→31（10月は31日まで）
-		assertEquals(new BigDecimal("10000.00"), fourthItem.getExpenditureKingaku()); // 支払金額
-		assertEquals(true, fourthItem.isClearStartFlg()); // 0円開始設定フラグ
+		assertEquals("携帯電話・インターネット詳細", fourthItem.getExpenditureDetailContext()); // 支出詳細
+		assertEquals("25", fourthItem.getSiharaiDate()); // 支払日：25→25
+		assertEquals(new BigDecimal("7000.00"), fourthItem.getExpenditureKingaku()); // 支払金額
+		assertEquals(false, fourthItem.isClearStartFlg()); // 0円開始設定フラグ
 
-		// 【5番目】ガス代(無駄遣いC) - FIXED_COST_SHIHARAI_TUKI='00'(毎月), DAY='40'(月末), KUBUN='1'
-		// 固定費名(FIXED_COST_NAME)の値「ガス代(無駄遣いC)」に「無駄遣いC」が含まれる場合、支出区分は'3'：無駄遣い（重度）が設定される
-		// 固定費支払日(FIXED_COST_SHIHARAI_DAY)='40'の場合、支払日は'31'が設定される
-		// 固定費区分(FIXED_COST_KUBUN)='1'の場合、0円開始設定フラグはfalseが設定される
-		// メモ：無駄遣いCとKUBUN='2'の組み合わせは11月固定費テストの「【5番目】ガス代(無駄遣いC)」のデータで確認
+		// 【5番目】水道代 - FIXED_COST_SHIHARAI_TUKI='10'(10月), DAY='20', KUBUN='2'
+		// 固定費名(FIXED_COST_NAME)の値「水道代」に「無駄遣いB」「無駄遣いC」のどちらも含まれない場合、支出区分は'1'：無駄遣いなしが設定される
+		// 固定費詳細(FIXED_COST_DETAIL_CONTEXT)の値に「無駄遣いB」が含まれているが、支出区分の判定はFIXED_COST_NAMEから行われるため、支出区分は'1'が設定される
+		// 固定費支払日(FIXED_COST_SHIHARAI_DAY)='20'の場合、支払日は'20'が設定される
+		// 固定費区分(FIXED_COST_KUBUN)='2'の場合、0円開始設定フラグはtrueが設定される
 		var fifthItem = response.getExpenditureRegistItemList().get(4);
 		assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, fifthItem.getDataType()); // データタイプ設定値は常に'new'
 		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, fifthItem.getAction()); // アクション設定値は常に'add'
 		assertEquals(17, fifthItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
-		assertEquals("0038", fifthItem.getExpenditureItemCode()); // 支出項目コード（ガス代）
+		assertEquals("0040", fifthItem.getExpenditureItemCode()); // 支出項目コード（水道代）
 		assertNull(fifthItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
-		assertEquals("ガス代(無駄遣いC)", fifthItem.getExpenditureName()); // 支出名
-		assertEquals("3", fifthItem.getExpenditureCategory());  // 支出区分:'3'(無駄遣い（重度）)
-		assertEquals("ガス代詳細", fifthItem.getExpenditureDetailContext()); // 支出詳細
-		assertEquals("31", fifthItem.getSiharaiDate()); // 支払日：40→31（10月は31日まで）
-		assertEquals(new BigDecimal("8000.00"), fifthItem.getExpenditureKingaku()); // 支払金額
-		assertEquals(false, fifthItem.isClearStartFlg()); // 0円開始設定フラグ
+		assertEquals("水道代", fifthItem.getExpenditureName()); // 支出名
+		assertEquals("1", fifthItem.getExpenditureCategory());  // 支出区分:'1'(無駄遣いなし)
+		assertEquals("水道代詳細(無駄遣いB)", fifthItem.getExpenditureDetailContext()); // 支出詳細
+		assertEquals("20", fifthItem.getSiharaiDate()); // 支払日：20→20
+		assertEquals(new BigDecimal("5000.00"), fifthItem.getExpenditureKingaku()); // 支払金額
+		assertEquals(true, fifthItem.isClearStartFlg()); // 0円開始設定フラグ
 
 	}
 
@@ -300,7 +301,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 	 * ・収入情報フォームが新規追加の初期値（アクション=add、収入区分名=【新規追加】、各項目null）で設定されること
 	 * ・収入区分選択ボックスが正しく設定されること
 	 * ・新規登録時は収入一覧情報が空で収入金額合計がnullであること
-	 * ・支出一覧情報が5件表示されること（支払日順：01日/20日/25日/31日/31日）
+	 * ・支出一覧情報が5件表示されること（支出項目の表示順：家賃/電気代/ガス代/通信費/水道代）
 	 * ・支出区分='2'の場合、支出名の先頭に【無駄遣いB】が付加されること
 	 * ・支出区分='3'の場合、支出名の先頭に【無駄遣いC】が付加されること
 	 * ・支出金額合計が92,000円であること
@@ -349,7 +350,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 		// Then: 支出一覧情報（画面表示用）が5件生成されている
 		assertEquals(5, response.getExpenditureListInfo().size());
 
-		// Then: 支出一覧情報の内容を検証（支払日順で表示）
+		// Then: 支出一覧情報の内容を検証（支出項目の表示順：家賃→電気代→ガス代→通信費→水道代）
 		// 【1番目】家賃 - 支出区分='1'の場合、支出名はそのまま表示
 		var firstExpenditure = response.getExpenditureListInfo().get(0);
 		assertEquals("家賃", firstExpenditure.getSisyutuItemName()); // 支出項目名（SISYUTU_ITEM_CODE='0030'）
@@ -359,37 +360,37 @@ class IncomeAndExpenditureInitIntegrationTest {
 		assertEquals("01日", firstExpenditure.getSiharaiDate()); // 支払日
 		assertEquals("62,000円", firstExpenditure.getShiharaiKingaku()); // 支払金額
 
-		// 【2番目】水道代 - 支出区分='1'の場合、支出名はそのまま表示
+		// 【2番目】電気代(無駄遣いB) - 支出区分='2'の場合、支出名の先頭に【無駄遣いB】が付加される
 		var secondExpenditure = response.getExpenditureListInfo().get(1);
-		assertEquals("水道代", secondExpenditure.getSisyutuItemName()); // 支出項目名（SISYUTU_ITEM_CODE='0040'）
-		assertEquals("水道代", secondExpenditure.getExpenditureName()); // 支出名
-		assertEquals("水道代詳細(無駄遣いB)", secondExpenditure.getExpenditureDetailContext()); // 支出詳細
-		assertEquals("20日", secondExpenditure.getSiharaiDate()); // 支払日
-		assertEquals("5,000円", secondExpenditure.getShiharaiKingaku()); // 支払金額
+		assertEquals("電気代", secondExpenditure.getSisyutuItemName()); // 支出項目名（SISYUTU_ITEM_CODE='0037'）
+		assertEquals("【無駄遣いB】電気代(無駄遣いB)", secondExpenditure.getExpenditureName()); // 支出名（支出区分名が先頭に付加）
+		assertEquals("電気代詳細", secondExpenditure.getExpenditureDetailContext()); // 支出詳細
+		assertEquals("31日", secondExpenditure.getSiharaiDate()); // 支払日
+		assertEquals("10,000円", secondExpenditure.getShiharaiKingaku()); // 支払金額
 
-		// 【3番目】通信費(無駄遣いB) - 支出区分='2'の場合、支出名の先頭に【無駄遣いB】が付加される
+		// 【3番目】ガス代(無駄遣いC) - 支出区分='3'の場合、支出名の先頭に【無駄遣いC】が付加される
 		var thirdExpenditure = response.getExpenditureListInfo().get(2);
-		assertEquals("通信費", thirdExpenditure.getSisyutuItemName()); // 支出項目名（SISYUTU_ITEM_CODE='0039'）
-		assertEquals("【無駄遣いB】通信費(無駄遣いB)", thirdExpenditure.getExpenditureName()); // 支出名（支出区分名が先頭に付加）
-		assertEquals("携帯電話・インターネット詳細", thirdExpenditure.getExpenditureDetailContext()); // 支出詳細
-		assertEquals("25日", thirdExpenditure.getSiharaiDate()); // 支払日
-		assertEquals("7,000円", thirdExpenditure.getShiharaiKingaku()); // 支払金額
+		assertEquals("ガス代", thirdExpenditure.getSisyutuItemName()); // 支出項目名（SISYUTU_ITEM_CODE='0038'）
+		assertEquals("【無駄遣いC】ガス代(無駄遣いC)", thirdExpenditure.getExpenditureName()); // 支出名（支出区分名が先頭に付加）
+		assertEquals("ガス代詳細", thirdExpenditure.getExpenditureDetailContext()); // 支出詳細
+		assertEquals("31日", thirdExpenditure.getSiharaiDate()); // 支払日
+		assertEquals("8,000円", thirdExpenditure.getShiharaiKingaku()); // 支払金額
 
-		// 【4番目】電気代(無駄遣いB) - 支出区分='2'の場合、支出名の先頭に【無駄遣いB】が付加される
+		// 【4番目】通信費(無駄遣いB) - 支出区分='2'の場合、支出名の先頭に【無駄遣いB】が付加される
 		var fourthExpenditure = response.getExpenditureListInfo().get(3);
-		assertEquals("電気代", fourthExpenditure.getSisyutuItemName()); // 支出項目名（SISYUTU_ITEM_CODE='0037'）
-		assertEquals("【無駄遣いB】電気代(無駄遣いB)", fourthExpenditure.getExpenditureName()); // 支出名（支出区分名が先頭に付加）
-		assertEquals("電気代詳細", fourthExpenditure.getExpenditureDetailContext()); // 支出詳細
-		assertEquals("31日", fourthExpenditure.getSiharaiDate()); // 支払日
-		assertEquals("10,000円", fourthExpenditure.getShiharaiKingaku()); // 支払金額
+		assertEquals("通信費", fourthExpenditure.getSisyutuItemName()); // 支出項目名（SISYUTU_ITEM_CODE='0039'）
+		assertEquals("【無駄遣いB】通信費(無駄遣いB)", fourthExpenditure.getExpenditureName()); // 支出名（支出区分名が先頭に付加）
+		assertEquals("携帯電話・インターネット詳細", fourthExpenditure.getExpenditureDetailContext()); // 支出詳細
+		assertEquals("25日", fourthExpenditure.getSiharaiDate()); // 支払日
+		assertEquals("7,000円", fourthExpenditure.getShiharaiKingaku()); // 支払金額
 
-		// 【5番目】ガス代(無駄遣いC) - 支出区分='3'の場合、支出名の先頭に【無駄遣いC】が付加される
+		// 【5番目】水道代 - 支出区分='1'の場合、支出名はそのまま表示
 		var fifthExpenditure = response.getExpenditureListInfo().get(4);
-		assertEquals("ガス代", fifthExpenditure.getSisyutuItemName()); // 支出項目名（SISYUTU_ITEM_CODE='0038'）
-		assertEquals("【無駄遣いC】ガス代(無駄遣いC)", fifthExpenditure.getExpenditureName()); // 支出名（支出区分名が先頭に付加）
-		assertEquals("ガス代詳細", fifthExpenditure.getExpenditureDetailContext()); // 支出詳細
-		assertEquals("31日", fifthExpenditure.getSiharaiDate()); // 支払日
-		assertEquals("8,000円", fifthExpenditure.getShiharaiKingaku()); // 支払金額
+		assertEquals("水道代", fifthExpenditure.getSisyutuItemName()); // 支出項目名（SISYUTU_ITEM_CODE='0040'）
+		assertEquals("水道代", fifthExpenditure.getExpenditureName()); // 支出名
+		assertEquals("水道代詳細(無駄遣いB)", fifthExpenditure.getExpenditureDetailContext()); // 支出詳細
+		assertEquals("20日", fifthExpenditure.getSiharaiDate()); // 支払日
+		assertEquals("5,000円", fifthExpenditure.getShiharaiKingaku()); // 支払金額
 
 		// Then: 支出金額合計が正しく計算されている
 		// 62,000 + 5,000 + 7,000 + 10,000 + 8,000 = 92,000
@@ -438,7 +439,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 		assertNotNull(response.getExpenditureRegistItemList());
 		assertEquals(5, response.getExpenditureRegistItemList().size());
 
-		// Then: 支出情報の内容を検証（支払日順：00→20→25→31→40）
+		// Then: 支出情報の内容を検証（支出項目の表示順：家賃0030→電気代0037→ガス代0038→通信費0039→水道代0040）
 		//
 		// 【1番目】家賃 - FIXED_COST_SHIHARAI_TUKI='20'(奇数月), DAY='00'(月初め), KUBUN='1'
 		// 固定費名(FIXED_COST_NAME)の値「家賃」に「無駄遣いB」「無駄遣いC」のどちらも含まれない場合、支出区分は'1'：無駄遣いなしが設定される
@@ -457,78 +458,78 @@ class IncomeAndExpenditureInitIntegrationTest {
 		assertEquals(new BigDecimal("62000.00"), firstItem.getExpenditureKingaku()); // 支払金額
 		assertEquals(false, firstItem.isClearStartFlg()); // 0円開始設定フラグ
 
-		// 【2番目】水道代 - FIXED_COST_SHIHARAI_TUKI='11'(11月), DAY='20', KUBUN='1'
-		// 固定費名(FIXED_COST_NAME)の値「水道代」に「無駄遣いB」「無駄遣いC」のどちらも含まれない場合、支出区分は'1'：無駄遣いなしが設定される
-		// 固定費詳細(FIXED_COST_DETAIL_CONTEXT)の値に「無駄遣いC」が含まれているが、支出区分の判定はFIXED_COST_NAMEから行われるため、支出区分は'1'が設定される
-		// 固定費支払日(FIXED_COST_SHIHARAI_DAY)='20'の場合、支払日は'20'が設定される
-		// 固定費区分(FIXED_COST_KUBUN)='1'の場合、0円開始設定フラグはfalseが設定される
-		var secondItem = response.getExpenditureRegistItemList().get(1);
-		assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, secondItem.getDataType()); // データタイプ設定値は常に'new'
-		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, secondItem.getAction()); // アクション設定値は常に'add'
-		assertEquals(17, secondItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
-		assertEquals("0040", secondItem.getExpenditureItemCode()); // 支出項目コード（水道代）
-		assertNull(secondItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
-		assertEquals("水道代", secondItem.getExpenditureName()); // 支出名
-		assertEquals("1", secondItem.getExpenditureCategory());  // 支出区分:'1'(無駄遣いなし) ※FIXED_COST_NAMEで判定
-		assertEquals("水道代詳細(無駄遣いC)", secondItem.getExpenditureDetailContext()); // 支出詳細
-		assertEquals("20", secondItem.getSiharaiDate()); // 支払日：20→20
-		assertEquals(new BigDecimal("5000.00"), secondItem.getExpenditureKingaku()); // 支払金額
-		assertEquals(false, secondItem.isClearStartFlg()); // 0円開始設定フラグ
-
-		// 【3番目】通信費(無駄遣いB) - FIXED_COST_SHIHARAI_TUKI='40'(その他任意), DAY='25', KUBUN='1'
-		// 固定費名(FIXED_COST_NAME)の値「通信費(無駄遣いB)」に「無駄遣いB」が含まれる場合、支出区分は'2'：無駄遣い（軽度）が設定される
-		// 固定費支払日(FIXED_COST_SHIHARAI_DAY)='25'の場合、支払日は'25'が設定される
-		// 固定費区分(FIXED_COST_KUBUN)='1'の場合、0円開始設定フラグはfalseが設定される
-		// メモ：無駄遣いBとKUBUN='2'の組み合わせは10月固定費テストの「【4番目】電気代(無駄遣いB)」のデータで確認
-		// 支出詳細：パターン4（DETAIL_CONTEXT=値あり, OPTIONAL_CONTEXT=値あり）→ "詳細値/任意詳細値"
-		var thirdItem = response.getExpenditureRegistItemList().get(2);
-		assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, thirdItem.getDataType()); // データタイプ設定値は常に'new'
-		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, thirdItem.getAction()); // アクション設定値は常に'add'
-		assertEquals(17, thirdItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
-		assertEquals("0039", thirdItem.getExpenditureItemCode()); // 支出項目コード（通信費）
-		assertNull(thirdItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
-		assertEquals("通信費(無駄遣いB)", thirdItem.getExpenditureName()); // 支出名
-		assertEquals("2", thirdItem.getExpenditureCategory());  // 支出区分:'2'(無駄遣い（軽度）)
-		assertEquals("携帯電話・インターネット詳細/11月通信費追加詳細", thirdItem.getExpenditureDetailContext()); // 支出詳細：パターン4
-		assertEquals("25", thirdItem.getSiharaiDate()); // 支払日：25→25
-		assertEquals(new BigDecimal("7000.00"), thirdItem.getExpenditureKingaku()); // 支払金額
-		assertEquals(false, thirdItem.isClearStartFlg()); // 0円開始設定フラグ
-
-		// 【4番目】電気代(無駄遣いC) - FIXED_COST_SHIHARAI_TUKI='00'(毎月), DAY='31', KUBUN='1'
+		// 【2番目】電気代(無駄遣いC) - FIXED_COST_SHIHARAI_TUKI='00'(毎月), DAY='31', KUBUN='1'
 		// 固定費名(FIXED_COST_NAME)の値「電気代(無駄遣いC)」に「無駄遣いC」が含まれる場合、支出区分は'3'：無駄遣い（重度）が設定される
 		// 固定費支払日(FIXED_COST_SHIHARAI_DAY)='31'の場合、支払日は'30'が設定される（11月は30日まで）
 		// 固定費区分(FIXED_COST_KUBUN)='1'の場合、0円開始設定フラグはfalseが設定される
 		// 支出詳細：パターン3（DETAIL_CONTEXT=null, OPTIONAL_CONTEXT=値あり）→ "任意詳細値"
-		var fourthItem = response.getExpenditureRegistItemList().get(3);
-		assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, fourthItem.getDataType()); // データタイプ設定値は常に'new'
-		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, fourthItem.getAction()); // アクション設定値は常に'add'
-		assertEquals(17, fourthItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
-		assertEquals("0037", fourthItem.getExpenditureItemCode()); // 支出項目コード（電気代）
-		assertNull(fourthItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
-		assertEquals("電気代(無駄遣いC)", fourthItem.getExpenditureName()); // 支出名
-		assertEquals("3", fourthItem.getExpenditureCategory());  // 支出区分:'3'(無駄遣い（重度）)
-		assertEquals("11月電気代任意詳細", fourthItem.getExpenditureDetailContext()); // 支出詳細：パターン3
-		assertEquals("30", fourthItem.getSiharaiDate()); // 支払日：31→30（11月は30日まで）
-		assertEquals(new BigDecimal("10000.00"), fourthItem.getExpenditureKingaku()); // 支払金額
-		assertEquals(false, fourthItem.isClearStartFlg()); // 0円開始設定フラグ
+		var secondItem = response.getExpenditureRegistItemList().get(1);
+		assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, secondItem.getDataType()); // データタイプ設定値は常に'new'
+		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, secondItem.getAction()); // アクション設定値は常に'add'
+		assertEquals(17, secondItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
+		assertEquals("0037", secondItem.getExpenditureItemCode()); // 支出項目コード（電気代）
+		assertNull(secondItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
+		assertEquals("電気代(無駄遣いC)", secondItem.getExpenditureName()); // 支出名
+		assertEquals("3", secondItem.getExpenditureCategory());  // 支出区分:'3'(無駄遣い（重度）)
+		assertEquals("11月電気代任意詳細", secondItem.getExpenditureDetailContext()); // 支出詳細：パターン3
+		assertEquals("30", secondItem.getSiharaiDate()); // 支払日：31→30（11月は30日まで）
+		assertEquals(new BigDecimal("10000.00"), secondItem.getExpenditureKingaku()); // 支払金額
+		assertEquals(false, secondItem.isClearStartFlg()); // 0円開始設定フラグ
 
-		// 【5番目】ガス代(無駄遣いC) - FIXED_COST_SHIHARAI_TUKI='00'(毎月), DAY='40'(月末), KUBUN='2'
+		// 【3番目】ガス代(無駄遣いC) - FIXED_COST_SHIHARAI_TUKI='00'(毎月), DAY='40'(月末), KUBUN='2'
 		// 固定費名(FIXED_COST_NAME)の値「ガス代(無駄遣いC)」に「無駄遣いC」が含まれる場合、支出区分は'3'：無駄遣い（重度）が設定される
 		// 固定費支払日(FIXED_COST_SHIHARAI_DAY)='40'の場合、支払日は'30'が設定される（11月は30日まで）
 		// 固定費区分(FIXED_COST_KUBUN)='2'の場合、0円開始設定フラグはtrueが設定される
 		// 支出詳細：パターン1（DETAIL_CONTEXT=null, OPTIONAL_CONTEXT=null）→ ""
+		var thirdItem = response.getExpenditureRegistItemList().get(2);
+		assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, thirdItem.getDataType()); // データタイプ設定値は常に'new'
+		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, thirdItem.getAction()); // アクション設定値は常に'add'
+		assertEquals(17, thirdItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
+		assertEquals("0038", thirdItem.getExpenditureItemCode()); // 支出項目コード（ガス代）
+		assertNull(thirdItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
+		assertEquals("ガス代(無駄遣いC)", thirdItem.getExpenditureName()); // 支出名
+		assertEquals("3", thirdItem.getExpenditureCategory());  // 支出区分:'3'(無駄遣い（重度）)
+		assertEquals("", thirdItem.getExpenditureDetailContext()); // 支出詳細：パターン1（両方NULL→空文字）
+		assertEquals("30", thirdItem.getSiharaiDate()); // 支払日：40→30（11月は30日まで）
+		assertEquals(new BigDecimal("8000.00"), thirdItem.getExpenditureKingaku()); // 支払金額
+		assertEquals(true, thirdItem.isClearStartFlg()); // 0円開始設定フラグ
+
+		// 【4番目】通信費(無駄遣いB) - FIXED_COST_SHIHARAI_TUKI='40'(その他任意), DAY='25', KUBUN='1'
+		// 固定費名(FIXED_COST_NAME)の値「通信費(無駄遣いB)」に「無駄遣いB」が含まれる場合、支出区分は'2'：無駄遣い（軽度）が設定される
+		// 固定費支払日(FIXED_COST_SHIHARAI_DAY)='25'の場合、支払日は'25'が設定される
+		// 固定費区分(FIXED_COST_KUBUN)='1'の場合、0円開始設定フラグはfalseが設定される
+		// メモ：無駄遣いBとKUBUN='2'の組み合わせは10月固定費テストの「【2番目】電気代(無駄遣いB)」のデータで確認
+		// 支出詳細：パターン4（DETAIL_CONTEXT=値あり, OPTIONAL_CONTEXT=値あり）→ "詳細値/任意詳細値"
+		var fourthItem = response.getExpenditureRegistItemList().get(3);
+		assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, fourthItem.getDataType()); // データタイプ設定値は常に'new'
+		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, fourthItem.getAction()); // アクション設定値は常に'add'
+		assertEquals(17, fourthItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
+		assertEquals("0039", fourthItem.getExpenditureItemCode()); // 支出項目コード（通信費）
+		assertNull(fourthItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
+		assertEquals("通信費(無駄遣いB)", fourthItem.getExpenditureName()); // 支出名
+		assertEquals("2", fourthItem.getExpenditureCategory());  // 支出区分:'2'(無駄遣い（軽度）)
+		assertEquals("携帯電話・インターネット詳細/11月通信費追加詳細", fourthItem.getExpenditureDetailContext()); // 支出詳細：パターン4
+		assertEquals("25", fourthItem.getSiharaiDate()); // 支払日：25→25
+		assertEquals(new BigDecimal("7000.00"), fourthItem.getExpenditureKingaku()); // 支払金額
+		assertEquals(false, fourthItem.isClearStartFlg()); // 0円開始設定フラグ
+
+		// 【5番目】水道代 - FIXED_COST_SHIHARAI_TUKI='11'(11月), DAY='20', KUBUN='1'
+		// 固定費名(FIXED_COST_NAME)の値「水道代」に「無駄遣いB」「無駄遣いC」のどちらも含まれない場合、支出区分は'1'：無駄遣いなしが設定される
+		// 固定費詳細(FIXED_COST_DETAIL_CONTEXT)の値に「無駄遣いC」が含まれているが、支出区分の判定はFIXED_COST_NAMEから行われるため、支出区分は'1'が設定される
+		// 固定費支払日(FIXED_COST_SHIHARAI_DAY)='20'の場合、支払日は'20'が設定される
+		// 固定費区分(FIXED_COST_KUBUN)='1'の場合、0円開始設定フラグはfalseが設定される
 		var fifthItem = response.getExpenditureRegistItemList().get(4);
 		assertEquals(MyHouseholdAccountBookContent.DATA_TYPE_NEW, fifthItem.getDataType()); // データタイプ設定値は常に'new'
 		assertEquals(MyHouseholdAccountBookContent.ACTION_TYPE_ADD, fifthItem.getAction()); // アクション設定値は常に'add'
 		assertEquals(17, fifthItem.getExpenditureCode().length());  // 支出コード(仮登録値なので長さのみ確認)
-		assertEquals("0038", fifthItem.getExpenditureItemCode()); // 支出項目コード（ガス代）
+		assertEquals("0040", fifthItem.getExpenditureItemCode()); // 支出項目コード（水道代）
 		assertNull(fifthItem.getEventCode());  // イベントコード設定値は常にnull(未設定。ExpenditureEventCodeがNullableIdentifierを継承しているため)
-		assertEquals("ガス代(無駄遣いC)", fifthItem.getExpenditureName()); // 支出名
-		assertEquals("3", fifthItem.getExpenditureCategory());  // 支出区分:'3'(無駄遣い（重度）)
-		assertEquals("", fifthItem.getExpenditureDetailContext()); // 支出詳細：パターン1（両方NULL→空文字）
-		assertEquals("30", fifthItem.getSiharaiDate()); // 支払日：40→30（11月は30日まで）
-		assertEquals(new BigDecimal("8000.00"), fifthItem.getExpenditureKingaku()); // 支払金額
-		assertEquals(true, fifthItem.isClearStartFlg()); // 0円開始設定フラグ
+		assertEquals("水道代", fifthItem.getExpenditureName()); // 支出名
+		assertEquals("1", fifthItem.getExpenditureCategory());  // 支出区分:'1'(無駄遣いなし) ※FIXED_COST_NAMEで判定
+		assertEquals("水道代詳細(無駄遣いC)", fifthItem.getExpenditureDetailContext()); // 支出詳細
+		assertEquals("20", fifthItem.getSiharaiDate()); // 支払日：20→20
+		assertEquals(new BigDecimal("5000.00"), fifthItem.getExpenditureKingaku()); // 支払金額
+		assertEquals(false, fifthItem.isClearStartFlg()); // 0円開始設定フラグ
 	}
 
 	/**
@@ -539,7 +540,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 	 * ・画面表示用年月（2025年11月）が正しく設定されること
 	 * ・収入情報フォームが新規追加の初期値で設定されること
 	 * ・収入区分選択ボックスが正しく設定されること
-	 * ・支出一覧情報が5件表示されること（支払日順：01日/20日/25日/30日/30日）
+	 * ・支出一覧情報が5件表示されること（支出項目の表示順：家賃/電気代/ガス代/通信費/水道代）
 	 * ・支出区分='2'の場合、支出名の先頭に【無駄遣いB】が付加されること
 	 * ・支出区分='3'の場合、支出名の先頭に【無駄遣いC】が付加されること
 	 * ・支出詳細が各パターン（パターン1～4）に応じて正しく表示されること
@@ -589,7 +590,7 @@ class IncomeAndExpenditureInitIntegrationTest {
 		// Then: 支出一覧情報（画面表示用）が5件生成されている
 		assertEquals(5, response.getExpenditureListInfo().size());
 
-		// Then: 支出一覧情報の内容を検証（支払日順で表示）
+		// Then: 支出一覧情報の内容を検証（支出項目の表示順：家賃→電気代→ガス代→通信費→水道代）
 		// 【1番目】家賃 - 支出区分='1'の場合、支出名はそのまま表示
 		var firstExpenditure = response.getExpenditureListInfo().get(0);
 		assertEquals("家賃", firstExpenditure.getSisyutuItemName()); // 支出項目名（SISYUTU_ITEM_CODE='0030'）
@@ -599,40 +600,40 @@ class IncomeAndExpenditureInitIntegrationTest {
 		assertEquals("01日", firstExpenditure.getSiharaiDate()); // 支払日
 		assertEquals("62,000円", firstExpenditure.getShiharaiKingaku()); // 支払金額
 
-		// 【2番目】水道代 - 支出区分='1'の場合、支出名はそのまま表示
-		var secondExpenditure = response.getExpenditureListInfo().get(1);
-		assertEquals("水道代", secondExpenditure.getSisyutuItemName()); // 支出項目名（SISYUTU_ITEM_CODE='0040'）
-		assertEquals("水道代", secondExpenditure.getExpenditureName()); // 支出名
-		assertEquals("水道代詳細(無駄遣いC)", secondExpenditure.getExpenditureDetailContext()); // 支出詳細
-		assertEquals("20日", secondExpenditure.getSiharaiDate()); // 支払日
-		assertEquals("5,000円", secondExpenditure.getShiharaiKingaku()); // 支払金額
-
-		// 【3番目】通信費(無駄遣いB) - 支出区分='2'の場合、支出名の先頭に【無駄遣いB】が付加される
-		// 支出詳細：パターン4（DETAIL_CONTEXT=値あり, OPTIONAL_CONTEXT=値あり）→ "詳細値/任意詳細値"
-		var thirdExpenditure = response.getExpenditureListInfo().get(2);
-		assertEquals("通信費", thirdExpenditure.getSisyutuItemName()); // 支出項目名（SISYUTU_ITEM_CODE='0039'）
-		assertEquals("【無駄遣いB】通信費(無駄遣いB)", thirdExpenditure.getExpenditureName()); // 支出名（支出区分名が先頭に付加）
-		assertEquals("携帯電話・インターネット詳細/11月通信費追加詳細", thirdExpenditure.getExpenditureDetailContext()); // 支出詳細：パターン4
-		assertEquals("25日", thirdExpenditure.getSiharaiDate()); // 支払日
-		assertEquals("7,000円", thirdExpenditure.getShiharaiKingaku()); // 支払金額
-
-		// 【4番目】電気代(無駄遣いC) - 支出区分='3'の場合、支出名の先頭に【無駄遣いC】が付加される
+		// 【2番目】電気代(無駄遣いC) - 支出区分='3'の場合、支出名の先頭に【無駄遣いC】が付加される
 		// 支出詳細：パターン3（DETAIL_CONTEXT=null, OPTIONAL_CONTEXT=値あり）→ "任意詳細値"
-		var fourthExpenditure = response.getExpenditureListInfo().get(3);
-		assertEquals("電気代", fourthExpenditure.getSisyutuItemName()); // 支出項目名（SISYUTU_ITEM_CODE='0037'）
-		assertEquals("【無駄遣いC】電気代(無駄遣いC)", fourthExpenditure.getExpenditureName()); // 支出名（支出区分名が先頭に付加）
-		assertEquals("11月電気代任意詳細", fourthExpenditure.getExpenditureDetailContext()); // 支出詳細：パターン3
-		assertEquals("30日", fourthExpenditure.getSiharaiDate()); // 支払日（11月は30日まで）
-		assertEquals("10,000円", fourthExpenditure.getShiharaiKingaku()); // 支払金額
+		var secondExpenditure = response.getExpenditureListInfo().get(1);
+		assertEquals("電気代", secondExpenditure.getSisyutuItemName()); // 支出項目名（SISYUTU_ITEM_CODE='0037'）
+		assertEquals("【無駄遣いC】電気代(無駄遣いC)", secondExpenditure.getExpenditureName()); // 支出名（支出区分名が先頭に付加）
+		assertEquals("11月電気代任意詳細", secondExpenditure.getExpenditureDetailContext()); // 支出詳細：パターン3
+		assertEquals("30日", secondExpenditure.getSiharaiDate()); // 支払日（11月は30日まで）
+		assertEquals("10,000円", secondExpenditure.getShiharaiKingaku()); // 支払金額
 
-		// 【5番目】ガス代(無駄遣いC) - 支出区分='3'の場合、支出名の先頭に【無駄遣いC】が付加される
+		// 【3番目】ガス代(無駄遣いC) - 支出区分='3'の場合、支出名の先頭に【無駄遣いC】が付加される
 		// 支出詳細：パターン1（DETAIL_CONTEXT=null, OPTIONAL_CONTEXT=null）→ ""
+		var thirdExpenditure = response.getExpenditureListInfo().get(2);
+		assertEquals("ガス代", thirdExpenditure.getSisyutuItemName()); // 支出項目名（SISYUTU_ITEM_CODE='0038'）
+		assertEquals("【無駄遣いC】ガス代(無駄遣いC)", thirdExpenditure.getExpenditureName()); // 支出名（支出区分名が先頭に付加）
+		assertEquals("", thirdExpenditure.getExpenditureDetailContext()); // 支出詳細：パターン1（両方NULL→空文字）
+		assertEquals("30日", thirdExpenditure.getSiharaiDate()); // 支払日（11月は30日まで）
+		assertEquals("8,000円", thirdExpenditure.getShiharaiKingaku()); // 支払金額
+
+		// 【4番目】通信費(無駄遣いB) - 支出区分='2'の場合、支出名の先頭に【無駄遣いB】が付加される
+		// 支出詳細：パターン4（DETAIL_CONTEXT=値あり, OPTIONAL_CONTEXT=値あり）→ "詳細値/任意詳細値"
+		var fourthExpenditure = response.getExpenditureListInfo().get(3);
+		assertEquals("通信費", fourthExpenditure.getSisyutuItemName()); // 支出項目名（SISYUTU_ITEM_CODE='0039'）
+		assertEquals("【無駄遣いB】通信費(無駄遣いB)", fourthExpenditure.getExpenditureName()); // 支出名（支出区分名が先頭に付加）
+		assertEquals("携帯電話・インターネット詳細/11月通信費追加詳細", fourthExpenditure.getExpenditureDetailContext()); // 支出詳細：パターン4
+		assertEquals("25日", fourthExpenditure.getSiharaiDate()); // 支払日
+		assertEquals("7,000円", fourthExpenditure.getShiharaiKingaku()); // 支払金額
+
+		// 【5番目】水道代 - 支出区分='1'の場合、支出名はそのまま表示
 		var fifthExpenditure = response.getExpenditureListInfo().get(4);
-		assertEquals("ガス代", fifthExpenditure.getSisyutuItemName()); // 支出項目名（SISYUTU_ITEM_CODE='0038'）
-		assertEquals("【無駄遣いC】ガス代(無駄遣いC)", fifthExpenditure.getExpenditureName()); // 支出名（支出区分名が先頭に付加）
-		assertEquals("", fifthExpenditure.getExpenditureDetailContext()); // 支出詳細：パターン1（両方NULL→空文字）
-		assertEquals("30日", fifthExpenditure.getSiharaiDate()); // 支払日（11月は30日まで）
-		assertEquals("8,000円", fifthExpenditure.getShiharaiKingaku()); // 支払金額
+		assertEquals("水道代", fifthExpenditure.getSisyutuItemName()); // 支出項目名（SISYUTU_ITEM_CODE='0040'）
+		assertEquals("水道代", fifthExpenditure.getExpenditureName()); // 支出名
+		assertEquals("水道代詳細(無駄遣いC)", fifthExpenditure.getExpenditureDetailContext()); // 支出詳細
+		assertEquals("20日", fifthExpenditure.getSiharaiDate()); // 支払日
+		assertEquals("5,000円", fifthExpenditure.getShiharaiKingaku()); // 支払金額
 
 		// Then: 支出金額合計が正しく計算されている
 		// 62,000 + 5,000 + 7,000 + 10,000 + 8,000 = 92,000
