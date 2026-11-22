@@ -105,15 +105,14 @@
 				<div class="card">
 					<div class="card-body">
 						<p class="h6">■支出登録エリア■</p>
-						<!-- 支払方法・引落先口座列(紙芝居MonthEndClosingProcess_1.htmlの■支出登録エリア■に合わせたヘッダ行・列構成) -->
+						<!-- 支払方法列(紙芝居MonthEndClosingProcess_1.htmlの■支出登録エリア■に合わせたヘッダ行・列構成。引落先口座列は廃止済み) -->
 						<table class="table table-sm table-bordered">
 							<thead>
 								<tr class="table-secondary">
 									<th scope="col" class="w20">支出名(区分)</th>
 									<th scope="col" class="w5">支払日</th>
-									<th scope="col" class="w10">支払方法</th>
+									<th scope="col" class="w25">支払方法</th>
 									<th scope="col" class="w10" style="vertical-align:middle; text-align:center;">支出金額</th>
-									<th scope="col" class="w10">引落先口座</th>
 									<th scope="col" class="w5">&emsp;</th>
 									<th scope="col">支出詳細</th>
 								</tr>
@@ -123,9 +122,8 @@
 									<tr th:class="${itemStat.odd} ? 'table-warning' : ''">
 										<td class="w20" th:text="${item.expenditureName}">支出名と支出区分</td>
 										<td class="w5" th:text="${item.siharaiDate}">支払日</td>
-										<td class="w10" th:text="${item.paymentMethodName}">支払方法</td>
+										<td class="w25" th:text="${item.paymentMethodName}">支払方法</td>
 										<td class="w10" th:text="${item.shiharaiKingaku}" align="right">支出金額</td>
-										<td class="w10" th:text="${item.bankAccountName}">引落先口座</td>
 										<td class="w5" align="center"><a class="btn text-bg-success btn-sm" th:href="@{/myhacbook/accountregist/incomeandexpenditure/expenditureupdateselect(expenditureCode=${item.expenditureCode})}">訂正</a></td>
 										<td th:text="${item.expenditureDetailContext}">支出詳細</td>
 									</tr>
